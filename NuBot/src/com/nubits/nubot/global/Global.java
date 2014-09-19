@@ -29,7 +29,7 @@ import java.util.Properties;
  */
 public class Global {
 
-    public static Properties settings = new Properties();
+    public static Properties settings;
     public static boolean running = false;
     public static Exchange exchange;
     public static boolean startupComplete = false;

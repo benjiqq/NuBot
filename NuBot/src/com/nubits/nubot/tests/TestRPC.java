@@ -20,7 +20,6 @@ package com.nubits.nubot.tests;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -100,8 +99,8 @@ public class TestRPC {
         }
         LOG.setLevel(Level.FINE);
 
-        System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);
+        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
+        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
 
         Global.publicAddress = Passwords.CUSTODIA_PUBLIC_ADDRESS;
 

@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,9 +17,12 @@
  */
 package com.nubits.nubot.utils;
 
+import com.nubits.nubot.global.Global;
+import com.nubits.nubot.launch.NuBot;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -31,6 +34,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Properties;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -208,5 +212,34 @@ public class Utils {
             toRet = (Double) obj;
         }
         return toRet;
+    }
+
+    public static Properties loadProperties(String filename) {
+        Global.settings = new Properties();
+        InputStream input = null;
+
+        try {
+
+            input = NuBot.class.getClassLoader().getResourceAsStream(filename);
+
+            if (input == null) {
+                LOG.severe("Sorry, unable to find " + filename);
+                System.exit(0);
+            }
+
+            //load a properties file from class path, inside static method
+            Global.settings.load(input);
+        } catch (IOException ex) {
+            LOG.severe(ex.getMessage());
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    LOG.severe(e.getMessage());
+                }
+            }
+        }
+        return null;
     }
 }

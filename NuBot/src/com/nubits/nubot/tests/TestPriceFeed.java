@@ -18,7 +18,7 @@
 package com.nubits.nubot.tests;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeed.AbstractPriceFeed;
@@ -61,8 +61,8 @@ public class TestPriceFeed {
         feed = new BitcoinaveragePriceFeed();
 
         LOG.info("Set up SSL certificates");
-        System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);
+        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
+        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
 
     }
 

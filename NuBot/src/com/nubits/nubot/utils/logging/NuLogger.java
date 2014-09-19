@@ -21,7 +21,7 @@ package com.nubits.nubot.utils.logging;
  *
  * @author Vogella
  */
-import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.global.Global;
 import java.io.IOException;
 import java.util.Date;
 import java.util.logging.ConsoleHandler;
@@ -57,9 +57,9 @@ public class NuLogger {
             }
         }
 
-        String filename = Settings.APP_TITLE + "_" + new Date().getTime() + "_log";
-        fileCsv = new FileHandler(Settings.LOG_PATH + filename + ".csv");
-        fileHTML = new FileHandler(Settings.LOG_PATH + filename + ".html");
+        String filename = Global.settings.getProperty("app_name") + "_" + new Date().getTime() + "_log";
+        fileCsv = new FileHandler(Global.settings.getProperty("log_path") + filename + ".csv");
+        fileHTML = new FileHandler(Global.settings.getProperty("log_path") + filename + ".html");
 
         // Create csv Formatter
 

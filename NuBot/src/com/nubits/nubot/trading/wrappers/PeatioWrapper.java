@@ -570,6 +570,7 @@ public class PeatioWrapper implements TradeInterface {
 
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to Peatio");
+            queryResult = "error : no connection with peatio";
         }
         return queryResult;
     }
