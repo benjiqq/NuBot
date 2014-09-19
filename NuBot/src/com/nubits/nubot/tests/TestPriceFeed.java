@@ -1,0 +1,105 @@
+/*
+ * Copyright (C) 2014 desrever <desrever at nubits.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+package com.nubits.nubot.tests;
+
+import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeed.AbstractPriceFeed;
+import com.nubits.nubot.pricefeed.BitcoinaveragePriceFeed;
+import com.nubits.nubot.pricefeed.PriceFeedManager;
+import com.nubits.nubot.utils.logging.NuLogger;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
+public class TestPriceFeed {
+
+    private static final Logger LOG = Logger.getLogger(TestPriceFeed.class.getName());
+    AbstractPriceFeed feed;
+    CurrencyPair pair;
+
+    public static void main(String a[]) {
+        TestPriceFeed test = new TestPriceFeed();
+        test.init();
+
+        test.executeSingle();
+        //test.execute();
+    }
+
+    private void init() {
+        pair = Constant.BTC_USD;
+        //feed = new BitcoinaveragePriceFeed();
+        try {
+            NuLogger.setup();
+        } catch (IOException ex) {
+            LOG.severe(ex.getMessage());
+        }
+        LOG.setLevel(Level.INFO);
+
+        feed = new BitcoinaveragePriceFeed();
+
+        LOG.info("Set up SSL certificates");
+        System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
+        System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);
+
+    }
+
+    private void executeSingle() {
+
+
+        LastPrice lastPrice = feed.getLastPrice(pair);
+        if (!lastPrice.isError()) {
+            LOG.info(lastPrice.toString());
+        } else {
+            //handle error
+            LOG.severe("There was a problem while updating the price");
+        }
+    }
+
+    private void execute() {
+
+        String mainFeed = PriceFeedManager.BTCE;
+
+        ArrayList<String> backupFeedList = new ArrayList<>();
+
+
+        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
+        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
+        backupFeedList.add(PriceFeedManager.COINBASE);
+        backupFeedList.add(PriceFeedManager.CCEDK);
+
+        PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+
+        LastPrice lastPrice = pfm.getLastPrice();
+
+        if (!lastPrice.isError()) {
+            LOG.info("All good!");
+            LOG.info(lastPrice.toString());
+        } else {
+            //handle error
+            LOG.severe("There was a problem while updating the price");
+        }
+    }
+}
