@@ -54,9 +54,7 @@ public class NuBot {
     public static void main(String args[]) {
         mainThread = Thread.currentThread();
 
-
         NuBot app = new NuBot();
-        Utils.printSeparator();
 
         Utils.printSeparator();
         if (app.readParams(args)) {

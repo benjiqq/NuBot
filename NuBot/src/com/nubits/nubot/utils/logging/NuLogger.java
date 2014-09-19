@@ -57,7 +57,7 @@ public class NuLogger {
             }
         }
 
-        String filename = Global.settings.getProperty("app_name") + "_" + new Date().getTime() + "_log";
+        String filename = Global.settings.getProperty("app_name", "NuBot") + "_" + new Date().getTime() + "_log";
         fileCsv = new FileHandler(Global.settings.getProperty("log_path") + filename + ".csv");
         fileHTML = new FileHandler(Global.settings.getProperty("log_path") + filename + ".html");
 

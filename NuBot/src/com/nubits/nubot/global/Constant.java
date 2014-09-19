@@ -30,12 +30,13 @@ public class Constant {
     private static final Logger LOG = Logger.getLogger(Constant.class.getName());
     //Exchanges
     public static final String BTCE = "btce";
-    public static final String VOS = "vos";
     public static final String CCEDK = "ccedk";
-    public static final String PEATIO_BTCCNY_API_BASE = "http://198.52.199.61/";
+    public static final String BTER = "bter";
     public static final String PEATIO_BTCCNY = "peatio_btccny";
     public static final String PEATIO_MULTIPAIR = "peatio_multipair";
-    public static final String PEATIO_MULTIPAIR_API_BASE = "http://198.52.199.61/"; //TODO CHANGE
+    //API base url for peatio instances
+    public static final String PEATIO_MULTIPAIR_API_BASE = "http://198.52.199.61/"; //TODO UPDATE WHEN AVAILABLE
+    public static final String PEATIO_BTCCNY_API_BASE = "http://198.52.199.61/";
     //UI components
     public static final String MAIN_DASHBOARD = "main-dasbhboard";
     public static final String OPTIONS = "options-dasbhboard";

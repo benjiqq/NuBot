@@ -21,7 +21,6 @@ package com.nubits.nubot.trading.wrappers;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -32,6 +31,7 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.trading.ServiceInterface;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.TradeUtils;
 import java.io.BufferedReader;
@@ -423,6 +423,7 @@ public class CcedkWrapper implements TradeInterface {
             queryResult = query.executeQuery(false, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to ccdek");
+            queryResult = "error : no connection with CCEDK";
         }
         return queryResult;
     }
@@ -435,6 +436,7 @@ public class CcedkWrapper implements TradeInterface {
             queryResult = query.executeQuery(true, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to ccdek");
+            queryResult = "error : no connection with CCEDK";
         }
         return queryResult;
     }

@@ -18,7 +18,7 @@
 package com.nubits.nubot.global;
 
 /**
- * Important : After filling variables, Refactor this class to Passwords.java
+ * Important : After filling variables, Rename this class to Passwords.java
  */
 public class PasswordsSample {
 
@@ -31,6 +31,8 @@ public class PasswordsSample {
     public static final String PEATIO_KEY = "xxx";
     public static final String CCEDK_SECRET = "xxx";
     public static final String CCEDK_KEY = "xxx";
+    public static final String BTER_KEY = "xxx";
+    public static final String BTER_SECRET = "xxx";
     public static final String GMAIL_USERNAME = "xxx@gmail.com"; //used to send mail notifications
     public static final String GMAIL_PASSWORD = "xxx";
     public static final String HIPCHAT_KEY = "xxx"; //not admin

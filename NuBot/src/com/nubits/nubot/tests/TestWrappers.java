@@ -33,8 +33,10 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.keys.ApiPermissions;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
+import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,10 +54,12 @@ public class TestWrappers {
     //These are the key pair associated with desrever's test account on btc-e
 
     public static void main(String[] args) {
+        //Load settings
+        Utils.loadProperties("settings.properties");
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
         runTests();
 
@@ -64,11 +68,11 @@ public class TestWrappers {
 
     public static void runTests() {
         //testGetPermissions();
-        //testGetBalances();
+        testGetBalances();
         //testGetBalanceWithArgs();
         //testGetLastPrice();
         //testSell();
-        testBuy();
+        //testBuy();
         //testGetOrders();
         //testGetOrdersWithArgs();
         //testGetOrderDetail();
@@ -354,6 +358,13 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.BTER)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.BTER_SECRET, Passwords.BTER_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
