@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.trading.wrappers;
+package com.nubits.nubot.trading;
 
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;

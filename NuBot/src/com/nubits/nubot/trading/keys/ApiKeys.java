@@ -21,7 +21,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
-import com.nubits.nubot.trading.wrappers.TradeInterface;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
 

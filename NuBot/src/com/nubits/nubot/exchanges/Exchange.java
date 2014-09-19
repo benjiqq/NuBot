@@ -18,7 +18,7 @@
 package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.TradeInterface;
+import com.nubits.nubot.trading.TradeInterface;
 import java.util.logging.Logger;
 
 /**

@@ -71,7 +71,7 @@
 
     -->
 
-    <target name="package-for-store" depends="jar">
+    <target name="_nubot-package" depends="jar">
 
         <!-- Change the value of this property to be the name of your JAR,
              minus the .jar extension. It should not have spaces.
@@ -112,16 +112,35 @@
             </resources>
 
           </copy>
+          
+          
+          <copy file="res/options/sample-options-reduced.json" tofile="${store.dir}/options-sample.json"/>
 
+          
+          <copy file="../LICENSE.md" tofile="${store.dir}/res/LICENSE.md"/>
+        
+        <file file="res/options/sample-options-reduced.json"/>
+        
         <mkdir dir="${store.dir}/logs"/>
 
 
-      <copy todir="${store.dir}/logs/res" >  
+        <copy todir="${store.dir}/logs/res" >  
             <fileset dir="res/logs_assets">  
             </fileset>
 
-          </copy>
-
+        </copy>
+          
+        <copy todir="${store.dir}/res/src/" >  
+            <fileset dir="src/">  
+            </fileset>
+        </copy>
+        
+        <copy todir="${store.dir}/res/lib/" >  
+            <fileset dir="lib/">  
+            </fileset>
+        </copy>
+        
+         
         <delete file="${store.dir}/temp_final.jar"/>
         <delete file="${store.dir}/res/ssl/readme.txt"/>
         <delete file="${store.dir}/res/ssl/listCertificates.sh"/>

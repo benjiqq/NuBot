@@ -1,7 +1,8 @@
 #A folder containing utilities that do not need to be pushed
 /gitignore/
 
-
+#Folder with builds
+releases/
 
 #Directories to ignore
 
