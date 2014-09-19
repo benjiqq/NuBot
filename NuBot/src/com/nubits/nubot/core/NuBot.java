@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -66,7 +66,7 @@ public class NuBot {
 
         NuBot app = new NuBot();
         Utils.printSeparator();
-        LOG.fine("Setting up  NuBot");
+        LOG.fine("Setting up  NuBot" + Settings.CURRENT_VERSION);
         Utils.printSeparator();
         if (app.readParams(args)) {
             createShutDownHook();
