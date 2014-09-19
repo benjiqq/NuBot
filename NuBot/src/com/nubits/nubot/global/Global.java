@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -21,7 +21,7 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.tasks.TaskManager;
-import java.util.logging.Logger;
+import java.util.Properties;
 
 /**
  *
@@ -29,8 +29,7 @@ import java.util.logging.Logger;
  */
 public class Global {
 
-    private static final Logger LOG = Logger.getLogger(Global.class.getName());
-    //Only used for test
+    public static Properties settings = new Properties();
     public static boolean running = false;
     public static Exchange exchange;
     public static boolean startupComplete = false;

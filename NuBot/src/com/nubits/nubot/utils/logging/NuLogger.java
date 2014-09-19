@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -24,9 +24,12 @@ package com.nubits.nubot.utils.logging;
 import com.nubits.nubot.global.Settings;
 import java.io.IOException;
 import java.util.Date;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
+import java.util.logging.Handler;
 import java.util.logging.Level;
+import static java.util.logging.Level.FINE;
 import java.util.logging.Logger;
 
 public class NuLogger {
@@ -36,12 +39,24 @@ public class NuLogger {
     static private FileHandler fileHTML;
     static private Formatter formatterHTML;
 
-    static public void setup() throws IOException {
+    static public void setup(boolean verbose) throws IOException {
 
         // get the global logger to configure it
-        Logger logger = Logger.getLogger("com.nubits.nubot");
+        Logger logger = Logger.getLogger("");
 
-        logger.setLevel(Level.FINE);
+        if (verbose) {
+            logger.setLevel(Level.FINE);
+        } else {
+            logger.setLevel(Level.INFO);
+        }
+
+        for (Handler handler : logger.getHandlers()) {
+            if (handler instanceof ConsoleHandler) {
+                // java.util.logging.ConsoleHandler.level = ALL
+                handler.setLevel(FINE);
+            }
+        }
+
         String filename = Settings.APP_TITLE + "_" + new Date().getTime() + "_log";
         fileCsv = new FileHandler(Settings.LOG_PATH + filename + ".csv");
         fileHTML = new FileHandler(Settings.LOG_PATH + filename + ".html");

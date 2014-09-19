@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -19,7 +19,6 @@ package com.nubits.nubot.utils;
 
 import com.nubits.nubot.utils.FileSystem;
 import java.io.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -104,14 +103,14 @@ public class FileSystem {
             }
 
         } catch (FileNotFoundException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.severe(ex.getMessage());
         } catch (IOException ex) {
-            Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.severe(ex.getMessage());
         } finally {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                Logger.getLogger(FileSystem.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.severe(ex.getMessage());
             }
         }
 

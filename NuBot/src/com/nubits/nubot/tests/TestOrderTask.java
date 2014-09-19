@@ -53,11 +53,11 @@ public class TestOrderTask {
     private static void setup() {
 
         try {
-            NuLogger.setup();
+            NuLogger.setup(true);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
-        LOG.setLevel(Level.INFO);
+        LOG.setLevel(Level.FINE);
 
         System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);

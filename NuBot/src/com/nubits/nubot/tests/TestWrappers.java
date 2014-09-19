@@ -307,7 +307,7 @@ public class TestWrappers {
 
     private static void init() {
         try {
-            NuLogger.setup();
+            NuLogger.setup(true);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }

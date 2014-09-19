@@ -52,11 +52,11 @@ public class TestPriceFeed {
         pair = Constant.BTC_USD;
         //feed = new BitcoinaveragePriceFeed();
         try {
-            NuLogger.setup();
+            NuLogger.setup(true);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
-        LOG.setLevel(Level.INFO);
+        LOG.setLevel(Level.FINE);
 
         feed = new BitcoinaveragePriceFeed();
 

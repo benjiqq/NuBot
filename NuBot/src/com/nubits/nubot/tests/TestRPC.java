@@ -94,11 +94,11 @@ public class TestRPC {
 
     private void setup() {
         try {
-            NuLogger.setup();
+            NuLogger.setup(true);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
-        LOG.setLevel(Level.INFO);
+        LOG.setLevel(Level.FINE);
 
         System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
         System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);
@@ -117,12 +117,7 @@ public class TestRPC {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        try {
-            NuLogger.setup();
-        } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
-        }
-        LOG.setLevel(Level.INFO);
+
     }
 
     private void testGetLiquidityInfo() {

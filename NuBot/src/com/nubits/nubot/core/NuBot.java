@@ -56,17 +56,11 @@ public class NuBot {
         mainThread = Thread.currentThread();
         FileSystem.mkdir(Settings.LOG_PATH);
         //init logger
-        LOG.fine("Init logging system");
 
-        try {
-            NuLogger.setup();
-        } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
-        }
 
         NuBot app = new NuBot();
         Utils.printSeparator();
-        LOG.fine("Setting up  NuBot" + Settings.CURRENT_VERSION);
+
         Utils.printSeparator();
         if (app.readParams(args)) {
             createShutDownHook();
@@ -84,20 +78,31 @@ public class NuBot {
         Global.running = true;
 
 
-        LOG.fine("Set up SSL certificates");
-        System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
-        System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);
-        Utils.printSeparator();
-
-        LOG.fine("Load options from " + optionsPath);
-        Utils.printSeparator();
-
 
         Global.options = OptionsJSON.parseOptions(optionsPath);
         if (Global.options == null) {
             LOG.severe("Error while loading options");
             System.exit(0);
         }
+        Utils.printSeparator();
+
+
+
+        try {
+            NuLogger.setup(Global.options.isVerbose());
+        } catch (IOException ex) {
+            LOG.severe(ex.getMessage());
+        }
+        LOG.fine("Setting up  NuBot" + Settings.CURRENT_VERSION);
+
+        LOG.fine("Init logging system");
+
+        LOG.fine("Set up SSL certificates");
+        System.setProperty("javax.net.ssl.trustStore", Settings.KEYSTORE_PATH);
+        System.setProperty("javax.net.ssl.trustStorePassword", Settings.KEYSTORE_PWD);
+        Utils.printSeparator();
+
+        LOG.fine("Load options from " + optionsPath);
         Utils.printSeparator();
 
 
