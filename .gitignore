@@ -1,0 +1,43 @@
+#A folder containing utilities that do not need to be pushed
+/gitignore/
+
+
+
+#Directories to ignore
+
+/NuBot/res/options/test/
+/NuBot/nbproject/private/
+/NuBot/build/
+/NuBot/dist/
+/NuBot/dist-packaged/
+/NuBot/logs/
+
+#Specific files to ignore
+ssl_readme.txt
+NuCancelOrders.java
+NuExecuteOrders.java
+NuPriceMonitor.java
+
+#Prevent test passwords to be pushed
+Passwords.java
+
+
+#Mac trash files
+.DS_Store
+
+#JavaFX backups
+*.bak
+
+#Class files
+*.class
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
