@@ -25,6 +25,10 @@ Passwords.java
 #Mac trash files
 .DS_Store
 
+#Sublime-Text files
+*.sublime-project
+*.sublime-workspace
+
 #JavaFX backups
 *.bak
 
