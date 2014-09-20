@@ -22,8 +22,9 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeed.AbstractPriceFeed;
-import com.nubits.nubot.pricefeed.BitcoinaveragePriceFeed;
+import com.nubits.nubot.pricefeed.BterPriceFeed;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
+import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,21 +45,22 @@ public class TestPriceFeed {
         TestPriceFeed test = new TestPriceFeed();
         test.init();
 
-        test.executeSingle();
-        //test.execute();
+        //test.executeSingle();
+        test.execute();
     }
 
     private void init() {
+        Utils.loadProperties("settings.properties");
         pair = Constant.BTC_USD;
         //feed = new BitcoinaveragePriceFeed();
         try {
-            NuLogger.setup(true);
+            NuLogger.setup(false);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
-        LOG.setLevel(Level.FINE);
+        LOG.setLevel(Level.INFO);
 
-        feed = new BitcoinaveragePriceFeed();
+        feed = new BterPriceFeed();
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -67,8 +69,6 @@ public class TestPriceFeed {
     }
 
     private void executeSingle() {
-
-
         LastPrice lastPrice = feed.getLastPrice(pair);
         if (!lastPrice.isError()) {
             LOG.info(lastPrice.toString());
@@ -89,6 +89,7 @@ public class TestPriceFeed {
         backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
         backupFeedList.add(PriceFeedManager.COINBASE);
         backupFeedList.add(PriceFeedManager.CCEDK);
+        backupFeedList.add(PriceFeedManager.BTER);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 

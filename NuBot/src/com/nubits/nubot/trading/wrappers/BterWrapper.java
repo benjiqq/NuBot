@@ -28,8 +28,10 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.trading.ServiceInterface;
+import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -246,7 +248,84 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getLastPriceImpl(pair, false);
+    }
+
+    public ApiResponse getLastPriceFeed(CurrencyPair pair) { //used for BterPriceFeed only
+        return getLastPriceImpl(pair, true);
+    }
+
+    private ApiResponse getLastPriceImpl(CurrencyPair pair, boolean bypass) {
+        Ticker ticker = new Ticker();
+        ApiResponse apiResponse = new ApiResponse();
+
+        double last = -1;
+        double ask = -1;
+        double bid = -1;
+
+        String ticker_url = API_BASE_URL + getTickerPath(pair);
+
+        HashMap<String, String> query_args = new HashMap<>();
+
+
+        /* Sample response
+         * {"result":"true","last":2599,"high":2620,"low":2406,"avg":2526.11,"sell":2598,"buy":2578,"vol_btc":544.5027,"vol_cny":1375475.92}
+         */
+
+        String queryResult = "";
+        if (bypass) { //sed by BterPriceFeed only
+            BterService query = new BterService(ticker_url, keys, query_args);
+            queryResult = query.executeQuery(true, true);
+        } else {
+            queryResult = query(ticker_url, query_args, true);
+        }
+
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean valid = true;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (ClassCastException e) {
+                valid = true;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("message");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+
+                LOG.severe("Bter API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+
+                last = Utils.getDouble(httpAnswerJson.get("last"));
+                bid = Utils.getDouble(httpAnswerJson.get("sell"));
+                ask = Utils.getDouble(httpAnswerJson.get("buy"));
+
+
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            return apiResponse;
+        }
+
+        ticker.setAsk(ask);
+        ticker.setBid(bid);
+        ticker.setLast(last);
+        apiResponse.setResponseObject(ticker);
+        return apiResponse;
+
     }
 
     @Override
@@ -421,6 +500,10 @@ public class BterWrapper implements TradeInterface {
         }
     }
 
+    public static String getTickerPath(CurrencyPair pair) {
+        return "ticker/" + pair.toString("_").toLowerCase();
+    }
+
     @Override
     public ApiResponse getPermissions() {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
@@ -471,6 +554,8 @@ public class BterWrapper implements TradeInterface {
             LOG.severe("The bot will not execute the query, there is no connection to bter");
             queryResult = "error : no connection with Bter";
         }
+
+
         return queryResult;
     }
 

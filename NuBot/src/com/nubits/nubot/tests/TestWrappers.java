@@ -77,7 +77,7 @@ public class TestWrappers {
         //testGetOrderDetail();
         //testCancelOrder();
         //testGetTxFee();
-        testGetTxFeeWithArgs();
+        //testGetTxFeeWithArgs();
         //testClearAllOrders();
         //testIsOrderActive("21312");
         //testIsOrderActive("362849485");
@@ -129,15 +129,15 @@ public class TestWrappers {
 
     private static void testGetLastPrice() {
         //Get lastPrice for a given CurrencyPair
-        ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(Constant.BTC_USD);
+        ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(Constant.BTC_BITUSD);
         if (lastPriceResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
+            LOG.info("Positive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
-            LOG.fine("Last price : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
+            LOG.info("Last price : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
                     + ticker.getLast() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
-            LOG.fine("ask  : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
+            LOG.info("ask  : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
                     + ticker.getAsk() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
-            LOG.fine("bid  : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
+            LOG.info("bid  : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
                     + ticker.getBid() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
 
         } else {

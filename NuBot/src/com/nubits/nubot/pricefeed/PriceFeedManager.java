@@ -110,6 +110,9 @@ public class PriceFeedManager {
             case CCEDK:
                 tempFeed = new CcedkPriceFeed();
                 break;
+            case BTER:
+                tempFeed = new BterPriceFeed();
+                break;
             default:
                 LOG.severe("Error wile adding price seed with name unrecognized : " + feedname);
                 break;

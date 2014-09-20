@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -21,14 +21,17 @@ package com.nubits.nubot.pricefeed;
  *
  * @author desrever <desrever at nubits.com>
  */
+import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.utils.Utils;
-import java.io.IOException;
+import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
 import java.util.logging.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 
 public class BterPriceFeed extends AbstractPriceFeed {
 
@@ -44,23 +47,27 @@ public class BterPriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = getUrl(pair);
-            String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
-            } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
-                return new LastPrice(true, name, pair.getOrderCurrency(), null);
-            }
-            JSONParser parser = new JSONParser();
-            try {
-                JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Double.valueOf((String) httpAnswerJson.get("last"));
+                Exchange exch = new Exchange(Constant.BTER);
+                ExchangeLiveData liveData = new ExchangeLiveData();
+                exch.setLiveData(liveData);
+                ApiKeys keys = new ApiKeys("a", "b");
+                exch.setTrade(new BterWrapper(keys, exch));
 
+                BterWrapper trader = (BterWrapper) exch.getTrade();
+                ApiResponse lastPriceResponse = trader.getLastPriceFeed(pair);
+                if (lastPriceResponse.isPositive()) {
+                    Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
+                    double last = ticker.getLast();
+                    lastRequest = System.currentTimeMillis();
+                    lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
+                    return lastPrice;
+                } else {
+                    LOG.severe(lastPriceResponse.getError().toString());
+                    lastRequest = System.currentTimeMillis();
+                    return new LastPrice(true, name, pair.getOrderCurrency(), null);
+                }
 
-                lastRequest = System.currentTimeMillis();
-                lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
-                return lastPrice;
             } catch (Exception ex) {
                 LOG.severe(ex.getMessage());
                 lastRequest = System.currentTimeMillis();
