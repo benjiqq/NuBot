@@ -40,7 +40,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -68,7 +67,7 @@ public class TestWrappers {
 
     public static void runTests() {
         //testGetPermissions();
-        testGetBalances();
+        //testGetBalances();
         //testGetBalanceWithArgs();
         //testGetLastPrice();
         //testSell();
@@ -78,7 +77,7 @@ public class TestWrappers {
         //testGetOrderDetail();
         //testCancelOrder();
         //testGetTxFee();
-        //testGetTxFeeWithArgs();
+        testGetTxFeeWithArgs();
         //testClearAllOrders();
         //testIsOrderActive("21312");
         //testIsOrderActive("362849485");
@@ -102,14 +101,13 @@ public class TestWrappers {
 
     private static void testGetBalances() {
         //Get all the balances  associated with the account
-        CurrencyPair pair = new CurrencyPair(Constant.PPC, Constant.USD);
+        CurrencyPair pair = new CurrencyPair(Constant.BITUSD, Constant.BTC);
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
             LOG.info("Positive response  from TradeInterface.getBalance() ");
             Balance balance = (Balance) balancesResponse.getResponseObject();
 
-            LOG.info("PEGs Balance = " + balance.getPEGBalance().getQuantity() + " " + balance.getPEGBalance().getCurrency().getCode() + "\n"
-                    + "NBT Balance = " + balance.getNubitsBalance().getQuantity() + " " + balance.getNubitsBalance().getCurrency().getCode());
+            LOG.info(balance.toString());
 
         } else {
             LOG.severe(balancesResponse.getError().toString());
@@ -118,14 +116,14 @@ public class TestWrappers {
 
     private static void testGetBalanceWithArgs() {
         //Get the USD balance associated with the account
-        ApiResponse USDBalancesResponse = Global.exchange.getTrade().getAvailableBalance(Constant.USD);
-        if (USDBalancesResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.getBalance(CurrencyPair pair) ");
-            Amount USDBalance = (Amount) USDBalancesResponse.getResponseObject();
+        ApiResponse balanceResponse = Global.exchange.getTrade().getAvailableBalance(Constant.BTC);
+        if (balanceResponse.isPositive()) {
+            LOG.info("Positive response  from TradeInterface.getBalance(CurrencyPair pair) ");
+            Amount balance = (Amount) balanceResponse.getResponseObject();
 
-            LOG.fine("USD Balance " + USDBalance.getQuantity() + " " + USDBalance.getCurrency().getSymbol());
+            LOG.info(balance.toString());
         } else {
-            LOG.severe(USDBalancesResponse.getError().toString());
+            LOG.severe(balanceResponse.getError().toString());
         }
     }
 
@@ -151,9 +149,11 @@ public class TestWrappers {
     private static void testSell() {
         //Place a sell order
 
-        double amountSell = 1;
-        double priceSell = 0.005;
-        CurrencyPair pair = Constant.PPC_BTC;
+        //test wrong amounts
+
+        double amountSell = 0.005;
+        double priceSell = 500;
+        CurrencyPair pair = Constant.BTC_BITUSD;
 
         ApiResponse sellResponse = Global.exchange.getTrade().sell(pair, amountSell, priceSell);
         if (sellResponse.isPositive()) {
@@ -172,18 +172,18 @@ public class TestWrappers {
 
     private static void testBuy() {
         //Place a buy order
-        double amountBuy = 1;
-        double priceBuy = 1;
-        CurrencyPair pair = Constant.PPC_BTC;
+        double amountBuy = 0.001;
+        double priceBuy = 200;
+        CurrencyPair pair = Constant.BTC_BITUSD;
 
         ApiResponse buyResponse = Global.exchange.getTrade().buy(pair, amountBuy, priceBuy);
         if (buyResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.buy(...) ");
-            LOG.warning("Strategy : Submit order : "
+            LOG.info("Positive response  from TradeInterface.buy(...) ");
+            LOG.info(": Submit order : "
                     + "buy" + amountBuy + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceBuy + " " + pair.getPaymentCurrency().getCode());
             String buyResponseString = (String) buyResponse.getResponseObject();
-            LOG.fine("Response = " + buyResponseString);
+            LOG.info("Response = " + buyResponseString);
 
         } else {
             LOG.severe(buyResponse.getError().toString());
@@ -310,11 +310,10 @@ public class TestWrappers {
 
     private static void init() {
         try {
-            NuLogger.setup(true);
+            NuLogger.setup(false);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
-        LOG.setLevel(Level.FINE);
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));

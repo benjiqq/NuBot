@@ -52,7 +52,6 @@ public class NuLogger {
 
         for (Handler handler : logger.getHandlers()) {
             if (handler instanceof ConsoleHandler) {
-                // java.util.logging.ConsoleHandler.level = ALL
                 handler.setLevel(FINE);
             }
         }

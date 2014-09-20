@@ -49,6 +49,7 @@ public class Constant {
     public static final Currency BTC = new Currency("B", false, "BTC", "Bitcoins");
     public static final Currency NBT = new Currency("N", false, "NBT", "Nubits");
     public static final Currency PPC = new Currency("P", false, "PPC", "Peercoin");
+    public static final Currency BITUSD = new Currency("busd", false, "BITUSD", "Bitshares X BitUSD");
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
@@ -57,6 +58,8 @@ public class Constant {
     public static final CurrencyPair PPC_USD = new CurrencyPair(PPC, USD);
     public static final CurrencyPair PPC_BTC = new CurrencyPair(PPC, BTC);
     public static final CurrencyPair BTC_CNY = new CurrencyPair(BTC, CNY);
+    public static final CurrencyPair BITUSD_BTC = new CurrencyPair(BITUSD, BTC);
+    public static final CurrencyPair BTC_BITUSD = new CurrencyPair(BTC, BITUSD);
 
     public static Currency getCurrencyFromCode(String codeString) {
         Currency toRet = null;
@@ -76,6 +79,9 @@ public class Constant {
                 break;
             case "NBT":
                 toRet = NBT;
+                break;
+            case "BITUSD":
+                toRet = BITUSD;
                 break;
             default:
                 LOG.severe("Currency " + codeString + " not available");

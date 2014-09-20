@@ -207,7 +207,7 @@ public class CcedkWrapper implements TradeInterface {
                     boolean foundPEG = false;
 
                     Amount NBTTotal = new Amount(-1, pair.getOrderCurrency());
-                    Amount PEGTotal = new Amount(-1, pair.getOrderCurrency());
+                    Amount PEGTotal = new Amount(-1, pair.getPaymentCurrency());
                     for (int i = 0; i < entities.size(); i++) {
                         JSONObject temp = (JSONObject) entities.get(i);
                         int tempid = Integer.parseInt((String) temp.get("currency_id"));
@@ -252,8 +252,6 @@ public class CcedkWrapper implements TradeInterface {
                         apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
                                 + "Cannot find a currency with id = " + id));
                     }
-
-
                 }
             }
         } catch (ParseException ex) {

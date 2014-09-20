@@ -56,24 +56,6 @@ public class Balance {
 
     /**
      *
-     * @param PEGTotal
-     * @param NBTTotal
-     * @param PEGonOrder
-     * @param NBTonOrder
-     * @param PEGAvailable
-     * @param NBTAvailable
-     */
-    public Balance(Amount PEGTotal, Amount NBTTotal, Amount PEGonOrder, Amount NBTonOrder, Amount PEGAvailable, Amount NBTAvailable) {
-        this.PEGTotal = PEGTotal;
-        this.NBTTotal = NBTTotal;
-        this.PEGonOrder = PEGonOrder;
-        this.NBTonOrder = NBTonOrder;
-        this.PEGAvailable = PEGAvailable;
-        this.NBTAvailable = NBTAvailable;
-    }
-
-    /**
-     *
      * @param PEGAvail
      * @param NBTAvail
      * @param PEGonOrder
@@ -179,5 +161,10 @@ public class Balance {
      */
     private void setNBTAvailableBalance(Amount NBTAvailable) {
         this.NBTAvailable = NBTAvailable;
+    }
+
+    @Override
+    public String toString() {
+        return "Balance{" + "PEGTotal=" + PEGTotal + ", PEGonOrder=" + PEGonOrder + ", PEGAvailable=" + PEGAvailable + ", NBTTotal=" + NBTTotal + ", NBTonOrder=" + NBTonOrder + ", NBTAvailable=" + NBTAvailable + '}';
     }
 }

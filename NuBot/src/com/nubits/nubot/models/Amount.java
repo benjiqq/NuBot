@@ -75,7 +75,7 @@ public class Amount {
 
     @Override
     public String toString() {
-        return "Amount{" + "quantity=" + quantity + ", currency=" + currency + '}';
+        return "Amount{" + "quantity=" + quantity + ", currency=" + currency + '}' + "\n";
     }
 
     /**
