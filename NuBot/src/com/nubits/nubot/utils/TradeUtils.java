@@ -201,10 +201,12 @@ public class TradeUtils {
     public static int getCCDKECurrencyId(String currencyCode) {
         /*
          * LAST UPDATED : 17 september
-         FROM : https://www.ccedk.com/api/v1/currency/list?nonce=1410950600
-         2,BTC
-         3,USD
-         8,PPC
+         * FROM : https://www.ccedk.com/api/v1/currency/list?nonce=1410950600
+         * 1,LTC
+         * 2,BTC
+         * 3,USD
+         * 8,PPC
+         *
 
          */
         final String BTC = Constant.BTC.getCode();
@@ -223,6 +225,9 @@ public class TradeUtils {
             case "PPC":
                 toRet = 8;
                 break;
+            case "LTC":
+                toRet = 1;
+                break;
             default:
                 LOG.severe("Currency " + currencyCode + "not available");
                 break;
@@ -232,12 +237,12 @@ public class TradeUtils {
 
     public static int getCCDKECurrencyPairId(CurrencyPair pair) {
         /*
-         * LAST UPDATED : 18 september
+         * LAST UPDATED : 20 september
          FROM : https://www.ccedk.com/api/v1/pair/list?nonce=1410950600
          * 2 ,BTC USD
          * 14 , PPC USD
          * 13 , PPC BTC
-         *
+         * 12 , PPC LTC
          * TODO Add them here when they add support
          * NBT BTC
          * NBT PPC
@@ -252,11 +257,49 @@ public class TradeUtils {
             return 14;
         } else if (pair.equals(Constant.PPC_BTC)) {
             return 13;
+        } else if (pair.equals(Constant.PPC_LTC)) {
+            return 12;
         } else {
             LOG.severe("Pair " + pair.toString() + " not available");
         }
 
         return toRet;
+    }
+
+    public static CurrencyPair getCCEDKPairFromID(int id) {
+        /*
+         * LAST UPDATED : 20 september
+         FROM : https://www.ccedk.com/api/v1/pair/list?nonce=1410950600
+         * 2 ,BTC USD
+         * 14 , PPC USD
+         * 13 , PPC BTC
+         * 12 , PPC LTC
+         * TODO Add them here when they add support
+         * NBT BTC
+         * NBT PPC
+         * NBT USD
+         */
+        CurrencyPair toRet = new CurrencyPair(Constant.BTC, Constant.BTC);
+
+        switch (id) {
+            case 2:
+                toRet = Constant.BTC_USD;
+                break;
+            case 12:
+                toRet = Constant.PPC_LTC;
+                break;
+            case 13:
+                toRet = Constant.PPC_BTC;
+                break;
+            case 14:
+                toRet = Constant.PPC_USD;
+                break;
+            default:
+                LOG.severe("Pair with id = " + id + " not available");
+
+        }
+        return toRet;
+
     }
 
     public static String getCCEDKTickerUrl(CurrencyPair pair) {

@@ -30,6 +30,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -45,6 +46,7 @@ import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -72,9 +74,9 @@ public class CcedkWrapper implements TradeInterface {
     private final String API_BASE_URL = checkConnectionUrl + "api/v1/";
     private final String API_GET_INFO = "balance/list"; //post
     private final String API_TRADE = "order/new"; //post
-    private final String API_ACTIVE_ORDERS = "";
-    private final String API_ORDER = "";
-    private final String API_CANCEL_ORDER = "";
+    private final String API_ACTIVE_ORDERS = "order/list";
+    private final String API_ORDER = "order/info";
+    private final String API_CANCEL_ORDER = "order/cancel";
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
     private ArrayList<ApiError> errors;
@@ -84,6 +86,7 @@ public class CcedkWrapper implements TradeInterface {
     private final int ERROR_GENERIC = 8562;
     private final int ERROR_PARSING = 8563;
     private final int ERROR_CURRENCY_NOT_FOUND = 8564;
+    private final int ERROR_ORDER_NOT_FOUND = 8565;
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
 
     public CcedkWrapper(ApiKeys keys, Exchange exchange) {
@@ -285,7 +288,7 @@ public class CcedkWrapper implements TradeInterface {
         query_args.put("pair_id", Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair)));
         query_args.put("type", type);
         query_args.put("price", Double.toString(price));
-        query_args.put("amount", Double.toString(amount));
+        query_args.put("volume", Double.toString(amount));
 
         String queryResult = query(API_BASE_URL, API_TRADE, query_args, false);
 
@@ -321,12 +324,12 @@ public class CcedkWrapper implements TradeInterface {
                 //correct
                 JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
                 JSONObject entity = (JSONObject) dataJson.get("entity");
-                order_id = "" + (long) entity.get("order_id");
+                order_id = (String) entity.get("order_id");
                 apiResponse.setResponseObject(order_id);
             }
         } catch (ParseException ex) {
             LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
         return apiResponse;
@@ -335,22 +338,210 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getActiveOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getActiveOrdersImpl(pair);
+    }
+
+    private ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+
+        if (pair != null) {
+            String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
+            query_args.put("pair_id", pair_id);
+        }
+        String queryResult = query(API_BASE_URL, API_ACTIVE_ORDERS, query_args, false);
+
+        /* Sample Answer
+         * {"errors":false,
+         * "response":
+         *     {"entity":
+         *         {"order_id":"2011",
+         *          "transaction_id":"6517"}}}
+         */
+
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean errors = true;
+            try {
+                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+            } catch (ClassCastException e) {
+                errors = true;
+            }
+
+            if (errors) {
+                //error
+                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+
+                LOG.severe("Ccedk API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+                JSONArray entities = (JSONArray) dataJson.get("entities");
+
+                for (int i = 0; i < entities.size(); i++) {
+                    JSONObject orderObject = (JSONObject) entities.get(i);
+                    Order tempOrder = parseOrder(orderObject);
+
+
+                    if (!tempOrder.isCompleted()) //Do not add executed orders
+                    {
+                        orderList.add(tempOrder);
+                    }
+                }
+                apiResponse.setResponseObject(orderList);
+
+                return apiResponse;
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+
+
+        query_args.put("order_id", orderID);
+
+        String queryResult = query(API_BASE_URL, API_ORDER, query_args, false);
+
+        /* Sample Answer
+         * {"errors":false,
+         *  "response":
+         * {"entity":
+         * {"order_id":"1617","pair_id":"3","type":"sell","volume":"48.00000000","price":"9.5000000 0","fee":"0.91 200000","active":"1","created":"1406098537"}
+         * }
+         * }
+         */
+
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean errors = true;
+            try {
+                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+            } catch (ClassCastException e) {
+                errors = true;
+            }
+
+            if (errors) {
+                //error
+                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+
+                LOG.severe("Ccedk API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+                JSONObject entity;
+
+                try {
+                    boolean valid = (boolean) dataJson.get("entity");
+                    String message = "The order " + orderID + " does not exist";
+                    LOG.severe(message);
+                    apiResponse.setError(new ApiError(ERROR_ORDER_NOT_FOUND, message));
+                    return apiResponse;
+                } catch (ClassCastException e) {
+                    entity = (JSONObject) dataJson.get("entity");
+                }
+
+                Order order = parseOrder(entity);
+
+                apiResponse.setResponseObject(order);
+
+                return apiResponse;
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+
+
+        query_args.put("order_id", orderID);
+
+        String queryResult = query(API_BASE_URL, API_CANCEL_ORDER, query_args, false);
+
+        /* Sample Answer
+         * {"errors":false,"response":{"entity":{"transaction_id":"6518"}}}
+         */
+
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean errors = true;
+            try {
+                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+            } catch (ClassCastException e) {
+                errors = true;
+            }
+
+            if (errors) {
+                //error
+                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
+
+                LOG.severe("Ccedk API returned an error: " + errorMessage);
+
+                apiResponse.setResponseObject(false);
+                return apiResponse;
+            } else {
+                //correct
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+                JSONObject entity;
+
+                try {
+                    boolean valid = (boolean) dataJson.get("entity");
+                    String message = "The order " + orderID + " does not exist";
+                    LOG.severe(message);
+                    apiResponse.setResponseObject(false);
+                    return apiResponse;
+                } catch (ClassCastException e) {
+                    entity = (JSONObject) dataJson.get("entity");
+                }
+
+                apiResponse.setResponseObject(true);
+
+                return apiResponse;
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
     }
 
     @Override
@@ -379,13 +570,118 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse orderExists(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+    public ApiResponse orderExists(String orderID) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+
+
+        query_args.put("order_id", orderID);
+
+        String queryResult = query(API_BASE_URL, API_ORDER, query_args, false);
+
+        /* Sample Answer
+         * {"errors":false,
+         *  "response":
+         * {"entity":
+         * {"order_id":"1617","pair_id":"3","type":"sell","volume":"48.00000000","price":"9.5000000 0","fee":"0.91 200000","active":"1","created":"1406098537"}
+         * }
+         * }
+         */
+
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean errors = true;
+            try {
+                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+            } catch (ClassCastException e) {
+                errors = true;
+            }
+
+            if (errors) {
+                //error
+                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+
+                LOG.severe("Ccedk API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+                JSONObject entity;
+
+                try {
+                    boolean valid = (boolean) dataJson.get("entity");
+                    String message = "The order " + orderID + " does not exist";
+                    LOG.severe(message);
+                    apiResponse.setResponseObject(false);
+                    return apiResponse;
+                } catch (ClassCastException e) {
+                    entity = (JSONObject) dataJson.get("entity");
+                }
+
+                Order order = parseOrder(entity);
+
+                apiResponse.setResponseObject(true);
+
+                return apiResponse;
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
     }
 
     @Override
     public ApiResponse clearOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        //Since there is no API entry point for that, this call will iterate over actie
+        ApiResponse toReturn = new ApiResponse();
+        boolean ok = true;
+
+        ApiResponse activeOrdersResponse = getActiveOrders();
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId());
+                if (deleteOrderResponse.isPositive()) {
+                    boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+
+                    if (deleted) {
+                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                    } else {
+                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        ok = false;
+                    }
+
+                } else {
+                    LOG.severe(deleteOrderResponse.getError().toString());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.getMessage());
+                }
+
+            }
+            toReturn.setResponseObject(ok);
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            toReturn.setError(activeOrdersResponse.getError());
+            return toReturn;
+        }
+
+        return toReturn;
+
+
     }
 
     @Override
@@ -449,39 +745,37 @@ public class CcedkWrapper implements TradeInterface {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
-    //DO NOT USE THIS METHOD DIRECTLY, use CREATENONCE
-    private long getNonceInternal(String requester) {
-        apiBusy = true;
-        long currentTime = System.currentTimeMillis() / 1000;
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info(currentTime + " Now apiBusy! req : " + requester);
-            }
-        }
-        long timeElapsedSinceLastCall = currentTime - lastSentTonce;
-        if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
-            try {
-                long sleepTime = SPACING_BETWEEN_CALLS;
-                Thread.sleep(sleepTime);
-                currentTime = System.currentTimeMillis() / 1000;
-                if (Global.options != null) {
-                    if (Global.options.isVerbose()) {
-                        LOG.info("Just slept " + sleepTime + "; req : " + requester);
-                    }
-                }
-            } catch (InterruptedException e) {
-                LOG.severe(e.getMessage());
-            }
+    private Order parseOrder(JSONObject orderObject) {
+        Order order = new Order();
+
+        /*
+         * "order_id":"1617","pair_id":"3",
+         * "type":"sell","volume":"48.00000000",
+         * "price":"9.50000000","fee":"0. 91200000",
+         * "active":"1","created":"1406098537"}
+         */
+
+        order.setId((String) orderObject.get("order_id"));
+
+        int currencyPairID = Integer.parseInt((String) orderObject.get("pair_id"));
+        CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
+        order.setPair(cp);
+
+        order.setType(((String) orderObject.get("type")).toUpperCase());
+        order.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
+        order.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
+
+        int active = Integer.parseInt((String) orderObject.get("active"));
+        if (active == 0) {
+            order.setCompleted(true);
+        } else {
+            order.setCompleted(false);
         }
 
-        lastSentTonce = currentTime;
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
-            }
-        }
-        apiBusy = false;
-        return lastSentTonce;
+        long created = Long.parseLong(((String) orderObject.get("created")) + "000");
+        order.setInsertedDate(new Date(created));
+
+        return order;
     }
 
     private class CcedkService implements ServiceInterface {

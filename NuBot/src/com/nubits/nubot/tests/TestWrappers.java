@@ -25,6 +25,7 @@ import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.models.Order;
@@ -58,7 +59,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
 
@@ -66,21 +67,21 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-        //testGetPermissions();
-        //testGetBalances();
-        //testGetBalanceWithArgs();
-        //testGetLastPrice();
+        //testGetAvailableBalances(Constant.PPC_LTC);
+        //testGetAvailableBalance(Constant.PPC);
         //testSell();
         //testBuy();
-        //testGetOrders();
-        //testGetOrdersWithArgs();
-        //testGetOrderDetail();
-        //testCancelOrder();
+        //testGetLastPrice();
+        //testGetActiveOrders();
+        //testGetActiveOrders(Constant.PPC_LTC);
+        //testGetOrderDetail("2725");
+        //testCancelOrder("2725");
         //testGetTxFee();
         //testGetTxFeeWithArgs();
-        //testClearAllOrders();
-        //testIsOrderActive("21312");
+        testClearAllOrders();
+        //testIsOrderActive("2726");
         //testIsOrderActive("362849485");
+        //testGetPermissions();
     }
 
     private static void testGetPermissions() {
@@ -88,10 +89,10 @@ public class TestWrappers {
 
         ApiResponse permissionResponse = Global.exchange.getTrade().getPermissions();
         if (permissionResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.getPermissions() ");
+            LOG.info("\nPositive response  from TradeInterface.getPermissions() ");
             ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
 
-            LOG.fine("Keys Valid :" + permissions.isValid_keys() + "\n"
+            LOG.info("Keys Valid :" + permissions.isValid_keys() + "\n"
                     + "getinfo : " + permissions.isGet_info() + "\n"
                     + "trade : " + permissions.isTrade());
         } else {
@@ -99,12 +100,11 @@ public class TestWrappers {
         }
     }
 
-    private static void testGetBalances() {
+    private static void tesGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
-        CurrencyPair pair = new CurrencyPair(Constant.BITUSD, Constant.BTC);
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
             Balance balance = (Balance) balancesResponse.getResponseObject();
 
             LOG.info(balance.toString());
@@ -114,11 +114,11 @@ public class TestWrappers {
         }
     }
 
-    private static void testGetBalanceWithArgs() {
+    private static void testGetAvailableBalance(Currency cur) {
         //Get the USD balance associated with the account
-        ApiResponse balanceResponse = Global.exchange.getTrade().getAvailableBalance(Constant.BTC);
+        ApiResponse balanceResponse = Global.exchange.getTrade().getAvailableBalance(cur);
         if (balanceResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance(CurrencyPair pair) ");
+            LOG.info("\nPositive response  from TradeInterface.getBalance(CurrencyPair pair) ");
             Amount balance = (Amount) balanceResponse.getResponseObject();
 
             LOG.info(balance.toString());
@@ -129,9 +129,9 @@ public class TestWrappers {
 
     private static void testGetLastPrice() {
         //Get lastPrice for a given CurrencyPair
-        ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(Constant.BTC_BITUSD);
+        ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(Constant.PPC_BTC);
         if (lastPriceResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
+            LOG.info("\nPositive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
             LOG.info("Last price : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
                     + ticker.getLast() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
@@ -151,14 +151,14 @@ public class TestWrappers {
 
         //test wrong amounts
 
-        double amountSell = 0.005;
-        double priceSell = 500;
-        CurrencyPair pair = Constant.BTC_BITUSD;
+        double amountSell = 0.1;
+        double priceSell = 100;
+        CurrencyPair pair = Constant.PPC_LTC;
 
         ApiResponse sellResponse = Global.exchange.getTrade().sell(pair, amountSell, priceSell);
         if (sellResponse.isPositive()) {
 
-            LOG.info("Positive response  from TradeInterface.sell(...) ");
+            LOG.info("\nPositive response  from TradeInterface.sell(...) ");
             LOG.warning("Strategy : Submit order : "
                     + "sell" + amountSell + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceSell + " " + pair.getPaymentCurrency().getCode());
@@ -178,7 +178,7 @@ public class TestWrappers {
 
         ApiResponse buyResponse = Global.exchange.getTrade().buy(pair, amountBuy, priceBuy);
         if (buyResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.buy(...) ");
+            LOG.info("\nPositive response  from TradeInterface.buy(...) ");
             LOG.info(": Submit order : "
                     + "buy" + amountBuy + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceBuy + " " + pair.getPaymentCurrency().getCode());
@@ -190,17 +190,17 @@ public class TestWrappers {
         }
     }
 
-    private static void testGetOrders() {
+    private static void testGetActiveOrders() {
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.getActiveOrders() ");
+            LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.fine("Active orders : " + orderList.size());
+            LOG.info("Active orders : " + orderList.size());
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                LOG.fine(tempOrder.toString());
+                LOG.info(tempOrder.toString());
             }
 
         } else {
@@ -208,47 +208,45 @@ public class TestWrappers {
         }
     }
 
-    private static void testGetOrdersWithArgs() {
+    private static void testGetActiveOrders(CurrencyPair pair) {
         //Get active orders associated with a specific CurrencyPair
-        ApiResponse activeOrdersUSDNTBResponse = Global.exchange.getTrade().getActiveOrders(Constant.PPC_USD);
+        ApiResponse activeOrdersUSDNTBResponse = Global.exchange.getTrade().getActiveOrders(pair);
         if (activeOrdersUSDNTBResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.getActiveOrders(CurrencyPair pair) ");
+            LOG.info("\nPositive response  from TradeInterface.getActiveOrders(CurrencyPair pair) ");
             ArrayList<Order> orderListUSDNBT = (ArrayList<Order>) activeOrdersUSDNTBResponse.getResponseObject();
 
-            LOG.fine("Active orders : " + orderListUSDNBT.size());
+            LOG.info("Active orders : " + orderListUSDNBT.size());
             for (int i = 0; i < orderListUSDNBT.size(); i++) {
                 Order tempOrder = orderListUSDNBT.get(i);
-                LOG.fine(tempOrder.toString());
+                LOG.info(tempOrder.toString());
             }
         } else {
             LOG.severe(activeOrdersUSDNTBResponse.getError().toString());
         }
     }
 
-    private static void testGetOrderDetail() {
+    private static void testGetOrderDetail(String order_id_detail) {
         //Get the order details for a specific order_id
-        String order_id_detail = "362840306";
         ApiResponse orderDetailResponse = Global.exchange.getTrade().getOrderDetail(order_id_detail);
         if (orderDetailResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.getOrderDetail(id) ");
+            LOG.info("\nPositive response  from TradeInterface.getOrderDetail(id) ");
             Order order = (Order) orderDetailResponse.getResponseObject();
-            LOG.fine(order.toString());
+            LOG.info(order.toString());
         } else {
             LOG.severe(orderDetailResponse.getError().toString());
         }
     }
 
-    private static void testCancelOrder() {
+    private static void testCancelOrder(String order_id_delete) {
         //Cancel an order
-        String order_id_delete = "319991270";
         ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(order_id_delete);
         if (deleteOrderResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
             if (deleted) {
-                LOG.fine("Order deleted succesfully");
+                LOG.info("Order deleted succesfully");
             } else {
-                LOG.fine("Could not delete order");
+                LOG.info("Could not delete order");
             }
 
         } else {
@@ -260,7 +258,7 @@ public class TestWrappers {
         //Get current trascation fee
         ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee();
         if (txFeeResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getTxFee()");
+            LOG.info("\nPositive response  from TradeInterface.getTxFee()");
             double txFee = (Double) txFeeResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFee + "%");
         } else {
@@ -272,7 +270,7 @@ public class TestWrappers {
         //Get the current transaction fee associated with a specific CurrencyPair
         ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Constant.BTC_USD);
         if (txFeeNTBUSDResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getTxFee(CurrencyPair pair)");
+            LOG.info("\nPositive response  from TradeInterface.getTxFee(CurrencyPair pair)");
             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFeeUSDNTB + "%");
         } else {
@@ -284,9 +282,9 @@ public class TestWrappers {
         //Check if orderId is active
         ApiResponse orderDetailResponse = Global.exchange.getTrade().orderExists(orderId);
         if (orderDetailResponse.isPositive()) {
-            LOG.fine("Positive response  from TradeInterface.orderExists(id) ");
+            LOG.info("\nPositive response  from TradeInterface.orderExists(id) ");
             boolean exist = (boolean) orderDetailResponse.getResponseObject();
-            LOG.fine("Order " + orderId + "  exist? " + exist);
+            LOG.info("Order " + orderId + "  exist? " + exist);
         } else {
             LOG.severe(orderDetailResponse.getError().toString());
         }
@@ -298,9 +296,9 @@ public class TestWrappers {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                LOG.fine("Order clear request succesfully");
+                LOG.info("Order clear request succesfully");
             } else {
-                LOG.fine("Could not submit request to clear orders");
+                LOG.info("Could not submit request to clear orders");
             }
 
         } else {

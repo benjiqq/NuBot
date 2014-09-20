@@ -17,7 +17,6 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-import com.nubits.nubot.trading.TradeInterface;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -33,6 +32,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.HttpUtils;
 import java.math.BigInteger;
@@ -338,8 +338,9 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        throw new UnsupportedOperationException("In this API you should specify the CurrencyPair"
+        ApiError err = new ApiError(ERROR_GENERIC, "In Peatio API you should specify the CurrencyPair"
                 + "\n use getActiveOrders(CurrencyPair pair)");
+        return new ApiResponse(false, null, err);
     }
 
     @Override
