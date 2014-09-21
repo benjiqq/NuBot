@@ -31,8 +31,8 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
 import com.nubits.nubot.tasks.StrategyCryptoTask;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.TradeUtils;
 import com.nubits.nubot.utils.Utils;
@@ -111,20 +111,14 @@ public class NuBot {
         Utils.printSeparator();
 
 
-        //Switch the ip of exchange
-        String apibase = "";
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_BTCCNY)) {
-            apibase = Constant.PEATIO_BTCCNY_API_BASE;
-        } else if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_MULTIPAIR_API_BASE)) {
-            apibase = Constant.PEATIO_MULTIPAIR_API_BASE;
-        } else {
-            LOG.severe("Exchange name not accepted : " + Global.options.getExchangeName());
-            System.exit(0);
-        }
-
         LOG.fine("Creating an Exchange object");
+
         Global.exchange = new Exchange(Global.options.getExchangeName());
         Utils.printSeparator();
+
+
+
+
 
 
         LOG.fine("Create e ExchangeLiveData object to accomodate liveData from the exchange");
@@ -133,10 +127,20 @@ public class NuBot {
         Utils.printSeparator();
 
 
+        LOG.fine("Create a new TradeInterface object");
+        TradeInterface ti = Exchange.getTradeInterface(Global.options.getExchangeName());
+        ti.setKeys(keys);
+        ti.setExchange(Global.exchange);
 
-        LOG.fine("Create a new TradeInterface object using the PeatioWrapper implementation "
-                + "and assign the TradeInterface to the peatio");
-        Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, apibase));
+        String apibase = "";
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_BTCCNY)) {
+            ti.setApiBaseUrl(Constant.PEATIO_BTCCNY_API_BASE);
+        } else if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_MULTIPAIR_API_BASE)) {
+            ti.setApiBaseUrl(Constant.PEATIO_MULTIPAIR_API_BASE);
+        }
+
+
+        Global.exchange.setTrade(ti);
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
         Utils.printSeparator();
 
@@ -307,8 +311,11 @@ public class NuBot {
             public void run() {
                 LOG.info("Bot shut down");
                 NuBot.mainThread.interrupt();
-                Global.taskManager.stopAll();
-
+                if (Global.taskManager != null) {
+                    if (Global.taskManager.isInitialized()) {
+                        Global.taskManager.stopAll();
+                    }
+                }
                 Thread.currentThread().interrupt();
                 return;
             }

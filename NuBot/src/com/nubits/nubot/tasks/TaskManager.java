@@ -42,6 +42,7 @@ public class TaskManager {
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
     private ArrayList<BotTask> taskList;
     private boolean running;
+    private boolean initialized = false;
 //Constructor
 
     public TaskManager() {
@@ -86,6 +87,7 @@ public class TaskManager {
                 new PriceMonitorTask(), checkbalanceInterval, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
+        initialized = true;
     }
 
     //Methods
@@ -211,5 +213,13 @@ public class TaskManager {
 
     public void setPriceMonitorTask(BotTask priceMonitorTask) {
         this.priceMonitorTask = priceMonitorTask;
+    }
+
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
     }
 }

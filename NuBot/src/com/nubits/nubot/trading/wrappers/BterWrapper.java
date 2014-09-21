@@ -89,6 +89,9 @@ public class BterWrapper implements TradeInterface {
     private final int ERROR_PARSING = 14563;
     private final int ERROR_CURRENCY_NOT_FOUND = 14567;
 
+    public BterWrapper() {
+    }
+
     public BterWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
@@ -573,6 +576,22 @@ public class BterWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public void setKeys(ApiKeys keys) {
+        this.keys = keys;
+    }
+
+    @Override
+    public void setExchange(Exchange exchange) {
+        this.exchange = exchange;
+    }
+
+    @Override
+    public void setApiBaseUrl(String apiBaseUrl) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+
     }
 
     private class BterService implements ServiceInterface {

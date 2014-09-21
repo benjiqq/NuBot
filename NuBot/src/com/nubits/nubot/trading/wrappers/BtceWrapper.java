@@ -89,10 +89,9 @@ public class BtceWrapper implements TradeInterface {
     private final int ERROR_SCRAPING_HTML = 4565;
     private final int ERRROR_API = 4566;
 
-    /**
-     *
-     * @param keys
-     */
+    public BtceWrapper() {
+    }
+
     public BtceWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
@@ -846,6 +845,22 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public String getUrlConnectionCheck() {
         return checkConnectionUrl;
+    }
+
+    @Override
+    public void setKeys(ApiKeys keys) {
+        this.keys = keys;
+    }
+
+    @Override
+    public void setExchange(Exchange exchange) {
+        this.exchange = exchange;
+    }
+
+    @Override
+    public void setApiBaseUrl(String apiBaseUrl) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+
     }
 
     /* Service implementation */

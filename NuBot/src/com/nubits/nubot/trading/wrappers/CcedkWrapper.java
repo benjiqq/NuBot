@@ -89,6 +89,9 @@ public class CcedkWrapper implements TradeInterface {
     private final int ERROR_ORDER_NOT_FOUND = 8565;
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
 
+    public CcedkWrapper() {
+    }
+
     public CcedkWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
@@ -776,6 +779,22 @@ public class CcedkWrapper implements TradeInterface {
         order.setInsertedDate(new Date(created));
 
         return order;
+    }
+
+    @Override
+    public void setKeys(ApiKeys keys) {
+        this.keys = keys;
+    }
+
+    @Override
+    public void setExchange(Exchange exchange) {
+        this.exchange = exchange;
+    }
+
+    @Override
+    public void setApiBaseUrl(String apiBaseUrl) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+
     }
 
     private class CcedkService implements ServiceInterface {

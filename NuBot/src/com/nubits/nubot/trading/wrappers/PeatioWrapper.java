@@ -68,7 +68,7 @@ public class PeatioWrapper implements TradeInterface {
     private final String SIGN_HASH_FUNCTION = "HmacSHA256";
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
-    public final String checkConnectionUrl;
+    public String checkConnectionUrl;
     private final String API_GET_INFO = "/api/v2/members/me"; //GET
     private final String API_TRADE = "/api/v2/orders"; //POST
     private final String API_ACTIVE_ORDERS = "/api/v2/orders"; //GET
@@ -88,6 +88,9 @@ public class PeatioWrapper implements TradeInterface {
     private final int ERROR_GET_ORDERS = 5567;
     private final int ERROR_GET_ORDERDETAIL = 5568;
     private final int ERROR_CANCEL_ORDER = 5569;
+
+    public PeatioWrapper() {
+    }
 
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
         this.keys = keys;
@@ -713,6 +716,21 @@ public class PeatioWrapper implements TradeInterface {
         }
         apiBusy = false;
         return lastSentTonce;
+    }
+
+    @Override
+    public void setKeys(ApiKeys keys) {
+        this.keys = keys;
+    }
+
+    @Override
+    public void setExchange(Exchange exchange) {
+        this.exchange = exchange;
+    }
+
+    @Override
+    public void setApiBaseUrl(String apiBaseUrl) {
+        this.apiBaseUrl = apiBaseUrl;
     }
 
     private class PeatioService implements ServiceInterface {

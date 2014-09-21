@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +17,16 @@
  */
 package com.nubits.nubot.exchanges;
 
-import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.trading.wrappers.BtceWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.PeatioWrapper;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.logging.Logger;
 
 /**
@@ -35,13 +43,38 @@ public class Exchange {
     private ExchangeLiveData exchangeLiveData; //contains the data shown in the UI
     private ApiKeys keys;
     private TradeInterface trade;
+    //Constructor
+    private static HashMap<String, TradeInterface> supportedExchanges = new HashMap<>();
 
-//Constructor
+    public static boolean isSupported(String name) {
+
+        supportedExchanges.put(Constant.BTCE, new BtceWrapper());
+        supportedExchanges.put(Constant.PEATIO_BTCCNY, new PeatioWrapper());
+        supportedExchanges.put(Constant.BTER, new BterWrapper());
+        supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
+
+
+        Iterator it = supportedExchanges.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            if (name.equalsIgnoreCase((String) pairs.getKey())) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public Exchange(String name) {
-        this.name = name;
+        if (isSupported(name)) {
+            this.name = name;
+            this.exchangeLiveData = new ExchangeLiveData();
+        } else {
+            LOG.severe("Nubot doesn't support exchange named : " + name);
+            listSupportedExchanges();
+            System.exit(0);
 
-        this.exchangeLiveData = new ExchangeLiveData();
-
+        }
 
     }
 
@@ -83,5 +116,31 @@ public class Exchange {
 
     public void setExchangeLiveData(ExchangeLiveData exchangeLiveData) {
         this.exchangeLiveData = exchangeLiveData;
+    }
+
+    private static void listSupportedExchanges() {
+        String infoString = "Accepted values for exchange name :";
+
+
+        Iterator it = supportedExchanges.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry pairs = (Map.Entry) it.next();
+            infoString += pairs.getKey() + " ; ";
+        }
+        LOG.info(infoString);
+    }
+
+    public static TradeInterface getTradeInterface(String name) {
+        TradeInterface ti = null;
+
+        if (supportedExchanges.containsKey(name)) {
+            return supportedExchanges.get(name);
+        } else {
+            LOG.severe("Cannot find the trading interface for " + name);
+            System.exit(0);
+        }
+
+        return ti;
+
     }
 }

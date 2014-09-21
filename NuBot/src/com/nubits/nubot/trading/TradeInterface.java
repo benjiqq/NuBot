@@ -17,12 +17,14 @@
  */
 package com.nubits.nubot.trading;
 
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.trading.keys.ApiKeys;
 import java.util.HashMap;
 import java.util.TreeMap;
 
@@ -236,4 +238,22 @@ public interface TradeInterface {
      * @return A String with the raw HTTP response
      */
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet);
+
+    /**
+     *
+     * @param keys
+     */
+    public void setKeys(ApiKeys keys);
+
+    /**
+     *
+     * @param exchange
+     */
+    public void setExchange(Exchange exchange);
+
+    /**
+     *
+     * @param apiBaseUrl
+     */
+    public void setApiBaseUrl(String apiBaseUrl);
 }
