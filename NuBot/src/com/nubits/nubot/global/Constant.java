@@ -69,6 +69,8 @@ public class Constant {
         switch (codeString) {
             case "USD":
                 toRet = USD;
+            case "LTC":
+                toRet = LTC;
                 break;
             case "CNY":
                 toRet = CNY;

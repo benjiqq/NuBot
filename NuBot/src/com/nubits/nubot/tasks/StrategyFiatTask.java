@@ -165,7 +165,7 @@ public class StrategyFiatTask extends TimerTask {
 
                         //Update TX fee :
                         //Get the current transaction fee associated with a specific CurrencyPair
-                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Constant.BTC_CNY);
+                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                         if (txFeeNTBUSDResponse.isPositive()) {
                             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
                             LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
@@ -176,11 +176,11 @@ public class StrategyFiatTask extends TimerTask {
                             double amountToSell = balanceNBT.getQuantity();
                             if (Global.executeOrders) {
                                 //execute the order
-                                String orderString = "sell " + amountToSell + " " + Constant.BTC_CNY.getOrderCurrency().getCode()
-                                        + " @ " + sellPrice + " " + Constant.BTC_CNY.getPaymentCurrency().getCode();
+                                String orderString = "sell " + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                        + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
                                 LOG.warning("Strategy : Submit order : " + orderString);
 
-                                ApiResponse sellResponse = Global.exchange.getTrade().sell(Constant.BTC_CNY, amountToSell, sellPrice);
+                                ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
                                 if (sellResponse.isPositive()) {
                                     HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
                                     String sellResponseString = (String) sellResponse.getResponseObject();
@@ -191,8 +191,8 @@ public class StrategyFiatTask extends TimerTask {
                             } else {
                                 //Testing only : print the order without executing it
                                 LOG.warning("Strategy : (Should) Submit order : "
-                                        + "sell" + amountToSell + " " + Constant.BTC_CNY.getOrderCurrency().getCode()
-                                        + " @ " + sellPrice + " " + Constant.BTC_CNY.getPaymentCurrency().getCode());
+                                        + "sell" + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                        + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
                             }
                         } else {
                             //Cannot update txfee
@@ -243,7 +243,7 @@ public class StrategyFiatTask extends TimerTask {
 
                         //Update TX fee :
                         //Get the current transaction fee associated with a specific CurrencyPair
-                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Constant.BTC_CNY);
+                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                         if (txFeeNTBUSDResponse.isPositive()) {
                             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
                             LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
@@ -255,12 +255,12 @@ public class StrategyFiatTask extends TimerTask {
                             double amountToBuy = balanceFIAT.getQuantity() / buyPrice;
                             if (Global.executeOrders) {
                                 //execute the order
-                                String orderString = "buy " + amountToBuy + " " + Constant.BTC_CNY.getOrderCurrency().getCode()
-                                        + " @ " + buyPrice + " " + Constant.BTC_CNY.getPaymentCurrency().getCode();
+                                String orderString = "buy " + amountToBuy + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                        + " @ " + buyPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
                                 LOG.warning("Strategy : Submit order : " + orderString);
 
 
-                                ApiResponse buyResponse = Global.exchange.getTrade().buy(Constant.BTC_CNY, amountToBuy, buyPrice);
+                                ApiResponse buyResponse = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy, buyPrice);
                                 if (buyResponse.isPositive()) {
                                     String buyResponseString = (String) buyResponse.getResponseObject();
                                     HipChatNotifications.sendMessage("New buy wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
@@ -271,8 +271,8 @@ public class StrategyFiatTask extends TimerTask {
                             } else {
                                 //Testing only : print the order without executing it
                                 LOG.warning("Strategy : (Should) Submit order : "
-                                        + "buy" + amountToBuy + " " + Constant.BTC_CNY.getOrderCurrency().getCode()
-                                        + " @ " + buyPrice + " " + Constant.BTC_CNY.getPaymentCurrency().getCode());
+                                        + "buy" + amountToBuy + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                        + " @ " + buyPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
                             }
                         } else {
                             //Cannot update txfee
@@ -361,7 +361,7 @@ public class StrategyFiatTask extends TimerTask {
 
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
-                ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Constant.BTC_CNY);
+                ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                 if (txFeeNTBFIATResponse.isPositive()) {
                     double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
                     LOG.fine("Updated Trasaction fee = " + txFeeFIATNTB + "%");
@@ -379,7 +379,6 @@ public class StrategyFiatTask extends TimerTask {
 
                     if (Global.options.isExecuteOrders()) {
                         //Place nbtBalance1 on a sell wall @ 1/priceBtc + tx_fee (buy_wall_order1)
-
 
                         LOG.warning("Strategy : Submit order : " + orderString1);
 
