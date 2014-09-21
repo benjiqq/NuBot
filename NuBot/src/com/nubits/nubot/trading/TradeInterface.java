@@ -29,8 +29,8 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 /**
- * This interface can be used to trade Please refer to TODO to best practice for
- * the implementation
+ * This interface can be used to trade Please refer to readme to best practice
+ * for the implementation
  *
  * @author desrever
  * @see Balance
@@ -153,14 +153,6 @@ public interface TradeInterface {
      * an ApiError in case of error.
      */
     public ApiResponse getTxFee(CurrencyPair pair);
-
-    /**
-     * Get the permissions associated with the current api keys
-     *
-     * @return the list of permissions wrapped in an ApiPermissions object an
-     * ApiError in case of error.
-     */
-    public ApiResponse getPermissions();
 
     /**
      * Get the transaction fee for a specific currency

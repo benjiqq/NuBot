@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,11 +17,6 @@
  */
 package com.nubits.nubot.trading.keys;
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.trading.wrappers.BtceWrapper;
-import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
 
@@ -85,34 +80,35 @@ public class ApiKeys {
         }
         return toReturn; //Wrong passphrase default
     }
+    /*
+     public static String validate(String secret, String api, Exchange exchange) {
+     TradeInterface trade = null;
+     String toReturn = "";
+     switch (exchange.getName()) {
+     case Constant.BTCE: {
+     trade = new BtceWrapper(new ApiKeys(secret, api), exchange);
+     break;
+     }
+     default: {
+     LOG.severe("Exchange " + exchange.getName() + " is not supported");
+     return "exchange " + exchange.getName() + " not supported";
+     }
+     }
 
-    public static String validate(String secret, String api, Exchange exchange) {
-        TradeInterface trade = null;
-        String toReturn = "";
-        switch (exchange.getName()) {
-            case Constant.BTCE: {
-                trade = new BtceWrapper(new ApiKeys(secret, api), exchange);
-                break;
-            }
-            default: {
-                LOG.severe("Exchange " + exchange.getName() + " is not supported");
-                return "exchange " + exchange.getName() + " not supported";
-            }
-        }
+     ApiResponse permissionResponse = exchange.getTrade().getPermissions();
+     if (permissionResponse.isPositive()) {
+     ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
 
-        ApiResponse permissionResponse = exchange.getTrade().getPermissions();
-        if (permissionResponse.isPositive()) {
-            ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
+     if (permissions.isGet_info() && permissions.isTrade()) {
+     toReturn = VALID_KEYS;
+     } else {
+     toReturn = "The keys of " + exchange.getName() + " works but some permission is missing. Activate at least : get_info and trade";
+     }
+     } else {
+     toReturn = "Authentication failed. Read the tutorial if the problem persist.";
+     }
 
-            if (permissions.isGet_info() && permissions.isTrade()) {
-                toReturn = VALID_KEYS;
-            } else {
-                toReturn = "The keys of " + exchange.getName() + " works but some permission is missing. Activate at least : get_info and trade";
-            }
-        } else {
-            toReturn = "Authentication failed. Read the tutorial if the problem persist.";
-        }
-
-        return toReturn;
-    }
+     return toReturn;
+     }
+     */
 }

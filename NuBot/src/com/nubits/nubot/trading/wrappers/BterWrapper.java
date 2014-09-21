@@ -509,11 +509,6 @@ public class BterWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse getPermissions() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public ApiResponse orderExists(String id) {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }

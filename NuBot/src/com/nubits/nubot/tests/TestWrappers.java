@@ -32,7 +32,6 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.keys.ApiPermissions;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
@@ -84,22 +83,23 @@ public class TestWrappers {
         //testGetPermissions();
     }
 
-    private static void testGetPermissions() {
-        //Test if the given apikey have permissions to trade and getinfo
+    /*
+     private static void testGetPermissions() {
+     //Test if the given apikey have permissions to trade and getinfo
 
-        ApiResponse permissionResponse = Global.exchange.getTrade().getPermissions();
-        if (permissionResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getPermissions() ");
-            ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
+     ApiResponse permissionResponse = Global.exchange.getTrade().getPermissions();
+     if (permissionResponse.isPositive()) {
+     LOG.info("\nPositive response  from TradeInterface.getPermissions() ");
+     ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
 
-            LOG.info("Keys Valid :" + permissions.isValid_keys() + "\n"
-                    + "getinfo : " + permissions.isGet_info() + "\n"
-                    + "trade : " + permissions.isTrade());
-        } else {
-            LOG.severe(permissionResponse.getError().toString());
-        }
-    }
-
+     LOG.info("Keys Valid :" + permissions.isValid_keys() + "\n"
+     + "getinfo : " + permissions.isGet_info() + "\n"
+     + "trade : " + permissions.isTrade());
+     } else {
+     LOG.severe(permissionResponse.getError().toString());
+     }
+     }
+     */
     private static void tesGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);

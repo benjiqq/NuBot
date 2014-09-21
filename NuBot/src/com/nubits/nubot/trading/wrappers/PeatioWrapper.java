@@ -535,11 +535,6 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse getPermissions() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public ApiError getErrorByCode(int code) {
         boolean found = false;
         ApiError toReturn = null;;

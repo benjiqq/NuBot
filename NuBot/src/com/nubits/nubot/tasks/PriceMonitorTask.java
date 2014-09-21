@@ -17,8 +17,8 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.launch.NuPriceMonitor;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.launch.NuPriceMonitor;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -114,7 +114,6 @@ public class PriceMonitorTask extends TimerTask {
                     }
                 }
             } else {
-                //One or more feeds had a problem  //TODO
             }
 
         }
@@ -192,13 +191,7 @@ public class PriceMonitorTask extends TimerTask {
         this.lastPrice = lp;
         LOG.info("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
-
-
-
-        tryMoveWalls(); //TODO remove
-
-
-
+        tryMoveWalls();
     }
 
     public LastPrice getLastPriceFromFeeds() {
@@ -208,7 +201,6 @@ public class PriceMonitorTask extends TimerTask {
     private void tryMoveWalls() {
 
         LOG.info("Executing tryMoveWalls");
-        //TODO for now I will mock up and compute price for sell and buy orders here. MOVE somewhere else ASAP!
         String notificationEmail = "";
         if (isFirstTime) {
             currentWallBtcPrice = lastPrice;

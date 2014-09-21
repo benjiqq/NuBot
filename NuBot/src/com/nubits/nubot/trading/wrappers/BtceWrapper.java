@@ -31,7 +31,6 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.keys.ApiPermissions;
 import com.nubits.nubot.utils.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
@@ -466,87 +465,86 @@ public class BtceWrapper implements TradeInterface {
         return getTxFee();
     }
 
-    @Override
-    public ApiResponse getPermissions() {
-        ApiResponse apiResponse = new ApiResponse();
-        String path = API_GET_INFO;
-        HashMap<String, String> query_args = new HashMap<>();
-        /*Params
-         *
-         */
-        ApiPermissions permissions = new ApiPermissions(false, false, false, false, false, false);
-        String queryResult = query(API_BASE_URL, API_GET_INFO, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(new ApiError(ERROR_GENERIC, "Generic error with btce service call"));
-            return apiResponse;
-        }
+    /*
+     public ApiResponse getPermissions() {
+     ApiResponse apiResponse = new ApiResponse();
+     String path = API_GET_INFO;
+     HashMap<String, String> query_args = new HashMap<>();
 
-        if (queryResult.equals(ERROR_NO_CONNECTION)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-        /*Sample result
-         *{
-         *"success":1,
-         *"return":{
-         *	"funds":{
-         *		"usd":325,
-         *		"btc":23.998,
-         *		"sc":121.998,
-         *		"ltc":0,
-         *		"ruc":0,
-         *		"nmc":0
-         *	},
-         *	"rights":{
-         *		"info":1,
-         *		"trade":1
-         *	},
-         *	"transaction_count":80,
-         *	"open_orders":1,
-         *	"server_time":1342123547
-         *      }
-         *}
-         */
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            long success = (long) httpAnswerJson.get("success");
-            if (success == 0) {
-                //error
-                String error = (String) httpAnswerJson.get("error");
-                apiResponse.setError(new ApiError(ERRROR_API, error));
-                LOG.severe("Btce returned an error: " + error);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("return");
-                JSONObject rightsJson = (JSONObject) dataJson.get("rights");
+     ApiPermissions permissions = new ApiPermissions(false, false, false, false, false, false);
+     String queryResult = query(API_BASE_URL, API_GET_INFO, query_args, false);
+     if (queryResult.startsWith(TOKEN_ERR)) {
+     apiResponse.setError(new ApiError(ERROR_GENERIC, "Generic error with btce service call"));
+     return apiResponse;
+     }
 
-                long info = (long) rightsJson.get("info");
-                long trade = (long) rightsJson.get("trade");
-                long withdraw = (long) rightsJson.get("withdraw");
+     if (queryResult.equals(ERROR_NO_CONNECTION)) {
+     apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+     return apiResponse;
+     }
+     /*Sample result
+     *{
+     *"success":1,
+     *"return":{
+     *	"funds":{
+     *		"usd":325,
+     *		"btc":23.998,
+     *		"sc":121.998,
+     *		"ltc":0,
+     *		"ruc":0,
+     *		"nmc":0
+     *	},
+     *	"rights":{
+     *		"info":1,
+     *		"trade":1
+     *	},
+     *	"transaction_count":80,
+     *	"open_orders":1,
+     *	"server_time":1342123547
+     *      }
+     *}
+     */
+    /*
+     JSONParser parser = new JSONParser();
+     try {
+     JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+     long success = (long) httpAnswerJson.get("success");
+     if (success == 0) {
+     //error
+     String error = (String) httpAnswerJson.get("error");
+     apiResponse.setError(new ApiError(ERRROR_API, error));
+     LOG.severe("Btce returned an error: " + error);
+     return apiResponse;
+     } else {
+     //correct
+     JSONObject dataJson = (JSONObject) httpAnswerJson.get("return");
+     JSONObject rightsJson = (JSONObject) dataJson.get("rights");
 
-                if (info == 1) {
-                    permissions.setGet_info(true);
-                }
-                if (trade == 1) {
-                    permissions.setTrade(true);
-                }
-                if (withdraw == 1) {
-                    permissions.setWithdraw(true);
-                }
+     long info = (long) rightsJson.get("info");
+     long trade = (long) rightsJson.get("trade");
+     long withdraw = (long) rightsJson.get("withdraw");
 
-                permissions.setValid_keys(true);
-            }
-        } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing api permissions for btce"));
-        }
-        apiResponse.setResponseObject(permissions);
-        return apiResponse;
+     if (info == 1) {
+     permissions.setGet_info(true);
+     }
+     if (trade == 1) {
+     permissions.setTrade(true);
+     }
+     if (withdraw == 1) {
+     permissions.setWithdraw(true);
+     }
 
-    }
+     permissions.setValid_keys(true);
+     }
+     } catch (ParseException ex) {
+     LOG.severe(ex.getMessage());
+     apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing api permissions for btce"));
+     }
+     apiResponse.setResponseObject(permissions);
+     return apiResponse;
 
+     }
+     */
     private ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();

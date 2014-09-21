@@ -577,11 +577,6 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse getPermissions() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
     public ApiResponse orderExists(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
