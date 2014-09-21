@@ -232,8 +232,8 @@ public class NuBot {
 
 
         if (Global.options.getPair().equals(Constant.NBT_USD)
-                || Global.options.getPair().equals(Constant.BTC_CNY)) //TODO remove this line when peatio is fixed
-        {
+                || Global.options.getPair().equals(Constant.BTC_CNY) //TODO remove this line when peatio is fixed
+                || Global.options.getPair().equals(Constant.PPC_LTC)) {
             Global.taskManager.getStrategyFiatTask().start(7);
         } else if (Global.options.getPair().equals(Constant.NBT_BTC)) {
 

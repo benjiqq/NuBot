@@ -90,12 +90,15 @@ public class BtceWrapper implements TradeInterface {
     private final int ERRROR_API = 4566;
 
     public BtceWrapper() {
+        setupErrors();
+
     }
 
     public BtceWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
         setupErrors();
+
     }
 
     private void setupErrors() {

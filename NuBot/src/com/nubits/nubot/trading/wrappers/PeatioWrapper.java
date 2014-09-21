@@ -90,6 +90,8 @@ public class PeatioWrapper implements TradeInterface {
     private final int ERROR_CANCEL_ORDER = 5569;
 
     public PeatioWrapper() {
+        setupErrors();
+
     }
 
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
@@ -98,6 +100,7 @@ public class PeatioWrapper implements TradeInterface {
         this.apiBaseUrl = api_base;
         this.checkConnectionUrl = api_base;
         setupErrors();
+
     }
 
     protected Long createNonce(String requester) {

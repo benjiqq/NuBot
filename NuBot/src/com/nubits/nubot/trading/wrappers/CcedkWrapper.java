@@ -90,12 +90,15 @@ public class CcedkWrapper implements TradeInterface {
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
 
     public CcedkWrapper() {
+        setupErrors();
+
     }
 
     public CcedkWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
         setupErrors();
+
     }
 
     protected String createNonce(String requester) {
@@ -392,7 +395,13 @@ public class CcedkWrapper implements TradeInterface {
             } else {
                 //correct
                 JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONArray entities = (JSONArray) dataJson.get("entities");
+                JSONArray entities;
+                try {
+                    entities = (JSONArray) dataJson.get("entities");
+                } catch (ClassCastException e) { //Empty order list returns {"errors":false,"response":{"entities":false},
+                    apiResponse.setResponseObject(orderList);
+                    return apiResponse;
+                }
 
                 for (int i = 0; i < entities.size(); i++) {
                     JSONObject orderObject = (JSONObject) entities.get(i);

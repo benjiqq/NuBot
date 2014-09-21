@@ -90,6 +90,7 @@ public class BterWrapper implements TradeInterface {
     private final int ERROR_CURRENCY_NOT_FOUND = 14567;
 
     public BterWrapper() {
+        setupErrors();
     }
 
     public BterWrapper(ApiKeys keys, Exchange exchange) {

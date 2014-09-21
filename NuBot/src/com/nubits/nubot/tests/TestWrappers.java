@@ -78,9 +78,9 @@ public class TestWrappers {
         //testCancelOrder("2725");
         //testGetTxFee();
         //testGetTxFeeWithArgs();
-        testClearAllOrders();
+        //testClearAllOrders();
         //testIsOrderActive("2726");
-        //testIsOrderActive("362849485");
+        testIsOrderActive("362849485");
         //testGetPermissions();
     }
 
