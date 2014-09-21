@@ -27,6 +27,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
@@ -41,6 +42,7 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -61,6 +63,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -77,8 +80,9 @@ public class BterWrapper implements TradeInterface {
     private final String API_BASE_URL = "https://bter.com/api/1/";
     private final String API_GET_INFO = "private/getfunds";
     private final String API_TRADE = "private/placeorder";
-    private final String API_ACTIVE_ORDERS = "";
-    private final String API_CANCEL_ORDER = "";
+    private final String API_ACTIVE_ORDERS = "private/orderlist";
+    private final String API_ORDER = "private/getorder";
+    private final String API_CANCEL_ORDER = "private/cancelorder";
     private final String API_GET_FEE = "http://data.bter.com/api/1/marketinfo";
     // Errors
     private ArrayList<ApiError> errors;
@@ -173,16 +177,23 @@ public class BterWrapper implements TradeInterface {
                 return apiResponse;
             } else {
                 //correct
+                boolean somethingLocked = false;
+                JSONObject lockedFundsJSON = null;
                 JSONObject availableFundsJSON = (JSONObject) httpAnswerJson.get("available_funds");
-                JSONObject lockedFundsJSON = (JSONObject) httpAnswerJson.get("locked_funds");
+
+                if (httpAnswerJson.containsKey("locked_funds")) {
+                    lockedFundsJSON = (JSONObject) httpAnswerJson.get("locked_funds");
+                    somethingLocked = true;
+                }
+
 
                 if (currency == null) { //Get all balances
 
                     boolean foundNBTavail = false;
                     boolean foundPEGavail = false;
 
-                    Amount NBTAvail = null,
-                            PEGAvail = null;
+                    Amount NBTAvail = new Amount(0, pair.getOrderCurrency()),
+                            PEGAvail = new Amount(0, pair.getPaymentCurrency());
 
                     Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
                     Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
@@ -201,49 +212,47 @@ public class BterWrapper implements TradeInterface {
                         foundPEGavail = true;
                     }
 
-                    if (lockedFundsJSON.containsKey(NBTcode)) {
-                        double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(NBTcode));
-                        NBTonOrder = new Amount(tempbalance, pair.getOrderCurrency());
+                    if (somethingLocked) {
+                        if (lockedFundsJSON.containsKey(NBTcode)) {
+                            double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(NBTcode));
+                            NBTonOrder = new Amount(tempbalance, pair.getOrderCurrency());
+                        }
+
+                        if (lockedFundsJSON.containsKey(PEGcode)) {
+                            double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(PEGcode));
+                            PEGonOrder = new Amount(tempbalance, pair.getOrderCurrency());
+                        }
                     }
 
-                    if (lockedFundsJSON.containsKey(PEGcode)) {
-                        double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(PEGcode));
-                        PEGonOrder = new Amount(tempbalance, pair.getOrderCurrency());
-                    }
+                    balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    apiResponse.setResponseObject(balance);
+                    if (!foundNBTavail || !foundPEGavail) {
+                        LOG.severe("Cannot find a balance for currency with code "
+                                + "" + NBTcode + " or " + PEGcode + " in your balance. "
+                                + "NuBot assumes that balance is 0");
 
-
-                    if (foundNBTavail && foundPEGavail) {
-                        //Pack it into the ApiResponse
-                        balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-
-                        apiResponse.setResponseObject(balance);
-                    } else {
-                        apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
-                                + "Cannot find a currency with code " + NBTcode + " or " + PEGcode + " in your balance"));
                     }
 
                 } else { //Get specific balance
 
                     boolean found = false;
-                    Amount avail = null;
+                    Amount avail = new Amount(0, currency);
                     String code = currency.getCode().toUpperCase();
                     if (availableFundsJSON.containsKey(code)) {
                         double tempbalance = Double.parseDouble((String) availableFundsJSON.get(code));
                         avail = new Amount(tempbalance, currency);
                         found = true;
                     }
-
-                    if (found) {
-                        apiResponse.setResponseObject(avail);
-                    } else {
-                        apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
-                                + "Cannot find a currency with code " + code + " in your balance"));
+                    apiResponse.setResponseObject(avail);
+                    if (!found) {
+                        LOG.severe("Cannot find a balance for currency with code "
+                                + code + " in your balance. NuBot assumes that balance is 0");
                     }
                 }
             }
         } catch (ParseException ex) {
             LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
 
@@ -320,7 +329,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
 
@@ -370,7 +379,17 @@ public class BterWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean valid = (boolean) httpAnswerJson.get("result");
+            /*NOTE TO SELF. Contact Bter support
+             * httpAnswerJson.get("result") contains "true" or false.
+             * one is a String the other is boolean
+             */
+
+            boolean valid = false;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (java.lang.ClassCastException e) {
+                valid = true;
+            }
 
             if (!valid) {
                 //error
@@ -397,32 +416,287 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
     }
 
     @Override
     public ApiResponse getActiveOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getActiveOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getActiveOrdersImpl(pair);
+    }
+
+    public ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        String path = API_BASE_URL + API_ACTIVE_ORDERS;
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+
+        /* Sample response
+         *{
+         "result":true,
+         "orders":[
+         {
+         "id":"15088",
+         "sell_type":"BTC",
+         "buy_type":"LTC",
+         "sell_amount":"0.39901357",
+         "buy_amount":"12.0",
+         "pair":"ltc_btc",
+         "type":"buy",
+         "rate":0.033251,
+         "amount":"0.39901357",
+         "initial_rate":0.033251,
+         "initial_amount":"1"
+         "status":"open"
+         },
+         {
+         "id":"15092",
+         "sell_type":"LTC",
+         "buy_type":"BTC",
+         "sell_amount":"13.0",
+         "buy_amount":"0.4210",
+         "pair":"ltc_btc",
+         "type":"buy",
+         "rate":0.0323846,
+         "amount":"0.4210",
+         "initial_rate":0.0323846,
+         "initial_amount":"1"
+         "status":"open"
+         }
+         ]
+         "msg":"Success"
+         }
+         }
+         */
+
+        String queryResult = query(path, query_args, false);
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            /*NOTE TO SELF. Contact Bter support
+             * httpAnswerJson.get("result") contains "true" or false.
+             * one is a String the other is boolean
+             */
+
+            boolean valid = false;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (java.lang.ClassCastException e) {
+                valid = true;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("msg");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+
+                LOG.severe("Bter API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                JSONArray orders;
+                try {
+                    orders = (JSONArray) httpAnswerJson.get("orders");
+                } catch (ClassCastException e) { //Empty order list?
+                    apiResponse.setResponseObject(orderList);
+                    return apiResponse;
+                }
+
+                for (int i = 0; i < orders.size(); i++) {
+                    JSONObject orderObject = (JSONObject) orders.get(i);
+                    Order tempOrder = parseOrder(orderObject);
+
+
+                    if (!tempOrder.isCompleted()) //Do not add executed orders
+                    {
+                        //check if a specific currencypair is set
+                        if (pair != null) {
+                            if (tempOrder.getPair().equals(pair)) {
+                                orderList.add(tempOrder);
+                            }
+                        } else {
+                            orderList.add(tempOrder);
+                        }
+                    }
+                }
+                apiResponse.setResponseObject(orderList);
+
+                return apiResponse;
+
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while response"));
+            return apiResponse;
+        }
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        ApiResponse apiResponse = new ApiResponse();
+        String path = API_BASE_URL + API_ORDER;
+
+
+        String order_id = "";
+        HashMap<String, String> query_args = new HashMap<>();
+        query_args.put("order_id", orderID);
+
+
+        /* Sample response
+         * {
+         "result":true,
+         "order":{
+         "id":"15088",
+         "status":"cancelled",
+         "pair":"btc_cny",
+         "type":"sell",
+         "rate":811,
+         "amount":"0.39901357",
+         "initial_rate":811,
+         "initial_amount":"1"
+         },
+         "msg":"Success"
+         }
+         */
+
+        String queryResult = query(path, query_args, false);
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            /*NOTE TO SELF. Contact Bter support
+             * httpAnswerJson.get("result") contains "true" or false.
+             * one is a String the other is boolean
+             */
+
+            boolean valid = false;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (java.lang.ClassCastException e) {
+                valid = true;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("msg");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+
+                LOG.severe("Bter API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+
+                String msg = (String) httpAnswerJson.get("msg");
+                if (!msg.equals("Success")) {
+                    LOG.severe("BTER : Something went wrong while gettin the order :" + msg);
+                    ApiError apiErr = new ApiError(ERROR_GENERIC, msg);
+                    apiResponse.setError(apiErr);
+                    return apiResponse;
+                } else {
+                    JSONObject orderObject = (JSONObject) httpAnswerJson.get("order");
+                    Order order = parseOrder(orderObject);
+                    apiResponse.setResponseObject(order);
+                    return apiResponse;
+                }
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        ApiResponse apiResponse = new ApiResponse();
+        String path = API_BASE_URL + API_CANCEL_ORDER;
+
+        HashMap<String, String> query_args = new HashMap<>();
+        query_args.put("order_id", orderID);
+
+
+        /* Sample response
+         * {
+         {
+         "result":"true",
+         "msg":"Success"
+         }
+         */
+
+        String queryResult = query(path, query_args, false);
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            /*NOTE TO SELF. Contact Bter support
+             * httpAnswerJson.get("result") contains "true" or false.
+             * one is a String the other is boolean
+             */
+
+            boolean valid = false;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (java.lang.ClassCastException e) {
+                valid = true;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("msg");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+
+                LOG.severe("Bter API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+
+                String msg = (String) httpAnswerJson.get("msg");
+                if (!msg.equals("Success")) {
+                    LOG.severe("BTER : Something went wrong while deleting the order :" + msg);
+                    apiResponse.setResponseObject(false);
+                    return apiResponse;
+                } else {
+
+                    apiResponse.setResponseObject(true);
+                    return apiResponse;
+                }
+            }
+        } catch (ParseException ex) {
+            LOG.severe(ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            return apiResponse;
+        }
     }
 
-    @Override
+//    @Override
     public ApiResponse getTxFee() {
         return new ApiResponse(false, null,
                 new ApiError(ERROR_UNKNOWN, "For Bter the fee changes with the currency. Please be more specific"));
@@ -432,7 +706,6 @@ public class BterWrapper implements TradeInterface {
     public ApiResponse getTxFee(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         double fee = 0;
-
 
         String path = API_GET_FEE;
 
@@ -499,7 +772,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
     }
@@ -509,13 +782,73 @@ public class BterWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse orderExists(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+    public ApiResponse isOrderActive(String id) {
+        ApiResponse apiResp = new ApiResponse();
+
+        ApiResponse orderDetailResponse = Global.exchange.getTrade().getOrderDetail(id);
+        if (orderDetailResponse.isPositive()) {
+            Order order = (Order) orderDetailResponse.getResponseObject();
+            if (order.isCompleted()) {
+                apiResp.setResponseObject(false);
+            } else {
+                apiResp.setResponseObject(true);
+            }
+        } else { //in case of api error...
+            //Distinguish between the "Is not valid" and another case of API err
+            String errMessage = orderDetailResponse.getError().toString();
+            String searching = "invalid order id";
+            if (errMessage.contains(searching)) { //order does not exist therfore not active
+                apiResp.setResponseObject(false);
+            } else { //is an error
+                apiResp = orderDetailResponse;
+            }
+        }
+
+        return apiResp;
+
     }
 
     @Override
     public ApiResponse clearOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        //Since there is no API entry point for that, this call will iterate over actie
+        ApiResponse toReturn = new ApiResponse();
+        boolean ok = true;
+
+        ApiResponse activeOrdersResponse = getActiveOrders();
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId());
+                if (deleteOrderResponse.isPositive()) {
+                    boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+
+                    if (deleted) {
+                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                    } else {
+                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        ok = false;
+                    }
+
+                } else {
+                    LOG.severe(deleteOrderResponse.getError().toString());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.getMessage());
+                }
+
+            }
+            toReturn.setResponseObject(ok);
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            toReturn.setError(activeOrdersResponse.getError());
+            return toReturn;
+        }
+
+        return toReturn;
     }
 
     @Override
@@ -588,6 +921,48 @@ public class BterWrapper implements TradeInterface {
     public void setApiBaseUrl(String apiBaseUrl) {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
 
+    }
+
+    private Order parseOrder(JSONObject orderObject) {
+        Order order = new Order();
+
+        /*
+         *id":"15088",
+         "sell_type":"BTC",
+         "buy_type":"LTC",
+         "sell_amount":"0.39901357",
+         "buy_amount":"12.0",
+         "pair":"ltc_btc",
+         "type":"buy",
+         "rate":0.033251,
+         "amount":"0.39901357",
+         "initial_rate":0.033251,
+         "initial_amount":"1"
+         "status":"open"
+         */
+
+        order.setId((String) orderObject.get("id"));
+
+
+        //TODO currencypair
+        CurrencyPair cp = CurrencyPair.getCurrencyPairFromString((String) orderObject.get("pair"), "_");
+        order.setPair(cp);
+
+        order.setType(((String) orderObject.get("type")).toUpperCase());
+        order.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), cp.getOrderCurrency()));
+        order.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
+
+        String status = (String) orderObject.get("status");
+
+        if (!status.equals("open")) {
+            order.setCompleted(true);
+        } else {
+            order.setCompleted(false);
+        }
+
+        order.setInsertedDate(new Date()); //Not provided
+
+        return order;
     }
 
     private class BterService implements ServiceInterface {

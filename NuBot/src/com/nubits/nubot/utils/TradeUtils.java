@@ -86,7 +86,7 @@ public class TradeUtils {
                 count += wait;
                 timedout = count > timeoutMS;
 
-                ApiResponse orderDetailResponse = Global.exchange.getTrade().orderExists(orderID);
+                ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderID);
                 if (orderDetailResponse.isPositive()) {
                     deleted = !((boolean) orderDetailResponse.getResponseObject());
                     LOG.fine("Does order " + orderID + "  still exist?" + !deleted);
@@ -172,7 +172,6 @@ public class TradeUtils {
 
     public static String getCCDKEvalidNonce() {
         //It tries to send a wrong nonce, get the allowed window, and use it for the actuall call
-        //TODO fix it
         String wrongNonce = "1234567891";
         try {
             String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce);

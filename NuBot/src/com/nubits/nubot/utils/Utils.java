@@ -79,9 +79,7 @@ public class Utils {
 
             FileUtils.writeByteArrayToFile(new File(pathToOutput), ciphertext);
 
-            if (Utils.isWindowsPlatform()) {
-                //TODO hide the file
-            }
+
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
             LOG.severe(ex.getMessage());
         }
@@ -209,7 +207,12 @@ public class Utils {
             Long l = new Long((long) obj);
             toRet = l.doubleValue();
         } else {
-            toRet = (Double) obj;
+            try {
+                toRet = (Double) obj;
+            } catch (ClassCastException e) {
+                //probably a String
+                toRet = Double.parseDouble((String) obj);
+            }
         }
         return toRet;
     }

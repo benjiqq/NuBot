@@ -214,7 +214,7 @@ public class PeatioWrapper implements TradeInterface {
                     NBTAvail = new Amount(balanceObj.getDouble("balance"), pair.getOrderCurrency());
                     NBTonOrder = new Amount(balanceObj.getDouble("locked"), pair.getOrderCurrency());
                 }
-                if (tempCurrency.equalsIgnoreCase(pegCurrencyCode)) { // TODO change when new exchange is up
+                if (tempCurrency.equalsIgnoreCase(pegCurrencyCode)) {
                     PEGAvail = new Amount(balanceObj.getDouble("balance"), pair.getPaymentCurrency());
                     PEGonOrder = new Amount(balanceObj.getDouble("locked"), pair.getPaymentCurrency());
                 }
@@ -487,7 +487,7 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse orderExists(String id) {
+    public ApiResponse isOrderActive(String id) {
         boolean exists = false;
         ApiResponse existResponse = new ApiResponse();
 
@@ -600,7 +600,7 @@ public class PeatioWrapper implements TradeInterface {
 
 
         //Create a CurrencyPair object
-        CurrencyPair cp = CurrencyPair.getCurrencyFromString(jsonObject.getString("market"), "");
+        CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(jsonObject.getString("market"), "");
 
         order.setPair(cp);
         order.setCompleted(executed);

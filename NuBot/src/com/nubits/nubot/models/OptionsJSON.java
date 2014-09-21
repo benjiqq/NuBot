@@ -470,7 +470,7 @@ public class OptionsJSON {
             String mailRecipient = (String) optionsJSON.get("mail-recipient");
 
             String pairStr = (String) optionsJSON.get("pair");
-            CurrencyPair pair = CurrencyPair.getCurrencyFromString(pairStr, "_");
+            CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
             boolean dualside = (boolean) optionsJSON.get("dualside");
 
             long nudPortlong = (long) optionsJSON.get("nudport");

@@ -620,7 +620,7 @@ public class BtceWrapper implements TradeInterface {
                     temp.setId(names[i]);
 
                     //Create a CurrencyPair object
-                    CurrencyPair cp = CurrencyPair.getCurrencyFromString((String) tempJson.get("pair"), "_");
+                    CurrencyPair cp = CurrencyPair.getCurrencyPairFromString((String) tempJson.get("pair"), "_");
 
                     //Parse the status to encapsulate into Order object
                     boolean executed = false;
@@ -743,7 +743,7 @@ public class BtceWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse orderExists(String id) {
+    public ApiResponse isOrderActive(String id) {
         ApiResponse existResponse = new ApiResponse();
 
         ApiResponse orderDetailResponse = getOrderDetail(id);

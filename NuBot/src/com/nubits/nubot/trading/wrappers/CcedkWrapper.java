@@ -577,7 +577,7 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse orderExists(String orderID) {
+    public ApiResponse isOrderActive(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
 

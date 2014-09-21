@@ -40,6 +40,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,7 +59,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
         runTests();
 
@@ -66,21 +67,28 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-        //testGetAvailableBalances(Constant.PPC_LTC);
-        //testGetAvailableBalance(Constant.PPC);
-        //testSell();
-        //testBuy();
-        //testGetLastPrice();
-        //testGetActiveOrders();
-        //testGetActiveOrders(Constant.PPC_LTC);
-        //testGetOrderDetail("2725");
-        //testCancelOrder("2725");
+        //testGetAvailableBalances(Constant.BTC_USD);
+        //testGetAvailableBalance(Constant.LTC);
+        //testSell(0.001, 500, Constant.BTC_USD);
+        //testBuy(1, 0.0005, Constant.BTC_USD);
+        //testGetLastPrice(Constant.PPC_BTC);
+        testGetActiveOrders(); //Try with 0 active orders also
+        //testGetActiveOrders(Constant.BTC_USD);
+        //testCancelOrder("63329550");
+        //testGetOrderDetail("63326121"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetTxFee();
-        //testGetTxFeeWithArgs();
-        //testClearAllOrders();
-        //testIsOrderActive("2726");
-        //testIsOrderActive("362849485");
+        //testGetTxFeeWithArgs(Constant.BTC_USD);
+        testClearAllOrders();
+        //testIsOrderActive("63329550");
         //testGetPermissions();
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+        testGetActiveOrders();
     }
 
     /*
@@ -100,7 +108,7 @@ public class TestWrappers {
      }
      }
      */
-    private static void tesGetAvailableBalances(CurrencyPair pair) {
+    private static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
@@ -127,9 +135,9 @@ public class TestWrappers {
         }
     }
 
-    private static void testGetLastPrice() {
+    private static void testGetLastPrice(CurrencyPair pair) {
         //Get lastPrice for a given CurrencyPair
-        ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(Constant.PPC_BTC);
+        ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(pair);
         if (lastPriceResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
@@ -146,14 +154,9 @@ public class TestWrappers {
 
     }
 
-    private static void testSell() {
+    private static void testSell(double amountSell, double priceSell, CurrencyPair pair) {
         //Place a sell order
 
-        //test wrong amounts
-
-        double amountSell = 0.1;
-        double priceSell = 100;
-        CurrencyPair pair = Constant.PPC_LTC;
 
         ApiResponse sellResponse = Global.exchange.getTrade().sell(pair, amountSell, priceSell);
         if (sellResponse.isPositive()) {
@@ -170,11 +173,8 @@ public class TestWrappers {
         }
     }
 
-    private static void testBuy() {
+    private static void testBuy(double amountBuy, double priceBuy, CurrencyPair pair) {
         //Place a buy order
-        double amountBuy = 0.001;
-        double priceBuy = 200;
-        CurrencyPair pair = Constant.BTC_BITUSD;
 
         ApiResponse buyResponse = Global.exchange.getTrade().buy(pair, amountBuy, priceBuy);
         if (buyResponse.isPositive()) {
@@ -266,9 +266,9 @@ public class TestWrappers {
         }
     }
 
-    private static void testGetTxFeeWithArgs() {
+    private static void testGetTxFeeWithArgs(CurrencyPair pair) {
         //Get the current transaction fee associated with a specific CurrencyPair
-        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Constant.BTC_USD);
+        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(pair);
         if (txFeeNTBUSDResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getTxFee(CurrencyPair pair)");
             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
@@ -280,11 +280,11 @@ public class TestWrappers {
 
     private static void testIsOrderActive(String orderId) {
         //Check if orderId is active
-        ApiResponse orderDetailResponse = Global.exchange.getTrade().orderExists(orderId);
+        ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderId);
         if (orderDetailResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.orderExists(id) ");
+            LOG.info("\nPositive response  from TradeInterface.isOrderActive(id) ");
             boolean exist = (boolean) orderDetailResponse.getResponseObject();
-            LOG.info("Order " + orderId + "  exist? " + exist);
+            LOG.info("Order " + orderId + "  active? " + exist);
         } else {
             LOG.severe(orderDetailResponse.getError().toString());
         }

@@ -161,7 +161,7 @@ public interface TradeInterface {
      * @return an ApiResponse object with the boolean response an ApiError in
      * case of error.
      */
-    public ApiResponse orderExists(String id);
+    public ApiResponse isOrderActive(String id);
 
     /**
      * Delete all active orders. Async

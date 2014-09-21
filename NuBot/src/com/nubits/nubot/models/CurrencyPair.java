@@ -47,7 +47,7 @@ public class CurrencyPair {
      * @param sep
      * @return
      */
-    public static CurrencyPair getCurrencyFromString(String pairString, String sep) {
+    public static CurrencyPair getCurrencyPairFromString(String pairString, String sep) {
         String orderCurrencyCode;
         String paymentCurrencyCode;
         if (!sep.equals("")) {
