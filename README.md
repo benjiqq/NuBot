@@ -1,6 +1,8 @@
 ![alt text](../master/readme-assets/logo.png?token=776957__eyJzY29wZSI6IlJhd0Jsb2I6YWR2MHIvbnUtYm90L21hc3Rlci9yZWFkbWUtYXNzZXRzL2xvZ28ucG5nIiwiZXhwaXJlcyI6MTQxMTU5NTQ0N30%3D--e085989b71fcc6e5f2dae1925d97169a84c62ed5 "NuBot Logo")
 #####Official automated trading bot for NuBits custodians
 
+*Disclaimer : this documentation is currently under-development therefore subject to sudden changes*
+
 #What is NuBot?
 
 NuBot is a tool that helps NuBits custodians to automate trades. As explained in the white paper, custodian's core mission is to help keeping the peg while introducing new currency in the market.
@@ -156,6 +158,9 @@ NuBot comes as a cross platform executable jar file to run from command line.
 ![alt text](../master/readme-assets/bot-case-2.png?token=776957__eyJzY29wZSI6IlJhd0Jsb2I6YWR2MHIvbnUtYm90L21hc3Rlci9yZWFkbWUtYXNzZXRzL2JvdC1jYXNlLTIucG5nIiwiZXhwaXJlcyI6MTQxMTU5NTQ0Nn0%3D--ae16c75aeeb3f1d56fd2dff536789ef3afcf1e43 "NuBot Double-Side logic")
 
 ##Implementation details
+
+##HipChat notifications
+##Email notifications
 ##Hidden parameters
 ##Adding SSL certificates for an exchange
 In order for the bot to communicate with the exchanges via encrypted https API, it is required to add the SSL certificate of the exchange to the list of trusted certificates locally. While NuBot includes the keystore file in its build, I still think that documenting it is a good way for keeping the team up to date. 
