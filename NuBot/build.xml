@@ -117,8 +117,11 @@
           <copy file="res/options/sample-options-reduced.json" tofile="${store.dir}/options-sample.json"/>
 
           
-          <copy file="../LICENSE.md" tofile="${store.dir}/res/LICENSE.md"/>
+       <copy file="../LICENSE.md" tofile="${store.dir}/res/sources/LICENSE.md"/>
         
+       
+       <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
+
         <file file="res/options/sample-options-reduced.json"/>
         
         <mkdir dir="${store.dir}/logs"/>
@@ -130,12 +133,12 @@
 
         </copy>
           
-        <copy todir="${store.dir}/res/src/" >  
+        <copy todir="${store.dir}/res/sources/src/" >  
             <fileset dir="src/">  
             </fileset>
         </copy>
         
-        <copy todir="${store.dir}/res/lib/" >  
+        <copy todir="${store.dir}/res/sources/lib/" >  
             <fileset dir="lib/">  
             </fileset>
         </copy>
@@ -146,8 +149,6 @@
         <delete file="${store.dir}/res/src/com/nubits/nubot/global/Passwords.java"/>
          
         <delete file="${store.dir}/temp_final.jar"/>
-        <delete file="${store.dir}/res/ssl/readme.txt"/>
-        <delete file="${store.dir}/res/ssl/listCertificates.sh"/>
 
     </target>
 </project>
