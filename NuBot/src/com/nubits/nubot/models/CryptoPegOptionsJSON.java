@@ -38,7 +38,6 @@ public class CryptoPegOptionsJSON {
     //Optional settings with a default value  ----------------------------
     private int refreshTime;
     private double wallchangeTreshold, priceOffset, distanceTreshold;
-    private int emergencyTimeout;
 
     /**
      *
@@ -50,14 +49,14 @@ public class CryptoPegOptionsJSON {
      * @param backupFeedNames
      * @param emergencyTimeout
      */
-    public CryptoPegOptionsJSON(int refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames, int emergencyTimeout) {
+    public CryptoPegOptionsJSON(int refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
         this.refreshTime = refreshTime;
         this.wallchangeTreshold = wallchangeTreshold;
         this.priceOffset = priceOffset;
         this.distanceTreshold = distanceTreshold;
         this.mainFeed = mainFeed;
         this.backupFeedNames = backupFeedNames;
-        this.emergencyTimeout = emergencyTimeout;
+
     }
 
     /**
@@ -99,7 +98,6 @@ public class CryptoPegOptionsJSON {
             double wallchangeTreshold = 3;
             double priceOffset = 0;
             double distanceTreshold = 10;
-            int emergencyTimeout = 60;
 
 
 
@@ -121,13 +119,7 @@ public class CryptoPegOptionsJSON {
                 refreshTime = new Integer((optionsJSON.get("refresh-time")).toString());
             }
 
-
-            if (optionsJSON.has("emergency-timeout")) {
-                emergencyTimeout = (int) optionsJSON.get("emergency-timeout");
-            }
-
-
-            return new CryptoPegOptionsJSON(refreshTime, wallchangeTreshold, priceOffset, distanceTreshold, mainFeed, backupFeedNames, emergencyTimeout);
+            return new CryptoPegOptionsJSON(refreshTime, wallchangeTreshold, priceOffset, distanceTreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
             LOG.severe(ex.getMessage());
             System.exit(0);
@@ -231,28 +223,12 @@ public class CryptoPegOptionsJSON {
         this.backupFeedNames = backupFeedNames;
     }
 
-    /**
-     *
-     * @return
-     */
-    public int getEmergencyTimeout() {
-        return emergencyTimeout;
-    }
-
-    /**
-     *
-     * @param emergencyTimeoutMinutes
-     */
-    public void setEmergencyTimeoutMinutes(int emergencyTimeoutMinutes) {
-        this.emergencyTimeout = emergencyTimeoutMinutes;
-    }
-
     @Override
     public String toString() {
-        return "CryptoPegOptionsJSON [" + "backupFeedNames " + backupFeedNames + " " + "distanceTreshold " + distanceTreshold + " " + "emergencyTimeoutMinutes " + emergencyTimeout + " " + "mainFeed " + mainFeed + " " + "priceOffset " + priceOffset + " " + "refreshTime " + refreshTime + " " + "wallchangeTreshold " + wallchangeTreshold + "]";
+        return "CryptoPegOptionsJSON [" + "backupFeedNames " + backupFeedNames + " " + "distanceTreshold " + distanceTreshold + "mainFeed " + mainFeed + " " + "priceOffset " + priceOffset + " " + "refreshTime " + refreshTime + " " + "wallchangeTreshold " + wallchangeTreshold + "]";
     }
 
     String toHtmlString() {
-        return "CryptoPegOptionsJSON : <br>" + "backupFeedNames " + backupFeedNames + " <br>" + "distanceTreshold " + distanceTreshold + "<br> " + "emergencyTimeoutMinutes " + emergencyTimeout + "<br>" + "mainFeed " + mainFeed + " <br>" + "priceOffset " + priceOffset + " <br>" + "refreshTime " + refreshTime + " <br>" + "wallchangeTreshold " + wallchangeTreshold;
+        return "CryptoPegOptionsJSON : <br>" + "backupFeedNames " + backupFeedNames + " <br>" + "distanceTreshold " + distanceTreshold + "<br>" + "mainFeed " + mainFeed + " <br>" + "priceOffset " + priceOffset + " <br>" + "refreshTime " + refreshTime + " <br>" + "wallchangeTreshold " + wallchangeTreshold;
     }
 }

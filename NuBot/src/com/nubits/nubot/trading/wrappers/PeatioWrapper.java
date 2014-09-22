@@ -729,6 +729,8 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
         this.apiBaseUrl = apiBaseUrl;
+        this.checkConnectionUrl = apiBaseUrl;
+
     }
 
     private class PeatioService implements ServiceInterface {

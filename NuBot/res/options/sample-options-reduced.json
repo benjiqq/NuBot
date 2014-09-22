@@ -9,16 +9,7 @@
     "rpcpass": "xxx",
     "rpcuser": "xxx",
     "pair":"xxx_xxx",
-    "mail-recipient":"xxx",
-    "crypto-peg-options":
-        {
-            "main-feed":"blockchain",
-            "backup-feeds": {
-                "backup1" : { "name" : "bitcoinaverage"},
-                "backup2" : { "name" : "coinbase"},
-                "backup3" : { "name" : "btce"}
-                }
-         }
+    "mail-recipient":"xxx"
  }
 }
   

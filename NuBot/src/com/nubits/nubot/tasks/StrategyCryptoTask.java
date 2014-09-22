@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -258,7 +258,7 @@ public class StrategyCryptoTask extends TimerTask {
                     LOG.warning("Clear all orders request succesfully");
                     //Wait until there are no active orders
                     boolean timedOut = false;
-                    long timeout = Global.options.getCryptoPegOptions().getEmergencyTimeout() * 1000;
+                    long timeout = Global.options.getEmergencyTimeout() * 1000;
                     long wait = 6 * 1000;
                     long count = 0L;
                     do {
@@ -377,7 +377,7 @@ public class StrategyCryptoTask extends TimerTask {
     }
 
     private void renewWall(String wallOrderID, String type, String orderIdentifier) {
-        if (TradeUtils.takeDownAndWait(wallOrderID, Global.options.getCryptoPegOptions().getEmergencyTimeout() * 1000)) {
+        if (TradeUtils.takeDownAndWait(wallOrderID, Global.options.getEmergencyTimeout() * 1000)) {
             //new_balance1 NBT is now back at disposal
 
             //Getavailable balance and check if there are credit available

@@ -51,6 +51,7 @@ public class Constant {
     public static final Currency PPC = new Currency("P", false, "PPC", "Peercoin");
     public static final Currency LTC = new Currency("L", false, "LTC", "Litecoin");
     public static final Currency BITUSD = new Currency("busd", false, "BITUSD", "Bitshare X BitUSD");
+    public static final Currency BTSX = new Currency("bx", false, "BTSX", "Bitshares X");
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
@@ -60,6 +61,8 @@ public class Constant {
     public static final CurrencyPair PPC_BTC = new CurrencyPair(PPC, BTC);
     public static final CurrencyPair PPC_LTC = new CurrencyPair(PPC, LTC);
     public static final CurrencyPair BTC_CNY = new CurrencyPair(BTC, CNY);
+    public static final CurrencyPair BTSX_USD = new CurrencyPair(BTSX, USD);
+    public static final CurrencyPair BTSX_BTC = new CurrencyPair(BTSX, BTC);
     public static final CurrencyPair BITUSD_BTC = new CurrencyPair(BITUSD, BTC);
     public static final CurrencyPair BTC_BITUSD = new CurrencyPair(BTC, BITUSD);
 
@@ -86,6 +89,9 @@ public class Constant {
                 break;
             case "BITUSD":
                 toRet = BITUSD;
+                break;
+            case "BTSX":
+                toRet = BTSX;
                 break;
             default:
                 LOG.severe("Currency " + codeString + " not available");

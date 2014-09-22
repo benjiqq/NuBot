@@ -17,8 +17,10 @@
  */
 package com.nubits.nubot.utils;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.launch.NuBot;
+import com.nubits.nubot.models.CurrencyPair;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -196,6 +198,26 @@ public class Utils {
 
     public static void printSeparator() {
         LOG.fine("\n----------- -----------  -----------\n");
+    }
+
+    public static boolean isSupported(CurrencyPair pair) {
+        if (pair.equals(Constant.NBT_USD)
+                || pair.equals(Constant.BTC_CNY)
+                || pair.equals(Constant.NBT_BTC)) { //TODO this is only for testing purposes on our internal exchange
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public static boolean requiresCryptoStrategy(CurrencyPair pair) {
+        //Return TRUE when it requires a dedicated NBT peg to something that is not USD
+        if (pair.equals(Constant.NBT_USD)
+                || pair.equals(Constant.BTC_CNY)) { //TODO this is only for testing purposes on our internal exchange
+            return false;
+        } else {
+            return true;
+        }
     }
 
     //When parsing Json with org.json.simple.JSONObject, use this for doubles

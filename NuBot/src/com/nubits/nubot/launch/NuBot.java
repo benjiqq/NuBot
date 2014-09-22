@@ -231,62 +231,62 @@ public class NuBot {
         //Switch strategy for different trading pair
 
 
-        if (Global.options.getPair().equals(Constant.NBT_USD)
-                || Global.options.getPair().equals(Constant.BTC_CNY) //TODO remove this line when peatio is fixed
-                || Global.options.getPair().equals(Constant.PPC_LTC)) {
-            Global.taskManager.getStrategyFiatTask().start(7);
-        } else if (Global.options.getPair().equals(Constant.NBT_BTC)) {
-
-            CryptoPegOptionsJSON cpo = Global.options.getCryptoPegOptions();
-            //Peg to a USD price via crypto pair
-            Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
-            CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
-
-            PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
-
-            //Then set the pfm
-            ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setPriceFeedManager(pfm);
-
-            //Set the priceDistance threshold
-            ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setDistanceTreshold(cpo.getDistanceTreshold());
-
-            //Set the priceDistance threshold
-            ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setWallchangeThreshold(cpo.getWallchangeTreshold());
-
-
-            //Compute the buy/sell prices in USD
-            double sellPriceUSD = TradeUtils.getSellPrice(Global.options.getTxFee());
-            double buyPriceUSD = TradeUtils.getBuyPrice(Global.options.getTxFee());
-
-            //Add(remove) the offset % from prices
-            sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * cpo.getPriceOffset());
-            buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * cpo.getPriceOffset());
-
-            if (Global.isDualSide) {
-                LOG.fine("Computing USD pegs with offset " + cpo.getPriceOffset() + "% : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
+        if (Utils.isSupported(Global.options.getPair())) {
+            if (!Utils.requiresCryptoStrategy(Global.options.getPair())) {
+                Global.taskManager.getStrategyFiatTask().start(7);
             } else {
-                LOG.fine("Computing USD pegs with offset " + cpo.getPriceOffset() + "% : sell @ " + sellPriceUSD);
+
+
+                CryptoPegOptionsJSON cpo = Global.options.getCryptoPegOptions();
+                //Peg to a USD price via crypto pair
+                Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
+
+                PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
+
+                //Then set the pfm
+                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setPriceFeedManager(pfm);
+
+                //Set the priceDistance threshold
+                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setDistanceTreshold(cpo.getDistanceTreshold());
+
+                //Set the priceDistance threshold
+                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setWallchangeThreshold(cpo.getWallchangeTreshold());
+
+
+                //Compute the buy/sell prices in USD
+                double sellPriceUSD = TradeUtils.getSellPrice(Global.options.getTxFee());
+                double buyPriceUSD = TradeUtils.getBuyPrice(Global.options.getTxFee());
+
+                //Add(remove) the offset % from prices
+                sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * cpo.getPriceOffset());
+                buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * cpo.getPriceOffset());
+
+                if (Global.isDualSide) {
+                    LOG.info("Computing USD pegs with offset " + cpo.getPriceOffset() + "% : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
+                } else {
+                    LOG.info("Computing USD pegs with offset " + cpo.getPriceOffset() + "% : sell @ " + sellPriceUSD);
+                }
+
+
+                //Set the prices in USD
+                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setSellPriceUSD(sellPriceUSD);
+                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setBuyPriceUSD(buyPriceUSD);
+
+
+
+                //set the interval from options
+                Global.taskManager.getStrategyCryptoTask().setInterval(cpo.getRefreshTime());
+
+                //then start the thread
+                Global.taskManager.getStrategyCryptoTask().start(2);
+
+
             }
-
-
-            //Set the prices in USD
-            ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setSellPriceUSD(sellPriceUSD);
-            ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setBuyPriceUSD(buyPriceUSD);
-
-
-
-            //set the interval from options
-            Global.taskManager.getStrategyCryptoTask().setInterval(cpo.getRefreshTime());
-
-            //then start the thread
-            Global.taskManager.getStrategyCryptoTask().start(2);
-
-
         } else {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
             System.exit(0);
         }
-
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";

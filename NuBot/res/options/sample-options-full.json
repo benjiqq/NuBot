@@ -20,6 +20,7 @@
     "hipchat":false,
     "mail-notifications":false,
     "mail-recipient":"xxx",
+     "emergency-timeout":60,
     "crypto-peg-options":
         {
             "main-feed":"blockchain",
@@ -31,8 +32,7 @@
             "refresh-time":124,
             "wallchange-treshold": 3,
             "price-offset": 0,
-            "price-distance-threshold":10,
-            "emergency-timeout":60
+            "price-distance-threshold":10
          }
  }
 }

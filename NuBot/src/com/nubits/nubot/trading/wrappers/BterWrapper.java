@@ -227,7 +227,7 @@ public class BterWrapper implements TradeInterface {
                     balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                     apiResponse.setResponseObject(balance);
                     if (!foundNBTavail || !foundPEGavail) {
-                        LOG.severe("Cannot find a balance for currency with code "
+                        LOG.info("Cannot find a balance for currency with code "
                                 + "" + NBTcode + " or " + PEGcode + " in your balance. "
                                 + "NuBot assumes that balance is 0");
 
@@ -245,7 +245,7 @@ public class BterWrapper implements TradeInterface {
                     }
                     apiResponse.setResponseObject(avail);
                     if (!found) {
-                        LOG.severe("Cannot find a balance for currency with code "
+                        LOG.info("Cannot find a balance for currency with code "
                                 + code + " in your balance. NuBot assumes that balance is 0");
                     }
                 }
