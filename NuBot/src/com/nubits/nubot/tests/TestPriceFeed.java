@@ -22,8 +22,9 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeed.AbstractPriceFeed;
-import com.nubits.nubot.pricefeed.BterPriceFeed;
+import com.nubits.nubot.pricefeed.CoinmarketcapnexuistPriceFeed;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
+import com.nubits.nubot.pricefeed.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -45,13 +46,16 @@ public class TestPriceFeed {
         TestPriceFeed test = new TestPriceFeed();
         test.init();
 
+        test.pair = Constant.PPC_USD;
+
+
         //test.executeSingle();
-        test.execute();
+        //test.execute();
+        test.executePPC();
     }
 
     private void init() {
         Utils.loadProperties("settings.properties");
-        pair = Constant.BTC_USD;
         //feed = new BitcoinaveragePriceFeed();
         try {
             NuLogger.setup(false);
@@ -60,7 +64,7 @@ public class TestPriceFeed {
         }
         LOG.setLevel(Level.INFO);
 
-        feed = new BterPriceFeed();
+        feed = new CoinmarketcapnexuistPriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -93,14 +97,43 @@ public class TestPriceFeed {
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 
-        LastPrice lastPrice = pfm.getLastPrice();
+        LastPriceResponse lpr = pfm.getLastPrices();
 
-        if (!lastPrice.isError()) {
-            LOG.info("All good!");
-            LOG.info(lastPrice.toString());
-        } else {
-            //handle error
-            LOG.severe("There was a problem while updating the price");
+
+        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+
+        LOG.info("CheckLastPrice received values from remote feeds. ");
+
+        LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
+        for (int i = 0; i < priceList.size(); i++) {
+            LastPrice tempPrice = priceList.get(i);
+            LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
+        }
+    }
+
+    private void executePPC() {
+
+        String mainFeed = PriceFeedManager.BTCE;
+
+        ArrayList<String> backupFeedList = new ArrayList<>();
+
+
+        backupFeedList.add(PriceFeedManager.COINMARKETCAP_NO);
+        backupFeedList.add(PriceFeedManager.COINMARKETCAP_NE);
+
+
+        PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+
+        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+
+        LOG.info("CheckLastPrice received values from remote feeds. ");
+
+        LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
+        for (int i = 0; i < priceList.size(); i++) {
+            LastPrice tempPrice = priceList.get(i);
+            LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }
 }

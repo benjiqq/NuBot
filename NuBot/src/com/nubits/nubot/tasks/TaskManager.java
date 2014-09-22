@@ -60,12 +60,13 @@ public class TaskManager {
             checkOrdersInterval = Global.options.getCheckOrdersInteval();
             checkbalanceInterval = Global.options.getCheckBalanceInterval();
             verbose = Global.options.isVerbose();
-        }
-        if (Global.options.getCryptoPegOptions() != null) {
-            //If global option have been loaded
-            checkPriceInterval = Global.options.getCryptoPegOptions().getRefreshTime();
+            if (Global.options.getCryptoPegOptions() != null) {
+                //If global option have been loaded
+                checkPriceInterval = Global.options.getCryptoPegOptions().getRefreshTime();
 
+            }
         }
+
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), 127, "checkConnection");

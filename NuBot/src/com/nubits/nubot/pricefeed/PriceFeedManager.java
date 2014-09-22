@@ -32,13 +32,18 @@ public class PriceFeedManager {
     private static final Logger LOG = Logger.getLogger(PriceFeedManager.class.getName());
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
-    public final static String BTCE = Constant.BTCE;
+    //Only BTC
     public final static String BLOCKCHAIN = "blockchain";
     public final static String BITCOINAVERAGE = "bitcoinaverage";
     public final static String COINBASE = "coinbase";
     public final static String BTER = "bter";
     public final static String CCEDK = "ccedk";
+    //BTC and PPC
+    public final static String BTCE = Constant.BTCE;
+    public final static String COINMARKETCAP_NO = "coinmarketcap_no";
+    public final static String COINMARKETCAP_NE = "coinmarketcap_ne";
 
+    //PPC
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
         this.pair = pair;
 
@@ -112,6 +117,12 @@ public class PriceFeedManager {
                 break;
             case BTER:
                 tempFeed = new BterPriceFeed();
+                break;
+            case COINMARKETCAP_NE:
+                tempFeed = new CoinmarketcapnexuistPriceFeed();
+                break;
+            case COINMARKETCAP_NO:
+                tempFeed = new CoinmarketcapnorthpolePriceFeed();
                 break;
             default:
                 LOG.severe("Error wile adding price seed with name unrecognized : " + feedname);

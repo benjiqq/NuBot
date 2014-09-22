@@ -44,11 +44,13 @@ public class PriceMonitorTask extends TimerTask {
     private double distanceTreshold;
     private LastPrice lastPrice;
     private boolean isFirstTime = true;
-    private LastPrice currentWallBtcPrice;
+    private LastPrice currentWallPEGPrice;
     private double wallchangeThreshold;
     private double sellPriceUSDsingleside, sellPriceUSDdoubleside, buyPriceUSD;
     private String outputPath, recipient;
     private boolean sendEmails;
+    private boolean isFirstEmail = true;
+    private String emailHistory = "";
 
     @Override
     public void run() {
@@ -105,6 +107,7 @@ public class PriceMonitorTask extends TimerTask {
                                 message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
                                         + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
                             }
+
 
 
                             MailNotifications.send(Global.options.getMailRecipient(), title, message);
@@ -203,10 +206,10 @@ public class PriceMonitorTask extends TimerTask {
         LOG.info("Executing tryMoveWalls");
         String notificationEmail = "";
         if (isFirstTime) {
-            currentWallBtcPrice = lastPrice;
+            currentWallPEGPrice = lastPrice;
             //Compute price for walls
             computePrices();
-            notificationEmail = "First time wall-setup with BTCprice = " + currentWallBtcPrice.getPrice().getQuantity();
+            notificationEmail = "First time wall-setup with PEGprice = " + currentWallPEGPrice.getPrice().getQuantity();
             LOG.info(notificationEmail);
         } else {
             //check if price moved more than x% from when the wall was setup
@@ -214,7 +217,7 @@ public class PriceMonitorTask extends TimerTask {
                 LOG.severe("We should move the walls now!");
                 //Compute price for walls
 
-                currentWallBtcPrice = lastPrice;
+                currentWallPEGPrice = lastPrice;
                 computePrices();
 
             } else {
@@ -228,10 +231,10 @@ public class PriceMonitorTask extends TimerTask {
     }
 
     private boolean needToMoveWalls(LastPrice last) {
-        double currentWallBTCprice = currentWallBtcPrice.getPrice().getQuantity();
-        double distance = Math.abs(last.getPrice().getQuantity() - currentWallBTCprice);
-        double percentageDistance = Utils.round((distance * 100) / currentWallBTCprice, 4);
-        LOG.info("d=" + percentageDistance + "% (old : " + currentWallBTCprice + " new " + last.getPrice().getQuantity() + ")");
+        double currentWallPEGprice = currentWallPEGPrice.getPrice().getQuantity();
+        double distance = Math.abs(last.getPrice().getQuantity() - currentWallPEGprice);
+        double percentageDistance = Utils.round((distance * 100) / currentWallPEGprice, 4);
+        LOG.info("d=" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
 
         if (percentageDistance < wallchangeThreshold) {
             return false;
@@ -245,18 +248,18 @@ public class PriceMonitorTask extends TimerTask {
 
         //Sell-side custodian sell-wall
 
-        double btc_price = lastPrice.getPrice().getQuantity();
+        double peg_price = lastPrice.getPrice().getQuantity();
 
 
-        //convert sell price to BTC
-        double sellPriceBTC = Utils.round(sellPriceUSDsingleside / btc_price, 8);
-        double sellPriceBTCdual = Utils.round(sellPriceUSDdoubleside / btc_price, 8);
-        double buyPriceBTC = Utils.round(buyPriceUSD / btc_price, 8);
+        //convert sell price to PEG
+        double sellPricePEG = Utils.round(sellPriceUSDsingleside / peg_price, 8);
+        double sellPricePEGdual = Utils.round(sellPriceUSDdoubleside / peg_price, 8);
+        double buyPricePEG = Utils.round(buyPriceUSD / peg_price, 8);
 
-        LOG.info("Sell wall prices in BTC : \n"
-                + "Sell Price (sell-side custodians) " + sellPriceBTC + "\n"
-                + "Sell Price (dual-side custodians) " + sellPriceBTCdual + "\n"
-                + "Buy Price  " + buyPriceBTC);
+        LOG.info("Sell wall prices: \n"
+                + "Sell Price (sell-side custodians) " + sellPricePEG + "\n"
+                + "Sell Price (dual-side custodians) " + sellPricePEGdual + "\n"
+                + "Buy Price  " + buyPricePEG);
 
 
 
@@ -264,9 +267,9 @@ public class PriceMonitorTask extends TimerTask {
 
         //------------ here for output csv
 
-        String source = currentWallBtcPrice.getSource();
-        double price = currentWallBtcPrice.getPrice().getQuantity();
-        String currency = currentWallBtcPrice.getPrice().getCurrency().getCode();
+        String source = currentWallPEGPrice.getSource();
+        double price = currentWallPEGPrice.getPrice().getQuantity();
+        String currency = currentWallPEGPrice.getPrice().getCurrency().getCode();
         String crypto = pfm.getPair().getOrderCurrency().getCode();
 
         String row = new Date() + ","
@@ -274,9 +277,9 @@ public class PriceMonitorTask extends TimerTask {
                 + crypto + ","
                 + price + ","
                 + currency + ","
-                + sellPriceBTC + ","
-                + sellPriceBTCdual + ","
-                + buyPriceBTC + ",";
+                + sellPricePEG + ","
+                + sellPricePEGdual + ","
+                + buyPricePEG + ",";
 
         String otherPricesAtThisTime = "";
 
@@ -289,7 +292,36 @@ public class PriceMonitorTask extends TimerTask {
         row += otherPricesAtThisTime + "\n";
 
         if (sendEmails) {
-            MailNotifications.send(recipient, " Notification : WallChange", NuPriceMonitor.HEADER + "\n" + row);
+            String title = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "%";
+            if (isFirstEmail) {
+                title = pfm.getPair().toString() + " price tracking started";
+            }
+
+            String messageNow = NuPriceMonitor.HEADER + row;
+            emailHistory += messageNow;
+
+
+            String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
+                    + "now is " + price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
+                    + "Here are the prices you should used in the new orders : \n"
+                    + "If you are a sell-side custodian, sell at " + sellPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
+                    + "If you area dual-side custodian, sell at " + sellPricePEGdual + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "
+                    + "and buy at " + buyPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
+                    + "\n#########\n"
+                    + "Below you can see the history of price changes. You can copy paste to create a csv report."
+                    + "For each row you should have shifted the sell/buy walls.\n\n";
+            if (isFirstEmail) {
+                tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price is now " + price + " " + pfm.getPair().getPaymentCurrency().getCode() + ".\n"
+                        + "Here are the prices you should used in the first order : \n"
+                        + "If you are a sell-side custodian, sell at " + sellPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
+                        + "If you area dual-side custodian, sell at " + sellPricePEGdual + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "
+                        + "and buy at " + buyPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + ".\nDetails.csv below \n\n\n";
+            }
+
+            MailNotifications.send(recipient, title, tldr + emailHistory);
+            isFirstEmail = false;
+
+
         }
         FileSystem.writeToFile(row, outputPath, true);
 
@@ -304,9 +336,9 @@ public class PriceMonitorTask extends TimerTask {
          + "<td>" + crypto + "</td>"
          + "<td>" + price + "</td>"
          + "<td>" + currency + "</td>"
-         + "<td>" + sellPriceBTC + "</td>"
-         + "<td>" + sellPriceBTCdual + "</td>"
-         + "<td>" + buyPriceBTC + "</td>"
+         + "<td>" + sellPricePEG + "</td>"
+         + "<td>" + sellPricePEGdual + "</td>"
+         + "<td>" + buyPricePEG + "</td>"
          + "<td>\n"
          + "\n"
          + "                    <table>\n";
