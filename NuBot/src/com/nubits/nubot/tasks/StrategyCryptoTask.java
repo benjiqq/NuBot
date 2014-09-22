@@ -66,88 +66,89 @@ public class StrategyCryptoTask extends TimerTask {
         if (pfm == null) {
             LOG.severe("CheckLastPrice task needs a PriceFeedManager to work. Please assign it before running it");
             System.exit(0);
-        } else {
-            LastPriceResponse lpr = pfm.getLastPrices();
-            ArrayList<LastPrice> priceList = lpr.getPrices();
+        }
 
-            LOG.fine("CheckLastPrice received values from remote feeds. ");
-            LOG.fine("Main feed valid? " + lpr.isMainFeedValid() + " .\n Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds. ");
-            for (int i = 0; i < priceList.size(); i++) {
-                LastPrice tempPrice = priceList.get(i);
-                LOG.fine(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
-            }
+        LastPriceResponse lpr = pfm.getLastPrices();
+        ArrayList<LastPrice> priceList = lpr.getPrices();
 
-
-            /*
-             Possible cases here:
-             *  there are backups available
-             *  mainPrice is reliable and there are no backups
-             no valid feeds at all
-             */
-            int numberOfBackups = priceList.size() - 1;
-
-            if (numberOfBackups >= 1) {
-                //At least one backup
-
-                //Check if first price is close enough to the others
-                // In a normal situation, mainPrice is the first element of the list
-                if (sanityCheck(priceList, 0)) {
-                    //first price is reliable compared to the others
-                    this.updateLastPrice(priceList.get(0));
-                } else {
-                    //first price is not reliable compared to the others
-                    //Check if other backup prices are close enough to each other
-                    boolean foundSomeValidBackUp = false;
-                    LastPrice goodPrice = null;
-                    for (int l = 1; l < priceList.size(); l++) {
-                        if (sanityCheck(priceList, l)) {
-                            goodPrice = priceList.get(l);
-                            foundSomeValidBackUp = true;
-                            break;
-                        }
-                    }
-
-                    if (foundSomeValidBackUp) {
-                        //goodPrice is a valid price backup!
-                        this.updateLastPrice(goodPrice);
-                    } else {
-                        //None of the source are in accord with others.
-
-                        //Try to send a notification
-                        if (Global.options != null) {
-                            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-                            String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-                            for (int i = 0; i < priceList.size(); i++) {
-                                LastPrice tempPrice = priceList.get(i);
-                                message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                                        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
-                            }
+        LOG.fine("CheckLastPrice received values from remote feeds. ");
+        LOG.fine("Main feed valid? " + lpr.isMainFeedValid() + " .\n Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds. ");
+        for (int i = 0; i < priceList.size(); i++) {
+            LastPrice tempPrice = priceList.get(i);
+            LOG.fine(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
+        }
 
 
-                            MailNotifications.send(Global.options.getMailRecipient(), title, message);
-                            HipChatNotifications.sendMessage(title + message, Color.RED);
-                            LOG.severe(title + message);
-                        }
+        /*
+         Possible cases here:
+         *  there are backups available
+         *  mainPrice is reliable and there are no backups
+         no valid feeds at all
+         */
+        int numberOfBackups = priceList.size() - 1;
 
+        if (numberOfBackups >= 1) {
+            //At least one backup
+
+            //Check if first price is close enough to the others
+            // In a normal situation, mainPrice is the first element of the list
+            if (sanityCheck(priceList, 0)) {
+                //first price is reliable compared to the others
+                this.updateLastPrice(priceList.get(0));
+            } else {
+                //first price is not reliable compared to the others
+                //Check if other backup prices are close enough to each other
+                boolean foundSomeValidBackUp = false;
+                LastPrice goodPrice = null;
+                for (int l = 1; l < priceList.size(); l++) {
+                    if (sanityCheck(priceList, l)) {
+                        goodPrice = priceList.get(l);
+                        foundSomeValidBackUp = true;
+                        break;
                     }
                 }
-            } else if (lpr.isMainFeedValid() && numberOfBackups < 1) {
-                //mainPrice valid, no backups available
-                LastPrice mainPrice = priceList.get(0);
-                this.updateLastPrice(mainPrice);
-                LOG.severe("New price updated. However,it could be unreliable. There were no backup feeds at the time");
 
-            } else {
-                //No valid price from feeds
-                String message = "Cannot get last price of" + pfm.getPair().getOrderCurrency().getCode() + "All feeds were not valid.";
-                String title = "The bot couldn't update last price";
-                MailNotifications.send(Global.options.getMailRecipient(), title, message);
-                HipChatNotifications.sendMessage(title + message, Color.RED);
-                LOG.severe(title + message);
+                if (foundSomeValidBackUp) {
+                    //goodPrice is a valid price backup!
+                    this.updateLastPrice(goodPrice);
+                } else {
+                    //None of the source are in accord with others.
 
+                    //Try to send a notification
+                    if (Global.options != null) {
+                        String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
+                        String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
+                        for (int i = 0; i < priceList.size(); i++) {
+                            LastPrice tempPrice = priceList.get(i);
+                            message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
+                        }
+
+
+                        MailNotifications.send(Global.options.getMailRecipient(), title, message);
+                        HipChatNotifications.sendMessage(title + message, Color.RED);
+                        LOG.severe(title + message);
+                    }
+
+                }
             }
+        } else if (lpr.isMainFeedValid() && numberOfBackups < 1) {
+            //mainPrice valid, no backups available
+            LastPrice mainPrice = priceList.get(0);
+            this.updateLastPrice(mainPrice);
+            LOG.severe("New price updated. However,it could be unreliable. There were no backup feeds at the time");
+
+        } else {
+            //No valid price from feeds
+            String message = "Cannot get last price of" + pfm.getPair().getOrderCurrency().getCode() + "All feeds were not valid.";
+            String title = "The bot couldn't update last price";
+            MailNotifications.send(Global.options.getMailRecipient(), title, message);
+            HipChatNotifications.sendMessage(title + message, Color.RED);
+            LOG.severe(title + message);
+
         }
+
     }
 
     private boolean sanityCheck(ArrayList<LastPrice> priceList, int mainPriceIndex) {

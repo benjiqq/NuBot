@@ -1,4 +1,4 @@
-![alt text](../master/readme-assets/logo.png?token=776957__eyJzY29wZSI6IlJhd0Jsb2I6YWR2MHIvbnUtYm90L21hc3Rlci9yZWFkbWUtYXNzZXRzL2xvZ28ucG5nIiwiZXhwaXJlcyI6MTQxMTU5NTQ0N30%3D--e085989b71fcc6e5f2dae1925d97169a84c62ed5 "NuBot Logo")
+![alt text](../master/readme-assets/logo.png "NuBot Logo")
 #####Official automated trading bot for NuBits custodians
 
 *Disclaimer : this documentation is currently under-development therefore subject to sudden changes*
@@ -40,8 +40,11 @@ Existing strategies to date :
 
 PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL. ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS.
 
-None of the authors, contributors, administrators, or anyone else connected with NuBits, in any way whatsoever, can be responsible for your use of the NuBot. By using NuBot you 
+None of the authors, contributors, administrators, or anyone else connected with NuBits, in any way whatsoever, can be responsible for your use of the NuBot. 
 
+By using NuBot you declare to be aware the afore-mentioned risks.
+
+Download latest version from the release page.
 
 ##Assumption for a correct functioning 
 * The computer that runs NuBot must be connected to the internet
@@ -49,32 +52,23 @@ None of the authors, contributors, administrators, or anyone else connected with
 * The custodian must avoid manual interacting with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
 
 
-##1) Prepare options.json
+### 1) Prepare options.json
 
 Essential options : (check under the hood for hidden parameters available ) 
-```
-{"options":
+
+```json
+{"options": 
     {
-    "exchangename":"peatio",
-    "apikey": "foo",
-    "apisecret": "bar",
-    "dualside": true,
-    "nubitaddress": "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5",
-    "nudip": "127.0.0.1",
+    "exchangename":"xxx",
+    "apikey": "xxx",
+    "apisecret": "xxx",
+    "dualside": false,
+    "nubitaddress": "xxx",
     "nudport": 9091,
-    "priceincrement": "0.001",
-    "rpcpass": "ciaociao",
-    "rpcuser": "adva",
-    "txfee": "0",
-    "sendrpc":true,
-    "executeorders":true,
-    "verbose":false,
-    "pair":"nbt_btc",
-    "check-balance-interval":30,
-    "check-orders-interval":30,
-    "hipchat":false,
-    "mail-notifications":true,
-    "mail-recipient":"hi@adva.io",
+    "rpcpass": "xxx",
+    "rpcuser": "xxx",
+    "pair":"xxx_xxx",
+    "mail-recipient":"xxx",
     "crypto-peg-options":
         {
             "main-feed":"blockchain",
@@ -82,42 +76,31 @@ Essential options : (check under the hood for hidden parameters available )
                 "backup1" : { "name" : "bitcoinaverage"},
                 "backup2" : { "name" : "coinbase"},
                 "backup3" : { "name" : "btce"}
-                },
-            "refresh-time":124,
-            "wallchange-treshold": 3,
-            "price-offset": 3,
-            "price-distance-threshold":10,
-            "emergency-timeout-minutes":60
+                }
          }
  }
 }
+  
 ```
-
-| Parameter        | default value           | Description  |
+| Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
-
-```
-exchangename : "peatio" is the only value accepted now. In the future this field will be use to switch between exchanges.
-dualside :  if set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.
-priceincrement : if working in sell-side mode, this value will be added to the sell price 
-txfee : 0.2 indicates a 0.2% tx fee
-sendrpc : if set to false, will not try to submit RPC liquidityinfo to the nu client
-executeorders: if set to false, will not execute the order, only print on screen. Useful for simulations
-verbose: if set to true, will print on screen additional debug messages 
-pair : the codes of the currency pair to operate, lowercase
-check-price-interval: seconds between two checkPrice executions, for BTC_NBT or PPC_NBT pairs
-check-balance-interval: seconds between two checkBalance operations, which triggers bot orders
-check-orders-interval: seconds between two checkOrders operations, which triggers liquidityinfo RPC call
-hipchat : if set to true will notify the Team on hipchat about Orders submitted, shutdowns, emergencies, and others
-mail-notifications : if set to true will send email in emergency cases
-mail-recipient : the email at which emergency email has to be sent  
-```
+| exchangename     | Name of the exchange where the bots operates | "bter" ; "ccedk" ; "btce" |
+| apikey      |  Custodian's public key to access the exchange      |  String |
+| apisecret |  Custodian's secret key to access the exchange    | String |
+| dualside |  If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.     | true,false |
+| nubitaddress | The public address where the custodial grant has been received    |   valid custodian NBT addresses (String) |
+| nudport | The RPC port  of the Nu daemon |   1024...65535 |
+| rpcpass |  The RPC password of the Nu daemon    |  String |
+| rpcuser |  The RPC username  of the Nu daemon    |    String |
+| pair |  The currency pair where the bot operates     |   "nbt_usd" |
+| mail-recipient | the email at which emergency email has to be sent  |  String  |
 
 
-##2)Prepare the nu client
+
+### 2)Prepare the nu client
+
+NOTE: Is it also possible to test NuBot without being a custodian and setting the sendRPC option to false. In this case you can ignore this section.
+
 The bot needs to broadcast liquidity notification to NuNet. It does so by interacting via the NuBits client of the custodian. 
 
 
@@ -133,10 +116,17 @@ rpcport=9091
 rpcallowip=<ip_of_machine_running_the_bot>
 ```
 
-Launch Nu client and make sure that bot wallets are unlocked, otherwise it won't execute RPC calls. Make also sure having being in running the client on a valid custodian address, aka the same that received the grant.  
-Is it also possible to test NuBot without being a custodian and setting the sendRPC option to false.
+Launch Nu client and , if encrypted, make sure that bot wallets are unlocked, otherwise it won't execute RPC calls. Make also sure having being in running the client on a valid custodian address, aka the same that received the grant.  
 
-##3)Run NuBot
+NOTE: unlocking the wallet for minting is not enough : the two wallets are locked/unlocked separately. To unlock the NuBits wallets, first make sure the client is showing the NuBits unit, then open the conolse and type :
+```
+walletpassphrase <your passphrase> 9999999999 
+```
+The comand above will unlock the NBT wallet for  9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg. 
+
+
+
+###3)Run NuBot
 
 
 ```

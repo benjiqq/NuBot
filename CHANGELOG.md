@@ -1,11 +1,14 @@
 ## 0.1.1 (unreleased)
 
-Features:
+New Features:
 
   - New strategy for trading NBT versus an asset different than USD (e.g. BTC, PPC, CNY ...) keeping the peg at ~ 1 USD
   - New strategy for keeping a fraction of proceedings from sales apart. 
   - Bter API
   - CCEDK Api
+
+Improvements
+- Reduced the amount of options necessary to launch the bot
 
   Bug fixes:
   - LOG.fine messages now gets print on system output
@@ -16,6 +19,10 @@ Features:
 
 Features:
 
-  - Bot working with NBT/USD pair
-  - Peatio API
-  - Btce API
+  - Bot NBT/USD pair for sell-side and dual-side custodians
+  - Peatio API Wrappers
+  - Btce API Wrappers
+  - Aggregate orders 
+  - HipChat notifications
+  - Email notifications
+  - RPC Client to interface with Nud
