@@ -486,16 +486,27 @@ public class StrategyFiatTask extends TimerTask {
     }
 
     private void recount() {
-        activeSellOrders = countActiveOrders(Constant.SELL);
-        activeBuyOrders = countActiveOrders(Constant.BUY);
-        totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-        countOk = false;
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+        if (balancesResponse.isPositive()) {
+            Balance balance = (Balance) balancesResponse.getResponseObject();
+            double balanceNBT = balance.getNBTAvailable().getQuantity();
+            double balanceFIAT = balance.getPEGAvailableBalance().getQuantity();
+            activeSellOrders = countActiveOrders(Constant.SELL);
+            activeBuyOrders = countActiveOrders(Constant.BUY);
+            totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-        if (Global.options.isDualSide()) {
-            countOk = activeSellOrders == 2 && activeBuyOrders == 2;
+            countOk = false;
+
+            if (Global.options.isDualSide()) {
+                countOk = (activeSellOrders == 2 && activeBuyOrders == 2 && balanceFIAT < 1 && balanceNBT < 1)
+                        || (activeSellOrders == 2 && activeBuyOrders == 0 && balanceFIAT < 1)
+                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1);
+            } else {
+                countOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
+            }
         } else {
-            countOk = activeSellOrders == 2 && activeBuyOrders == 0;
+            LOG.severe(balancesResponse.getError().toString());
         }
     }
 }
