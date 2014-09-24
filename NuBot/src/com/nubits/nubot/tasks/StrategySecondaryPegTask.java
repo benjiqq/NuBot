@@ -451,11 +451,11 @@ public class StrategySecondaryPegTask extends TimerTask {
             countOk = false;
 
             if (Global.options.isDualSide()) {
-                countOk = (activeSellOrders == 2 && activeBuyOrders == 2)
+                countOk = (activeSellOrders == 2 && activeBuyOrders == 2 && balancePEG < 0.001 && balanceNBT < 0.01)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < 0.001)
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 0.01);
             } else {
-                countOk = activeSellOrders == 2 && activeBuyOrders == 0;
+                countOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
             }
         } else {
             LOG.severe(balancesResponse.getError().toString());
@@ -539,5 +539,13 @@ public class StrategySecondaryPegTask extends TimerTask {
         } catch (InterruptedException ex) {
             LOG.severe(ex.getMessage());
         }
+    }
+
+    private double getFroozenBalance() {
+        return Double.parseDouble(Global.settings.getProperty("frozen_balance"));
+    }
+
+    private void updateFrozenBalance(double newbalance) {
+        //TODO HERE
     }
 }

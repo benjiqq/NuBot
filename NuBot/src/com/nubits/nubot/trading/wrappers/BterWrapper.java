@@ -599,7 +599,7 @@ public class BterWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get("msg");
                 ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
 
-                LOG.severe("Bter API returned an error: " + errorMessage);
+                //LOG.severe("Bter API returned an error: " + errorMessage);
 
                 apiResponse.setError(apiErr);
                 return apiResponse;

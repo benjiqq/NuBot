@@ -40,7 +40,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -72,23 +71,18 @@ public class TestWrappers {
         //testSell(0.001, 500, Constant.BTC_USD);
         //testBuy(1, 0.0005, Constant.BTC_USD);
         //testGetLastPrice(Constant.PPC_BTC);
-        testGetActiveOrders(); //Try with 0 active orders also
+        //testGetActiveOrders(); //Try with 0 active orders also
         //testGetActiveOrders(Constant.BTC_USD);
         //testCancelOrder("63329550");
         //testGetOrderDetail("63326121"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
-        testClearAllOrders();
-        //testIsOrderActive("63329550");
+        //testClearAllOrders();
+        testIsOrderActive("40700422");
         //testGetPermissions();
-        try {
-            Thread.sleep(10000);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-        }
 
 
-        testGetActiveOrders();
+        //testGetActiveOrders();
     }
 
     /*
