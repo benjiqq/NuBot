@@ -317,7 +317,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private void buySide(Amount balancePEG) {
         //----------------------USD (Buys)----------------------------
         //Check if USD balance > 1
-        if (balancePEG.getQuantity() > 1) {
+        if (balancePEG.getQuantity() > 0.001) {
             String idToDelete = getSmallerWallID(Constant.BUY);
             if (!idToDelete.equals("-1")) {
                 LOG.warning("Buyside : Taking down smaller order to aggregate it with new balance");

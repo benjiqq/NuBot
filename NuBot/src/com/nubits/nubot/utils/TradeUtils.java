@@ -205,7 +205,7 @@ public class TradeUtils {
          * 2,BTC
          * 3,USD
          * 8,PPC
-         *
+         * 15, NBT
 
          */
         final String BTC = Constant.BTC.getCode();
@@ -227,6 +227,9 @@ public class TradeUtils {
             case "LTC":
                 toRet = 1;
                 break;
+            case "NBT":
+                toRet = 15;
+                break;
             default:
                 LOG.severe("Currency " + currencyCode + "not available");
                 break;
@@ -242,10 +245,9 @@ public class TradeUtils {
          * 14 , PPC USD
          * 13 , PPC BTC
          * 12 , PPC LTC
-         * TODO Add them here when they add support
-         * NBT BTC
-         * NBT PPC
-         * NBT USD
+         * 47, NBT BTC
+         * 48, NBT PPC
+         * 46, NBT USD
          */
 
         int toRet = -1;
@@ -258,6 +260,12 @@ public class TradeUtils {
             return 13;
         } else if (pair.equals(Constant.PPC_LTC)) {
             return 12;
+        } else if (pair.equals(Constant.NBT_BTC)) {
+            return 47;
+        } else if (pair.equals(Constant.NBT_PPC)) {
+            return 48;
+        } else if (pair.equals(Constant.NBT_USD)) {
+            return 46;
         } else {
             LOG.severe("Pair " + pair.toString() + " not available");
         }
