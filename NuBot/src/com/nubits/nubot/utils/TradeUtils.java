@@ -281,10 +281,9 @@ public class TradeUtils {
          * 14 , PPC USD
          * 13 , PPC BTC
          * 12 , PPC LTC
-         * TODO Add them here when they add support
-         * NBT BTC
-         * NBT PPC
-         * NBT USD
+         * 47, NBT BTC
+         * 48, NBT PPC
+         * 46, NBT USD
          */
         CurrencyPair toRet = new CurrencyPair(Constant.BTC, Constant.BTC);
 
@@ -300,6 +299,15 @@ public class TradeUtils {
                 break;
             case 14:
                 toRet = Constant.PPC_USD;
+                break;
+            case 46:
+                toRet = Constant.NBT_USD;
+                break;
+            case 47:
+                toRet = Constant.NBT_BTC;
+                break;
+            case 48:
+                toRet = Constant.NBT_PPC;
                 break;
             default:
                 LOG.severe("Pair with id = " + id + " not available");
