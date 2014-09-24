@@ -17,7 +17,7 @@ package com.nubits.nubot.tests;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.nubits.nubot.frozen.FrozenBalancesManager;
+import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
