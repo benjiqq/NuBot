@@ -37,9 +37,9 @@ import java.util.logging.Logger;
  *
  * USE THIS TASK ONLY WITH NuPriceMonitor bot
  */
-public class PriceMonitorTask extends TimerTask {
+public class NuPriceMonitorTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(PriceMonitorTask.class.getName());
+    private static final Logger LOG = Logger.getLogger(NuPriceMonitorTask.class.getName());
     private PriceFeedManager pfm = null;
     private double distanceTreshold;
     private LastPrice lastPrice;
@@ -226,7 +226,6 @@ public class PriceMonitorTask extends TimerTask {
 
         }
 
-
         isFirstTime = false;
     }
 
@@ -292,9 +291,9 @@ public class PriceMonitorTask extends TimerTask {
         row += otherPricesAtThisTime + "\n";
 
         if (sendEmails) {
-            String title = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "%";
+            String title = "[" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
             if (isFirstEmail) {
-                title = pfm.getPair().toString() + " price tracking started";
+                title = "[" + pfm.getPair().toString() + "] price tracking started";
             }
 
             String messageNow = NuPriceMonitor.HEADER + row;
@@ -311,7 +310,8 @@ public class PriceMonitorTask extends TimerTask {
                     + "Below you can see the history of price changes. You can copy paste to create a csv report."
                     + "For each row you should have shifted the sell/buy walls.\n\n";
             if (isFirstEmail) {
-                tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price is now " + price + " " + pfm.getPair().getPaymentCurrency().getCode() + ".\n"
+                tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price is now " + price + " " + pfm.getPair().getPaymentCurrency().getCode() + ""
+                        + "(" + source + ").\n"
                         + "Here are the prices you should used in the first order : \n"
                         + "If you are a sell-side custodian, sell at " + sellPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
                         + "If you area dual-side custodian, sell at " + sellPricePEGdual + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "

@@ -39,9 +39,9 @@ import java.util.logging.Logger;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class StrategyCryptoTask extends TimerTask {
+public class Deprecated_StrategyCryptoTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(StrategyCryptoTask.class.getName());
+    private static final Logger LOG = Logger.getLogger(Deprecated_StrategyCryptoTask.class.getName());
     //Used to identify which order is being processed by the method renewWall
     private static final String SELL1 = "sellWall1";
     private static final String SELL2 = "sellWall2";

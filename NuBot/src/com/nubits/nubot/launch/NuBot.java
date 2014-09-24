@@ -29,15 +29,16 @@ import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
-import com.nubits.nubot.tasks.StrategyCryptoTask;
+import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FileSystem;
-import com.nubits.nubot.utils.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -236,52 +237,46 @@ public class NuBot {
                 Global.taskManager.getStrategyFiatTask().start(7);
             } else {
 
-
                 CryptoPegOptionsJSON cpo = Global.options.getCryptoPegOptions();
+                if (cpo == null) {
+                    LOG.severe("To run in secondary peg mode, you need to specify the crypto-peg-options");
+                    System.exit(0);
+                }
+
                 //Peg to a USD price via crypto pair
                 Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
+                //Set the wallet shift threshold
+
+
+                StrategySecondaryPegTask secondaryPegStrategy = ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()));
+
+                //Then set trading strategy
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setStrategy(secondaryPegStrategy);
+
                 PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
-
                 //Then set the pfm
-                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setPriceFeedManager(pfm);
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
 
                 //Set the priceDistance threshold
-                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setDistanceTreshold(cpo.getDistanceTreshold());
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(cpo.getDistanceTreshold());
 
-                //Set the priceDistance threshold
-                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setWallchangeThreshold(cpo.getWallchangeTreshold());
+                //Set the wallet shift threshold
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeTreshold());
 
+                //Set the outputpath
 
-                //Compute the buy/sell prices in USD
-                double sellPriceUSD = TradeUtils.getSellPrice(Global.options.getTxFee());
-                double buyPriceUSD = TradeUtils.getBuyPrice(Global.options.getTxFee());
-
-                //Add(remove) the offset % from prices
-                sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * cpo.getPriceOffset());
-                buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * cpo.getPriceOffset());
-
-                if (Global.isDualSide) {
-                    LOG.info("Computing USD pegs with offset " + cpo.getPriceOffset() + "% : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
-                } else {
-                    LOG.info("Computing USD pegs with offset " + cpo.getPriceOffset() + "% : sell @ " + sellPriceUSD);
-                }
-
-
-                //Set the prices in USD
-                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setSellPriceUSD(sellPriceUSD);
-                ((StrategyCryptoTask) (Global.taskManager.getStrategyCryptoTask().getTask())).setBuyPriceUSD(buyPriceUSD);
-
-
+                String outputPath = Global.settings.getProperty("log_path") + "wall_shifts" + new Date().getTime() + ".csv";
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
+                FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
                 //set the interval from options
-                Global.taskManager.getStrategyCryptoTask().setInterval(cpo.getRefreshTime());
+                Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
+
 
                 //then start the thread
-                Global.taskManager.getStrategyCryptoTask().start(2);
-
-
+                Global.taskManager.getPriceTriggerTask().start(2);
             }
         } else {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());

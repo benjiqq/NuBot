@@ -36,17 +36,19 @@ import java.util.logging.Logger;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class StrategyFiatTask extends TimerTask {
+public class StrategySecondaryPegTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(StrategyFiatTask.class.getName());
+    private static final Logger LOG = Logger.getLogger(StrategySecondaryPegTask.class.getName());
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean countOk;
+    private boolean needWallShift;
+    private double sellPricePEG;
+    private double buyPricePEG;
 
     @Override
     public void run() {
-        LOG.fine("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
-
+        LOG.fine("Executing task : StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
         recount(); //Count number of active sells and buys
 
@@ -56,60 +58,18 @@ public class StrategyFiatTask extends TimerTask {
             // if there are 0 orders, place initial walls
             // if there are a number of orders different than 2, cancel all and place initial walls
 
-
             if (!(countOk)) {
-                //They are either 0 or need to be cancelled
-                if (totalActiveOrders != 0) {
-                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
-                    if (deleteOrdersResponse.isPositive()) {
-                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-                        if (deleted) {
-                            LOG.warning("Clear all orders request succesfully");
-                            //Wait until there are no active orders
-                            boolean timedOut = false;
-                            long timeout = Global.options.getEmergencyTimeout() * 1000;
-                            long wait = 6 * 1000;
-                            long count = 0L;
-                            do {
-                                try {
-                                    Thread.sleep(wait);
-                                    count += wait;
-                                    timedOut = count > timeout;
-
-                                } catch (InterruptedException ex) {
-                                    LOG.severe(ex.getMessage());
-                                }
-                            } while (!TradeUtils.areAllOrdersCanceled() && !timedOut);
-
-                            if (timedOut) {
-                                String message = "There was a problem cancelling all existing orders";
-                                LOG.severe(message);
-                                HipChatNotifications.sendMessage(message, Color.YELLOW);
-                                MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
-                                //Continue anyway, maybe there is some balance to put up on order.
-                            }
-                            //Update the balance
-                            placeInitialWalls();
-                        } else {
-                            String message = "Could not submit request to clear orders";
-                            LOG.severe(message);
-                            System.exit(0);
-                        }
-
-                    } else {
-                        LOG.severe(deleteOrdersResponse.getError().toString());
-                        String message = "Could not submit request to clear orders";
-                        LOG.severe(message);
-                        System.exit(0);
-                    }
-                } else {
-                    placeInitialWalls();
-                }
+                reInitiateOrders();
             } else {
                 LOG.warning("No need to init new orders since current orders seems correct");
             }
             mightNeedInit = false;
             recount();
+        } else {
+            if (needWallShift) {
+                reInitiateOrders();
+                needWallShift = false;
+            }
         }
 
 
@@ -124,16 +84,16 @@ public class StrategyFiatTask extends TimerTask {
             if (balancesResponse.isPositive()) {
                 Balance balance = (Balance) balancesResponse.getResponseObject();
                 Amount balanceNBT = balance.getNBTAvailable();
-                Amount balanceFIAT = balance.getPEGAvailableBalance();
+                Amount balancePEG = balance.getPEGAvailableBalance();
                 LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                        + balanceFIAT.getQuantity() + " USD");
+                        + balancePEG.getQuantity() + " USD");
 
                 //Execute sellSide strategy
                 sellSide(balanceNBT);
 
                 //Execute buy Side strategy
                 if (Global.isDualSide) {
-                    buySide(balanceFIAT);
+                    buySide(balancePEG);
                 }
 
             } else {
@@ -156,28 +116,24 @@ public class StrategyFiatTask extends TimerTask {
 
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
-                ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-                if (txFeeNTBFIATResponse.isPositive()) {
-                    double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
-                    LOG.fine("Updated Trasaction fee = " + txFeeFIATNTB + "%");
-
+                ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+                if (txFeeNTBPEGResponse.isPositive()) {
+                    double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
+                    LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                     //Prepare the sell order
 
-                    double sellPrice = TradeUtils.getSellPrice(txFeeFIATNTB);
-
-
                     String orderString1 = "sell " + nbtBalance1 + " " + Global.options.getPair().getOrderCurrency().getCode()
-                            + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                            + " @ " + sellPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode();
                     String orderString2 = "sell " + nbtBalance2 + " " + Global.options.getPair().getOrderCurrency().getCode()
-                            + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                            + " @ " + sellPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
                     if (Global.options.isExecuteOrders()) {
                         //Place nbtBalance1 on a sell wall @ 1/priceBtc + tx_fee (buy_wall_order1)
 
                         LOG.warning("Strategy : Submit order : " + orderString1);
 
-                        ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), nbtBalance1, sellPrice);
+                        ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), nbtBalance1, sellPricePEG);
                         if (sellResponse.isPositive()) {
                             HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString1, Color.YELLOW);
                             String sellResponseString = (String) sellResponse.getResponseObject();
@@ -190,7 +146,7 @@ public class StrategyFiatTask extends TimerTask {
                         //Place nbtBalance2 on a sell wall @ 1/priceBtc + tx_fee (buy_wall_order2)
                         LOG.warning("Strategy : Submit order : " + orderString2);
 
-                        ApiResponse sellResponse2 = Global.exchange.getTrade().sell(Global.options.getPair(), nbtBalance2, sellPrice);
+                        ApiResponse sellResponse2 = Global.exchange.getTrade().sell(Global.options.getPair(), nbtBalance2, sellPricePEG);
                         if (sellResponse2.isPositive()) {
                             HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString2, Color.YELLOW);
                             String sellResponseString2 = (String) sellResponse2.getResponseObject();
@@ -213,43 +169,40 @@ public class StrategyFiatTask extends TimerTask {
             LOG.severe(NBTBalancesResponse.getError().toString());
         }
 
-
-
         if (Global.options.isDualSide()) {
             //Update the crypto balance (BTC, PPC, etc)
-            Amount fiatBalance = null;
-            ApiResponse fiatBalanceResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
-            if (fiatBalanceResponse.isPositive()) {
-                fiatBalance = (Amount) fiatBalanceResponse.getResponseObject();
+            Amount pegBalance = null;
+            ApiResponse pegBalanceResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
+            if (pegBalanceResponse.isPositive()) {
+                pegBalance = (Amount) pegBalanceResponse.getResponseObject();
 
-                if (fiatBalance.getQuantity() > 1) {
+                if (pegBalance.getQuantity() > 0.0001) {
                     // Divide the  balance 50% 50% in balance1 and balance2
-                    double fiatBalance1 = Utils.round(fiatBalance.getQuantity() / 2, 4);
-                    double fiatBalance2 = fiatBalance.getQuantity() - fiatBalance1;
+                    double pegBalance1 = Utils.round(pegBalance.getQuantity() / 2, 4);
+                    double pegBalance2 = pegBalance.getQuantity() - pegBalance1;
 
                     //Update TX fee :
                     //Get the current transaction fee associated with a specific CurrencyPair
-                    ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-                    if (txFeeNTBFIATResponse.isPositive()) {
-                        double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
-                        LOG.fine("Updated Trasaction fee = " + txFeeFIATNTB + "%");
+                    ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+                    if (txFeeNTBPEGResponse.isPositive()) {
+                        double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
+                        LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                         //Prepare the buy order
-                        double buyPrice = TradeUtils.getBuyPrice(txFeeFIATNTB);
 
-                        double amountToBuy1 = fiatBalance1 / buyPrice;
-                        double amountToBuy2 = fiatBalance2 / buyPrice;
+                        double amountToBuy1 = pegBalance1 / buyPricePEG;
+                        double amountToBuy2 = pegBalance2 / buyPricePEG;
 
                         String buyOrderString1 = "buy " + amountToBuy1 + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                + " @ " + buyPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                                + " @ " + buyPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode();
                         String buyOrderString2 = "buy " + amountToBuy2 + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                + " @ " + buyPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                                + " @ " + buyPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
                         if (Global.options.isExecuteOrders()) {
                             //Place cryptoBalance1 on a buy wall @ 1 - tx_fee (buy_wall_order1)
                             LOG.warning("Strategy : Submit order : " + buyOrderString1);
 
-                            ApiResponse buyResponse1 = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy1, buyPrice);
+                            ApiResponse buyResponse1 = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy1, buyPricePEG);
                             if (buyResponse1.isPositive()) {
                                 HipChatNotifications.sendMessage("New buy wall is up on " + Global.options.getExchangeName() + " : " + buyOrderString1, Color.YELLOW);
                                 String buyResponseString1 = (String) buyResponse1.getResponseObject();
@@ -262,7 +215,7 @@ public class StrategyFiatTask extends TimerTask {
                             //Place cryptoBalance2 on a buy wall @ 1 - tx_fee (buy_wall_order2)
                             LOG.warning("Strategy : Submit order : " + buyOrderString2);
 
-                            ApiResponse buyResponse2 = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy2, buyPrice);
+                            ApiResponse buyResponse2 = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy2, buyPricePEG);
                             if (buyResponse2.isPositive()) {
                                 HipChatNotifications.sendMessage("New buy wall is up on " + Global.options.getExchangeName() + " : " + buyOrderString2, Color.YELLOW);
                                 String buyResponseString2 = (String) buyResponse2.getResponseObject();
@@ -281,7 +234,7 @@ public class StrategyFiatTask extends TimerTask {
                     LOG.fine(Global.options.getPair().getPaymentCurrency().getCode() + " available balance < 1, no orders to execute");
                 }
             } else {
-                LOG.severe(fiatBalanceResponse.getError().toString());
+                LOG.severe(pegBalanceResponse.getError().toString());
             }
         }
     }
@@ -301,9 +254,9 @@ public class StrategyFiatTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         balanceNBT = balance.getNBTAvailable();
-                        Amount balanceFIAT = balance.getPEGAvailableBalance();
+                        Amount balancePEG = balance.getPEGAvailableBalance();
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
-                                + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
+                                + balancePEG.getQuantity() + " " + balancePEG.getCurrency().getCode());
 
                         //Update TX fee :
                         //Get the current transaction fee associated with a specific CurrencyPair
@@ -313,16 +266,15 @@ public class StrategyFiatTask extends TimerTask {
                             LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
 
                             //Prepare the sell order
-                            double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
 
                             double amountToSell = balanceNBT.getQuantity();
                             if (Global.executeOrders) {
                                 //execute the order
                                 String orderString = "sell " + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                        + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                                        + " @ " + sellPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode();
                                 LOG.warning("Strategy : Submit order : " + orderString);
 
-                                ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
+                                ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPricePEG);
                                 if (sellResponse.isPositive()) {
                                     HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
                                     String sellResponseString = (String) sellResponse.getResponseObject();
@@ -334,7 +286,7 @@ public class StrategyFiatTask extends TimerTask {
                                 //Testing only : print the order without executing it
                                 LOG.warning("Strategy : (Should) Submit order : "
                                         + "sell" + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                        + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
+                                        + " @ " + sellPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode());
                             }
                         } else {
                             //Cannot update txfee
@@ -362,10 +314,10 @@ public class StrategyFiatTask extends TimerTask {
         }
     }
 
-    private void buySide(Amount balanceFIAT) {
+    private void buySide(Amount balancePEG) {
         //----------------------USD (Buys)----------------------------
         //Check if USD balance > 1
-        if (balanceFIAT.getQuantity() > 1) {
+        if (balancePEG.getQuantity() > 1) {
             String idToDelete = getSmallerWallID(Constant.BUY);
             if (!idToDelete.equals("-1")) {
                 LOG.warning("Buyside : Taking down smaller order to aggregate it with new balance");
@@ -376,9 +328,9 @@ public class StrategyFiatTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         Amount balanceNBT = balance.getNBTAvailable();
-                        balanceFIAT = balance.getPEGAvailableBalance();
+                        balancePEG = balance.getPEGAvailableBalance();
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                                + balanceFIAT.getQuantity() + " USD");
+                                + balancePEG.getQuantity() + " USD");
 
                         //Update TX fee :
                         //Get the current transaction fee associated with a specific CurrencyPair
@@ -388,16 +340,15 @@ public class StrategyFiatTask extends TimerTask {
                             LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
 
                             //Prepare the buy order
-                            double buyPrice = TradeUtils.getBuyPrice(txFeeUSDNTB);
 
-                            double amountToBuy = balanceFIAT.getQuantity() / buyPrice;
+                            double amountToBuy = balancePEG.getQuantity() / buyPricePEG;
                             if (Global.executeOrders) {
                                 //execute the order
                                 String orderString = "buy " + amountToBuy + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                        + " @ " + buyPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                                        + " @ " + buyPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode();
                                 LOG.warning("Strategy : Submit order : " + orderString);
 
-                                ApiResponse buyResponse = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy, buyPrice);
+                                ApiResponse buyResponse = Global.exchange.getTrade().buy(Global.options.getPair(), amountToBuy, buyPricePEG);
                                 if (buyResponse.isPositive()) {
                                     String buyResponseString = (String) buyResponse.getResponseObject();
                                     HipChatNotifications.sendMessage("New buy wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
@@ -409,7 +360,7 @@ public class StrategyFiatTask extends TimerTask {
                                 //Testing only : print the order without executing it
                                 LOG.warning("Strategy : (Should) Submit order : "
                                         + "buy" + amountToBuy + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                        + " @ " + buyPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
+                                        + " @ " + buyPricePEG + " " + Global.options.getPair().getPaymentCurrency().getCode());
                             }
                         } else {
                             //Cannot update txfee
@@ -427,7 +378,7 @@ public class StrategyFiatTask extends TimerTask {
                 }
 
             } else {
-                LOG.severe("Can't get smaller wall id.");
+                LOG.severe("Can'g get smaller wall id.");
             }
 
         } else {
@@ -486,16 +437,107 @@ public class StrategyFiatTask extends TimerTask {
     }
 
     private void recount() {
-        activeSellOrders = countActiveOrders(Constant.SELL);
-        activeBuyOrders = countActiveOrders(Constant.BUY);
-        totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-        countOk = false;
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+        if (balancesResponse.isPositive()) {
+            Balance balance = (Balance) balancesResponse.getResponseObject();
+            double balanceNBT = balance.getNBTAvailable().getQuantity();
+            double balancePEG = balance.getPEGAvailableBalance().getQuantity();
 
-        if (Global.options.isDualSide()) {
-            countOk = activeSellOrders == 2 && activeBuyOrders == 2;
+            activeSellOrders = countActiveOrders(Constant.SELL);
+            activeBuyOrders = countActiveOrders(Constant.BUY);
+            totalActiveOrders = activeSellOrders + activeBuyOrders;
+
+            countOk = false;
+
+            if (Global.options.isDualSide()) {
+                countOk = (activeSellOrders == 2 && activeBuyOrders == 2)
+                        || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < 0.001)
+                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 0.01);
+            } else {
+                countOk = activeSellOrders == 2 && activeBuyOrders == 0;
+            }
         } else {
-            countOk = activeSellOrders == 2 && activeBuyOrders == 0;
+            LOG.severe(balancesResponse.getError().toString());
+        }
+    }
+
+    public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion) {
+        LOG.warning("Strategy received a price change notification.");
+        needWallShift = true;
+        Global.conversion = conversion;
+        sellPricePEG = new_sellPricePEG;
+        buyPricePEG = new_buyPricePEG;
+    }
+
+    public double getSellPricePEG() {
+        return sellPricePEG;
+    }
+
+    public void setSellPricePEG(double sellPricePEG) {
+        this.sellPricePEG = sellPricePEG;
+    }
+
+    public double getBuyPricePEG() {
+        return buyPricePEG;
+    }
+
+    public void setBuyPricePEG(double buyPricePEG) {
+        this.buyPricePEG = buyPricePEG;
+    }
+
+    private void reInitiateOrders() {
+        //They are either 0 or need to be cancelled
+        if (totalActiveOrders != 0) {
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+                if (deleted) {
+                    LOG.warning("Clear all orders request succesfully");
+                    //Wait until there are no active orders
+                    boolean timedOut = false;
+                    long timeout = Global.options.getEmergencyTimeout() * 1000;
+                    long wait = 6 * 1000;
+                    long count = 0L;
+                    do {
+                        try {
+                            Thread.sleep(wait);
+                            count += wait;
+                            timedOut = count > timeout;
+
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.getMessage());
+                        }
+                    } while (!TradeUtils.areAllOrdersCanceled() && !timedOut);
+
+                    if (timedOut) {
+                        String message = "There was a problem cancelling all existing orders";
+                        LOG.severe(message);
+                        HipChatNotifications.sendMessage(message, Color.YELLOW);
+                        MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
+                        //Continue anyway, maybe there is some balance to put up on order.
+                    }
+                    //Update the balance
+                    placeInitialWalls();
+                } else {
+                    String message = "Could not submit request to clear orders";
+                    LOG.severe(message);
+                    System.exit(0);
+                }
+
+            } else {
+                LOG.severe(deleteOrdersResponse.getError().toString());
+                String message = "Could not submit request to clear orders";
+                LOG.severe(message);
+                System.exit(0);
+            }
+        } else {
+            placeInitialWalls();
+        }
+        try {
+            Thread.sleep(4000); //Give the time to new orders to be placed before counting again
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.getMessage());
         }
     }
 }

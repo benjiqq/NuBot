@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -77,16 +77,19 @@ public class CheckOrdersTask extends TimerTask {
                     nbt_onbuy += toAdd;
                 }
 
-                //Update the order
-                Global.exchange.getLiveData().setOrdersList(orderListUSDNBT);
-                Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
-                Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
+            }
+            //Update the order
+            Global.exchange.getLiveData().setOrdersList(orderListUSDNBT);
+            if (Global.conversion != -1) {
+                //if the bot is running on Strategy Secondary Peg, we need to convert this value
+                nbt_onbuy = nbt_onbuy * Global.conversion;
+            }
+            Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
+            Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
 
-                if (verbose) {
-                    LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
-                    LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
-                }
-
+            if (verbose) {
+                LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
+                LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
             }
             //Call RPC
             if (Global.options.isSendRPC()) {

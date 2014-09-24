@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -36,7 +36,7 @@ public class BtcePriceFeed extends AbstractPriceFeed {
 
     public BtcePriceFeed() {
         name = PriceFeedManager.BTCE;
-        refreshMinTime = 60 * 1000; //one minutee
+        refreshMinTime = 40 * 1000; //one minutee
     }
 
     @Override

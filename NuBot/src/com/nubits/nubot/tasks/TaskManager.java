@@ -36,10 +36,13 @@ public class TaskManager {
     protected int interval;
     private BotTask checkConnectionTask;
     private BotTask strategyFiatTask;
-    private BotTask strategyCryptoTask;
     private BotTask checkOrdersTask;
     private BotTask checkNudTask;
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
+    //these are used for secondary peg strategy
+    private BotTask secondaryPegTask;
+    private BotTask priceTriggerTask;
+    //--------------end secondary peg tasks
     private ArrayList<BotTask> taskList;
     private boolean running;
     private boolean initialized = false;
@@ -63,7 +66,6 @@ public class TaskManager {
             if (Global.options.getCryptoPegOptions() != null) {
                 //If global option have been loaded
                 checkPriceInterval = Global.options.getCryptoPegOptions().getRefreshTime();
-
             }
         }
 
@@ -84,12 +86,16 @@ public class TaskManager {
                 new StrategyFiatTask(), checkbalanceInterval, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
 
-        strategyCryptoTask = new BotTask(
-                new StrategyCryptoTask(), checkPriceInterval, STRATEGY_CRYPTO);
-        taskList.add(strategyCryptoTask);
+        secondaryPegTask = new BotTask(
+                new StrategySecondaryPegTask(), checkbalanceInterval, STRATEGY_CRYPTO);
+        taskList.add(secondaryPegTask);
+
+        priceTriggerTask = new BotTask(
+                new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
+        taskList.add(secondaryPegTask);
 
         priceMonitorTask = new BotTask(
-                new PriceMonitorTask(), checkbalanceInterval, STRATEGY_CRYPTO);
+                new NuPriceMonitorTask(), checkbalanceInterval, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
         initialized = true;
@@ -180,16 +186,24 @@ public class TaskManager {
         this.strategyFiatTask = strategyFiatTask;
     }
 
-    public BotTask getStrategyCryptoTask() {
-        return strategyCryptoTask;
-    }
-
-    public void setStrategyCryptoTask(BotTask strategyCryptoTask) {
-        this.strategyCryptoTask = strategyCryptoTask;
-    }
-
     public BotTask getCheckOrdersTask() {
         return checkOrdersTask;
+    }
+
+    public BotTask getSecondaryPegTask() {
+        return secondaryPegTask;
+    }
+
+    public void setSecondaryPegTask(BotTask secondaryPegTask) {
+        this.secondaryPegTask = secondaryPegTask;
+    }
+
+    public BotTask getPriceTriggerTask() {
+        return priceTriggerTask;
+    }
+
+    public void setPriceTriggerTask(BotTask priceTriggerTask) {
+        this.priceTriggerTask = priceTriggerTask;
     }
 
     public void setCheckOrdersTask(BotTask checkOrdersTask) {

@@ -203,7 +203,8 @@ public class Utils {
     public static boolean isSupported(CurrencyPair pair) {
         if (pair.equals(Constant.NBT_USD)
                 || pair.equals(Constant.BTC_CNY)
-                || pair.equals(Constant.NBT_BTC)) { //TODO this is only for testing purposes on our internal exchange
+                || pair.equals(Constant.NBT_BTC)
+                || pair.equals(Constant.NBT_PPC)) { //TODO this is only for testing purposes on our internal exchange
             return true;
         } else {
             return false;
