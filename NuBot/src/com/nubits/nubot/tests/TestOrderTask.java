@@ -64,7 +64,7 @@ public class TestOrderTask {
 
         Global.options = new OptionsJSON(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
-                60, 30, false, false, "", -1, null);
+                60, 30, false, false, "", -1, 0, null);
 
 
         //Check local filesystem for API keys

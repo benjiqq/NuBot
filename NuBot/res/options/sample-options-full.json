@@ -20,7 +20,8 @@
     "hipchat":false,
     "mail-notifications":false,
     "mail-recipient":"xxx",
-     "emergency-timeout":60,
+    "emergency-timeout":60,
+    "keep-proceedings":0,
     "crypto-peg-options":
         {
             "main-feed":"blockchain",

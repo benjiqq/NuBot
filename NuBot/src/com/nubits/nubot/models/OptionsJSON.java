@@ -58,6 +58,7 @@ public class OptionsJSON {
     private double txFee;
     private double priceIncrement;
     private int emergencyTimeout;
+    private double keepProceedings;
     private CryptoPegOptionsJSON cpo;
 
     /**
@@ -88,7 +89,7 @@ public class OptionsJSON {
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int checkBalanceInterval, int checkOrdersInteval, boolean sendHipchat,
-            boolean sendMails, String mailRecipient, int emergencyTimeout, CryptoPegOptionsJSON cryptoPegOptions) {
+            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceedings, CryptoPegOptionsJSON cryptoPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -110,6 +111,7 @@ public class OptionsJSON {
         this.sendMails = sendMails;
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
+        this.keepProceedings = keepProceedings;
         this.cryptoPegOptions = cryptoPegOptions;
     }
 
@@ -507,6 +509,7 @@ public class OptionsJSON {
 
             double txFee = 0.2;
             double priceIncrement = 0.001;
+            double keepProceedings = 0;
 
             int emergencyTimeout = 60;
 
@@ -559,11 +562,16 @@ public class OptionsJSON {
                 emergencyTimeout = (int) emergencyTimeoutLong;
             }
 
+            if (optionsJSON.containsKey("keep-proceedings")) {
+                keepProceedings = Double.parseDouble((String) (optionsJSON.get("keep-proceedings")));
+            }
+
             //Create a new Instance
             options = new OptionsJSON(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                     rpcPass, nudIp, nudPort, priceIncrement, txFee, sendRPC, exchangeName,
                     executeOrders, verbose, pair, checkBalanceInterval,
-                    checkOrdersInteval, sendHipchat, sendMails, mailRecipient, emergencyTimeout, cpo);
+                    checkOrdersInteval, sendHipchat, sendMails, mailRecipient,
+                    emergencyTimeout, keepProceedings, cpo);
 
 
 
@@ -589,13 +597,21 @@ public class OptionsJSON {
         this.emergencyTimeout = emergencyTimeoutMinutes;
     }
 
+    public double getKeepProceedings() {
+        return keepProceedings;
+    }
+
+    public void setKeepProceedings(double keepProceedings) {
+        this.keepProceedings = keepProceedings;
+    }
+
     @Override
     public String toString() {
         String cryptoOptions = "";
         if (cryptoPegOptions != null) {
             cryptoOptions = cryptoPegOptions.toString();
         }
-        return "OptionsJSON{" + "dualSide=" + dualSide + ", sendRPC=" + sendRPC + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", checkBalanceInterval=" + checkBalanceInterval + ", checkOrdersInteval=" + checkOrdersInteval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + " , cryptoPegOptions=" + cryptoOptions + '}';
+        return "OptionsJSON{" + "dualSide=" + dualSide + ", sendRPC=" + sendRPC + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", checkBalanceInterval=" + checkBalanceInterval + ", checkOrdersInteval=" + checkOrdersInteval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + " , cryptoPegOptions=" + cryptoOptions + '}';
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
@@ -608,6 +624,6 @@ public class OptionsJSON {
         if (cryptoPegOptions != null) {
             cryptoOptions = cryptoPegOptions.toHtmlString();
         }
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> sendRPC=" + sendRPC + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> checkBalanceInterval=" + checkBalanceInterval + "<br> checkOrdersInteval=" + checkOrdersInteval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + " <br><br>" + cryptoOptions + '}';
+        return "Options : {<br>" + "dualSide=" + dualSide + "<br> sendRPC=" + sendRPC + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> checkBalanceInterval=" + checkBalanceInterval + "<br> checkOrdersInteval=" + checkOrdersInteval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + " <br><br>" + cryptoOptions + '}';
     }
 }
