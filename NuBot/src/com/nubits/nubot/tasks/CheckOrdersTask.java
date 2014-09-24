@@ -76,7 +76,6 @@ public class CheckOrdersTask extends TimerTask {
                     //Start summing up amounts of NBT
                     nbt_onbuy += toAdd;
                 }
-
             }
             //Update the order
             Global.exchange.getLiveData().setOrdersList(orderListUSDNBT);
