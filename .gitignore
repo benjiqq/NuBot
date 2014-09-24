@@ -11,6 +11,7 @@ releases/
 /NuBot/build/
 /NuBot/dist/
 /NuBot/dist-packaged/
+/NuBot/res/frozen
 /NuBot/logs/
 
 #Specific files to ignore
