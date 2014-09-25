@@ -309,6 +309,7 @@ public class NuBot {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
+
                 LOG.info("Bot shut down");
                 NuBot.mainThread.interrupt();
                 if (Global.taskManager != null) {

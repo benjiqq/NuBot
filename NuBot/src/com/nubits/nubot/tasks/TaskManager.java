@@ -118,7 +118,11 @@ public class TaskManager {
             BotTask bt = taskList.get(i);
             if (bt.getName().equals(STRATEGY_FIAT) || bt.getName().equals(STRATEGY_CRYPTO)) {
                 if (!sentNotification) {
-                    HipChatNotifications.sendMessage("Bot shut-down", Color.RED);
+                    String additionalInfo = "";
+                    if (Global.options != null) {
+                        additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toString("_");
+                    }
+                    HipChatNotifications.sendMessage("Bot shut-down ( " + additionalInfo + " )", Color.RED);
                     sentNotification = true;
                 }
             }

@@ -72,8 +72,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
         }
 
-
-
         //Make sure there are 2 orders per side
         if (!countOk) {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
@@ -444,7 +442,6 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     private void recount() {
-
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
             Balance balance = (Balance) balancesResponse.getResponseObject();
@@ -458,7 +455,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             countOk = false;
 
             if (Global.options.isDualSide()) {
-
 
                 countOk = ((activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < 0.001)

@@ -290,7 +290,7 @@ public class TradeUtils {
                 double updatedQuantity = amount.getQuantity() - frozen.getAmount().getQuantity();
                 return new Amount(updatedQuantity, currentPegCurrency);
             } else {
-                LOG.severe("Cannot compare the frozen currency (" + frozenCurrency + ") with the peg currency  (" + currentPegCurrency + "). "
+                LOG.severe("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
                         + "Returning original balance without freezing value");
                 return amount;
             }
@@ -309,9 +309,9 @@ public class TradeUtils {
             Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
             Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
 
-            HipChatNotifications.sendMessage(percentageToSetApart + "% of  sale proceedings have been put aside to pay dividends : "
-                    + "" + df.format(quantityToFreeze) + " " + curerncyToFreeze + " \n"
-                    + "Subtotal = " + Global.frozenBalances.getFrozenAmount().toString(), Message.Color.PURPLE);
+            HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode() + "have been put aside to pay dividends ("
+                    + percentageToSetApart * 100 + "% of  sale proceedings)"
+                    + ". Funds frozen to date = " + Global.frozenBalances.getFrozenAmount().toString(), Message.Color.PURPLE);
         }
     }
 

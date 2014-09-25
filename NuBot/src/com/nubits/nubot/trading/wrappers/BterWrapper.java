@@ -539,8 +539,8 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while response"));
+            LOG.severe("Parse error");
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
             return apiResponse;
         }
     }

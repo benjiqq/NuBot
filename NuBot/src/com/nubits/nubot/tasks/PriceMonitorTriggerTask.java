@@ -296,7 +296,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
 
 
-
             FileSystem.writeToFile(row, outputPath, true);
 
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
@@ -343,7 +342,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         Global.conversion = peg_price; //used then for liquidity info
         //Compute the buy/sell prices in USD
-        sellPriceUSD = 1 + (0.01 * Global.options.getTxFee()) - 0.01;  //TODO REMOVE ABSOLUTELY THE - 0.01 , just for debug
+        sellPriceUSD = 1 + (0.01 * Global.options.getTxFee());
         if (!Global.options.isDualSide()) {
             sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();
         }
