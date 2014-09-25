@@ -208,7 +208,7 @@ public class BterWrapper implements TradeInterface {
 
                     if (availableFundsJSON.containsKey(PEGcode)) {
                         double tempbalance = Double.parseDouble((String) availableFundsJSON.get(PEGcode));
-                        PEGAvail = new Amount(tempbalance, pair.getOrderCurrency());
+                        PEGAvail = new Amount(tempbalance, pair.getPaymentCurrency());
                         foundPEGavail = true;
                     }
 
