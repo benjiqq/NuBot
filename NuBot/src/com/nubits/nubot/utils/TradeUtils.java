@@ -23,9 +23,15 @@ package com.nubits.nubot.utils;
  */
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.notifications.jhipchat.messages.Message;
+import com.nubits.nubot.utils.FrozenBalancesManager.FrozenAmount;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -271,6 +277,41 @@ public class TradeUtils {
         }
 
         return toRet;
+    }
+
+    public static Balance removeFrozenAmount(Balance balance, FrozenAmount frozen) {
+        if (frozen.getAmount().getQuantity() == 0) {
+            return balance; //nothing to freeze
+        } else {
+            Currency currentPegCurrency = balance.getPEGAvailableBalance().getCurrency();
+            Currency frozenCurrency = frozen.getAmount().getCurrency();
+
+            if (currentPegCurrency.equals(frozenCurrency)) {
+                double updatedQuantity = balance.getPEGAvailableBalance().getQuantity() - frozen.getAmount().getQuantity();
+                return new Balance(new Amount(updatedQuantity, currentPegCurrency),
+                        balance.getNBTAvailable(),
+                        balance.getPEGBalanceonOrder(),
+                        balance.getNBTonOrder());
+            } else {
+                LOG.severe("Cannot compare the frozen currency (" + frozenCurrency + ") with the peg currency  (" + currentPegCurrency + "). "
+                        + "Returning original balance without freezing value");
+                return balance;
+            }
+        }
+    }
+
+    public static void tryKeepProceedingsAside(Amount amountFoundInBalance) {
+        double percentageToSetApart = Global.options.getKeepProceedings();
+
+        if (percentageToSetApart != 0) {
+            double quantityToFreeze = percentageToSetApart * amountFoundInBalance.getQuantity();
+            Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
+            Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
+
+            HipChatNotifications.sendMessage(percentageToSetApart + "% of  sale proceedings have been put aside to pay dividends : "
+                    + "" + quantityToFreeze + " " + curerncyToFreeze + " \n"
+                    + "Subtotal = " + Global.frozenBalances.getFrozenAmount().toString(), Message.Color.PURPLE);
+        }
     }
 
     public static CurrencyPair getCCEDKPairFromID(int id) {

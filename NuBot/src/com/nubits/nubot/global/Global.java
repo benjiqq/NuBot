@@ -21,6 +21,7 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.utils.FrozenBalancesManager;
 import java.util.Properties;
 
 /**
@@ -42,4 +43,5 @@ public class Global {
     public static NuRPCClient rpcClient;
     public static OptionsJSON options;
     public static double conversion = -1;
+    public static FrozenBalancesManager frozenBalances;
 }

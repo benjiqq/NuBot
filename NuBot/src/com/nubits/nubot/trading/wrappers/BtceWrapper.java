@@ -864,6 +864,7 @@ public class BtceWrapper implements TradeInterface {
 
     }
 
+
     /* Service implementation */
     private class BtceService implements ServiceInterface {
 

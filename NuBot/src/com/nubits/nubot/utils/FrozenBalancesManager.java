@@ -23,7 +23,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.utils.FileSystem;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -183,7 +182,7 @@ public class FrozenBalancesManager {
 
         @Override
         public String toString() {
-            return "FrozenBalance{" + "amount=" + amount + '}';
+            return amount.getQuantity() + " " + amount.getCurrency().getCode().toUpperCase();
         }
     }
 
@@ -226,10 +225,6 @@ public class FrozenBalancesManager {
         @Override
         public String toString() {
             return "historyRow{" + "timestamp=" + timestamp + ", freezedQuantity=" + freezedQuantity + ", currencyCode=" + currencyCode + '}';
-        }
-
-        public String toJsonString() {
-            return "{" + "\"timestamp\":" + "\"" + timestamp + "\"" + ", \"freezedQuantity\":" + freezedQuantity + ", \"currencyCode\":" + "\"" + currencyCode + "\"" + '}';
         }
     }
 }

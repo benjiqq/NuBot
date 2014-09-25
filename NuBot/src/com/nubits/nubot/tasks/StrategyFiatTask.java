@@ -47,7 +47,6 @@ public class StrategyFiatTask extends TimerTask {
     public void run() {
         LOG.fine("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
 
-
         recount(); //Count number of active sells and buys
 
         if (mightNeedInit) {
@@ -122,7 +121,7 @@ public class StrategyFiatTask extends TimerTask {
 
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
             if (balancesResponse.isPositive()) {
-                Balance balance = (Balance) balancesResponse.getResponseObject();
+                Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
                 Amount balanceNBT = balance.getNBTAvailable();
                 Amount balanceFIAT = balance.getPEGAvailableBalance();
                 LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
@@ -299,7 +298,7 @@ public class StrategyFiatTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
+                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
                         balanceNBT = balance.getNBTAvailable();
                         Amount balanceFIAT = balance.getPEGAvailableBalance();
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
@@ -366,6 +365,10 @@ public class StrategyFiatTask extends TimerTask {
         //----------------------USD (Buys)----------------------------
         //Check if USD balance > 1
         if (balanceFIAT.getQuantity() > 1) {
+
+            TradeUtils.tryKeepProceedingsAside(balanceFIAT);
+
+
             String idToDelete = getSmallerWallID(Constant.BUY);
             if (!idToDelete.equals("-1")) {
                 LOG.warning("Buyside : Taking down smaller order to aggregate it with new balance");
@@ -374,7 +377,7 @@ public class StrategyFiatTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
+                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
                         Amount balanceNBT = balance.getNBTAvailable();
                         balanceFIAT = balance.getPEGAvailableBalance();
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
@@ -489,7 +492,7 @@ public class StrategyFiatTask extends TimerTask {
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
             double balanceNBT = balance.getNBTAvailable().getQuantity();
             double balanceFIAT = balance.getPEGAvailableBalance().getQuantity();
             activeSellOrders = countActiveOrders(Constant.SELL);

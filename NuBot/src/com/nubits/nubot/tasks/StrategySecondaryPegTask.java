@@ -79,10 +79,9 @@ public class StrategySecondaryPegTask extends TimerTask {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
         } else {
-
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
             if (balancesResponse.isPositive()) {
-                Balance balance = (Balance) balancesResponse.getResponseObject();
+                Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
                 Amount balanceNBT = balance.getNBTAvailable();
                 Amount balancePEG = balance.getPEGAvailableBalance();
                 LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
@@ -252,7 +251,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
+                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
                         balanceNBT = balance.getNBTAvailable();
                         Amount balancePEG = balance.getPEGAvailableBalance();
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
@@ -318,6 +317,10 @@ public class StrategySecondaryPegTask extends TimerTask {
         //----------------------USD (Buys)----------------------------
         //Check if USD balance > 1
         if (balancePEG.getQuantity() > 0.001) {
+
+            //Here its time to compute the balance to put apart, if any
+            TradeUtils.tryKeepProceedingsAside(balancePEG);
+
             String idToDelete = getSmallerWallID(Constant.BUY);
             if (!idToDelete.equals("-1")) {
                 LOG.warning("Buyside : Taking down smaller order to aggregate it with new balance");
@@ -326,7 +329,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
+                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
                         Amount balanceNBT = balance.getNBTAvailable();
                         balancePEG = balance.getPEGAvailableBalance();
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
@@ -440,7 +443,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
             double balanceNBT = balance.getNBTAvailable().getQuantity();
             double balancePEG = balance.getPEGAvailableBalance().getQuantity();
 

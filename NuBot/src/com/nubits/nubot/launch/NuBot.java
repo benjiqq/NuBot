@@ -35,6 +35,7 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -229,6 +230,12 @@ public class NuBot {
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
         LOG.info(Global.options.toStringNoKeys());
+
+
+        // Set the frozen balance manager in the global variable
+        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.settings.getProperty("frozen_folder"));
+
+
         //Switch strategy for different trading pair
 
 
@@ -248,7 +255,6 @@ public class NuBot {
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
                 //Set the wallet shift threshold
-
 
                 StrategySecondaryPegTask secondaryPegStrategy = ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()));
 

@@ -563,7 +563,7 @@ public class OptionsJSON {
             }
 
             if (optionsJSON.containsKey("keep-proceedings")) {
-                keepProceedings = Double.parseDouble((String) (optionsJSON.get("keep-proceedings")));
+                keepProceedings = Utils.getDouble((optionsJSON.get("keep-proceedings")));
             }
 
             //Create a new Instance
