@@ -81,11 +81,12 @@ public class StrategySecondaryPegTask extends TimerTask {
         } else {
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
             if (balancesResponse.isPositive()) {
-                Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                Balance balance = (Balance) balancesResponse.getResponseObject();
                 Amount balanceNBT = balance.getNBTAvailable();
-                Amount balancePEG = balance.getPEGAvailableBalance();
+                Amount balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+
                 LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                        + balancePEG.getQuantity() + " USD");
+                        + balancePEG.getQuantity() + " " + balancePEG.getCurrency());
 
                 //Execute sellSide strategy
                 sellSide(balanceNBT);
@@ -173,7 +174,8 @@ public class StrategySecondaryPegTask extends TimerTask {
             Amount pegBalance = null;
             ApiResponse pegBalanceResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
             if (pegBalanceResponse.isPositive()) {
-                pegBalance = (Amount) pegBalanceResponse.getResponseObject();
+                pegBalance = TradeUtils.removeFrozenAmount((Amount) pegBalanceResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+
 
                 if (pegBalance.getQuantity() > 0.0001) {
                     // Divide the  balance 50% 50% in balance1 and balance2
@@ -251,18 +253,19 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                        Balance balance = (Balance) balancesResponse.getResponseObject();
                         balanceNBT = balance.getNBTAvailable();
-                        Amount balancePEG = balance.getPEGAvailableBalance();
+                        Amount balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                                 + balancePEG.getQuantity() + " " + balancePEG.getCurrency().getCode());
 
                         //Update TX fee :
                         //Get the current transaction fee associated with a specific CurrencyPair
-                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-                        if (txFeeNTBUSDResponse.isPositive()) {
-                            double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
-                            LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
+                        ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+                        if (txFeeNTBPEGResponse.isPositive()) {
+                            double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
+                            LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                             //Prepare the sell order
 
@@ -289,7 +292,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                             }
                         } else {
                             //Cannot update txfee
-                            LOG.severe(txFeeNTBUSDResponse.getError().toString());
+                            LOG.severe(txFeeNTBPEGResponse.getError().toString());
                         }
 
 
@@ -314,8 +317,8 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     private void buySide(Amount balancePEG) {
-        //----------------------USD (Buys)----------------------------
-        //Check if USD balance > 1
+        //----------------------PEG (Buys)----------------------------
+        //Check if PEG balance > 1
         if (balancePEG.getQuantity() > 0.001) {
 
             //Here its time to compute the balance to put apart, if any
@@ -329,18 +332,19 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                        Balance balance = (Balance) balancesResponse.getResponseObject();
                         Amount balanceNBT = balance.getNBTAvailable();
-                        balancePEG = balance.getPEGAvailableBalance();
+                        balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                                + balancePEG.getQuantity() + " USD");
+                                + balancePEG.getQuantity() + " " + balancePEG.getCurrency().getCode());
 
                         //Update TX fee :
                         //Get the current transaction fee associated with a specific CurrencyPair
-                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-                        if (txFeeNTBUSDResponse.isPositive()) {
-                            double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
-                            LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
+                        ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+                        if (txFeeNTBPEGResponse.isPositive()) {
+                            double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
+                            LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                             //Prepare the buy order
 
@@ -367,7 +371,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                             }
                         } else {
                             //Cannot update txfee
-                            LOG.severe(txFeeNTBUSDResponse.getError().toString());
+                            LOG.severe(txFeeNTBPEGResponse.getError().toString());
                         }
                     } else {
                         //Cannot get balance
@@ -385,8 +389,8 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
 
         } else {
-            //USD balance = 0
-            LOG.fine("USD balance < 1, no orders to execute");
+            //PEG balance = 0
+            LOG.fine(balancePEG.getCurrency().getCode() + "balance < 1, no orders to execute");
         }
     }
 
@@ -443,9 +447,9 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+            Balance balance = (Balance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balancePEG = balance.getPEGAvailableBalance().getQuantity();
+            double balancePEG = (TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 
             activeSellOrders = countActiveOrders(Constant.SELL);
             activeBuyOrders = countActiveOrders(Constant.BUY);
@@ -454,9 +458,16 @@ public class StrategySecondaryPegTask extends TimerTask {
             countOk = false;
 
             if (Global.options.isDualSide()) {
-                countOk = (activeSellOrders == 2 && activeBuyOrders == 2 && balancePEG < 0.001 && balanceNBT < 0.01)
+
+
+                countOk = ((activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < 0.001)
-                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 0.01);
+                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 0.01));
+
+                if (balancePEG > 0.001) {
+                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
+                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                }
             } else {
                 countOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
             }

@@ -121,9 +121,10 @@ public class StrategyFiatTask extends TimerTask {
 
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
             if (balancesResponse.isPositive()) {
-                Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                Balance balance = (Balance) balancesResponse.getResponseObject();
                 Amount balanceNBT = balance.getNBTAvailable();
-                Amount balanceFIAT = balance.getPEGAvailableBalance();
+
+                Amount balanceFIAT = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
                 LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                         + balanceFIAT.getQuantity() + " USD");
 
@@ -219,7 +220,7 @@ public class StrategyFiatTask extends TimerTask {
             Amount fiatBalance = null;
             ApiResponse fiatBalanceResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
             if (fiatBalanceResponse.isPositive()) {
-                fiatBalance = (Amount) fiatBalanceResponse.getResponseObject();
+                fiatBalance = TradeUtils.removeFrozenAmount((Amount) fiatBalanceResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
 
                 if (fiatBalance.getQuantity() > 1) {
                     // Divide the  balance 50% 50% in balance1 and balance2
@@ -298,9 +299,10 @@ public class StrategyFiatTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                        Balance balance = (Balance) balancesResponse.getResponseObject();
                         balanceNBT = balance.getNBTAvailable();
-                        Amount balanceFIAT = balance.getPEGAvailableBalance();
+                        Amount balanceFIAT = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                                 + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
 
@@ -377,9 +379,10 @@ public class StrategyFiatTask extends TimerTask {
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                     if (balancesResponse.isPositive()) {
-                        Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                        Balance balance = (Balance) balancesResponse.getResponseObject();
                         Amount balanceNBT = balance.getNBTAvailable();
-                        balanceFIAT = balance.getPEGAvailableBalance();
+                        balanceFIAT = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                                 + balanceFIAT.getQuantity() + " USD");
 
@@ -492,9 +495,9 @@ public class StrategyFiatTask extends TimerTask {
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = TradeUtils.removeFrozenAmount((Balance) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+            Balance balance = (Balance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balanceFIAT = balance.getPEGAvailableBalance().getQuantity();
+            double balanceFIAT = (TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
             activeSellOrders = countActiveOrders(Constant.SELL);
             activeBuyOrders = countActiveOrders(Constant.BUY);
             totalActiveOrders = activeSellOrders + activeBuyOrders;
@@ -502,9 +505,14 @@ public class StrategyFiatTask extends TimerTask {
             countOk = false;
 
             if (Global.options.isDualSide()) {
-                countOk = (activeSellOrders == 2 && activeBuyOrders == 2 && balanceFIAT < 1 && balanceNBT < 1)
+                countOk = (activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balanceFIAT < 1)
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1);
+
+                if (balanceFIAT > 1) {
+                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If you just started the bot or if the balance represent proceedings "
+                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                }
             } else {
                 countOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
             }

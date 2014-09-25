@@ -343,7 +343,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         Global.conversion = peg_price; //used then for liquidity info
         //Compute the buy/sell prices in USD
-        sellPriceUSD = 1 + (0.01 * Global.options.getTxFee());
+        sellPriceUSD = 1 + (0.01 * Global.options.getTxFee()) - 0.01;  //TODO REMOVE ABSOLUTELY THE - 0.01 , just for debug
         if (!Global.options.isDualSide()) {
             sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();
         }

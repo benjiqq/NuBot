@@ -112,10 +112,10 @@ public class FrozenBalancesManager {
                 DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
                 Date timestamp = df.parse((String) tempHistoryRow.get("timestamp"));
 
-                double freezedQuantity = (Double) tempHistoryRow.get("freezed-quantity");
+                double frozeQuantity = (Double) tempHistoryRow.get("froze-quantity");
                 String currencyCode = (String) tempHistoryRow.get("currency-code");
 
-                history.add(new HistoryRow(timestamp, freezedQuantity, currencyCode));
+                history.add(new HistoryRow(timestamp, frozeQuantity, currencyCode));
             }
 
         } catch (ParseException | NumberFormatException | java.text.ParseException e) {
@@ -135,7 +135,7 @@ public class FrozenBalancesManager {
             JSONObject tempRow = new JSONObject();
             HistoryRow tempHistory = history.get(i);
             tempRow.put("timestamp", tempHistory.getTimestamp().toString());
-            tempRow.put("freezed-quantity", tempHistory.getFreezedQuantity());
+            tempRow.put("froze-quantity", tempHistory.getFreezedQuantity());
             tempRow.put("currency-code", tempHistory.getCurrencyCode());
 
             historyListJ.add(tempRow);
@@ -169,7 +169,7 @@ public class FrozenBalancesManager {
         private Amount amount;
 
         public FrozenAmount(Amount amount) {
-            this.amount = amount;
+            this.amount = new Amount(Utils.round(amount.getQuantity(), 8), amount.getCurrency());
         }
 
         public Amount getAmount() {
@@ -177,7 +177,7 @@ public class FrozenBalancesManager {
         }
 
         public void setAmount(Amount amount) {
-            this.amount = amount;
+            this.amount = new Amount(Utils.round(amount.getQuantity(), 8), amount.getCurrency());
         }
 
         @Override
@@ -189,12 +189,12 @@ public class FrozenBalancesManager {
     public class HistoryRow {
 
         private Date timestamp;
-        private double freezedQuantity;
+        private double frozeQuantity;
         private String currencyCode;
 
-        public HistoryRow(Date timestamp, double freezedQuantity, String currencyCode) {
+        public HistoryRow(Date timestamp, double frozeQuantity, String currencyCode) {
             this.timestamp = timestamp;
-            this.freezedQuantity = freezedQuantity;
+            this.frozeQuantity = frozeQuantity;
             this.currencyCode = currencyCode;
         }
 
@@ -207,11 +207,11 @@ public class FrozenBalancesManager {
         }
 
         public double getFreezedQuantity() {
-            return freezedQuantity;
+            return frozeQuantity;
         }
 
-        public void setFreezedQuantity(double freezedQuantity) {
-            this.freezedQuantity = freezedQuantity;
+        public void setFreezedQuantity(double frozeQuantity) {
+            this.frozeQuantity = frozeQuantity;
         }
 
         public String getCurrencyCode() {
@@ -224,7 +224,7 @@ public class FrozenBalancesManager {
 
         @Override
         public String toString() {
-            return "historyRow{" + "timestamp=" + timestamp + ", freezedQuantity=" + freezedQuantity + ", currencyCode=" + currencyCode + '}';
+            return "historyRow{" + "timestamp=" + timestamp + ", frozeQuantity=" + frozeQuantity + ", currencyCode=" + currencyCode + '}';
         }
     }
 }

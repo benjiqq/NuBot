@@ -49,7 +49,7 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/test/options-reduced.json";
+    private static final String TEST_OPTIONS_PATH = "res/options/test/options-full.json";
     //These are the key pair associated with desrever's test account on btc-e
 
     public static void main(String[] args) {
@@ -66,7 +66,7 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-        //testGetAvailableBalances(Constant.BTC_USD);
+        testGetAvailableBalances(Constant.NBT_BTC);
         //testGetAvailableBalance(Constant.LTC);
         //testSell(0.001, 500, Constant.BTC_USD);
         //testBuy(1, 0.0005, Constant.BTC_USD);
@@ -78,7 +78,7 @@ public class TestWrappers {
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //testClearAllOrders();
-        testIsOrderActive("40700422");
+        //testIsOrderActive("40700422");
         //testGetPermissions();
 
 

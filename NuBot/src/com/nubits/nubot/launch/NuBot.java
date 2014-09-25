@@ -280,7 +280,6 @@ public class NuBot {
                 //set the interval from options
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
 
-
                 //then start the thread
                 Global.taskManager.getPriceTriggerTask().start(2);
             }
