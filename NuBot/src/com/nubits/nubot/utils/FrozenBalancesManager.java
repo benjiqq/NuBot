@@ -26,6 +26,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -101,7 +102,7 @@ public class FrozenBalancesManager {
         String FrozenBalancesManagerString = FileSystem.readFromFile(this.pathToFrozenBalancesFiles);
         try {
             JSONObject frozenBalancesJSON = (JSONObject) (parser.parse(FrozenBalancesManagerString));
-            double quantity = (Double) frozenBalancesJSON.get("frozen-quantity-total");
+            double quantity = Double.parseDouble((String) frozenBalancesJSON.get("frozen-quantity-total"));
             Amount frozenAmount = new Amount(quantity, pair.getPaymentCurrency());
             setInitialFrozenAmount(frozenAmount, false);
 
@@ -112,7 +113,7 @@ public class FrozenBalancesManager {
                 DateFormat df = new SimpleDateFormat("EEE MMM dd kk:mm:ss z yyyy", Locale.ENGLISH);
                 Date timestamp = df.parse((String) tempHistoryRow.get("timestamp"));
 
-                double frozeQuantity = (Double) tempHistoryRow.get("froze-quantity");
+                double frozeQuantity = Double.parseDouble((String) tempHistoryRow.get("froze-quantity"));
                 String currencyCode = (String) tempHistoryRow.get("currency-code");
 
                 history.add(new HistoryRow(timestamp, frozeQuantity, currencyCode));
@@ -128,14 +129,20 @@ public class FrozenBalancesManager {
         String toWrite = "";
         JSONObject toWriteJ = new JSONObject();
 
-        toWriteJ.put("frozen-quantity-total", getFrozenAmount().getAmount().getQuantity());
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(8);
 
+        toWriteJ.put("frozen-quantity-total", df.format(getFrozenAmount().getAmount().getQuantity()));
+        toWriteJ.put("frozen-currency", getFrozenAmount().getAmount().getCurrency().getCode());
         JSONArray historyListJ = new JSONArray();
         for (int i = 0; i < history.size(); i++) {
             JSONObject tempRow = new JSONObject();
             HistoryRow tempHistory = history.get(i);
+
+
+
             tempRow.put("timestamp", tempHistory.getTimestamp().toString());
-            tempRow.put("froze-quantity", tempHistory.getFreezedQuantity());
+            tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
             tempRow.put("currency-code", tempHistory.getCurrencyCode());
 
             historyListJ.add(tempRow);

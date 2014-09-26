@@ -302,7 +302,7 @@ public class TradeUtils {
 
         if (percentageToSetApart != 0) {
             double quantityToFreeze = percentageToSetApart * amountFoundInBalance.getQuantity();
-            //Option2, use decimalFormat.
+
             DecimalFormat df = new DecimalFormat("#");
             df.setMaximumFractionDigits(8);
 

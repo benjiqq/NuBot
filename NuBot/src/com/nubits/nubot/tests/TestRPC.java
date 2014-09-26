@@ -18,9 +18,11 @@
 package com.nubits.nubot.tests;
 
 import com.nubits.nubot.RPC.NuRPCClient;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -36,19 +38,29 @@ public class TestRPC {
     private static final Logger LOG = Logger.getLogger(TestRPC.class.getName());
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
-    private static boolean verbose = true;
+    private static boolean verbose = false;
 
     public static void main(String[] args) {
+        Utils.loadProperties("settings.properties");
+
         TestRPC test = new TestRPC();
 
         test.setup();
         test.testCheckNudTask();
-        test.testGetInfo();
+        try {
+            Thread.sleep(2000);
+
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestRPC.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        //test.testGetInfo();
         //test.testIsConnected();
         //test.testSendLiquidityInfo();
+        //test.testGetLiquidityInfo();
+        test.testGetLiquidityInfo(Constant.SELL);
+        test.testGetLiquidityInfo(Constant.BUY);
 
-        //testGetLiquidityInfo();
-        //System.exit(0);
+        System.exit(0);
 
     }
 
@@ -77,7 +89,7 @@ public class TestRPC {
     private void testGetInfo() {
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject = Global.rpcClient.getInfo();
-            LOG.fine(responseObject.toJSONString());
+            LOG.info(responseObject.toJSONString());
         } else {
             LOG.severe("Nu Client offline. ");
         }
@@ -88,16 +100,15 @@ public class TestRPC {
         if (Global.rpcClient.isConnected()) {
             connectedString = "online";
         }
-        LOG.fine("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
+        LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
     }
 
     private void setup() {
         try {
-            NuLogger.setup(true);
+            NuLogger.setup(verbose);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
-        LOG.setLevel(Level.FINE);
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
@@ -125,10 +136,24 @@ public class TestRPC {
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.fine(responseObject.toJSONString());
+                LOG.info(responseObject.toJSONString());
             }
         } else {
             LOG.severe("Nu Client offline. ");
         }
+    }
+
+    private void testGetLiquidityInfo(String type) {
+        if (Global.rpcClient.isConnected()) {
+            double response = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, type);
+            if (response == -1) {
+                LOG.severe("Something went wrong while sending liquidityinfo");
+            } else {
+                LOG.info("Total " + type + " liquidity : " + response + " " + Constant.NBT.getCode());
+            }
+        } else {
+            LOG.severe("Nu Client offline. ");
+        }
+
     }
 }

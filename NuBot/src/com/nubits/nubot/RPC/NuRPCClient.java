@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.RPC;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import java.io.IOException;
 import java.util.Arrays;
@@ -110,6 +111,39 @@ public class NuRPCClient {
 
         } else {
             return new JSONObject();
+        }
+    }
+
+    public double getLiquidityInfo(String currency, String type) {
+        JSONObject toReturn = null;
+
+
+        //String[] params = { USDchar,buyamount,sellamount,custodianPublicAddress };
+        List params = Arrays.asList(currency);
+
+        JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GETLIQUIDITYINFO, params);
+        if (json != null) {
+
+            if ((JSONObject) json.get("result") != null) {
+                JSONObject result = (JSONObject) json.get("result");
+                JSONObject total = (JSONObject) result.get("total");
+                double toRet = -1;
+                if (type.equalsIgnoreCase(Constant.SELL)) {
+                    toRet = (double) total.get("sell");
+                } else if (type.equalsIgnoreCase(Constant.BUY)) {
+                    toRet = (double) total.get("buy");
+                } else {
+                    LOG.severe("The type can be either buy or sell");
+                }
+                return toRet;
+            } else {
+                LOG.severe(((JSONObject) json.get("error")).toString());
+                return 0;
+            }
+
+        } else {
+            LOG.severe("getliquidityinfo returned null");
+            return -1;
         }
     }
 

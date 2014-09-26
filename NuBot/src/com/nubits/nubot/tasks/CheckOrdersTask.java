@@ -36,6 +36,8 @@ public class CheckOrdersTask extends TimerTask {
 
     private static final Logger LOG = Logger.getLogger(CheckOrdersTask.class.getName());
     private boolean verbose;
+    private double lastSellSent = 0;
+    private double lastBuySent = 0;
 
     public CheckOrdersTask(boolean verbose) {
         this.verbose = verbose;
@@ -86,6 +88,8 @@ public class CheckOrdersTask extends TimerTask {
             Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
             Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
 
+
+
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
                 LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
@@ -101,11 +105,29 @@ public class CheckOrdersTask extends TimerTask {
 
     private void sendLiquidityInfo(Exchange exchange) {
         if (Global.rpcClient.isConnected()) {
+
+            //Get current liquidity total for buy and sell
+
+            double currentTotalLiquiditySell = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.SELL);
+            double currentTotalLiquidityBuy = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.BUY);
+
+            if (currentTotalLiquiditySell == -1 || currentTotalLiquidityBuy == -1) {
+                LOG.severe("Something went wrong while getting liquidityinfo");
+            }
+
+
+            //Take out my part from the total, and re-add my part on top of the total
+
+            double sellLiquidityToSend = exchange.getLiveData().getNBTonsell() + (currentTotalLiquiditySell - lastSellSent);
+            double buyLiquidityToSend = exchange.getLiveData().getNBTonbuy() + (currentTotalLiquidityBuy - lastBuySent);
+
             JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                    exchange.getLiveData().getNBTonbuy(), exchange.getLiveData().getNBTonsell(), Global.publicAddress);
+                    buyLiquidityToSend, sellLiquidityToSend, Global.publicAddress);
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
+                lastBuySent = exchange.getLiveData().getNBTonbuy();
+                lastSellSent = exchange.getLiveData().getNBTonsell();
                 LOG.fine(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
                     LOG.fine("RPC Liquidityinfo sent : "

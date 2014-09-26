@@ -17,12 +17,12 @@ package com.nubits.nubot.tests;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
 
@@ -40,7 +40,7 @@ public class TestFroozenAmounts {
 
         FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair, Global.settings.getProperty("frozen_folder"));
 
-        fbm.updateFrozenBalance(new Amount(10, currency));
+        fbm.updateFrozenBalance(new Amount(0.000000091, currency));
         fbm.updateFrozenBalance(new Amount(5032, currency));
         fbm.updateFrozenBalance(new Amount(202, currency));
         fbm.updateFrozenBalance(new Amount(30.3, currency));
