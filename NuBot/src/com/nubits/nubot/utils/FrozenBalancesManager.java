@@ -67,7 +67,9 @@ public class FrozenBalancesManager {
     //use this method to set frozen amount
     public void setInitialFrozenAmount(Amount newAmount, boolean writeToFile) {
         this.frozenAmount = new FrozenAmount(newAmount);
-        LOG.warning("Setting frozen amount to : " + this.frozenAmount.getAmount().getQuantity() + " " + pair.getPaymentCurrency().getCode());
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(8);
+        LOG.warning("Setting frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
         if (writeToFile) {
             updateFrozenFilesystem();
         }
@@ -160,7 +162,7 @@ public class FrozenBalancesManager {
 
         try {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
-            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + getFrozenAmount().getAmount().getQuantity() + " " + pair.getPaymentCurrency().getCode());
+            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }

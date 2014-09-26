@@ -309,9 +309,9 @@ public class TradeUtils {
             Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
             Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
 
-            HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode() + "have been put aside to pay dividends ("
+            HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
                     + percentageToSetApart * 100 + "% of  sale proceedings)"
-                    + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount()), Message.Color.PURPLE);
+                    + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
         }
     }
 
