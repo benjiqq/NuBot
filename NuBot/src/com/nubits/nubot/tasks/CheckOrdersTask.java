@@ -108,8 +108,8 @@ public class CheckOrdersTask extends TimerTask {
 
             //Get current liquidity total for buy and sell
 
-            double currentTotalLiquiditySell = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.SELL);
-            double currentTotalLiquidityBuy = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.BUY);
+            double currentTotalLiquiditySell = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.SELL, Global.options.getNubitAddress());
+            double currentTotalLiquidityBuy = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.BUY, Global.options.getNubitAddress());
 
             if (currentTotalLiquiditySell == -1 || currentTotalLiquidityBuy == -1) {
                 LOG.severe("Something went wrong while getting liquidityinfo");

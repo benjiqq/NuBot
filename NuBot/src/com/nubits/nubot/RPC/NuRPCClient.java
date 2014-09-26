@@ -114,7 +114,7 @@ public class NuRPCClient {
         }
     }
 
-    public double getLiquidityInfo(String currency, String type) {
+    public double getLiquidityInfo(String currency, String type, String address) {
         JSONObject toReturn = null;
 
 
@@ -126,7 +126,7 @@ public class NuRPCClient {
 
             if ((JSONObject) json.get("result") != null) {
                 JSONObject result = (JSONObject) json.get("result");
-                JSONObject total = (JSONObject) result.get("total");
+                JSONObject total = (JSONObject) result.get(address);
                 double toRet = -1;
                 if (type.equalsIgnoreCase(Constant.SELL)) {
                     toRet = (double) total.get("sell");

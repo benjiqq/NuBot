@@ -57,8 +57,8 @@ public class TestRPC {
         //test.testIsConnected();
         //test.testSendLiquidityInfo();
         //test.testGetLiquidityInfo();
-        test.testGetLiquidityInfo(Constant.SELL);
-        test.testGetLiquidityInfo(Constant.BUY);
+        test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
+        test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
 
         System.exit(0);
 
@@ -143,9 +143,9 @@ public class TestRPC {
         }
     }
 
-    private void testGetLiquidityInfo(String type) {
+    private void testGetLiquidityInfo(String type, String address) {
         if (Global.rpcClient.isConnected()) {
-            double response = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, type);
+            double response = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, type, address);
             if (response == -1) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
