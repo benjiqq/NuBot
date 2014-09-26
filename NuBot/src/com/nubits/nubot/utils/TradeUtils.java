@@ -311,7 +311,7 @@ public class TradeUtils {
 
             HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode() + "have been put aside to pay dividends ("
                     + percentageToSetApart * 100 + "% of  sale proceedings)"
-                    + ". Funds frozen to date = " + Global.frozenBalances.getFrozenAmount().toString(), Message.Color.PURPLE);
+                    + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount()), Message.Color.PURPLE);
         }
     }
 
