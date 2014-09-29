@@ -58,17 +58,22 @@ public class StrategySecondaryPegTask extends TimerTask {
             // if there are 0 orders, place initial walls
             // if there are a number of orders different than 2, cancel all and place initial walls
 
+            boolean reinitiateSuccess = true;
             if (!(countOk)) {
-                reInitiateOrders();
+                reinitiateSuccess = reInitiateOrders();
             } else {
                 LOG.warning("No need to init new orders since current orders seems correct");
             }
-            mightNeedInit = false;
+            if (reinitiateSuccess) {
+                mightNeedInit = false;
+            }
             recount();
         } else {
             if (needWallShift) {
-                reInitiateOrders();
-                needWallShift = false;
+                boolean reinitiateSuccess = reInitiateOrders();
+                if (reinitiateSuccess) {
+                    needWallShift = false;
+                }
             }
         }
 
@@ -496,7 +501,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.buyPricePEG = buyPricePEG;
     }
 
-    private void reInitiateOrders() {
+    private boolean reInitiateOrders() {
         //They are either 0 or need to be cancelled
         if (totalActiveOrders != 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
@@ -532,12 +537,14 @@ public class StrategySecondaryPegTask extends TimerTask {
                 } else {
                     String message = "Could not submit request to clear orders";
                     LOG.severe(message);
+                    return false;
                 }
 
             } else {
                 LOG.severe(deleteOrdersResponse.getError().toString());
                 String message = "Could not submit request to clear orders";
                 LOG.severe(message);
+                return false;
             }
         } else {
             placeInitialWalls();
@@ -547,6 +554,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         } catch (InterruptedException ex) {
             LOG.severe(ex.getMessage());
         }
+        return true;
     }
 
     private double getFroozenBalance() {
