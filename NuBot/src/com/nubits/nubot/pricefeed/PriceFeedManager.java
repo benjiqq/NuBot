@@ -67,7 +67,7 @@ public class PriceFeedManager {
                     isMainFeedValid = true;
                 }
             } else {
-                LOG.severe("Error while updating " + pair.getOrderCurrency().getCode() + ""
+                LOG.warning("Error while updating " + pair.getOrderCurrency().getCode() + ""
                         + " price from " + tempFeed.name);
             }
         }
