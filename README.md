@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="../master/readme-assets/logo.png?raw=true" alt="NuBot Logo"/>
-</p>
+![NuBot Logo](raw/master/readme-assets/logo.png)
 
 #####Official automated trading bot for NuBits custodians
 
