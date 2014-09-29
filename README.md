@@ -1,4 +1,4 @@
-![NuBot Logo](raw/master/readme-assets/logo.png)
+![NuBot Logo](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/logo.png)
 
 #####Official automated trading bot for NuBits custodians
 
@@ -154,11 +154,11 @@ NuBot comes as a cross platform executable jar file to run from command line. It
 
 ### <a name="diagram-sell"></a>Sell-side logic
 
-![alt text](../master/readme-assets/bot-case-2.png "NuBot Sell-Side logic")
+![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-2.png "NuBot Sell-Side logic")
 
 ### <a name="diagram-dual"></a>Dual-side logic
 
-![alt text](../master/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
+![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
 
 ##Implementation details
 *coming soon*
