@@ -86,7 +86,7 @@ The comand above will unlock the NBT wallet for  9999999999 seconds, ~ 300 years
 
 ### 2) Configure the NuBot
 
-**Download latest stable builds from the release page.**
+**Download latest stable builds from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).**
 
 The bot reads options from a *.json* file.
 
@@ -145,18 +145,18 @@ NuBot comes as a cross platform executable jar file to run from command line. It
 
 
 
-# <a name="hood"></a>Under the hood
+# Under the hood
 ##Additional configuration parameters
 *coming soon*
 ##Adding support for an exchange
 *coming soon*
-## <a name="diagrams"></a>Design and diagrams
+##Design and diagrams
 
-### <a name="diagram-sell"></a>Sell-side logic
+###Sell-side logic
 
 ![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-2.png "NuBot Sell-Side logic")
 
-### <a name="diagram-dual"></a>Dual-side logic
+###Dual-side logic
 
 ![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
 
