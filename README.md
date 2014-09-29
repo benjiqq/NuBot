@@ -56,6 +56,7 @@ By using NuBot you declare to be accept the afore-mentioned risks.
 * The computer that runs NuBot must be connected to the internet
 * The custodian must provide the bot with access to market exchanges where NuBits are traded
 * The custodian must avoid manual interacting with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
+* The custodian must avoid opening multiple instances of Nu in control of the custodian address.
 
 ### 1)Prepare the NuBits client client
 
