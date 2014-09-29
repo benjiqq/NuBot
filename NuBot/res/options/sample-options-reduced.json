@@ -1,0 +1,15 @@
+{"options": 
+    {
+    "exchangename":"xxx",
+    "apikey": "xxx",
+    "apisecret": "xxx",
+    "dualside": false,
+    "nubitaddress": "xxx",
+    "nudport": 9091,
+    "rpcpass": "xxx",
+    "rpcuser": "xxx",
+    "pair":"xxx_xxx",
+    "mail-recipient":"xxx"
+ }
+}
+  
