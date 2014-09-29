@@ -532,14 +532,12 @@ public class StrategySecondaryPegTask extends TimerTask {
                 } else {
                     String message = "Could not submit request to clear orders";
                     LOG.severe(message);
-                    System.exit(0);
                 }
 
             } else {
                 LOG.severe(deleteOrdersResponse.getError().toString());
                 String message = "Could not submit request to clear orders";
                 LOG.severe(message);
-                System.exit(0);
             }
         } else {
             placeInitialWalls();

@@ -55,9 +55,9 @@ public class TestRPC {
         } catch (InterruptedException ex) {
             Logger.getLogger(TestRPC.class.getName()).log(Level.SEVERE, null, ex);
         }
-        //test.testGetInfo();
+        test.testGetInfo();
         //test.testIsConnected();
-        test.testSendLiquidityInfo();
+        //test.testSendLiquidityInfo();
         //test.testGetLiquidityInfo();
         //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
         //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
