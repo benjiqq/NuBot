@@ -99,10 +99,11 @@ public class TestOrderTask {
         Global.taskManager.getCheckConnectionTask().start();
 
 
-        Global.publicAddress = Passwords.CUSTODIA_PUBLIC_ADDRESS;
+        Global.publicAddress = Passwords.CUSTODIAN_PUBLIC_ADDRESS;
 
         LOG.fine("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
-        Global.rpcClient = new NuRPCClient(nudip, nudport, Passwords.NUD_RPC_USER, Passwords.NUD_RPC_PASS, true);
+        Global.rpcClient = new NuRPCClient(nudip, nudport, Passwords.NUD_RPC_USER,
+                Passwords.NUD_RPC_PASS, true, true, Global.publicAddress, Constant.NBT_PPC, "testid");
 
         Utils.printSeparator();
 

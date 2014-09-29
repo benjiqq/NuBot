@@ -71,7 +71,7 @@ public class MailNotifications {
         Date now = new Date();
         String footer = "\n --- \n Message generated at " + now;
         if (Global.options != null) {
-            footer += "from bot with custodial address " + Global.options.getNubitAddress() + " on " + Global.options.getExchangeName();
+            footer += "from bot with custodial address " + Global.options.getNubitsAddress() + " on " + Global.options.getExchangeName();
         }
         message = message + footer;
         MailNotifications.Send(username, password, recipientEmail, "", title, message);

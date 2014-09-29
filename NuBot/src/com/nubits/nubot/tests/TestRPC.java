@@ -21,6 +21,7 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
@@ -39,13 +40,14 @@ public class TestRPC {
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
     private static boolean verbose = false;
+    private static boolean useIdentifier = true;
 
     public static void main(String[] args) {
         Utils.loadProperties("settings.properties");
 
         TestRPC test = new TestRPC();
 
-        test.setup();
+        test.setup(Constant.PEATIO_BTCCNY, Passwords.CUSTODIAN_PUBLIC_ADDRESS, Constant.NBT_BTC);
         test.testCheckNudTask();
         try {
             Thread.sleep(2000);
@@ -55,21 +57,21 @@ public class TestRPC {
         }
         //test.testGetInfo();
         //test.testIsConnected();
-        //test.testSendLiquidityInfo();
+        test.testSendLiquidityInfo();
         //test.testGetLiquidityInfo();
-        test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
-        test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
+        //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
+        //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
 
         System.exit(0);
 
     }
 
     private void testSendLiquidityInfo() {
-        double amountSell = 15;
-        double amountBuy = 994;
+        double amountSell = 0;
+        double amountBuy = 0;
 
         if (Global.rpcClient.isConnected()) {
-            JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar, amountBuy, amountSell, Passwords.CUSTODIA_PUBLIC_ADDRESS);
+            JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar, amountBuy, amountSell);
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
@@ -103,7 +105,7 @@ public class TestRPC {
         LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
     }
 
-    private void setup() {
+    private void setup(String exchangeName, String custodianAddress, CurrencyPair pair) {
         try {
             NuLogger.setup(verbose);
         } catch (IOException ex) {
@@ -113,10 +115,10 @@ public class TestRPC {
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
 
-        Global.publicAddress = Passwords.CUSTODIA_PUBLIC_ADDRESS;
+        Global.publicAddress = custodianAddress;
 
         //Create the client
-        Global.rpcClient = new NuRPCClient(ipTest, portTest, Passwords.NUD_RPC_USER, Passwords.NUD_RPC_PASS, verbose);
+        Global.rpcClient = new NuRPCClient(ipTest, portTest, Passwords.NUD_RPC_USER, Passwords.NUD_RPC_PASS, verbose, useIdentifier, custodianAddress, pair, exchangeName);
     }
 
     private void testCheckNudTask() {

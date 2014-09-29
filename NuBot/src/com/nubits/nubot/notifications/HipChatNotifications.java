@@ -41,7 +41,7 @@ public class HipChatNotifications {
         String publicAddress = "";
         boolean send = false; // default don't send
         if (Global.options != null) {
-            publicAddress = Global.options.getNubitAddress();
+            publicAddress = Global.options.getNubitsAddress();
             send = Global.options.isSendHipchat();
         }
 

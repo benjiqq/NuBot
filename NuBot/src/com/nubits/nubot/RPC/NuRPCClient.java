@@ -19,6 +19,7 @@ package com.nubits.nubot.RPC;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.models.CurrencyPair;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -55,23 +56,44 @@ public class NuRPCClient {
     private String rpcPassword;
     private boolean connected;
     private boolean verbose;
+    private boolean useIdentifier;
+    private String identifier;
+    private String custodianPublicAddress;
+    private String exchangeName;
+    private CurrencyPair pair;
 
     //Constructor
-    public NuRPCClient(String ip, int port, String rpcUser, String rpcPass, boolean verbose) {
+    public NuRPCClient(String ip, int port, String rpcUser, String rpcPass, boolean verbose, boolean useIdentifier, String custodianPublicAddress, CurrencyPair pair, String exchangeName) {
         this.ip = ip;
         this.port = port;
         this.rpcPassword = rpcPass;
         this.rpcUsername = rpcUser;
         this.verbose = verbose;
+        this.useIdentifier = useIdentifier;
+        this.custodianPublicAddress = custodianPublicAddress;
+        this.pair = pair;
+        this.exchangeName = exchangeName;
+        if (useIdentifier) {
+            identifier = generateIdentifier();
+        }
     }
 
     //Public Methods
-    public JSONObject submitLiquidityInfo(String currencyChar, double buyamount, double sellamount, String custodianPublicAddress) {
-        JSONObject toReturn = null;
+    public JSONObject submitLiquidityInfo(String currencyChar, double buyamount, double sellamount) {
+
+        /*
+         * String[] params = { USDchar,buyamount,sellamount,custodianPublicAddress, identifier* };
+         * identifier default empty string
+         */
 
 
-        //String[] params = { USDchar,buyamount,sellamount,custodianPublicAddress };
-        List params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress);
+        List params;
+        if (useIdentifier) {
+            params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress, identifier);
+        } else {
+            params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress);
+        }
+
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
@@ -94,10 +116,7 @@ public class NuRPCClient {
     }
 
     public JSONObject getLiquidityInfo(String currency) {
-        JSONObject toReturn = null;
 
-
-        //String[] params = { USDchar,buyamount,sellamount,custodianPublicAddress };
         List params = Arrays.asList(currency);
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GETLIQUIDITYINFO, params);
@@ -286,5 +305,9 @@ public class NuRPCClient {
             httpclient.getConnectionManager().shutdown();
         }
         return responseJsonObj;
+    }
+
+    private String generateIdentifier() {
+        return custodianPublicAddress + "_" + exchangeName + "_" + pair.toString().toUpperCase();
     }
 }

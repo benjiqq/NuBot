@@ -153,9 +153,10 @@ public class NuBot {
 
         if (Global.options.isSendRPC()) {
             LOG.fine("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
-            Global.publicAddress = Global.options.getNubitAddress();
+            Global.publicAddress = Global.options.getNubitsAddress();
             Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
-                    Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose());
+                    Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
+                    Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
 
             Utils.printSeparator();
             LOG.fine("Starting task : Check connection with Nud  ");

@@ -215,7 +215,7 @@ public class OptionsJSON {
      *
      * @return
      */
-    public String getNubitAddress() {
+    public String getNubitsAddress() {
         return nubitAddress;
     }
 
@@ -223,7 +223,7 @@ public class OptionsJSON {
      *
      * @param nubitAddress
      */
-    public void setNubitAddress(String nubitAddress) {
+    public void setNubitsAddress(String nubitAddress) {
         this.nubitAddress = nubitAddress;
     }
 

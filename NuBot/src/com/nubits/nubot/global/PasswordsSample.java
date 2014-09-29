@@ -22,9 +22,9 @@ package com.nubits.nubot.global;
  */
 public class PasswordsSample {
 
-    public static final String nuduser = "xxx";
-    public static final String nudpass = "xxx";
-    public static final String custodianPublicAddress = "xxx"; //Vaid elected custodian
+    public static final String NUD_RPC_USER = "xxx";
+    public static final String NUD_RPC_PASS = "xxx";
+    public static final String CUSTODIAN_PUBLIC_ADDRESS = "xxx"; //testnet elected custodian
     public static final String BTCE_SECRET = "xxx";
     public static final String BTCE_KEY = "xxx";
     public static final String PEATIO_SECRET = "xxx";
@@ -33,7 +33,7 @@ public class PasswordsSample {
     public static final String CCEDK_KEY = "xxx";
     public static final String BTER_KEY = "xxx";
     public static final String BTER_SECRET = "xxx";
-    public static final String GMAIL_USERNAME = "xxx@gmail.com"; //used to send mail notifications
+    public static final String GMAIL_USERNAME = "xxx"; //used to send mail notifications
     public static final String GMAIL_PASSWORD = "xxx";
     public static final String HIPCHAT_KEY = "xxx"; //not admin
     public static final String HIPCHAT_LIQUIDITY_ROOM_ID = "xxx"; //Liquidity Testing
