@@ -36,8 +36,6 @@ public class CheckOrdersTask extends TimerTask {
 
     private static final Logger LOG = Logger.getLogger(CheckOrdersTask.class.getName());
     private boolean verbose;
-    private double lastSellSent = 0;
-    private double lastBuySent = 0;
 
     public CheckOrdersTask(boolean verbose) {
         this.verbose = verbose;
@@ -106,28 +104,11 @@ public class CheckOrdersTask extends TimerTask {
     private void sendLiquidityInfo(Exchange exchange) {
         if (Global.rpcClient.isConnected()) {
 
-            //Get current liquidity total for buy and sell
-
-            double currentTotalLiquiditySell = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.SELL, Global.options.getNubitsAddress());
-            double currentTotalLiquidityBuy = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, Constant.BUY, Global.options.getNubitsAddress());
-
-            if (currentTotalLiquiditySell == -1 || currentTotalLiquidityBuy == -1) {
-                LOG.severe("Something went wrong while getting liquidityinfo");
-            }
-
-
-            //Take out my part from the total, and re-add my part on top of the total
-
-            double sellLiquidityToSend = exchange.getLiveData().getNBTonsell() + (currentTotalLiquiditySell - lastSellSent);
-            double buyLiquidityToSend = exchange.getLiveData().getNBTonbuy() + (currentTotalLiquidityBuy - lastBuySent);
-
             JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                    buyLiquidityToSend, sellLiquidityToSend);
+                    Global.exchange.getLiveData().getNBTonbuy(), Global.exchange.getLiveData().getNBTonsell());
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
-                lastBuySent = exchange.getLiveData().getNBTonbuy();
-                lastSellSent = exchange.getLiveData().getNBTonsell();
                 LOG.fine(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
                     LOG.fine("RPC Liquidityinfo sent : "
@@ -142,6 +123,7 @@ public class CheckOrdersTask extends TimerTask {
             }
         } else {
             LOG.severe("Client offline. ");
+
         }
     }
 }
