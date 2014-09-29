@@ -79,13 +79,12 @@ public class CheckOrdersTask extends TimerTask {
             }
             //Update the order
             Global.exchange.getLiveData().setOrdersList(orderListUSDNBT);
-            if (Global.conversion != -1) {
+            if (Global.conversion != -1 && !Global.options.getExchangeName().equals(Constant.CCEDK)) {
                 //if the bot is running on Strategy Secondary Peg, we need to convert this value
                 nbt_onbuy = nbt_onbuy * Global.conversion;
             }
             Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
             Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
-
 
 
             if (verbose) {
