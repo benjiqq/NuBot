@@ -153,7 +153,7 @@ NuBot comes as a cross platform executable jar file to run from command line. It
 ###Secondary Peg Parameters
 When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.  The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.  The price feed will track the live rate between the *secondary peg* currency and USD.
 
-It is sufficient to append a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
+It is sufficient to add a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
 
 ```json
 "secondary-peg-options":
@@ -169,7 +169,6 @@ It is sufficient to append a JSON object in the standard options file structured
             "price-offset": 0.2,
             "price-distance-threshold":10       
          }
- }
 ```
 
 
