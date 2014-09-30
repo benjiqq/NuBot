@@ -186,6 +186,7 @@ Parameters explanation :
 | price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
 Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
+
 | Feed name        | Currencies available for tracking   |  Feed |   
 | ------------- |:-------------:| -------------:| 
 | blockchain    | BTC  |  https://blockchain.info |
@@ -203,6 +204,24 @@ Available price feed names (can be used as value for *main-feed* and *backup-fee
 | exchangeratelab    | EUR,CNY, ...  |  https://exchangeratelab.com |
 
 
+
+###Additional parameters
+
+NuBot can be further configured by adding additional parameters to its config file. Below a table with an explanation of each parameter and its default value. 
+| Parameter      |  Default value  |  Description  |   Admitted values  | 
+| ------------- |:-------------:| -------------:| 
+| nudip    | "127.0.0.1"  |   | The IP address of the machine that hosts the Nu Client |
+| verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
+| hipchat    | true |  f set to false will disable hipchat notifications | boolean |
+| mail-notifications    | true |  if set to false will disable email notifications | boolean |
+| sendrpc    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
+| executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
+| check-balance-interval   | 30 |   seconds between two checkBalance operations, which triggers bot orders | int (seconds) |
+| check-orders-interval    | 37 |  seconds between two checkOrders operations, which triggers liquidityinfo RPC call |  int (seconds)|
+| emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
+| txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
+| keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
+| priceincrement    | 0.001 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
 
 ##Adding support for an exchange
 *coming soon*
