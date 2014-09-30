@@ -22,7 +22,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.CryptoPegOptionsJSON;
+import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OptionsJSON;
@@ -245,7 +245,7 @@ public class NuBot {
                 Global.taskManager.getStrategyFiatTask().start(7);
             } else {
 
-                CryptoPegOptionsJSON cpo = Global.options.getCryptoPegOptions();
+                SecondaryPegOptionsJSON cpo = Global.options.getCryptoPegOptions();
                 if (cpo == null) {
                     LOG.severe("To run in secondary peg mode, you need to specify the crypto-peg-options");
                     System.exit(0);

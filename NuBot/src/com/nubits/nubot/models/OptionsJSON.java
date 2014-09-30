@@ -45,7 +45,7 @@ public class OptionsJSON {
     private int nudPort;
     private boolean dualSide;
     private CurrencyPair pair;
-    private CryptoPegOptionsJSON cryptoPegOptions;
+    private SecondaryPegOptionsJSON secondaryPegOptions;
     //Optional settings with a default value  ----------------------------
     private String nudIp;
     private boolean sendMails;
@@ -59,7 +59,7 @@ public class OptionsJSON {
     private double priceIncrement;
     private int emergencyTimeout;
     private double keepProceedings;
-    private CryptoPegOptionsJSON cpo;
+    private SecondaryPegOptionsJSON cpo;
 
     /**
      *
@@ -83,13 +83,13 @@ public class OptionsJSON {
      * @param sendHipchat
      * @param sendMails
      * @param mailRecipient
-     * @param cryptoPegOptions
+     * @param secondaryPegOptions
      */
     public OptionsJSON(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int checkBalanceInterval, int checkOrdersInteval, boolean sendHipchat,
-            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceedings, CryptoPegOptionsJSON cryptoPegOptions) {
+            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceedings, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -112,7 +112,7 @@ public class OptionsJSON {
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceedings = keepProceedings;
-        this.cryptoPegOptions = cryptoPegOptions;
+        this.secondaryPegOptions = secondaryPegOptions;
     }
 
     /**
@@ -439,16 +439,16 @@ public class OptionsJSON {
      *
      * @return
      */
-    public CryptoPegOptionsJSON getCryptoPegOptions() {
-        return cryptoPegOptions;
+    public SecondaryPegOptionsJSON getCryptoPegOptions() {
+        return secondaryPegOptions;
     }
 
     /**
      *
-     * @param cryptoPegOptions
+     * @param secondaryPegOptions
      */
-    public void setCryptoPegOptions(CryptoPegOptionsJSON cryptoPegOptions) {
-        this.cryptoPegOptions = cryptoPegOptions;
+    public void setCryptoPegOptions(SecondaryPegOptionsJSON cryptoPegOptions) {
+        this.secondaryPegOptions = cryptoPegOptions;
     }
 
     /**
@@ -484,15 +484,15 @@ public class OptionsJSON {
 
 
 
-            //Based on the pair, set a parameter do define whether setting CryptoPegOptionsJSON i necessary or not
+            //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
             boolean requireCryptoOptions = Utils.requiresCryptoStrategy(pair);
             org.json.JSONObject pegOptionsJSON;
-            CryptoPegOptionsJSON cpo = null;
+            SecondaryPegOptionsJSON cpo = null;
             if (requireCryptoOptions) {
                 org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
                 org.json.JSONObject optionsJSON2 = (org.json.JSONObject) jsonString.get("options");
-                pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("crypto-peg-options");
-                cpo = CryptoPegOptionsJSON.create(pegOptionsJSON);
+                pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("secondary-peg-options");
+                cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON);
             }
 
             //Then parse optional settings. If not use the default value declared here
@@ -608,8 +608,8 @@ public class OptionsJSON {
     @Override
     public String toString() {
         String cryptoOptions = "";
-        if (cryptoPegOptions != null) {
-            cryptoOptions = cryptoPegOptions.toString();
+        if (secondaryPegOptions != null) {
+            cryptoOptions = secondaryPegOptions.toString();
         }
         return "OptionsJSON{" + "dualSide=" + dualSide + ", sendRPC=" + sendRPC + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", checkBalanceInterval=" + checkBalanceInterval + ", checkOrdersInteval=" + checkOrdersInteval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + " , cryptoPegOptions=" + cryptoOptions + '}';
     }
@@ -621,8 +621,8 @@ public class OptionsJSON {
      */
     public String toStringNoKeys() {
         String cryptoOptions = "";
-        if (cryptoPegOptions != null) {
-            cryptoOptions = cryptoPegOptions.toHtmlString();
+        if (secondaryPegOptions != null) {
+            cryptoOptions = secondaryPegOptions.toHtmlString();
         }
         return "Options : {<br>" + "dualSide=" + dualSide + "<br> sendRPC=" + sendRPC + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> checkBalanceInterval=" + checkBalanceInterval + "<br> checkOrdersInteval=" + checkOrdersInteval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + " <br><br>" + cryptoOptions + '}';
     }
