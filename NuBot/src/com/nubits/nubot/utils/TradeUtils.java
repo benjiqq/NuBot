@@ -298,7 +298,7 @@ public class TradeUtils {
     }
 
     public static void tryKeepProceedingsAside(Amount amountFoundInBalance) {
-        double percentageToSetApart = Global.options.getKeepProceedings();
+        double percentageToSetApart = Utils.round(Global.options.getKeepProceedings() / 100, 4);
 
         if (percentageToSetApart != 0) {
             double quantityToFreeze = percentageToSetApart * amountFoundInBalance.getQuantity();
