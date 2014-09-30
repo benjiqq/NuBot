@@ -46,8 +46,7 @@ public class TestPriceFeed {
         TestPriceFeed test = new TestPriceFeed();
         test.init();
 
-        test.pair = Constant.EUR_USD;
-
+        test.pair = Constant.CNY_USD;
 
         //test.executeSingle();
         test.execute();
@@ -84,12 +83,11 @@ public class TestPriceFeed {
 
     private void execute() {
 
-        String mainFeed = PriceFeedManager.BITSTAMP_EURUSD;
+        String mainFeed = PriceFeedManager.GOOGLE_UNOFFICIAL;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
 
-        backupFeedList.add(PriceFeedManager.GOOGLE_UNOFFICIAL);
         backupFeedList.add(PriceFeedManager.YAHOO);
         backupFeedList.add(PriceFeedManager.OPENEXCHANGERATES);
         backupFeedList.add(PriceFeedManager.EXCHANGERATELAB);

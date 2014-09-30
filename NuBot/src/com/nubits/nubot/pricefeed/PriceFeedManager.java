@@ -33,22 +33,19 @@ public class PriceFeedManager {
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
     //Only BTC
-    public final static String BLOCKCHAIN = "blockchain";
-    public final static String BITCOINAVERAGE = "bitcoinaverage";
-    public final static String COINBASE = "coinbase";
-    public final static String BTER = "bter";
-    public final static String CCEDK = "ccedk";
-    //BTC and PPC
+    public final static String BLOCKCHAIN = "blockchain"; //BTC
+    public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
+    public final static String COINBASE = "coinbase"; //BTC
+    public final static String BTER = "bter"; //BTC and PPC
+    public final static String CCEDK = "ccedk"; //BTC and PPC
     public final static String BTCE = Constant.BTCE;
-    public final static String COINMARKETCAP_NO = "coinmarketcap_no";
-    public final static String COINMARKETCAP_NE = "coinmarketcap_ne";
-    //EUR
-    public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // https://www.bitstamp.net/api/eur_usd/
-    //EUR AND CNY
-    public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // http://rate-exchange.appspot.com/currency?from=USD&to=EUR
-    public final static String YAHOO = "yahoo";
-    public final static String OPENEXCHANGERATES = "openexchangerates"; //https://openexchangerates.org/
-    public final static String EXCHANGERATELAB = "exchangeratelab"; //http://api.exchangeratelab.com/
+    public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
+    public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
+    public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR
+    public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
+    public final static String YAHOO = "yahoo"; //EUR CNY
+    public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
+    public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
         this.pair = pair;
