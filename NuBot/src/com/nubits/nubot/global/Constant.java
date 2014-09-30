@@ -46,6 +46,7 @@ public class Constant {
     //Currencies
     public static final Currency USD = new Currency("$", true, "USD", "US Dollar");
     public static final Currency CNY = new Currency("C", true, "CNY", "CNY");
+    public static final Currency EUR = new Currency("€", true, "EUR", "Euro");
     public static final Currency BTC = new Currency("B", false, "BTC", "Bitcoin");
     public static final Currency NBT = new Currency("N", false, "NBT", "Nubits");
     public static final Currency PPC = new Currency("P", false, "PPC", "Peercoin");
@@ -65,6 +66,8 @@ public class Constant {
     public static final CurrencyPair BTSX_BTC = new CurrencyPair(BTSX, BTC);
     public static final CurrencyPair BITUSD_BTC = new CurrencyPair(BITUSD, BTC);
     public static final CurrencyPair BTC_BITUSD = new CurrencyPair(BTC, BITUSD);
+    public static final CurrencyPair EUR_USD = new CurrencyPair(EUR, USD);
+    public static final CurrencyPair CNY_USD = new CurrencyPair(CNY, USD);
 
     public static Currency getCurrencyFromCode(String codeString) {
         Currency toRet = null;

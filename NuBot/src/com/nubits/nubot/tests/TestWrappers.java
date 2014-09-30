@@ -40,6 +40,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,7 +59,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
 
@@ -72,7 +73,19 @@ public class TestWrappers {
         //testBuy(1, 0.0005, Constant.BTC_USD);
         //testGetLastPrice(Constant.PPC_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also
-        testGetActiveOrders(Constant.NBT_BTC);
+
+        long sleeptime = 500;
+        for (int i = 0; i <= 100; i++) {
+            testGetActiveOrders(Constant.NBT_PPC);
+            try {
+                Thread.sleep(sleeptime);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+
+
         //testCancelOrder("63329550");
         //testGetOrderDetail("63326121"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetTxFee();

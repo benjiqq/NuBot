@@ -17,34 +17,36 @@
  */
 package com.nubits.nubot.pricefeed;
 
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
+import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-public class BlockchainPriceFeed extends AbstractPriceFeed {
+public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BlockchainPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(ExchangeratelabPriceFeed.class.getName());
 
-    public BlockchainPriceFeed() {
-        name = PriceFeedManager.BLOCKCHAIN;
-        refreshMinTime = 60 * 1000; //one minutee
+    public ExchangeratelabPriceFeed() {
+        name = PriceFeedManager.EXCHANGERATELAB;
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = "http://blockchain.info/ticker";
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url);
@@ -55,12 +57,33 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("USD");
-                double last = Utils.getDouble(tickerObject.get("last"));
+                JSONArray array = (JSONArray) httpAnswerJson.get("rates");
+
+                String lookingfor = pair.getOrderCurrency().getCode().toUpperCase();
+
+                boolean found = false;
+                double rate = -1;
+                for (int i = 0; i < array.size(); i++) {
+                    JSONObject temp = (JSONObject) array.get(i);
+                    String tempCurrency = (String) temp.get("to");
+                    if (tempCurrency.equalsIgnoreCase(lookingfor)) {
+                        found = true;
+                        rate = Utils.getDouble((Double) temp.get("rate"));
+                        rate = Utils.round(1 / rate, 6);
+                    }
+                }
 
                 lastRequest = System.currentTimeMillis();
-                lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
-                return lastPrice;
+
+                if (found) {
+
+                    lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(rate, pair.getPaymentCurrency()));
+                    return lastPrice;
+                } else {
+                    LOG.warning("Cannot find currency " + lookingfor + " on feed " + name);
+                    return new LastPrice(true, name, pair.getOrderCurrency(), null);
+                }
+
             } catch (Exception ex) {
                 LOG.severe(ex.getMessage());
                 lastRequest = System.currentTimeMillis();
@@ -71,6 +94,9 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+    }
 
+    private String getUrl(CurrencyPair pair) {
+        return "http://api.exchangeratelab.com/api/current?apikey=" + Passwords.EXCHANGE_RATE_LAB;
     }
 }

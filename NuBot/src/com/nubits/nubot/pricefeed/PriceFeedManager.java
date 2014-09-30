@@ -42,8 +42,14 @@ public class PriceFeedManager {
     public final static String BTCE = Constant.BTCE;
     public final static String COINMARKETCAP_NO = "coinmarketcap_no";
     public final static String COINMARKETCAP_NE = "coinmarketcap_ne";
+    //EUR
+    public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // https://www.bitstamp.net/api/eur_usd/
+    //EUR AND CNY
+    public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // http://rate-exchange.appspot.com/currency?from=USD&to=EUR
+    public final static String YAHOO = "yahoo";
+    public final static String OPENEXCHANGERATES = "openexchangerates"; //https://openexchangerates.org/
+    public final static String EXCHANGERATELAB = "exchangeratelab"; //http://api.exchangeratelab.com/
 
-    //PPC
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
         this.pair = pair;
 
@@ -123,6 +129,26 @@ public class PriceFeedManager {
                 break;
             case COINMARKETCAP_NO:
                 tempFeed = new CoinmarketcapnorthpolePriceFeed();
+                break;
+
+            case BITSTAMP_EURUSD:
+                tempFeed = new BitstampPriceFeed();
+                break;
+
+            case GOOGLE_UNOFFICIAL:
+                tempFeed = new GoogleUnofficialPriceFeed();
+                break;
+
+            case YAHOO:
+                tempFeed = new YahooPriceFeed();
+                break;
+
+            case OPENEXCHANGERATES:
+                tempFeed = new OpenexchangeratesPriceFeed();
+                break;
+
+            case EXCHANGERATELAB:
+                tempFeed = new ExchangeratelabPriceFeed();
                 break;
             default:
                 LOG.severe("Error wile adding price seed with name unrecognized : " + feedname);

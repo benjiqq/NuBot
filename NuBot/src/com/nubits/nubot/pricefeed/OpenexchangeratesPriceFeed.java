@@ -17,6 +17,11 @@
  */
 package com.nubits.nubot.pricefeed;
 
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
+import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -25,26 +30,23 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-public class BlockchainPriceFeed extends AbstractPriceFeed {
+public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BlockchainPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(OpenexchangeratesPriceFeed.class.getName());
 
-    public BlockchainPriceFeed() {
-        name = PriceFeedManager.BLOCKCHAIN;
-        refreshMinTime = 60 * 1000; //one minutee
+    public OpenexchangeratesPriceFeed() {
+        name = PriceFeedManager.OPENEXCHANGERATES;
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = "http://blockchain.info/ticker";
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url);
@@ -53,15 +55,25 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
+            boolean found = false;
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("USD");
-                double last = Utils.getDouble(tickerObject.get("last"));
 
+                String lookingfor = pair.getOrderCurrency().getCode().toUpperCase();
+                JSONObject rates = (JSONObject) httpAnswerJson.get("rates");
                 lastRequest = System.currentTimeMillis();
-                lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
-                return lastPrice;
-            } catch (Exception ex) {
+                if (rates.containsKey(lookingfor)) {
+                    double last = (Double) rates.get(lookingfor);
+                    last = Utils.round(1 / last, 6);
+                    lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
+                    return lastPrice;
+                } else {
+                    LOG.warning("Cannot find currency :" + lookingfor + " on feed :" + name);
+                    return new LastPrice(true, name, pair.getOrderCurrency(), null);
+                }
+
+
+            } catch (ParseException ex) {
                 LOG.severe(ex.getMessage());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
@@ -71,6 +83,10 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+    }
 
+    private String getUrl(CurrencyPair pair) {
+        String key = Passwords.OPEN_EXCHANGE_RATES_APP_ID;
+        return "https://openexchangerates.org/api/latest.json?app_id=" + key;
     }
 }

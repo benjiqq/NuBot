@@ -17,6 +17,10 @@
  */
 package com.nubits.nubot.pricefeed;
 
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -26,25 +30,21 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-public class BlockchainPriceFeed extends AbstractPriceFeed {
+public class BitstampPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BlockchainPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(BitstampPriceFeed.class.getName());
 
-    public BlockchainPriceFeed() {
-        name = PriceFeedManager.BLOCKCHAIN;
-        refreshMinTime = 60 * 1000; //one minutee
+    public BitstampPriceFeed() {
+        name = PriceFeedManager.BITSTAMP_EURUSD;
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = "http://blockchain.info/ticker";
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = "https://www.bitstamp.net/api/eur_usd/";
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url);
@@ -55,8 +55,12 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("USD");
-                double last = Utils.getDouble(tickerObject.get("last"));
+                double buy = Double.valueOf((String) httpAnswerJson.get("buy"));
+                double sell = Double.valueOf((String) httpAnswerJson.get("sell"));
+
+                //Make the average between buy and sell
+                double last = Utils.round((buy + sell) / 2, 5);
+
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
@@ -71,6 +75,5 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-
     }
 }

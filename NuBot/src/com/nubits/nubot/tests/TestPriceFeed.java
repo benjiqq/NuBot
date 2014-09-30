@@ -22,9 +22,9 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeed.AbstractPriceFeed;
-import com.nubits.nubot.pricefeed.CoinmarketcapnexuistPriceFeed;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
 import com.nubits.nubot.pricefeed.PriceFeedManager.LastPriceResponse;
+import com.nubits.nubot.pricefeed.YahooPriceFeed;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -46,12 +46,12 @@ public class TestPriceFeed {
         TestPriceFeed test = new TestPriceFeed();
         test.init();
 
-        test.pair = Constant.PPC_USD;
+        test.pair = Constant.EUR_USD;
 
 
         //test.executeSingle();
-        //test.execute();
-        test.executePPC();
+        test.execute();
+        //test.executePPC();
     }
 
     private void init() {
@@ -64,7 +64,7 @@ public class TestPriceFeed {
         }
         LOG.setLevel(Level.INFO);
 
-        feed = new CoinmarketcapnexuistPriceFeed(); //REPLACE HERE
+        feed = new YahooPriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -84,16 +84,15 @@ public class TestPriceFeed {
 
     private void execute() {
 
-        String mainFeed = PriceFeedManager.BTCE;
+        String mainFeed = PriceFeedManager.BITSTAMP_EURUSD;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
 
-        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
-        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
-        backupFeedList.add(PriceFeedManager.COINBASE);
-        backupFeedList.add(PriceFeedManager.CCEDK);
-        backupFeedList.add(PriceFeedManager.BTER);
+        backupFeedList.add(PriceFeedManager.GOOGLE_UNOFFICIAL);
+        backupFeedList.add(PriceFeedManager.YAHOO);
+        backupFeedList.add(PriceFeedManager.OPENEXCHANGERATES);
+        backupFeedList.add(PriceFeedManager.EXCHANGERATELAB);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 

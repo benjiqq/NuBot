@@ -17,6 +17,10 @@
  */
 package com.nubits.nubot.pricefeed;
 
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -26,25 +30,21 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-public class BlockchainPriceFeed extends AbstractPriceFeed {
+public class YahooPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BlockchainPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(YahooPriceFeed.class.getName());
 
-    public BlockchainPriceFeed() {
-        name = PriceFeedManager.BLOCKCHAIN;
-        refreshMinTime = 60 * 1000; //one minutee
+    public YahooPriceFeed() {
+        name = PriceFeedManager.YAHOO;
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = "http://blockchain.info/ticker";
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url);
@@ -55,8 +55,11 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("USD");
-                double last = Utils.getDouble(tickerObject.get("last"));
+                JSONObject query = (JSONObject) httpAnswerJson.get("query");
+                JSONObject results = (JSONObject) query.get("results");
+                JSONObject rate = (JSONObject) results.get("rate");
+
+                double last = Utils.getDouble((String) rate.get("Rate"));
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
@@ -71,6 +74,14 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+    }
 
+    private String getUrl(CurrencyPair pair) {
+        String pairString = pair.toString().toUpperCase();
+        return "https://query.yahooapis.com/v1/public/"
+                + "yql?q=select%20*%20from%20yahoo.finance.xchange%20"
+                + "where%20pair%20in%20(%22" + pairString + "%22)&format=json"
+                + "&diagnostics=false&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
+                + "&callback=";
     }
 }
