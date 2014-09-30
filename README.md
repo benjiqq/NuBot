@@ -148,7 +148,62 @@ NuBot comes as a cross platform executable jar file to run from command line. It
 
 # Under the hood
 ##Additional configuration parameters
-*coming soon*
+
+
+###Secondary Peg Parameters
+When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.  The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.  The price feed will track the live rate between the *secondary peg* currency and USD.
+
+It is sufficient to add a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
+
+```json
+...<standard options here>
+"secondary-peg-options":
+        {
+            "main-feed":"bter",
+            "backup-feeds": {
+                "backup1" : { "name" : "bitcoinaverage"},
+                "backup2" : { "name" : "coinbase"},
+                "backup3" : { "name" : "blockchain"}
+                },
+            "refresh-time":65,
+            "wallchange-treshold": 0.1,
+            "price-offset": 0.2,
+            "price-distance-threshold":10       
+         }
+ }
+  
+```
+
+Parameters explanation :
+
+| Parameter        | Description          |  Admitted values  |
+| ------------- |:-------------:| -----:|
+| main-feed     | the name of the main price feed that has priority over the others | **see following table |
+| backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
+| refresh-time |  time interval between price peg refreshing .  |   integer (seconds) . Minimum 61, several API do not even refresh faster than that. For fiat, minimum allowed is 8 hours , 28800 seconds  |
+| wallchange-treshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
+| price-offset | a % to be added/removed on top of regular peg price     |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%    |
+| price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
+
+Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
+| Feed name        | Currencies available for tracking   |  Feed |   
+| ------------- |:-------------:| -------------:| 
+| blockchain    | BTC  |  https://blockchain.info |
+| bitcoinaverage    | BTC  |  https://api.bitcoinaverage.com |
+| coinbase    | BTC  |  https://coinbase.com |
+| btce  | BTC, PPC, ...  |  https://btc-e.com |
+| bter    | BTC, PPC, ...  |  http://data.bter.com |
+| ccedk    | BTC, PPC, ...  |  https://www.ccedk.com |
+| coinmarketcap_no    | BTC, PPC, ...  |  http://coinmarketcap.northpole.ro |
+| coinmarketcap_ne    | BTC  |  http://coinmarketcap-nexuist.rhcloud.com |
+| bitstampeurusd    | EUR  |  https://bitstamp.com |
+| google-unofficial    | EUR,CNY, ...  |  http://rate-exchange.appspot.com |
+| yahoo    | EUR,CNY, ...  |  https://yahooapis.com |
+| openexchangerates    | EUR,CNY, ...  |  https://openexchangerates.org |
+| exchangeratelab    | EUR,CNY, ...  |  https://exchangeratelab.com |
+
+
+
 ##Adding support for an exchange
 *coming soon*
 ##Design and diagrams
