@@ -153,10 +153,9 @@ NuBot comes as a cross platform executable jar file to run from command line. It
 ###Secondary Peg Parameters
 When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.  The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.  The price feed will track the live rate between the *secondary peg* currency and USD.
 
-It is sufficient to add a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
+It is sufficient to append a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
 
 ```json
-...<standard options here>
 "secondary-peg-options":
         {
             "main-feed":"bter",
@@ -171,10 +170,13 @@ It is sufficient to add a JSON object in the standard options file structured in
             "price-distance-threshold":10       
          }
  }
-  
 ```
 
+
+
 Parameters explanation :
+
+
 
 | Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
@@ -185,7 +187,11 @@ Parameters explanation :
 | price-offset | a % to be added/removed on top of regular peg price     |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%    |
 | price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
+
+
 Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
+
+
 
 | Feed name        | Currencies available for tracking   |  Feed |   
 | ------------- |:-------------:| -------------:| 
@@ -208,6 +214,8 @@ Available price feed names (can be used as value for *main-feed* and *backup-fee
 ###Additional parameters
 
 NuBot can be further configured by adding additional parameters to its config file. Below a table with an explanation of each parameter and its default value. 
+
+
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| 
 | nudip    | "127.0.0.1"  |   | The IP address of the machine that hosts the Nu Client |
