@@ -192,7 +192,7 @@ It is sufficient to add a JSON object in the standard options file structured in
 | btce  | BTC, PPC, ...  |  https://btc-e.com |
 | bter    | BTC  |  http://data.bter.com |
 | ccedk    | BTC |  https://www.ccedk.com |
-| coinmarketcap_no    | PPC, ...  |  http://coinmarketcap.northpole.ro |
+| coinmarketcap_no    | PPC |  http://coinmarketcap.northpole.ro |
 | coinmarketcap_ne    | PPC |  http://coinmarketcap-nexuist.rhcloud.com |
 | bitstampeurusd    | EUR  |  https://bitstamp.com |
 | google-unofficial    | EUR,CNY, ...  |  http://rate-exchange.appspot.com |
