@@ -264,7 +264,7 @@ public class CcedkWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -334,7 +334,7 @@ public class CcedkWrapper implements TradeInterface {
                 apiResponse.setResponseObject(order_id);
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -418,7 +418,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -488,7 +488,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -549,7 +549,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -639,7 +639,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }

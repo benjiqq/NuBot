@@ -185,7 +185,7 @@ public class BtceWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -262,7 +262,7 @@ public class BtceWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -302,7 +302,7 @@ public class BtceWrapper implements TradeInterface {
             ask = Utils.getDouble(tickerObject.get("buy"));
 
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -420,7 +420,7 @@ public class BtceWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -716,7 +716,7 @@ public class BtceWrapper implements TradeInterface {
                 apiResponse.setResponseObject(order_id);
             }
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
         }
         return apiResponse;
