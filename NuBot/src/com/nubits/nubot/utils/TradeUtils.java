@@ -55,7 +55,7 @@ public class TradeUtils {
             if (orderList.size() == 0) {
                 toRet = true;
             } else {
-                LOG.severe("There are still : " + orderList.size() + " active orders");
+                LOG.warning("There are still : " + orderList.size() + " active orders");
             }
         } else {
             LOG.severe(activeOrdersResponse.getError().toString());

@@ -244,7 +244,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double sellPricePEG = Utils.round(sellPriceUSD / peg_price, 8);
         double buyPricePEG = Utils.round(buyPriceUSD / peg_price, 8);
 
-        LOG.info(" Sell Price (sell-side custodians) " + sellPricePEG + "\n"
+        LOG.info(" Sell Price " + sellPricePEG + "\n"
                 + "Buy Price  " + buyPricePEG);
 
 

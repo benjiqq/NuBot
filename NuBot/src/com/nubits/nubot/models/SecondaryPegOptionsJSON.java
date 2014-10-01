@@ -78,7 +78,7 @@ public class SecondaryPegOptionsJSON {
             //Iterate on backupFeeds
 
             String names[] = org.json.JSONObject.getNames(dataJson);
-            if (names.length <= 2) {
+            if (names.length < 2) {
                 LOG.severe("The bot requires at least two backup data feeds to run");
                 System.exit(0);
             }
