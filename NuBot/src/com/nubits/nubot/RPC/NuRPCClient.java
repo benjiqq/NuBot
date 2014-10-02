@@ -194,6 +194,11 @@ public class NuRPCClient {
         if (responseObject.get("blocks") != null) {
             conn = true;
         }
+        long lockedUntil = (long) responseObject.get("unlocked_until");
+        if (lockedUntil == 0) {
+            LOG.warning("Nu client is locked and will not be able to submit liquidity info."
+                    + "\nUse walletpassphrase <yourpassphrase> 9999999 to unlock it");
+        }
         this.setConnected(conn);
 
     }
@@ -309,5 +314,11 @@ public class NuRPCClient {
 
     private String generateIdentifier() {
         return custodianPublicAddress + "_" + exchangeName + "_" + pair.toString().toUpperCase();
+    }
+
+    private boolean isWalletLocked(JSONObject infoJSON) {
+        boolean toRet = false;
+
+        return toRet;
     }
 }
