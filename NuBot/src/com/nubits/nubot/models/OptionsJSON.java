@@ -508,7 +508,7 @@ public class OptionsJSON {
             int checkOrdersInteval = 37;
 
             double txFee = 0.2;
-            double priceIncrement = 0.001;
+            double priceIncrement = 0.0001;
             double keepProceedings = 0;
 
             int emergencyTimeout = 60;
