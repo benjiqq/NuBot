@@ -32,7 +32,6 @@
                 },
             "refresh-time":124,
             "wallchange-treshold": 3,
-            "price-offset": 0,
             "price-distance-threshold":10
          }
  }

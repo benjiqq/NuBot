@@ -166,7 +166,6 @@ It is sufficient to add a JSON object in the standard options file structured in
                 },
             "refresh-time":65,
             "wallchange-treshold": 0.1,
-            "price-offset": 0.2,
             "price-distance-threshold":10       
          }
 ```
@@ -179,7 +178,6 @@ It is sufficient to add a JSON object in the standard options file structured in
 | backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 | refresh-time |  time interval between price peg refreshing .  |   integer (seconds) . Minimum 61, several API do not even refresh faster than that. For fiat, minimum allowed is 8 hours , 28800 seconds  |
 | wallchange-treshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
-| price-offset | a % to be added/removed on top of regular peg price     |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%    |
 | price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
 #### Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
@@ -219,7 +217,7 @@ NuBot can be further configured by adding additional parameters to its config fi
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| priceincrement    | 0.001 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
+| priceincrement    | 0.0001 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
 
 ##Adding support for an exchange
 *coming soon*

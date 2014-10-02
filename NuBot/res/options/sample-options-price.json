@@ -11,7 +11,6 @@
     "tx-fee": 0.2 ,
     "increment": 0.002 ,
     "wallchange-treshold": 0.1,
-    "price-offset": 0,
     "price-distance-threshold":10,
     "emails": true,
     "recipient": "xxx",
