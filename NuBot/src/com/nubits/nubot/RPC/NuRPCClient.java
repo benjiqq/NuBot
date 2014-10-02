@@ -194,10 +194,13 @@ public class NuRPCClient {
         if (responseObject.get("blocks") != null) {
             conn = true;
         }
-        long lockedUntil = (long) responseObject.get("unlocked_until");
-        if (lockedUntil == 0) {
-            LOG.warning("Nu client is locked and will not be able to submit liquidity info."
-                    + "\nUse walletpassphrase <yourpassphrase> 9999999 to unlock it");
+        boolean locked = false;
+        if (responseObject.containsKey("unlocked_until")) {
+            long lockedUntil = (long) responseObject.get("unlocked_until");
+            if (lockedUntil == 0) {
+                LOG.warning("Nu client is locked and will not be able to submit liquidity info."
+                        + "\nUse walletpassphrase <yourpassphrase> 9999999 to unlock it");
+            }
         }
         this.setConnected(conn);
 
