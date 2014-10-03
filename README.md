@@ -56,6 +56,7 @@ By using NuBot you declare to be accept the afore-mentioned risks.
 * The computer that runs NuBot must be connected to the internet
 * The custodian must provide the bot with access to market exchanges where NuBits are traded
 * The custodian must avoid manual interacting with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
+* The custodian must avoid opening multiple instances of Nu client in control of the custodian address at the same time.
 * The custodian must avoid opening multiple instances of Nu in control of the custodian address.
 
 ### 1)Prepare the NuBits client client
@@ -212,12 +213,12 @@ NuBot can be further configured by adding additional parameters to its config fi
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |
 | sendrpc    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
-| check-balance-interval   | 30 |   seconds between two checkBalance operations, which triggers bot orders | int (seconds) |
-| check-orders-interval    | 37 |  seconds between two checkOrders operations, which triggers liquidityinfo RPC call |  int (seconds)|
+| check-balance-interval   | 45 |   seconds between two checkBalance operations, which triggers bot orders | int (seconds) |
+| check-orders-interval    | 60 |  seconds between two checkOrders operations, which triggers liquidityinfo RPC call |  int (seconds)|
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| priceincrement    | 0.0001 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
+| priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
 
 ##Adding support for an exchange
 *coming soon*
