@@ -520,11 +520,11 @@ public class OptionsJSON {
             }
 
             if (optionsJSON.containsKey("priceincrement")) {
-                priceIncrement = Double.parseDouble((String) (optionsJSON.get("priceincrement")));
+                priceIncrement = (Double) (optionsJSON.get("priceincrement"));
             }
 
             if (optionsJSON.containsKey("txfee")) {
-                txFee = Double.parseDouble((String) optionsJSON.get("txfee"));
+                txFee = (Double) optionsJSON.get("txfee");
             }
 
             if (optionsJSON.containsKey("sendrpc")) {
