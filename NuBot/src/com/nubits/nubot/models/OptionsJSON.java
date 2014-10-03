@@ -439,7 +439,7 @@ public class OptionsJSON {
      *
      * @return
      */
-    public SecondaryPegOptionsJSON getCryptoPegOptions() {
+    public SecondaryPegOptionsJSON getSecondaryPegOptions() {
         return secondaryPegOptions;
     }
 

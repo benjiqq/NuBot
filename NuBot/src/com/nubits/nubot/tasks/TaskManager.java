@@ -63,9 +63,9 @@ public class TaskManager {
             checkOrdersInterval = Global.options.getCheckOrdersInteval();
             checkbalanceInterval = Global.options.getCheckBalanceInterval();
             verbose = Global.options.isVerbose();
-            if (Global.options.getCryptoPegOptions() != null) {
+            if (Global.options.getSecondaryPegOptions() != null) {
                 //If global option have been loaded
-                checkPriceInterval = Global.options.getCryptoPegOptions().getRefreshTime();
+                checkPriceInterval = Global.options.getSecondaryPegOptions().getRefreshTime();
             }
         }
 

@@ -245,7 +245,7 @@ public class NuBot {
                 Global.taskManager.getStrategyFiatTask().start(7);
             } else {
 
-                SecondaryPegOptionsJSON cpo = Global.options.getCryptoPegOptions();
+                SecondaryPegOptionsJSON cpo = Global.options.getSecondaryPegOptions();
                 if (cpo == null) {
                     LOG.severe("To run in secondary peg mode, you need to specify the crypto-peg-options");
                     System.exit(0);

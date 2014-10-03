@@ -349,10 +349,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
         buyPriceUSD = 1 - (0.01 * Global.options.getTxFee());
 
         //Add(remove) the offset % from prices
-        sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getCryptoPegOptions().getPriceOffset());
-        buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getCryptoPegOptions().getPriceOffset());
+        sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
+        buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
 
-        LOG.info("Computing USD prices with offset " + Global.options.getCryptoPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
+        LOG.info("Computing USD prices with offset " + Global.options.getSecondaryPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
 
         //convert sell price to PEG
         double sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
@@ -370,7 +370,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Send email notification
         String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
         String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
-                + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getCryptoPegOptions().getWallchangeTreshold() + "%.";
+                + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + "%.";
         MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
     }
 }
