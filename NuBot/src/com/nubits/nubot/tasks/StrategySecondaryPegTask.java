@@ -41,7 +41,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private static final Logger LOG = Logger.getLogger(StrategySecondaryPegTask.class.getName());
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
-    private boolean countOk;
+    private boolean ordersAndBalancesOK;
     private boolean needWallShift;
     private double sellPricePEG;
     private double buyPricePEG;
@@ -54,26 +54,63 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (mightNeedInit) {
             boolean reinitiateSuccess = true;
-            if (!(countOk)) {
+            if (!(ordersAndBalancesOK)) {
                 reinitiateSuccess = reInitiateOrders();
+                if (reinitiateSuccess) {
+                    mightNeedInit = false;
+                }
             } else {
                 LOG.warning("No need to init new orders since current orders seems correct");
-            }
-            if (reinitiateSuccess) {
-                mightNeedInit = false;
             }
             recount();
         } else {
             if (needWallShift) {
-                boolean reinitiateSuccess = reInitiateOrders();
-                if (reinitiateSuccess) {
-                    needWallShift = false;
+                //Secondary peg price changed, need to shift walls
+                boolean reinitiateSuccess = true;
+
+                //If orders and balance are not ok, reset them
+                if (!(ordersAndBalancesOK)) {
+                    reinitiateSuccess = reInitiateOrders(); //TODO this will cause ignoring frozen proceedings. review
+                    if (reinitiateSuccess) {
+                        mightNeedInit = false;
+                    }
+                } else {
+                    //Orders and balances seems ok.
+
+                    String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+                            + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+                    HipChatNotifications.sendMessage(message, Color.PURPLE);
+                    LOG.warning(message);
+
+                    //First try doing it gracefully, one wall at the time.
+                    boolean shiftSellWallsSuccess = true;
+                    boolean shiftBuyWallsSuccess = true;
+
+                    //Execute sellSide strategy
+                    shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL);
+
+                    //Execute buy Side strategy
+                    if (Global.isDualSide) {
+                        shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY);
+                    }
+
+                    if (shiftSellWallsSuccess && shiftBuyWallsSuccess) {
+                        LOG.warning("Gracefull wall shift succesful");
+                    } else { //If doing it gracefully didn't work
+                        LOG.warning("Gracefull wall shift failed. Trying to clear all orders");
+                        //Simply clear all and restart
+                        boolean reinitiateSuccess2 = reInitiateOrders();
+                        if (reinitiateSuccess2) {
+                            mightNeedInit = false;
+                        }
+                    }
                 }
+                recount();
             }
         }
 
-        //Make sure there are 2 orders per side
-        if (!countOk) {
+        //Make sure the orders and balances are ok
+        if (!ordersAndBalancesOK) {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
         } else {
@@ -242,7 +279,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
-            aggregateOrders(Constant.SELL);
+            gracefullyRefreshOrders(Constant.SELL);
         } else {
             //NBT balance = 0
             LOG.fine("NBT balance < 1, no orders to execute");
@@ -257,7 +294,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
             TradeUtils.tryKeepProceedingsAside(balancePEG);
-            aggregateOrders(Constant.BUY);
+            gracefullyRefreshOrders(Constant.BUY);
         } else {
             //PEG balance = 0
             LOG.fine(balancePEG.getCurrency().getCode() + "balance < 1, no orders to execute");
@@ -380,12 +417,12 @@ public class StrategySecondaryPegTask extends TimerTask {
             activeBuyOrders = countActiveOrders(Constant.BUY);
             totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-            countOk = false;
+            ordersAndBalancesOK = false;
             double oneNBT = Utils.round(1 / Global.conversion, 6);
 
             if (Global.options.isDualSide()) {
 
-                countOk = ((activeSellOrders == 2 && activeBuyOrders == 2)
+                ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
@@ -395,7 +432,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                             + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 }
             } else {
-                countOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 1;
+                ordersAndBalancesOK = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 1;
             }
         } else {
             LOG.severe(balancesResponse.getError().toString());
@@ -426,7 +463,8 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.buyPricePEG = buyPricePEG;
     }
 
-    private void aggregateOrders(String type) {
+    private boolean gracefullyRefreshOrders(String type) {
+        boolean success = true;
         Amount balanceNBT;
         Amount balancePEG;
 
@@ -454,7 +492,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                         LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                         //Prepare the order
-
                         double amount = 0;
                         double price = 0;
 
@@ -466,6 +503,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                             price = sellPricePEG;
                         } else {
                             LOG.severe("Wrong order type " + type + ".It can be either " + Constant.SELL + " or " + Constant.BUY);
+                            success = false;
                         }
 
                         if (Global.executeOrders) {
@@ -481,6 +519,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                                 LOG.warning("Strategy : " + type + " Response = " + responseString);
                             } else {
                                 LOG.severe(response.getError().toString());
+                                success = false;
                             }
                         } else {
                             //Testing only : print the order without executing it
@@ -491,21 +530,24 @@ public class StrategySecondaryPegTask extends TimerTask {
                     } else {
                         //Cannot update txfee
                         LOG.severe(txFeeNTBPEGResponse.getError().toString());
+                        success = false;
                     }
-
-
                 } else {
                     //Cannot get balance
                     LOG.severe(balancesResponse.getError().toString());
+                    success = false;
                 }
             } else {
                 String errMessagedeletingOrder = "could not delete order " + idToDelete;
                 LOG.severe(errMessagedeletingOrder);
                 HipChatNotifications.sendMessage(errMessagedeletingOrder, Color.YELLOW);
                 MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
+                success = false;
             }
         } else {
             LOG.severe("Can't get smaller wall id.");
+            success = false;
         }
+        return success;
     }
 }

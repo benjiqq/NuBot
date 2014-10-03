@@ -40,7 +40,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -72,20 +71,9 @@ public class TestWrappers {
         //testSell(0.001, 500, Constant.BTC_USD);
         //testBuy(1, 0.0005, Constant.BTC_USD);
         //testGetLastPrice(Constant.PPC_BTC);
-        //testGetActiveOrders(); //Try with 0 active orders also
-
-        long sleeptime = 500;
-        for (int i = 0; i <= 100; i++) {
-            testGetActiveOrders(Constant.NBT_PPC);
-            try {
-                Thread.sleep(sleeptime);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-
-
-
+        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //If returned in the main currency and not the payment currency, update the checkorders routine
+        //testGetActiveOrders(Constant.NBT_PPC);
         //testCancelOrder("63329550");
         //testGetOrderDetail("63326121"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetTxFee();
@@ -93,8 +81,6 @@ public class TestWrappers {
         //testClearAllOrders();
         //testIsOrderActive("40700422");
         //testGetPermissions();
-
-
         //testGetActiveOrders();
     }
 
