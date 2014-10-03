@@ -209,7 +209,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //check if price moved more than x% from when the wall was setup
         if (needToMoveWalls(lastPrice)) {
-            LOG.severe("We should move the walls now!");
+            LOG.info("Walls needs to be shifted");
             //Compute price for walls
 
             currentWallPEGPrice = lastPrice;
@@ -285,6 +285,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String messageNow = row;
             emailHistory += messageNow;
 
+            FileSystem.writeToFile(row, outputPath, true);
 
             String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
                     + "now is " + price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
@@ -296,7 +297,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
 
 
-            FileSystem.writeToFile(row, outputPath, true);
+
 
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
         }

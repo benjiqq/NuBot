@@ -60,7 +60,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     mightNeedInit = false;
                 }
             } else {
-                LOG.warning("No need to init new orders since current orders seems correct");
+                LOG.fine("No need to init new orders since current orders seems correct");
             }
             recount();
         } else {
@@ -83,21 +83,28 @@ public class StrategySecondaryPegTask extends TimerTask {
                     LOG.warning(message);
 
                     //First try doing it gracefully, one wall at the time.
-                    boolean shiftSellWallsSuccess = true;
+                    boolean shiftSellWallsSuccess;
                     boolean shiftBuyWallsSuccess = true;
 
-                    //Execute sellSide strategy
-                    shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL);
+                    //Shift sell walls
+                    shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
 
-                    //Execute buy Side strategy
+                    //try ti shift buy walls
                     if (Global.isDualSide) {
-                        shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY);
+                        shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
                     }
-
                     if (shiftSellWallsSuccess && shiftBuyWallsSuccess) {
-                        LOG.warning("Gracefull wall shift succesful");
+                        LOG.info("Graceful wall shift succesful");
+                        mightNeedInit = false;
+                        needWallShift = false;
+                        //Here I should wait until the two orders are correctly displaied. It can take some seconds
+                        try {
+                            Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.getMessage());
+                        }
                     } else { //If doing it gracefully didn't work
-                        LOG.warning("Gracefull wall shift failed. Trying to clear all orders");
+                        LOG.warning("Graceful wall shift failed. Trying to clear all orders");
                         //Simply clear all and restart
                         boolean reinitiateSuccess2 = reInitiateOrders();
                         if (reinitiateSuccess2) {
@@ -105,7 +112,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                         }
                     }
                 }
-                recount();
             }
         }
 
@@ -279,7 +285,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
-            gracefullyRefreshOrders(Constant.SELL);
+            gracefullyRefreshOrders(Constant.SELL, false);
         } else {
             //NBT balance = 0
             LOG.fine("NBT balance < 1, no orders to execute");
@@ -294,7 +300,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
             TradeUtils.tryKeepProceedingsAside(balancePEG);
-            gracefullyRefreshOrders(Constant.BUY);
+            gracefullyRefreshOrders(Constant.BUY, false);
         } else {
             //PEG balance = 0
             LOG.fine(balancePEG.getCurrency().getCode() + "balance < 1, no orders to execute");
@@ -357,32 +363,56 @@ public class StrategySecondaryPegTask extends TimerTask {
         return true;
     }
 
-    private String getSmallerWallID(String type) {
+    /* Returns an array of two strings representing orders id.
+     * the first element of the array is the smallest order and the second the largest */
+    private String[] getSmallerWallID(String type) {
+        String[] toRet = new String[2];
         Order smallerOrder = new Order();
+        Order biggerOrder = new Order();
         smallerOrder.setId("-1");
+        biggerOrder.setId("-1");
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
 
-            for (int i = 0; i < orderListCategorized.size(); i++) {
-                Order tempOrder = orderListCategorized.get(i);
-                if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    if (i == 0) {
-                        smallerOrder = tempOrder;
-                    } else {
-                        if (smallerOrder.getAmount().getQuantity() > tempOrder.getAmount().getQuantity()) {
-                            smallerOrder = tempOrder;
-                        }
-                    }
+            if (orderListCategorized.size() != 2) {
+                LOG.severe("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
+                String[] err = {"-1", "-1"};
+                return err;
+            } else {
+                Order tempOrder1 = orderListCategorized.get(0);
+                Order tempOrder2 = orderListCategorized.get(1);
+                smallerOrder = tempOrder1;
+                biggerOrder = tempOrder2;
+                if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
+                    smallerOrder = tempOrder2;
+                    biggerOrder = tempOrder1;
                 }
+                toRet[0] = smallerOrder.getId();
+                toRet[1] = biggerOrder.getId();
+
             }
+            /* the commented code works with more than two orders, but is not needed now
+             for (int i = 0; i < orderListCategorized.size(); i++) {
+             Order tempOrder = orderListCategorized.get(i);
+             if (tempOrder.getType().equalsIgnoreCase(type)) {
+             if (i == 0) {
+             smallerOrder = tempOrder;
+             } else {
+             if (smallerOrder.getAmount().getQuantity() > tempOrder.getAmount().getQuantity()) {
+             smallerOrder = tempOrder;
+             }
+             }
+             }
+             }
+             */
         } else {
             LOG.severe(activeOrdersResponse.getError().toString());
-            return "-1";
+            String[] err = {"-1", "-1"};
+            return err;
         }
-
-        return smallerOrder.getId();
+        return toRet;
     }
 
     private int countActiveOrders(String type) {
@@ -463,89 +493,135 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.buyPricePEG = buyPricePEG;
     }
 
-    private boolean gracefullyRefreshOrders(String type) {
+    //set shift to true only when a wall shift is needed. set it to false when its simply an order aggregation
+    private boolean gracefullyRefreshOrders(String type, boolean shift) {
+        LOG.info("executing graceful refresh. Shift = " + shift);
+        boolean success = true;
+        //Check if there are two orders on the side
+        int numberOfOrdersActivePerSide = 0;
+        if (type.equalsIgnoreCase(Constant.BUY)) {
+            numberOfOrdersActivePerSide = activeBuyOrders;
+        } else if (type.equalsIgnoreCase(Constant.SELL)) {
+            numberOfOrdersActivePerSide = activeSellOrders;
+
+        } else {
+            LOG.severe("Wrong order type " + type + ".It can be either " + Constant.SELL + " or " + Constant.BUY);
+            success = false;
+        }
+
+        if (numberOfOrdersActivePerSide == 2) {
+            String[] idToDelete = getSmallerWallID(type);
+
+
+            if (!idToDelete[0].equals("-1")) {
+                LOG.info("Taking down first order ");
+                if (TradeUtils.takeDownAndWait(idToDelete[0], Global.options.getEmergencyTimeout() * 1000)) {
+                    if (putAllBalanceOnOrder(type)) {
+                        if (shift && !idToDelete[1].equals("-1")) {//if this is a wall shift and the second order has a valid id
+                            //take the other order which is still up with the old price,
+                            LOG.info("Taking down second order ");
+                            if (TradeUtils.takeDownAndWait(idToDelete[1], Global.options.getEmergencyTimeout() * 1000)) {
+                                //try to restore at new price.
+                                if (putAllBalanceOnOrder(type)) {
+                                } else {
+                                    success = false;
+                                }
+                            } else {
+                                String errMessagedeletingOrder = "could not delete order " + idToDelete[1];
+                                LOG.severe(errMessagedeletingOrder);
+                                HipChatNotifications.sendMessage(errMessagedeletingOrder, Color.YELLOW);
+                                MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
+                                success = false;
+                            }
+                        }
+                    } else {
+                        //some error
+                        success = false;
+                    }
+
+                } else {
+                    String errMessagedeletingOrder = "could not delete order " + idToDelete[0];
+                    LOG.severe(errMessagedeletingOrder);
+                    HipChatNotifications.sendMessage(errMessagedeletingOrder, Color.YELLOW);
+                    MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
+                    success = false;
+                }
+            } else {
+                LOG.severe("Can't get smaller wall id.");
+                success = false;
+            }
+        } else {
+            LOG.warning(" No need of graceful shift on " + type + " side since there are a number of active orders different from two ");
+        }
+        return success;
+    }
+
+    private boolean putAllBalanceOnOrder(String type) {
         boolean success = true;
         Amount balanceNBT;
         Amount balancePEG;
 
-        String idToDelete = getSmallerWallID(type);
-        if (!idToDelete.equals("-1")) {
-            LOG.warning("Sellside : Taking down smaller order to aggregate it with new balance");
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+        if (balancesResponse.isPositive()) {
+            Balance balance = (Balance) balancesResponse.getResponseObject();
+            balanceNBT = balance.getNBTAvailable();
+            balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
-            if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000)) {
+            LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
+                    + balancePEG.getQuantity() + " " + balancePEG.getCurrency().getCode());
 
-                //Update balances to aggregate new amount made available
-                ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-                if (balancesResponse.isPositive()) {
-                    Balance balance = (Balance) balancesResponse.getResponseObject();
-                    balanceNBT = balance.getNBTAvailable();
-                    balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            //Update TX fee :
+            //Get the current transaction fee associated with a specific CurrencyPair
+            ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+            if (txFeeNTBPEGResponse.isPositive()) {
+                double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
+                LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
-                    LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
-                            + balancePEG.getQuantity() + " " + balancePEG.getCurrency().getCode());
+                //Prepare the order
+                double amount = 0;
+                double price = 0;
 
-                    //Update TX fee :
-                    //Get the current transaction fee associated with a specific CurrencyPair
-                    ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-                    if (txFeeNTBPEGResponse.isPositive()) {
-                        double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                        LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                if (type.equalsIgnoreCase(Constant.BUY)) {
+                    amount = balancePEG.getQuantity() / buyPricePEG;
 
-                        //Prepare the order
-                        double amount = 0;
-                        double price = 0;
+                } else if (type.equalsIgnoreCase(Constant.SELL)) {
+                    amount = balanceNBT.getQuantity();
+                    price = sellPricePEG;
+                } else {
+                    LOG.severe("Wrong order type " + type + ".It can be either " + Constant.SELL + " or " + Constant.BUY);
+                    success = false;
+                }
 
-                        if (type.equalsIgnoreCase(Constant.BUY)) {
-                            amount = balancePEG.getQuantity() / buyPricePEG;
+                if (Global.executeOrders) {
+                    //execute the order
+                    String orderString = type + " " + amount + " " + Global.options.getPair().getOrderCurrency().getCode()
+                            + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                    LOG.warning("Strategy : Submit order : " + orderString);
 
-                        } else if (type.equalsIgnoreCase(Constant.SELL)) {
-                            amount = balanceNBT.getQuantity();
-                            price = sellPricePEG;
-                        } else {
-                            LOG.severe("Wrong order type " + type + ".It can be either " + Constant.SELL + " or " + Constant.BUY);
-                            success = false;
-                        }
+                    ApiResponse response = Global.exchange.getTrade().sell(Global.options.getPair(), amount, price);
+                    if (response.isPositive()) {
+                        HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
+                        String responseString = (String) response.getResponseObject();
+                        LOG.warning("Strategy : " + type + " Response = " + responseString);
 
-                        if (Global.executeOrders) {
-                            //execute the order
-                            String orderString = type + " " + amount + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-                            LOG.warning("Strategy : Submit order : " + orderString);
-
-                            ApiResponse response = Global.exchange.getTrade().sell(Global.options.getPair(), amount, price);
-                            if (response.isPositive()) {
-                                HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
-                                String responseString = (String) response.getResponseObject();
-                                LOG.warning("Strategy : " + type + " Response = " + responseString);
-                            } else {
-                                LOG.severe(response.getError().toString());
-                                success = false;
-                            }
-                        } else {
-                            //Testing only : print the order without executing it
-                            LOG.warning("Strategy : (Should) Submit order : "
-                                    + type + " " + amount + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode());
-                        }
                     } else {
-                        //Cannot update txfee
-                        LOG.severe(txFeeNTBPEGResponse.getError().toString());
+                        LOG.severe(response.getError().toString());
                         success = false;
                     }
                 } else {
-                    //Cannot get balance
-                    LOG.severe(balancesResponse.getError().toString());
-                    success = false;
+                    //Testing only : print the order without executing it
+                    LOG.warning("Strategy : (Should) Submit order : "
+                            + type + " " + amount + " " + Global.options.getPair().getOrderCurrency().getCode()
+                            + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode());
                 }
             } else {
-                String errMessagedeletingOrder = "could not delete order " + idToDelete;
-                LOG.severe(errMessagedeletingOrder);
-                HipChatNotifications.sendMessage(errMessagedeletingOrder, Color.YELLOW);
-                MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
+                //Cannot update txfee
+                LOG.severe(txFeeNTBPEGResponse.getError().toString());
                 success = false;
             }
         } else {
-            LOG.severe("Can't get smaller wall id.");
+            //Cannot get balance
+            LOG.severe(balancesResponse.getError().toString());
             success = false;
         }
         return success;

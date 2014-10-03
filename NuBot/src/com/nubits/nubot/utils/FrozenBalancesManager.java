@@ -69,7 +69,7 @@ public class FrozenBalancesManager {
         this.frozenAmount = new FrozenAmount(newAmount);
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(8);
-        LOG.warning("Setting frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
+        LOG.info("Setting frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
         if (writeToFile) {
             updateFrozenFilesystem();
         }

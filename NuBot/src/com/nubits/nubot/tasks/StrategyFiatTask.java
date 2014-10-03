@@ -41,7 +41,7 @@ public class StrategyFiatTask extends TimerTask {
     private static final Logger LOG = Logger.getLogger(StrategyFiatTask.class.getName());
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
-    private boolean countOk;
+    private boolean ordersAndBalancesOk;
 
     @Override
     public void run() {
@@ -56,7 +56,7 @@ public class StrategyFiatTask extends TimerTask {
             // if there are a number of orders different than 2, cancel all and place initial walls
 
 
-            if (!(countOk)) {
+            if (!(ordersAndBalancesOk)) {
                 //They are either 0 or need to be cancelled
                 if (totalActiveOrders != 0) {
                     ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
@@ -114,7 +114,7 @@ public class StrategyFiatTask extends TimerTask {
 
 
         //Make sure there are 2 orders per side
-        if (!countOk) {
+        if (!ordersAndBalancesOk) {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
         } else {
@@ -502,10 +502,10 @@ public class StrategyFiatTask extends TimerTask {
             activeBuyOrders = countActiveOrders(Constant.BUY);
             totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-            countOk = false;
+            ordersAndBalancesOk = false;
 
             if (Global.options.isDualSide()) {
-                countOk = (activeSellOrders == 2 && activeBuyOrders == 2)
+                ordersAndBalancesOk = (activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balanceFIAT < 1)
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1);
 
@@ -514,7 +514,7 @@ public class StrategyFiatTask extends TimerTask {
                             + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 }
             } else {
-                countOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
+                ordersAndBalancesOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
             }
         } else {
             LOG.severe(balancesResponse.getError().toString());

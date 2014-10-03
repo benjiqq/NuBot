@@ -504,11 +504,11 @@ public class OptionsJSON {
             boolean verbose = false;
             boolean sendHipchat = true;
 
-            int checkBalanceInterval = 30;
-            int checkOrdersInteval = 37;
+            int checkBalanceInterval = 45;
+            int checkOrdersInteval = 60;
 
             double txFee = 0.2;
-            double priceIncrement = 0.0001;
+            double priceIncrement = 0.0003;
             double keepProceedings = 0;
 
             int emergencyTimeout = 60;
@@ -520,11 +520,11 @@ public class OptionsJSON {
             }
 
             if (optionsJSON.containsKey("priceincrement")) {
-                priceIncrement = (Double) (optionsJSON.get("priceincrement"));
+                priceIncrement = Utils.getDouble(optionsJSON.get("priceincrement"));
             }
 
             if (optionsJSON.containsKey("txfee")) {
-                txFee = (Double) optionsJSON.get("txfee");
+                txFee = Utils.getDouble(optionsJSON.get("txfee"));
             }
 
             if (optionsJSON.containsKey("sendrpc")) {
