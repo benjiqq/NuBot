@@ -42,6 +42,6 @@ public class Global {
     public static String publicAddress;
     public static NuRPCClient rpcClient;
     public static OptionsJSON options;
-    public static double conversion = -1;
+    public static double conversion = 1;
     public static FrozenBalancesManager frozenBalances;
 }

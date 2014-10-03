@@ -177,7 +177,8 @@ public class NuRPCClient {
      String[] params = { account };
      JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GET_NEW_ADDRESS, Arrays.asList(params));
      return (String)json.get("result");
-     } */
+     }
+     */
     public JSONObject getInfo() {
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GET_INFO, null);
         if (json != null) {
