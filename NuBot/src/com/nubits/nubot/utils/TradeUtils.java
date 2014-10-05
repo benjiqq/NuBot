@@ -223,6 +223,7 @@ public class TradeUtils {
          * 1,LTC
          * 2,BTC
          * 3,USD
+         * 4, EUR
          * 8,PPC
          * 15, NBT
 
@@ -249,6 +250,9 @@ public class TradeUtils {
             case "NBT":
                 toRet = 15;
                 break;
+            case "EUR":
+                toRet = 4;
+                break;
             default:
                 LOG.severe("Currency " + currencyCode + "not available");
                 break;
@@ -267,6 +271,7 @@ public class TradeUtils {
          * 47, NBT BTC
          * 48, NBT PPC
          * 46, NBT USD
+         * 49, NBT EUR
          */
 
         int toRet = -1;
@@ -285,11 +290,61 @@ public class TradeUtils {
             return 48;
         } else if (pair.equals(Constant.NBT_USD)) {
             return 46;
+        } else if (pair.equals(Constant.NBT_EUR)) {
+            return 49;
         } else {
             LOG.severe("Pair " + pair.toString() + " not available");
         }
 
         return toRet;
+    }
+
+    public static CurrencyPair getCCEDKPairFromID(int id) {
+        /*
+         * LAST UPDATED : 20 september
+         FROM : https://www.ccedk.com/api/v1/pair/list?nonce=1410950600
+         * 2 ,BTC USD
+         * 14 , PPC USD
+         * 13 , PPC BTC
+         * 12 , PPC LTC
+         * 47, NBT BTC
+         * 48, NBT PPC
+         * 46, NBT USD
+         * 49, NBT EUR
+         */
+        CurrencyPair toRet = new CurrencyPair(Constant.BTC, Constant.BTC);
+
+        switch (id) {
+            case 2:
+                toRet = Constant.BTC_USD;
+                break;
+            case 12:
+                toRet = Constant.PPC_LTC;
+                break;
+            case 13:
+                toRet = Constant.PPC_BTC;
+                break;
+            case 14:
+                toRet = Constant.PPC_USD;
+                break;
+            case 46:
+                toRet = Constant.NBT_USD;
+                break;
+            case 47:
+                toRet = Constant.NBT_BTC;
+                break;
+            case 48:
+                toRet = Constant.NBT_PPC;
+                break;
+            case 49:
+                toRet = Constant.NBT_EUR;
+                break;
+            default:
+                LOG.severe("Pair with id = " + id + " not available");
+
+        }
+        return toRet;
+
     }
 
     public static Amount removeFrozenAmount(Amount amount, FrozenAmount frozen) {
@@ -326,50 +381,6 @@ public class TradeUtils {
                     + percentageToSetApart * 100 + "% of  sale proceedings)"
                     + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
         }
-    }
-
-    public static CurrencyPair getCCEDKPairFromID(int id) {
-        /*
-         * LAST UPDATED : 20 september
-         FROM : https://www.ccedk.com/api/v1/pair/list?nonce=1410950600
-         * 2 ,BTC USD
-         * 14 , PPC USD
-         * 13 , PPC BTC
-         * 12 , PPC LTC
-         * 47, NBT BTC
-         * 48, NBT PPC
-         * 46, NBT USD
-         */
-        CurrencyPair toRet = new CurrencyPair(Constant.BTC, Constant.BTC);
-
-        switch (id) {
-            case 2:
-                toRet = Constant.BTC_USD;
-                break;
-            case 12:
-                toRet = Constant.PPC_LTC;
-                break;
-            case 13:
-                toRet = Constant.PPC_BTC;
-                break;
-            case 14:
-                toRet = Constant.PPC_USD;
-                break;
-            case 46:
-                toRet = Constant.NBT_USD;
-                break;
-            case 47:
-                toRet = Constant.NBT_BTC;
-                break;
-            case 48:
-                toRet = Constant.NBT_PPC;
-                break;
-            default:
-                LOG.severe("Pair with id = " + id + " not available");
-
-        }
-        return toRet;
-
     }
 
     public static String getCCEDKTickerUrl(CurrencyPair pair) {
