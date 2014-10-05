@@ -803,9 +803,7 @@ public class BterWrapper implements TradeInterface {
                 apiResp = orderDetailResponse;
             }
         }
-
         return apiResp;
-
     }
 
     @Override

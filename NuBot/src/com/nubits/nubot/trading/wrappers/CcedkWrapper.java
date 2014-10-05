@@ -625,7 +625,7 @@ public class CcedkWrapper implements TradeInterface {
                 try {
                     boolean valid = (boolean) dataJson.get("entity");
                     String message = "The order " + orderID + " does not exist";
-                    LOG.severe(message);
+                    LOG.info(message);
                     apiResponse.setResponseObject(false);
                     return apiResponse;
                 } catch (ClassCastException e) {

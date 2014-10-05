@@ -58,7 +58,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
         runTests();
 
@@ -79,9 +79,9 @@ public class TestWrappers {
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //testClearAllOrders();
-        //testIsOrderActive("40700422");
+        testIsOrderActive("30177");
         //testGetPermissions();
-        testGetActiveOrders();
+        //testGetActiveOrders();
     }
 
     /*
