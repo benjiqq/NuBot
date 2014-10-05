@@ -81,7 +81,7 @@ public class TestWrappers {
         //testClearAllOrders();
         //testIsOrderActive("40700422");
         //testGetPermissions();
-        //testGetActiveOrders();
+        testGetActiveOrders();
     }
 
     /*

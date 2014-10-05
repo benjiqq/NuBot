@@ -202,16 +202,18 @@ public class Utils {
 
     public static boolean isSupported(CurrencyPair pair) {
         if (pair.equals(Constant.NBT_USD)
-                || pair.equals(Constant.BTC_CNY)
+                || pair.equals(Constant.BTC_CNY)//TODO this is only for testing purposes on our internal exchange
                 || pair.equals(Constant.NBT_BTC)
-                || pair.equals(Constant.NBT_PPC)) { //TODO this is only for testing purposes on our internal exchange
+                || pair.equals(Constant.NBT_EUR)
+                || pair.equals(Constant.NBT_CNY)
+                || pair.equals(Constant.NBT_PPC)) {
             return true;
         } else {
             return false;
         }
     }
 
-    public static boolean requiresCryptoStrategy(CurrencyPair pair) {
+    public static boolean requiresSecondaryPegStrategy(CurrencyPair pair) {
         //Return TRUE when it requires a dedicated NBT peg to something that is not USD
         if (pair.equals(Constant.NBT_USD)
                 || pair.equals(Constant.BTC_CNY)) { //TODO this is only for testing purposes on our internal exchange

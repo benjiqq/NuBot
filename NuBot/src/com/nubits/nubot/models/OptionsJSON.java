@@ -485,7 +485,7 @@ public class OptionsJSON {
 
 
             //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
-            boolean requireCryptoOptions = Utils.requiresCryptoStrategy(pair);
+            boolean requireCryptoOptions = Utils.requiresSecondaryPegStrategy(pair);
             org.json.JSONObject pegOptionsJSON;
             SecondaryPegOptionsJSON cpo = null;
             if (requireCryptoOptions) {

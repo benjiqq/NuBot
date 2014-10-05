@@ -22,10 +22,10 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OptionsJSON;
+import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
@@ -241,7 +241,7 @@ public class NuBot {
 
 
         if (Utils.isSupported(Global.options.getPair())) {
-            if (!Utils.requiresCryptoStrategy(Global.options.getPair())) {
+            if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
                 Global.taskManager.getStrategyFiatTask().start(7);
             } else {
 

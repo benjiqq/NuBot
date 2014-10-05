@@ -57,6 +57,8 @@ public class Constant {
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
     public static final CurrencyPair NBT_PPC = new CurrencyPair(NBT, PPC);
+    public static final CurrencyPair NBT_EUR = new CurrencyPair(NBT, EUR);
+    public static final CurrencyPair NBT_CNY = new CurrencyPair(NBT, CNY);
     public static final CurrencyPair BTC_USD = new CurrencyPair(BTC, USD);
     public static final CurrencyPair PPC_USD = new CurrencyPair(PPC, USD);
     public static final CurrencyPair PPC_BTC = new CurrencyPair(PPC, BTC);
