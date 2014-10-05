@@ -56,6 +56,19 @@ public class TradeUtils {
                 toRet = true;
             } else {
                 LOG.warning("There are still : " + orderList.size() + " active orders");
+                //Retry to cancel them to fix issue #14
+                ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+                if (deleteOrdersResponse.isPositive()) {
+                    boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                    if (deleted) {
+                        LOG.info("Order clear request succesfully");
+                    } else {
+                        LOG.info("Could not submit request to clear orders");
+                    }
+                } else {
+                    LOG.severe(deleteOrdersResponse.getError().toString());
+                }
             }
         } else {
             LOG.severe(activeOrdersResponse.getError().toString());
