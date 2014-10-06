@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -113,7 +113,7 @@ class LogFormatterHTML extends Formatter {
                 + "							<label for=\"chkb01\" class=\"css-label lrg vlad\">Info</label>\n"
                 + "						<br/>\n"
                 + "						<input id=\"chkb02\" class=\"css-checkbox lrg\"rel=\"trades\" type=\"checkbox\" value=\"trades\" checked=\"checked\"> \n"
-                + "							<label for=\"chkb02\" class=\"css-label lrg vlad\">Trades</label>\n"
+                + "							<label for=\"chkb02\" class=\"css-label lrg vlad\">Warnings</label>\n"
                 + "						<br/>\n"
                 + "						<input id=\"chkb03\" class=\"css-checkbox lrg\"rel=\"errors\" type=\"checkbox\" value=\"errors\" checked=\"checked\"> \n"
                 + "							<label for=\"chkb03\" class=\"css-label lrg vlad\">Errors</label>\n"
