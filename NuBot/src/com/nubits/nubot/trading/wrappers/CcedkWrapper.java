@@ -474,7 +474,6 @@ public class CcedkWrapper implements TradeInterface {
                 try {
                     boolean valid = (boolean) dataJson.get("entity");
                     String message = "The order " + orderID + " does not exist";
-                    LOG.severe(message);
                     apiResponse.setError(new ApiError(ERROR_ORDER_NOT_FOUND, message));
                     return apiResponse;
                 } catch (ClassCastException e) {
@@ -626,6 +625,7 @@ public class CcedkWrapper implements TradeInterface {
                     boolean valid = (boolean) dataJson.get("entity");
                     String message = "The order " + orderID + " does not exist";
                     LOG.info(message);
+
                     apiResponse.setResponseObject(false);
                     return apiResponse;
                 } catch (ClassCastException e) {
@@ -808,12 +808,17 @@ public class CcedkWrapper implements TradeInterface {
         protected HashMap args;
         protected ApiKeys keys;
         protected String url;
+        //Parameters used to repeat an API call in case of wrong nonce error
+        protected final int MAX_NUMBER_ATTEMPTS = 3;
+        protected int wrongNonceCounter;
+        protected String adjustedNonce;
 
         public CcedkService(String base, String method, HashMap<String, String> args, ApiKeys keys) {
             this.base = base;
             this.method = method;
             this.args = args;
             this.keys = keys;
+            this.wrongNonceCounter = 0;
 
         }
 
@@ -822,11 +827,12 @@ public class CcedkWrapper implements TradeInterface {
             this.url = url;
             this.args = args;
             this.method = "";
-
+            this.wrongNonceCounter = 0;
         }
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
+
             String answer = "";
             String signature = "";
             String post_data = "";
@@ -836,7 +842,16 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 // add nonce and build arg list
                 if (needAuth) {
-                    args.put("nonce", createNonce(""));
+                    String nonce;
+                    if (wrongNonceCounter == 0) {
+                        nonce = createNonce("");
+                    } else {
+                        LOG.warning("Re executing query for the " + wrongNonceCounter + " time. "
+                                + "New nonce = " + adjustedNonce
+                                + "while calling : " + method); //TODO, down to log.info when debugging is done
+                        nonce = adjustedNonce;
+                    }
+                    args.put("nonce", nonce);
                     post_data = TradeUtils.buildQueryString(args, ENCODING);
 
                     // args signature with apache cryptografic tools
@@ -925,9 +940,41 @@ public class CcedkWrapper implements TradeInterface {
                 connection.disconnect();
                 connection = null;
             }
+
+            /*Since CCEDK's engine uses an unreliable nonce system
+             I should check if the API call returned a wrong nonce error.
+             if it does, try making the same request again MAX_NUMBER_ATTEMPTS times,
+             with a fresh computed nonce
+             */
+            JSONParser parser = new JSONParser();
+
+            try {
+                //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
+                try {
+                    JSONObject httpAnswerJson = (JSONObject) (parser.parse(answer));
+                    JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
+                    if (errors.containsKey("nonce")) {
+                        //Detected a nonce error
+                        wrongNonceCounter++;
+                        if (wrongNonceCounter <= MAX_NUMBER_ATTEMPTS) {
+                            LOG.warning("Detected wrong nonce, adjusting it and retrying to execute the call");
+                            LOG.warning("nonce problem detail : " + errors.toJSONString()
+                                    + "while calling : " + method);
+
+                            adjustedNonce = TradeUtils.getCCDKEvalidNonce(answer);
+                            executeQuery(needAuth, isGet); //recursively retry to do the query
+                        } else {
+                            LOG.severe("Cannot get correct nonce on CCEDK after trying " + MAX_NUMBER_ATTEMPTS + " times."
+                                    + "When this happens, try to reset all orders.");
+                        }
+                    }
+                } catch (ClassCastException e) {
+                    //Do nothing, all good
+                }
+            } catch (ParseException ex) {
+                LOG.severe(answer + " " + ex.getMessage());
+            }
             return answer;
-
-
         }
 
         @Override

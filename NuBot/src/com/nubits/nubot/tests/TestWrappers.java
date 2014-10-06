@@ -40,6 +40,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -58,7 +59,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
 
@@ -66,22 +67,50 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-        //testGetAvailableBalances(Constant.NBT_BTC);
-        //testGetAvailableBalance(Constant.LTC);
-        //testSell(0.001, 500, Constant.BTC_USD);
-        //testBuy(1, 0.0005, Constant.BTC_USD);
+        //testGetAvailableBalances(Constant.NBT_BTC); //ok
+        //testGetAvailableBalance(Constant.NBT); //ok
+        //testSell(1, 0.002992, Constant.NBT_BTC);  //ok
+        //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
+        //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
         //testGetLastPrice(Constant.PPC_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //If returned in the main currency and not the payment currency, update the checkorders routine
         //testGetActiveOrders(Constant.NBT_PPC);
-        //testCancelOrder("63329550");
-        //testGetOrderDetail("63326121"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
+        //testCancelOrder("681977190");
+        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //testClearAllOrders();
-        testIsOrderActive("30177");
+        //testIsOrderActive("681977190");
         //testGetPermissions();
-        //testGetActiveOrders();
+        /* stimulating ccedk wrong nonce */
+
+
+
+        for (int i = 0; i < 5000; i++) {
+            testGetActiveOrders();
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+            testGetAvailableBalances(Constant.NBT_PPC);
+
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            testGetOrderDetail("3454");
+
+            try {
+                Thread.sleep(800);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
     }
 
     /*
@@ -226,7 +255,7 @@ public class TestWrappers {
             Order order = (Order) orderDetailResponse.getResponseObject();
             LOG.info(order.toString());
         } else {
-            LOG.severe(orderDetailResponse.getError().toString());
+            LOG.info(orderDetailResponse.getError().toString());
         }
     }
 
@@ -312,7 +341,6 @@ public class TestWrappers {
 
     public static void configExchange(String exchangeName) {
         ApiKeys keys;
-
 
         Global.exchange = new Exchange(exchangeName);
 
