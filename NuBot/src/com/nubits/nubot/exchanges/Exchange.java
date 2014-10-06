@@ -52,6 +52,7 @@ public class Exchange {
         supportedExchanges.put(Constant.PEATIO_BTCCNY, new PeatioWrapper());
         supportedExchanges.put(Constant.BTER, new BterWrapper());
         supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
+        supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());
 
 
         Iterator it = supportedExchanges.entrySet().iterator();

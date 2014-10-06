@@ -118,11 +118,6 @@ public class NuBot {
         Global.exchange = new Exchange(Global.options.getExchangeName());
         Utils.printSeparator();
 
-
-
-
-
-
         LOG.fine("Create e ExchangeLiveData object to accomodate liveData from the exchange");
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
