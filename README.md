@@ -57,7 +57,7 @@ By using NuBot you declare to be accept the afore-mentioned risks.
 * The custodian must provide the bot with access to market exchanges where NuBits are traded
 * The custodian must avoid manual interacting with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
 * The custodian must avoid opening multiple instances of Nu client in control of the custodian address at the same time.
-* The custodian must avoid opening multiple instances of Nu in control of the custodian address.
+* To communicate liquidityinfo, the custodian should possess an unlocked nubit client controlling the custodial grant address. 
 
 ### 1)Prepare the NuBits client client
 
