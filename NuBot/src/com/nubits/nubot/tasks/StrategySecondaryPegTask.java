@@ -45,6 +45,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean needWallShift;
     private double sellPricePEG;
     private double buyPricePEG;
+    private String pegPriceDirection;  //this parameter can be either Constant.UP (when the price of the peg increased since last wall) or Constant.DOWN  (peg decreased)
 
     @Override
     public void run() {
@@ -84,15 +85,23 @@ public class StrategySecondaryPegTask extends TimerTask {
 
                     //First try doing it gracefully, one wall at the time.
                     boolean shiftSellWallsSuccess;
-                    boolean shiftBuyWallsSuccess = true;
+                    boolean shiftBuyWallsSuccess = true; //set it to true in case of sellSide custodians
 
-                    //Shift sell walls
-                    shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+                    //If sell side custodian, move sell walls
 
-                    //try ti shift buy walls
-                    if (Global.isDualSide) {
-                        shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
+                    if (!Global.isDualSide) {
+                        shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+                    } else {
+                        //If dual side :
+                        if (pegPriceDirection.equals(Constant.UP)) { //If peg price increased, first move buy walls
+                            shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
+                            shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+                        } else {  //If peg price decreased, first move sell walls
+                            shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+                            shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
+                        }
                     }
+
                     if (shiftSellWallsSuccess && shiftBuyWallsSuccess) {
                         LOG.info("Graceful wall shift succesful");
                         mightNeedInit = false;
@@ -469,12 +478,13 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
     }
 
-    public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion) {
+    public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
         LOG.warning("Strategy received a price change notification.");
         needWallShift = true;
         Global.conversion = conversion;
         sellPricePEG = new_sellPricePEG;
         buyPricePEG = new_buyPricePEG;
+        this.pegPriceDirection = direction;
     }
 
     public double getSellPricePEG() {
@@ -511,8 +521,6 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (numberOfOrdersActivePerSide == 2) {
             String[] idToDelete = getSmallerWallID(type);
-
-
             if (!idToDelete[0].equals("-1")) {
                 LOG.info("Taking down first order ");
                 if (TradeUtils.takeDownAndWait(idToDelete[0], Global.options.getEmergencyTimeout() * 1000)) {

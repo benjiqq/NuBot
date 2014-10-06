@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.tasks;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
@@ -48,6 +49,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private double sellPriceUSD, buyPriceUSD;
     private String outputPath;
     private String emailHistory = "";
+    private String priceDirection;
 
     @Override
     public void run() {
@@ -213,7 +215,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Compute price for walls
 
             currentWallPEGPrice = lastPrice;
-            computeNewPrices();
+            computeNewPrices(this.priceDirection);
 
         } else {
             LOG.fine("No need to move walls");
@@ -229,11 +231,18 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (percentageDistance < wallchangeThreshold) {
             return false;
         } else {
+            //check if the price increased or decreased
+            if ((last.getPrice().getQuantity() - currentWallPEGprice) > 0) {
+                this.priceDirection = Constant.UP;
+            } else {
+                this.priceDirection = Constant.DOWN;
+            }
+
             return true;
         }
     }
 
-    private void computeNewPrices() {
+    private void computeNewPrices(String direction) {
 
         //Sell-side custodian sell-wall
 
@@ -257,7 +266,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //Call
 
-        strategy.notifyPriceChanged(sellPricePEG, buyPricePEG, price);
+        strategy.notifyPriceChanged(sellPricePEG, buyPricePEG, price, direction);
 
         String row = new Date() + ","
                 + source + ","

@@ -71,6 +71,9 @@ public class Constant {
     public static final CurrencyPair BTC_BITUSD = new CurrencyPair(BTC, BITUSD);
     public static final CurrencyPair EUR_USD = new CurrencyPair(EUR, USD);
     public static final CurrencyPair CNY_USD = new CurrencyPair(CNY, USD);
+    //Direction of price
+    public static final String UP = "up";
+    public static final String DOWN = "down";
 
     public static Currency getCurrencyFromCode(String codeString) {
         Currency toRet = null;
