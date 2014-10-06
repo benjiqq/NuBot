@@ -40,6 +40,7 @@ import java.util.TreeMap;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 public class TradeUtils {
 
@@ -194,7 +195,16 @@ public class TradeUtils {
         String wrongNonce = "1234567891";
         try {
             String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce);
-            JSONParser parser = new JSONParser();
+            return getCCDKEvalidNonce(htmlString);
+        } catch (IOException ex) {
+            LOG.severe(ex.getMessage());
+        }
+        return wrongNonce;
+    }
+
+    //used by ccedkqueryservice
+    public static String getCCDKEvalidNonce(String htmlString){
+        JSONParser parser = new JSONParser();
             try {
                 //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
@@ -206,16 +216,13 @@ public class TradeUtils {
                 String subStr = nonceError.substring(indexStart, indexStart + 10);
 
                 return subStr;
-            } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
-                return wrongNonce;
-            }
-        } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
-        }
-        return wrongNonce;
+            } catch (ParseException ex) {
+                LOG.severe(htmlString+" "+ex.getMessage());
+                return "1234567891";
+            } 
     }
-
+    
+    
     public static int getCCDKECurrencyId(String currencyCode) {
         /*
          * LAST UPDATED : 17 september
