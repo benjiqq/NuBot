@@ -24,6 +24,7 @@ import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
+import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
