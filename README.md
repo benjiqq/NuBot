@@ -41,7 +41,7 @@ See [Attached Diagrams](#diagram-sell) for a visual flowchart.
 There might be adjusted versions of the two strategies explained above. To request a custom build of NuBot to fulfil a particular custodial grant, [get in touch](http://discuss.nubits.com/category/nubits/automated-trading).
 
 Alternative strategies currently under development :
-* *Proxy Peg Strategy* : a strategy to let custodian trade of pairs different from NBT/USD .
+* *Secondary Peg Strategy* : a strategy to let custodian trade of pairs different from NBT/USD .
 * *KTms Strategy* : dual side Strategy with 10% of proceedings from sales kept in balance. Link to [KTm's custodial proposal](http://discuss.nubits.com/t/proposal-to-operate-a-nubits-grant-to-provide-early-stage-dual-side-liquidity-and-shareholder-dividends/120/25) .
 
 #Using NuBot
