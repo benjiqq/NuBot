@@ -386,9 +386,13 @@ public class BterWrapper implements TradeInterface {
 
             boolean valid = false;
             try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (java.lang.ClassCastException e) {
-                valid = true;
+                valid = (boolean) httpAnswerJson.get("result");
+            } catch (Exception e) {
+                try {
+                    valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+                } catch (ClassCastException ex) {
+                    valid = true;
+                }
             }
 
             if (!valid) {
