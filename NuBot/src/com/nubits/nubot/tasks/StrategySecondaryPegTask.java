@@ -591,7 +591,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
                 if (type.equalsIgnoreCase(Constant.BUY)) {
                     amount = balancePEG.getQuantity() / buyPricePEG;
-
+                    price = buyPricePEG;
                 } else if (type.equalsIgnoreCase(Constant.SELL)) {
                     amount = balanceNBT.getQuantity();
                     price = sellPricePEG;
