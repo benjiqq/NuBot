@@ -294,7 +294,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String messageNow = row;
             emailHistory += messageNow;
 
-            FileSystem.writeToFile(row, outputPath, true);
+
 
             String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
                     + "now is " + price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
@@ -310,6 +310,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
         }
+        FileSystem.writeToFile(row, outputPath, true);
     }
 
     public double getWallchangeThreshold() {
