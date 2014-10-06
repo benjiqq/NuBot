@@ -34,6 +34,7 @@ public class Constant {
     public static final String BTER = "bter";
     public static final String PEATIO_BTCCNY = "peatio_btccny";
     public static final String PEATIO_MULTIPAIR = "peatio_multipair";
+    public static final String POLONIEX = "poloniex";
     //API base url for peatio instances
     public static final String PEATIO_MULTIPAIR_API_BASE = "http://198.52.199.61/"; //TODO UPDATE WHEN AVAILABLE
     public static final String PEATIO_BTCCNY_API_BASE = "http://198.52.199.61/";

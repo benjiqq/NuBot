@@ -33,6 +33,8 @@ public class PasswordsSample {
     public static final String CCEDK_KEY = "xxx";
     public static final String BTER_KEY = "xxx";
     public static final String BTER_SECRET = "xxx";
+    public static final String POLONIEX_SECRET = "xxx";
+    public static final String POLONIEX_KEY = "xxx";
     public static final String GMAIL_USERNAME = "xxx"; //used to send mail notifications
     public static final String GMAIL_PASSWORD = "xxx";
     public static final String HIPCHAT_KEY = "xxx"; //not admin
