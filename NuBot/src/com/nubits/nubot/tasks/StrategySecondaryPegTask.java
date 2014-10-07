@@ -108,7 +108,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                         needWallShift = false;
                         //Here I should wait until the two orders are correctly displaied. It can take some seconds
                         try {
-                            Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+                            Thread.sleep(10 * 1000); //TODO wait a dynamic interval.
                         } catch (InterruptedException ex) {
                             LOG.severe(ex.getMessage());
                         }
@@ -295,7 +295,10 @@ public class StrategySecondaryPegTask extends TimerTask {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
-            gracefullyRefreshOrders(Constant.SELL, false);
+            if(Global.options.isAggregate())
+            {
+                gracefullyRefreshOrders(Constant.SELL, false);
+            }
         } else {
             //NBT balance = 0
             LOG.fine("NBT balance < 1, no orders to execute");
@@ -309,8 +312,11 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
-            TradeUtils.tryKeepProceedingsAside(balancePEG);
-            gracefullyRefreshOrders(Constant.BUY, false);
+            if(Global.options.isAggregate())
+            {
+                TradeUtils.tryKeepProceedingsAside(balancePEG); 
+                gracefullyRefreshOrders(Constant.BUY, false);
+            }
         } else {
             //PEG balance = 0
             LOG.fine(balancePEG.getCurrency().getCode() + "balance < 1, no orders to execute");
@@ -467,7 +473,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
 
-                if (balancePEG > oneNBT) {
+                if (balancePEG > oneNBT && Global.options.isAggregate()) {
                     LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If this is the first executeion, ignore this message. "
                             + "If the balance represent proceedings from a sale the bot will notice. "
                             + " If you keep seying this message repeatedly over and over, you should restart the bot. ");

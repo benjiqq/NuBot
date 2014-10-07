@@ -103,12 +103,12 @@ public class SecondaryPegOptionsJSON {
                 wallchangeTreshold = new Double((optionsJSON.get("wallchange-treshold")).toString());
             }
 
-            /* TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
+             // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
 
              if (optionsJSON.has("price-offset")) {
              priceOffset = new Double((optionsJSON.get("price-offset")).toString());
              }
-             */
+             
 
             if (optionsJSON.has("price-distance-threshold")) {
                 distanceTreshold = new Double((optionsJSON.get("price-distance-threshold")).toString());
