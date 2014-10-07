@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -848,7 +849,7 @@ public class CcedkWrapper implements TradeInterface {
                     } else {
                         LOG.warning("Re executing query for the " + wrongNonceCounter + " time. "
                                 + "New nonce = " + adjustedNonce
-                                + "while calling : " + method); //TODO, down to log.info when debugging is done
+                                + " while calling : " + method); //TODO, down to log.info when debugging is done
                         nonce = adjustedNonce;
                     }
                     args.put("nonce", nonce);
@@ -962,6 +963,11 @@ public class CcedkWrapper implements TradeInterface {
                                     + "while calling : " + method);
 
                             adjustedNonce = TradeUtils.getCCDKEvalidNonce(answer);
+                            try {
+                                Thread.sleep(1000);
+                            } catch (InterruptedException ex) {
+                                Logger.getLogger(CcedkWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                            }
                             executeQuery(needAuth, isGet); //recursively retry to do the query
                         } else {
                             LOG.severe("Cannot get correct nonce on CCEDK after trying " + MAX_NUMBER_ATTEMPTS + " times."
