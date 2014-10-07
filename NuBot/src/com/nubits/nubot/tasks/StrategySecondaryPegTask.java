@@ -227,7 +227,8 @@ public class StrategySecondaryPegTask extends TimerTask {
                 pegBalance = TradeUtils.removeFrozenAmount((Amount) pegBalanceResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
 
 
-                if (pegBalance.getQuantity() > 0.0001) {
+                double oneNBT = Utils.round(1 / Global.conversion, 6);
+                if (pegBalance.getQuantity() > oneNBT) {
                     // Divide the  balance 50% 50% in balance1 and balance2
                     double pegBalance1 = Utils.round(pegBalance.getQuantity() / 2, 4);
                     double pegBalance2 = pegBalance.getQuantity() - pegBalance1;
@@ -467,8 +468,9 @@ public class StrategySecondaryPegTask extends TimerTask {
 
 
                 if (balancePEG > oneNBT) {
-                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
-                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If this is the first executeion, ignore this message. "
+                            + "If the balance represent proceedings from a sale the bot will notice. "
+                            + " If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 }
             } else {
                 ordersAndBalancesOK = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 1;
@@ -590,7 +592,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 double price = 0;
 
                 if (type.equalsIgnoreCase(Constant.BUY)) {
-                    amount = balancePEG.getQuantity() / buyPricePEG;
+                    amount = Utils.round(balancePEG.getQuantity() / buyPricePEG, 6);
                     price = buyPricePEG;
                 } else if (type.equalsIgnoreCase(Constant.SELL)) {
                     amount = balanceNBT.getQuantity();
@@ -605,8 +607,13 @@ public class StrategySecondaryPegTask extends TimerTask {
                     String orderString = type + " " + amount + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
                     LOG.warning("Strategy : Submit order : " + orderString);
+                    ApiResponse response;
+                    if (type.equalsIgnoreCase(Constant.SELL)) {
+                        response = Global.exchange.getTrade().sell(Global.options.getPair(), amount, price);
+                    } else {
+                        response = Global.exchange.getTrade().buy(Global.options.getPair(), amount, price);
+                    }
 
-                    ApiResponse response = Global.exchange.getTrade().sell(Global.options.getPair(), amount, price);
                     if (response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
                         String responseString = (String) response.getResponseObject();
