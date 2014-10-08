@@ -29,6 +29,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -40,7 +41,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -59,7 +59,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
         runTests();
 
@@ -83,10 +83,12 @@ public class TestWrappers {
         //testClearAllOrders();
         //testIsOrderActive("681977190");
         //testGetPermissions();
+        
+        testGetLastTrades(Constant.NBT_BTC);
         /* stimulating ccedk wrong nonce */
 
 
-
+        /*
         for (int i = 0; i < 5000; i++) {
             testGetActiveOrders();
             try {
@@ -110,7 +112,7 @@ public class TestWrappers {
                 Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-
+        */
     }
 
     /*
@@ -404,5 +406,22 @@ public class TestWrappers {
         }
 
         /* Setup (end) ------------------------------------------------------------------------------------------------------ */
+    }
+
+    private static void testGetLastTrades(CurrencyPair pair) {
+           //Get active orders
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair);
+        if (activeOrdersResponse.isPositive()) {
+            LOG.info("\nPositive response  from TradeInterface.getLastTrades(pair) ");
+            ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
+            LOG.info("Last trades : " + tradeList.size());
+            for (int i = 0; i < tradeList.size(); i++) {
+                Trade tempTrade = tradeList.get(i);
+                LOG.info(tempTrade.toString());
+            }
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+        }
+    
     }
 }

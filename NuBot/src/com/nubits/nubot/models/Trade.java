@@ -44,6 +44,9 @@ public class Trade {
         this.date = date;
     }
 
+    public Trade() {
+    }
+
     public String getId() {
         return id;
     }
