@@ -20,6 +20,7 @@ ssl_readme.txt
 NuCancelOrders.java
 NuExecuteOrders.java
 NuPriceMonitor.java
+NuLastTrades.java
 
 #launch configurations
 /NuBot/nbproject/configs/*.properties
