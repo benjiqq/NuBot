@@ -155,7 +155,7 @@ public interface TradeInterface {
     public ApiResponse getTxFee(CurrencyPair pair);
     
      /**
-     * Get the last trades associated with the account
+     * Get the last trades associated with the account, default 24 hours
      *
      * @param pair pair.orderCurrency is the currency on order and
      * pair.paymentCurrency is unit for its payment/redeem

@@ -31,6 +31,7 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -75,6 +76,8 @@ public class CcedkWrapper implements TradeInterface {
     private final String API_BASE_URL = checkConnectionUrl + "api/v1/";
     private final String API_GET_INFO = "balance/list"; //post
     private final String API_TRADE = "order/new"; //post
+    private final String API_GET_TRADES = "trade/list"; //post
+
     private final String API_ACTIVE_ORDERS = "order/list";
     private final String API_ORDER = "order/info";
     private final String API_CANCEL_ORDER = "order/cancel";
@@ -785,6 +788,39 @@ public class CcedkWrapper implements TradeInterface {
 
         return order;
     }
+    
+    
+     private Trade parseTrade(JSONObject orderObject) {
+        Trade trade = new Trade();
+
+        /*
+            "id":<\d+> AS "trade_id",
+            "pair_id":<\d+>, 
+            "type":<buy|sell>, 
+            "is_buyer":<0|1>, 
+            "is_seller":<0|1>, 
+            "price":<\d{1,8}\.d{0,8}>, 
+            "volume":<\d{1,8}\.d{0,8}>, 
+            "fee":<\d{1,8}\.d{0,8}>, 
+            "created":<\d{10}>
+         */
+
+        trade.setId((String) orderObject.get("trade_id"));
+
+        int currencyPairID = Integer.parseInt((String) orderObject.get("pair_id"));
+        CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
+        trade.setPair(cp);
+
+        trade.setType(((String) orderObject.get("type")).toUpperCase());
+        trade.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
+        trade.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
+
+     
+        long date = Long.parseLong(((String) orderObject.get("created")) + "000");
+        trade.setDate(new Date(date));
+
+        return trade;
+    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -800,6 +836,75 @@ public class CcedkWrapper implements TradeInterface {
     public void setApiBaseUrl(String apiBaseUrl) {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
 
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Trade> tradesList = new ArrayList<Trade>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+        
+        String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
+        
+        long now = System.currentTimeMillis();
+        long yesterday = Math.round((now - 1000*60*60*36)/1000);
+        query_args.put("pair_id", pair_id);
+        query_args.put("date_from", Long.toString(yesterday)); //24hours
+        
+        String queryResult = query(API_BASE_URL, API_GET_TRADES, query_args, false);
+
+        /* Sample Answer
+         * {"errors":false,"response":{"entities":[{"trade_id":"1710","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00005505","vo lume":"1.22320232","fee":"0.00000013","created":"1405787314"},{"trade_id":"1714","pair_id":"30","type":"buy","is_buyer":"0","is_seller":" 1","price":"0.00005505","volume":"1.00000000","fee":"0.00000011","created":"1405787314"},{"trade_id":"1718","pair_id":"30","type":"buy ","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"1.03679768","fee":"0.00000011","created":"1405787314"},{"trade_id":"1720 ","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"2.22000000","fee":"0.00000024","created":"140 5787369"},{"trade_id":"1780","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00007600","volume":"5000.00000000","fe e":"0.00076000","created":"1405964079"}]},"pagination":{"total_items":5,"items_per_page":10,"current_page":1,"total_pages":1}}
+         */
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean errors = true;
+            try {
+                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+            } catch (ClassCastException e) {
+                errors = true;
+            }
+
+            if (errors) {
+                //error
+                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+
+                LOG.severe("Ccedk API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+                JSONArray entities;
+                try {
+                    entities = (JSONArray) dataJson.get("entities");
+                } catch (ClassCastException e) { //Empty order list returns {"errors":false,"response":{"entities":false},
+                    apiResponse.setResponseObject(tradesList);
+                    return apiResponse;
+                }
+
+                for (int i = 0; i < entities.size(); i++) {
+                    JSONObject tradeObject = (JSONObject) entities.get(i);
+                    Trade tempTrade = parseTrade(tradeObject);
+                    tradesList.add(tempTrade);
+                    
+                }
+                apiResponse.setResponseObject(tradesList);
+
+                return apiResponse;
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+    
+    
     }
 
     private class CcedkService implements ServiceInterface {
@@ -832,7 +937,7 @@ public class CcedkWrapper implements TradeInterface {
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(boolean needAuth, boolean isGet ) {
 
             String answer = "";
             String signature = "";
@@ -968,7 +1073,8 @@ public class CcedkWrapper implements TradeInterface {
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(CcedkWrapper.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            executeQuery(needAuth, isGet); //recursively retry to do the query
+                            
+                            new CcedkService(base, method, args, keys).executeQuery(needAuth, isGet); //recursively retry to do the query
                         } else {
                             LOG.severe("Cannot get correct nonce on CCEDK after trying " + MAX_NUMBER_ATTEMPTS + " times."
                                     + "When this happens, try to reset all orders.");

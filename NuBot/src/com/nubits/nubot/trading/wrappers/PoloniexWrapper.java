@@ -170,6 +170,11 @@ public class PoloniexWrapper implements TradeInterface {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
     private class PoloniexService implements ServiceInterface {
 
         protected String base;
