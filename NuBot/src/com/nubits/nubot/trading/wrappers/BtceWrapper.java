@@ -864,6 +864,11 @@ public class BtceWrapper implements TradeInterface {
 
     }
 
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 
     /* Service implementation */
     private class BtceService implements ServiceInterface {

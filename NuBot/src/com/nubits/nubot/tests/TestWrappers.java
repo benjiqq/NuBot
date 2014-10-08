@@ -59,7 +59,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
 
@@ -84,7 +84,7 @@ public class TestWrappers {
         //testIsOrderActive("681977190");
         //testGetPermissions();
         
-        testGetLastTrades(Constant.NBT_BTC);
+        testGetLastTrades(Constant.NBT_PPC);
         /* stimulating ccedk wrong nonce */
 
 
@@ -414,7 +414,7 @@ public class TestWrappers {
         if (activeOrdersResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getLastTrades(pair) ");
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
-            LOG.info("Last trades : " + tradeList.size());
+            LOG.info("Last 24h trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
                 LOG.info(tempTrade.toString());

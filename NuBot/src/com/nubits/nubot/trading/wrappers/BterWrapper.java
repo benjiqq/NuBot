@@ -997,8 +997,8 @@ public class BterWrapper implements TradeInterface {
         trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
 
    
-        
-        trade.setDate(new Date( Long.parseLong((String) orderObject.get("time_unix")  ))); 
+        long date = Long.parseLong(((String) orderObject.get("time_unix")) + "000");
+        trade.setDate(new Date(date)); 
 
         return trade;
     }
