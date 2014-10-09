@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.utils.Utils;
 import java.util.Date;
 
 /**
@@ -256,4 +257,10 @@ public class Order {
                 + ", price=" + price + ", fee=" + fee + ", amountPlusFee=" + amountPlusFee
                 + ", completed=" + completed + '}';
     }
+    
+    public String getDigest(){
+        //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC } 
+        return id + " : { "+ type +" "+ Utils.round(amount.getQuantity(),2) + "@" + Utils.round(price.getQuantity(),6) + "} " ;
+    }
+   
 }
