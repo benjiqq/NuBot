@@ -105,7 +105,12 @@ public class Trade {
 
     @Override
     public String toString() {
-        return "Trade{" + "id=" + id + ", order_id=" + order_id + ", pair=" + pair + ", type=" + type + ", price=" + price + ", amount=" + amount + ", date=" + date + '}';
+        return "Trade{" + "id=" + id + ", order_id=" + order_id + ", pair=" + pair.toString() + ", type=" + type + ", price=" + price.getQuantity() + ", amount=" + amount.getQuantity() + ", date=" + date + '}';
     }   
+    
+    public String toCsvString()
+    {
+        return id + "," + order_id + "," +pair.toString("_") + "," +type + "," +price.getQuantity() + "," +amount.getQuantity() + "," +date ;
+    }
     
 }

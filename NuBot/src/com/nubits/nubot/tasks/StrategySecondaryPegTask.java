@@ -54,6 +54,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         recount(); //Count number of active sells and buys
 
         if (mightNeedInit) {
+            
             boolean reinitiateSuccess = true;
             if (!(ordersAndBalancesOK)) {
                 reinitiateSuccess = reInitiateOrders();
@@ -64,8 +65,28 @@ public class StrategySecondaryPegTask extends TimerTask {
                 LOG.fine("No need to init new orders since current orders seems correct");
             }
             recount();
-        } else {
+        } 
+        
+       else {
             if (needWallShift) {
+                String message = "(hard) Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+                            + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+                    HipChatNotifications.sendMessage(message, Color.PURPLE);
+                    LOG.warning(message);
+                     boolean reinitiateSuccess2 = reInitiateOrders();
+                        if (reinitiateSuccess2) {
+                            mightNeedInit = false;
+                            needWallShift = false;
+                        }
+            }
+        }
+            
+         /* this was the graceful. 
+         else {
+            if (needWallShift) {
+                
+               
+                
                 //Secondary peg price changed, need to shift walls
                 boolean reinitiateSuccess = true;
 
@@ -118,11 +139,14 @@ public class StrategySecondaryPegTask extends TimerTask {
                         boolean reinitiateSuccess2 = reInitiateOrders();
                         if (reinitiateSuccess2) {
                             mightNeedInit = false;
+                            needWallShift = false;
                         }
                     }
                 }
+               
             }
         }
+        End graceful */
 
         //Make sure the orders and balances are ok
         if (!ordersAndBalancesOK) {
@@ -334,7 +358,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Wait until there are no active orders
                     boolean timedOut = false;
                     long timeout = Global.options.getEmergencyTimeout() * 1000;
-                    long wait = 6 * 1000;
+                    long wait = 8 * 1000;
                     long count = 0L;
                     do {
                         try {
