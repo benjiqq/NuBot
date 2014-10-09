@@ -51,8 +51,12 @@ public class TestOrderTask {
 
     private static void setup() {
 
+        String folderName = "tests_"+System.currentTimeMillis()+"/";
+        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+         
+       
         try {
-            NuLogger.setup(true);
+            NuLogger.setup(true,logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }

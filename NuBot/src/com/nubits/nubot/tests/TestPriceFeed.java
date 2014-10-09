@@ -56,8 +56,10 @@ public class TestPriceFeed {
     private void init() {
         Utils.loadProperties("settings.properties");
         //feed = new BitcoinaveragePriceFeed();
+        String folderName = "tests_"+System.currentTimeMillis()+"/";
+        String logsFolder = Global.settings.getProperty("log_path")+folderName;
         try {
-            NuLogger.setup(false);
+            NuLogger.setup(false,logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
