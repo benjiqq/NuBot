@@ -17,6 +17,7 @@ releases/
 
 #Specific files to ignore
 ssl_readme.txt
+project.properties
 NuCancelOrders.java
 NuExecuteOrders.java
 NuPriceMonitor.java
