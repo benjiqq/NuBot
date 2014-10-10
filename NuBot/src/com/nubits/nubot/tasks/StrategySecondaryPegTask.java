@@ -53,34 +53,28 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         recount(); //Count number of active sells and buys
 
-        boolean justReinitiated = false;
-        if (mightNeedInit) {
+        if(needWallShift){
+                String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+                            + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+                HipChatNotifications.sendMessage(message, Color.PURPLE);
+                LOG.warning(message);
+            }
+        
+        if (mightNeedInit || needWallShift) {
             
-            boolean reinitiateSuccess = true;
+            boolean reinitiateSuccess ;
             if (!(ordersAndBalancesOK)) {
                 reinitiateSuccess = reInitiateOrders();
                 if (reinitiateSuccess) {
                     mightNeedInit = false;
-                    justReinitiated= true;
+                    needWallShift = false;
                 }
             } else {
                 LOG.fine("No need to init new orders since current orders seems correct");
-                mightNeedInit = false;
             }
             recount();
         } 
 
-        if (needWallShift && !justReinitiated) {
-            String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
-                        + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
-                HipChatNotifications.sendMessage(message, Color.PURPLE);
-                LOG.warning(message);
-                 boolean reinitiateSuccess2 = reInitiateOrders();
-                    if (reinitiateSuccess2) {
-                        mightNeedInit = false;
-                        needWallShift = false;
-                    }
-        }
             
          /* this was the graceful shift. Restore after standard shifts has been properly tested 
          else {
