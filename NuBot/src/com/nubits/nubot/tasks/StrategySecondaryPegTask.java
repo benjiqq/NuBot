@@ -63,7 +63,10 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (mightNeedInit || needWallShift) {
             
             boolean reinitiateSuccess ;
-            if (!(ordersAndBalancesOK)) {
+            
+            boolean reset = ( needWallShift )
+                    || mightNeedInit && !(ordersAndBalancesOK)  ;
+            if (reset) {
                 reinitiateSuccess = reInitiateOrders();
                 if (reinitiateSuccess) {
                     mightNeedInit = false;
@@ -359,9 +362,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                     boolean areAllOrdersCanceled=false;
                     do {
                         try {
-                            areAllOrdersCanceled = TradeUtils.areAllOrdersCanceled();
-                            LOG.warning("Are all orders canceled? " + areAllOrdersCanceled);
+                            
                             Thread.sleep(wait);
+                            areAllOrdersCanceled = TradeUtils.areAllOrdersCanceled();
+                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
                             count += wait;
                             timedOut = count > timeout;
 
@@ -520,6 +524,8 @@ public class StrategySecondaryPegTask extends TimerTask {
         } else {
             LOG.severe(balancesResponse.getError().toString());
         }
+
+        mightNeedInit = !ordersAndBalancesOK;
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
