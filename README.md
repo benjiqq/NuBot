@@ -219,6 +219,8 @@ NuBot can be further configured by adding additional parameters to its config fi
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
+| aggregate | true | If set to false, will nullify the function to put funds back on sell or buy. It will put them back when the walls shift | boolean|
+
 
 ##Adding support for an exchange
 *coming soon*
@@ -269,7 +271,9 @@ keytool -list -v -keystore Nubot_keystore.jks
 
 ##Logging on HTML and csv
 
-The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. *fine* are never logged to file (only to console) , info are logged to file if we set`"verbose"=true`, *warning* are used for logging trading-related messagges, and *severe* for errors.
+The bot produces different output log files, all stored in a special folder created for each session under *logs/*. The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. *fine* are never logged to file (only to console) , info are logged to file if we set`"verbose"=true`, *warning* are used for logging trading-related messagges, and *severe* for errors.
+
+Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
 
 #Changelogs
 See [changelog.md](../master/CHANGELOG.md)
