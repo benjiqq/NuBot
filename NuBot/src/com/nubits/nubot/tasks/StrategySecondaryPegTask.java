@@ -53,19 +53,19 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         recount(); //Count number of active sells and buys
 
-        if(needWallShift){
-                String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
-                            + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
-                HipChatNotifications.sendMessage(message, Color.PURPLE);
-                LOG.warning(message);
-            }
-        
+        if (needWallShift) {
+            String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+                    + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+            HipChatNotifications.sendMessage(message, Color.PURPLE);
+            LOG.warning(message);
+        }
+
         if (mightNeedInit || needWallShift) {
-            
-            boolean reinitiateSuccess ;
-            
-            boolean reset = ( needWallShift )
-                    || mightNeedInit && !(ordersAndBalancesOK)  ;
+
+            boolean reinitiateSuccess;
+
+            boolean reset = (needWallShift)
+                    || mightNeedInit && !(ordersAndBalancesOK);
             if (reset) {
                 reinitiateSuccess = reInitiateOrders();
                 if (reinitiateSuccess) {
@@ -76,80 +76,80 @@ public class StrategySecondaryPegTask extends TimerTask {
                 LOG.fine("No need to init new orders since current orders seems correct");
             }
             recount();
-        } 
-
-            
-         /* this was the graceful shift. Restore after standard shifts has been properly tested 
-         else {
-            if (needWallShift) {
-                
-               
-                
-                //Secondary peg price changed, need to shift walls
-                boolean reinitiateSuccess = true;
-
-                //If orders and balance are not ok, reset them
-                if (!(ordersAndBalancesOK)) {
-                    reinitiateSuccess = reInitiateOrders(); //TODO this will cause ignoring frozen proceedings. review
-                    if (reinitiateSuccess) {
-                        mightNeedInit = false;
-                    }
-                } else {
-                    //Orders and balances seems ok.
-
-                    String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
-                            + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
-                    HipChatNotifications.sendMessage(message, Color.PURPLE);
-                    LOG.warning(message);
-
-                    //First try doing it gracefully, one wall at the time.
-                    boolean shiftSellWallsSuccess;
-                    boolean shiftBuyWallsSuccess = true; //set it to true in case of sellSide custodians
-
-                    //If sell side custodian, move sell walls
-
-                    if (!Global.isDualSide) {
-                        shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
-                    } else {
-                        //If dual side :
-                        if (pegPriceDirection.equals(Constant.UP)) { //If peg price increased, first move buy walls
-                            shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
-                            shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
-                        } else {  //If peg price decreased, first move sell walls
-                            shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
-                            shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
-                        }
-                    }
-
-                    if (shiftSellWallsSuccess && shiftBuyWallsSuccess) {
-                        LOG.info("Graceful wall shift succesful");
-                        mightNeedInit = false;
-                        needWallShift = false;
-                        //Here I should wait until the two orders are correctly displaied. It can take some seconds
-                        try {
-                            Thread.sleep(10 * 1000); //TODO wait a dynamic interval.
-                        } catch (InterruptedException ex) {
-                            LOG.severe(ex.getMessage());
-                        }
-                    } else { //If doing it gracefully didn't work
-                        LOG.warning("Graceful wall shift failed. Trying to clear all orders");
-                        //Simply clear all and restart
-                        boolean reinitiateSuccess2 = reInitiateOrders();
-                        if (reinitiateSuccess2) {
-                            mightNeedInit = false;
-                            needWallShift = false;
-                        }
-                    }
-                }
-               
-            }
         }
-        End graceful */
+
+
+        /* this was the graceful shift. Restore after standard shifts has been properly tested
+         else {
+         if (needWallShift) {
+
+
+
+         //Secondary peg price changed, need to shift walls
+         boolean reinitiateSuccess = true;
+
+         //If orders and balance are not ok, reset them
+         if (!(ordersAndBalancesOK)) {
+         reinitiateSuccess = reInitiateOrders(); //TODO this will cause ignoring frozen proceedings. review
+         if (reinitiateSuccess) {
+         mightNeedInit = false;
+         }
+         } else {
+         //Orders and balances seems ok.
+
+         String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+         + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+         HipChatNotifications.sendMessage(message, Color.PURPLE);
+         LOG.warning(message);
+
+         //First try doing it gracefully, one wall at the time.
+         boolean shiftSellWallsSuccess;
+         boolean shiftBuyWallsSuccess = true; //set it to true in case of sellSide custodians
+
+         //If sell side custodian, move sell walls
+
+         if (!Global.isDualSide) {
+         shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+         } else {
+         //If dual side :
+         if (pegPriceDirection.equals(Constant.UP)) { //If peg price increased, first move buy walls
+         shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
+         shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+         } else {  //If peg price decreased, first move sell walls
+         shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
+         shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
+         }
+         }
+
+         if (shiftSellWallsSuccess && shiftBuyWallsSuccess) {
+         LOG.info("Graceful wall shift succesful");
+         mightNeedInit = false;
+         needWallShift = false;
+         //Here I should wait until the two orders are correctly displaied. It can take some seconds
+         try {
+         Thread.sleep(10 * 1000); //TODO wait a dynamic interval.
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.getMessage());
+         }
+         } else { //If doing it gracefully didn't work
+         LOG.warning("Graceful wall shift failed. Trying to clear all orders");
+         //Simply clear all and restart
+         boolean reinitiateSuccess2 = reInitiateOrders();
+         if (reinitiateSuccess2) {
+         mightNeedInit = false;
+         needWallShift = false;
+         }
+         }
+         }
+
+         }
+         }
+         End graceful */
 
         //Make sure the orders and balances are ok
         if (!ordersAndBalancesOK) {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-            mightNeedInit = true; 
+            mightNeedInit = true;
         } else {
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
             if (balancesResponse.isPositive()) {
@@ -317,8 +317,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
-            if(Global.options.isAggregate())
-            {
+            if (Global.options.isAggregate()) {
                 gracefullyRefreshOrders(Constant.SELL, false);
             }
         } else {
@@ -334,9 +333,8 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
-            if(Global.options.isAggregate())
-            {
-                TradeUtils.tryKeepProceedingsAside(balancePEG); 
+            if (Global.options.isAggregate()) {
+                TradeUtils.tryKeepProceedingsAside(balancePEG);
                 gracefullyRefreshOrders(Constant.BUY, false);
             }
         } else {
@@ -358,11 +356,11 @@ public class StrategySecondaryPegTask extends TimerTask {
                     long timeout = Global.options.getEmergencyTimeout() * 1000;
                     long wait = 5 * 1000;
                     long count = 0L;
-                    
-                    boolean areAllOrdersCanceled=false;
+
+                    boolean areAllOrdersCanceled = false;
                     do {
                         try {
-                            
+
                             Thread.sleep(wait);
                             areAllOrdersCanceled = TradeUtils.areAllOrdersCanceled();
                             LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
@@ -494,16 +492,14 @@ public class StrategySecondaryPegTask extends TimerTask {
             double oneNBT = Utils.round(1 / Global.conversion, 6);
 
             if (Global.options.isDualSide()) {
-                if (Global.options.isAggregate())
-                {
-                        ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2 && balancePEG < oneNBT  && balanceNBT < 1 )
-                                || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                                || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
-                }
-                else{//Ignore the balance
-                        ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
-                                || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                                || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+                if (Global.options.isAggregate()) {
+                    ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2 && balancePEG < oneNBT && balanceNBT < 1)
+                            || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
+                            || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+                } else {//Ignore the balance
+                    ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
+                            || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
+                            || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
                 }
 
 
@@ -513,12 +509,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                             + " If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 }
             } else {
-                if (Global.options.isAggregate())
-                {
-                     ordersAndBalancesOK = activeSellOrders == 2  && activeBuyOrders == 0  && balanceNBT < 1;
-                }
-                else{
-                     ordersAndBalancesOK = activeSellOrders == 2  && activeBuyOrders == 0 ; // Ignore the balance
+                if (Global.options.isAggregate()) {
+                    ordersAndBalancesOK = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 1;
+                } else {
+                    ordersAndBalancesOK = activeSellOrders == 2 && activeBuyOrders == 0; // Ignore the balance
                 }
             }
         } else {
@@ -531,7 +525,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
         LOG.warning("Strategy received a price change notification.");
         needWallShift = true;
-        Global.conversion = conversion; //TODO should update this value only after its 100% that the wall has been shifted? 
+        Global.conversion = conversion; //TODO should update this value only after its 100% that the wall has been shifted?
         sellPricePEG = new_sellPricePEG;
         buyPricePEG = new_buyPricePEG;
         this.pegPriceDirection = direction;

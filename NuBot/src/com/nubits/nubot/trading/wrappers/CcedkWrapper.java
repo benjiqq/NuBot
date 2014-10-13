@@ -77,7 +77,6 @@ public class CcedkWrapper implements TradeInterface {
     private final String API_GET_INFO = "balance/list"; //post
     private final String API_TRADE = "order/new"; //post
     private final String API_GET_TRADES = "trade/list"; //post
-
     private final String API_ACTIVE_ORDERS = "order/list";
     private final String API_ORDER = "order/info";
     private final String API_CANCEL_ORDER = "order/cancel";
@@ -788,21 +787,20 @@ public class CcedkWrapper implements TradeInterface {
 
         return order;
     }
-    
-    
-     private Trade parseTrade(JSONObject orderObject) {
+
+    private Trade parseTrade(JSONObject orderObject) {
         Trade trade = new Trade();
 
         /*
-            "id":<\d+> AS "trade_id",
-            "pair_id":<\d+>, 
-            "type":<buy|sell>, 
-            "is_buyer":<0|1>, 
-            "is_seller":<0|1>, 
-            "price":<\d{1,8}\.d{0,8}>, 
-            "volume":<\d{1,8}\.d{0,8}>, 
-            "fee":<\d{1,8}\.d{0,8}>, 
-            "created":<\d{10}>
+         "id":<\d+> AS "trade_id",
+         "pair_id":<\d+>,
+         "type":<buy|sell>,
+         "is_buyer":<0|1>,
+         "is_seller":<0|1>,
+         "price":<\d{1,8}\.d{0,8}>,
+         "volume":<\d{1,8}\.d{0,8}>,
+         "fee":<\d{1,8}\.d{0,8}>,
+         "created":<\d{10}>
          */
 
         trade.setId((String) orderObject.get("trade_id"));
@@ -815,7 +813,7 @@ public class CcedkWrapper implements TradeInterface {
         trade.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
         trade.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
 
-     
+
         long date = Long.parseLong(((String) orderObject.get("created")) + "000");
         trade.setDate(new Date(date));
 
@@ -844,14 +842,14 @@ public class CcedkWrapper implements TradeInterface {
         ArrayList<Trade> tradesList = new ArrayList<Trade>();
 
         HashMap<String, String> query_args = new HashMap<>();
-        
+
         String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
-        
+
         long now = System.currentTimeMillis();
-        long yesterday = Math.round((now - 1000*60*60*36)/1000);
+        long yesterday = Math.round((now - 1000 * 60 * 60 * 36) / 1000);
         query_args.put("pair_id", pair_id);
         query_args.put("date_from", Long.toString(yesterday)); //24hours
-        
+
         String queryResult = query(API_BASE_URL, API_GET_TRADES, query_args, false);
 
         /* Sample Answer
@@ -892,7 +890,7 @@ public class CcedkWrapper implements TradeInterface {
                     JSONObject tradeObject = (JSONObject) entities.get(i);
                     Trade tempTrade = parseTrade(tradeObject);
                     tradesList.add(tempTrade);
-                    
+
                 }
                 apiResponse.setResponseObject(tradesList);
 
@@ -903,8 +901,8 @@ public class CcedkWrapper implements TradeInterface {
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
-    
-    
+
+
     }
 
     private class CcedkService implements ServiceInterface {
@@ -937,7 +935,7 @@ public class CcedkWrapper implements TradeInterface {
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet ) {
+        public String executeQuery(boolean needAuth, boolean isGet) {
 
             String answer = "";
             String signature = "";
@@ -954,7 +952,7 @@ public class CcedkWrapper implements TradeInterface {
                     } else {
                         LOG.warning("Re executing query for the " + wrongNonceCounter + " time. "
                                 + "New nonce = " + adjustedNonce
-                                + " while calling : " + method); //TODO, down to log.info when debugging is done
+                                + " while calling : " + method); //TODO, down to log. info when debugging is done
                         nonce = adjustedNonce;
                     }
                     args.put("nonce", nonce);
@@ -1053,7 +1051,7 @@ public class CcedkWrapper implements TradeInterface {
              with a fresh computed nonce
              */
             JSONParser parser = new JSONParser();
-            JSONObject httpAnswerJson = new JSONObject() ;
+            JSONObject httpAnswerJson = new JSONObject();
             try {
                 //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
                 try {
@@ -1072,13 +1070,13 @@ public class CcedkWrapper implements TradeInterface {
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(CcedkWrapper.class.getName()).log(Level.SEVERE, null, ex);
                             }
-                            
+
                             adjustedNonce = TradeUtils.getCCDKEvalidNonce(answer);
-                            
-                            httpAnswerJson = null ;
+
+                            httpAnswerJson = null;
                             errors = null;
                             parser = null;
-                            
+
                             args.remove("nonce");
                             executeQuery(needAuth, isGet); //recursively retry to do the query
                         } else {
@@ -1089,8 +1087,9 @@ public class CcedkWrapper implements TradeInterface {
                 } catch (ClassCastException e) {
                     //Do nothing, all good
                     boolean errors = (boolean) httpAnswerJson.get("errors");
-                    if (errors)
+                    if (errors) {
                         LOG.severe(e.getMessage());
+                    }
                 }
             } catch (ParseException ex) {
                 LOG.severe(answer + " " + ex.getMessage());

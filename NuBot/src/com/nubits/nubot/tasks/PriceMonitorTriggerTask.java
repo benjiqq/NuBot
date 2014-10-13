@@ -49,7 +49,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private double sellPriceUSD, buyPriceUSD;
     private String outputPath;
     private String emailHistory = "";
-    private String priceDirection;
+    private String pegPriceDirection;
+    private double sellPricePEG_old;
+    private double buyPricePEG_old;
 
     @Override
     public void run() {
@@ -215,7 +217,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Compute price for walls
 
             currentWallPEGPrice = lastPrice;
-            computeNewPrices(this.priceDirection);
+            computeNewPrices();
 
         } else {
             LOG.fine("No need to move walls");
@@ -231,30 +233,29 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (percentageDistance < wallchangeThreshold) {
             return false;
         } else {
-            //check if the price increased or decreased
-            if ((last.getPrice().getQuantity() - currentWallPEGprice) > 0) {
-                this.priceDirection = Constant.UP;
-            } else {
-                this.priceDirection = Constant.DOWN;
-            }
-
             return true;
         }
     }
 
-    private void computeNewPrices(String direction) {
+    private void computeNewPrices() {
 
         //Sell-side custodian sell-wall
 
         double peg_price = lastPrice.getPrice().getQuantity();
 
-
         //convert sell price to PEG
-        double sellPricePEG = Utils.round(sellPriceUSD / peg_price, 8);
-        double buyPricePEG = Utils.round(buyPriceUSD / peg_price, 8);
+        double sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, 8);
+        double buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, 8);
 
-        LOG.info(" Sell Price " + sellPricePEG + "\n"
-                + "Buy Price  " + buyPricePEG);
+        //check if the price increased or decreased
+        if ((sellPricePEG_new - sellPricePEG_old) > 0) {
+            this.pegPriceDirection = Constant.UP;
+        } else {
+            this.pegPriceDirection = Constant.DOWN;
+        }
+
+        LOG.info(" Sell Price " + sellPricePEG_new + "\n"
+                + "Buy Price  " + buyPricePEG_new);
 
 
         //------------ here for output csv
@@ -266,15 +267,19 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //Call
 
-        strategy.notifyPriceChanged(sellPricePEG, buyPricePEG, price, direction);
+        strategy.notifyPriceChanged(sellPricePEG_new, buyPricePEG_new, price, pegPriceDirection);
+
+        //Store values in class variable
+        sellPricePEG_old = sellPricePEG_new;
+        buyPricePEG_old = buyPricePEG_new;
 
         String row = new Date() + ","
                 + source + ","
                 + crypto + ","
                 + price + ","
                 + currency + ","
-                + sellPricePEG + ","
-                + buyPricePEG + ",";
+                + sellPricePEG_new + ","
+                + buyPricePEG_new + ",";
 
         String otherPricesAtThisTime = "";
 
@@ -299,8 +304,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
                     + "now is " + price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
                     + "Here are the prices the bot used in the new orders : \n"
-                    + "Sell at " + sellPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "
-                    + "and buy at " + buyPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
+                    + "Sell at " + sellPricePEG_new + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "
+                    + "and buy at " + buyPricePEG_new + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
                     + "\n#########\n"
                     + "Below you can see the history of price changes. You can copy paste to create a csv report."
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
@@ -368,6 +373,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //convert sell price to PEG
         double sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
         double buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+
+        //store it
+        buyPricePEG_old = buyPricePEGInitial;
+        sellPricePEG_old = sellPricePEGInitial;
 
         LOG.info("Converted : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
                 + "; buy @" + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode());
