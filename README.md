@@ -92,7 +92,7 @@ The comand above will unlock the NBT wallet for  9999999999 seconds, ~ 300 years
 
 The bot reads options from a *.json* file.
 
-Here is a list of sssential options : 
+Here is a list of essential options : 
 
 | Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
