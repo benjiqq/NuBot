@@ -1053,11 +1053,11 @@ public class CcedkWrapper implements TradeInterface {
              with a fresh computed nonce
              */
             JSONParser parser = new JSONParser();
-
+            JSONObject httpAnswerJson = new JSONObject() ;
             try {
                 //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
                 try {
-                    JSONObject httpAnswerJson = (JSONObject) (parser.parse(answer));
+                    httpAnswerJson = (JSONObject) (parser.parse(answer));
                     JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
                     if (errors.containsKey("nonce")) {
                         //Detected a nonce error
@@ -1067,14 +1067,20 @@ public class CcedkWrapper implements TradeInterface {
                             LOG.warning("nonce problem detail : " + errors.toJSONString()
                                     + "while calling : " + method);
 
-                            adjustedNonce = TradeUtils.getCCDKEvalidNonce(answer);
                             try {
-                                Thread.sleep(1000);
+                                Thread.sleep(2000);
                             } catch (InterruptedException ex) {
                                 Logger.getLogger(CcedkWrapper.class.getName()).log(Level.SEVERE, null, ex);
                             }
                             
-                            new CcedkService(base, method, args, keys).executeQuery(needAuth, isGet); //recursively retry to do the query
+                            adjustedNonce = TradeUtils.getCCDKEvalidNonce(answer);
+                            
+                            httpAnswerJson = null ;
+                            errors = null;
+                            parser = null;
+                            
+                            args.remove("nonce");
+                            executeQuery(needAuth, isGet); //recursively retry to do the query
                         } else {
                             LOG.severe("Cannot get correct nonce on CCEDK after trying " + MAX_NUMBER_ATTEMPTS + " times."
                                     + "When this happens, try to reset all orders.");
@@ -1082,6 +1088,9 @@ public class CcedkWrapper implements TradeInterface {
                     }
                 } catch (ClassCastException e) {
                     //Do nothing, all good
+                    boolean errors = (boolean) httpAnswerJson.get("errors");
+                    if (errors)
+                        LOG.severe(e.getMessage());
                 }
             } catch (ParseException ex) {
                 LOG.severe(answer + " " + ex.getMessage());
