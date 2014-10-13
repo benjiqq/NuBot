@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
@@ -38,6 +38,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -294,19 +295,18 @@ public class NuRPCClient {
 
                 if (entity != null) {
                     LOG.fine("RPC : Response content length: " + entity.getContentLength());
-                    // System.out.println(EntityUtils.toString(entity));
                 }
             }
             JSONParser parser = new JSONParser();
-            responseJsonObj = (JSONObject) parser.parse(EntityUtils.toString(entity));
+            String entityString = EntityUtils.toString(entity);
+            //LOG.info("Entity = " + entityString); // TODO remove
+            responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
             LOG.severe(e.getMessage());
         } catch (IOException e) {
             LOG.severe(e.getMessage());
-        } catch (ParseException e) {
-            LOG.severe(e.getMessage());
-        } catch (org.json.simple.parser.ParseException e) {
-            LOG.severe(e.getMessage());
+        } catch (ParseException ex) {
+            Logger.getLogger(NuRPCClient.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
             // When HttpClient instance is no longer needed,
             // shut down the connection manager to ensure
@@ -318,11 +318,5 @@ public class NuRPCClient {
 
     private String generateIdentifier() {
         return custodianPublicAddress + "_" + exchangeName + "_" + pair.toString().toUpperCase();
-    }
-
-    private boolean isWalletLocked(JSONObject infoJSON) {
-        boolean toRet = false;
-
-        return toRet;
     }
 }
