@@ -38,6 +38,7 @@ import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
+import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -61,7 +62,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
         runTests();
 
@@ -75,7 +76,7 @@ public class TestWrappers {
         //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
         //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
         //testGetLastPrice(Constant.PPC_BTC);
-        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //If returned in the main currency and not the payment currency, update the checkorders routine
         //testGetActiveOrders(Constant.NBT_PPC);
         //testCancelOrder("681977190");
@@ -87,7 +88,19 @@ public class TestWrappers {
         //testGetPermissions();
         
         //testGetLastTrades(Constant.NBT_PPC);
-        /* stimulating ccedk wrong nonce */
+        
+        /*
+         for (int i = 0; i < 5000; i++) {
+             LOG.info(TradeUtils.getCCDKEvalidNonce());
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         }
+        
+        */
+        //stimulating ccedk wrong nonce 
 
 
         
@@ -101,8 +114,8 @@ public class TestWrappers {
 
             testGetAvailableBalances(Constant.NBT_PPC);
 
-            try {
-                Thread.sleep(100);
+            try { 
+               Thread.sleep(100);
             } catch (InterruptedException ex) {
                 Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -114,7 +127,7 @@ public class TestWrappers {
                 Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        
+       
     }
 
     /*
@@ -350,8 +363,10 @@ public class TestWrappers {
     }
 
     private static void init() {
-        String folderName = "tests_"+System.currentTimeMillis()+"/";
+        String folderName = "testwrappers_"+System.currentTimeMillis()+"/";
         String logsFolder = Global.settings.getProperty("log_path")+folderName;
+        //Create log dir
+        FileSystem.mkdir(logsFolder);
         try {
             NuLogger.setup(false,logsFolder);
         } catch (IOException ex) {

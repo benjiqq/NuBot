@@ -85,7 +85,7 @@ public class TestPriceFeed {
 
     private void execute() {
 
-        String mainFeed = PriceFeedManager.BTCE;
+        String mainFeed = PriceFeedManager.BTER;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 

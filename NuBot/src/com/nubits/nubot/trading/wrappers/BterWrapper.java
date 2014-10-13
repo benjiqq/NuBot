@@ -968,20 +968,19 @@ public class BterWrapper implements TradeInterface {
 
         return order;
     }
-    
-    
+
     private Trade parseTrade(JSONObject orderObject) {
         Trade trade = new Trade();
 
         /*
-        "id":"7942422"
-        "orderid":"38100777"
-        "pair":"ltc_btc"
-        "type":"sell"
-        "rate":"0.01719"
-        "amount":"0.0588"
-        "time":"06-12 02:49:11"
-        "time_unix":"1402512551"
+         "id":"7942422"
+         "orderid":"38100777"
+         "pair":"ltc_btc"
+         "type":"sell"
+         "rate":"0.01719"
+         "amount":"0.0588"
+         "time":"06-12 02:49:11"
+         "time_unix":"1402512551"
          */
 
         trade.setId((String) orderObject.get("id"));
@@ -996,9 +995,9 @@ public class BterWrapper implements TradeInterface {
         trade.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), cp.getOrderCurrency()));
         trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
 
-   
+
         long date = Long.parseLong(((String) orderObject.get("time_unix")) + "000");
-        trade.setDate(new Date(date)); 
+        trade.setDate(new Date(date));
 
         return trade;
     }
@@ -1014,31 +1013,31 @@ public class BterWrapper implements TradeInterface {
         /* Sample response
          *{
          {
-		"result":true,
-		"trades":[
-		    {
-		      "id":"7942422"
-		      "orderid":"38100777"
-		      "pair":"ltc_btc"
-		      "type":"sell"
-		      "rate":"0.01719"
-		      "amount":"0.0588"
-		      "time":"06-12 02:49:11"
-		      "time_unix":"1402512551"
-		    }
-		    {
-		      "id":"7942422"
-		      "orderid":"38100491"
-		      "pair":"ltc_btc"
-		      "type":"buy"
-		      "rate":"0.01719"
-		      "amount":"0.0588"
-		      "time":"06-12 02:49:11"
-		      "time_unix":"1402512551"
-		    }
-	  	]
-	  	"msg":"Success"
-	}
+         "result":true,
+         "trades":[
+         {
+         "id":"7942422"
+         "orderid":"38100777"
+         "pair":"ltc_btc"
+         "type":"sell"
+         "rate":"0.01719"
+         "amount":"0.0588"
+         "time":"06-12 02:49:11"
+         "time_unix":"1402512551"
+         }
+         {
+         "id":"7942422"
+         "orderid":"38100491"
+         "pair":"ltc_btc"
+         "type":"buy"
+         "rate":"0.01719"
+         "amount":"0.0588"
+         "time":"06-12 02:49:11"
+         "time_unix":"1402512551"
+         }
+         ]
+         "msg":"Success"
+         }
          */
 
         String queryResult = query(path, query_args, false);
@@ -1084,7 +1083,7 @@ public class BterWrapper implements TradeInterface {
                 for (int i = 0; i < orders.size(); i++) {
                     JSONObject tradeObject = (JSONObject) orders.get(i);
                     Trade tempTrade = parseTrade(tradeObject);
-                    tradeList.add(tempTrade); 
+                    tradeList.add(tempTrade);
                 }
                 apiResponse.setResponseObject(tradeList);
 
@@ -1096,7 +1095,7 @@ public class BterWrapper implements TradeInterface {
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
             return apiResponse;
         }
-    
+
     }
 
     private class BterService implements ServiceInterface {
