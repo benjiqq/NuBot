@@ -75,7 +75,7 @@ rpcport=9091
 rpcallowip=<ip_of_machine_running_the_bot>
 ```
 
-*NOTE: if using NuBot and NuBits on the same machine, the last parameter can be ignored*
+*NOTE: if using NuBot and NuBits on the same machine, the last parameter must be set to 127.0.0.1*
 
 Launch Nu client and , if the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Also, make sure that the NuBit client controls a public address which received a custodian grants.
 
