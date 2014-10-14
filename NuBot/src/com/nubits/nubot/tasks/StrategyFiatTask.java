@@ -26,7 +26,7 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
-import com.nubits.nubot.utils.TradeUtils;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
 import java.util.TimerTask;
