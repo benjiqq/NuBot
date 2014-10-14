@@ -28,7 +28,7 @@ import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.pricefeed.PriceFeedManager;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.CheckOrdersTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
