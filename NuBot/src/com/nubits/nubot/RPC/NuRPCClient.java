@@ -299,7 +299,7 @@ public class NuRPCClient {
             }
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
-            //LOG.info("Entity = " + entityString); // TODO remove
+            LOG.info("Entity = " + entityString); // TODO remove
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
             LOG.severe(e.getMessage());
