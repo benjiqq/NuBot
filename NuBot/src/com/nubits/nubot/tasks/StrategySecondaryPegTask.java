@@ -67,6 +67,9 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (shiftSuccess) {
                 mightNeedInit = false;
                 needWallShift = false;
+                LOG.info("Wall shift successful");
+            } else {
+                LOG.severe("Wall shift failed");
             }
             recount();
         }
@@ -153,8 +156,6 @@ public class StrategySecondaryPegTask extends TimerTask {
          End graceful */
 
         //Make sure the orders and balances are ok or try to aggregate
-
-
         if (!ordersAndBalancesOK) {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true;
@@ -586,14 +587,20 @@ public class StrategySecondaryPegTask extends TimerTask {
                 success = false;
             }
         } else {
-            //TODO
             success = false;
         }
-        try {
-            //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-            //TODO what happens if in the meantime this bots receives a new price change notification?
 
-            Thread.sleep(wait_time);
+        if (success) { //Only move the second type of order if sure that the first have been taken down
+            try {
+                //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
+                //TODO what happens if in the meantime this bots receives a new price change notification?
+
+                Thread.sleep(wait_time);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.getMessage());
+                success = false;
+            }
+
             //Cancel active <waitAndShiftOrderType> orders
             boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType);
 
@@ -603,13 +610,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                     success = false;
                 }
             } else {
-                //TODO
                 success = false;
             }
-        } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
-            success = false;
         }
+
         return success;
     }
 
