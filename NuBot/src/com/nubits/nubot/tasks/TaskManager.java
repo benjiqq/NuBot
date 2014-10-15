@@ -51,17 +51,17 @@ public class TaskManager {
     public TaskManager() {
         this.running = false;
         taskList = new ArrayList<BotTask>();
-        //assign default values in case are not defined in options.json
-        int checkOrdersInterval = 30,
-                checkbalanceInterval = 30,
-                checkPriceInterval = 61;
+        //assign default values just for testing without Global.options loaded
+        int sendLiquidityInterval = 181,
+                executeStrategyInterval = 41,
+                checkPriceInterval = 81;
 
         boolean verbose = false;
 
         if (Global.options != null) {
             //If global option have been loaded
-            checkOrdersInterval = Global.options.getCheckOrdersInteval();
-            checkbalanceInterval = Global.options.getCheckBalanceInterval();
+            sendLiquidityInterval = Global.options.getSendLiquidityInteval();
+            executeStrategyInterval = Global.options.getExecuteStrategyInterval();
             verbose = Global.options.isVerbose();
             if (Global.options.getSecondaryPegOptions() != null) {
                 //If global option have been loaded
@@ -75,7 +75,7 @@ public class TaskManager {
         taskList.add(checkConnectionTask);
 
         checkOrdersTask = new BotTask(
-                new SendLiquidityinfoTask(verbose), checkOrdersInterval, "checkOrders"); //true for verbosity
+                new SendLiquidityinfoTask(verbose), sendLiquidityInterval, "checkOrders"); //true for verbosity
         taskList.add(checkOrdersTask);
 
         checkNudTask = new BotTask(
@@ -83,11 +83,11 @@ public class TaskManager {
         taskList.add(checkNudTask);
 
         strategyFiatTask = new BotTask(
-                new StrategyFiatTask(), checkbalanceInterval, STRATEGY_FIAT);
+                new StrategyFiatTask(), executeStrategyInterval, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
 
         secondaryPegTask = new BotTask(
-                new StrategySecondaryPegTask(), checkbalanceInterval, STRATEGY_CRYPTO);
+                new StrategySecondaryPegTask(), executeStrategyInterval, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
 
         priceTriggerTask = new BotTask(
@@ -95,7 +95,7 @@ public class TaskManager {
         taskList.add(secondaryPegTask);
 
         priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), checkbalanceInterval, STRATEGY_CRYPTO);
+                new NuPriceMonitorTask(), checkPriceInterval, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
         initialized = true;

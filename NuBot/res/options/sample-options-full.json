@@ -15,8 +15,6 @@
     "executeorders":true,
     "verbose":false,
     "pair":"xxx_yyy",
-    "check-balance-interval":45,
-    "check-orders-interval":60,
     "hipchat":false,
     "mail-notifications":false,
     "mail-recipient":"xxx",
@@ -31,7 +29,6 @@
                 "backup2" : { "name" : "coinbase"},
                 "backup3" : { "name" : "btce"}
                 },
-            "refresh-time":60,
             "wallchange-treshold": 3,
             "price-distance-threshold":10
          }

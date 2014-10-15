@@ -94,7 +94,7 @@ public class SecondaryPegOptionsJSON {
 
             //Then parse optional settings. If not use the default value declared here
 
-            int refreshTime = 124;
+            int refreshTime = 81;
             double wallchangeTreshold = 3;
             double priceOffset = 0;
             double distanceTreshold = 10;
@@ -103,21 +103,23 @@ public class SecondaryPegOptionsJSON {
                 wallchangeTreshold = new Double((optionsJSON.get("wallchange-treshold")).toString());
             }
 
-             // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
+            // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
 
-             if (optionsJSON.has("price-offset")) {
-             priceOffset = new Double((optionsJSON.get("price-offset")).toString());
-             }
-             
+            if (optionsJSON.has("price-offset")) {
+                priceOffset = new Double((optionsJSON.get("price-offset")).toString());
+            }
+
 
             if (optionsJSON.has("price-distance-threshold")) {
                 distanceTreshold = new Double((optionsJSON.get("price-distance-threshold")).toString());
             }
 
 
-            if (optionsJSON.has("refresh-time")) {
-                refreshTime = new Integer((optionsJSON.get("refresh-time")).toString());
-            }
+            /* ignore the refresh-time parameter to avoid single custodians checking faster than others (causing self-executing orders)
+             if (optionsJSON.has("refresh-time")) {
+             refreshTime = new Integer((optionsJSON.get("refresh-time")).toString());
+             }
+             */
 
             return new SecondaryPegOptionsJSON(refreshTime, wallchangeTreshold, priceOffset, distanceTreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
