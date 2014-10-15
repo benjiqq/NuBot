@@ -69,6 +69,7 @@ The bot communicates with the Nu client via RCP over HTTP. If you plan to run th
 
 
 ```
+server=1
 rpcuser=<your_username>
 rpcpassword=<your_password>
 rpcport=9091
@@ -165,7 +166,6 @@ It is sufficient to add a JSON object in the standard options file structured in
                 "backup2" : { "name" : "coinbase"},
                 "backup3" : { "name" : "blockchain"}
                 },
-            "refresh-time":65,
             "wallchange-treshold": 0.1,
             "price-distance-threshold":10       
          }
@@ -177,7 +177,6 @@ It is sufficient to add a JSON object in the standard options file structured in
 | ------------- |:-------------:| -----:|
 | main-feed     | the name of the main price feed that has priority over the others | **see following table |
 | backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
-| refresh-time |  time interval between price peg refreshing .  |   integer (seconds) . Minimum 61, several API do not even refresh faster than that. For fiat, minimum allowed is 8 hours , 28800 seconds  |
 | wallchange-treshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 | price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
@@ -213,8 +212,6 @@ NuBot can be further configured by adding additional parameters to its config fi
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |
 | sendrpc    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
-| check-balance-interval   | 45 |   seconds between two checkBalance operations, which triggers bot orders | int (seconds) |
-| check-orders-interval    | 60 |  seconds between two checkOrders operations, which triggers liquidityinfo RPC call |  int (seconds)|
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
