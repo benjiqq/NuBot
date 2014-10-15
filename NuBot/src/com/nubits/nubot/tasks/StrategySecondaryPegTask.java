@@ -53,6 +53,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void run() {
         LOG.fine("Executing task : StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
+
         recount(); //Count number of active sells and buys
 
         boolean shiftSuccess = false;
@@ -171,11 +172,11 @@ public class StrategySecondaryPegTask extends TimerTask {
                             + balancePEG.getQuantity() + " " + balancePEG.getCurrency());
 
                     //Execute sellSide strategy
-                    sellSide(balanceNBT);
+                    aggregateSellSide(balanceNBT);
 
                     //Execute buy Side strategy
                     if (Global.isDualSide) {
-                        buySide(balancePEG);
+                        aggregateBuySide(balancePEG);
                     }
 
                 } else {
@@ -200,7 +201,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
     }
 
-    private void sellSide(Amount balanceNBT) {
+    private void aggregateSellSide(Amount balanceNBT) {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
@@ -211,7 +212,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
     }
 
-    private void buySide(Amount balancePEG) {
+    private void aggregateBuySide(Amount balancePEG) {
         //----------------------PEG (Buys)----------------------------
         //Check if PEG balance > 1
         double oneNBT = Utils.round(1 / Global.conversion, 6);
@@ -416,22 +417,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.priceDirection = direction;
     }
 
-    public double getSellPricePEG() {
-        return sellPricePEG;
-    }
-
-    public void setSellPricePEG(double sellPricePEG) {
-        this.sellPricePEG = sellPricePEG;
-    }
-
-    public double getBuyPricePEG() {
-        return buyPricePEG;
-    }
-
-    public void setBuyPricePEG(double buyPricePEG) {
-        this.buyPricePEG = buyPricePEG;
-    }
-
     //set shift to true only when a wall shift is needed. set it to false when its simply an order aggregation
     private boolean gracefullyRefreshOrders(String type, boolean shift) {
         LOG.info("executing graceful refresh. Shift = " + shift);
@@ -571,6 +556,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     private boolean shiftWalls() {
         boolean success = true;
+
         long wait_time = (1000 * (80 + 40 + 10)); // this is with priceRefresh 80, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
         //fix prices, so that if they change during wait time, this wall shift is not affected.
@@ -733,5 +719,22 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         return success;
+    }
+
+    //Getters and setters
+    public double getSellPricePEG() {
+        return sellPricePEG;
+    }
+
+    public void setSellPricePEG(double sellPricePEG) {
+        this.sellPricePEG = sellPricePEG;
+    }
+
+    public double getBuyPricePEG() {
+        return buyPricePEG;
+    }
+
+    public void setBuyPricePEG(double buyPricePEG) {
+        this.buyPricePEG = buyPricePEG;
     }
 }
