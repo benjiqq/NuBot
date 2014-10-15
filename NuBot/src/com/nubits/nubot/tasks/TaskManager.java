@@ -75,7 +75,7 @@ public class TaskManager {
         taskList.add(checkConnectionTask);
 
         checkOrdersTask = new BotTask(
-                new CheckOrdersTask(verbose), checkOrdersInterval, "checkOrders"); //true for verbosity
+                new SendLiquidityinfoTask(verbose), checkOrdersInterval, "checkOrders"); //true for verbosity
         taskList.add(checkOrdersTask);
 
         checkNudTask = new BotTask(

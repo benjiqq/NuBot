@@ -29,7 +29,7 @@ import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.CheckOrdersTask;
+import com.nubits.nubot.tasks.SendLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -181,7 +181,7 @@ public class NuBot {
         
 
         String orders_outputPath =  logsFolder + "orders_history.csv";
-        ((CheckOrdersTask) (Global.taskManager.getCheckOrdersTask().getTask())).setOutputFile(orders_outputPath);
+        ((SendLiquidityinfoTask) (Global.taskManager.getCheckOrdersTask().getTask())).setOutputFile(orders_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
 
         
