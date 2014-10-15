@@ -70,13 +70,14 @@ The bot communicates with the Nu client via RCP over HTTP. If you plan to run th
 
 ```
 server=1
-rpcuser=<your_username>
-rpcpassword=<your_password>
+rpcuser=<choose-a-username>
+rpcpassword=<choose-a-pass>
+port=9090
 rpcport=9091
 rpcallowip=<ip_of_machine_running_the_bot>
 ```
 
-*NOTE: if using NuBot and NuBits on the same machine, the last parameter must be set to 127.0.0.1*
+*NOTE: if using NuBot and NuBits on the same machine, the last parameter can be omitted*
 
 Launch Nu client and , if the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Also, make sure that the NuBit client controls a public address which received a custodian grants.
 
