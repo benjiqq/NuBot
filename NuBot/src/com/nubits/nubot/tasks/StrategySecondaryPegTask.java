@@ -188,9 +188,15 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     private void placeInitialWalls() {
         boolean buysOrdersOk = true;
-        boolean sellsOrdersOk = initOrders(Constant.SELL);
+        boolean sellsOrdersOk = initOrders(Constant.SELL, sellPricePEG);
         if (Global.options.isDualSide()) {
-            buysOrdersOk = initOrders(Constant.BUY);
+            buysOrdersOk = initOrders(Constant.BUY, buyPricePEG);
+        }
+
+        if (buysOrdersOk && sellsOrdersOk) {
+            mightNeedInit = false;
+        } else {
+            mightNeedInit = true;
         }
     }
 
@@ -565,24 +571,33 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     private boolean shiftWalls() {
         boolean success = true;
-        long wait_time = (1000 * 125);
+        long wait_time = (1000 * (80 + 40 + 10)); // this is with priceRefresh 80, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
+        //fix prices, so that if they change during wait time, this wall shift is not affected.
+        double sellPrice = sellPricePEG;
+        double buyPrice = buyPricePEG;
 
         String shiftImmediatelyOrderType;
         String waitAndShiftOrderType;
+        double priceImmediatelyType;
+        double priceWaitType;
 
         if (priceDirection.equals(Constant.UP)) {
             shiftImmediatelyOrderType = Constant.SELL;
             waitAndShiftOrderType = Constant.BUY;
+            priceImmediatelyType = sellPrice;
+            priceWaitType = buyPrice;
         } else {
             shiftImmediatelyOrderType = Constant.BUY;
             waitAndShiftOrderType = Constant.SELL;
+            priceImmediatelyType = buyPrice;
+            priceWaitType = sellPrice;
         }
 
         //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
         boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType);
         if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
-            boolean init1 = initOrders(shiftImmediatelyOrderType);
+            boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
             if (!init1) {
                 success = false;
             }
@@ -605,7 +620,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType);
 
             if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
-                boolean init2 = initOrders(waitAndShiftOrderType);
+                boolean init2 = initOrders(waitAndShiftOrderType, priceWaitType);
                 if (!init2) {
                     success = false;
                 }
@@ -617,7 +632,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         return success;
     }
 
-    private boolean initOrders(String type) {
+    private boolean initOrders(String type, double price) {
         boolean success = true;
         Amount balance = null;
         //Update the available balance
@@ -644,8 +659,13 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (balance.getQuantity() > oneNBT) {
                 // Divide the  balance 50% 50% in balance1 and balance2
 
-                double balance1 = Utils.round(balance.getQuantity() / 2, 6);
-                double balance2 = balance.getQuantity() - balance1;
+                double amount1 = Utils.round(balance.getQuantity() / 2, 6);
+                double amount2 = balance.getQuantity() - amount1;
+
+                if (type.equals(Constant.BUY)) {
+                    amount1 = Utils.round(amount1 / price, 6);
+                    amount2 = Utils.round(amount2 / price, 6);
+                }
 
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
@@ -655,21 +675,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                     //Prepare the orders
-
-                    double amount1;
-                    double amount2;
-                    double price;
-
-                    if (type.equals(Constant.SELL)) {
-                        amount1 = balance1;
-                        amount2 = balance2;
-                        price = sellPricePEG;
-
-                    } else {
-                        amount1 = Utils.round(balance1 / buyPricePEG, 6);
-                        amount2 = Utils.round(balance2 / buyPricePEG, 6);
-                        price = buyPricePEG;
-                    }
 
                     String orderString1 = type + " " + amount1 + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
