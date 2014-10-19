@@ -43,7 +43,9 @@ import java.util.Date;
 import java.util.logging.Logger;
 
 /**
- *
+ * Provides the main class of NuBot.
+ * Instantiate this class to start the NuBot program 
+ * 
  * @author desrever <desrever at nubits.com>
  */
 public class NuBot {
@@ -53,6 +55,14 @@ public class NuBot {
     private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
+    /**
+     * Initialises the NuBot.
+     * Check if NuBot has valid parameters and quit if it doesn't
+     * Check if NuBot is already running and Log if that is so
+     * 
+     * @author desrever <desrever at nubits.com>
+     * @param args a list of valid arguments
+     */
     public static void main(String args[]) {
         mainThread = Thread.currentThread();
 
@@ -70,7 +80,11 @@ public class NuBot {
             System.exit(0);
         }
     }
-
+    
+    /**
+     * 
+     * @author desrever <desrever at nubits.com>
+     */
     private void execute() {
         Global.running = true;
 

@@ -20,7 +20,7 @@ package com.nubits.nubot.global;
 /**
  * Important : After filling variables, Rename this class to Passwords.java
  */
-public class PasswordsSample {
+public class Passwords {
 
     public static final String NUD_RPC_USER = "xxx";
     public static final String NUD_RPC_PASS = "xxx";
