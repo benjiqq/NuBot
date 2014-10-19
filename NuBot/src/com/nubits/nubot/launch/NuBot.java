@@ -29,6 +29,7 @@ import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
+import com.nubits.nubot.tasks.CheckOrdersTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -39,7 +40,6 @@ import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
-import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -52,6 +52,7 @@ public class NuBot {
 
     private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
     private String optionsPath;
+    private String logsFolder;
     private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
@@ -91,9 +92,7 @@ public class NuBot {
         //Load settings
         Utils.loadProperties("settings.properties");
 
-        //Create log dir
-        FileSystem.mkdir(Global.settings.getProperty("log_path"));
-
+      
         //Load Options
         Global.options = OptionsJSON.parseOptions(optionsPath);
         if (Global.options == null) {
@@ -103,9 +102,15 @@ public class NuBot {
         Utils.printSeparator();
 
 
-
+        //Setting up log folder for this session :
+        
+        String folderName = "NuBot_"+System.currentTimeMillis()+"_"+Global.options.getExchangeName()+"_"+Global.options.getPair().toString().toUpperCase()+"/";
+        logsFolder = Global.settings.getProperty("log_path")+folderName;
+        
+        //Create log dir
+        FileSystem.mkdir(logsFolder);
         try {
-            NuLogger.setup(Global.options.isVerbose());
+            NuLogger.setup(Global.options.isVerbose(),logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
@@ -186,6 +191,14 @@ public class NuBot {
         }
 
 
+        //Set the fileoutput for active orders
+        
+
+        String orders_outputPath =  logsFolder + "orders_history.csv";
+        ((CheckOrdersTask) (Global.taskManager.getCheckOrdersTask().getTask())).setOutputFile(orders_outputPath);
+        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
+
+        
         //Start task to check orders
         Global.taskManager.getCheckOrdersTask().start(13);
 
@@ -281,12 +294,13 @@ public class NuBot {
                 //Set the wallet shift threshold
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeTreshold());
 
-                //Set the outputpath
+                //Set the outputpath for wallshifts
 
-                String outputPath = Global.settings.getProperty("log_path") + "wall_shifts" + new Date().getTime() + ".csv";
+                String outputPath = logsFolder + "wall_shifts.csv";
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
                 FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
+                
                 //set the interval from options
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
 
@@ -297,6 +311,10 @@ public class NuBot {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
             System.exit(0);
         }
+        
+        
+       
+        
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";

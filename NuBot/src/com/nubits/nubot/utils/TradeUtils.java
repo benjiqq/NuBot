@@ -37,6 +37,7 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -193,17 +194,45 @@ public class TradeUtils {
     public static String getCCDKEvalidNonce() {
         //It tries to send a wrong nonce, get the allowed window, and use it for the actuall call
         String wrongNonce = "1234567891";
-        try {
-            String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce);
-            return getCCDKEvalidNonce(htmlString);
-        } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+        int MAX_ATTEMPTS = 5;
+        int failed_attemps = 0;
+        String validNonce ="retry";
+        do
+        {
+            try {
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce);
+                validNonce = getCCDKEvalidNonce(htmlString);
+                
+                if(validNonce.equals("retry")){
+                    try {   
+                            failed_attemps++;
+                            LOG.warning("Failed attempt "+failed_attemps);
+                            Thread.sleep(2000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(TradeUtils.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+            } catch (IOException ex) {
+                LOG.severe(ex.getMessage());
+                return wrongNonce;
+            }
         }
-        return wrongNonce;
+        while(validNonce.equals("retry") && failed_attemps<=MAX_ATTEMPTS);
+        
+        if(failed_attemps<=MAX_ATTEMPTS)
+        {            
+            return validNonce;
+        }
+        else 
+        {
+            LOG.severe("Returning wrongNonce");
+            return wrongNonce; //too many attempts
+        }
     }
 
     //used by ccedkqueryservice
     public static String getCCDKEvalidNonce(String htmlString){
+        
         JSONParser parser = new JSONParser();
             try {
                 //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
@@ -213,9 +242,20 @@ public class TradeUtils {
 
                 String startStr = " must be from";
                 int indexStart = nonceError.lastIndexOf(startStr) + startStr.length() + 2;
-                String subStr = nonceError.substring(indexStart, indexStart + 10);
+                String from = nonceError.substring(indexStart, indexStart + 10);
+                
+                
+                String startStr2 = " till";
+                int indexStart2 = nonceError.lastIndexOf(startStr2) + startStr2.length() + 2;
+                String to = nonceError.substring(indexStart2, indexStart2 + 10);
 
-                return subStr;
+                if(to.equals(from))
+                {
+                    LOG.info("Detected ! " + to + " = "+ from );
+                    return "retry";
+                }
+                
+                return from;
             } catch (ParseException ex) {
                 LOG.severe(htmlString+" "+ex.getMessage());
                 return "1234567891";

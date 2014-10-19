@@ -114,7 +114,8 @@
           </copy>
           
           
-          <copy file="res/options/sample-options-reduced.json" tofile="${store.dir}/options-sample.json"/>
+          <copy file="res/options/sample-options-reduced.json" tofile="${store.dir}/options-sample-min.json"/>
+          <copy file="res/options/sample-options-full.json" tofile="${store.dir}/options-sample-extended.json"/>
 
           
           <copy file="../LICENSE.md" tofile="${store.dir}/res/sources/LICENSE.md"/>
@@ -124,7 +125,6 @@
        
        <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
 
-        <file file="res/options/sample-options-reduced.json"/>
         
         <mkdir dir="${store.dir}/logs"/>
 

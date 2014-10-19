@@ -243,12 +243,9 @@ public class NuPriceMonitorTask extends TimerTask {
     }
 
     private void computePrices() {
-
-
         //Sell-side custodian sell-wall
 
         double peg_price = lastPrice.getPrice().getQuantity();
-
 
         //convert sell price to PEG
         double sellPricePEG = Utils.round(sellPriceUSDsingleside / peg_price, 8);
@@ -261,11 +258,7 @@ public class NuPriceMonitorTask extends TimerTask {
                 + "Buy Price  " + buyPricePEG);
 
 
-
-
-
         //------------ here for output csv
-
         String source = currentWallPEGPrice.getSource();
         double price = currentWallPEGPrice.getPrice().getQuantity();
         String currency = currentWallPEGPrice.getPrice().getCurrency().getCode();
@@ -325,7 +318,6 @@ public class NuPriceMonitorTask extends TimerTask {
         }
         FileSystem.writeToFile(row, outputPath, true);
 
-
         //HTML logging
         /*
          String preHTML = "        <tbody>\n"
@@ -357,7 +349,6 @@ public class NuPriceMonitorTask extends TimerTask {
 
          FileSystem.writeToFile(preHTML + bodyHTML + footerHTML, outputPath + ".html", true);
          */
-
     }
 
     public double getWallchangeThreshold() {

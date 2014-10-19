@@ -53,19 +53,38 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         recount(); //Count number of active sells and buys
 
-        if (mightNeedInit) {
-            boolean reinitiateSuccess = true;
-            if (!(ordersAndBalancesOK)) {
+        if(needWallShift){
+                String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+                            + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+                HipChatNotifications.sendMessage(message, Color.PURPLE);
+                LOG.warning(message);
+            }
+        
+        if (mightNeedInit || needWallShift) {
+            
+            boolean reinitiateSuccess ;
+            
+            boolean reset = ( needWallShift )
+                    || mightNeedInit && !(ordersAndBalancesOK)  ;
+            if (reset) {
                 reinitiateSuccess = reInitiateOrders();
                 if (reinitiateSuccess) {
                     mightNeedInit = false;
+                    needWallShift = false;
                 }
             } else {
                 LOG.fine("No need to init new orders since current orders seems correct");
             }
             recount();
-        } else {
+        } 
+
+            
+         /* this was the graceful shift. Restore after standard shifts has been properly tested 
+         else {
             if (needWallShift) {
+                
+               
+                
                 //Secondary peg price changed, need to shift walls
                 boolean reinitiateSuccess = true;
 
@@ -108,7 +127,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                         needWallShift = false;
                         //Here I should wait until the two orders are correctly displaied. It can take some seconds
                         try {
-                            Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+                            Thread.sleep(10 * 1000); //TODO wait a dynamic interval.
                         } catch (InterruptedException ex) {
                             LOG.severe(ex.getMessage());
                         }
@@ -118,16 +137,19 @@ public class StrategySecondaryPegTask extends TimerTask {
                         boolean reinitiateSuccess2 = reInitiateOrders();
                         if (reinitiateSuccess2) {
                             mightNeedInit = false;
+                            needWallShift = false;
                         }
                     }
                 }
+               
             }
         }
+        End graceful */
 
         //Make sure the orders and balances are ok
         if (!ordersAndBalancesOK) {
             LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-            mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
+            mightNeedInit = true; 
         } else {
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
             if (balancesResponse.isPositive()) {
@@ -227,7 +249,8 @@ public class StrategySecondaryPegTask extends TimerTask {
                 pegBalance = TradeUtils.removeFrozenAmount((Amount) pegBalanceResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
 
 
-                if (pegBalance.getQuantity() > 0.0001) {
+                double oneNBT = Utils.round(1 / Global.conversion, 6);
+                if (pegBalance.getQuantity() > oneNBT) {
                     // Divide the  balance 50% 50% in balance1 and balance2
                     double pegBalance1 = Utils.round(pegBalance.getQuantity() / 2, 4);
                     double pegBalance2 = pegBalance.getQuantity() - pegBalance1;
@@ -294,7 +317,10 @@ public class StrategySecondaryPegTask extends TimerTask {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
-            gracefullyRefreshOrders(Constant.SELL, false);
+            if(Global.options.isAggregate())
+            {
+                gracefullyRefreshOrders(Constant.SELL, false);
+            }
         } else {
             //NBT balance = 0
             LOG.fine("NBT balance < 1, no orders to execute");
@@ -308,8 +334,11 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
-            TradeUtils.tryKeepProceedingsAside(balancePEG);
-            gracefullyRefreshOrders(Constant.BUY, false);
+            if(Global.options.isAggregate())
+            {
+                TradeUtils.tryKeepProceedingsAside(balancePEG); 
+                gracefullyRefreshOrders(Constant.BUY, false);
+            }
         } else {
             //PEG balance = 0
             LOG.fine(balancePEG.getCurrency().getCode() + "balance < 1, no orders to execute");
@@ -327,18 +356,23 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Wait until there are no active orders
                     boolean timedOut = false;
                     long timeout = Global.options.getEmergencyTimeout() * 1000;
-                    long wait = 6 * 1000;
+                    long wait = 5 * 1000;
                     long count = 0L;
+                    
+                    boolean areAllOrdersCanceled=false;
                     do {
                         try {
+                            
                             Thread.sleep(wait);
+                            areAllOrdersCanceled = TradeUtils.areAllOrdersCanceled();
+                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
                             count += wait;
                             timedOut = count > timeout;
 
                         } catch (InterruptedException ex) {
                             LOG.severe(ex.getMessage());
                         }
-                    } while (!TradeUtils.areAllOrdersCanceled() && !timedOut);
+                    } while (!areAllOrdersCanceled && !timedOut);
 
                     if (timedOut) {
                         String message = "There was a problem cancelling all existing orders";
@@ -460,28 +494,44 @@ public class StrategySecondaryPegTask extends TimerTask {
             double oneNBT = Utils.round(1 / Global.conversion, 6);
 
             if (Global.options.isDualSide()) {
+                if (Global.options.isAggregate())
+                {
+                        ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2 && balancePEG < oneNBT  && balanceNBT < 1 )
+                                || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
+                                || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+                }
+                else{//Ignore the balance
+                        ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
+                                || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
+                                || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+                }
 
-                ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
-                        || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
-
-                if (balancePEG > oneNBT) {
-                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
-                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                if (balancePEG > oneNBT && Global.options.isAggregate()) {
+                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If this is the first executeion, ignore this message. "
+                            + "If the balance represent proceedings from a sale the bot will notice. "
+                            + " If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 }
             } else {
-                ordersAndBalancesOK = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 1;
+                if (Global.options.isAggregate())
+                {
+                     ordersAndBalancesOK = activeSellOrders == 2  && activeBuyOrders == 0  && balanceNBT < 1;
+                }
+                else{
+                     ordersAndBalancesOK = activeSellOrders == 2  && activeBuyOrders == 0 ; // Ignore the balance
+                }
             }
         } else {
             LOG.severe(balancesResponse.getError().toString());
         }
+
+        mightNeedInit = !ordersAndBalancesOK;
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
         LOG.warning("Strategy received a price change notification.");
         needWallShift = true;
-        Global.conversion = conversion;
+        Global.conversion = conversion; //TODO should update this value only after its 100% that the wall has been shifted? 
         sellPricePEG = new_sellPricePEG;
         buyPricePEG = new_buyPricePEG;
         this.pegPriceDirection = direction;
@@ -590,8 +640,8 @@ public class StrategySecondaryPegTask extends TimerTask {
                 double price = 0;
 
                 if (type.equalsIgnoreCase(Constant.BUY)) {
-                    amount = balancePEG.getQuantity() / buyPricePEG;
-
+                    amount = Utils.round(balancePEG.getQuantity() / buyPricePEG, 6);
+                    price = buyPricePEG;
                 } else if (type.equalsIgnoreCase(Constant.SELL)) {
                     amount = balanceNBT.getQuantity();
                     price = sellPricePEG;
@@ -605,8 +655,13 @@ public class StrategySecondaryPegTask extends TimerTask {
                     String orderString = type + " " + amount + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
                     LOG.warning("Strategy : Submit order : " + orderString);
+                    ApiResponse response;
+                    if (type.equalsIgnoreCase(Constant.SELL)) {
+                        response = Global.exchange.getTrade().sell(Global.options.getPair(), amount, price);
+                    } else {
+                        response = Global.exchange.getTrade().buy(Global.options.getPair(), amount, price);
+                    }
 
-                    ApiResponse response = Global.exchange.getTrade().sell(Global.options.getPair(), amount, price);
                     if (response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
                         String responseString = (String) response.getResponseObject();

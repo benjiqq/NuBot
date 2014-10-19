@@ -23,7 +23,9 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.utils.FileSystem;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
@@ -36,6 +38,7 @@ public class CheckOrdersTask extends TimerTask {
 
     private static final Logger LOG = Logger.getLogger(CheckOrdersTask.class.getName());
     private boolean verbose;
+    private String outputFile;
 
     public CheckOrdersTask(boolean verbose) {
         this.verbose = verbose;
@@ -49,11 +52,11 @@ public class CheckOrdersTask extends TimerTask {
     //Taken the input exchange, updates it and returns it.
 
     private void checkOrders() {
-        ApiResponse activeOrdersUSDNTBResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersUSDNTBResponse.isPositive()) {
-            ArrayList<Order> orderListUSDNBT = (ArrayList<Order>) activeOrdersUSDNTBResponse.getResponseObject();
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.fine("Active orders : " + orderListUSDNBT.size());
+            LOG.fine("Active orders : " + orderList.size());
 
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
@@ -62,8 +65,12 @@ public class CheckOrdersTask extends TimerTask {
 
             double nbt_onsell = 0;
             double nbt_onbuy = 0;
-            for (int i = 0; i < orderListUSDNBT.size(); i++) {
-                Order tempOrder = orderListUSDNBT.get(i);
+            int sells = 0;
+            int buys = 0;
+            String digest = "";
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                digest = digest+ tempOrder.getDigest();
                 double toAdd = tempOrder.getAmount().getQuantity();
                 if (verbose) {
                     LOG.fine(tempOrder.toString());
@@ -72,13 +79,15 @@ public class CheckOrdersTask extends TimerTask {
                 if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
                     //Start summing up amounts of NBT
                     nbt_onsell += toAdd;
+                    sells++;
                 } else if (tempOrder.getType().equalsIgnoreCase(Constant.BUY)) {
                     //Start summing up amounts of NBT
                     nbt_onbuy += toAdd;
+                    buys++;
                 }
             }
             //Update the order
-            Global.exchange.getLiveData().setOrdersList(orderListUSDNBT);
+            Global.exchange.getLiveData().setOrdersList(orderList);
             if (Global.conversion != -1 && !Global.options.getExchangeName().equals(Constant.CCEDK)) {
                 //if the bot is running on Strategy Secondary Peg, we need to convert this value
                 nbt_onbuy = nbt_onbuy * Global.conversion;
@@ -86,6 +95,10 @@ public class CheckOrdersTask extends TimerTask {
             Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
             Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
 
+            
+            //Write to file timestamp,activeOrders, sells,buys, digest
+            String toWrite = new Date().toString() + " , " + orderList.size() + " , " +sells+ " , " +buys+ " , " +digest;
+            FileSystem.writeToFile(toWrite, outputFile, true);
 
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
@@ -96,7 +109,7 @@ public class CheckOrdersTask extends TimerTask {
                 sendLiquidityInfo(Global.exchange);
             }
         } else {
-            LOG.severe(activeOrdersUSDNTBResponse.getError().toString());
+            LOG.severe(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -125,4 +138,10 @@ public class CheckOrdersTask extends TimerTask {
 
         }
     }
+
+    public void setOutputFile(String outputFile) {
+        this.outputFile = outputFile;
+    }
+    
+    
 }

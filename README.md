@@ -10,7 +10,7 @@
 
 NuBot is a tool that helps [NuBits](https://www.nubits.com) custodians to automate trades. As explained in the [white paper](http://staging.nubits.com/about/white-paper), custodian's core mission is to **help keeping the peg while introducing new currency in the market**.
 
-It is a cross-platform automated trading bot written in java. 
+NuBot is a cross-platform automated trading bot written in java. 
 
 [Discuss nubot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
@@ -41,7 +41,7 @@ See [Attached Diagrams](#diagram-sell) for a visual flowchart.
 There might be adjusted versions of the two strategies explained above. To request a custom build of NuBot to fulfil a particular custodial grant, [get in touch](http://discuss.nubits.com/category/nubits/automated-trading).
 
 Alternative strategies currently under development :
-* *Proxy Peg Strategy* : a strategy to let custodian trade of pairs different from NBT/USD .
+* *Secondary Peg Strategy* : a strategy to let custodian trade of pairs different from NBT/USD .
 * *KTms Strategy* : dual side Strategy with 10% of proceedings from sales kept in balance. Link to [KTm's custodial proposal](http://discuss.nubits.com/t/proposal-to-operate-a-nubits-grant-to-provide-early-stage-dual-side-liquidity-and-shareholder-dividends/120/25) .
 
 #Using NuBot
@@ -69,13 +69,15 @@ The bot communicates with the Nu client via RCP over HTTP. If you plan to run th
 
 
 ```
-rpcuser=<your_username>
-rpcpassword=<your_password>
+server=1
+rpcuser=<choose-a-username>
+rpcpassword=<choose-a-pass>
+port=9090
 rpcport=9091
 rpcallowip=<ip_of_machine_running_the_bot>
 ```
 
-*NOTE: if using NuBot and NuBits on the same machine, the last parameter can be ignored*
+*NOTE: if using NuBot and NuBits on the same machine, the last parameter can be omitted*
 
 Launch Nu client and , if the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Also, make sure that the NuBit client controls a public address which received a custodian grants.
 
@@ -92,7 +94,7 @@ The comand above will unlock the NBT wallet for  9999999999 seconds, ~ 300 years
 
 The bot reads options from a *.json* file.
 
-Here is a list of sssential options : 
+Here is a list of essential options : 
 
 | Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
@@ -165,7 +167,6 @@ It is sufficient to add a JSON object in the standard options file structured in
                 "backup2" : { "name" : "coinbase"},
                 "backup3" : { "name" : "blockchain"}
                 },
-            "refresh-time":65,
             "wallchange-treshold": 0.1,
             "price-distance-threshold":10       
          }
@@ -177,7 +178,6 @@ It is sufficient to add a JSON object in the standard options file structured in
 | ------------- |:-------------:| -----:|
 | main-feed     | the name of the main price feed that has priority over the others | **see following table |
 | backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
-| refresh-time |  time interval between price peg refreshing .  |   integer (seconds) . Minimum 61, several API do not even refresh faster than that. For fiat, minimum allowed is 8 hours , 28800 seconds  |
 | wallchange-treshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 | price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
@@ -213,12 +213,12 @@ NuBot can be further configured by adding additional parameters to its config fi
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |
 | sendrpc    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
-| check-balance-interval   | 45 |   seconds between two checkBalance operations, which triggers bot orders | int (seconds) |
-| check-orders-interval    | 60 |  seconds between two checkOrders operations, which triggers liquidityinfo RPC call |  int (seconds)|
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
+| aggregate | true | If set to false, will nullify the function to put funds back on sell or buy. It will put them back when the walls shift | boolean|
+
 
 ##Adding support for an exchange
 *coming soon*
@@ -269,7 +269,9 @@ keytool -list -v -keystore Nubot_keystore.jks
 
 ##Logging on HTML and csv
 
-The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. *fine* are never logged to file (only to console) , info are logged to file if we set`"verbose"=true`, *warning* are used for logging trading-related messagges, and *severe* for errors.
+The bot produces different output log files, all stored in a special folder created for each session under *logs/*. The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. *fine* are never logged to file (only to console) , info are logged to file if we set`"verbose"=true`, *warning* are used for logging trading-related messagges, and *severe* for errors.
+
+Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
 
 #Changelogs
 See [changelog.md](../master/CHANGELOG.md)

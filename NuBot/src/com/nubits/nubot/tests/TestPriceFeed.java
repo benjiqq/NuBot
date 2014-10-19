@@ -22,9 +22,9 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeed.AbstractPriceFeed;
+import com.nubits.nubot.pricefeed.GoogleUnofficialPriceFeed;
 import com.nubits.nubot.pricefeed.PriceFeedManager;
 import com.nubits.nubot.pricefeed.PriceFeedManager.LastPriceResponse;
-import com.nubits.nubot.pricefeed.YahooPriceFeed;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class TestPriceFeed {
         TestPriceFeed test = new TestPriceFeed();
         test.init();
 
-        test.pair = Constant.CNY_USD;
+        test.pair = Constant.BTC_USD;
 
         //test.executeSingle();
         test.execute();
@@ -56,14 +56,16 @@ public class TestPriceFeed {
     private void init() {
         Utils.loadProperties("settings.properties");
         //feed = new BitcoinaveragePriceFeed();
+        String folderName = "tests_"+System.currentTimeMillis()+"/";
+        String logsFolder = Global.settings.getProperty("log_path")+folderName;
         try {
-            NuLogger.setup(false);
+            NuLogger.setup(false,logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
         LOG.setLevel(Level.INFO);
 
-        feed = new YahooPriceFeed(); //REPLACE HERE
+        feed = new GoogleUnofficialPriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -83,14 +85,14 @@ public class TestPriceFeed {
 
     private void execute() {
 
-        String mainFeed = PriceFeedManager.GOOGLE_UNOFFICIAL;
+        String mainFeed = PriceFeedManager.BTER;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
 
-        backupFeedList.add(PriceFeedManager.YAHOO);
-        backupFeedList.add(PriceFeedManager.OPENEXCHANGERATES);
-        backupFeedList.add(PriceFeedManager.EXCHANGERATELAB);
+        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
+        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
+        backupFeedList.add(PriceFeedManager.COINBASE);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 

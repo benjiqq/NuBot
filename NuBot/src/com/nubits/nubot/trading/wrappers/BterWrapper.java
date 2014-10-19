@@ -28,6 +28,7 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
@@ -80,6 +81,7 @@ public class BterWrapper implements TradeInterface {
     private final String API_BASE_URL = "https://bter.com/api/1/";
     private final String API_GET_INFO = "private/getfunds";
     private final String API_TRADE = "private/placeorder";
+    private final String API_GET_TRADES = "private/mytrades";
     private final String API_ACTIVE_ORDERS = "private/orderlist";
     private final String API_ORDER = "private/getorder";
     private final String API_CANCEL_ORDER = "private/cancelorder";
@@ -386,9 +388,13 @@ public class BterWrapper implements TradeInterface {
 
             boolean valid = false;
             try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (java.lang.ClassCastException e) {
-                valid = true;
+                valid = (boolean) httpAnswerJson.get("result");
+            } catch (Exception e) {
+                try {
+                    valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+                } catch (ClassCastException ex) {
+                    valid = true;
+                }
             }
 
             if (!valid) {
@@ -961,6 +967,135 @@ public class BterWrapper implements TradeInterface {
         order.setInsertedDate(new Date()); //Not provided
 
         return order;
+    }
+
+    private Trade parseTrade(JSONObject orderObject) {
+        Trade trade = new Trade();
+
+        /*
+         "id":"7942422"
+         "orderid":"38100777"
+         "pair":"ltc_btc"
+         "type":"sell"
+         "rate":"0.01719"
+         "amount":"0.0588"
+         "time":"06-12 02:49:11"
+         "time_unix":"1402512551"
+         */
+
+        trade.setId((String) orderObject.get("id"));
+        trade.setOrder_id((String) orderObject.get("orderid"));
+
+
+        //TODO currencypair
+        CurrencyPair cp = CurrencyPair.getCurrencyPairFromString((String) orderObject.get("pair"), "_");
+        trade.setPair(cp);
+
+        trade.setType(((String) orderObject.get("type")).toUpperCase());
+        trade.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), cp.getOrderCurrency()));
+        trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
+
+
+        long date = Long.parseLong(((String) orderObject.get("time_unix")) + "000");
+        trade.setDate(new Date(date));
+
+        return trade;
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        String path = API_BASE_URL + API_GET_TRADES;
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+
+        HashMap<String, String> query_args = new HashMap<>();
+        query_args.put("pair", pair.toString("_").toLowerCase());
+        /* Sample response
+         *{
+         {
+         "result":true,
+         "trades":[
+         {
+         "id":"7942422"
+         "orderid":"38100777"
+         "pair":"ltc_btc"
+         "type":"sell"
+         "rate":"0.01719"
+         "amount":"0.0588"
+         "time":"06-12 02:49:11"
+         "time_unix":"1402512551"
+         }
+         {
+         "id":"7942422"
+         "orderid":"38100491"
+         "pair":"ltc_btc"
+         "type":"buy"
+         "rate":"0.01719"
+         "amount":"0.0588"
+         "time":"06-12 02:49:11"
+         "time_unix":"1402512551"
+         }
+         ]
+         "msg":"Success"
+         }
+         */
+
+        String queryResult = query(path, query_args, false);
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            /*NOTE TO SELF. Contact Bter support
+             * httpAnswerJson.get("result") contains "true" or false.
+             * one is a String the other is boolean
+             */
+
+            boolean valid = false;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (java.lang.ClassCastException e) {
+                valid = true;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("msg");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+
+                LOG.severe("Bter API returned an error: " + errorMessage);
+
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                JSONArray orders;
+                try {
+                    orders = (JSONArray) httpAnswerJson.get("trades");
+                } catch (ClassCastException e) { //Empty order list?
+                    apiResponse.setResponseObject(tradeList);
+                    return apiResponse;
+                }
+
+                for (int i = 0; i < orders.size(); i++) {
+                    JSONObject tradeObject = (JSONObject) orders.get(i);
+                    Trade tempTrade = parseTrade(tradeObject);
+                    tradeList.add(tempTrade);
+                }
+                apiResponse.setResponseObject(tradeList);
+
+                return apiResponse;
+
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
+            return apiResponse;
+        }
+
     }
 
     private class BterService implements ServiceInterface {

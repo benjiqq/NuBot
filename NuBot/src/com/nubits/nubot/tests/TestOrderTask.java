@@ -51,8 +51,12 @@ public class TestOrderTask {
 
     private static void setup() {
 
+        String folderName = "tests_"+System.currentTimeMillis()+"/";
+        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+         
+       
         try {
-            NuLogger.setup(true);
+            NuLogger.setup(true,logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
@@ -64,7 +68,7 @@ public class TestOrderTask {
 
         Global.options = new OptionsJSON(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
-                60, 30, false, false, "", -1, 0, null);
+                60, 30, false, false, "", -1, 0,false, null);
 
 
         //Check local filesystem for API keys

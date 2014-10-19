@@ -106,8 +106,10 @@ public class TestRPC {
     }
 
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair) {
+        String folderName = "tests_"+System.currentTimeMillis()+"/";
+        String logsFolder = Global.settings.getProperty("log_path")+folderName;
         try {
-            NuLogger.setup(verbose);
+            NuLogger.setup(verbose,logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }

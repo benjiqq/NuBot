@@ -222,7 +222,7 @@ public class Utils {
             return true;
         }
     }
-
+    
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
     //not needed if using alibaba json parser
     public static double getDouble(Object obj) {
@@ -236,7 +236,12 @@ public class Utils {
                 toRet = (Double) obj;
             } catch (ClassCastException e) {
                 //probably a String
-                toRet = Double.parseDouble((String) obj);
+                try {
+                    toRet = Double.parseDouble((String) obj);
+                } catch (ClassCastException ex) {
+                    LOG.severe("cannot parse object : " + obj.toString());
+                    return -1;
+                }
             }
         }
         return toRet;

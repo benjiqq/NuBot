@@ -1,6 +1,7 @@
 #A folder containing utilities that do not need to be pushed
 /gitignore/
 
+
 #Folder with builds
 releases/
 
@@ -16,9 +17,11 @@ releases/
 
 #Specific files to ignore
 ssl_readme.txt
+project.properties
 NuCancelOrders.java
 NuExecuteOrders.java
 NuPriceMonitor.java
+NuLastTrades.java
 
 #launch configurations
 /NuBot/nbproject/configs/*.properties
