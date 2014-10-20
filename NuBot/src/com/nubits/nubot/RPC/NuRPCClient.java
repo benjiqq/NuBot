@@ -96,6 +96,8 @@ public class NuRPCClient {
         }
 
 
+        LOG.fine("RPC parameters " + params.toString());
+
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
 
