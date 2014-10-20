@@ -983,6 +983,8 @@ public class BterWrapper implements TradeInterface {
          "time_unix":"1402512551"
          */
 
+        trade.setExchangeName(Constant.BTER);
+
         trade.setId((String) orderObject.get("id"));
         trade.setOrder_id((String) orderObject.get("orderid"));
 
@@ -994,7 +996,7 @@ public class BterWrapper implements TradeInterface {
         trade.setType(((String) orderObject.get("type")).toUpperCase());
         trade.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), cp.getOrderCurrency()));
         trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
-
+        trade.setFee(new Amount(0, cp.getPaymentCurrency())); //Not available from API
 
         long date = Long.parseLong(((String) orderObject.get("time_unix")) + "000");
         trade.setDate(new Date(date));
@@ -1096,6 +1098,12 @@ public class BterWrapper implements TradeInterface {
             return apiResponse;
         }
 
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        LOG.warning("BTER only expose access to trades from 24 hours");
+        return getLastTrades(pair);
     }
 
     private class BterService implements ServiceInterface {

@@ -153,15 +153,28 @@ public interface TradeInterface {
      * an ApiError in case of error.
      */
     public ApiResponse getTxFee(CurrencyPair pair);
-    
-     /**
-     * Get the last trades associated with the account, default 24 hours
+
+    /**
+     * Get the last trades associated with the account. The range of time
+     * depends on the exchange's default range
      *
      * @param pair pair.orderCurrency is the currency on order and
      * pair.paymentCurrency is unit for its payment/redeem
      * @return an ApiResponse object with an array of Trades
      */
     public ApiResponse getLastTrades(CurrencyPair pair);
+
+    /**
+     * Get the last trades associated with the account. The range of time
+     * depends on the exchange's default range
+     *
+     * @param pair pair.orderCurrency is the currency on order and
+     * pair.paymentCurrency is unit for its payment/redeem
+     * @param startDate a unix-timestamp (seconds) indicating the start of the
+     * period
+     * @return an ApiResponse object with an array of Trades
+     */
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime);
 
     /**
      * Get the transaction fee for a specific currency

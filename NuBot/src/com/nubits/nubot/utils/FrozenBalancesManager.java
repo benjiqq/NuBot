@@ -141,8 +141,6 @@ public class FrozenBalancesManager {
             JSONObject tempRow = new JSONObject();
             HistoryRow tempHistory = history.get(i);
 
-
-
             tempRow.put("timestamp", tempHistory.getTimestamp().toString());
             tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
             tempRow.put("currency-code", tempHistory.getCurrencyCode());

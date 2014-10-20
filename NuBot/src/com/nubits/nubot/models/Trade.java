@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.models;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
@@ -33,8 +34,9 @@ public class Trade {
     private Amount amount;    //Object containing the number of units for this trade (without fees).
     private Amount fee; //containing the fee paid
     private Date date; //the time at which this trade was inserted place.
+    private String exchangeName; //The name of the exchange
 
-    public Trade(String id, String order_id, CurrencyPair pair, String type, Amount price, Amount amount, Amount fee, Date date) {
+    public Trade(String id, String order_id, CurrencyPair pair, String type, Amount price, Amount amount, Amount fee, Date date, String exchangeName) {
         this.id = id;
         this.order_id = order_id;
         this.pair = pair;
@@ -43,6 +45,7 @@ public class Trade {
         this.amount = amount;
         this.date = date;
         this.fee = fee;
+        this.exchangeName = exchangeName;
     }
 
     public Trade() {
@@ -112,25 +115,39 @@ public class Trade {
         this.fee = fee;
     }
 
-    @Override
-    public String toString() {
-        return "Trade{" + "id=" + id + ", order_id=" + order_id + ", pair=" + pair + ", type=" + type + ", price=" + price + ", amount=" + amount + ", fee=" + fee + ", date=" + date + '}';
+    public String getExchangeName() {
+        return exchangeName;
     }
 
-    /*
+    public void setExchangeName(String exchangeName) {
+        this.exchangeName = exchangeName;
+    }
+
+    @Override
+    public String toString() {
+        return "Trade{" + "id=" + id + ", order_id=" + order_id + ", pair=" + pair + ", type=" + type + ", price=" + price + ", amount=" + amount + ", fee=" + fee + ", date=" + date + ", exchangeName=" + exchangeName + '}';
+    }
+
+
+    /* uncomment for csv output
      public String toCsvString() {
      return id + "," + order_id + "," + pair.toString("_") + "," + type + "," + price.getQuantity() + "," + amount.getQuantity() + "," + date;
      }
      */
-    public String toJsonString() {
+    public String toJSONString() {
+        DecimalFormat df = new DecimalFormat("0");
+        df.setMaximumFractionDigits(8);
+
         return "\"Trade_" + id + "\":{\n"
                 + "\"id\":\"" + id + "\",\n"
                 + "\"order_id\":\"" + order_id + "\",\n"
+                + "\"exchange\":\"" + exchangeName + "\",\n"
                 + "\"pair\":\"" + pair.toString() + "\",\n"
                 + "\"type\":\"" + type.toUpperCase() + "\",\n"
                 + "\"price\":" + price.getQuantity() + ",\n"
                 + "\"amount\":" + amount.getQuantity() + ",\n"
-                + "\"fee\":" + fee.getQuantity() + ",\n"
+                + "\"fee\":" + df.format(fee.getQuantity()) + ",\n"
+                + "\"timestamp\":" + date.getTime() + ",\n"
                 + "\"date\":\"" + date + "\"\n"
                 + "}";
     }

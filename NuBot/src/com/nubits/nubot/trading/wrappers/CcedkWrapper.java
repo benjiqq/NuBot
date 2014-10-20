@@ -34,8 +34,8 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.trading.keys.ApiKeys;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -805,6 +805,7 @@ public class CcedkWrapper implements TradeInterface {
 
         trade.setId((String) orderObject.get("trade_id"));
 
+        trade.setExchangeName(Constant.CCEDK);
         int currencyPairID = Integer.parseInt((String) orderObject.get("pair_id"));
         CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
         trade.setPair(cp);
@@ -812,6 +813,7 @@ public class CcedkWrapper implements TradeInterface {
         trade.setType(((String) orderObject.get("type")).toUpperCase());
         trade.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
         trade.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
+        trade.setFee(new Amount(Double.parseDouble((String) orderObject.get("fee")), cp.getPaymentCurrency()));
 
 
         long date = Long.parseLong(((String) orderObject.get("created")) + "000");
@@ -838,6 +840,15 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
+        return getLastTradesImpl(pair, 0);
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Trade> tradesList = new ArrayList<Trade>();
 
@@ -845,10 +856,16 @@ public class CcedkWrapper implements TradeInterface {
 
         String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
 
-        long now = System.currentTimeMillis();
-        long yesterday = Math.round((now - 1000 * 60 * 60 * 36) / 1000);
-        query_args.put("pair_id", pair_id);
-        query_args.put("date_from", Long.toString(yesterday)); //24hours
+        String startDateArg;
+        if (startTime == 0) {
+            long now = System.currentTimeMillis();
+            long yesterday = Math.round((now - 1000 * 60 * 60 * 36) / 1000);
+            startDateArg = Long.toString(yesterday); //24hours
+        } else {
+            startDateArg = Long.toString(startTime);
+        }
+
+        query_args.put("date_from", startDateArg);
 
         String queryResult = query(API_BASE_URL, API_GET_TRADES, query_args, false);
 
@@ -901,8 +918,6 @@ public class CcedkWrapper implements TradeInterface {
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
-
-
     }
 
     private class CcedkService implements ServiceInterface {

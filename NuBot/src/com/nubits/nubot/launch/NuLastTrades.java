@@ -68,7 +68,7 @@ public class NuLastTrades {
                 LOG.severe(ex.getMessage());
             }
 
-            LOG.info("Launching NuLastTrades ");
+            LOG.info("Launching NuLastTrades on " + app.exchangename);
             app.prepareForExecution();
             app.execute();
             LOG.info("Done");
@@ -124,7 +124,7 @@ public class NuLastTrades {
     private boolean readParams(String[] args) {
         boolean ok = false;
 
-        if (args.length != 4 || args.length != 5) {
+        if (args.length != 4 && args.length != 5) {
             LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
@@ -138,22 +138,30 @@ public class NuLastTrades {
             dateFrom = Long.parseLong(args[4]);
         }
 
-        output = "last_trades_" + exchangename + "_" + pair.toString() + ".csv";
+        output = "last_trades_" + exchangename + "_" + pair.toString() + ".json";
         ok = true;
         return ok;
     }
 
     private void execute() {
-        FileSystem.writeToFile(HEADER, output, false);
+        //FileSystem.writeToFile(HEADER, output, false); //uncomment for csv outputs
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, dateFrom);
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
-            LOG.info("Last 24h trades : " + tradeList.size());
+            FileSystem.writeToFile("{\n", output, false);
+            //FileSystem.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
+            //FileSystem.writeToFile("\"pair\":\"" + pair.toString("_") + "\",\n", output, true);
+            LOG.info("Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
                 LOG.info(tempTrade.toString());
-                FileSystem.writeToFile(tempTrade.toCsvString(), output, true);
+                String comma = ",\n";
+                if (i == tradeList.size() - 1) {
+                    comma = "";
+                }
+                FileSystem.writeToFile(tempTrade.toJSONString() + comma, output, true);
             }
+            FileSystem.writeToFile("}", output, true);
         } else {
             LOG.severe(activeOrdersResponse.getError().toString());
         }

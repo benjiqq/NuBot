@@ -738,6 +738,11 @@ public class PeatioWrapper implements TradeInterface {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+    }
+
     private class PeatioService implements ServiceInterface {
 
         protected String base;
