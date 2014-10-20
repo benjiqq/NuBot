@@ -43,7 +43,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -62,7 +61,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
 
@@ -76,7 +75,7 @@ public class TestWrappers {
         //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
         //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
         //testGetLastPrice(Constant.PPC_BTC);
-        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //If returned in the main currency and not the payment currency, update the checkorders routine
         //testGetActiveOrders(Constant.NBT_PPC);
         //testCancelOrder("681977190");
@@ -86,48 +85,51 @@ public class TestWrappers {
         //testClearAllOrders();
         //testIsOrderActive("681977190");
         //testGetPermissions();
-        
-        //testGetLastTrades(Constant.NBT_PPC);
-        
+
+        testGetLastTrades(Constant.NBT_PPC);
+        System.out.println("\n\n\n");
+        testGetLastTrades(Constant.NBT_PPC, 1409566800);
+
+
         /*
          for (int i = 0; i < 5000; i++) {
-             LOG.info(TradeUtils.getCCDKEvalidNonce());
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+         LOG.info(TradeUtils.getCCDKEvalidNonce());
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
          }
-        
-        */
-        //stimulating ccedk wrong nonce 
+         }
 
 
-        
-        for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+         //stimulating ccedk wrong nonce
 
-            testGetAvailableBalances(Constant.NBT_PPC);
 
-            try { 
-               Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            testGetOrderDetail("3454");
 
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        }
-       
+         for (int i = 0; i < 5000; i++) {
+         testGetActiveOrders();
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+
+         testGetAvailableBalances(Constant.NBT_PPC);
+
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         testGetOrderDetail("3454");
+
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         }
+         */
     }
 
     /*
@@ -344,10 +346,9 @@ public class TestWrappers {
             LOG.severe(deleteOrdersResponse.getError().toString());
         }
     }
-    
-    
+
     private static void testGetLastTrades(CurrencyPair pair) {
-           //Get active orders
+        //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair);
         if (activeOrdersResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getLastTrades(pair) ");
@@ -362,13 +363,29 @@ public class TestWrappers {
         }
     }
 
+    private static void testGetLastTrades(CurrencyPair pair, long startTime) {
+        //Get active orders
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, startTime);
+        if (activeOrdersResponse.isPositive()) {
+            LOG.info("\nPositive response  from TradeInterface.getLastTrades(pair,startTime) ");
+            ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
+            LOG.info("Last trades from " + startTime + " : " + tradeList.size());
+            for (int i = 0; i < tradeList.size(); i++) {
+                Trade tempTrade = tradeList.get(i);
+                LOG.info(tempTrade.toString());
+            }
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+        }
+    }
+
     private static void init() {
-        String folderName = "testwrappers_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+        String folderName = "testwrappers_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
         try {
-            NuLogger.setup(false,logsFolder);
+            NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
@@ -421,16 +438,14 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        }else if (exchangeName.equals(Constant.POLONIEX)) {
+        } else if (exchangeName.equals(Constant.POLONIEX)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.POLONIEX_SECRET, Passwords.POLONIEX_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        }
-        
-        else {
+        } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
         }
@@ -452,5 +467,4 @@ public class TestWrappers {
 
         /* Setup (end) ------------------------------------------------------------------------------------------------------ */
     }
-   
 }
