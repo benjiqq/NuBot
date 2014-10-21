@@ -46,17 +46,17 @@ public class TestOrderTask {
 
     public static void main(String[] args) {
         setup();
-        Global.taskManager.getCheckOrdersTask().start();
+        Global.taskManager.getSendLiquidityTask().start();
     }
 
     private static void setup() {
 
-        String folderName = "tests_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
-         
-       
+        String folderName = "tests_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+
+
         try {
-            NuLogger.setup(true,logsFolder);
+            NuLogger.setup(true, logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.getMessage());
         }
@@ -68,7 +68,7 @@ public class TestOrderTask {
 
         Global.options = new OptionsJSON(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
-                60, 30, false, false, "", -1, 0,false, null);
+                60, 30, false, false, "", -1, 0, false, null);
 
 
         //Check local filesystem for API keys

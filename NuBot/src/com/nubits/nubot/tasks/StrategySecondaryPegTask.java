@@ -49,6 +49,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private double buyPricePEG;
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
+    private SendLiquidityinfoTask sendLiquidityTask;
 
     @Override
     public void run() {
@@ -560,6 +561,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         //Communicate to the priceMonitorTask that a wall shift is in place
         priceMonitorTask.setWallsBeingShifted(true);
+        sendLiquidityTask.setWallsBeingShifted(true);
 
         //fix prices, so that if they change during wait time, this wall shift is not affected.
         double sellPrice = sellPricePEG;
@@ -628,6 +630,8 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         //Communicate to the priceMonitorTask that the wall shift is over
         priceMonitorTask.setWallsBeingShifted(false);
+        sendLiquidityTask.setWallsBeingShifted(false);
+
         return success;
     }
 
@@ -757,5 +761,13 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void setPriceMonitorTask(PriceMonitorTriggerTask priceMonitorTask) {
         this.priceMonitorTask = priceMonitorTask;
+    }
+
+    public SendLiquidityinfoTask getSendLiquidityTask() {
+        return sendLiquidityTask;
+    }
+
+    public void setSendLiquidityTask(SendLiquidityinfoTask sendLiquidityTask) {
+        this.sendLiquidityTask = sendLiquidityTask;
     }
 }

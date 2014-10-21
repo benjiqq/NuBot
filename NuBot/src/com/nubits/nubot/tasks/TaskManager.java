@@ -32,11 +32,11 @@ public class TaskManager {
     private static final Logger LOG = Logger.getLogger(TaskManager.class.getName());
     private static final String STRATEGY_FIAT = "Strategy Fiat Task";
     private static final String STRATEGY_CRYPTO = "Strategy Crypto Task";
-//Class Variables
+    //Class Variables
     protected int interval;
     private BotTask checkConnectionTask;
     private BotTask strategyFiatTask;
-    private BotTask checkOrdersTask;
+    private BotTask sendLiquidityTask;
     private BotTask checkNudTask;
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
     //these are used for secondary peg strategy
@@ -74,9 +74,9 @@ public class TaskManager {
                 new CheckConnectionTask(), 127, "checkConnection");
         taskList.add(checkConnectionTask);
 
-        checkOrdersTask = new BotTask(
-                new SendLiquidityinfoTask(verbose), sendLiquidityInterval, "checkOrders"); //true for verbosity
-        taskList.add(checkOrdersTask);
+        sendLiquidityTask = new BotTask(
+                new SendLiquidityinfoTask(verbose), sendLiquidityInterval, "sendLiquidity"); //true for verbosity
+        taskList.add(sendLiquidityTask);
 
         checkNudTask = new BotTask(
                 new CheckNudTask(), 30, "checkNud");
@@ -190,8 +190,8 @@ public class TaskManager {
         this.strategyFiatTask = strategyFiatTask;
     }
 
-    public BotTask getCheckOrdersTask() {
-        return checkOrdersTask;
+    public BotTask getSendLiquidityTask() {
+        return sendLiquidityTask;
     }
 
     public BotTask getSecondaryPegTask() {
@@ -210,8 +210,8 @@ public class TaskManager {
         this.priceTriggerTask = priceTriggerTask;
     }
 
-    public void setCheckOrdersTask(BotTask checkOrdersTask) {
-        this.checkOrdersTask = checkOrdersTask;
+    public void setSendLiquidityTask(BotTask slt) {
+        this.sendLiquidityTask = slt;
     }
 
     public ArrayList<BotTask> getTaskList() {

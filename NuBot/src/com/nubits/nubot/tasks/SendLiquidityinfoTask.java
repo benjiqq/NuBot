@@ -39,6 +39,7 @@ public class SendLiquidityinfoTask extends TimerTask {
     private static final Logger LOG = Logger.getLogger(SendLiquidityinfoTask.class.getName());
     private boolean verbose;
     private String outputFile;
+    private boolean wallsBeingShifted = false;
 
     public SendLiquidityinfoTask(boolean verbose) {
         this.verbose = verbose;
@@ -52,64 +53,68 @@ public class SendLiquidityinfoTask extends TimerTask {
     //Taken the input exchange, updates it and returns it.
 
     private void checkOrders() {
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
+            ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+            if (activeOrdersResponse.isPositive()) {
+                ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.fine("Active orders : " + orderList.size());
+                LOG.fine("Active orders : " + orderList.size());
 
-            if (verbose) {
-                LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
-                LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
-            }
-
-            double nbt_onsell = 0;
-            double nbt_onbuy = 0;
-            int sells = 0;
-            int buys = 0;
-            String digest = "";
-            for (int i = 0; i < orderList.size(); i++) {
-                Order tempOrder = orderList.get(i);
-                digest = digest+ tempOrder.getDigest();
-                double toAdd = tempOrder.getAmount().getQuantity();
                 if (verbose) {
-                    LOG.fine(tempOrder.toString());
+                    LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
+                    LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
                 }
 
-                if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
-                    //Start summing up amounts of NBT
-                    nbt_onsell += toAdd;
-                    sells++;
-                } else if (tempOrder.getType().equalsIgnoreCase(Constant.BUY)) {
-                    //Start summing up amounts of NBT
-                    nbt_onbuy += toAdd;
-                    buys++;
+                double nbt_onsell = 0;
+                double nbt_onbuy = 0;
+                int sells = 0;
+                int buys = 0;
+                String digest = "";
+                for (int i = 0; i < orderList.size(); i++) {
+                    Order tempOrder = orderList.get(i);
+                    digest = digest + tempOrder.getDigest();
+                    double toAdd = tempOrder.getAmount().getQuantity();
+                    if (verbose) {
+                        LOG.fine(tempOrder.toString());
+                    }
+
+                    if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
+                        //Start summing up amounts of NBT
+                        nbt_onsell += toAdd;
+                        sells++;
+                    } else if (tempOrder.getType().equalsIgnoreCase(Constant.BUY)) {
+                        //Start summing up amounts of NBT
+                        nbt_onbuy += toAdd;
+                        buys++;
+                    }
                 }
-            }
-            //Update the order
-            Global.exchange.getLiveData().setOrdersList(orderList);
-            if (Global.conversion != -1 && !Global.options.getExchangeName().equals(Constant.CCEDK)) {
-                //if the bot is running on Strategy Secondary Peg, we need to convert this value
-                nbt_onbuy = nbt_onbuy * Global.conversion;
-            }
-            Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
-            Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
+                //Update the order
+                Global.exchange.getLiveData().setOrdersList(orderList);
+                if (Global.conversion != -1 && !Global.options.getExchangeName().equals(Constant.CCEDK)) {
+                    //if the bot is running on Strategy Secondary Peg, we need to convert this value
+                    nbt_onbuy = nbt_onbuy * Global.conversion;
+                }
+                Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
+                Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
 
-            
-            //Write to file timestamp,activeOrders, sells,buys, digest
-            String toWrite = new Date().toString() + " , " + orderList.size() + " , " +sells+ " , " +buys+ " , " +digest;
-            FileSystem.writeToFile(toWrite, outputFile, true);
 
-            if (verbose) {
-                LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
-                LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
-            }
-            //Call RPC
-            if (Global.options.isSendRPC()) {
-                sendLiquidityInfo(Global.exchange);
+                //Write to file timestamp,activeOrders, sells,buys, digest
+                String toWrite = new Date().toString() + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
+                FileSystem.writeToFile(toWrite, outputFile, true);
+
+                if (verbose) {
+                    LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
+                    LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
+                }
+                //Call RPC
+                if (Global.options.isSendRPC()) {
+                    sendLiquidityInfo(Global.exchange);
+                }
+            } else {
+                LOG.severe(activeOrdersResponse.getError().toString());
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
         }
     }
 
@@ -142,6 +147,20 @@ public class SendLiquidityinfoTask extends TimerTask {
     public void setOutputFile(String outputFile) {
         this.outputFile = outputFile;
     }
-    
-    
+
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
+    public boolean isWallsBeingShifted() {
+        return wallsBeingShifted;
+    }
+
+    public void setWallsBeingShifted(boolean wallsBeingShifted) {
+        this.wallsBeingShifted = wallsBeingShifted;
+    }
 }
