@@ -63,7 +63,7 @@ By using NuBot you declare to be accept the afore-mentioned risks.
 
 To function correctly, NuBot needs to communicate with the NuBits client of the custodian. The bot needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have real-time information about active orders in the network across custodians, and react to it. It does so by interacting via the *NuBits client of the custodian*. 
 
-*NOTE: Is it also possible to test NuBot without being a custodian and setting the `"sendrpc":false` in the option file. In this case you can ignore this section.*
+*NOTE: Is it also possible to test NuBot without being a custodian and setting the `"submit-liquidity":false` in the option file. In this case you can ignore this section.*
 
 The bot communicates with the Nu client via RCP over HTTP. If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client. In order to do that, open your *nu.conf* and add make sure you have it properly configured .
 
@@ -211,7 +211,7 @@ NuBot can be further configured by adding additional parameters to its config fi
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  f set to false will disable hipchat notifications | boolean |
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |
-| sendrpc    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
+| submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
