@@ -123,8 +123,15 @@
 
         
        
-       <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
+          <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
 
+          <!--Compile README.md to html , requires grip https://github.com/joeyespo/grip-->
+         
+          <exec dir="../" executable="bash">  
+              <arg value="compileReadme.sh"/>  
+          </exec>  
+          
+          <copy file="../README.html" tofile="${store.dir}/README.html"/>
         
         <mkdir dir="${store.dir}/logs"/>
 
@@ -144,6 +151,8 @@
             <fileset dir="lib/">  
             </fileset>
         </copy>
+        
+        
         
         <delete file="${store.dir}/res/src/com/nubits/nubot/launch/NuCancelOrders.java"/>
         <delete file="${store.dir}/res/src/com/nubits/nubot/launch/NuExecuteOrders.java"/>
