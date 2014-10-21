@@ -29,8 +29,8 @@ import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.SendLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.SendLiquidityinfoTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
@@ -263,12 +263,14 @@ public class NuBot {
                 Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
-                //Set the wallet shift threshold
 
-                StrategySecondaryPegTask secondaryPegStrategy = ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()));
-
-                //Then set trading strategy
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setStrategy(secondaryPegStrategy);
+                // set trading strategy to the price monitor task
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
+                        .setStrategy(((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())));
+                
+                // set price monitor task to the strategy
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
+                        .setPriceMonitorTask(((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())));
 
                 PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
                 //Then set the pfm

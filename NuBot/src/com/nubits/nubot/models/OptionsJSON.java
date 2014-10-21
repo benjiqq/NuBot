@@ -518,8 +518,6 @@ public class OptionsJSON {
 
             int emergencyTimeout = 60;
 
-
-
             if (optionsJSON.containsKey("nudip")) {
                 nudIp = (String) optionsJSON.get("nudip");
             }

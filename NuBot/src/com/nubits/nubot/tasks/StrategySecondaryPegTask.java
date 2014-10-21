@@ -48,7 +48,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private double sellPricePEG;
     private double buyPricePEG;
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
-
+    private PriceMonitorTriggerTask priceMonitorTask;
     @Override
     public void run() {
         LOG.fine("Executing task : StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
@@ -557,8 +557,11 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean shiftWalls() {
         boolean success = true;
 
-        long wait_time = (1000 * (80 + 40 + 10)); // this is with priceRefresh 80, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
+        long wait_time = (1000 * (61 + 41 + 8)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
+        //Communicate to the priceMonitorTask that a wall shift is in place 
+        priceMonitorTask.setWallsBeingShifted(true);
+        
         //fix prices, so that if they change during wait time, this wall shift is not affected.
         double sellPrice = sellPricePEG;
         double buyPrice = buyPricePEG;
@@ -614,7 +617,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                 success = false;
             }
         }
+        
+        //Communicate to the priceMonitorTask that the wall shift is over 
 
+        priceMonitorTask.setWallsBeingShifted(false);
         return success;
     }
 
@@ -737,4 +743,14 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void setBuyPricePEG(double buyPricePEG) {
         this.buyPricePEG = buyPricePEG;
     }
+
+    public PriceMonitorTriggerTask getPriceMonitorTask() {
+        return priceMonitorTask;
+    }
+
+    public void setPriceMonitorTask(PriceMonitorTriggerTask priceMonitorTask) {
+        this.priceMonitorTask = priceMonitorTask;
+    }
+    
+    
 }

@@ -47,7 +47,6 @@ public class SecondaryPegOptionsJSON {
      * @param distanceTreshold
      * @param mainFeed
      * @param backupFeedNames
-     * @param emergencyTimeout
      */
     public SecondaryPegOptionsJSON(int refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
         this.refreshTime = refreshTime;
@@ -94,7 +93,7 @@ public class SecondaryPegOptionsJSON {
 
             //Then parse optional settings. If not use the default value declared here
 
-            int refreshTime = 81;
+            int refreshTime = 61;
             double wallchangeTreshold = 3;
             double priceOffset = 0;
             double distanceTreshold = 10;
