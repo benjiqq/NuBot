@@ -11,7 +11,7 @@
     "rpcpass": "xxx",
     "rpcuser": "xxx",
     "txfee": "0.2",
-    "sendrpc":true,
+    "submit-liquidity":true,
     "executeorders":true,
     "verbose":false,
     "pair":"xxx_yyy",
