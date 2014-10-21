@@ -174,7 +174,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-
     public void updateLastPrice(LastPrice lp) {
         this.lastPrice = lp;
         LOG.fine("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
@@ -207,8 +206,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else {
             LOG.fine("No need to move walls");
-            if(isWallsBeingShifted() && needToMoveWalls)
-            {
+            if (isWallsBeingShifted() && needToMoveWalls) {
                 LOG.warning("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
             }
         }
@@ -330,7 +328,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //store it
         sellPricePEG_old = sellPricePEGInitial;
 
-        LOG.info("Converted price (using 1 "+Global.options.getPair().getPaymentCurrency().getCode()+" = "+peg_price+" USD)"
+        LOG.info("Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
                 + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
                 + "; buy @" + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode());
 
@@ -346,7 +344,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + "%.";
         MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
     }
-    
+
     public double getWallchangeThreshold() {
         return wallchangeThreshold;
     }
@@ -389,9 +387,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     public void setWallsBeingShifted(boolean wallsBeingShifted) {
         this.wallsBeingShifted = wallsBeingShifted;
-    } 
-    
-     public PriceFeedManager getPfm() {
+    }
+
+    public PriceFeedManager getPfm() {
         return pfm;
     }
 
@@ -406,5 +404,4 @@ public class PriceMonitorTriggerTask extends TimerTask {
     public void setDistanceTreshold(double distanceTreshold) {
         this.distanceTreshold = distanceTreshold;
     }
-    
 }

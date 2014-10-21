@@ -49,6 +49,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private double buyPricePEG;
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
+
     @Override
     public void run() {
         LOG.fine("Executing task : StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
@@ -557,9 +558,9 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         long wait_time = (1000 * (61 + 41 + 8)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
-        //Communicate to the priceMonitorTask that a wall shift is in place 
+        //Communicate to the priceMonitorTask that a wall shift is in place
         priceMonitorTask.setWallsBeingShifted(true);
-        
+
         //fix prices, so that if they change during wait time, this wall shift is not affected.
         double sellPrice = sellPricePEG;
         double buyPrice = buyPricePEG;
@@ -570,7 +571,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         double priceWaitType;
 
         if (priceDirection.equals(Constant.UP)) {
-            
+
             shiftImmediatelyOrderType = Constant.SELL;
             waitAndShiftOrderType = Constant.BUY;
             priceImmediatelyType = sellPrice;
@@ -581,7 +582,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             priceImmediatelyType = buyPrice;
             priceWaitType = sellPrice;
         }
-        LOG.info("Immediately try to shift "+shiftImmediatelyOrderType+" orders");
+        LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " orders");
 
         //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
         boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType);
@@ -597,8 +598,8 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (success) { //Only move the second type of order if sure that the first have been taken down
             try {
                 //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                LOG.info ("Wait "+Math.round(wait_time/1000)+" seconds to make sure all the bots shifter their "+shiftImmediatelyOrderType+" own orders. "
-                        + "Then try to shift "+waitAndShiftOrderType +" orders.");
+                LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shifter their " + shiftImmediatelyOrderType + " own orders. "
+                        + "Then try to shift " + waitAndShiftOrderType + " orders.");
                 Thread.sleep(wait_time);
             } catch (InterruptedException ex) {
                 LOG.severe(ex.getMessage());
@@ -617,15 +618,15 @@ public class StrategySecondaryPegTask extends TimerTask {
                 success = false;
             }
         }
-        
-         //Here I wait until the two orders are correctly displaied. It can take some seconds
-         try {
-         Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
-         } catch (InterruptedException ex) {
-         LOG.severe(ex.getMessage());
-         }
-        
-        //Communicate to the priceMonitorTask that the wall shift is over 
+
+        //Here I wait until the two orders are correctly displaied. It can take some seconds
+        try {
+            Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.getMessage());
+        }
+
+        //Communicate to the priceMonitorTask that the wall shift is over
         priceMonitorTask.setWallsBeingShifted(false);
         return success;
     }
@@ -757,6 +758,4 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void setPriceMonitorTask(PriceMonitorTriggerTask priceMonitorTask) {
         this.priceMonitorTask = priceMonitorTask;
     }
-    
-    
 }

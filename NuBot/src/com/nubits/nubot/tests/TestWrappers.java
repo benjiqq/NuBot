@@ -90,7 +90,6 @@ public class TestWrappers {
         System.out.println("\n\n\n");
         testGetLastTrades(Constant.NBT_PPC, 1409566800);
 
-
         /*
          for (int i = 0; i < 5000; i++) {
          LOG.info(TradeUtils.getCCDKEvalidNonce());

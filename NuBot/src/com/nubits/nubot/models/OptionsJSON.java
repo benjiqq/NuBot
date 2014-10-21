@@ -49,7 +49,7 @@ public class OptionsJSON {
     //Optional settings with a default value  ----------------------------
     private String nudIp;
     private boolean sendMails;
-    private boolean sendRPC;
+    private boolean submitLiquidity;
     private boolean executeOrders;
     private boolean verbose;
     private boolean sendHipchat;
@@ -103,7 +103,7 @@ public class OptionsJSON {
         this.nudPort = nudPort;
         this.priceIncrement = priceIncrement;
         this.txFee = txFee;
-        this.sendRPC = sendRPC;
+        this.submitLiquidity = sendRPC;
         this.exchangeName = exchangeName;
         this.verbose = verbose;
         this.executeOrders = executeOrders;
@@ -140,7 +140,7 @@ public class OptionsJSON {
      * @return
      */
     public boolean isSendRPC() {
-        return sendRPC;
+        return submitLiquidity;
     }
 
     /**
@@ -148,7 +148,7 @@ public class OptionsJSON {
      * @param sendRPC
      */
     public void setSendRPC(boolean sendRPC) {
-        this.sendRPC = sendRPC;
+        this.submitLiquidity = sendRPC;
     }
 
     /**
@@ -503,7 +503,7 @@ public class OptionsJSON {
 
             String nudIp = "127.0.0.1";
             boolean sendMails = true;
-            boolean sendRPC = true;
+            boolean submitLiquidity = true;
             boolean executeOrders = true;
             boolean verbose = false;
             boolean sendHipchat = true;
@@ -530,8 +530,8 @@ public class OptionsJSON {
                 txFee = Utils.getDouble(optionsJSON.get("txfee"));
             }
 
-            if (optionsJSON.containsKey("sendrpc")) {
-                sendRPC = (boolean) optionsJSON.get("sendrpc");
+            if (optionsJSON.containsKey("submit-liquidity")) {
+                submitLiquidity = (boolean) optionsJSON.get("submit-liquidity");
             }
 
             if (optionsJSON.containsKey("executeorders")) {
@@ -578,7 +578,7 @@ public class OptionsJSON {
 
             //Create a new Instance
             options = new OptionsJSON(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
-                    rpcPass, nudIp, nudPort, priceIncrement, txFee, sendRPC, exchangeName,
+                    rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                     executeOrders, verbose, pair, executeStrategyInterval,
                     sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
                     emergencyTimeout, keepProceedings, aggregate, cpo);
@@ -637,7 +637,7 @@ public class OptionsJSON {
         if (secondaryPegOptions != null) {
             cryptoOptions = secondaryPegOptions.toString();
         }
-        return "OptionsJSON{" + "dualSide=" + dualSide + ", sendRPC=" + sendRPC + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + "aggregate=" + aggregate + " , cryptoPegOptions=" + cryptoOptions + '}';
+        return "OptionsJSON{" + "dualSide=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + "aggregate=" + aggregate + " , cryptoPegOptions=" + cryptoOptions + '}';
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
@@ -650,6 +650,6 @@ public class OptionsJSON {
         if (secondaryPegOptions != null) {
             cryptoOptions = secondaryPegOptions.toHtmlString();
         }
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> sendRPC=" + sendRPC + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceedings=" + keepProceedings + "<br> aggregate=" + aggregate + " <br><br>" + cryptoOptions + '}';
+        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceedings=" + keepProceedings + "<br> aggregate=" + aggregate + " <br><br>" + cryptoOptions + '}';
     }
 }
