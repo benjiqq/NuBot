@@ -329,7 +329,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //store it
         sellPricePEG_old = sellPricePEGInitial;
 
-        LOG.info("Converted : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
+        LOG.info("Converted price (using 1 "+Global.options.getPair().getPaymentCurrency().getCode()+" = "+peg_price+" USD)"
+                + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
                 + "; buy @" + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode());
 
         //Assign prices
