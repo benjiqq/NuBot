@@ -404,8 +404,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         } else {
             LOG.severe(balancesResponse.getError().toString());
         }
-
-        mightNeedInit = !ordersAndBalancesOK;
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
@@ -572,6 +570,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         double priceWaitType;
 
         if (priceDirection.equals(Constant.UP)) {
+            
             shiftImmediatelyOrderType = Constant.SELL;
             waitAndShiftOrderType = Constant.BUY;
             priceImmediatelyType = sellPrice;
@@ -582,6 +581,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             priceImmediatelyType = buyPrice;
             priceWaitType = sellPrice;
         }
+        LOG.info("Immediately try to shift "+shiftImmediatelyOrderType+" orders");
 
         //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
         boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType);
@@ -597,8 +597,8 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (success) { //Only move the second type of order if sure that the first have been taken down
             try {
                 //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                //TODO what happens if in the meantime this bots receives a new price change notification?
-
+                LOG.info ("Wait "+Math.round(wait_time/1000)+" seconds to make sure all the bots shifter their "+shiftImmediatelyOrderType+" own orders. "
+                        + "Then try to shift "+waitAndShiftOrderType +" orders.");
                 Thread.sleep(wait_time);
             } catch (InterruptedException ex) {
                 LOG.severe(ex.getMessage());
@@ -618,8 +618,14 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
         }
         
+         //Here I wait until the two orders are correctly displaied. It can take some seconds
+         try {
+         Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.getMessage());
+         }
+        
         //Communicate to the priceMonitorTask that the wall shift is over 
-
         priceMonitorTask.setWallsBeingShifted(false);
         return success;
     }
