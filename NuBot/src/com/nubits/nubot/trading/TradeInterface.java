@@ -131,10 +131,11 @@ public interface TradeInterface {
      * Cancel an order
      *
      * @param orderID The id of the order (exchange specific)
+     * @param pair  The currency pair of the order. Ignored by most exchanged, needed by some
      * @return an ApiResponse object with the a boolean object (true if
      * succesful) an ApiError in case of error.
      */
-    public ApiResponse cancelOrder(String orderID);
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair);
 
     /**
      * Get the transaction fee

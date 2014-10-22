@@ -497,7 +497,7 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
 
@@ -661,7 +661,7 @@ public class CcedkWrapper implements TradeInterface {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
 
-                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId());
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(),null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 

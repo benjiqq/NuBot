@@ -74,11 +74,9 @@ public class TestWrappers {
         //testGetAvailableBalances(Constant.BTC_NBT);
         //testGetActiveOrders(Constant.BTC_NBT)
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testSell(1, 0.00430509, Constant.BTC_NBT);  //ok
-        testBuy(1, 0.00199999, Constant.BTC_NBT);  //ok
-
-        //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
-        //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
+        //testSell(0.3, 0.00430509, Constant.BTC_NBT);  //ok
+        //testBuy(1, 0.00199999, Constant.BTC_NBT);  //ok
+        testCancelOrder("38284713",Constant.BTC_NBT );
         //testIsOrderActive("681977190");
         //testClearAllOrders();
         //testGetTxFee();
@@ -264,9 +262,9 @@ public class TestWrappers {
         }
     }
 
-    private static void testCancelOrder(String order_id_delete) {
+    private static void testCancelOrder(String order_id_delete, CurrencyPair pair) {
         //Cancel an order
-        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(order_id_delete);
+        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(order_id_delete,pair);
         if (deleteOrderResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 

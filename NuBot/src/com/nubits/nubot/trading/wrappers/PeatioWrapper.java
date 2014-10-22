@@ -444,7 +444,7 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String path = API_CANCEL_ORDER;
         boolean isGet = false;

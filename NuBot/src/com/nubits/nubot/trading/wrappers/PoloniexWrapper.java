@@ -79,6 +79,8 @@ public class PoloniexWrapper implements TradeInterface {
     private final String API_GET_TRADES = "returnTradeHistory";
     private final String API_SELL = "sell";
     private final String API_BUY = "buy";
+    private final String API_CANCEL_ORDER = "cancelOrder";
+
     //Errors
     private ArrayList<ApiError> errors;
     private final String TOKEN_ERR = "error";
@@ -429,8 +431,57 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        String base = API_BASE_URL;
+   
+        String command = API_CANCEL_ORDER;
+                
+        HashMap<String, String> query_args = new HashMap<>();
+        
+        /*Params
+         */
+        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("orderNumber", orderID);
+
+
+        String queryResult = query(base, command, query_args, false);
+        
+        /*Sample result
+            {"success":1}
+         */
+        
+         if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean valid = true;
+            if (httpAnswerJson.containsKey("error")) {
+                valid = false;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("error");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                LOG.warning("Cannot delete order "+orderID+" :" + errorMessage);
+                                    apiResponse.setResponseObject(false);
+
+                return apiResponse;
+            } else {
+                //correct
+                apiResponse.setResponseObject(true);
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+        return apiResponse;
     }
 
     @Override

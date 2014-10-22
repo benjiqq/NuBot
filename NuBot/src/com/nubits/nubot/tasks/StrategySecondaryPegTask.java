@@ -437,12 +437,12 @@ public class StrategySecondaryPegTask extends TimerTask {
             String[] idToDelete = getSmallerWallID(type);
             if (!idToDelete[0].equals("-1")) {
                 LOG.info("Taking down first order ");
-                if (TradeUtils.takeDownAndWait(idToDelete[0], Global.options.getEmergencyTimeout() * 1000)) {
+                if (TradeUtils.takeDownAndWait(idToDelete[0], Global.options.getEmergencyTimeout() * 1000,Global.options.getPair())) {
                     if (putAllBalanceOnOrder(type)) {
                         if (shift && !idToDelete[1].equals("-1")) {//if this is a wall shift and the second order has a valid id
                             //take the other order which is still up with the old price,
                             LOG.info("Taking down second order ");
-                            if (TradeUtils.takeDownAndWait(idToDelete[1], Global.options.getEmergencyTimeout() * 1000)) {
+                            if (TradeUtils.takeDownAndWait(idToDelete[1], Global.options.getEmergencyTimeout() * 1000,Global.options.getPair())) {
                                 //try to restore at new price.
                                 if (putAllBalanceOnOrder(type)) {
                                 } else {
@@ -586,7 +586,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " orders");
 
         //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
-        boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType);
+        boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
         if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
             boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
             if (!init1) {
@@ -608,7 +608,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
 
             //Cancel active <waitAndShiftOrderType> orders
-            boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType);
+            boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType, Global.options.getPair());
 
             if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
                 boolean init2 = initOrders(waitAndShiftOrderType, priceWaitType);

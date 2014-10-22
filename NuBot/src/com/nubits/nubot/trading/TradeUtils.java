@@ -80,7 +80,7 @@ public class TradeUtils {
         return toRet;
     }
 
-    public static boolean takeDownOrders(String type) {
+    public static boolean takeDownOrders(String type, CurrencyPair pair) {
         boolean completed = true;
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -90,7 +90,7 @@ public class TradeUtils {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
                 if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000);
+                    boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000,pair);
                     if (!tempDeleted) {
                         completed = false;
                     }
@@ -103,9 +103,9 @@ public class TradeUtils {
         return completed;
     }
 
-    public static boolean takeDownAndWait(String orderID, long timeoutMS) {
+    public static boolean takeDownAndWait(String orderID, long timeoutMS, CurrencyPair pair) {
 
-        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID);
+        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID,pair);
         if (deleteOrderResponse.isPositive()) {
             boolean delRequested = (boolean) deleteOrderResponse.getResponseObject();
 

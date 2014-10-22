@@ -635,7 +635,7 @@ public class BterWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String path = API_BASE_URL + API_CANCEL_ORDER;
 
@@ -690,7 +690,6 @@ public class BterWrapper implements TradeInterface {
                     apiResponse.setResponseObject(false);
                     return apiResponse;
                 } else {
-
                     apiResponse.setResponseObject(true);
                     return apiResponse;
                 }
@@ -824,7 +823,7 @@ public class BterWrapper implements TradeInterface {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
 
-                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId());
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(),null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 

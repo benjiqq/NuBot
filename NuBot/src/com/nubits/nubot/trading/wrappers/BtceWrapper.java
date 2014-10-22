@@ -365,7 +365,7 @@ public class BtceWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
 
         String path = API_CANCEL_ORDER;
@@ -812,7 +812,7 @@ public class BtceWrapper implements TradeInterface {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
 
-                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId());
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(),null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
