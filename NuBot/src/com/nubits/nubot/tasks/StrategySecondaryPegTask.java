@@ -573,7 +573,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         double priceWaitType;
 
         if (priceDirection.equals(Constant.UP)) {
-
             shiftImmediatelyOrderType = Constant.SELL;
             waitAndShiftOrderType = Constant.BUY;
             priceImmediatelyType = sellPrice;
@@ -662,13 +661,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (balance.getQuantity() > oneNBT) {
                 // Divide the  balance 50% 50% in balance1 and balance2
 
-                double amount1 = Utils.round(balance.getQuantity() / 2, 6);
-                double amount2 = balance.getQuantity() - amount1;
 
-                if (type.equals(Constant.BUY)) {
-                    amount1 = Utils.round(amount1 / price, 6);
-                    amount2 = Utils.round(amount2 / price, 6);
-                }
 
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
@@ -676,6 +669,16 @@ public class StrategySecondaryPegTask extends TimerTask {
                 if (txFeeNTBPEGResponse.isPositive()) {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
+
+
+                    double amount1 = Utils.round(balance.getQuantity() / 2, 6);
+                    double amount2 = balance.getQuantity() - amount1 - ((txFeePEGNTB / 100) * amount1); // minus the feed (twice)
+
+                    if (type.equals(Constant.BUY)) {
+                        amount1 = Utils.round(amount1 / price, 6);
+                        amount2 = Utils.round(amount2 / price, 6);
+                    }
+
 
                     //Prepare the orders
 
