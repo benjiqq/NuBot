@@ -68,26 +68,30 @@ public class TestWrappers {
     }
 
     public static void runTests() {
+        //Methods strictly necessary for NuBot to run---------------
+        //---------------
         //testGetAvailableBalance(Constant.BTC); //
         //testGetAvailableBalances(Constant.BTC_NBT);
-        //testGetActiveOrders(Constant.BTC_NBT);
+        //testGetActiveOrders(Constant.BTC_NBT)
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testSell(1, 0.002992, Constant.NBT_BTC);  //ok
+        //testSell(1, 0.00430509, Constant.BTC_NBT);  //ok
+        testBuy(1, 0.00199999, Constant.BTC_NBT);  //ok
+
         //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
         //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
-        //testGetLastPrice(Constant.PPC_BTC);
-        //If returned in the main currency and not the payment currency, update the checkorders routine
-        //testCancelOrder("681977190");
-        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
+        //testIsOrderActive("681977190");
+        //testClearAllOrders();
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
-        //testClearAllOrders();
-        //testIsOrderActive("681977190");
-        //testGetPermissions();
+        //testCancelOrder("681977190");
+
+        //Methods not necessary for NuBot to run---------------
+        //---------------
+       
+        //testGetLastPrice(Constant.PPC_BTC);
+        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3" 
         //testGetLastTrades(Constant.NBT_PPC);
-        //System.out.println("\n\n\n");
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
-        testGetLastTrades(Constant.BTC_NBT);
 
         /*
          for (int i = 0; i < 5000; i++) {
@@ -130,23 +134,7 @@ public class TestWrappers {
          */
     }
 
-    /*
-     private static void testGetPermissions() {
-     //Test if the given apikey have permissions to trade and getinfo
 
-     ApiResponse permissionResponse = Global.exchange.getTrade().getPermissions();
-     if (permissionResponse.isPositive()) {
-     LOG.info("\nPositive response  from TradeInterface.getPermissions() ");
-     ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
-
-     LOG.info("Keys Valid :" + permissions.isValid_keys() + "\n"
-     + "getinfo : " + permissions.isGet_info() + "\n"
-     + "trade : " + permissions.isTrade());
-     } else {
-     LOG.severe(permissionResponse.getError().toString());
-     }
-     }
-     */
     private static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);

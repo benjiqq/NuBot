@@ -77,6 +77,8 @@ public class PoloniexWrapper implements TradeInterface {
     private final String API_GET_BALANCES = "returnCompleteBalances";
     private final String API_GET_ORDERS = "returnOpenOrders";
     private final String API_GET_TRADES = "returnTradeHistory";
+    private final String API_SELL = "sell";
+    private final String API_BUY = "buy";
     //Errors
     private ArrayList<ApiError> errors;
     private final String TOKEN_ERR = "error";
@@ -233,12 +235,71 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return enterOrder(Constant.SELL ,pair,amount,rate);
     }
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return enterOrder(Constant.BUY ,pair,amount,rate);
+    }
+    
+    private ApiResponse enterOrder(String type,CurrencyPair pair, double amount, double rate )
+    {
+        ApiResponse apiResponse = new ApiResponse();
+
+        String base = API_BASE_URL;
+        String command ;
+        if (type.equals(Constant.SELL))
+            command = API_SELL;
+        else
+            command = API_BUY;
+                
+        HashMap<String, String> query_args = new HashMap<>();
+        
+        /*Params
+         */
+        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("amount", Double.toString(amount));
+        query_args.put("rate", Double.toString(rate));
+
+
+        String queryResult = query(base, command, query_args, false);
+        
+        /*Sample result
+         *{"orderNumber":31226040,"resultingTrades":[{"amount":"338.8732","date":"2014-10-18 23:03:21","rate":"0.00000173","total":"0.00058625","tradeID":"16164","type":"buy"}]}
+         */
+        
+         if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean valid = true;
+            if (httpAnswerJson.containsKey("error")) {
+                valid = false;
+            }
+
+            if (!valid) {
+                //error
+                String errorMessage = (String) httpAnswerJson.get("error");
+                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                //LOG.severe("Poloniex API returned an error: " + errorMessage);
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                String order_id = (String) httpAnswerJson.get("orderNumber");
+                apiResponse.setResponseObject(order_id);
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+        return apiResponse;
     }
 
     @Override
