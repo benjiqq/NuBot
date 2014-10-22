@@ -610,8 +610,6 @@ public class PeatioWrapper implements TradeInterface {
 
         order.setInsertedDate(parseDate(jsonObject.getString("created_at")));
 
-
-
         order.setType(jsonObject.getString("side"));
         //Created at?
         order.setExecutedAmount(new Amount(jsonObject.getDouble("executed_volume"), cp.getOrderCurrency()));

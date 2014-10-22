@@ -22,6 +22,7 @@ package com.nubits.nubot.trading.wrappers;
  * @author ---
  */
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
@@ -30,6 +31,7 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
@@ -45,9 +47,12 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
@@ -71,6 +76,7 @@ public class PoloniexWrapper implements TradeInterface {
     private final String API_BASE_URL = "https://poloniex.com/tradingApi";
     private final String API_GET_BALANCES = "returnCompleteBalances";
     private final String API_GET_ORDERS = "returnOpenOrders";
+    private final String API_GET_TRADES = "returnTradeHistory";
     //Errors
     private ArrayList<ApiError> errors;
     private final String TOKEN_ERR = "error";
@@ -456,12 +462,96 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getTradesImpl(pair, startTime);
+    }
+
+    private ApiResponse getTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+
+        String base = API_BASE_URL;
+        String command = API_GET_TRADES;
+        HashMap<String, String> query_args = new HashMap<>();
+
+        String startDateArg;
+        if (startTime == 0) {
+            long now = System.currentTimeMillis();
+            long yesterday = Math.round((now - 1000 * 60 * 60 * 36) / 1000);
+            startDateArg = Long.toString(yesterday); //24hours
+        } else {
+            startDateArg = Long.toString(startTime);
+        }
+
+        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("start", startDateArg);
+
+        String queryResult = query(base, command, query_args, false);
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        boolean valid = true;
+        boolean isArray = false;
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+        } catch (ClassCastException ex) {
+            isArray = true;
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+        JSONObject httpAnswerJSONobject = null;
+        JSONArray httpAnwerJSONarray = null;
+        if (isArray) {
+            try {
+                httpAnwerJSONarray = (JSONArray) (parser.parse(queryResult));
+            } catch (ParseException ex) {
+                LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+                apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+                return apiResponse;
+            }
+        }
+        if (!isArray && httpAnswerJSONobject.containsKey("error")) {
+            valid = false;
+        }
+        if (!valid) {
+            //error
+            String errorMessage = (String) httpAnswerJSONobject.get("error");
+            ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+            //LOG.severe("Poloniex API returned an error: " + errorMessage);
+            apiResponse.setError(apiErr);
+            return apiResponse;
+        } else {
+            //correct
+            JSONArray trades = null;
+            if (isArray) {
+                /*Sample result
+                 * if currencyPair is specified
+                 *[
+                 * {"date":"2014-02-19 03:44:59","rate":"0.0011","amount":"99.9070909","total":"0.10989779","orderNumber":"3048809","type":"sell"},
+                 *{"date":"2014-02-19 04:55:44","rate":"0.0015","amount":"100","total":"0.15","orderNumber":"3048903","type":"sell"},
+                 * ... ] */
+                trades = httpAnwerJSONarray;
+                for (int i = 0; i < trades.size(); i++) {
+                    JSONObject tradesObject = (JSONObject) trades.get(i);
+                    Trade tempTrade = parseTrade(tradesObject, pair);
+                    tradeList.add(tempTrade);
+                }
+
+            }
+
+        }
+        apiResponse.setResponseObject(tradeList);
+        return apiResponse;
     }
 
     private Order parseOrder(JSONObject orderObject, CurrencyPair pair) {
@@ -469,19 +559,51 @@ public class PoloniexWrapper implements TradeInterface {
         Order order = new Order();
 
         order.setType(((String) orderObject.get("type")).toUpperCase());
-
         order.setId((String) orderObject.get("orderNumber"));
-
         order.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), pair.getPaymentCurrency()));
         order.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), pair.getOrderCurrency()));
-
         order.setCompleted(false);
         order.setPair(pair);
-
         order.setInsertedDate(new Date()); //Not provided
 
         return order;
 
+    }
+
+    private Trade parseTrade(JSONObject orderObject, CurrencyPair pair) {
+        /* {"date":"2014-02-19 04:55:44","rate":"0.0015","amount":"100","fee":"0.02","total":"0.15","orderNumber":"3048903","type":"sell"}*/
+        Trade trade = new Trade();
+        trade.setOrder_id((String) orderObject.get("orderNumber"));
+
+        trade.setExchangeName(Constant.POLONIEX);
+        trade.setPair(pair);
+
+        trade.setType(((String) orderObject.get("type")).toUpperCase());
+        trade.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), pair.getPaymentCurrency()));
+        trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), pair.getOrderCurrency()));
+        trade.setFee(new Amount(0, pair.getPaymentCurrency()));
+
+        String date = (String) orderObject.get("date");
+        trade.setDate(parseDate(date));
+
+        return trade;
+    }
+
+    private Date parseDate(String dateStr) {
+        Date toRet = null;
+        //Parse the date
+        //Sample 2014-02-19 04:55:44
+
+        //Remove the Timezone
+        String datePattern = "yyyy-MM-dd HH:mm:ss";
+        DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
+        try {
+            toRet = df.parse(dateStr);
+        } catch (java.text.ParseException ex) {
+            LOG.severe(ex.getMessage());
+            toRet = new Date();
+        }
+        return toRet;
     }
 
     private class PoloniexService implements ServiceInterface {

@@ -69,9 +69,9 @@ public class TestWrappers {
 
     public static void runTests() {
         //testGetAvailableBalance(Constant.BTC); //
-        //testGetAvailableBalances(Constant.NBT_USD);
+        //testGetAvailableBalances(Constant.BTC_NBT);
         //testGetActiveOrders(Constant.BTC_NBT);
-        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testSell(1, 0.002992, Constant.NBT_BTC);  //ok
         //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
         //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
@@ -86,7 +86,8 @@ public class TestWrappers {
         //testGetPermissions();
         //testGetLastTrades(Constant.NBT_PPC);
         //System.out.println("\n\n\n");
-        //testGetLastTrades(Constant.NBT_PPC, 1409566800);
+        //testGetLastTrades(Constant.BTC_NBT, 1409566800);
+        testGetLastTrades(Constant.BTC_NBT);
 
         /*
          for (int i = 0; i < 5000; i++) {
