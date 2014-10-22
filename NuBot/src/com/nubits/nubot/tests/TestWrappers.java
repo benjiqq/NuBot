@@ -61,7 +61,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.POLONIEX); //Replace to test a differe API implementation
 
         runTests();
 
@@ -69,8 +69,9 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-        //testGetAvailableBalances(Constant.NBT_BTC); //ok
-        //testGetAvailableBalance(Constant.NBT); //ok
+        testGetAvailableBalance(Constant.NBT); //
+        testGetAvailableBalances(Constant.NBT_BTC);
+
         //testSell(1, 0.002992, Constant.NBT_BTC);  //ok
         //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
         //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
@@ -86,9 +87,9 @@ public class TestWrappers {
         //testIsOrderActive("681977190");
         //testGetPermissions();
 
-        testGetLastTrades(Constant.NBT_PPC);
-        System.out.println("\n\n\n");
-        testGetLastTrades(Constant.NBT_PPC, 1409566800);
+        //testGetLastTrades(Constant.NBT_PPC);
+        //System.out.println("\n\n\n");
+        //testGetLastTrades(Constant.NBT_PPC, 1409566800);
 
         /*
          for (int i = 0; i < 5000; i++) {

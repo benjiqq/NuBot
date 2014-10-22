@@ -247,7 +247,7 @@ public class BterWrapper implements TradeInterface {
                     }
                     apiResponse.setResponseObject(avail);
                     if (!found) {
-                        LOG.info("Cannot find a balance for currency with code "
+                        LOG.warning("Cannot find a balance for currency with code "
                                 + code + " in your balance. NuBot assumes that balance is 0");
                     }
                 }
