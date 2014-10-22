@@ -64,21 +64,19 @@ public class TestWrappers {
         configExchange(Constant.POLONIEX); //Replace to test a differe API implementation
 
         runTests();
-
         System.exit(0);
     }
 
     public static void runTests() {
-        testGetAvailableBalance(Constant.NBT); //
-        testGetAvailableBalances(Constant.NBT_BTC);
-
+        //testGetAvailableBalance(Constant.BTC); //
+        //testGetAvailableBalances(Constant.NBT_USD);
+        //testGetActiveOrders(Constant.BTC_NBT);
+        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testSell(1, 0.002992, Constant.NBT_BTC);  //ok
         //testBuy(100, 0.002909, Constant.NBT_EUR); //ok
         //testBuy(0.1, 0.002909, Constant.NBT_BTC); //ok
         //testGetLastPrice(Constant.PPC_BTC);
-        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //If returned in the main currency and not the payment currency, update the checkorders routine
-        //testGetActiveOrders(Constant.NBT_PPC);
         //testCancelOrder("681977190");
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetTxFee();
@@ -86,7 +84,6 @@ public class TestWrappers {
         //testClearAllOrders();
         //testIsOrderActive("681977190");
         //testGetPermissions();
-
         //testGetLastTrades(Constant.NBT_PPC);
         //System.out.println("\n\n\n");
         //testGetLastTrades(Constant.NBT_PPC, 1409566800);

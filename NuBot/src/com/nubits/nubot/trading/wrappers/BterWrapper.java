@@ -948,7 +948,6 @@ public class BterWrapper implements TradeInterface {
         order.setId((String) orderObject.get("id"));
 
 
-        //TODO currencypair
         CurrencyPair cp = CurrencyPair.getCurrencyPairFromString((String) orderObject.get("pair"), "_");
         order.setPair(cp);
 

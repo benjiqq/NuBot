@@ -57,6 +57,7 @@ public class Constant {
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
+    public static final CurrencyPair BTC_NBT = new CurrencyPair(BTC, NBT);
     public static final CurrencyPair NBT_PPC = new CurrencyPair(NBT, PPC);
     public static final CurrencyPair NBT_EUR = new CurrencyPair(NBT, EUR);
     public static final CurrencyPair NBT_CNY = new CurrencyPair(NBT, CNY);
@@ -81,8 +82,10 @@ public class Constant {
         switch (codeString) {
             case "USD":
                 toRet = USD;
+                break;
             case "EUR":
                 toRet = EUR;
+                break;
             case "LTC":
                 toRet = LTC;
                 break;

@@ -90,7 +90,7 @@ public class SendLiquidityinfoTask extends TimerTask {
                 }
                 //Update the order
                 Global.exchange.getLiveData().setOrdersList(orderList);
-                if (Global.conversion != -1 && !Global.options.getExchangeName().equals(Constant.CCEDK)) {
+                if (Global.conversion != 1 && !Global.options.getExchangeName().equals(Constant.CCEDK)) {
                     //if the bot is running on Strategy Secondary Peg, we need to convert this value
                     nbt_onbuy = nbt_onbuy * Global.conversion;
                 }

@@ -46,13 +46,16 @@ import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -67,6 +70,7 @@ public class PoloniexWrapper implements TradeInterface {
     //Entry points
     private final String API_BASE_URL = "https://poloniex.com/tradingApi";
     private final String API_GET_BALANCES = "returnCompleteBalances";
+    private final String API_GET_ORDERS = "returnOpenOrders";
     //Errors
     private ArrayList<ApiError> errors;
     private final String TOKEN_ERR = "error";
@@ -233,12 +237,123 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getOrdersImpl(pair);
+    }
+
+    private ApiResponse getOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        String base = API_BASE_URL;
+        String command = API_GET_ORDERS;
+        HashMap<String, String> query_args = new HashMap<>();
+
+        String pairString = "all";
+        if (pair != null) {
+            pairString = pair.toString("_").toUpperCase();
+        }
+
+        query_args.put("currencyPair", pairString);
+
+
+        String queryResult = query(base, command, query_args, false);
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        boolean valid = true;
+        boolean isArray = false;
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+        } catch (ClassCastException ex) {
+            isArray = true;
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+
+        JSONObject httpAnswerJSONobject = null;
+        JSONArray httpAnwerJSONarray = null;
+        if (isArray) {
+            try {
+                httpAnwerJSONarray = (JSONArray) (parser.parse(queryResult));
+            } catch (ParseException ex) {
+                LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+                apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+                return apiResponse;
+            }
+        } else {
+            try {
+                httpAnswerJSONobject = (JSONObject) (parser.parse(queryResult));
+            } catch (ParseException ex) {
+                LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+                apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+                return apiResponse;
+            }
+        }
+
+        if (!isArray && httpAnswerJSONobject.containsKey("error")) {
+            valid = false;
+        }
+        if (!valid) {
+            //error
+            String errorMessage = (String) httpAnswerJSONobject.get("error");
+            ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+            //LOG.severe("Poloniex API returned an error: " + errorMessage);
+            apiResponse.setError(apiErr);
+            return apiResponse;
+        } else {
+            //correct
+            JSONArray orders = null;
+            if (isArray) {
+                /*Sample result
+                 * if currencyPair is specified
+                 *[
+                 * {"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5"},
+                 * {"orderNumber":"120467","type":"sell","rate":"0.04","amount":"100","total":"4"},
+                 * ... ]
+                 */
+                orders = httpAnwerJSONarray;
+                for (int i = 0; i < orders.size(); i++) {
+                    JSONObject orderObject = (JSONObject) orders.get(i);
+                    Order tempOrder = parseOrder(orderObject, pair);
+                    orderList.add(tempOrder);
+                }
+
+            } else { //if currencyPair is set to 'all'
+                /*
+                 * {"BTC_1CR":[],
+                 * "BTC_AC":
+                 *      [{"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5"},
+                 *          {"orderNumber":"120467","type":"sell","rate":"0.04","amount":"100","total":"4"}],
+                 *          ... }
+                 */
+
+                Set<String> set = httpAnswerJSONobject.keySet();
+                for (String key : set) {
+                    JSONArray tempArray = (JSONArray) httpAnswerJSONobject.get(key);
+                    for (int i = 0; i < tempArray.size(); i++) {
+                        CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(key, "_");
+                        JSONObject orderObject = (JSONObject) tempArray.get(i);
+                        Order tempOrder = parseOrder(orderObject, cp);
+                        orderList.add(tempOrder);
+                    }
+                }
+
+            }
+
+        }
+        apiResponse.setResponseObject(orderList);
+        return apiResponse;
     }
 
     @Override
@@ -349,9 +464,24 @@ public class PoloniexWrapper implements TradeInterface {
         throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
-    private Order parseOrder(JSONObject orderObject) {
+    private Order parseOrder(JSONObject orderObject, CurrencyPair pair) {
+        /* {"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5" */
         Order order = new Order();
+
+        order.setType(((String) orderObject.get("type")).toUpperCase());
+
+        order.setId((String) orderObject.get("orderNumber"));
+
+        order.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), pair.getPaymentCurrency()));
+        order.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), pair.getOrderCurrency()));
+
+        order.setCompleted(false);
+        order.setPair(pair);
+
+        order.setInsertedDate(new Date()); //Not provided
+
         return order;
+
     }
 
     private class PoloniexService implements ServiceInterface {
