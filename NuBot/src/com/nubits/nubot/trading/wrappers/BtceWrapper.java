@@ -359,8 +359,6 @@ public class BtceWrapper implements TradeInterface {
         } else {
             return listApiResp;
         }
-
-
         return apiResp;
     }
 
