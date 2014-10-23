@@ -381,7 +381,55 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+
+        ApiResponse apiResponse = new ApiResponse();
+
+        String order_id = "";
+
+        //https://c-cex.com/t/r.html?key=Your_API_Key&a=cancelorder&id=OrderID
+
+
+        String url = baseUrl + "&a=cancelorder";
+        url += "&id=" + orderID;
+
+        String queryResult = query(url, new HashMap<String, String>(), true);
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+        if (queryResult.startsWith("Access denied")) {
+            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            return apiResponse;
+        }
+
+        /*Sample result
+         *
+         * {"return":"Order 4678299 canceled"}
+         *  - OR -
+         *{"error":"Order 1228 not found"}
+         */
+
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+
+            if (httpAnswerJson.containsKey("error")) {
+                ApiError apiErr = new ApiError(ERROR_GENERIC, (String) httpAnswerJson.get("error"));
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                apiResponse.setResponseObject(true);
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+        return apiResponse;
+
     }
 
     @Override
