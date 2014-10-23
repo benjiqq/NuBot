@@ -467,7 +467,45 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        //Since there is no API entry point for that, this call will iterate over actie
+        ApiResponse toReturn = new ApiResponse();
+        boolean ok = true;
+
+        ApiResponse activeOrdersResponse = getActiveOrders();
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), pair);
+                if (deleteOrderResponse.isPositive()) {
+                    boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+
+                    if (deleted) {
+                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                    } else {
+                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        ok = false;
+                    }
+
+                } else {
+                    LOG.severe(deleteOrderResponse.getError().toString());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.getMessage());
+                }
+
+            }
+            toReturn.setResponseObject(ok);
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            toReturn.setError(activeOrdersResponse.getError());
+            return toReturn;
+        }
+
+        return toReturn;
     }
 
     @Override
