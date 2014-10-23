@@ -37,7 +37,7 @@ import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
+//import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
@@ -427,7 +427,7 @@ public class TestWrappers {
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
-            Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
+            //Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
         }
         
         else {

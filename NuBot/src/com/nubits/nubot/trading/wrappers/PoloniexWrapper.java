@@ -75,11 +75,11 @@ public class PoloniexWrapper implements TradeInterface {
     // Errors
     private ArrayList<ApiError> errors;
     private final String TOKEN_ERR = "error";
-    private final int ERROR_UNKNOWN = 14560;
-    private final int ERROR_NO_CONNECTION = 14561;
-    private final int ERROR_GENERIC = 14562;
-    private final int ERROR_PARSING = 14563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 14567;
+    private final int ERROR_UNKNOWN = 10560;
+    private final int ERROR_NO_CONNECTION = 10561;
+    private final int ERROR_GENERIC = 10562;
+    private final int ERROR_PARSING = 10563;
+    private final int ERROR_CURRENCY_NOT_FOUND = 10567;
 
     public PoloniexWrapper() {
         setupErrors();
