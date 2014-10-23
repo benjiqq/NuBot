@@ -343,6 +343,10 @@ public class CcexWrapper implements TradeInterface {
             //correct
             org.json.JSONObject dataJson = (org.json.JSONObject) httpAnswerJson.get("return");
 
+            if (dataJson.length() == 0) { //empty order list
+                apiResponse.setResponseObject(orderList);
+                return apiResponse;
+            }
             //Iterate on orders
             String names[] = org.json.JSONObject.getNames(dataJson);
             for (int i = 0; i < names.length; i++) {
@@ -376,7 +380,30 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        ApiResponse apiResp = new ApiResponse();
+        Order order = null;
+
+        ApiResponse listApiResp = getActiveOrders();
+        if (listApiResp.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) listApiResp.getResponseObject();
+            boolean found = false;
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                if (orderID.equals(tempOrder.getId())) {
+                    found = true;
+                    apiResp.setResponseObject(tempOrder);
+                    return apiResp;
+                }
+            }
+            if (!found) {
+                apiResp.setError(new ApiError(ERROR_GENERIC, "Cannot find the order with id " + orderID));
+                return apiResp;
+
+            }
+        } else {
+            return listApiResp;
+        }
+        return apiResp;
     }
 
     @Override
@@ -462,7 +489,22 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse isOrderActive(String id) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        ApiResponse existResponse = new ApiResponse();
+
+        ApiResponse orderDetailResponse = getOrderDetail(id);
+        if (orderDetailResponse.isPositive()) {
+            Order order = (Order) orderDetailResponse.getResponseObject();
+            existResponse.setResponseObject(true);
+        } else {
+            ApiError err = orderDetailResponse.getError();
+            if (err.getDescription().contains("Cannot find the order")) {
+                existResponse.setResponseObject(false);
+
+            } else {
+                existResponse.setError(err);
+            }
+        }
+        return existResponse;
     }
 
     @Override

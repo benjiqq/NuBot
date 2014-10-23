@@ -447,10 +447,7 @@ public class PoloniexWrapper implements TradeInterface {
         } else {
             return listApiResp;
         }
-
-
         return apiResp;
-
     }
 
     @Override
