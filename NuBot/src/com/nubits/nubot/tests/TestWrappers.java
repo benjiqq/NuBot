@@ -76,18 +76,19 @@ public class TestWrappers {
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testSell(0.3, 0.00430509, Constant.BTC_NBT);  //ok
         //testBuy(1, 0.00199999, Constant.BTC_NBT);  //ok
-        testCancelOrder("38284713",Constant.BTC_NBT );
+        //testCancelOrder("38284713",Constant.BTC_NBT );
+        testClearAllOrders(Constant.BTC_NBT);
         //testIsOrderActive("681977190");
-        //testClearAllOrders();
+
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //testCancelOrder("681977190");
 
         //Methods not necessary for NuBot to run---------------
         //---------------
-       
+
         //testGetLastPrice(Constant.PPC_BTC);
-        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3" 
+        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_PPC);
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
@@ -131,7 +132,6 @@ public class TestWrappers {
          }
          */
     }
-
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
@@ -264,7 +264,7 @@ public class TestWrappers {
 
     private static void testCancelOrder(String order_id_delete, CurrencyPair pair) {
         //Cancel an order
-        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(order_id_delete,pair);
+        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(order_id_delete, pair);
         if (deleteOrderResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
@@ -315,8 +315,8 @@ public class TestWrappers {
         }
     }
 
-    private static void testClearAllOrders() {
-        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+    private static void testClearAllOrders(CurrencyPair pair) {
+        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 

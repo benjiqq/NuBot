@@ -647,7 +647,7 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse clearOrders() {
+    public ApiResponse clearOrders(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String path = API_CLEAR_ORDERS;
         boolean isGet = false;

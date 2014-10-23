@@ -48,7 +48,7 @@ public class TradeUtils {
 
     private static final Logger LOG = Logger.getLogger(TradeUtils.class.getName());
 
-    public static boolean areAllOrdersCanceled() {
+    public static boolean tryCancelAllOrders(CurrencyPair pair) { //TODO the name of the method does not reflect its content
         boolean toRet = false;
         //get all orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -60,7 +60,7 @@ public class TradeUtils {
             } else {
                 LOG.warning("There are still : " + orderList.size() + " active orders");
                 //Retry to cancel them to fix issue #14
-                ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+                ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
                 if (deleteOrdersResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
@@ -90,7 +90,7 @@ public class TradeUtils {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
                 if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000,pair);
+                    boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000, pair);
                     if (!tempDeleted) {
                         completed = false;
                     }
@@ -105,7 +105,7 @@ public class TradeUtils {
 
     public static boolean takeDownAndWait(String orderID, long timeoutMS, CurrencyPair pair) {
 
-        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID,pair);
+        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID, pair);
         if (deleteOrderResponse.isPositive()) {
             boolean delRequested = (boolean) deleteOrderResponse.getResponseObject();
 

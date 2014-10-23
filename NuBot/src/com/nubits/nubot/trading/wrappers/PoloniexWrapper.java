@@ -80,7 +80,6 @@ public class PoloniexWrapper implements TradeInterface {
     private final String API_SELL = "sell";
     private final String API_BUY = "buy";
     private final String API_CANCEL_ORDER = "cancelOrder";
-
     //Errors
     private ArrayList<ApiError> errors;
     private final String TOKEN_ERR = "error";
@@ -237,27 +236,27 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        return enterOrder(Constant.SELL ,pair,amount,rate);
+        return enterOrder(Constant.SELL, pair, amount, rate);
     }
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        return enterOrder(Constant.BUY ,pair,amount,rate);
+        return enterOrder(Constant.BUY, pair, amount, rate);
     }
-    
-    private ApiResponse enterOrder(String type,CurrencyPair pair, double amount, double rate )
-    {
+
+    private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
 
         String base = API_BASE_URL;
-        String command ;
-        if (type.equals(Constant.SELL))
+        String command;
+        if (type.equals(Constant.SELL)) {
             command = API_SELL;
-        else
+        } else {
             command = API_BUY;
-                
+        }
+
         HashMap<String, String> query_args = new HashMap<>();
-        
+
         /*Params
          */
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
@@ -266,12 +265,12 @@ public class PoloniexWrapper implements TradeInterface {
 
 
         String queryResult = query(base, command, query_args, false);
-        
+
         /*Sample result
          *{"orderNumber":31226040,"resultingTrades":[{"amount":"338.8732","date":"2014-10-18 23:03:21","rate":"0.00000173","total":"0.00058625","tradeID":"16164","type":"buy"}]}
          */
-        
-         if (queryResult.startsWith(TOKEN_ERR)) {
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
             apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
             return apiResponse;
         }
@@ -434,11 +433,11 @@ public class PoloniexWrapper implements TradeInterface {
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String base = API_BASE_URL;
-   
+
         String command = API_CANCEL_ORDER;
-                
+
         HashMap<String, String> query_args = new HashMap<>();
-        
+
         /*Params
          */
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
@@ -446,12 +445,12 @@ public class PoloniexWrapper implements TradeInterface {
 
 
         String queryResult = query(base, command, query_args, false);
-        
+
         /*Sample result
-            {"success":1}
+         {"success":1}
          */
-        
-         if (queryResult.startsWith(TOKEN_ERR)) {
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
             apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
             return apiResponse;
         }
@@ -468,8 +467,8 @@ public class PoloniexWrapper implements TradeInterface {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-                LOG.warning("Cannot delete order "+orderID+" :" + errorMessage);
-                                    apiResponse.setResponseObject(false);
+                LOG.warning("Cannot delete order " + orderID + " :" + errorMessage);
+                apiResponse.setResponseObject(false);
 
                 return apiResponse;
             } else {
@@ -500,8 +499,46 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse clearOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+    public ApiResponse clearOrders(CurrencyPair pair) {
+        //Since there is no API entry point for that, this call will iterate over actie
+        ApiResponse toReturn = new ApiResponse();
+        boolean ok = true;
+
+        ApiResponse activeOrdersResponse = getActiveOrders();
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), pair);
+                if (deleteOrderResponse.isPositive()) {
+                    boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+
+                    if (deleted) {
+                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                    } else {
+                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        ok = false;
+                    }
+
+                } else {
+                    LOG.severe(deleteOrderResponse.getError().toString());
+                }
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.getMessage());
+                }
+
+            }
+            toReturn.setResponseObject(ok);
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            toReturn.setError(activeOrdersResponse.getError());
+            return toReturn;
+        }
+
+        return toReturn;
     }
 
     @Override

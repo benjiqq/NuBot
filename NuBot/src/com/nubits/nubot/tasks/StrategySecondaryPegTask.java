@@ -232,7 +232,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean reInitiateOrders() {
         //They are either 0 or need to be cancelled
         if (totalActiveOrders != 0) {
-            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
@@ -248,7 +248,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                         try {
 
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = TradeUtils.areAllOrdersCanceled();
+                            areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
                             LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
                             count += wait;
                             timedOut = count > timeout;
@@ -437,12 +437,12 @@ public class StrategySecondaryPegTask extends TimerTask {
             String[] idToDelete = getSmallerWallID(type);
             if (!idToDelete[0].equals("-1")) {
                 LOG.info("Taking down first order ");
-                if (TradeUtils.takeDownAndWait(idToDelete[0], Global.options.getEmergencyTimeout() * 1000,Global.options.getPair())) {
+                if (TradeUtils.takeDownAndWait(idToDelete[0], Global.options.getEmergencyTimeout() * 1000, Global.options.getPair())) {
                     if (putAllBalanceOnOrder(type)) {
                         if (shift && !idToDelete[1].equals("-1")) {//if this is a wall shift and the second order has a valid id
                             //take the other order which is still up with the old price,
                             LOG.info("Taking down second order ");
-                            if (TradeUtils.takeDownAndWait(idToDelete[1], Global.options.getEmergencyTimeout() * 1000,Global.options.getPair())) {
+                            if (TradeUtils.takeDownAndWait(idToDelete[1], Global.options.getEmergencyTimeout() * 1000, Global.options.getPair())) {
                                 //try to restore at new price.
                                 if (putAllBalanceOnOrder(type)) {
                                 } else {

@@ -59,7 +59,7 @@ public class StrategyFiatTask extends TimerTask {
             if (!(ordersAndBalancesOk)) {
                 //They are either 0 or need to be cancelled
                 if (totalActiveOrders != 0) {
-                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
                     if (deleteOrdersResponse.isPositive()) {
                         boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                         if (deleted) {
@@ -78,7 +78,7 @@ public class StrategyFiatTask extends TimerTask {
                                 } catch (InterruptedException ex) {
                                     LOG.severe(ex.getMessage());
                                 }
-                            } while (!TradeUtils.areAllOrdersCanceled() && !timedOut);
+                            } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
 
                             if (timedOut) {
                                 String message = "There was a problem cancelling all existing orders";
@@ -294,7 +294,7 @@ public class StrategyFiatTask extends TimerTask {
             if (!idToDelete.equals("-1")) {
                 LOG.warning("Sellside : Taking down smaller order to aggregate it with new balance");
 
-                if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000,Global.options.getPair())) {
+                if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair())) {
 
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
@@ -374,7 +374,7 @@ public class StrategyFiatTask extends TimerTask {
             String idToDelete = getSmallerWallID(Constant.BUY);
             if (!idToDelete.equals("-1")) {
                 LOG.warning("Buyside : Taking down smaller order to aggregate it with new balance");
-                if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000,Global.options.getPair())) {
+                if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair())) {
 
                     //Update balanceNBT to aggregate new amount made available
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());

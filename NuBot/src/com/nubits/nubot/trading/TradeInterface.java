@@ -131,7 +131,8 @@ public interface TradeInterface {
      * Cancel an order
      *
      * @param orderID The id of the order (exchange specific)
-     * @param pair  The currency pair of the order. Ignored by most exchanged, needed by some
+     * @param pair The currency pair of the order. Ignored by most exchanged,
+     * needed by some
      * @return an ApiResponse object with the a boolean object (true if
      * succesful) an ApiError in case of error.
      */
@@ -189,10 +190,12 @@ public interface TradeInterface {
     /**
      * Delete all active orders. Async
      *
+     * @param pair The currency pair of the order. Ignored by most exchanged,
+     * needed by some
      * @return an ApiResponse object with the boolean response (positive,
      * submitted ok) an ApiError in case of error.
      */
-    public ApiResponse clearOrders();
+    public ApiResponse clearOrders(CurrencyPair pair);
 
     /**
      * Get the ApiError associated with an error code

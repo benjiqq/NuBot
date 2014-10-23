@@ -22,6 +22,7 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
@@ -41,28 +42,29 @@ public class NuCancelOrders {
     private String api;
     private String secret;
     private String exchangename;
+    private CurrencyPair pair;
     private ApiKeys keys;
-    public static final String USAGE_STRING = "java  -jar NuCancelOrders <apikey> <secretkey> <exchange-name>";
+    public static final String USAGE_STRING = "java  -jar NuCancelOrders <apikey> <secretkey> <exchange-name> <pair>";
 
     public static void main(String[] args) {
         //Load settings
         Utils.loadProperties("settings.properties");
 
         NuCancelOrders app = new NuCancelOrders();
-        String folderName = "NuCancelOrders_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+        String folderName = "NuCancelOrders_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
         if (app.readParams(args)) {
             try {
-                NuLogger.setup(false,logsFolder);
+                NuLogger.setup(false, logsFolder);
             } catch (IOException ex) {
                 LOG.severe(ex.getMessage());
             }
 
             LOG.fine("Launching CancellAllOrders ");
             app.prepareForExecution();
-            app.cancelAllOrders();
+            app.cancelAllOrders(app.pair);
             LOG.fine("Done");
             System.exit(0);
 
@@ -71,9 +73,9 @@ public class NuCancelOrders {
         }
     }
 
-    private void cancelAllOrders() {
+    private void cancelAllOrders(CurrencyPair pair) {
 
-        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
@@ -138,7 +140,7 @@ public class NuCancelOrders {
     private boolean readParams(String[] args) {
         boolean ok = false;
 
-        if (args.length != 3) {
+        if (args.length != 4) {
             LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
@@ -147,6 +149,7 @@ public class NuCancelOrders {
         api = args[0];
         secret = args[1];
         exchangename = args[2];
+        pair = CurrencyPair.getCurrencyPairFromString(args[3], "_");
 
         ok = true;
         return ok;
