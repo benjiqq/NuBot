@@ -889,8 +889,6 @@ public class BterWrapper implements TradeInterface {
             LOG.severe("The bot will not execute the query, there is no connection to bter");
             queryResult = "error : no connection with Bter";
         }
-
-
         return queryResult;
     }
 
