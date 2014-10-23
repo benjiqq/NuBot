@@ -204,6 +204,7 @@ public class Utils {
         if (pair.equals(Constant.NBT_USD)
                 || pair.equals(Constant.BTC_CNY)//TODO this is only for testing purposes on our internal exchange
                 || pair.equals(Constant.NBT_BTC)
+                || pair.equals(Constant.BTC_NBT)
                 || pair.equals(Constant.NBT_EUR)
                 || pair.equals(Constant.NBT_CNY)
                 || pair.equals(Constant.NBT_PPC)) {
@@ -222,7 +223,7 @@ public class Utils {
             return true;
         }
     }
-    
+
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
     //not needed if using alibaba json parser
     public static double getDouble(Object obj) {

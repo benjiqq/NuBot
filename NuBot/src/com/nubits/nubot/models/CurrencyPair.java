@@ -146,11 +146,10 @@ public class CurrencyPair {
 
     }
 
-    /**
-     *
-     * @param currencyCode
-     * @return
-     */
+    public static CurrencyPair swap(CurrencyPair regular) {
+        return new CurrencyPair(regular.paymentCurrency, regular.orderCurrency);
+    }
+
     public static boolean isFiat(String currencyCode) {
         boolean fiat = false;
         //toto

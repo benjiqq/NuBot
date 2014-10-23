@@ -36,11 +36,8 @@ public class Constant {
     public static final String PEATIO_MULTIPAIR = "peatio_multipair";
     public static final String POLONIEX = "poloniex";
     //API base url for peatio instances
-    public static final String PEATIO_MULTIPAIR_API_BASE = "http://198.52.199.61/"; //TODO UPDATE WHEN AVAILABLE
+    public static final String PEATIO_MULTIPAIR_API_BASE = "http://178.62.186.229/";
     public static final String PEATIO_BTCCNY_API_BASE = "http://198.52.199.61/";
-    //UI components
-    public static final String MAIN_DASHBOARD = "main-dasbhboard";
-    public static final String OPTIONS = "options-dasbhboard";
     //Order types
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
