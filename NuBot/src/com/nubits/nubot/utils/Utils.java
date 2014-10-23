@@ -276,4 +276,8 @@ public class Utils {
         }
         return null;
     }
+
+    public static long getOneDayInMillis() {
+        return 1000 * 60 * 60 * 24;
+    }
 }

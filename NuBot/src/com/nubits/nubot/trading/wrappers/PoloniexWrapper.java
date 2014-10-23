@@ -447,6 +447,7 @@ public class PoloniexWrapper implements TradeInterface {
         } else {
             return listApiResp;
         }
+
         return apiResp;
     }
 
@@ -674,7 +675,7 @@ public class PoloniexWrapper implements TradeInterface {
         String startDateArg;
         if (startTime == 0) {
             long now = System.currentTimeMillis();
-            long yesterday = Math.round((now - 1000 * 60 * 60 * 36) / 1000);
+            long yesterday = now - Utils.getOneDayInMillis();
             startDateArg = Long.toString(yesterday); //24hours
         } else {
             startDateArg = Long.toString(startTime);
@@ -763,20 +764,20 @@ public class PoloniexWrapper implements TradeInterface {
 
     }
 
-    private Trade parseTrade(JSONObject orderObject, CurrencyPair pair) {
+    private Trade parseTrade(JSONObject tradeObj, CurrencyPair pair) {
         /* {"date":"2014-02-19 04:55:44","rate":"0.0015","amount":"100","fee":"0.02","total":"0.15","orderNumber":"3048903","type":"sell"}*/
         Trade trade = new Trade();
-        trade.setOrder_id((String) orderObject.get("orderNumber"));
+        trade.setOrder_id((String) tradeObj.get("orderNumber"));
 
         trade.setExchangeName(Constant.POLONIEX);
         trade.setPair(pair);
 
-        trade.setType(((String) orderObject.get("type")).toUpperCase());
-        trade.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), pair.getPaymentCurrency()));
-        trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), pair.getOrderCurrency()));
+        trade.setType(((String) tradeObj.get("type")).toUpperCase());
+        trade.setAmount(new Amount(Utils.getDouble(tradeObj.get("amount")), pair.getPaymentCurrency()));
+        trade.setPrice(new Amount(Utils.getDouble(tradeObj.get("rate")), pair.getOrderCurrency()));
         trade.setFee(new Amount(0, pair.getPaymentCurrency()));
 
-        String date = (String) orderObject.get("date");
+        String date = (String) tradeObj.get("date");
         trade.setDate(parseDate(date));
 
         return trade;
@@ -787,7 +788,6 @@ public class PoloniexWrapper implements TradeInterface {
         //Parse the date
         //Sample 2014-02-19 04:55:44
 
-        //Remove the Timezone
         String datePattern = "yyyy-MM-dd HH:mm:ss";
         DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
         try {

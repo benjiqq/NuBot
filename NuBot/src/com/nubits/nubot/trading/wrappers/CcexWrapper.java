@@ -31,6 +31,7 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -40,9 +41,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -310,7 +316,7 @@ public class CcexWrapper implements TradeInterface {
         ArrayList<Order> orderList = new ArrayList<Order>();
         String url = baseUrl + "&a=orderlist&self=1";
         if (pair != null) {
-            url += "&pair=" + pair.toString("-").toLowerCase();
+            url += "&pair=" + (pair.toString("-")).toLowerCase();
         }
 
         String queryResult = query(url, new HashMap<String, String>(), true);
@@ -479,12 +485,82 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+
+        long now = System.currentTimeMillis();
+        long yesterday = now - Utils.getOneDayInMillis();
+
+        return getTradesImpl(pair, yesterday);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getTradesImpl(pair, startTime);
+    }
+
+    private ApiResponse getTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+
+        /*
+         * https://c-cex.com/t/r.html?key=Your_API_Key&a=tradehistory&d1=Date_Time_From&d2=Date_Time_To&pair=Curr1-Curr2
+         * Example: https://c-cex.com/t/r.html?key=Your_API_Key&a=tradehistory&d1=2014-01-01&d2=2014-02-10&pair=grc-btc
+         */
+
+        //Parse the date
+
+        Date date = new Date(startTime);
+        Calendar myCal = new GregorianCalendar();
+        myCal.setTime(date);
+        String formattedStartDate = Integer.toString(myCal.get(Calendar.YEAR))
+                + "-" + (myCal.get(Calendar.MONTH) + 1)
+                + "-" + myCal.get(Calendar.DAY_OF_MONTH);
+
+        myCal.setTime(new Date()); //now
+        String formattedStopDate = Integer.toString(myCal.get(Calendar.YEAR))
+                + "-" + (myCal.get(Calendar.MONTH) + 1)
+                + "-" + myCal.get(Calendar.DAY_OF_MONTH);
+
+        String url = baseUrl + "&a=tradehistory";
+        url += "&d1=" + formattedStartDate;
+        url += "&d2=" + formattedStopDate;
+        url += "&pair=" + (pair.toString("-")).toLowerCase();
+
+        String queryResult = query(url, new HashMap<String, String>(), true);
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+        if (queryResult.startsWith("Access denied")) {
+            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            return apiResponse;
+        }
+
+        /*Sample result
+         *{"return":
+         * [
+         *  {"id":"464351","dt":"2014-10-23 13:04:49","type":"Buy","amount":0.04271662,"rate":369,"backrate":0.00271003}
+         * ]
+         * }
+         */
+        JSONParser parser = new JSONParser();
+
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+
+            //correct
+            JSONArray array = (JSONArray) httpAnswerJson.get("return");
+            for (int i = 0; i < array.size(); i++) {
+                tradeList.add(parseTrade((JSONObject) array.get(i), pair));
+            }
+            apiResponse.setResponseObject(tradeList);
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -654,6 +730,40 @@ public class CcexWrapper implements TradeInterface {
         }
         return order;
 
+    }
+
+    private Trade parseTrade(JSONObject tradeObj, CurrencyPair pair) {
+        //  {"id":"464351","dt":"2014-10-23 13:04:49","type":"Buy","amount":0.04271662,"rate":369,"backrate":0.00271003}
+        Trade trade = new Trade();
+        trade.setOrder_id((String) tradeObj.get("id"));
+
+        trade.setExchangeName(Constant.CCEX);
+        trade.setPair(pair);
+
+        trade.setType(((String) tradeObj.get("type")).toUpperCase());
+        trade.setAmount(new Amount(Utils.getDouble(tradeObj.get("amount")), pair.getPaymentCurrency()));
+        trade.setPrice(new Amount(Utils.getDouble(tradeObj.get("rate")), pair.getOrderCurrency()));
+        trade.setFee(new Amount(0, pair.getPaymentCurrency()));
+
+        trade.setDate(parseDate((String) tradeObj.get("dt")));
+
+        return trade;
+    }
+
+    private Date parseDate(String dateStr) {
+        Date toRet = null;
+        //Parse the date
+        //Sample 2014-02-19 04:55:44
+
+        String datePattern = "yyyy-MM-dd HH:mm:ss";
+        DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
+        try {
+            toRet = df.parse(dateStr);
+        } catch (java.text.ParseException ex) {
+            LOG.severe(ex.getMessage());
+            toRet = new Date();
+        }
+        return toRet;
     }
 
     private class CcexService implements ServiceInterface {
