@@ -511,12 +511,20 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        double defaultFee = 0.2;
+
+        if (Global.options != null) {
+            return new ApiResponse(true, Global.options.getTxFee(), null);
+        } else {
+            return new ApiResponse(true, defaultFee, null);
+        }
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        LOG.warning("Poloniex uses global TX fee, currency pair not supprted. \n"
+                + "now calling getTxFee()");
+        return getTxFee();
     }
 
     @Override

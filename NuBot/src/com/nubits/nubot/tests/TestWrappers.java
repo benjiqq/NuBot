@@ -78,13 +78,12 @@ public class TestWrappers {
         //testBuy(1, 0.00199999, Constant.BTC_NBT);  //ok
         //testCancelOrder("38284713",Constant.BTC_NBT );
         //testClearAllOrders(Constant.BTC_NBT);
-        testIsOrderActive("38531066");
+        //testIsOrderActive("38531066");
 
-        //testGetTxFee();
-        //testGetTxFeeWithArgs(Constant.BTC_USD);
-        //testCancelOrder("681977190");
+        testGetTxFee();
+        testGetTxFeeWithArgs(Constant.BTC_USD);
 
-        //Methods not necessary for NuBot to run---------------
+        //Methods NOT strucly necessary for NuBot to run---------------
         //---------------
 
         //testGetLastPrice(Constant.PPC_BTC);

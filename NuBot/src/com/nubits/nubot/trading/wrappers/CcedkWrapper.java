@@ -560,15 +560,6 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        return getTxFeeImpl();
-    }
-
-    @Override
-    public ApiResponse getTxFee(CurrencyPair pair) {
-        return getTxFeeImpl();
-    }
-
-    private ApiResponse getTxFeeImpl() {
         double defaultFee = 0.2;
 
         if (Global.options != null) {
@@ -576,6 +567,13 @@ public class CcedkWrapper implements TradeInterface {
         } else {
             return new ApiResponse(true, defaultFee, null);
         }
+    }
+
+    @Override
+    public ApiResponse getTxFee(CurrencyPair pair) {
+        LOG.warning("CCEDK uses global TX fee, currency pair not supprted. \n"
+                + "now calling getTxFee()");
+        return getTxFee();
     }
 
     @Override
