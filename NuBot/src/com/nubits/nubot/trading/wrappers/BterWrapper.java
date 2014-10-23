@@ -381,7 +381,7 @@ public class BterWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /*NOTE TO SELF. Contact Bter support
+            /* NOTE TO SELF. Contact Bter support
              * httpAnswerJson.get("result") contains "true" or false.
              * one is a String the other is boolean
              */

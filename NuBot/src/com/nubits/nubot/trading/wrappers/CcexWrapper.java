@@ -22,6 +22,7 @@ package com.nubits.nubot.trading.wrappers;
  * @author desrever <desrever at nubits.com>
  */
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
@@ -29,6 +30,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -39,6 +41,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -50,6 +53,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHeader;
+import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -219,22 +223,155 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return enterOrder(Constant.SELL, pair, amount, rate);
     }
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return enterOrder(Constant.BUY, pair, amount, rate);
+    }
+
+    private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
+        ApiResponse apiResponse = new ApiResponse();
+
+        String order_id = "";
+
+        /*https://c-cex.com/t/r.html?key=Your_API_Key&a=makeorder&pair=Curr1-Curr2&q=Amount&t=[s/b]&r=Rate
+         "t" - order type. t=s - Sell, t=b - Buy
+         */
+
+        String typeCode;
+        if (type.equals(Constant.BUY)) {
+            typeCode = "b";
+        } else {
+            typeCode = "s";
+        }
+
+        String url = baseUrl + "&a=makeorder";
+        url += "&pair=" + (pair.toString("-")).toLowerCase();
+        url += "&q=" + amount;
+        url += "&t=" + typeCode;
+        url += "&r=" + rate;
+
+
+        String queryResult = query(url, new HashMap<String, String>(), true);
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+        if (queryResult.startsWith("Access denied")) {
+            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            return apiResponse;
+        }
+
+        /*Sample result
+         *
+         *{"return":"not enough funds"}
+         *  - OR -
+         *{"return":"4677949"}
+         */
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            String ret = (String) httpAnswerJson.get("return");
+
+            if (ret.contains("not enough funds") || ret.contains(" ")) {
+                ApiError apiErr = new ApiError(ERROR_GENERIC, ret);
+                LOG.severe("CCex API returned an error: " + ret);
+                apiResponse.setError(apiErr);
+                return apiResponse;
+            } else {
+                //correct
+                order_id = ret;
+                apiResponse.setResponseObject(order_id);
+            }
+
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getActiveOrders() {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        return getOrdersImpl(pair);
+    }
+
+    public ApiResponse getOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+        String url = baseUrl + "&a=orderlist&self=1";
+        if (pair != null) {
+            url += "&pair=" + pair.toString("-").toLowerCase();
+        }
+
+        String queryResult = query(url, new HashMap<String, String>(), true);
+
+        if (queryResult.startsWith(TOKEN_ERR)) {
+            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            return apiResponse;
+        }
+        if (queryResult.startsWith("Access denied")) {
+            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            return apiResponse;
+        }
+
+
+        /*Sample result
+         *
+         *{"return":
+         *  {"158913":
+         *   {"type":"sell","c1":"usd","c2":"btc","amount":0.00064744,"price":520,"self":0},
+         *  "158912":
+         *      {...}
+         *   }
+         * }
+         *
+         */
+
+        try {
+            org.json.JSONObject httpAnswerJson = new org.json.JSONObject(queryResult);
+
+            //correct
+            org.json.JSONObject dataJson = (org.json.JSONObject) httpAnswerJson.get("return");
+
+            //Iterate on orders
+            String names[] = org.json.JSONObject.getNames(dataJson);
+            for (int i = 0; i < names.length; i++) {
+                org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
+                Order tempOrder = parseOrder(tempJson);
+                tempOrder.setId(names[i]);
+
+                if (!tempOrder.isCompleted()) //Do not add executed orders
+                {
+                    //check if a specific currencypair is set
+                    if (pair != null) {
+                        if (tempOrder.getPair().equals(pair)) {
+                            orderList.add(tempOrder);
+                        }
+                    } else {
+                        orderList.add(tempOrder);
+                    }
+                }
+            }
+            apiResponse.setResponseObject(orderList);
+
+
+        } catch (JSONException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -357,6 +494,40 @@ public class CcexWrapper implements TradeInterface {
 
     }
 
+    private Order parseOrder(org.json.JSONObject orderObject) {
+
+        Order order = new Order();
+        try {
+            /*
+             "type" - Order type - by/sell
+             "c1" - Currency 1
+             "c2" - Currency 2
+             "amount" - Currency 2 amount
+             "price" - Currency rate
+             "self" - 1 - self older
+             */
+
+            String c1 = orderObject.getString("c1");
+            String c2 = orderObject.getString("c2");
+
+            CurrencyPair cp = new CurrencyPair(new Currency("", CurrencyPair.isFiat(c1), c1, ""), new Currency("", CurrencyPair.isFiat(c2), c2, ""));
+
+            order.setPair(cp);
+            order.setType((orderObject.getString("type")).toUpperCase());
+            order.setAmount(new Amount(orderObject.getDouble("amount"), cp.getOrderCurrency()));
+            order.setPrice(new Amount(orderObject.getDouble("price"), cp.getPaymentCurrency()));
+
+            order.setCompleted(false);
+
+            order.setInsertedDate(new Date()); //Not provided
+
+        } catch (JSONException ex) {
+            LOG.severe(ex.getMessage());
+        }
+        return order;
+
+    }
+
     private class CcexService implements ServiceInterface {
 
         protected ApiKeys keys;
@@ -365,7 +536,6 @@ public class CcexWrapper implements TradeInterface {
         private CcexService(String url) {
             //Used for ticker, does not require auth
             this.url = url;
-
         }
 
         @Override
