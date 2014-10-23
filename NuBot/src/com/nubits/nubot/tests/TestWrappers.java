@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
 import com.nubits.nubot.utils.FileSystem;
@@ -79,13 +80,10 @@ public class TestWrappers {
         //testCancelOrder("38284713",Constant.BTC_NBT );
         //testClearAllOrders(Constant.BTC_NBT);
         //testIsOrderActive("38531066");
-
-        testGetTxFee();
-        testGetTxFeeWithArgs(Constant.BTC_USD);
-
+        //testGetTxFee();
+        //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strucly necessary for NuBot to run---------------
         //---------------
-
         //testGetLastPrice(Constant.PPC_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_PPC);
@@ -428,6 +426,13 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.CCEX)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.CCEX_SECRET, "");
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);

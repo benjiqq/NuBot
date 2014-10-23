@@ -19,7 +19,7 @@ package com.nubits.nubot.trading.wrappers;
 
 /**
  *
- * @author ---
+ * @author desrever <desrever at nubits.com>
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
@@ -67,6 +67,7 @@ import org.json.simple.parser.ParseException;
 
 public class PoloniexWrapper implements TradeInterface {
 
+    private static final Logger LOG = Logger.getLogger(PoloniexWrapper.class.getName());
     private ApiKeys keys;
     private Exchange exchange;
     private String checkConnectionUrl = "http://poloniex.com/";
@@ -103,10 +104,7 @@ public class PoloniexWrapper implements TradeInterface {
         errors = new ArrayList<ApiError>();
         errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
         errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
-
-
     }
-    private static final Logger LOG = Logger.getLogger(PoloniexWrapper.class.getName());
 
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
