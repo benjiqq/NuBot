@@ -98,7 +98,7 @@ Here is a list of essential options :
 
 | Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
-| exchangename     | Name of the exchange where the bots operates | "bter" ; "ccedk" ; "btce" |
+| exchangename     | Name of the exchange where the bots operates | "bter" ; "ccedk" ; "btce" ; "peatio" ; "poloniex" ;  "ccex" ;  |
 | apikey      |  Custodian's public key to access the exchange      |  String |
 | apisecret |  Custodian's secret key to access the exchange    | String |
 | dualside |  If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.     | true,false |
