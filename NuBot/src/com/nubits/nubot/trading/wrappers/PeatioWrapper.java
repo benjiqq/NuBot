@@ -612,7 +612,6 @@ public class PeatioWrapper implements TradeInterface {
 
         order.setType(jsonObject.getString("side"));
         //Created at?
-        order.setExecutedAmount(new Amount(jsonObject.getDouble("executed_volume"), cp.getOrderCurrency()));
 
         return order;
 
