@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -857,7 +858,7 @@ public class CcedkWrapper implements TradeInterface {
         String startDateArg;
         if (startTime == 0) {
             long now = System.currentTimeMillis();
-            long yesterday = Math.round((now - 1000 * 60 * 60 * 36) / 1000);
+            long yesterday = now - Utils.getOneDayInMillis();
             startDateArg = Long.toString(yesterday); //24hours
         } else {
             startDateArg = Long.toString(startTime);

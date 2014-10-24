@@ -36,7 +36,6 @@ public class Order {
     private Amount executedAmount; //Object representing the amount of units executed
     private Amount onOrderAmount; ////Object representing the amount of units currently on order. ( total-executed )
     private Amount price; //Object containing the price for each units traded.
-    private Amount fee; //Object containing the fee charged to execute this trade.
     private Amount amountPlusFee; //Object representing the total costs/proceeds of this trade.
     private boolean completed; // true if the order is filled completely
 
@@ -51,14 +50,13 @@ public class Order {
      * @param price
      * @param fee
      */
-    public Order(String id, Date insertedDate, String type, CurrencyPair pair, Amount amount, Amount price, Amount fee) {
+    public Order(String id, Date insertedDate, String type, CurrencyPair pair, Amount amount, Amount price) {
         this.id = id;
         this.insertedDate = insertedDate;
         this.type = type;
         this.pair = pair;
         this.amount = amount;
         this.price = price;
-        this.setFee(fee);
 
         this.completed = false; //default false
     }
@@ -212,23 +210,6 @@ public class Order {
      *
      * @return
      */
-    public Amount getFee() {
-        return fee;
-    }
-
-    /**
-     *
-     * @param fee
-     */
-    public void setFee(Amount fee) {
-        this.fee = fee;
-        this.amountPlusFee = new Amount(fee.getQuantity() + this.amount.getQuantity(), fee.getCurrency());
-    }
-
-    /**
-     *
-     * @return
-     */
     public Amount getAmountPlusFee() {
         return amountPlusFee;
     }
@@ -254,13 +235,12 @@ public class Order {
         return "Order{" + "id=" + id + ", insertedDate=" + insertedDate + ", executedDate="
                 + executedDate + ", type=" + type + ", pair=" + pair + ", amount=" + amount
                 + ", executedAmount=" + executedAmount + ", onOrderAmount=" + onOrderAmount
-                + ", price=" + price + ", fee=" + fee + ", amountPlusFee=" + amountPlusFee
+                + ", price=" + price + ", amountPlusFee=" + amountPlusFee
                 + ", completed=" + completed + '}';
     }
-    
-    public String getDigest(){
-        //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC } 
-        return id + " : { "+ type +" "+ Utils.round(amount.getQuantity(),2) + "@" + Utils.round(price.getQuantity(),6) + "} " ;
+
+    public String getDigest() {
+        //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC }
+        return id + " : { " + type + " " + Utils.round(amount.getQuantity(), 2) + "@" + Utils.round(price.getQuantity(), 6) + "} ";
     }
-   
 }
