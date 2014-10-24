@@ -117,6 +117,7 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
+        //Swap the pair for the request       
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = new Balance();
 
@@ -254,7 +255,9 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         HashMap<String, String> query_args = new HashMap<>();
-
+        
+        //Swap the pair for the request
+        pair=CurrencyPair.swap(pair);
         /*Params
          */
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
@@ -321,6 +324,7 @@ public class PoloniexWrapper implements TradeInterface {
 
         String pairString = "all";
         if (pair != null) {
+            pair=CurrencyPair.swap(pair);
             pairString = pair.toString("_").toUpperCase();
         }
 
@@ -462,6 +466,7 @@ public class PoloniexWrapper implements TradeInterface {
 
         /*Params
          */
+        pair = CurrencyPair.swap(pair);
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
         query_args.put("orderNumber", orderID);
 
@@ -675,12 +680,14 @@ public class PoloniexWrapper implements TradeInterface {
         String startDateArg;
         if (startTime == 0) {
             long now = System.currentTimeMillis();
-            long yesterday = now - Utils.getOneDayInMillis();
+            long yesterday = Math.round((now - Utils.getOneDayInMillis()) / 1000 );
             startDateArg = Long.toString(yesterday); //24hours
         } else {
             startDateArg = Long.toString(startTime);
         }
-
+        
+        
+        pair=CurrencyPair.swap(pair);
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
         query_args.put("start", startDateArg);
 
