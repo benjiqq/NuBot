@@ -53,7 +53,7 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/test/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "options.json";
     //These are the key pair associated with desrever's test account on btc-e
 
     public static void main(String[] args) {
@@ -71,7 +71,7 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
-        //testGetAvailableBalance(Constant.BTC); //
+        testGetAvailableBalance(Constant.NBT); //
         //testGetAvailableBalances(Constant.BTC_NBT);
         //testGetActiveOrders(Constant.BTC_NBT)
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
@@ -84,9 +84,9 @@ public class TestWrappers {
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strucly necessary for NuBot to run---------------
         //---------------
-        //testGetLastPrice(Constant.PPC_BTC);
+        //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
-        //testGetLastTrades(Constant.NBT_PPC);
+        //testGetLastTrades(Constant.NBT_BTC);
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
         /*

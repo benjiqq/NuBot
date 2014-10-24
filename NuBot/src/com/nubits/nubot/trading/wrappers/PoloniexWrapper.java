@@ -840,7 +840,7 @@ public class PoloniexWrapper implements TradeInterface {
 
                     post_data = TradeUtils.buildQueryString(args, ENCODING);
 
-                    // args signature with apache cryptografic tools
+                    // args signature with apache cryptographic tools
                     String toHash = post_data;
 
                     signature = signRequest(keys.getPrivateKey(), toHash);
