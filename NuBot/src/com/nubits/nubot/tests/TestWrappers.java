@@ -32,6 +32,7 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
@@ -44,6 +45,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -62,7 +64,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.POLONIEX); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
         System.exit(0);
@@ -89,15 +91,15 @@ public class TestWrappers {
         //testGetLastTrades(Constant.NBT_BTC);
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
-        /*
-         for (int i = 0; i < 5000; i++) {
-         LOG.info(TradeUtils.getCCDKEvalidNonce());
-         try {
-         Thread.sleep(300);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         }
+
+         /*for (int i = 0; i < 5000; i++) {
+            LOG.info(TradeUtils.getCCDKEvalidNonce());
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         }*/
 
 
          //stimulating ccedk wrong nonce
@@ -105,29 +107,28 @@ public class TestWrappers {
 
 
          for (int i = 0; i < 5000; i++) {
-         testGetActiveOrders();
-         try {
-         Thread.sleep(100);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
+            testGetActiveOrders();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
-         testGetAvailableBalances(Constant.NBT_PPC);
+            testGetAvailableBalances(Constant.NBT_PPC);
 
-         try {
-         Thread.sleep(100);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         testGetOrderDetail("3454");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            testGetOrderDetail("3454");
 
-         try {
-         Thread.sleep(300);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
          }
-         }
-         */
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {

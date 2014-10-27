@@ -105,7 +105,7 @@ public class CcedkWrapper implements TradeInterface {
 
     }
 
-    protected String createNonce(String requester) {
+    public String createNonce(String requester) {
         //This is a  workaround waiting for clarifications from CCEDK team
 
 
