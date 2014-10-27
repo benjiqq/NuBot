@@ -217,6 +217,10 @@ public class TradeUtils {
     }
 
 
+    //The following lines have been commented out.
+    //The two methods have been amalgamated into the CCDEK wrapper
+    //TODO - remove these methods once testing has taken place
+    /*
     public static int offset = 0;
 
     public static String getCCDKEvalidNonce() {
@@ -284,7 +288,7 @@ public class TradeUtils {
             return "1234567891";
         }
     }
-
+    */
     public static int getCCDKECurrencyId(String currencyCode) {
         /*
          * LAST UPDATED : 17 september

@@ -47,10 +47,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
@@ -70,6 +67,7 @@ public class CcedkWrapper implements TradeInterface {
     private final int SPACING_BETWEEN_CALLS = 1100;
     private final int TIME_OUT = 15000;
     private long lastSentTonce = 0L;
+    private static int offset = -1000000000;
     private String checkConnectionUrl = "https://www.ccedk.com/";
     private boolean apiBusy = false;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
@@ -107,29 +105,43 @@ public class CcedkWrapper implements TradeInterface {
 
     public String createNonce(String requester) {
         //This is a  workaround waiting for clarifications from CCEDK team
-
-
-        return TradeUtils.getCCDKEvalidNonce();
-        /*
-         Long toReturn = 0L;
-         if (!apiBusy) {
-         toReturn = getNonceInternal(requester);
-         } else {
-         try {
-         if (Global.options != null) {
-         if (Global.options.isVerbose()) {
-         LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-         }
-         }
-         Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
-         createNonce(requester);
-         } catch (InterruptedException e) {
-         LOG.severe(e.getMessage());
-         }
-         }
-         return Long.toString(toReturn);
-         * */
-
+        String lastdigits;
+        String validNonce;
+        String startvalid = " till";
+        int indexStart;
+        String nonceError;
+        if (offset == -1000000000) {
+            JSONParser parser = new JSONParser();
+            try {
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=1234567891");
+                try {
+                    //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
+                    JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
+                    JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
+                    nonceError = (String) errors.get("nonce");
+                    indexStart = nonceError.lastIndexOf(startvalid) + startvalid.length() + 2;
+                    validNonce = nonceError.substring(indexStart, indexStart + 10);
+                } catch (ParseException ex) {
+                    validNonce = "1234567891";
+                }
+                offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
+            } catch (IOException io) {
+                validNonce = "1234567891";
+            }
+        } else {
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) - 1);
+        }
+        if (!validNonce.equals("")) {
+            lastdigits = validNonce.substring(validNonce.length() - 2);
+            if (lastdigits.equals("98") || lastdigits.equals("99")) {
+                offset = -1000000000;
+                validNonce = createNonce("self");
+            }
+        } else {
+            offset = -1000000000;
+            validNonce = createNonce("self");
+        }
+        return validNonce;
     }
 
     private void setupErrors() {
