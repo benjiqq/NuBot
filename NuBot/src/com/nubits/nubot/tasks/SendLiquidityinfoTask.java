@@ -113,7 +113,9 @@ public class SendLiquidityinfoTask extends TimerTask {
                 LOG.severe(activeOrdersResponse.getError().toString());
             }
         } else {
-            LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            if (isWallsBeingShifted()) {
+                LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            }
         }
     }
 

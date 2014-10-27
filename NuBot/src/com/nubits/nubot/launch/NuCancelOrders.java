@@ -59,7 +59,7 @@ public class NuCancelOrders {
             try {
                 NuLogger.setup(false, logsFolder);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
 
             LOG.fine("Launching CancellAllOrders ");
@@ -132,7 +132,7 @@ public class NuCancelOrders {
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
     }

@@ -253,7 +253,7 @@ public class BterWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -330,7 +330,7 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -421,7 +421,7 @@ public class BterWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -545,7 +545,7 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
             return apiResponse;
         }
@@ -626,7 +626,7 @@ public class BterWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -695,7 +695,7 @@ public class BterWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -776,7 +776,7 @@ public class BterWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -840,7 +840,7 @@ public class BterWrapper implements TradeInterface {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                 }
 
             }
@@ -1089,7 +1089,7 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
             return apiResponse;
         }
@@ -1152,7 +1152,7 @@ public class BterWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = null;
@@ -1237,7 +1237,7 @@ public class BterWrapper implements TradeInterface {
                 sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
             return sign;
 

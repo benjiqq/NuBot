@@ -162,7 +162,7 @@ public class FrozenBalancesManager {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
             LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
     }

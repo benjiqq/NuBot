@@ -51,7 +51,7 @@ public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
             try {
                 htmlString = Utils.getHTML(url);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
@@ -85,7 +85,7 @@ public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
                 }
 
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }

@@ -639,7 +639,7 @@ public class PeatioWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             toRet = new Date();
         }
         return toRet;

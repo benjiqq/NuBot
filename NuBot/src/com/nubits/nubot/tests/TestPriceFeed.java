@@ -61,7 +61,7 @@ public class TestPriceFeed {
         try {
             NuLogger.setup(false,logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         LOG.setLevel(Level.INFO);
 

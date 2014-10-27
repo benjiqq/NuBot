@@ -117,7 +117,7 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
-        //Swap the pair for the request       
+        //Swap the pair for the request
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = new Balance();
 
@@ -220,7 +220,7 @@ public class PoloniexWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -255,9 +255,9 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         HashMap<String, String> query_args = new HashMap<>();
-        
+
         //Swap the pair for the request
-        pair=CurrencyPair.swap(pair);
+        pair = CurrencyPair.swap(pair);
         /*Params
          */
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
@@ -297,7 +297,7 @@ public class PoloniexWrapper implements TradeInterface {
                 apiResponse.setResponseObject(order_id);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -324,7 +324,7 @@ public class PoloniexWrapper implements TradeInterface {
 
         String pairString = "all";
         if (pair != null) {
-            pair=CurrencyPair.swap(pair);
+            pair = CurrencyPair.swap(pair);
             pairString = pair.toString("_").toUpperCase();
         }
 
@@ -345,7 +345,7 @@ public class PoloniexWrapper implements TradeInterface {
         } catch (ClassCastException ex) {
             isArray = true;
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -357,7 +357,7 @@ public class PoloniexWrapper implements TradeInterface {
             try {
                 httpAnwerJSONarray = (JSONArray) (parser.parse(queryResult));
             } catch (ParseException ex) {
-                LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+                LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
                 apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
                 return apiResponse;
             }
@@ -365,7 +365,7 @@ public class PoloniexWrapper implements TradeInterface {
             try {
                 httpAnswerJSONobject = (JSONObject) (parser.parse(queryResult));
             } catch (ParseException ex) {
-                LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+                LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
                 apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
                 return apiResponse;
             }
@@ -503,7 +503,7 @@ public class PoloniexWrapper implements TradeInterface {
                 apiResponse.setResponseObject(true);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -523,8 +523,7 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warning("Poloniex uses global TX fee, currency pair not supprted. \n"
-                + "now calling getTxFee()");
+        LOG.fine("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
         return getTxFee();
     }
 
@@ -577,7 +576,7 @@ public class PoloniexWrapper implements TradeInterface {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                 }
 
             }
@@ -680,14 +679,14 @@ public class PoloniexWrapper implements TradeInterface {
         String startDateArg;
         if (startTime == 0) {
             long now = System.currentTimeMillis();
-            long yesterday = Math.round((now - Utils.getOneDayInMillis()) / 1000 );
+            long yesterday = Math.round((now - Utils.getOneDayInMillis()) / 1000);
             startDateArg = Long.toString(yesterday); //24hours
         } else {
             startDateArg = Long.toString(startTime);
         }
-        
-        
-        pair=CurrencyPair.swap(pair);
+
+
+        pair = CurrencyPair.swap(pair);
         query_args.put("currencyPair", pair.toString("_").toUpperCase());
         query_args.put("start", startDateArg);
 
@@ -705,7 +704,7 @@ public class PoloniexWrapper implements TradeInterface {
         } catch (ClassCastException ex) {
             isArray = true;
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -716,7 +715,7 @@ public class PoloniexWrapper implements TradeInterface {
             try {
                 httpAnwerJSONarray = (JSONArray) (parser.parse(queryResult));
             } catch (ParseException ex) {
-                LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+                LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
                 apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
                 return apiResponse;
             }
@@ -800,7 +799,7 @@ public class PoloniexWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (java.text.ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             toRet = new Date();
         }
         return toRet;
@@ -909,21 +908,21 @@ public class PoloniexWrapper implements TradeInterface {
                         answer = (String) obj2.get(TOKEN_ERR);
 
                     } catch (ParseException ex) {
-                        LOG.severe(ex.getMessage());
+                        LOG.severe(ex.toString());
 
                     }
                 }
             } //Capture Exceptions
             catch (IllegalStateException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
 
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
 
                 answer = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();
@@ -962,7 +961,7 @@ public class PoloniexWrapper implements TradeInterface {
                 sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
             return sign;
         }

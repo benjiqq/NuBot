@@ -49,7 +49,7 @@ public class YahooPriceFeed extends AbstractPriceFeed {
             try {
                 htmlString = Utils.getHTML(url);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
@@ -65,7 +65,7 @@ public class YahooPriceFeed extends AbstractPriceFeed {
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }

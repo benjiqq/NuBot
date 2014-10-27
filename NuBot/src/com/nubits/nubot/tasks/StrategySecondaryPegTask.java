@@ -141,7 +141,7 @@ public class StrategySecondaryPegTask extends TimerTask {
          try {
          Thread.sleep(10 * 1000); //TODO wait a dynamic interval.
          } catch (InterruptedException ex) {
-         LOG.severe(ex.getMessage());
+         LOG.severe(ex.toString());
          }
          } else { //If doing it gracefully didn't work
          LOG.warning("Graceful wall shift failed. Trying to clear all orders");
@@ -254,7 +254,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                             timedOut = count > timeout;
 
                         } catch (InterruptedException ex) {
-                            LOG.severe(ex.getMessage());
+                            LOG.severe(ex.toString());
                         }
                     } while (!areAllOrdersCanceled && !timedOut);
 
@@ -285,7 +285,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         try {
             Thread.sleep(4000); //Give the time to new orders to be placed before counting again
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         return true;
     }
@@ -599,11 +599,11 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (success) { //Only move the second type of order if sure that the first have been taken down
             try {
                 //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shifter their " + shiftImmediatelyOrderType + " own orders. "
+                LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
                         + "Then try to shift " + waitAndShiftOrderType + " orders.");
                 Thread.sleep(wait_time);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 success = false;
             }
 
@@ -624,7 +624,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         try {
             Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         //Communicate to the priceMonitorTask that the wall shift is over

@@ -95,6 +95,10 @@ public class CcexWrapper implements TradeInterface {
         setupErrors();
     }
 
+    public void initBaseUrl() {
+        this.baseUrl = API_BASE + "key=" + keys.getPrivateKey();
+    }
+
     private void setupErrors() {
         errors = new ArrayList<ApiError>();
         errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
@@ -214,7 +218,7 @@ public class CcexWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -294,7 +298,7 @@ public class CcexWrapper implements TradeInterface {
             }
 
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -376,7 +380,7 @@ public class CcexWrapper implements TradeInterface {
 
 
         } catch (JSONException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -457,7 +461,7 @@ public class CcexWrapper implements TradeInterface {
                 apiResponse.setResponseObject(true);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -478,7 +482,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warning("CCex uses global TX fee, currency pair not supprted. \n"
+        LOG.fine("CCex uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -555,7 +559,7 @@ public class CcexWrapper implements TradeInterface {
             }
             apiResponse.setResponseObject(tradeList);
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -612,7 +616,7 @@ public class CcexWrapper implements TradeInterface {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                 }
 
             }
@@ -726,7 +730,7 @@ public class CcexWrapper implements TradeInterface {
             order.setInsertedDate(new Date()); //Not provided
 
         } catch (JSONException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         return order;
 
@@ -760,7 +764,7 @@ public class CcexWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (java.text.ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             toRet = new Date();
         }
         return toRet;
@@ -788,7 +792,7 @@ public class CcexWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
 
             HttpClient client = HttpClientBuilder.create().build();

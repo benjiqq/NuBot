@@ -69,7 +69,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
                 }
 
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }

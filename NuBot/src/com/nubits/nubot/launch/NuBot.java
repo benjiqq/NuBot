@@ -35,6 +35,7 @@ import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
@@ -98,7 +99,7 @@ public class NuBot {
         try {
             NuLogger.setup(Global.options.isVerbose(), logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         LOG.fine("Setting up  NuBot" + Global.settings.getProperty("version"));
 
@@ -133,6 +134,9 @@ public class NuBot {
         TradeInterface ti = Exchange.getTradeInterface(Global.options.getExchangeName());
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
+        if (Global.options.getExchangeName().equals(Constant.CCEX)) {
+            ((CcexWrapper) (ti)).initBaseUrl();;
+        }
 
         String apibase = "";
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_BTCCNY)) {
@@ -173,7 +177,7 @@ public class NuBot {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
 

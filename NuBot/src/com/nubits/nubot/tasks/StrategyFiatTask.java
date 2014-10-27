@@ -76,7 +76,7 @@ public class StrategyFiatTask extends TimerTask {
                                     timedOut = count > timeout;
 
                                 } catch (InterruptedException ex) {
-                                    LOG.severe(ex.getMessage());
+                                    LOG.severe(ex.toString());
                                 }
                             } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
 

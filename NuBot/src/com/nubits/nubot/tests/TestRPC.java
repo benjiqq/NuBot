@@ -130,7 +130,7 @@ public class TestRPC {
         try {
             NuLogger.setup(verbose, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));

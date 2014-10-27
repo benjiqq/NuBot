@@ -72,24 +72,23 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         //testGetAvailableBalance(Constant.BTC); //
-        //testGetAvailableBalances(Constant.BTC_NBT);
-        //testGetActiveOrders(Constant.BTC_NBT)
+        //testGetAvailableBalances(Constant.NBT_BTC);
+        //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testSell(0.3, 0.00430509, Constant.BTC_NBT);  //ok
-        //testBuy(1, 0.00199999, Constant.BTC_NBT);  //ok
-        //testCancelOrder("38284713",Constant.BTC_NBT );
-        //testClearAllOrders(Constant.BTC_NBT);
-        //testIsOrderActive("38531066");
+        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
+        //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
+        //testCancelOrder("4678290", Constant.BTC_NBT);
+        //testClearAllOrders(Constant.NBT_BTC);
+        testIsOrderActive("41496587");
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strucly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(Constant.PPC_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
-        //testGetLastTrades(Constant.NBT_PPC);
+        //testGetLastTrades(Constant.NBT_BTC);
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
-
-        /*
+                /*
          for (int i = 0; i < 5000; i++) {
          LOG.info(TradeUtils.getCCDKEvalidNonce());
          try {
@@ -368,7 +367,7 @@ public class TestWrappers {
         try {
             NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -450,7 +449,7 @@ public class TestWrappers {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         /* Setup (end) ------------------------------------------------------------------------------------------------------ */

@@ -83,7 +83,7 @@ public class Utils {
 
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         return encodedString;
@@ -111,7 +111,7 @@ public class Utils {
             clearString = new String(aes.doFinal(ciphertextBytes));
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             return "-1";
         }
         return clearString;
@@ -264,7 +264,7 @@ public class Utils {
             //load a properties file from class path, inside static method
             Global.settings.load(input);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         } finally {
             if (input != null) {
                 try {

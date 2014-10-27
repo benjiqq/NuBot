@@ -268,7 +268,7 @@ public class CcedkWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -338,7 +338,7 @@ public class CcedkWrapper implements TradeInterface {
                 apiResponse.setResponseObject(order_id);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -422,7 +422,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -491,7 +491,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -552,7 +552,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -641,7 +641,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -677,7 +677,7 @@ public class CcedkWrapper implements TradeInterface {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                 }
 
             }
@@ -913,7 +913,7 @@ public class CcedkWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -1038,21 +1038,21 @@ public class CcedkWrapper implements TradeInterface {
                         answer = (String) obj2.get(TOKEN_ERR);
 
                     } catch (ParseException ex) {
-                        LOG.severe(ex.getMessage());
+                        LOG.severe(ex.toString());
 
                     }
                 }
             } //Capture Exceptions
             catch (IllegalStateException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
 
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
 
                 answer = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();
@@ -1106,7 +1106,7 @@ public class CcedkWrapper implements TradeInterface {
                     }
                 }
             } catch (ParseException ex) {
-                LOG.severe(answer + " " + ex.getMessage());
+                LOG.severe(answer + " " + ex.toString());
             }
             return answer;
         }
@@ -1145,7 +1145,7 @@ public class CcedkWrapper implements TradeInterface {
                 signature = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
             return signature;
         }

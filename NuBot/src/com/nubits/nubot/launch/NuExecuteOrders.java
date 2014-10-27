@@ -66,7 +66,7 @@ public class NuExecuteOrders {
         try {
             NuLogger.setup(true,logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
 
@@ -142,7 +142,7 @@ public class NuExecuteOrders {
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
     }
@@ -230,7 +230,7 @@ public class NuExecuteOrders {
             try {
                 Thread.sleep(this.delay);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
 
 

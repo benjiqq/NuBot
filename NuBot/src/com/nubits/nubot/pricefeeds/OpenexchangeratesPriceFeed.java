@@ -51,7 +51,7 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
             try {
                 htmlString = Utils.getHTML(url);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
@@ -74,7 +74,7 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
 
 
             } catch (ParseException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }

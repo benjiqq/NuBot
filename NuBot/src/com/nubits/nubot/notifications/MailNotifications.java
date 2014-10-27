@@ -44,9 +44,9 @@ public class MailNotifications {
             try {
                 MailNotifications.Send(Passwords.GMAIL_USERNAME, Passwords.GMAIL_PASSWORD, address, title, message);
             } catch (AddressException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             } catch (MessagingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
     }

@@ -64,7 +64,7 @@ public class NuPriceMonitor {
         try {
             NuLogger.setup(false,logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         NuPriceMonitor app = new NuPriceMonitor();
@@ -173,7 +173,7 @@ public class NuPriceMonitor {
                     org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                     backupFeedNames.add((String) tempJson.get("name"));
                 } catch (JSONException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                     System.exit(0);
                 }
             }
@@ -193,7 +193,7 @@ public class NuPriceMonitor {
 
             ok = true;
         } catch (JSONException | NumberFormatException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         return ok;
     }

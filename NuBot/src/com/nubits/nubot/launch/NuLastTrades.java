@@ -65,7 +65,7 @@ public class NuLastTrades {
             try {
                 NuLogger.setup(false, logsFolder);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
 
             LOG.info("Launching NuLastTrades on " + app.exchangename);
@@ -116,7 +116,7 @@ public class NuLastTrades {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
     }

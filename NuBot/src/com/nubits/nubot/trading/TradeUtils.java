@@ -140,7 +140,7 @@ public class TradeUtils {
                     return false;
                 }
             } catch (InterruptedException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return false;
             }
         } while (!deleted && !timedout);
@@ -193,7 +193,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
         return result;
@@ -209,7 +209,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
         return result;
@@ -236,7 +236,7 @@ public class TradeUtils {
                     }
                 }
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return wrongNonce;
             }
         } while (validNonce.equals("retry") && failed_attemps <= MAX_ATTEMPTS);
@@ -275,7 +275,7 @@ public class TradeUtils {
 
             return from;
         } catch (ParseException ex) {
-            LOG.severe(htmlString + " " + ex.getMessage());
+            LOG.severe(htmlString + " " + ex.toString());
             return "1234567891";
         }
     }

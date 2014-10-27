@@ -73,9 +73,9 @@ public class FileSystem {
                 writer.println(what);
                 writer.close();
             } catch (FileNotFoundException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         } else {
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(where, true)))) {
@@ -103,14 +103,14 @@ public class FileSystem {
             }
 
         } catch (FileNotFoundException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         } finally {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
 

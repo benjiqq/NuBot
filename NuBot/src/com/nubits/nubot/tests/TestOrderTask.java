@@ -58,7 +58,7 @@ public class TestOrderTask {
         try {
             NuLogger.setup(true, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         LOG.setLevel(Level.FINE);
 
@@ -117,7 +117,7 @@ public class TestOrderTask {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
 

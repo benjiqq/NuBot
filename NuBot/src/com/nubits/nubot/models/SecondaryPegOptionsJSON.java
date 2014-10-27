@@ -86,7 +86,7 @@ public class SecondaryPegOptionsJSON {
                     org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                     backupFeedNames.add((String) tempJson.get("name"));
                 } catch (JSONException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                     System.exit(0);
                 }
             }
@@ -122,7 +122,7 @@ public class SecondaryPegOptionsJSON {
 
             return new SecondaryPegOptionsJSON(refreshTime, wallchangeTreshold, priceOffset, distanceTreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             System.exit(0);
         }
         return null; //never reached
