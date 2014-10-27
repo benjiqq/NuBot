@@ -45,9 +45,9 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String htmlString;
+            String htmlString = "";
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);

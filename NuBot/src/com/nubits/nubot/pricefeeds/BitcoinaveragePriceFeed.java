@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -48,7 +48,7 @@ public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
         if (diff >= refreshMinTime) {
             String htmlString;
             try {
-                htmlString = Utils.getHTML(getUrl(pair));
+                htmlString = Utils.getHTML(getUrl(pair), true);
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);

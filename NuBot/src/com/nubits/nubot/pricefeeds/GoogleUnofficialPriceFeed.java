@@ -47,7 +47,7 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
             String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);

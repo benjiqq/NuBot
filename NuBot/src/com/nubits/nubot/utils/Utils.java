@@ -173,16 +173,13 @@ public class Utils {
         return dateFormat.format(date);
     }
 
-    public static String getHTML(String url) throws IOException {
-
-
-
+    public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
         String line = "", all = "";
         URL myUrl = null;
         BufferedReader in = null;
         try {
             myUrl = new URL(url);
-            in = new BufferedReader(new InputStreamReader(myUrl.openStream()));
+            in = new BufferedReader(new InputStreamReader(myUrl.openStream(), "UTF-8"));
 
             while ((line = in.readLine()) != null) {
                 all += line;
@@ -193,6 +190,9 @@ public class Utils {
             }
         }
 
+        if (removeNonLatinChars) {
+            all = all.replaceAll("[^\\x00-\\x7F]", "");
+        }
         return all;
     }
 

@@ -47,7 +47,7 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
             String url = "https://www.bitstamp.net/api/eur_usd/";
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);

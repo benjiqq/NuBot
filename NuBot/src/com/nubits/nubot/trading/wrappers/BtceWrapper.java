@@ -437,7 +437,7 @@ public class BtceWrapper implements TradeInterface {
             String strDelimterStop = "%.</p>";
             String content = "ERROR";
             try {
-                content = Utils.getHTML(API_GET_FEE);
+                content = Utils.getHTML(API_GET_FEE, true);
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
             }

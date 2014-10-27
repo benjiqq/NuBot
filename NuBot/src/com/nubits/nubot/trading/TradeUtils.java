@@ -223,7 +223,7 @@ public class TradeUtils {
         String validNonce = "retry";
         do {
             try {
-                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce);
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, true);
                 validNonce = getCCDKEvalidNonce(htmlString);
 
                 if (validNonce.equals("retry")) {

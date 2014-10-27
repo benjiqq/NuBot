@@ -63,14 +63,20 @@ public class PriceFeedManager {
         ArrayList<LastPrice> prices = new ArrayList<>();
         for (int i = 0; i < feedList.size(); i++) {
             AbstractPriceFeed tempFeed = feedList.get(i);
+
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
-            if (!lastPrice.isError()) {
-                prices.add(lastPrice);
-                if (i == 0) {
-                    isMainFeedValid = true;
+            if (lastPrice != null) {
+                if (!lastPrice.isError()) {
+                    prices.add(lastPrice);
+                    if (i == 0) {
+                        isMainFeedValid = true;
+                    }
+                } else {
+                    LOG.warning("Error while updating " + pair.getOrderCurrency().getCode() + ""
+                            + " price from " + tempFeed.name);
                 }
             } else {
-                LOG.warning("Error while updating " + pair.getOrderCurrency().getCode() + ""
+                LOG.warning("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
                         + " price from " + tempFeed.name);
             }
         }

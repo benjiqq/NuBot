@@ -48,7 +48,7 @@ public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
         if (diff >= refreshMinTime) {
             String htmlString;
             try {
-                htmlString = Utils.getHTML(getUrl(pair));
+                htmlString = Utils.getHTML(getUrl(pair), true);
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
