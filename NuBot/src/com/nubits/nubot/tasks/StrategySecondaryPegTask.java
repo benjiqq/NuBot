@@ -597,14 +597,19 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         if (success) { //Only move the second type of order if sure that the first have been taken down
-            try {
-                //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
-                        + "Then try to shift " + waitAndShiftOrderType + " orders.");
-                Thread.sleep(wait_time);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-                success = false;
+            if (Global.options.isWaitBeforeShift()) {
+                try {
+
+                    //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
+                    LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
+                            + "Then try to shift " + waitAndShiftOrderType + " orders.");
+                    Thread.sleep(wait_time);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.toString());
+                    success = false;
+                }
+            } else {
+                LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
             }
 
             //Cancel active <waitAndShiftOrderType> orders
