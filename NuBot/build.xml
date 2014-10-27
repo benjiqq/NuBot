@@ -136,7 +136,7 @@
         <mkdir dir="${store.dir}/logs"/>
 
 
-        <copy todir="${store.dir}/logs/res" >  
+        <copy todir="${store.dir}/res/logs_assets" >  
             <fileset dir="res/logs_assets">  
             </fileset>
 
