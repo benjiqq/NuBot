@@ -124,7 +124,7 @@ public class CcedkWrapper implements TradeInterface {
          Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
          createNonce(requester);
          } catch (InterruptedException e) {
-         LOG.severe(e.getMessage());
+         LOG.severe(e.toString());
          }
          }
          return Long.toString(toReturn);
@@ -1102,7 +1102,7 @@ public class CcedkWrapper implements TradeInterface {
                     //Do nothing, all good
                     boolean errors = (boolean) httpAnswerJson.get("errors");
                     if (errors) {
-                        LOG.severe(e.getMessage());
+                        LOG.severe(e.toString());
                     }
                 }
             } catch (ParseException ex) {

@@ -270,7 +270,7 @@ public class Utils {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    LOG.severe(e.getMessage());
+                    LOG.severe(e.toString());
                 }
             }
         }

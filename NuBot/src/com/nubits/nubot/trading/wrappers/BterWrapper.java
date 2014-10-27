@@ -1172,7 +1172,7 @@ public class BterWrapper implements TradeInterface {
                     response = client.execute(get);
                 }
             } catch (Exception e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
             BufferedReader rd;
 

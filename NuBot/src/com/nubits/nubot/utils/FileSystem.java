@@ -38,7 +38,7 @@ public class FileSystem {
                 LOG.severe("Delete operation is failed for : " + path);
             }
         } catch (Exception e) {
-            LOG.severe(e.getMessage());
+            LOG.severe(e.toString());
         }
     }
 
@@ -56,7 +56,7 @@ public class FileSystem {
             }
         } catch (Exception e) {
             if (verbose) {
-                LOG.info(e.getMessage());
+                LOG.info(e.toString());
             }
         }
     }
@@ -81,7 +81,7 @@ public class FileSystem {
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(where, true)))) {
                 out.println(what);
             } catch (IOException e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
         }
     }

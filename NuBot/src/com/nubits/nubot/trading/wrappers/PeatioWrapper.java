@@ -117,7 +117,7 @@ public class PeatioWrapper implements TradeInterface {
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
         }
         return toReturn;
@@ -699,7 +699,7 @@ public class PeatioWrapper implements TradeInterface {
                     }
                 }
             } catch (InterruptedException e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
         }
 
@@ -797,7 +797,7 @@ public class PeatioWrapper implements TradeInterface {
 
                 return response;
             } catch (Exception e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
                 return null;
             } finally {
                 LOG.fine("result:{}" + response);

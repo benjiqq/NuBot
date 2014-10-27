@@ -123,7 +123,7 @@ public class FrozenBalancesManager {
 
         } catch (ParseException | NumberFormatException | java.text.ParseException e) {
             LOG.severe("Error while parsing the frozen balances file (" + pathToFrozenBalancesFiles + ")\n"
-                    + e.getMessage());
+                    + e.toString());
         }
     }
 

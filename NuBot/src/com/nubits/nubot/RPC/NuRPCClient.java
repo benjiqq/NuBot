@@ -304,9 +304,9 @@ public class NuRPCClient {
             LOG.fine("Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
-            LOG.severe(e.getMessage());
+            LOG.severe(e.toString());
         } catch (IOException e) {
-            LOG.severe(e.getMessage());
+            LOG.severe(e.toString());
         } catch (ParseException ex) {
             Logger.getLogger(NuRPCClient.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
