@@ -39,6 +39,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -49,7 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -1171,8 +1172,33 @@ public class BterWrapper implements TradeInterface {
                     get.setHeaders(headers);
                     response = client.execute(get);
                 }
-            } catch (Exception e) {
+            } catch (NoRouteToHostException e) {
+                LOG.warning("Debug 1");//TODO remove
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
                 LOG.severe(e.toString());
+                return TOKEN_ERR;
+            } catch (SocketException e) {
+                LOG.warning("Debug 2"); //TODO remove
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
+                LOG.severe(e.toString());
+                return TOKEN_ERR;
+            } catch (Exception e) {
+                LOG.warning("Debug 3"); //TODO remove
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
+                LOG.severe(e.toString());
+                return TOKEN_ERR;
             }
             BufferedReader rd;
 
@@ -1189,9 +1215,15 @@ public class BterWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.warning("Debug 4");//TODO remove
+
+                LOG.severe(ex.toString());
+                return TOKEN_ERR;
             } catch (IllegalStateException ex) {
-                Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.warning("Debug 5"); //TODO remove
+
+                LOG.severe(ex.toString());
+                return TOKEN_ERR;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
