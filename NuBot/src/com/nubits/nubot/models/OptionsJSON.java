@@ -506,7 +506,7 @@ public class OptionsJSON {
                 org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
                 org.json.JSONObject optionsJSON2 = (org.json.JSONObject) jsonString.get("options");
                 pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("secondary-peg-options");
-                cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON);
+                cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
             }
 
             //Then parse optional settings. If not use the default value declared here

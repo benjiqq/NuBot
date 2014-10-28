@@ -36,7 +36,7 @@ public class BtcePriceFeed extends AbstractPriceFeed {
 
     public BtcePriceFeed() {
         name = PriceFeedManager.BTCE;
-        refreshMinTime = 40 * 1000; //one minutee
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override

@@ -36,7 +36,7 @@ public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
 
     public BitcoinaveragePriceFeed() {
         name = PriceFeedManager.BITCOINAVERAGE;
-        refreshMinTime = 120 * 1000; //Two minutes
+        refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }
 

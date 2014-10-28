@@ -37,7 +37,7 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
 
     public CcedkPriceFeed() {
         name = PriceFeedManager.CCEDK;
-        refreshMinTime = 40 * 1000; //one minutee
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override

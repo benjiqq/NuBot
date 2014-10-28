@@ -39,7 +39,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
 
     public BterPriceFeed() {
         name = PriceFeedManager.BTER;
-        refreshMinTime = 40 * 1000; //one minutee
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override

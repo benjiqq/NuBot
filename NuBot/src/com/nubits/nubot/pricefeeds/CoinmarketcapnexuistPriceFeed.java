@@ -36,7 +36,7 @@ public class CoinmarketcapnexuistPriceFeed extends AbstractPriceFeed {
 
     public CoinmarketcapnexuistPriceFeed() {
         name = PriceFeedManager.COINMARKETCAP_NE;
-        refreshMinTime = 120 * 1000; //Two minutes
+        refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }
 

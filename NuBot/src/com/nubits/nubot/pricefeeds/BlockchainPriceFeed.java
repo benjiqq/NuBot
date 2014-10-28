@@ -36,7 +36,7 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
 
     public BlockchainPriceFeed() {
         name = PriceFeedManager.BLOCKCHAIN;
-        refreshMinTime = 60 * 1000; //one minutee
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override

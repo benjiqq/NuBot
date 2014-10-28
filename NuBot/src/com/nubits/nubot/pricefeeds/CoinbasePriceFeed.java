@@ -36,7 +36,7 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
 
     public CoinbasePriceFeed() {
         name = PriceFeedManager.COINBASE;
-        refreshMinTime = 60 * 1000; //one minutee
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override

@@ -36,7 +36,7 @@ public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
 
     public CoinmarketcapnorthpolePriceFeed() {
         name = PriceFeedManager.COINMARKETCAP_NO;
-        refreshMinTime = 120 * 1000; //Two minutes
+        refreshMinTime = 50 * 1000;
         lastRequest = 0L;
     }
 

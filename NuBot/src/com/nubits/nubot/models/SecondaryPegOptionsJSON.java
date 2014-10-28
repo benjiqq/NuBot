@@ -63,7 +63,7 @@ public class SecondaryPegOptionsJSON {
      * @param optionsJSON
      * @return
      */
-    public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON) {
+    public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON, CurrencyPair pair) {
         OptionsJSON options = null;
         try {
             //First try to parse compulsory parameters
@@ -93,7 +93,13 @@ public class SecondaryPegOptionsJSON {
 
             //Then parse optional settings. If not use the default value declared here
 
-            int refreshTime = 61;
+            //set the refresh time according to the global trading pair
+            int refreshTime;
+            if (pair.getPaymentCurrency().isFiat()) {
+                refreshTime = 8 * 60 * 59 * 1000; //8 hours;
+            } else {
+                refreshTime = 61;
+            }
             double wallchangeTreshold = 3;
             double priceOffset = 0;
             double distanceTreshold = 10;
