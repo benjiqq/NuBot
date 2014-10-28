@@ -38,6 +38,8 @@ import java.util.logging.Logger;
  */
 public class PriceMonitorTriggerTask extends TimerTask {
 
+    private int count;
+    private final int MAX_ATTEMPTS = 5;
     private static final Logger LOG = Logger.getLogger(PriceMonitorTriggerTask.class.getName());
     private PriceFeedManager pfm = null;
     private StrategySecondaryPegTask strategy = null;
@@ -60,6 +62,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
             LOG.severe("PriceMonitorTriggerTask task needs a PriceFeedManager and a Strategy to work. Please assign it before running it");
 
         } else {
+            count = 1;
+            executeUpdatePrice(count);
+        }
+    }
+
+    private void executeUpdatePrice(int countTrials) {
+        if (countTrials <= MAX_ATTEMPTS) {
             ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
             LOG.fine("CheckLastPrice received values from remote feeds. ");
@@ -70,7 +79,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 LOG.fine(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
                         + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
             }
-
 
             if (priceList.size() == pfm.getFeedList().size()) {
                 //All feeds returned a positive value
@@ -97,28 +105,68 @@ public class PriceMonitorTriggerTask extends TimerTask {
                         this.updateLastPrice(goodPrice);
                     } else {
                         //None of the source are in accord with others.
-
                         //Try to send a notification
-                        if (Global.options != null) {
-                            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-                            String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-                            for (int i = 0; i < priceList.size(); i++) {
-                                LastPrice tempPrice = priceList.get(i);
-                                message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                                        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
-                            }
-
-
-
-                            MailNotifications.send(Global.options.getMailRecipient(), title, message);
-                            HipChatNotifications.sendMessage(title + message, Color.RED);
-                            LOG.severe(title + message);
-                        }
+                        unableToUpdatePrice(priceList);
                     }
                 }
             } else {
-            }
+                //One or more feed returned an error value
 
+                if (priceList.size() == 2) { // if only 2 values are available
+                    if (closeEnough(priceList.get(0).getPrice().getQuantity(), priceList.get(1).getPrice().getQuantity())) {
+                        this.updateLastPrice(priceList.get(0));
+                    } else {
+                        //The two values are too unreliable
+                        unableToUpdatePrice(priceList);
+                    }
+                } else if (priceList.size() > 2) { // more than two
+                    //Check if other backup prices are close enough to each other
+                    boolean foundSomeValidBackUp = false;
+                    LastPrice goodPrice = null;
+                    for (int l = 1; l < priceList.size(); l++) {
+                        if (sanityCheck(priceList, l)) {
+                            goodPrice = priceList.get(l);
+                            foundSomeValidBackUp = true;
+                            break;
+                        }
+                    }
+                    if (foundSomeValidBackUp) {
+                        //goodPrice is a valid price backup!
+                        this.updateLastPrice(goodPrice);
+                    } else {
+                        //None of the source are in accord with others.
+                        //Try to send a notification
+                        unableToUpdatePrice(priceList);
+                    }
+                } else {//if only one or 0 feeds are positive
+                    unableToUpdatePrice(priceList);
+                }
+            }
+        } else {
+            //Tried more than three times without success
+            LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
+            sendErrorNotification();
+        }
+    }
+
+    private void unableToUpdatePrice(ArrayList<LastPrice> priceList) {
+        count++;
+        try {
+            Thread.sleep(count * 60 * 1000);
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.toString());
+        }
+        executeUpdatePrice(count);
+    }
+
+    private void sendErrorNotification() {
+        if (Global.options != null) {
+            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
+            String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
+                    + " price. Please restart the bot and get in touch with Nu Dev team";
+            MailNotifications.send(Global.options.getMailRecipient(), title, message);
+            HipChatNotifications.sendMessage(title + message, Color.RED);
+            LOG.severe(title + message);
         }
     }
 
