@@ -279,10 +279,10 @@ The bot produces different output log files, all stored in a special folder crea
 Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
 
 #Changelogs
-See [changelog.md](../master/CHANGELOG.md)
+See [changelog.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
 
 #Contribute
 *coming soon*
 
 #License 
-NuBot is released under [GNU GPL v2.0](../master/LICENSE.md)
+NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
