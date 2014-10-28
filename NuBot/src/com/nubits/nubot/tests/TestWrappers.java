@@ -32,6 +32,7 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
@@ -44,6 +45,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -53,7 +55,7 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/test/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "options.json";
     //These are the key pair associated with desrever's test account on btc-e
 
     public static void main(String[] args) {
@@ -62,7 +64,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.POLONIEX); //Replace to test a differe API implementation
+        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
 
         runTests();
         System.exit(0);
@@ -71,9 +73,9 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
-        //testGetAvailableBalance(Constant.BTC); //
-        //testGetAvailableBalances(Constant.NBT_BTC);
-        //testGetActiveOrders(Constant.NBT_BTC);
+        testGetAvailableBalance(Constant.NBT); //
+        //testGetAvailableBalances(Constant.BTC_NBT);
+        //testGetActiveOrders(Constant.BTC_NBT)
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
         //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
@@ -84,19 +86,20 @@ public class TestWrappers {
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strucly necessary for NuBot to run---------------
         //---------------
-        //testGetLastPrice(Constant.PPC_BTC);
+        //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC);
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
-                /*
-         for (int i = 0; i < 5000; i++) {
-         LOG.info(TradeUtils.getCCDKEvalidNonce());
-         try {
-         Thread.sleep(300);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         }
+
+
+         /*for (int i = 0; i < 5000; i++) {
+            LOG.info(TradeUtils.getCCDKEvalidNonce());
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+         }*/
 
 
          //stimulating ccedk wrong nonce
@@ -104,29 +107,28 @@ public class TestWrappers {
 
 
          for (int i = 0; i < 5000; i++) {
-         testGetActiveOrders();
-         try {
-         Thread.sleep(100);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
+            testGetActiveOrders();
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
 
-         testGetAvailableBalances(Constant.NBT_PPC);
+            testGetAvailableBalances(Constant.NBT_PPC);
 
-         try {
-         Thread.sleep(100);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         testGetOrderDetail("3454");
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            testGetOrderDetail("3454");
 
-         try {
-         Thread.sleep(300);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+            }
          }
-         }
-         */
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {

@@ -37,6 +37,7 @@ import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -215,38 +216,46 @@ public class TradeUtils {
         return result;
     }
 
+
+
+    //The two methods below have been amalgamated into the CCDEK wrapper
+    //TODO - remove these methods once testing has taken place
+
+    public static int offset = 0;
+
     public static String getCCDKEvalidNonce() {
-        //It tries to send a wrong nonce, get the allowed window, and use it for the actuall call
+        //It tries to send a wrong nonce, get the allowed window, and use it for the actual call
         String wrongNonce = "1234567891";
-        int MAX_ATTEMPTS = 5;
-        int failed_attemps = 0;
-        String validNonce = "retry";
-        do {
+        String lastdigits;
+        //LOG.info("Offset = " + Objects.toString(offset));
+        String validNonce;
+        if (offset == 0) {
             try {
-                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, true);
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, false);
+                //LOG.info(htmlString);
+                //LOG.info(Objects.toString(System.currentTimeMillis() / 1000L));
                 validNonce = getCCDKEvalidNonce(htmlString);
-
-                if (validNonce.equals("retry")) {
-                    try {
-                        failed_attemps++;
-                        LOG.warning("Failed attempt " + failed_attemps);
-                        Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(TradeUtils.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            } catch (IOException ex) {
-                LOG.severe(ex.toString());
-                return wrongNonce;
+                offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
+                //LOG.info("Offset = " + Objects.toString(offset));
+            } catch (IOException io) {
+                //LOG.info(io.toString());
+                validNonce = "";
             }
-        } while (validNonce.equals("retry") && failed_attemps <= MAX_ATTEMPTS);
-
-        if (failed_attemps <= MAX_ATTEMPTS) {
-            return validNonce;
         } else {
-            LOG.severe("Returning wrongNonce");
-            return wrongNonce; //too many attempts
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) -1);
         }
+        if (!validNonce.equals("")) {
+            lastdigits = validNonce.substring(validNonce.length() - 2);
+            if (lastdigits.equals("98") || lastdigits.equals("99")) {
+                offset = 0;
+                validNonce = getCCDKEvalidNonce();
+            }
+        } else {
+            offset = 0;
+            validNonce = getCCDKEvalidNonce();
+        }
+        //LOG.info("Last digits = " + lastdigits + "\nvalidNonce = " + validNonce);
+        return validNonce;
     }
 
     //used by ccedkqueryservice
@@ -259,21 +268,21 @@ public class TradeUtils {
             JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
             String nonceError = (String) errors.get("nonce");
 
-            String startStr = " must be from";
-            int indexStart = nonceError.lastIndexOf(startStr) + startStr.length() + 2;
-            String from = nonceError.substring(indexStart, indexStart + 10);
+            //String startStr = " must be from";
+            //int indexStart = nonceError.lastIndexOf(startStr) + startStr.length() + 2;
+            //String from = nonceError.substring(indexStart, indexStart + 10);
 
 
             String startStr2 = " till";
             int indexStart2 = nonceError.lastIndexOf(startStr2) + startStr2.length() + 2;
             String to = nonceError.substring(indexStart2, indexStart2 + 10);
 
-            if (to.equals(from)) {
-                LOG.info("Detected ! " + to + " = " + from);
-                return "retry";
-            }
+            //if (to.equals(from)) {
+            //    LOG.info("Detected ! " + to + " = " + from);
+            //    return "retry";
+            //}
 
-            return from;
+            return to;
         } catch (ParseException ex) {
             LOG.severe(htmlString + " " + ex.toString());
             return "1234567891";

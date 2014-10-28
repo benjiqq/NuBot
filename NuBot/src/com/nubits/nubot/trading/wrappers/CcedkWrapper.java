@@ -47,10 +47,7 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
@@ -70,6 +67,7 @@ public class CcedkWrapper implements TradeInterface {
     private final int SPACING_BETWEEN_CALLS = 1100;
     private final int TIME_OUT = 15000;
     private long lastSentTonce = 0L;
+    private static int offset = -1000000000;
     private String checkConnectionUrl = "https://www.ccedk.com/";
     private boolean apiBusy = false;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
@@ -105,31 +103,45 @@ public class CcedkWrapper implements TradeInterface {
 
     }
 
-    protected String createNonce(String requester) {
+    public String createNonce(String requester) {
         //This is a  workaround waiting for clarifications from CCEDK team
-
-
-        return TradeUtils.getCCDKEvalidNonce();
-        /*
-         Long toReturn = 0L;
-         if (!apiBusy) {
-         toReturn = getNonceInternal(requester);
-         } else {
-         try {
-         if (Global.options != null) {
-         if (Global.options.isVerbose()) {
-         LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-         }
-         }
-         Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
-         createNonce(requester);
-         } catch (InterruptedException e) {
-         LOG.severe(e.toString());
-         }
-         }
-         return Long.toString(toReturn);
-         * */
-
+        String lastdigits;
+        String validNonce;
+        String startvalid = " till";
+        int indexStart;
+        String nonceError;
+        if (offset == -1000000000) {
+            JSONParser parser = new JSONParser();
+            try {
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=1234567891", false);
+                try {
+                    //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
+                    JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
+                    JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
+                    nonceError = (String) errors.get("nonce");
+                    indexStart = nonceError.lastIndexOf(startvalid) + startvalid.length() + 2;
+                    validNonce = nonceError.substring(indexStart, indexStart + 10);
+                } catch (ParseException ex) {
+                    validNonce = "1234567891";
+                }
+                offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
+            } catch (IOException io) {
+                validNonce = "1234567891";
+            }
+        } else {
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) - 1);
+        }
+        if (!validNonce.equals("")) {
+            lastdigits = validNonce.substring(validNonce.length() - 2);
+            if (lastdigits.equals("98") || lastdigits.equals("99")) {
+                offset = -1000000000;
+                validNonce = createNonce("self");
+            }
+        } else {
+            offset = -1000000000;
+            validNonce = createNonce("self");
+        }
+        return validNonce;
     }
 
     private void setupErrors() {
@@ -1059,55 +1071,6 @@ public class CcedkWrapper implements TradeInterface {
                 connection = null;
             }
 
-            /*Since CCEDK's engine uses an unreliable nonce system
-             I should check if the API call returned a wrong nonce error.
-             if it does, try making the same request again MAX_NUMBER_ATTEMPTS times,
-             with a fresh computed nonce
-             */
-            JSONParser parser = new JSONParser();
-            JSONObject httpAnswerJson = new JSONObject();
-            try {
-                //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
-                try {
-                    httpAnswerJson = (JSONObject) (parser.parse(answer));
-                    JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
-                    if (errors.containsKey("nonce")) {
-                        //Detected a nonce error
-                        wrongNonceCounter++;
-                        if (wrongNonceCounter <= MAX_NUMBER_ATTEMPTS) {
-                            LOG.warning("Detected wrong nonce, adjusting it and retrying to execute the call");
-                            LOG.warning("nonce problem detail : " + errors.toJSONString()
-                                    + "while calling : " + method);
-
-                            try {
-                                Thread.sleep(2000);
-                            } catch (InterruptedException ex) {
-                                Logger.getLogger(CcedkWrapper.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-
-                            adjustedNonce = TradeUtils.getCCDKEvalidNonce(answer);
-
-                            httpAnswerJson = null;
-                            errors = null;
-                            parser = null;
-
-                            args.remove("nonce");
-                            executeQuery(needAuth, isGet); //recursively retry to do the query
-                        } else {
-                            LOG.severe("Cannot get correct nonce on CCEDK after trying " + MAX_NUMBER_ATTEMPTS + " times."
-                                    + "When this happens, try to reset all orders.");
-                        }
-                    }
-                } catch (ClassCastException e) {
-                    //Do nothing, all good
-                    boolean errors = (boolean) httpAnswerJson.get("errors");
-                    if (errors) {
-                        LOG.severe(e.toString());
-                    }
-                }
-            } catch (ParseException ex) {
-                LOG.severe(answer + " " + ex.toString());
-            }
             return answer;
         }
 
