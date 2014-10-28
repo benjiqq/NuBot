@@ -51,13 +51,15 @@ Alternative strategies currently under development :
 
 By using NuBot you declare to be accept the afore-mentioned risks.
 
-
 ##Assumption for a correct functioning 
+
 * The computer that runs NuBot must be connected to the internet
 * The custodian must provide the bot with access to market exchanges where NuBits are traded
 * The custodian must avoid manual interacting with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
 * The custodian must avoid opening multiple instances of Nu client in control of the custodian address at the same time.
 * To communicate liquidityinfo, the custodian should possess an unlocked nubit client controlling the custodial grant address. 
+* Before running the bot on a market where another instance of NuBot is operating, make sure to reach an agreement on the price-feed to be used.
+* For NBT_EUR pair, only one instance per market is currently allowed.
 
 ### 1)Prepare the NuBits client client
 
