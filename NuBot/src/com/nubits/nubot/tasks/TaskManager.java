@@ -53,8 +53,8 @@ public class TaskManager {
         taskList = new ArrayList<BotTask>();
         //assign default values just for testing without Global.options loaded
         int sendLiquidityInterval = 181,
-                executeStrategyInterval = 41,
-                checkPriceInterval = 81;
+                executeStrategyInterval = 41;
+        long checkPriceInterval = 61;
 
         boolean verbose = false;
 

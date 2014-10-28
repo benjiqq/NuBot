@@ -36,7 +36,7 @@ public class SecondaryPegOptionsJSON {
     private String mainFeed;
     private ArrayList<String> backupFeedNames;
     //Optional settings with a default value  ----------------------------
-    private int refreshTime;
+    private long refreshTime;
     private double wallchangeTreshold, priceOffset, distanceTreshold;
 
     /**
@@ -48,7 +48,7 @@ public class SecondaryPegOptionsJSON {
      * @param mainFeed
      * @param backupFeedNames
      */
-    public SecondaryPegOptionsJSON(int refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
+    public SecondaryPegOptionsJSON(long refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
         this.refreshTime = refreshTime;
         this.wallchangeTreshold = wallchangeTreshold;
         this.priceOffset = priceOffset;
@@ -94,7 +94,7 @@ public class SecondaryPegOptionsJSON {
             //Then parse optional settings. If not use the default value declared here
 
             //set the refresh time according to the global trading pair
-            int refreshTime;
+            long refreshTime;
             if (pair.getPaymentCurrency().isFiat()) {
                 refreshTime = 8 * 60 * 59 * 1000; //8 hours;
             } else {
@@ -138,7 +138,7 @@ public class SecondaryPegOptionsJSON {
      *
      * @return
      */
-    public int getRefreshTime() {
+    public long getRefreshTime() {
         return refreshTime;
     }
 
