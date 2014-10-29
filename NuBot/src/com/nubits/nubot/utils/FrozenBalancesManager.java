@@ -123,7 +123,7 @@ public class FrozenBalancesManager {
 
         } catch (ParseException | NumberFormatException | java.text.ParseException e) {
             LOG.severe("Error while parsing the frozen balances file (" + pathToFrozenBalancesFiles + ")\n"
-                    + e.getMessage());
+                    + e.toString());
         }
     }
 
@@ -140,8 +140,6 @@ public class FrozenBalancesManager {
         for (int i = 0; i < history.size(); i++) {
             JSONObject tempRow = new JSONObject();
             HistoryRow tempHistory = history.get(i);
-
-
 
             tempRow.put("timestamp", tempHistory.getTimestamp().toString());
             tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
@@ -164,7 +162,7 @@ public class FrozenBalancesManager {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
             LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
     }

@@ -21,10 +21,10 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeed.AbstractPriceFeed;
-import com.nubits.nubot.pricefeed.GoogleUnofficialPriceFeed;
-import com.nubits.nubot.pricefeed.PriceFeedManager;
-import com.nubits.nubot.pricefeed.PriceFeedManager.LastPriceResponse;
+import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
+import com.nubits.nubot.pricefeeds.GoogleUnofficialPriceFeed;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class TestPriceFeed {
         try {
             NuLogger.setup(false,logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         LOG.setLevel(Level.INFO);
 

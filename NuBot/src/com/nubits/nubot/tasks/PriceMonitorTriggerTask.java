@@ -23,7 +23,7 @@ import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
-import com.nubits.nubot.pricefeed.PriceFeedManager;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
@@ -38,6 +38,8 @@ import java.util.logging.Logger;
  */
 public class PriceMonitorTriggerTask extends TimerTask {
 
+    private int count;
+    private final int MAX_ATTEMPTS = 5;
     private static final Logger LOG = Logger.getLogger(PriceMonitorTriggerTask.class.getName());
     private PriceFeedManager pfm = null;
     private StrategySecondaryPegTask strategy = null;
@@ -49,7 +51,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private double sellPriceUSD, buyPriceUSD;
     private String outputPath;
     private String emailHistory = "";
-    private String priceDirection;
+    private String pegPriceDirection;
+    private double sellPricePEG_old;
+    private boolean wallsBeingShifted = false;
 
     @Override
     public void run() {
@@ -58,6 +62,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
             LOG.severe("PriceMonitorTriggerTask task needs a PriceFeedManager and a Strategy to work. Please assign it before running it");
 
         } else {
+            count = 1;
+            executeUpdatePrice(count);
+        }
+    }
+
+    private void executeUpdatePrice(int countTrials) {
+        if (countTrials <= MAX_ATTEMPTS) {
             ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
             LOG.fine("CheckLastPrice received values from remote feeds. ");
@@ -68,7 +79,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 LOG.fine(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
                         + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
             }
-
 
             if (priceList.size() == pfm.getFeedList().size()) {
                 //All feeds returned a positive value
@@ -95,28 +105,68 @@ public class PriceMonitorTriggerTask extends TimerTask {
                         this.updateLastPrice(goodPrice);
                     } else {
                         //None of the source are in accord with others.
-
                         //Try to send a notification
-                        if (Global.options != null) {
-                            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-                            String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-                            for (int i = 0; i < priceList.size(); i++) {
-                                LastPrice tempPrice = priceList.get(i);
-                                message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                                        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
-                            }
-
-
-
-                            MailNotifications.send(Global.options.getMailRecipient(), title, message);
-                            HipChatNotifications.sendMessage(title + message, Color.RED);
-                            LOG.severe(title + message);
-                        }
+                        unableToUpdatePrice(priceList);
                     }
                 }
             } else {
-            }
+                //One or more feed returned an error value
 
+                if (priceList.size() == 2) { // if only 2 values are available
+                    if (closeEnough(priceList.get(0).getPrice().getQuantity(), priceList.get(1).getPrice().getQuantity())) {
+                        this.updateLastPrice(priceList.get(0));
+                    } else {
+                        //The two values are too unreliable
+                        unableToUpdatePrice(priceList);
+                    }
+                } else if (priceList.size() > 2) { // more than two
+                    //Check if other backup prices are close enough to each other
+                    boolean foundSomeValidBackUp = false;
+                    LastPrice goodPrice = null;
+                    for (int l = 1; l < priceList.size(); l++) {
+                        if (sanityCheck(priceList, l)) {
+                            goodPrice = priceList.get(l);
+                            foundSomeValidBackUp = true;
+                            break;
+                        }
+                    }
+                    if (foundSomeValidBackUp) {
+                        //goodPrice is a valid price backup!
+                        this.updateLastPrice(goodPrice);
+                    } else {
+                        //None of the source are in accord with others.
+                        //Try to send a notification
+                        unableToUpdatePrice(priceList);
+                    }
+                } else {//if only one or 0 feeds are positive
+                    unableToUpdatePrice(priceList);
+                }
+            }
+        } else {
+            //Tried more than three times without success
+            LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
+            sendErrorNotification();
+        }
+    }
+
+    private void unableToUpdatePrice(ArrayList<LastPrice> priceList) {
+        count++;
+        try {
+            Thread.sleep(count * 60 * 1000);
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.toString());
+        }
+        executeUpdatePrice(count);
+    }
+
+    private void sendErrorNotification() {
+        if (Global.options != null) {
+            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
+            String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
+                    + " price. Please restart the bot and get in touch with Nu Dev team";
+            MailNotifications.send(Global.options.getMailRecipient(), title, message);
+            HipChatNotifications.sendMessage(title + message, Color.RED);
+            LOG.severe(title + message);
         }
     }
 
@@ -172,22 +222,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    public PriceFeedManager getPfm() {
-        return pfm;
-    }
-
-    public void setPriceFeedManager(PriceFeedManager pfm) {
-        this.pfm = pfm;
-    }
-
-    public double getDistanceTreshold() {
-        return distanceTreshold;
-    }
-
-    public void setDistanceTreshold(double distanceTreshold) {
-        this.distanceTreshold = distanceTreshold;
-    }
-
     public void updateLastPrice(LastPrice lp) {
         this.lastPrice = lp;
         LOG.fine("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
@@ -209,16 +243,20 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         LOG.fine("Executing tryMoveWalls");
 
+        boolean needToMoveWalls = needToMoveWalls(lastPrice);
         //check if price moved more than x% from when the wall was setup
-        if (needToMoveWalls(lastPrice)) {
+        if (needToMoveWalls && !isWallsBeingShifted()) { //prevent a wall shift trigger if the strategy is already shifting walls.
             LOG.info("Walls needs to be shifted");
             //Compute price for walls
 
             currentWallPEGPrice = lastPrice;
-            computeNewPrices(this.priceDirection);
+            computeNewPrices();
 
         } else {
             LOG.fine("No need to move walls");
+            if (isWallsBeingShifted() && needToMoveWalls) {
+                LOG.warning("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
+            }
         }
     }
 
@@ -231,30 +269,29 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (percentageDistance < wallchangeThreshold) {
             return false;
         } else {
-            //check if the price increased or decreased
-            if ((last.getPrice().getQuantity() - currentWallPEGprice) > 0) {
-                this.priceDirection = Constant.UP;
-            } else {
-                this.priceDirection = Constant.DOWN;
-            }
-
             return true;
         }
     }
 
-    private void computeNewPrices(String direction) {
+    private void computeNewPrices() {
 
         //Sell-side custodian sell-wall
 
         double peg_price = lastPrice.getPrice().getQuantity();
 
-
         //convert sell price to PEG
-        double sellPricePEG = Utils.round(sellPriceUSD / peg_price, 8);
-        double buyPricePEG = Utils.round(buyPriceUSD / peg_price, 8);
+        double sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, 8);
+        double buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, 8);
 
-        LOG.info(" Sell Price " + sellPricePEG + "\n"
-                + "Buy Price  " + buyPricePEG);
+        //check if the price increased or decreased
+        if ((sellPricePEG_new - sellPricePEG_old) > 0) {
+            this.pegPriceDirection = Constant.UP;
+        } else {
+            this.pegPriceDirection = Constant.DOWN;
+        }
+
+        LOG.info(" Sell Price " + sellPricePEG_new + "\n"
+                + "Buy Price  " + buyPricePEG_new);
 
 
         //------------ here for output csv
@@ -266,15 +303,18 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //Call
 
-        strategy.notifyPriceChanged(sellPricePEG, buyPricePEG, price, direction);
+        strategy.notifyPriceChanged(sellPricePEG_new, buyPricePEG_new, price, pegPriceDirection);
+
+        //Store values in class variable
+        sellPricePEG_old = sellPricePEG_new;
 
         String row = new Date() + ","
                 + source + ","
                 + crypto + ","
                 + price + ","
                 + currency + ","
-                + sellPricePEG + ","
-                + buyPricePEG + ",";
+                + sellPricePEG_new + ","
+                + buyPricePEG_new + ",";
 
         String otherPricesAtThisTime = "";
 
@@ -299,8 +339,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
                     + "now is " + price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
                     + "Here are the prices the bot used in the new orders : \n"
-                    + "Sell at " + sellPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "
-                    + "and buy at " + buyPricePEG + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
+                    + "Sell at " + sellPricePEG_new + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " "
+                    + "and buy at " + buyPricePEG_new + " " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + "\n"
                     + "\n#########\n"
                     + "Below you can see the history of price changes. You can copy paste to create a csv report."
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
@@ -311,6 +351,46 @@ public class PriceMonitorTriggerTask extends TimerTask {
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
         }
         FileSystem.writeToFile(row, outputPath, true);
+    }
+
+    private void initStrategy(double peg_price) {
+
+        Global.conversion = peg_price; //used then for liquidity info
+        //Compute the buy/sell prices in USD
+        sellPriceUSD = 1 + (0.01 * Global.options.getTxFee());
+        if (!Global.options.isDualSide()) {
+            sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();
+        }
+        buyPriceUSD = 1 - (0.01 * Global.options.getTxFee());
+
+        //Add(remove) the offset % from prices
+        sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
+        buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
+
+        LOG.info("Computing USD prices with offset " + Global.options.getSecondaryPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
+
+        //convert sell price to PEG
+        double sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
+        double buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+
+        //store it
+        sellPricePEG_old = sellPricePEGInitial;
+
+        LOG.info("Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
+                + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
+                + "; buy @" + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode());
+
+        //Assign prices
+        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(buyPricePEGInitial);
+        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(sellPricePEGInitial);
+        //Start strategy
+        Global.taskManager.getSecondaryPegTask().start();
+
+        //Send email notification
+        String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
+        String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
+                + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + "%.";
+        MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
     }
 
     public double getWallchangeThreshold() {
@@ -349,39 +429,27 @@ public class PriceMonitorTriggerTask extends TimerTask {
         this.strategy = strategy;
     }
 
-    private void initStrategy(double peg_price) {
+    public boolean isWallsBeingShifted() {
+        return wallsBeingShifted;
+    }
 
-        Global.conversion = peg_price; //used then for liquidity info
-        //Compute the buy/sell prices in USD
-        sellPriceUSD = 1 + (0.01 * Global.options.getTxFee());
-        if (!Global.options.isDualSide()) {
-            sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();
-        }
-        buyPriceUSD = 1 - (0.01 * Global.options.getTxFee());
+    public void setWallsBeingShifted(boolean wallsBeingShifted) {
+        this.wallsBeingShifted = wallsBeingShifted;
+    }
 
-        //Add(remove) the offset % from prices
-        sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
-        buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
+    public PriceFeedManager getPfm() {
+        return pfm;
+    }
 
-        LOG.info("Computing USD prices with offset " + Global.options.getSecondaryPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
+    public void setPriceFeedManager(PriceFeedManager pfm) {
+        this.pfm = pfm;
+    }
 
-        //convert sell price to PEG
-        double sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
-        double buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+    public double getDistanceTreshold() {
+        return distanceTreshold;
+    }
 
-        LOG.info("Converted : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
-                + "; buy @" + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode());
-
-        //Assign prices
-        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(buyPricePEGInitial);
-        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(sellPricePEGInitial);
-        //Start strategy
-        Global.taskManager.getSecondaryPegTask().start();
-
-        //Send email notification
-        String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
-        String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
-                + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + "%.";
-        MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
+    public void setDistanceTreshold(double distanceTreshold) {
+        this.distanceTreshold = distanceTreshold;
     }
 }

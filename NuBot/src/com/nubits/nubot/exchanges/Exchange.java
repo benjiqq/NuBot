@@ -23,8 +23,9 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-//import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
+import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -53,7 +54,8 @@ public class Exchange {
         supportedExchanges.put(Constant.PEATIO_BTCCNY, new PeatioWrapper());
         supportedExchanges.put(Constant.BTER, new BterWrapper());
         supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
-        /*supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());*/
+        supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());
+        supportedExchanges.put(Constant.CCEX, new CcexWrapper());
 
 
         Iterator it = supportedExchanges.entrySet().iterator();

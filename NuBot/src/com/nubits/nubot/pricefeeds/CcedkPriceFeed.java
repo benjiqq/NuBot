@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.utils.TradeUtils;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import java.util.logging.Logger;
@@ -37,7 +37,7 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
 
     public CcedkPriceFeed() {
         name = PriceFeedManager.CCEDK;
-        refreshMinTime = 40 * 1000; //one minutee
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
@@ -48,9 +48,9 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
         if (diff >= refreshMinTime) {
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
@@ -67,7 +67,7 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }

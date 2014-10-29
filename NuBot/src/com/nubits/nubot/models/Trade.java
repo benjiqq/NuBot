@@ -15,9 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package com.nubits.nubot.models;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
@@ -25,16 +25,18 @@ import java.util.Date;
  * @author admin
  */
 public class Trade {
-    
+
     private String id; // A String containing a unique identifier for this order
     private String order_id; // A String containing a unique identifier for this order
     private CurrencyPair pair; //Object containing currency pair
     private String type; // string value containing either Constant.BUY or Constant.SELL
     private Amount price; //Object containing the price for each units traded.
     private Amount amount;    //Object containing the number of units for this trade (without fees).
+    private Amount fee; //containing the fee paid
     private Date date; //the time at which this trade was inserted place.
+    private String exchangeName; //The name of the exchange
 
-    public Trade(String id, String order_id, CurrencyPair pair, String type, Amount price, Amount amount, Date date) {
+    public Trade(String id, String order_id, CurrencyPair pair, String type, Amount price, Amount amount, Amount fee, Date date, String exchangeName) {
         this.id = id;
         this.order_id = order_id;
         this.pair = pair;
@@ -42,6 +44,8 @@ public class Trade {
         this.price = price;
         this.amount = amount;
         this.date = date;
+        this.fee = fee;
+        this.exchangeName = exchangeName;
     }
 
     public Trade() {
@@ -103,14 +107,48 @@ public class Trade {
         this.date = date;
     }
 
+    public Amount getFee() {
+        return fee;
+    }
+
+    public void setFee(Amount fee) {
+        this.fee = fee;
+    }
+
+    public String getExchangeName() {
+        return exchangeName;
+    }
+
+    public void setExchangeName(String exchangeName) {
+        this.exchangeName = exchangeName;
+    }
+
     @Override
     public String toString() {
-        return "Trade{" + "id=" + id + ", order_id=" + order_id + ", pair=" + pair.toString() + ", type=" + type + ", price=" + price.getQuantity() + ", amount=" + amount.getQuantity() + ", date=" + date + '}';
-    }   
-    
-    public String toCsvString()
-    {
-        return id + "," + order_id + "," +pair.toString("_") + "," +type + "," +price.getQuantity() + "," +amount.getQuantity() + "," +date ;
+        return "Trade{" + "id=" + id + ", order_id=" + order_id + ", pair=" + pair + ", type=" + type + ", price=" + price + ", amount=" + amount + ", fee=" + fee + ", date=" + date + ", exchangeName=" + exchangeName + '}';
     }
-    
+
+
+    /* uncomment for csv output
+     public String toCsvString() {
+     return id + "," + order_id + "," + pair.toString("_") + "," + type + "," + price.getQuantity() + "," + amount.getQuantity() + "," + date;
+     }
+     */
+    public String toJSONString() {
+        DecimalFormat df = new DecimalFormat("0");
+        df.setMaximumFractionDigits(8);
+
+        return "\"Trade_" + id + "\":{\n"
+                + "\"id\":\"" + id + "\",\n"
+                + "\"order_id\":\"" + order_id + "\",\n"
+                + "\"exchange\":\"" + exchangeName + "\",\n"
+                + "\"pair\":\"" + pair.toString() + "\",\n"
+                + "\"type\":\"" + type.toUpperCase() + "\",\n"
+                + "\"price\":" + price.getQuantity() + ",\n"
+                + "\"amount\":" + amount.getQuantity() + ",\n"
+                + "\"fee\":" + df.format(fee.getQuantity()) + ",\n"
+                + "\"timestamp\":" + date.getTime() + ",\n"
+                + "\"date\":\"" + date + "\"\n"
+                + "}";
+    }
 }

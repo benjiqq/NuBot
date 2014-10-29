@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.utils;
+package com.nubits.nubot.trading;
 
 /**
  *
@@ -31,11 +31,13 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.utils.FrozenBalancesManager.FrozenAmount;
+import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,7 +49,7 @@ public class TradeUtils {
 
     private static final Logger LOG = Logger.getLogger(TradeUtils.class.getName());
 
-    public static boolean areAllOrdersCanceled() {
+    public static boolean tryCancelAllOrders(CurrencyPair pair) { //TODO the name of the method does not reflect its content
         boolean toRet = false;
         //get all orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -59,7 +61,7 @@ public class TradeUtils {
             } else {
                 LOG.warning("There are still : " + orderList.size() + " active orders");
                 //Retry to cancel them to fix issue #14
-                ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders();
+                ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
                 if (deleteOrdersResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
@@ -79,9 +81,32 @@ public class TradeUtils {
         return toRet;
     }
 
-    public static boolean takeDownAndWait(String orderID, long timeoutMS) {
+    public static boolean takeDownOrders(String type, CurrencyPair pair) {
+        boolean completed = true;
+        //Get active orders
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID);
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                if (tempOrder.getType().equalsIgnoreCase(type)) {
+                    boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000, pair);
+                    if (!tempDeleted) {
+                        completed = false;
+                    }
+                }
+            }
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            return false;
+        }
+        return completed;
+    }
+
+    public static boolean takeDownAndWait(String orderID, long timeoutMS, CurrencyPair pair) {
+
+        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID, pair);
         if (deleteOrderResponse.isPositive()) {
             boolean delRequested = (boolean) deleteOrderResponse.getResponseObject();
 
@@ -116,7 +141,7 @@ public class TradeUtils {
                     return false;
                 }
             } catch (InterruptedException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return false;
             }
         } while (!deleted && !timedout);
@@ -169,7 +194,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
         return result;
@@ -185,84 +210,85 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
         return result;
     }
 
+
+
+    //The two methods below have been amalgamated into the CCDEK wrapper
+    //TODO - remove these methods once testing has taken place
+
+    public static int offset = 0;
+
     public static String getCCDKEvalidNonce() {
-        //It tries to send a wrong nonce, get the allowed window, and use it for the actuall call
+        //It tries to send a wrong nonce, get the allowed window, and use it for the actual call
         String wrongNonce = "1234567891";
-        int MAX_ATTEMPTS = 5;
-        int failed_attemps = 0;
-        String validNonce ="retry";
-        do
-        {
+        String lastdigits;
+        //LOG.info("Offset = " + Objects.toString(offset));
+        String validNonce;
+        if (offset == 0) {
             try {
-                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce);
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, false);
+                //LOG.info(htmlString);
+                //LOG.info(Objects.toString(System.currentTimeMillis() / 1000L));
                 validNonce = getCCDKEvalidNonce(htmlString);
-                
-                if(validNonce.equals("retry")){
-                    try {   
-                            failed_attemps++;
-                            LOG.warning("Failed attempt "+failed_attemps);
-                            Thread.sleep(2000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(TradeUtils.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
-                return wrongNonce;
+                offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
+                //LOG.info("Offset = " + Objects.toString(offset));
+            } catch (IOException io) {
+                //LOG.info(io.toString());
+                validNonce = "";
             }
+        } else {
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) -1);
         }
-        while(validNonce.equals("retry") && failed_attemps<=MAX_ATTEMPTS);
-        
-        if(failed_attemps<=MAX_ATTEMPTS)
-        {            
-            return validNonce;
+        if (!validNonce.equals("")) {
+            lastdigits = validNonce.substring(validNonce.length() - 2);
+            if (lastdigits.equals("98") || lastdigits.equals("99")) {
+                offset = 0;
+                validNonce = getCCDKEvalidNonce();
+            }
+        } else {
+            offset = 0;
+            validNonce = getCCDKEvalidNonce();
         }
-        else 
-        {
-            LOG.severe("Returning wrongNonce");
-            return wrongNonce; //too many attempts
-        }
+        //LOG.info("Last digits = " + lastdigits + "\nvalidNonce = " + validNonce);
+        return validNonce;
     }
 
     //used by ccedkqueryservice
-    public static String getCCDKEvalidNonce(String htmlString){
-        
+    public static String getCCDKEvalidNonce(String htmlString) {
+
         JSONParser parser = new JSONParser();
-            try {
-                //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
-                JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
-                String nonceError = (String) errors.get("nonce");
+        try {
+            //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
+            JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
+            String nonceError = (String) errors.get("nonce");
 
-                String startStr = " must be from";
-                int indexStart = nonceError.lastIndexOf(startStr) + startStr.length() + 2;
-                String from = nonceError.substring(indexStart, indexStart + 10);
-                
-                
-                String startStr2 = " till";
-                int indexStart2 = nonceError.lastIndexOf(startStr2) + startStr2.length() + 2;
-                String to = nonceError.substring(indexStart2, indexStart2 + 10);
+            //String startStr = " must be from";
+            //int indexStart = nonceError.lastIndexOf(startStr) + startStr.length() + 2;
+            //String from = nonceError.substring(indexStart, indexStart + 10);
 
-                if(to.equals(from))
-                {
-                    LOG.info("Detected ! " + to + " = "+ from );
-                    return "retry";
-                }
-                
-                return from;
-            } catch (ParseException ex) {
-                LOG.severe(htmlString+" "+ex.getMessage());
-                return "1234567891";
-            } 
+
+            String startStr2 = " till";
+            int indexStart2 = nonceError.lastIndexOf(startStr2) + startStr2.length() + 2;
+            String to = nonceError.substring(indexStart2, indexStart2 + 10);
+
+            //if (to.equals(from)) {
+            //    LOG.info("Detected ! " + to + " = " + from);
+            //    return "retry";
+            //}
+
+            return to;
+        } catch (ParseException ex) {
+            LOG.severe(htmlString + " " + ex.toString());
+            return "1234567891";
+        }
     }
-    
-    
+
     public static int getCCDKECurrencyId(String currencyCode) {
         /*
          * LAST UPDATED : 17 september

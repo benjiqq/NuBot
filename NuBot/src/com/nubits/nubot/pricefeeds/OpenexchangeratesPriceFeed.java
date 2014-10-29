@@ -15,31 +15,30 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 /**
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.utils.Utils;
+import java.io.IOException;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
-public class BterPriceFeed extends AbstractPriceFeed {
+public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BterPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(OpenexchangeratesPriceFeed.class.getName());
 
-    public BterPriceFeed() {
-        name = PriceFeedManager.BTER;
-        refreshMinTime = 40 * 1000; //one minutee
+    public OpenexchangeratesPriceFeed() {
+        name = PriceFeedManager.OPENEXCHANGERATES;
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
@@ -47,29 +46,35 @@ public class BterPriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
+            String htmlString;
             try {
-                Exchange exch = new Exchange(Constant.BTER);
-                ExchangeLiveData liveData = new ExchangeLiveData();
-                exch.setLiveData(liveData);
-                ApiKeys keys = new ApiKeys("a", "b");
-                exch.setTrade(new BterWrapper(keys, exch));
+                htmlString = Utils.getHTML(url, true);
+            } catch (IOException ex) {
+                LOG.severe(ex.toString());
+                return new LastPrice(true, name, pair.getOrderCurrency(), null);
+            }
+            JSONParser parser = new JSONParser();
+            boolean found = false;
+            try {
+                JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
 
-                BterWrapper trader = (BterWrapper) exch.getTrade();
-                ApiResponse lastPriceResponse = trader.getLastPriceFeed(pair);
-                if (lastPriceResponse.isPositive()) {
-                    Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
-                    double last = ticker.getLast();
-                    lastRequest = System.currentTimeMillis();
+                String lookingfor = pair.getOrderCurrency().getCode().toUpperCase();
+                JSONObject rates = (JSONObject) httpAnswerJson.get("rates");
+                lastRequest = System.currentTimeMillis();
+                if (rates.containsKey(lookingfor)) {
+                    double last = (Double) rates.get(lookingfor);
+                    last = Utils.round(1 / last, 6);
                     lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                     return lastPrice;
                 } else {
-                    LOG.severe(lastPriceResponse.getError().toString());
-                    lastRequest = System.currentTimeMillis();
+                    LOG.warning("Cannot find currency :" + lookingfor + " on feed :" + name);
                     return new LastPrice(true, name, pair.getOrderCurrency(), null);
                 }
 
-            } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+
+            } catch (ParseException ex) {
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -81,6 +86,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
     }
 
     private String getUrl(CurrencyPair pair) {
-        return "http://data.bter.com/api/1/ticker/" + pair.toString("_");
+        String key = Passwords.OPEN_EXCHANGE_RATES_APP_ID;
+        return "https://openexchangerates.org/api/latest.json?app_id=" + key;
     }
 }

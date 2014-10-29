@@ -33,10 +33,7 @@ public class Order {
     private String type; // string value containing either Constant.BUY or Constant.SELL
     private CurrencyPair pair; //Object containing currency pair
     private Amount amount;    //Object containing the number of units for this trade (without fees).
-    private Amount executedAmount; //Object representing the amount of units executed
-    private Amount onOrderAmount; ////Object representing the amount of units currently on order. ( total-executed )
     private Amount price; //Object containing the price for each units traded.
-    private Amount fee; //Object containing the fee charged to execute this trade.
     private Amount amountPlusFee; //Object representing the total costs/proceeds of this trade.
     private boolean completed; // true if the order is filled completely
 
@@ -49,16 +46,14 @@ public class Order {
      * @param pair
      * @param amount
      * @param price
-     * @param fee
      */
-    public Order(String id, Date insertedDate, String type, CurrencyPair pair, Amount amount, Amount price, Amount fee) {
+    public Order(String id, Date insertedDate, String type, CurrencyPair pair, Amount amount, Amount price) {
         this.id = id;
         this.insertedDate = insertedDate;
         this.type = type;
         this.pair = pair;
         this.amount = amount;
         this.price = price;
-        this.setFee(fee);
 
         this.completed = false; //default false
     }
@@ -166,32 +161,7 @@ public class Order {
         this.amount = amount;
     }
 
-    /**
-     *
-     * @return
-     */
-    public Amount getExecutedAmount() {
-        return executedAmount;
-    }
-
-    /**
-     *
-     * @param executedAmount
-     */
-    public void setExecutedAmount(Amount executedAmount) {
-        this.executedAmount = executedAmount;
-        this.onOrderAmount = new Amount(this.amount.getQuantity() - executedAmount.getQuantity(),
-                executedAmount.getCurrency()); //update the  onOrderAmount based on executed
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Amount getOnOrderAmount() {
-        return onOrderAmount;
-    }
-
+    
     /**
      *
      * @return
@@ -206,23 +176,6 @@ public class Order {
      */
     public void setPrice(Amount price) {
         this.price = price;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public Amount getFee() {
-        return fee;
-    }
-
-    /**
-     *
-     * @param fee
-     */
-    public void setFee(Amount fee) {
-        this.fee = fee;
-        this.amountPlusFee = new Amount(fee.getQuantity() + this.amount.getQuantity(), fee.getCurrency());
     }
 
     /**
@@ -253,14 +206,12 @@ public class Order {
     public String toString() {
         return "Order{" + "id=" + id + ", insertedDate=" + insertedDate + ", executedDate="
                 + executedDate + ", type=" + type + ", pair=" + pair + ", amount=" + amount
-                + ", executedAmount=" + executedAmount + ", onOrderAmount=" + onOrderAmount
-                + ", price=" + price + ", fee=" + fee + ", amountPlusFee=" + amountPlusFee
+                + ", price=" + price + ", amountPlusFee=" + amountPlusFee
                 + ", completed=" + completed + '}';
     }
-    
-    public String getDigest(){
-        //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC } 
-        return id + " : { "+ type +" "+ Utils.round(amount.getQuantity(),2) + "@" + Utils.round(price.getQuantity(),6) + "} " ;
+
+    public String getDigest() {
+        //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC }
+        return id + " : { " + type + " " + Utils.round(amount.getQuantity(), 2) + "@" + Utils.round(price.getQuantity(), 6) + "} ";
     }
-   
 }

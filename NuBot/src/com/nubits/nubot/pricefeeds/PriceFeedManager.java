@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
@@ -63,14 +63,20 @@ public class PriceFeedManager {
         ArrayList<LastPrice> prices = new ArrayList<>();
         for (int i = 0; i < feedList.size(); i++) {
             AbstractPriceFeed tempFeed = feedList.get(i);
+
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
-            if (!lastPrice.isError()) {
-                prices.add(lastPrice);
-                if (i == 0) {
-                    isMainFeedValid = true;
+            if (lastPrice != null) {
+                if (!lastPrice.isError()) {
+                    prices.add(lastPrice);
+                    if (i == 0) {
+                        isMainFeedValid = true;
+                    }
+                } else {
+                    LOG.warning("Error while updating " + pair.getOrderCurrency().getCode() + ""
+                            + " price from " + tempFeed.name);
                 }
             } else {
-                LOG.warning("Error while updating " + pair.getOrderCurrency().getCode() + ""
+                LOG.warning("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
                         + " price from " + tempFeed.name);
             }
         }
