@@ -1,33 +1,39 @@
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.HttpUtils;
 import org.apache.commons.codec.binary.Hex;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.omg.CORBA.TIMEOUT;
 
 import javax.crypto.Mac;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
 import java.sql.Time;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
 
 /**
  * Created by woolly_sammoth on 21/10/14.
  */
-public class AllCoinWrapper implements TradeInterface {
+public abstract class AllCoinWrapper implements TradeInterface {
 
     private static final Logger LOG = Logger.getLogger(BterWrapper.class.getName());
     //Class fields
@@ -37,8 +43,9 @@ public class AllCoinWrapper implements TradeInterface {
     private String checkConnectionUrl = "https://www.allcoin.com/";
     private final String SIGN_HASH_FUNCTION = "MD5";
     private final String ENCODING = "UTF-8";
+    //Entry Points
     private final String API_BASE_URL = "https://www.allcoin.com/api2/";
-    private final String API_AUTH_URL = "auth_api/";
+    private final String API_AUTH_URL = "https://www.allcoin.com/api2/auth_api/";
     private final String API_GET_INFO = "getinfo";
     //Errors
     private ArrayList<ApiError> errors;
@@ -106,7 +113,7 @@ public class AllCoinWrapper implements TradeInterface {
 
          */
 
-        String url = API_BASE_URL + API_AUTH_URL;
+        String url = API_AUTH_URL;
 
         String queryResult = query(url, query_args, isGet);
         if (queryResult == null) {
@@ -171,22 +178,104 @@ public class AllCoinWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-            args.put("access_key", keys.getApiKey());
-            Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
-            args.put("created", currentTimestamp.toString());
-            args.put("method", method);
-            args.put("sign", "");
 
-            LOG.fine("Calling " + method + " with params: " + args)
-            Document doc;
-            String response = null;
+            HttpsURLConnection connection = null;
+            URL queryUrl = null;
+            String post_data = "";
+            boolean httpError = false;
+            String output;
+            int response = 200;
+            String answer = "";
+
             try {
-                String url = API_BASE_URL + API_AUTH_URL;
-                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
-
-                connection.ignoreHttpErrors(true);
-                if ("post".equalsIgnoreCase())
+                queryUrl = new URL(url);
+            } catch (MalformedURLException mal) {
+                LOG.severe(mal.toString());
             }
+
+            if (needAuth) {
+                //add the access key, timestamp, method and sign to the args
+                args.put("access_key", keys.getApiKey());
+                Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
+                args.put("created", currentTimestamp.toString());
+                args.put("method", method);
+                //the sign is the MD% hash of all arguments so far in alphabetical order
+                args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
+
+                post_data = TradeUtils.buildQueryString(args, ENCODING);
+            } else {
+                post_data = TradeUtils.buildQueryString(args, ENCODING);
+                try {
+                    queryUrl = new URL(queryUrl + "?" + post_data);
+                } catch (MalformedURLException mal) {
+                    LOG.severe(mal.toString());
+                }
+            }
+
+
+            connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+            connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+
+            connection.setDoOutput(true);
+            connection.setDoInput(true);
+
+            try {
+                connection = (HttpsURLConnection) queryUrl.openConnection();
+                if (isGet) {
+                    connection.setRequestMethod("GET");
+                } else {
+                    connection.setRequestMethod("POST");
+                    DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+                    os.writeBytes(post_data);
+                    os.flush();
+                    os.close();
+                }
+
+            } catch (IOException io) {
+                LOG.severe(io.toString());
+            }
+
+            BufferedReader br = null;
+            try {
+                if (connection.getResponseCode() >= 400) {
+                    httpError = true;
+                    response = connection.getResponseCode();
+                    br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                } else {
+                    br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                }
+            } catch (IOException io) {
+                LOG.severe(io.toString());
+            }
+
+            if (httpError) {
+                LOG.severe("Query to : " + url + " (method = " + method + " )" +
+                        "\nData : \" + post_data" +
+                        "\nHTTP Response : " + Objects.toString(response));
+            }
+
+            try {
+                while ((output = br.readLine()) != null) {
+                    answer += output;
+                }
+            } catch (IOException io) {
+                LOG.severe(io.toString());
+            }
+
+            if (httpError) {
+                JSONParser parser = new JSONParser();
+                try {
+                    JSONObject obj = (JSONObject) (parser.parse(answer));
+                    answer = (String) obj.get(TOKEN_ERR);
+                } catch (ParseException pe) {
+                    LOG.severe(pe.toString());
+                }
+            }
+
+            connection.disconnect();
+            connection = null;
+
+            return answer;
         }
 
         @Override
@@ -197,7 +286,7 @@ public class AllCoinWrapper implements TradeInterface {
                 SecretKeySpec key = null;
                 //create a new secret key
                 try {
-                    key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION));
+                    key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
                 } catch (UnsupportedEncodingException uee) {
                     LOG.severe("Unsupported encoding exception: " + uee.toString());
                 }
