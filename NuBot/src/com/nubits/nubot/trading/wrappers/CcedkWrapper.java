@@ -881,7 +881,15 @@ public class CcedkWrapper implements TradeInterface {
         String queryResult = query(API_BASE_URL, API_GET_TRADES, query_args, false);
 
         /* Sample Answer
-         * {"errors":false,"response":{"entities":[{"trade_id":"1710","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00005505","vo lume":"1.22320232","fee":"0.00000013","created":"1405787314"},{"trade_id":"1714","pair_id":"30","type":"buy","is_buyer":"0","is_seller":" 1","price":"0.00005505","volume":"1.00000000","fee":"0.00000011","created":"1405787314"},{"trade_id":"1718","pair_id":"30","type":"buy ","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"1.03679768","fee":"0.00000011","created":"1405787314"},{"trade_id":"1720 ","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"2.22000000","fee":"0.00000024","created":"140 5787369"},{"trade_id":"1780","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00007600","volume":"5000.00000000","fe e":"0.00076000","created":"1405964079"}]},"pagination":{"total_items":5,"items_per_page":10,"current_page":1,"total_pages":1}}
+         * {
+         *    "errors":false,
+         *    "response":{
+         *       "entities":[
+         *          {
+         *             "trade_id":"1710",
+         *             "pair_id":"30",
+         *             "type":"buy",
+         *             "is_buyer":"0","is_seller":"1","price":"0.00005505","vo lume":"1.22320232","fee":"0.00000013","created":"1405787314"},{"trade_id":"1714","pair_id":"30","type":"buy","is_buyer":"0","is_seller":" 1","price":"0.00005505","volume":"1.00000000","fee":"0.00000011","created":"1405787314"},{"trade_id":"1718","pair_id":"30","type":"buy ","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"1.03679768","fee":"0.00000011","created":"1405787314"},{"trade_id":"1720 ","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"2.22000000","fee":"0.00000024","created":"140 5787369"},{"trade_id":"1780","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00007600","volume":"5000.00000000","fe e":"0.00076000","created":"1405964079"}]},"pagination":{"total_items":5,"items_per_page":10,"current_page":1,"total_pages":1}}
          */
 
         JSONParser parser = new JSONParser();

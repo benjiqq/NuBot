@@ -10,6 +10,8 @@ import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.HttpUtils;
 import org.apache.commons.codec.binary.Hex;
+import org.json.JSONString;
+import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -20,8 +22,11 @@ import org.omg.CORBA.TIMEOUT;
 import javax.crypto.Mac;
 import java.io.*;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
 import java.sql.Time;
@@ -33,7 +38,7 @@ import javax.net.ssl.HttpsURLConnection;
 /**
  * Created by woolly_sammoth on 21/10/14.
  */
-public abstract class AllCoinWrapper implements TradeInterface {
+public class AllCoinWrapper implements TradeInterface {
 
     private static final Logger LOG = Logger.getLogger(BterWrapper.class.getName());
     //Class fields
@@ -49,7 +54,11 @@ public abstract class AllCoinWrapper implements TradeInterface {
     private final String API_GET_INFO = "getinfo";
     //Errors
     private ArrayList<ApiError> errors;
-    private final String TOKEN_ERR = "error";
+    private final String TOKEN_ERR = "error_info";
+    private final String TOKEN_CODE = "code";
+    private final String TOKEN_DATA = "data";
+    private final String TOKEN_BAL_AVAIL = "balances_avaidlable";
+    private final String TOKEN_BAL_HOLD = "balance_hold";
     private final int ERROR_UNKNOWN = 12560;
     private final int ERROR_NO_CONNECTION = 12561;
     private final int ERROR_GENERIC = 12562;
@@ -91,6 +100,18 @@ public abstract class AllCoinWrapper implements TradeInterface {
         }
     }
 
+
+    @Override
+    public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
+        ApiResponse response = new ApiResponse();
+        return response;
+    }
+
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         return getBalanceImpl(null, pair);
@@ -103,10 +124,7 @@ public abstract class AllCoinWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
-
         boolean isGet = false;
-
         TreeMap<String, String> query_args = new TreeMap<>();
 
         /*Params
@@ -115,7 +133,8 @@ public abstract class AllCoinWrapper implements TradeInterface {
 
         String url = API_AUTH_URL;
 
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, API_GET_INFO, query_args, isGet);
+        //LOG.info("Response = " + queryResult);
         if (queryResult == null) {
             apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
         }
@@ -138,8 +157,96 @@ public abstract class AllCoinWrapper implements TradeInterface {
             }
         }
          */
+        /* Error Response
+            {"code":-13,"error_info":"invalide access_key","data":null}
+         */
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            int code = 0;
+            try {
+                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
+            } catch (ClassCastException cce) {
+                LOG.severe(cce.toString());
+            }
+
+            if (code < 0) {
+                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                //LOG.severe("AllCoin API returned an error : " + errorMessage);
+                apiResponse.setError(apiError);
+            } else {
+                //we have returned data
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
+                JSONObject availableBal = (JSONObject) dataJson.get(TOKEN_BAL_AVAIL);
+                String s;
+                if (currency == null) { //get all balances
+                    JSONObject holdBal = (JSONObject) dataJson.get(TOKEN_BAL_HOLD);
+                    Amount PEGAvail = new Amount(-1, pair.getPaymentCurrency());
+                    Amount NBTAvail = new Amount(-1, pair.getOrderCurrency());
+                    Amount PEGonOrder = new Amount (-1, pair.getPaymentCurrency());
+                    Amount NBTonOrder = new Amount(-1, pair.getOrderCurrency());
+
+                    if (availableBal.containsKey(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        s = availableBal.get(pair.getPaymentCurrency().getCode().toUpperCase()).toString();
+                        PEGAvail.setQuantity(Double.parseDouble(s));
+                    }
+
+                    if (availableBal.containsKey(pair.getOrderCurrency().getCode().toUpperCase())) {
+                        s = availableBal.get(pair.getOrderCurrency().getCode().toUpperCase()).toString();
+                        NBTAvail.setQuantity(Double.parseDouble(s));
+                    }
+
+                    if (holdBal.containsKey(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        s = holdBal.get(pair.getPaymentCurrency().getCode().toUpperCase()).toString();
+                        PEGonOrder.setQuantity(Double.parseDouble(s));
+                    }
+
+                    if (holdBal.containsKey((pair.getOrderCurrency().getCode().toUpperCase()))) {
+                        s = holdBal.get(pair.getOrderCurrency().getCode().toUpperCase()).toString();
+                        NBTonOrder.setQuantity(Double.parseDouble(s));
+                    }
+
+                    Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    apiResponse.setResponseObject(balance);
+                } else { //specific currency requested
+                    Amount total = new Amount(-1, currency);
+                    if (availableBal.containsKey(currency.getCode().toUpperCase())) {
+                        s = availableBal.get(currency.getCode().toUpperCase()).toString();
+                        total.setQuantity(Double.parseDouble(s));
+                    }
+                    apiResponse.setResponseObject(total);
+                }
+            }
+
+        } catch (ParseException pe) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
 
         return apiResponse;
+    }
+
+    @Override
+    public String getUrlConnectionCheck() {
+        return checkConnectionUrl;
+    }
+
+    @Override
+    public ApiResponse getLastPrice(CurrencyPair pair) {
+        return null;
+    }
+
+    @Override
+    public String query(String url, HashMap<String, String> args, boolean isGet) {
+        return null;
+    }
+
+    @Override
+    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
+        return null;
     }
 
     @Override
@@ -154,6 +261,77 @@ public abstract class AllCoinWrapper implements TradeInterface {
             queryResult = "error : no connection with AllCoin";
         }
         return queryResult;
+    }
+
+
+    @Override
+    public String query(String url, TreeMap<String, String> args, boolean isGet) {
+        return "";
+    }
+
+    @Override
+    public void setKeys(ApiKeys keys) {
+
+    }
+
+    @Override
+    public void setExchange(Exchange exchange) {
+
+    }
+
+    @Override
+    public void setApiBaseUrl(String apiBaseUrl) {
+
+    }
+
+    @Override
+    public ApiResponse getActiveOrders() {
+        return null;
+    }
+
+    @Override
+    public ApiResponse getActiveOrders(CurrencyPair pair) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse getOrderDetail(String orderID) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse getTxFee() {
+        return null;
+    }
+
+    @Override
+    public ApiResponse getTxFee(CurrencyPair pair) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse isOrderActive(String id) {
+        return null;
+    }
+
+    @Override
+    public ApiResponse clearOrders(CurrencyPair pair) {
+        return null;
     }
 
     private class AllCoinService implements ServiceInterface {
@@ -185,7 +363,7 @@ public abstract class AllCoinWrapper implements TradeInterface {
             boolean httpError = false;
             String output;
             int response = 200;
-            String answer = "";
+            String answer = null;
 
             try {
                 queryUrl = new URL(url);
@@ -212,15 +390,14 @@ public abstract class AllCoinWrapper implements TradeInterface {
                 }
             }
 
-
-            connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-            connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
-
-            connection.setDoOutput(true);
-            connection.setDoInput(true);
-
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
+                connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+
+                connection.setDoOutput(true);
+                connection.setDoInput(true);
+
                 if (isGet) {
                     connection.setRequestMethod("GET");
                 } else {
@@ -230,10 +407,12 @@ public abstract class AllCoinWrapper implements TradeInterface {
                     os.flush();
                     os.close();
                 }
-
+            } catch (ProtocolException pe) {
+                LOG.severe(pe.toString());
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.severe((io.toString()));
             }
+
 
             BufferedReader br = null;
             try {
@@ -242,6 +421,7 @@ public abstract class AllCoinWrapper implements TradeInterface {
                     response = connection.getResponseCode();
                     br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 } else {
+                    answer = "";
                     br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 }
             } catch (IOException io) {
@@ -280,35 +460,20 @@ public abstract class AllCoinWrapper implements TradeInterface {
 
         @Override
         public String signRequest(String secret, String hash_data) {
+            byte[] sign_bytes = "BAD".getBytes();
             String sign = "";
+            MessageDigest MD5Digest = null;
             try {
-                Mac mac = null;
-                SecretKeySpec key = null;
-                //create a new secret key
-                try {
-                    key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-                } catch (UnsupportedEncodingException uee) {
-                    LOG.severe("Unsupported encoding exception: " + uee.toString());
-                }
-
-                //create a new mac
-                try {
-                    mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                } catch (NoSuchAlgorithmException nsae) {
-                    LOG.severe("No such Algorithm exception: " + nsae.toString());
-                }
-
-                //Init mac with key
-                try {
-                    mac.init(key);
-                } catch (InvalidKeyException ike) {
-                    LOG.severe("Invalid key exception: " + ike.toString());
-                }
-
-                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                MD5Digest = MessageDigest.getInstance("MD5");
+            } catch (NoSuchAlgorithmException nsae) {
+                LOG.severe(nsae.toString());
+            }
+            MD5Digest.update(hash_data.getBytes());
+            sign_bytes = MD5Digest.digest();
+            try {
+                sign = new String(sign_bytes, ENCODING);
+            } catch (UnsupportedEncodingException use) {
+                LOG.severe(use.toString());
             }
             return sign;
         }
