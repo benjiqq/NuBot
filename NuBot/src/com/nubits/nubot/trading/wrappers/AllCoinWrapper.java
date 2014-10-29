@@ -1,6 +1,7 @@
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
@@ -52,19 +53,26 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_BASE_URL = "https://www.allcoin.com/api2/";
     private final String API_AUTH_URL = "https://www.allcoin.com/api2/auth_api/";
     private final String API_GET_INFO = "getinfo";
-    //Errors
-    private ArrayList<ApiError> errors;
+    private final String API_SELL_COIN = "sell_coin";
+    private final String API_BUY_COIN = "buy_coin";
+    //Tokens
     private final String TOKEN_ERR = "error_info";
     private final String TOKEN_CODE = "code";
     private final String TOKEN_DATA = "data";
     private final String TOKEN_BAL_AVAIL = "balances_avaidlable";
     private final String TOKEN_BAL_HOLD = "balance_hold";
+    private final String TOKEN_ORDER_ID = "order_id";
+    //Errors
+    private ArrayList<ApiError> errors;
+    private final int NO_ERROR = 12059;
     private final int ERROR_UNKNOWN = 12560;
     private final int ERROR_NO_CONNECTION = 12561;
     private final int ERROR_GENERIC = 12562;
     private final int ERROR_PARSING = 12563;
     private final int ERROR_CURRENCY_NOT_FOUND = 12567;
-    private final int ERROR_GET_INFO = 12564;
+    private final int ERROR_GET_INFO = 12568;
+    private final int ERROR_SELL_COIN = 12569;
+
 
     public AllCoinWrapper() { setupErrors(); }
 
@@ -103,13 +111,69 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        return null;
+        return enterOrder(Constant.SELL, pair, amount, rate);
     }
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        ApiResponse response = new ApiResponse();
-        return response;
+        return enterOrder(Constant.BUY, pair, amount, rate);
+    }
+
+    private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double price) {
+        ApiResponse apiResponse = new ApiResponse();
+        String order_id;
+        boolean isGet = false;
+        TreeMap<String, String> query_args = new TreeMap<>();
+
+        query_args.put("num", String.valueOf(amount));
+        query_args.put("price", String.valueOf(price));
+        query_args.put("type", pair.getOrderCurrency().getCode().toUpperCase());
+
+        String url = API_AUTH_URL;
+        String method;
+
+        if (type == Constant.BUY) {
+            method = API_BUY_COIN;
+        } else {
+            method = API_SELL_COIN;
+        }
+
+        String queryResult = query(url, method, query_args, isGet);
+        if (queryResult == null) {
+            apiResponse.setError(getErrorByCode(ERROR_SELL_COIN));
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            int code = 0;
+            try {
+                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
+            } catch (ClassCastException cce) {
+                LOG.severe(cce.toString());
+            }
+
+            if (code < 0) {
+                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                //LOG.severe("AllCoin API returned an error : " + errorMessage);
+                apiResponse.setError(apiError);
+            } else {
+                //we have returned data
+                JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
+                if (dataJson.containsKey(TOKEN_ORDER_ID)) {
+                    order_id = dataJson.get(TOKEN_ORDER_ID).toString();
+                    apiResponse.setResponseObject(order_id);
+                }
+            }
+
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -133,8 +197,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         String url = API_AUTH_URL;
 
-        String queryResult = query(url, API_GET_INFO, query_args, isGet);
-        //LOG.info("Response = " + queryResult);
+        String queryResult = query(url, API_GET_INFO, query_args, isGet);;
         if (queryResult == null) {
             apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
         }
@@ -221,7 +284,7 @@ public class AllCoinWrapper implements TradeInterface {
             }
 
         } catch (ParseException pe) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + pe.toString());
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -236,26 +299,25 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates
     }
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates
     }
 
     @Override
     public String query(String url, String method, TreeMap<String, String> args, boolean isGet) {
         AllCoinService query = new AllCoinService(url, method, args, keys);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
-
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
             queryResult = "error : no connection with AllCoin";
@@ -266,22 +328,22 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return "";
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates
     }
 
     @Override
     public void setKeys(ApiKeys keys) {
-
+        this.keys = keys;
     }
 
     @Override
     public void setExchange(Exchange exchange) {
-
+        this.exchange = exchange;
     }
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates
     }
 
     @Override
@@ -291,7 +353,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        return null;
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates
     }
 
     @Override
@@ -372,8 +434,9 @@ public class AllCoinWrapper implements TradeInterface {
             }
 
             if (needAuth) {
-                //add the access key, timestamp, method and sign to the args
+                //add the access key, secret key, timestamp, method and sign to the args
                 args.put("access_key", keys.getApiKey());
+                args.put("secret_key", keys.getPrivateKey());
                 Date currentTimestamp = new java.sql.Timestamp(Calendar.getInstance().getTime().getTime());
                 args.put("created", currentTimestamp.toString());
                 args.put("method", method);
