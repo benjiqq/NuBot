@@ -392,15 +392,19 @@ public class AllCoinWrapper implements TradeInterface {
                         Order order = new Order();
                         JSONObject thisData = data.next();
                         //set the order id
+                        // A String containing a unique identifier for this order
                         order.setId(thisData.get(TOKEN_ORDER_ID).toString());
                         //set the pair
+                        //Object containing currency pair
                         String pairString = thisData.get("type").toString() + "_" + thisData.get("exchange").toString();
                         CurrencyPair thisPair = CurrencyPair.getCurrencyPairFromString(pairString, "_");
                         order.setPair(thisPair);
                         //set the amount
+                        //Object containing the number of units for this trade (without fees).
                         Amount thisAmount = new Amount(Double.parseDouble(thisData.get("num").toString()), thisPair.getOrderCurrency());
                         order.setAmount(thisAmount);
                         //set the price
+                        //Object containing the price for each units traded.
                         Amount thisPrice = new Amount(Double.parseDouble(thisData.get("price").toString()), thisPair.getOrderCurrency());
                         order.setPrice(thisPrice);
                         //set the
