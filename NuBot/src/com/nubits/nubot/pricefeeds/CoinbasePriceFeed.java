@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,39 +30,39 @@ import org.json.simple.parser.JSONParser;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class CoinmarketcapnexuistPriceFeed extends AbstractPriceFeed {
+public class CoinbasePriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BitcoinaveragePriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(CoinbasePriceFeed.class.getName());
 
-    public CoinmarketcapnexuistPriceFeed() {
-        name = PriceFeedManager.COINMARKETCAP_NE;
-        refreshMinTime = 120 * 1000; //Two minutes
-        lastRequest = 0L;
+    public CoinbasePriceFeed() {
+        name = PriceFeedManager.COINBASE;
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(getUrl(pair));
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject price = (JSONObject) httpAnswerJson.get("price");
-                double last = Utils.getDouble(price.get("usd"));
+                double last = Double.valueOf((String) httpAnswerJson.get("amount"));
+
+
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -71,13 +71,9 @@ public class CoinmarketcapnexuistPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-
-
     }
 
     private String getUrl(CurrencyPair pair) {
-        //controls
-        String currency = pair.getOrderCurrency().getCode().toLowerCase();
-        return "http://coinmarketcap-nexuist.rhcloud.com/api/" + currency;
+        return "https://coinbase.com/api/v1/prices/spot_rate?currency=" + pair.getPaymentCurrency().getCode().toUpperCase();
     }
 }

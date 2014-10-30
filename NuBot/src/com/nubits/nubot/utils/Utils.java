@@ -83,7 +83,7 @@ public class Utils {
 
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         return encodedString;
@@ -111,7 +111,7 @@ public class Utils {
             clearString = new String(aes.doFinal(ciphertextBytes));
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             return "-1";
         }
         return clearString;
@@ -173,16 +173,13 @@ public class Utils {
         return dateFormat.format(date);
     }
 
-    public static String getHTML(String url) throws IOException {
-
-
-
+    public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
         String line = "", all = "";
         URL myUrl = null;
         BufferedReader in = null;
         try {
             myUrl = new URL(url);
-            in = new BufferedReader(new InputStreamReader(myUrl.openStream()));
+            in = new BufferedReader(new InputStreamReader(myUrl.openStream(), "UTF-8"));
 
             while ((line = in.readLine()) != null) {
                 all += line;
@@ -193,6 +190,9 @@ public class Utils {
             }
         }
 
+        if (removeNonLatinChars) {
+            all = all.replaceAll("[^\\x00-\\x7F]", "");
+        }
         return all;
     }
 
@@ -204,6 +204,7 @@ public class Utils {
         if (pair.equals(Constant.NBT_USD)
                 || pair.equals(Constant.BTC_CNY)//TODO this is only for testing purposes on our internal exchange
                 || pair.equals(Constant.NBT_BTC)
+                || pair.equals(Constant.BTC_NBT)
                 || pair.equals(Constant.NBT_EUR)
                 || pair.equals(Constant.NBT_CNY)
                 || pair.equals(Constant.NBT_PPC)) {
@@ -222,7 +223,7 @@ public class Utils {
             return true;
         }
     }
-    
+
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
     //not needed if using alibaba json parser
     public static double getDouble(Object obj) {
@@ -263,16 +264,20 @@ public class Utils {
             //load a properties file from class path, inside static method
             Global.settings.load(input);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    LOG.severe(e.getMessage());
+                    LOG.severe(e.toString());
                 }
             }
         }
         return null;
+    }
+
+    public static long getOneDayInMillis() {
+        return 1000 * 60 * 60 * 24;
     }
 }

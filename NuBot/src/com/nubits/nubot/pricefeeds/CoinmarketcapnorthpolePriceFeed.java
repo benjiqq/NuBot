@@ -15,13 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -30,51 +25,43 @@ import java.io.IOException;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
-public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
+public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(OpenexchangeratesPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(BitcoinaveragePriceFeed.class.getName());
 
-    public OpenexchangeratesPriceFeed() {
-        name = PriceFeedManager.OPENEXCHANGERATES;
-        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
+    public CoinmarketcapnorthpolePriceFeed() {
+        name = PriceFeedManager.COINMARKETCAP_NO;
+        refreshMinTime = 50 * 1000;
+        lastRequest = 0L;
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
+
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(getUrl(pair), true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
-            boolean found = false;
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-
-                String lookingfor = pair.getOrderCurrency().getCode().toUpperCase();
-                JSONObject rates = (JSONObject) httpAnswerJson.get("rates");
+                double last = Utils.getDouble(httpAnswerJson.get("price"));
                 lastRequest = System.currentTimeMillis();
-                if (rates.containsKey(lookingfor)) {
-                    double last = (Double) rates.get(lookingfor);
-                    last = Utils.round(1 / last, 6);
-                    lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
-                    return lastPrice;
-                } else {
-                    LOG.warning("Cannot find currency :" + lookingfor + " on feed :" + name);
-                    return new LastPrice(true, name, pair.getOrderCurrency(), null);
-                }
-
-
-            } catch (ParseException ex) {
-                LOG.severe(ex.getMessage());
+                lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
+                return lastPrice;
+            } catch (Exception ex) {
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -83,10 +70,13 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+
+
     }
 
     private String getUrl(CurrencyPair pair) {
-        String key = Passwords.OPEN_EXCHANGE_RATES_APP_ID;
-        return "https://openexchangerates.org/api/latest.json?app_id=" + key;
+        //controls
+        String currency = pair.getOrderCurrency().getCode().toLowerCase();
+        return "http://coinmarketcap.northpole.ro/api/" + currency + ".json";
     }
 }

@@ -7,16 +7,14 @@
     "nubitaddress": "xxx",
     "nudip": "127.0.0.1",
     "nudport": 9091,
-    "priceincrement": "0.001",
+    "priceincrement": "0.0003",
     "rpcpass": "xxx",
     "rpcuser": "xxx",
     "txfee": "0.2",
-    "sendrpc":true,
+    "submit-liquidity":true,
     "executeorders":true,
     "verbose":false,
-    "pair":"xxx",
-    "check-balance-interval":30,
-    "check-orders-interval":37,
+    "pair":"xxx_yyy",
     "hipchat":false,
     "mail-notifications":false,
     "mail-recipient":"xxx",
@@ -31,7 +29,6 @@
                 "backup2" : { "name" : "coinbase"},
                 "backup3" : { "name" : "btce"}
                 },
-            "refresh-time":124,
             "wallchange-treshold": 3,
             "price-distance-threshold":10
          }

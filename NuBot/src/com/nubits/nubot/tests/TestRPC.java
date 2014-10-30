@@ -23,6 +23,7 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -40,14 +41,31 @@ public class TestRPC {
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
     private static boolean verbose = false;
-    private static boolean useIdentifier = true;
+    private static boolean useIdentifier = false;
 
     public static void main(String[] args) {
+
+        //Default values
+        String custodian = Passwords.CUSTODIAN_PUBLIC_ADDRESS;
+        String user = Passwords.NUD_RPC_USER;
+        String pass = Passwords.NUD_RPC_PASS;
+        double sell = 0;
+        double buy = 0;
+        //java -jar testRPC user pass custodian sell buy
+        if (args.length == 5) {
+            LOG.info("Reading input parameters");
+            user = args[0];
+            pass = args[1];
+            custodian = args[2];
+            sell = Double.parseDouble(args[3]);
+            buy = Double.parseDouble(args[4]);
+        }
+
         Utils.loadProperties("settings.properties");
 
         TestRPC test = new TestRPC();
 
-        test.setup(Constant.PEATIO_BTCCNY, Passwords.CUSTODIAN_PUBLIC_ADDRESS, Constant.NBT_BTC);
+        test.setup(Constant.PEATIO_BTCCNY, custodian, Constant.NBT_BTC, user, pass);
         test.testCheckNudTask();
         try {
             Thread.sleep(2000);
@@ -55,9 +73,9 @@ public class TestRPC {
         } catch (InterruptedException ex) {
             Logger.getLogger(TestRPC.class.getName()).log(Level.SEVERE, null, ex);
         }
-        test.testGetInfo();
+        //test.testGetInfo();
         //test.testIsConnected();
-        //test.testSendLiquidityInfo();
+        test.testSendLiquidityInfo(buy, sell);
         //test.testGetLiquidityInfo();
         //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
         //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
@@ -66,20 +84,19 @@ public class TestRPC {
 
     }
 
-    private void testSendLiquidityInfo() {
-        double amountSell = 0;
-        double amountBuy = 0;
+    private void testSendLiquidityInfo(double amountBuy, double amountSell) {
+
 
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar, amountBuy, amountSell);
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.fine(responseObject.toJSONString());
+                LOG.info(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
-                    LOG.fine("Now calling getliquidityinfo");
+                    LOG.info("Now calling getliquidityinfo");
                     JSONObject infoObject = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar);
-                    LOG.fine(infoObject.toJSONString());
+                    LOG.info(infoObject.toJSONString());
                 }
             }
         } else {
@@ -105,13 +122,15 @@ public class TestRPC {
         LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
     }
 
-    private void setup(String exchangeName, String custodianAddress, CurrencyPair pair) {
-        String folderName = "tests_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+    private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
+        String folderName = "tests_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        //Create log dir
+        FileSystem.mkdir(logsFolder);
         try {
-            NuLogger.setup(verbose,logsFolder);
+            NuLogger.setup(verbose, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -120,7 +139,7 @@ public class TestRPC {
         Global.publicAddress = custodianAddress;
 
         //Create the client
-        Global.rpcClient = new NuRPCClient(ipTest, portTest, Passwords.NUD_RPC_USER, Passwords.NUD_RPC_PASS, verbose, useIdentifier, custodianAddress, pair, exchangeName);
+        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodianAddress, pair, exchangeName);
     }
 
     private void testCheckNudTask() {

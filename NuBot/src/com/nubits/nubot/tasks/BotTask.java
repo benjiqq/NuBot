@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -30,11 +30,11 @@ public class BotTask {
     private static final Logger LOG = Logger.getLogger(BotTask.class.getName());
     private Timer timer;
     private boolean running;
-    private int interval; //expressed in millseconds
+    private long interval; //expressed in millseconds
     private TimerTask task;
     private String name;
 
-    public BotTask(TimerTask task, int interval, String name) {
+    public BotTask(TimerTask task, long interval, String name) {
         this.timer = new Timer();
         this.running = false;
 
@@ -88,11 +88,11 @@ public class BotTask {
         this.timer = timer;
     }
 
-    public int getInterval() {
+    public long getInterval() {
         return interval;
     }
 
-    public void setInterval(int interval) {
+    public void setInterval(long interval) {
         this.interval = interval;
     }
 

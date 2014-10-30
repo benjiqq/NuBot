@@ -28,13 +28,14 @@ import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.pricefeed.PriceFeedManager;
-import com.nubits.nubot.tasks.CheckOrdersTask;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.SendLiquidityinfoTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
@@ -43,7 +44,9 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- *
+ * Provides the main class of NuBot.
+ * Instantiate this class to start the NuBot program 
+ * 
  * @author desrever <desrever at nubits.com>
  */
 public class NuBot {
@@ -54,6 +57,14 @@ public class NuBot {
     private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
+    /**
+     * Initialises the NuBot.
+     * Check if NuBot has valid parameters and quit if it doesn't
+     * Check if NuBot is already running and Log if that is so
+     * 
+     * @author desrever <desrever at nubits.com>
+     * @param args a list of valid arguments
+     */
     public static void main(String args[]) {
         mainThread = Thread.currentThread();
 
@@ -71,14 +82,18 @@ public class NuBot {
             System.exit(0);
         }
     }
-
+    
+    /**
+     * 
+     * @author desrever <desrever at nubits.com>
+     */
     private void execute() {
         Global.running = true;
 
         //Load settings
         Utils.loadProperties("settings.properties");
 
-      
+
         //Load Options
         Global.options = OptionsJSON.parseOptions(optionsPath);
         if (Global.options == null) {
@@ -89,16 +104,16 @@ public class NuBot {
 
 
         //Setting up log folder for this session :
-        
-        String folderName = "NuBot_"+System.currentTimeMillis()+"_"+Global.options.getExchangeName()+"_"+Global.options.getPair().toString().toUpperCase()+"/";
-        logsFolder = Global.settings.getProperty("log_path")+folderName;
-        
+
+        String folderName = "NuBot_" + System.currentTimeMillis() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
+        logsFolder = Global.settings.getProperty("log_path") + folderName;
+
         //Create log dir
         FileSystem.mkdir(logsFolder);
         try {
-            NuLogger.setup(Global.options.isVerbose(),logsFolder);
+            NuLogger.setup(Global.options.isVerbose(), logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         LOG.fine("Setting up  NuBot" + Global.settings.getProperty("version"));
 
@@ -133,6 +148,9 @@ public class NuBot {
         TradeInterface ti = Exchange.getTradeInterface(Global.options.getExchangeName());
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
+        if (Global.options.getExchangeName().equals(Constant.CCEX)) {
+            ((CcexWrapper) (ti)).initBaseUrl();;
+        }
 
         String apibase = "";
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_BTCCNY)) {
@@ -173,20 +191,20 @@ public class NuBot {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
 
         //Set the fileoutput for active orders
-        
 
-        String orders_outputPath =  logsFolder + "orders_history.csv";
-        ((CheckOrdersTask) (Global.taskManager.getCheckOrdersTask().getTask())).setOutputFile(orders_outputPath);
+
+        String orders_outputPath = logsFolder + "orders_history.csv";
+        ((SendLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFile(orders_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
 
-        
+
         //Start task to check orders
-        Global.taskManager.getCheckOrdersTask().start(13);
+        Global.taskManager.getSendLiquidityTask().start(39);
 
         Utils.printSeparator();
         /*
@@ -263,12 +281,19 @@ public class NuBot {
                 Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
-                //Set the wallet shift threshold
 
-                StrategySecondaryPegTask secondaryPegStrategy = ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()));
+                // set trading strategy to the price monitor task
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
+                        .setStrategy(((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())));
 
-                //Then set trading strategy
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setStrategy(secondaryPegStrategy);
+                // set price monitor task to the strategy
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
+                        .setPriceMonitorTask(((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())));
+
+                // set liquidityinfo task to the strategy
+
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
+                        .setSendLiquidityTask(((SendLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
 
                 PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
                 //Then set the pfm
@@ -286,7 +311,7 @@ public class NuBot {
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
                 FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
-                
+
                 //set the interval from options
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
 
@@ -297,10 +322,10 @@ public class NuBot {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
             System.exit(0);
         }
-        
-        
-       
-        
+
+
+
+
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";
