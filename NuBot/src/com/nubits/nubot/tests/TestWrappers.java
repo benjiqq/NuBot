@@ -69,11 +69,11 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         testGetAvailableBalance(Constant.NBT); //
-        //testGetAvailableBalances(Constant.BTC_NBT);
-        //testGetActiveOrders(Constant.BTC_NBT)
-        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
+        testGetAvailableBalances(Constant.BTC_NBT);
+        testGetActiveOrders(Constant.BTC_NBT);
+        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
+        testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
         //testCancelOrder("4678290", Constant.BTC_NBT);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("41496587");

@@ -55,6 +55,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_GET_INFO = "getinfo";
     private final String API_SELL_COIN = "sell_coin";
     private final String API_BUY_COIN = "buy_coin";
+    private final String API_OPEN_ORDERS = "myorders";
     //Tokens
     private final String TOKEN_ERR = "error_info";
     private final String TOKEN_CODE = "code";
@@ -72,6 +73,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final int ERROR_CURRENCY_NOT_FOUND = 12567;
     private final int ERROR_GET_INFO = 12568;
     private final int ERROR_SELL_COIN = 12569;
+    private final int ERROR_ACTIVE_ORDERS = 12570;
 
 
     public AllCoinWrapper() { setupErrors(); }
@@ -197,32 +199,10 @@ public class AllCoinWrapper implements TradeInterface {
 
         String url = API_AUTH_URL;
 
-        String queryResult = query(url, API_GET_INFO, query_args, isGet);;
+        String queryResult = query(url, API_GET_INFO, query_args, isGet);
         if (queryResult == null) {
             apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
         }
-
-        /* Response
-        {
-            "code": 1,
-            "data": {
-                "balances_avaidlable": {
-                    "BTC": "100.06187964",
-                    "LTC": "30.22620324",
-                    ...
-                },
-                "balance_hold": {
-                    "DOGE": 100000,
-                    "BTC": 10.00773423,
-                    ...
-                },
-                "servertimestamp": 1402830826
-            }
-        }
-         */
-        /* Error Response
-            {"code":-13,"error_info":"invalide access_key","data":null}
-         */
 
         JSONParser parser = new JSONParser();
         try {
@@ -348,12 +328,95 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        return null;
+        return getActiveOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates
+        return getActiveOrdersImpl(pair);
+    }
+
+    public ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        boolean isGet = false;
+        TreeMap<String, String> query_args = new TreeMap<>();
+
+        String url = API_AUTH_URL;
+
+        String queryResult = query(url, API_OPEN_ORDERS, query_args, isGet);
+        if (queryResult == null) {
+            apiResponse.setError(getErrorByCode(ERROR_ACTIVE_ORDERS));
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            int code = 0;
+            try {
+                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
+            } catch (ClassCastException cce) {
+                LOG.severe(cce.toString());
+            }
+
+            if (code < 0) { //we have an error
+                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                apiResponse.setError(apiError);
+            } else {
+                //we have returned data
+                JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
+                /*
+                {
+                    "code": 1,
+                    "data": [
+                        {
+                            "order_id": "1410027",
+                            "user_id": "100000",
+                            "type": "DOGE",
+                            "exchange": "BTC",
+                            "ctime": "2014-06-15 14:42:36",
+                            "price": "0.00000060",
+                            "num": "1000.00000000",
+                            "total": "0.00060000",
+                            "rest_num": "1000.00000000", // the remaining DOGE of the order
+                            "rest_total": "0.00060000", //the remaining BTC of the order
+                            "fee": "0.00000090", // about fees, please visit here https://www.allcoin.com/pub/fee
+                            "order_type": "sell"
+                        },
+                        ...
+                }
+                 */
+                ArrayList<Order> orderList = new ArrayList<Order>();
+                if (pair == null) { //return all orders
+                    for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext(); ) {
+                        Order order = new Order();
+                        JSONObject thisData = data.next();
+                        //set the order id
+                        order.setId(thisData.get(TOKEN_ORDER_ID).toString());
+                        //set the pair
+                        String pairString = thisData.get("type").toString() + "_" + thisData.get("exchange").toString();
+                        CurrencyPair thisPair = CurrencyPair.getCurrencyPairFromString(pairString, "_");
+                        order.setPair(thisPair);
+                        //set the amount
+                        Amount thisAmount = new Amount(Double.parseDouble(thisData.get("num").toString()), thisPair.getOrderCurrency());
+                        order.setAmount(thisAmount);
+                        //set the price
+                        Amount thisPrice = new Amount(Double.parseDouble(thisData.get("price").toString()), thisPair.getOrderCurrency());
+                        order.setPrice(thisPrice);
+                        //set the
+                        //order.s
+                    }
+                }
+            }
+
+
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+        return apiResponse;
     }
 
     @Override
