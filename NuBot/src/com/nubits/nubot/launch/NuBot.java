@@ -153,10 +153,8 @@ public class NuBot {
         }
 
         String apibase = "";
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_BTCCNY)) {
-            ti.setApiBaseUrl(Constant.PEATIO_BTCCNY_API_BASE);
-        } else if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_MULTIPAIR_API_BASE)) {
-            ti.setApiBaseUrl(Constant.PEATIO_MULTIPAIR_API_BASE);
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_API_BASE)) {
+            ti.setApiBaseUrl(Constant.PEATIO_API_BASE);
         }
 
 

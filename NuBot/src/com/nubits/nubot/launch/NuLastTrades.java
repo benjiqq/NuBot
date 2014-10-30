@@ -92,8 +92,8 @@ public class NuLastTrades {
 
         if (exchangename.equals(Constant.BTCE)) {
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.PEATIO_BTCCNY)) {
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.PEATIO_BTCCNY_API_BASE));
+        } else if (exchangename.equals(Constant.PEATIO)) {
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.PEATIO_API_BASE));
         } else if (exchangename.equals(Constant.CCEDK)) {
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
         } else if (exchangename.equals(Constant.BTER)) {

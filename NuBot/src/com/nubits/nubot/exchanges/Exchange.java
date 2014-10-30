@@ -47,7 +47,7 @@ public class Exchange {
     public static boolean isSupported(String name) {
 
         supportedExchanges.put(Constant.BTCE, new BtceWrapper());
-        supportedExchanges.put(Constant.PEATIO_BTCCNY, new PeatioWrapper());
+        supportedExchanges.put(Constant.PEATIO, new PeatioWrapper());
         supportedExchanges.put(Constant.BTER, new BterWrapper());
         supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
         supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());

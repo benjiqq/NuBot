@@ -85,7 +85,7 @@ public class TestOrderTask {
         //Create a new Exchange
 
 
-        exchange = new Exchange(Constant.PEATIO_BTCCNY);
+        exchange = new Exchange(Constant.PEATIO);
 
         //Create e ExchangeLiveData object to accomodate liveData from the exchange
         ExchangeLiveData liveData = new ExchangeLiveData();
@@ -94,7 +94,7 @@ public class TestOrderTask {
 
         //Create a new TradeInterface object using the BtceWrapper implementation
         //Assign the TradeInterface to the btceExchange
-        exchange.setTrade(new PeatioWrapper(keys, exchange, Constant.PEATIO_BTCCNY_API_BASE));
+        exchange.setTrade(new PeatioWrapper(keys, exchange, Constant.PEATIO_API_BASE));
         exchange.getLiveData().setUrlConnectionCheck(exchange.getTrade().getUrlConnectionCheck());
 
         //Create a TaskManager and

@@ -390,17 +390,13 @@ public class TestWrappers {
 
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
 
-        } else if (exchangeName.equals(Constant.PEATIO_BTCCNY)) {
+        } else if (exchangeName.equals(Constant.PEATIO)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.PEATIO_SECRET, Passwords.PEATIO_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.PEATIO_BTCCNY_API_BASE));
-
-        } else if (exchangeName.equals(Constant.PEATIO_MULTIPAIR)) {
-            LOG.severe("Exchange " + exchangeName + " not supported");
-            System.exit(0);
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.PEATIO_API_BASE));
         } else if (exchangeName.equals(Constant.CCEDK)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEDK_SECRET, Passwords.CCEDK_KEY);
