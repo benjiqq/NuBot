@@ -32,7 +32,7 @@ public class Constant {
     public static final String BTCE = "btce";
     public static final String CCEDK = "ccedk";
     public static final String BTER = "bter";
-    public static final String PEATIO_BTCCNY = "peatio_btccny";
+    public static final String PEATIO_BTCCNY = "peatio";
     public static final String PEATIO_MULTIPAIR = "peatio_multipair";
     public static final String POLONIEX = "poloniex";
     public static final String CCEX = "ccex";
