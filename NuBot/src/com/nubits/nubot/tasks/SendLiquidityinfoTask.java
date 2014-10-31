@@ -53,7 +53,7 @@ public class SendLiquidityinfoTask extends TimerTask {
     //Taken the input exchange, updates it and returns it.
 
     private void checkOrders() {
-        if (!isWallsBeingShifted() && Global.options.isSendRPC()) { //Do not report liquidity info during wall shifts (issue #23)
+        if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
             ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
             if (activeOrdersResponse.isPositive()) {
                 ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
@@ -109,8 +109,10 @@ public class SendLiquidityinfoTask extends TimerTask {
                     LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
                     LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
                 }
-                //Call RPC
-                sendLiquidityInfo(Global.exchange);
+                if (Global.options.isSendRPC()) {
+                    //Call RPC
+                    sendLiquidityInfo(Global.exchange);
+                }
 
             } else {
                 LOG.severe(activeOrdersResponse.getError().toString());

@@ -76,8 +76,8 @@ public class TestOrderTask {
 
         ApiKeys keys;
 
-        String secret = Passwords.PEATIO_SECRET;
-        String apikey = Passwords.PEATIO_KEY;
+        String secret = Passwords.INTERNAL_PEATIO_SECRET;
+        String apikey = Passwords.INTERNAL_PEATIO_KEY;
 
         //Wrap the keys into a new ApiKeys object
         keys = new ApiKeys(secret, apikey);

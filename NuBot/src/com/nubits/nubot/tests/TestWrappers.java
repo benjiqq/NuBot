@@ -32,7 +32,6 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BtceWrapper;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
@@ -92,21 +91,21 @@ public class TestWrappers {
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
 
-         /*for (int i = 0; i < 5000; i++) {
-            LOG.info(TradeUtils.getCCDKEvalidNonce());
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        /*for (int i = 0; i < 5000; i++) {
+         LOG.info(TradeUtils.getCCDKEvalidNonce());
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
          }*/
 
 
-         //stimulating ccedk wrong nonce
+        //stimulating ccedk wrong nonce
 
 
 
-         for (int i = 0; i < 5000; i++) {
+        for (int i = 0; i < 5000; i++) {
             testGetActiveOrders();
             try {
                 Thread.sleep(100);
@@ -128,7 +127,7 @@ public class TestWrappers {
             } catch (InterruptedException ex) {
                 Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
             }
-         }
+        }
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
@@ -397,7 +396,7 @@ public class TestWrappers {
 
         } else if (exchangeName.equals(Constant.PEATIO_BTCCNY)) {
             //Wrap the keys into a new ApiKeys object
-            keys = new ApiKeys(Passwords.PEATIO_SECRET, Passwords.PEATIO_KEY);
+            keys = new ApiKeys(Passwords.INTERNAL_PEATIO_SECRET, Passwords.INTERNAL_PEATIO_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
