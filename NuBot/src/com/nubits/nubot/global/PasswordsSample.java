@@ -27,8 +27,8 @@ public class PasswordsSample {
     public static final String CUSTODIAN_PUBLIC_ADDRESS = "xxx"; //testnet elected custodian
     public static final String BTCE_SECRET = "xxx";
     public static final String BTCE_KEY = "xxx";
-    public static final String PEATIO_SECRET = "xxx";
-    public static final String PEATIO_KEY = "xxx";
+    public static final String INTERNAL_PEATIO_SECRET = "xxx";
+    public static final String INTERNAL_PEATIO_KEY = "xxx";
     public static final String CCEDK_SECRET = "xxx";
     public static final String CCEDK_KEY = "xxx";
     public static final String BTER_KEY = "xxx";

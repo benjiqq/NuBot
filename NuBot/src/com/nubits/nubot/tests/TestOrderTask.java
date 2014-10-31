@@ -76,8 +76,8 @@ public class TestOrderTask {
 
         ApiKeys keys;
 
-        String secret = Passwords.PEATIO_SECRET;
-        String apikey = Passwords.PEATIO_KEY;
+        String secret = Passwords.INTERNAL_PEATIO_SECRET;
+        String apikey = Passwords.INTERNAL_PEATIO_KEY;
 
         //Wrap the keys into a new ApiKeys object
         keys = new ApiKeys(secret, apikey);
@@ -85,7 +85,7 @@ public class TestOrderTask {
         //Create a new Exchange
 
 
-        exchange = new Exchange(Constant.PEATIO);
+        exchange = new Exchange(Constant.INTERNAL_EXCHANGE_PEATIO);
 
         //Create e ExchangeLiveData object to accomodate liveData from the exchange
         ExchangeLiveData liveData = new ExchangeLiveData();
@@ -94,7 +94,7 @@ public class TestOrderTask {
 
         //Create a new TradeInterface object using the BtceWrapper implementation
         //Assign the TradeInterface to the btceExchange
-        exchange.setTrade(new PeatioWrapper(keys, exchange, Constant.PEATIO_API_BASE));
+        exchange.setTrade(new PeatioWrapper(keys, exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
         exchange.getLiveData().setUrlConnectionCheck(exchange.getTrade().getUrlConnectionCheck());
 
         //Create a TaskManager and

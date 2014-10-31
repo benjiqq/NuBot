@@ -57,14 +57,14 @@ public class NuExecuteOrders {
         Utils.loadProperties("settings.properties");
 
         mainThread = Thread.currentThread();
-        
-        String folderName = "NuExecuteOrders_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+
+        String folderName = "NuExecuteOrders_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        
+
         try {
-            NuLogger.setup(true,logsFolder);
+            NuLogger.setup(true, logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
@@ -114,8 +114,8 @@ public class NuExecuteOrders {
 
         //Switch the ip of exchange
         String apibase = "";
-        if (exchangename.equalsIgnoreCase(Constant.PEATIO)) {
-            apibase = Constant.PEATIO_API_BASE;
+        if (exchangename.equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            apibase = Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE;
         } else {
             LOG.severe("Exchange name not accepted : " + exchangename);
             System.exit(0);

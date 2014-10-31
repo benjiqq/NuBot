@@ -32,7 +32,6 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
@@ -40,7 +39,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -87,42 +85,42 @@ public class TestWrappers {
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
 
-         /*for (int i = 0; i < 5000; i++) {
-            LOG.info(TradeUtils.getCCDKEvalidNonce());
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        /*for (int i = 0; i < 5000; i++) {
+         LOG.info(TradeUtils.getCCDKEvalidNonce());
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
          }*/
 
 
-         //stimulating ccedk wrong nonce
+        //stimulating ccedk wrong nonce
 
-/*
+        /*
 
          for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+         testGetActiveOrders();
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
 
-            testGetAvailableBalances(Constant.NBT_PPC);
+         testGetAvailableBalances(Constant.NBT_PPC);
 
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            testGetOrderDetail("3454");
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         testGetOrderDetail("3454");
 
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
          }*/
     }
 
@@ -390,13 +388,13 @@ public class TestWrappers {
 
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
 
-        } else if (exchangeName.equals(Constant.PEATIO)) {
+        } else if (exchangeName.equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             //Wrap the keys into a new ApiKeys object
-            keys = new ApiKeys(Passwords.PEATIO_SECRET, Passwords.PEATIO_KEY);
+            keys = new ApiKeys(Passwords.INTERNAL_PEATIO_SECRET, Passwords.INTERNAL_PEATIO_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.PEATIO_API_BASE));
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
         } else if (exchangeName.equals(Constant.CCEDK)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEDK_SECRET, Passwords.CCEDK_KEY);

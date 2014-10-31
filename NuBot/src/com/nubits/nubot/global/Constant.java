@@ -32,12 +32,13 @@ public class Constant {
     public static final String BTCE = "btce";
     public static final String CCEDK = "ccedk";
     public static final String BTER = "bter";
-    public static final String PEATIO = "peatio";
+    public static final String INTERNAL_EXCHANGE_PEATIO = "peatio";
+    public static final String BITSPARK_PEATIO = "bitspark";
     public static final String POLONIEX = "poloniex";
     public static final String CCEX = "ccex";
     public static final String ALLCOIN = "allcoin";
     //API base url for peatio instances
-    public static final String PEATIO_API_BASE = "http://178.62.186.229/";
+    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";
     //Order types
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";

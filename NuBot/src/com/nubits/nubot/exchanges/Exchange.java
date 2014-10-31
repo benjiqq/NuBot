@@ -21,7 +21,6 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,7 +46,7 @@ public class Exchange {
     public static boolean isSupported(String name) {
 
         supportedExchanges.put(Constant.BTCE, new BtceWrapper());
-        supportedExchanges.put(Constant.PEATIO, new PeatioWrapper());
+        supportedExchanges.put(Constant.INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
         supportedExchanges.put(Constant.BTER, new BterWrapper());
         supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
         supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());

@@ -102,8 +102,8 @@ public class NuCancelOrders {
 
         //Switch the ip of exchange
         String apibase = "";
-        if (exchangename.equalsIgnoreCase(Constant.PEATIO_API_BASE)) {
-            apibase = Constant.PEATIO_API_BASE;
+        if (exchangename.equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            apibase = Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE;
         } else {
             LOG.severe("Exchange name not accepted : " + exchangename);
             System.exit(0);

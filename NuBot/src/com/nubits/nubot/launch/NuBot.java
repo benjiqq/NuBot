@@ -44,9 +44,9 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
- * Provides the main class of NuBot.
- * Instantiate this class to start the NuBot program 
- * 
+ * Provides the main class of NuBot. Instantiate this class to start the NuBot
+ * program
+ *
  * @author desrever <desrever at nubits.com>
  */
 public class NuBot {
@@ -58,10 +58,9 @@ public class NuBot {
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
     /**
-     * Initialises the NuBot.
-     * Check if NuBot has valid parameters and quit if it doesn't
-     * Check if NuBot is already running and Log if that is so
-     * 
+     * Initialises the NuBot. Check if NuBot has valid parameters and quit if it
+     * doesn't Check if NuBot is already running and Log if that is so
+     *
      * @author desrever <desrever at nubits.com>
      * @param args a list of valid arguments
      */
@@ -82,9 +81,9 @@ public class NuBot {
             System.exit(0);
         }
     }
-    
+
     /**
-     * 
+     *
      * @author desrever <desrever at nubits.com>
      */
     private void execute() {
@@ -153,8 +152,8 @@ public class NuBot {
         }
 
         String apibase = "";
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_API_BASE)) {
-            ti.setApiBaseUrl(Constant.PEATIO_API_BASE);
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
         }
 
 
