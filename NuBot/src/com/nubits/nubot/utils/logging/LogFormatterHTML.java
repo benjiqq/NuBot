@@ -33,6 +33,8 @@ import java.util.logging.LogRecord;
 class LogFormatterHTML extends Formatter {
     // This method is called for every log records
 
+    private static final String PATH_TO_ASSETS = "../../res/logs_assets/";
+
     public String format(LogRecord rec) {
         if (rec.getLevel().intValue() >= Level.INFO.intValue()) {
             StringBuffer buf = new StringBuffer(1000);
@@ -88,7 +90,7 @@ class LogFormatterHTML extends Formatter {
                 + "<html>\n"
                 + "<head>\n"
                 + "	<title>NuBot Logs</title>\n"
-                + "	<link rel=\"stylesheet\" type=\"text/css\" href=\"../res/css/style.css\">\n"
+                + "	<link rel=\"stylesheet\" type=\"text/css\" href=\"" + PATH_TO_ASSETS + "css/style.css\">\n"
                 + "	<meta http-equiv=\"Content-Type\" content=\"text/html; charset=UTF-8\" />\n"
                 + "</head>\n"
                 + "<body>\n"
@@ -147,7 +149,7 @@ class LogFormatterHTML extends Formatter {
                 + "	</table>\n"
                 + "</section>\n"
                 + "	\n"
-                + "	<script src=\"../res/js/jquery-2.1.1.min.js\"></script>\n"
+                + "	<script src=\"" + PATH_TO_ASSETS + "js/jquery-2.1.1.min.js\"></script>\n"
                 + "	<script type=\"text/javascript\">\n"
                 + "		$(\"input:checkbox\").click(function () {\n"
                 + "		    $('tr').not('.first').css(\"display\",\"none\"); \n"

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,41 +30,40 @@ import org.json.simple.parser.JSONParser;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class BtcePriceFeed extends AbstractPriceFeed {
+public class BlockchainPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BtcePriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(BlockchainPriceFeed.class.getName());
 
-    public BtcePriceFeed() {
-        name = PriceFeedManager.BTCE;
-        refreshMinTime = 40 * 1000; //one minutee
+    public BlockchainPriceFeed() {
+        name = PriceFeedManager.BLOCKCHAIN;
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-
+        String url = "http://blockchain.info/ticker";
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = getUrl(pair);
-            String htmlString;
+            String htmlString = "";
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("ticker");
+                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("USD");
                 double last = Utils.getDouble(tickerObject.get("last"));
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
                 lastRequest = System.currentTimeMillis();
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
         } else {
@@ -72,9 +71,6 @@ public class BtcePriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-    }
 
-    private String getUrl(CurrencyPair pair) {
-        return "https://btc-e.com/api/2/" + (pair.toString("_")).toLowerCase() + "/ticker/";
     }
 }

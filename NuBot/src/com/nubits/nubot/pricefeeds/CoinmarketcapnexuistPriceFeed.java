@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,13 +30,13 @@ import org.json.simple.parser.JSONParser;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
+public class CoinmarketcapnexuistPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = Logger.getLogger(BitcoinaveragePriceFeed.class.getName());
 
-    public BitcoinaveragePriceFeed() {
-        name = PriceFeedManager.BITCOINAVERAGE;
-        refreshMinTime = 120 * 1000; //Two minutes
+    public CoinmarketcapnexuistPriceFeed() {
+        name = PriceFeedManager.COINMARKETCAP_NE;
+        refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }
 
@@ -48,20 +48,21 @@ public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
         if (diff >= refreshMinTime) {
             String htmlString;
             try {
-                htmlString = Utils.getHTML(getUrl(pair));
+                htmlString = Utils.getHTML(getUrl(pair), true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Utils.getDouble(httpAnswerJson.get("last"));
+                JSONObject price = (JSONObject) httpAnswerJson.get("price");
+                double last = Utils.getDouble(price.get("usd"));
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -76,6 +77,7 @@ public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
 
     private String getUrl(CurrencyPair pair) {
         //controls
-        return "https://api.bitcoinaverage.com/ticker/global/" + pair.getPaymentCurrency().getCode().toUpperCase();
+        String currency = pair.getOrderCurrency().getCode().toLowerCase();
+        return "http://coinmarketcap-nexuist.rhcloud.com/api/" + currency;
     }
 }

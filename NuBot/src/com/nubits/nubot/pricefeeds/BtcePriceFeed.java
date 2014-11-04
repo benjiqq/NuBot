@@ -15,12 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -30,43 +26,45 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class BitstampPriceFeed extends AbstractPriceFeed {
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
+public class BtcePriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BitstampPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(BtcePriceFeed.class.getName());
 
-    public BitstampPriceFeed() {
-        name = PriceFeedManager.BITSTAMP_EURUSD;
-        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
+    public BtcePriceFeed() {
+        name = PriceFeedManager.BTCE;
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
+
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = "https://www.bitstamp.net/api/eur_usd/";
+            String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double buy = Double.valueOf((String) httpAnswerJson.get("buy"));
-                double sell = Double.valueOf((String) httpAnswerJson.get("sell"));
-
-                //Make the average between buy and sell
-                double last = Utils.round((buy + sell) / 2, 5);
-
+                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("ticker");
+                double last = Utils.getDouble(tickerObject.get("last"));
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(htmlString);
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -75,5 +73,9 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+    }
+
+    private String getUrl(CurrencyPair pair) {
+        return "https://btc-e.com/api/2/" + (pair.toString("_")).toLowerCase() + "/ticker/";
     }
 }

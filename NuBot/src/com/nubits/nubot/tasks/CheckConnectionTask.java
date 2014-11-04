@@ -51,7 +51,7 @@ public class CheckConnectionTask extends TimerTask {
         try {
             query = new URL(url);
         } catch (MalformedURLException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         try {
             connection = (HttpURLConnection) query.openConnection();
@@ -63,7 +63,7 @@ public class CheckConnectionTask extends TimerTask {
         } catch (NoRouteToHostException | UnknownHostException ex) {
             connected = false;
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         return connected;
     }

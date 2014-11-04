@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -15,8 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -26,17 +30,13 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-public class CoinbasePriceFeed extends AbstractPriceFeed {
+public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(CoinbasePriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(GoogleUnofficialPriceFeed.class.getName());
 
-    public CoinbasePriceFeed() {
-        name = PriceFeedManager.COINBASE;
-        refreshMinTime = 60 * 1000; //one minutee
+    public GoogleUnofficialPriceFeed() {
+        name = PriceFeedManager.GOOGLE_UNOFFICIAL;
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
@@ -47,22 +47,21 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
             String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Double.valueOf((String) httpAnswerJson.get("amount"));
-
-
+                double last = Utils.getDouble((Double) httpAnswerJson.get("rate"));
+                last = Utils.round(last, 6);
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -74,6 +73,8 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
     }
 
     private String getUrl(CurrencyPair pair) {
-        return "https://coinbase.com/api/v1/prices/spot_rate?currency=" + pair.getPaymentCurrency().getCode().toUpperCase();
+        String from = pair.getOrderCurrency().getCode().toUpperCase();
+        String to = pair.getPaymentCurrency().getCode().toUpperCase();
+        return "http://rate-exchange.appspot.com/currency?from=" + from + "&to=" + to;
     }
 }

@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeed;
+package com.nubits.nubot.pricefeeds;
 
 /**
  *
@@ -30,12 +30,12 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class YahooPriceFeed extends AbstractPriceFeed {
+public class BitstampPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(YahooPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(BitstampPriceFeed.class.getName());
 
-    public YahooPriceFeed() {
-        name = PriceFeedManager.YAHOO;
+    public BitstampPriceFeed() {
+        name = PriceFeedManager.BITSTAMP_EURUSD;
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
@@ -44,28 +44,29 @@ public class YahooPriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = getUrl(pair);
+            String url = "https://www.bitstamp.net/api/eur_usd/";
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject query = (JSONObject) httpAnswerJson.get("query");
-                JSONObject results = (JSONObject) query.get("results");
-                JSONObject rate = (JSONObject) results.get("rate");
+                double buy = Double.valueOf((String) httpAnswerJson.get("buy"));
+                double sell = Double.valueOf((String) httpAnswerJson.get("sell"));
 
-                double last = Utils.getDouble((String) rate.get("Rate"));
+                //Make the average between buy and sell
+                double last = Utils.round((buy + sell) / 2, 5);
+
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
@@ -74,14 +75,5 @@ public class YahooPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-    }
-
-    private String getUrl(CurrencyPair pair) {
-        String pairString = pair.toString().toUpperCase();
-        return "https://query.yahooapis.com/v1/public/"
-                + "yql?q=select%20*%20from%20yahoo.finance.xchange%20"
-                + "where%20pair%20in%20(%22" + pairString + "%22)&format=json"
-                + "&diagnostics=false&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
-                + "&callback=";
     }
 }

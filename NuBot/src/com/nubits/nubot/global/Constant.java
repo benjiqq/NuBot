@@ -35,12 +35,10 @@ public class Constant {
     public static final String PEATIO_BTCCNY = "peatio_btccny";
     public static final String PEATIO_MULTIPAIR = "peatio_multipair";
     public static final String POLONIEX = "poloniex";
+    public static final String CCEX = "ccex";
     //API base url for peatio instances
-    public static final String PEATIO_MULTIPAIR_API_BASE = "http://198.52.199.61/"; //TODO UPDATE WHEN AVAILABLE
+    public static final String PEATIO_MULTIPAIR_API_BASE = "http://178.62.186.229/";
     public static final String PEATIO_BTCCNY_API_BASE = "http://198.52.199.61/";
-    //UI components
-    public static final String MAIN_DASHBOARD = "main-dasbhboard";
-    public static final String OPTIONS = "options-dasbhboard";
     //Order types
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
@@ -57,6 +55,7 @@ public class Constant {
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
+    public static final CurrencyPair BTC_NBT = new CurrencyPair(BTC, NBT);
     public static final CurrencyPair NBT_PPC = new CurrencyPair(NBT, PPC);
     public static final CurrencyPair NBT_EUR = new CurrencyPair(NBT, EUR);
     public static final CurrencyPair NBT_CNY = new CurrencyPair(NBT, CNY);
@@ -81,8 +80,10 @@ public class Constant {
         switch (codeString) {
             case "USD":
                 toRet = USD;
+                break;
             case "EUR":
                 toRet = EUR;
+                break;
             case "LTC":
                 toRet = LTC;
                 break;

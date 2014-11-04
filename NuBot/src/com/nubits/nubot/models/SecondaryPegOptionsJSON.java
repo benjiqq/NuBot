@@ -36,7 +36,7 @@ public class SecondaryPegOptionsJSON {
     private String mainFeed;
     private ArrayList<String> backupFeedNames;
     //Optional settings with a default value  ----------------------------
-    private int refreshTime;
+    private long refreshTime;
     private double wallchangeTreshold, priceOffset, distanceTreshold;
 
     /**
@@ -47,9 +47,8 @@ public class SecondaryPegOptionsJSON {
      * @param distanceTreshold
      * @param mainFeed
      * @param backupFeedNames
-     * @param emergencyTimeout
      */
-    public SecondaryPegOptionsJSON(int refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
+    public SecondaryPegOptionsJSON(long refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
         this.refreshTime = refreshTime;
         this.wallchangeTreshold = wallchangeTreshold;
         this.priceOffset = priceOffset;
@@ -64,7 +63,7 @@ public class SecondaryPegOptionsJSON {
      * @param optionsJSON
      * @return
      */
-    public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON) {
+    public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON, CurrencyPair pair) {
         OptionsJSON options = null;
         try {
             //First try to parse compulsory parameters
@@ -87,14 +86,20 @@ public class SecondaryPegOptionsJSON {
                     org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                     backupFeedNames.add((String) tempJson.get("name"));
                 } catch (JSONException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                     System.exit(0);
                 }
             }
 
             //Then parse optional settings. If not use the default value declared here
 
-            int refreshTime = 124;
+            //set the refresh time according to the global trading pair
+            long refreshTime;
+            if (pair.getPaymentCurrency().isFiat()) {
+                refreshTime = 8 * 60 * 59 * 1000; //8 hours;
+            } else {
+                refreshTime = 61;
+            }
             double wallchangeTreshold = 3;
             double priceOffset = 0;
             double distanceTreshold = 10;
@@ -103,25 +108,27 @@ public class SecondaryPegOptionsJSON {
                 wallchangeTreshold = new Double((optionsJSON.get("wallchange-treshold")).toString());
             }
 
-             // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
+            // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
 
-             if (optionsJSON.has("price-offset")) {
-             priceOffset = new Double((optionsJSON.get("price-offset")).toString());
-             }
-             
+            if (optionsJSON.has("price-offset")) {
+                priceOffset = new Double((optionsJSON.get("price-offset")).toString());
+            }
+
 
             if (optionsJSON.has("price-distance-threshold")) {
                 distanceTreshold = new Double((optionsJSON.get("price-distance-threshold")).toString());
             }
 
 
-            if (optionsJSON.has("refresh-time")) {
-                refreshTime = new Integer((optionsJSON.get("refresh-time")).toString());
-            }
+            /* ignore the refresh-time parameter to avoid single custodians checking faster than others (causing self-executing orders)
+             if (optionsJSON.has("refresh-time")) {
+             refreshTime = new Integer((optionsJSON.get("refresh-time")).toString());
+             }
+             */
 
             return new SecondaryPegOptionsJSON(refreshTime, wallchangeTreshold, priceOffset, distanceTreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             System.exit(0);
         }
         return null; //never reached
@@ -131,7 +138,7 @@ public class SecondaryPegOptionsJSON {
      *
      * @return
      */
-    public int getRefreshTime() {
+    public long getRefreshTime() {
         return refreshTime;
     }
 

@@ -38,7 +38,7 @@ public class FileSystem {
                 LOG.severe("Delete operation is failed for : " + path);
             }
         } catch (Exception e) {
-            LOG.severe(e.getMessage());
+            LOG.severe(e.toString());
         }
     }
 
@@ -56,7 +56,7 @@ public class FileSystem {
             }
         } catch (Exception e) {
             if (verbose) {
-                LOG.info(e.getMessage());
+                LOG.info(e.toString());
             }
         }
     }
@@ -73,15 +73,15 @@ public class FileSystem {
                 writer.println(what);
                 writer.close();
             } catch (FileNotFoundException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         } else {
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(where, true)))) {
                 out.println(what);
             } catch (IOException e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
         }
     }
@@ -103,14 +103,14 @@ public class FileSystem {
             }
 
         } catch (FileNotFoundException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         } finally {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
         }
 

@@ -39,6 +39,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -49,7 +51,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -247,13 +248,13 @@ public class BterWrapper implements TradeInterface {
                     }
                     apiResponse.setResponseObject(avail);
                     if (!found) {
-                        LOG.info("Cannot find a balance for currency with code "
+                        LOG.warning("Cannot find a balance for currency with code "
                                 + code + " in your balance. NuBot assumes that balance is 0");
                     }
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -330,7 +331,7 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -381,7 +382,7 @@ public class BterWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /*NOTE TO SELF. Contact Bter support
+            /* NOTE TO SELF. Contact Bter support
              * httpAnswerJson.get("result") contains "true" or false.
              * one is a String the other is boolean
              */
@@ -421,7 +422,7 @@ public class BterWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -545,7 +546,7 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
             return apiResponse;
         }
@@ -626,7 +627,7 @@ public class BterWrapper implements TradeInterface {
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -635,7 +636,7 @@ public class BterWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String path = API_BASE_URL + API_CANCEL_ORDER;
 
@@ -690,13 +691,12 @@ public class BterWrapper implements TradeInterface {
                     apiResponse.setResponseObject(false);
                     return apiResponse;
                 } else {
-
                     apiResponse.setResponseObject(true);
                     return apiResponse;
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
             return apiResponse;
         }
@@ -777,7 +777,7 @@ public class BterWrapper implements TradeInterface {
                 return apiResponse;
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
@@ -813,7 +813,7 @@ public class BterWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse clearOrders() {
+    public ApiResponse clearOrders(CurrencyPair pair) {
         //Since there is no API entry point for that, this call will iterate over actie
         ApiResponse toReturn = new ApiResponse();
         boolean ok = true;
@@ -824,7 +824,7 @@ public class BterWrapper implements TradeInterface {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
 
-                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId());
+                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
@@ -841,7 +841,7 @@ public class BterWrapper implements TradeInterface {
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.getMessage());
+                    LOG.severe(ex.toString());
                 }
 
             }
@@ -890,8 +890,6 @@ public class BterWrapper implements TradeInterface {
             LOG.severe("The bot will not execute the query, there is no connection to bter");
             queryResult = "error : no connection with Bter";
         }
-
-
         return queryResult;
     }
 
@@ -948,7 +946,6 @@ public class BterWrapper implements TradeInterface {
         order.setId((String) orderObject.get("id"));
 
 
-        //TODO currencypair
         CurrencyPair cp = CurrencyPair.getCurrencyPairFromString((String) orderObject.get("pair"), "_");
         order.setPair(cp);
 
@@ -983,6 +980,8 @@ public class BterWrapper implements TradeInterface {
          "time_unix":"1402512551"
          */
 
+        trade.setExchangeName(Constant.BTER);
+
         trade.setId((String) orderObject.get("id"));
         trade.setOrder_id((String) orderObject.get("orderid"));
 
@@ -994,7 +993,7 @@ public class BterWrapper implements TradeInterface {
         trade.setType(((String) orderObject.get("type")).toUpperCase());
         trade.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), cp.getOrderCurrency()));
         trade.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
-
+        trade.setFee(new Amount(0, cp.getPaymentCurrency())); //Not available from API
 
         long date = Long.parseLong(((String) orderObject.get("time_unix")) + "000");
         trade.setDate(new Date(date));
@@ -1091,11 +1090,17 @@ public class BterWrapper implements TradeInterface {
 
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.getMessage());
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
             return apiResponse;
         }
 
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        LOG.warning("BTER only expose access to trades from 24 hours");
+        return getLastTrades(pair);
     }
 
     private class BterService implements ServiceInterface {
@@ -1148,7 +1153,7 @@ public class BterWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = null;
@@ -1167,8 +1172,33 @@ public class BterWrapper implements TradeInterface {
                     get.setHeaders(headers);
                     response = client.execute(get);
                 }
+            } catch (NoRouteToHostException e) {
+                LOG.warning("Debug 1");//TODO remove
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
+                LOG.severe(e.toString());
+                return TOKEN_ERR;
+            } catch (SocketException e) {
+                LOG.warning("Debug 2"); //TODO remove
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
+                LOG.severe(e.toString());
+                return TOKEN_ERR;
             } catch (Exception e) {
-                LOG.severe(e.getMessage());
+                LOG.warning("Debug 3"); //TODO remove
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
+                LOG.severe(e.toString());
+                return TOKEN_ERR;
             }
             BufferedReader rd;
 
@@ -1185,9 +1215,15 @@ public class BterWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.warning("Debug 4");//TODO remove
+
+                LOG.severe(ex.toString());
+                return TOKEN_ERR;
             } catch (IllegalStateException ex) {
-                Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.warning("Debug 5"); //TODO remove
+
+                LOG.severe(ex.toString());
+                return TOKEN_ERR;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
@@ -1233,7 +1269,7 @@ public class BterWrapper implements TradeInterface {
                 sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.severe(ex.toString());
             }
             return sign;
 

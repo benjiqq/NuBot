@@ -117,7 +117,7 @@ public class PeatioWrapper implements TradeInterface {
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
         }
         return toReturn;
@@ -444,7 +444,7 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse cancelOrder(String orderID) {
+    public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String path = API_CANCEL_ORDER;
         boolean isGet = false;
@@ -610,11 +610,8 @@ public class PeatioWrapper implements TradeInterface {
 
         order.setInsertedDate(parseDate(jsonObject.getString("created_at")));
 
-
-
         order.setType(jsonObject.getString("side"));
         //Created at?
-        order.setExecutedAmount(new Amount(jsonObject.getDouble("executed_volume"), cp.getOrderCurrency()));
 
         return order;
 
@@ -642,14 +639,14 @@ public class PeatioWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (ParseException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
             toRet = new Date();
         }
         return toRet;
     }
 
     @Override
-    public ApiResponse clearOrders() {
+    public ApiResponse clearOrders(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         String path = API_CLEAR_ORDERS;
         boolean isGet = false;
@@ -702,7 +699,7 @@ public class PeatioWrapper implements TradeInterface {
                     }
                 }
             } catch (InterruptedException e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
             }
         }
 
@@ -736,6 +733,11 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
     private class PeatioService implements ServiceInterface {
@@ -795,7 +797,7 @@ public class PeatioWrapper implements TradeInterface {
 
                 return response;
             } catch (Exception e) {
-                LOG.severe(e.getMessage());
+                LOG.severe(e.toString());
                 return null;
             } finally {
                 LOG.fine("result:{}" + response);

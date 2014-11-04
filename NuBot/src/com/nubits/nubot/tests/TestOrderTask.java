@@ -46,19 +46,19 @@ public class TestOrderTask {
 
     public static void main(String[] args) {
         setup();
-        Global.taskManager.getCheckOrdersTask().start();
+        Global.taskManager.getSendLiquidityTask().start();
     }
 
     private static void setup() {
 
-        String folderName = "tests_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
-         
-       
+        String folderName = "tests_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+
+
         try {
-            NuLogger.setup(true,logsFolder);
+            NuLogger.setup(true, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
         LOG.setLevel(Level.FINE);
 
@@ -68,7 +68,7 @@ public class TestOrderTask {
 
         Global.options = new OptionsJSON(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
-                60, 30, false, false, "", -1, 0,false, null);
+                60, 30, false, false, "", -1, 0, false, true, null);
 
 
         //Check local filesystem for API keys
@@ -76,8 +76,8 @@ public class TestOrderTask {
 
         ApiKeys keys;
 
-        String secret = Passwords.PEATIO_SECRET;
-        String apikey = Passwords.PEATIO_KEY;
+        String secret = Passwords.INTERNAL_PEATIO_SECRET;
+        String apikey = Passwords.INTERNAL_PEATIO_KEY;
 
         //Wrap the keys into a new ApiKeys object
         keys = new ApiKeys(secret, apikey);
@@ -117,7 +117,7 @@ public class TestOrderTask {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.severe(ex.toString());
         }
 
 
