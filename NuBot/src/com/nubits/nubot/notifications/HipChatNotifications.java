@@ -39,16 +39,22 @@ public class HipChatNotifications {
 
     public static void sendMessage(String message, Color color) {
         String publicAddress = "";
-        boolean send = false; // default don't send
+        boolean send = true; // default send
+        boolean notify = true; //default notify
         if (Global.options != null) {
             publicAddress = Global.options.getNubitsAddress();
             send = Global.options.isSendHipchat();
+            notify = false;
         }
 
         String toSend = message + " (" + publicAddress + ")";
 
+        if (color == Color.RED) {
+            notify = true;
+        }
+
         if (send) {
-            room.sendMessage(toSend, hipchatUser, false, color);
+            room.sendMessage(toSend, hipchatUser, notify, color);
         }
     }
 }

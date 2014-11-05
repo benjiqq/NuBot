@@ -65,7 +65,7 @@ public class TestRPC {
 
         TestRPC test = new TestRPC();
 
-        test.setup(Constant.PEATIO_BTCCNY, custodian, Constant.NBT_BTC, user, pass);
+        test.setup(Constant.INTERNAL_EXCHANGE_PEATIO, custodian, Constant.NBT_BTC, user, pass);
         test.testCheckNudTask();
         try {
             Thread.sleep(2000);

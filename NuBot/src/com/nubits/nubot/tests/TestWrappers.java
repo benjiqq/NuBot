@@ -33,18 +33,12 @@ import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.BtceWrapper;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.CcexWrapper;
-import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
+import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -63,7 +57,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.CCEDK); //Replace to test a differe API implementation
+        configExchange(Constant.ALLCOIN); //Replace to test a differe API implementation
 
         runTests();
         System.exit(0);
@@ -80,7 +74,7 @@ public class TestWrappers {
         //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
         //testCancelOrder("4678290", Constant.BTC_NBT);
         //testClearAllOrders(Constant.NBT_BTC);
-        testIsOrderActive("41496587");
+        //testIsOrderActive("41496587");
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strucly necessary for NuBot to run---------------
@@ -103,31 +97,31 @@ public class TestWrappers {
 
         //stimulating ccedk wrong nonce
 
-
+        /*
 
         for (int i = 0; i < 5000; i++) {
             testGetActiveOrders();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-            testGetAvailableBalances(Constant.NBT_PPC);
-
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            testGetOrderDetail("3454");
-
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-            }
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
         }
+
+        testGetAvailableBalances(Constant.NBT_PPC);
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        testGetOrderDetail("3454");
+
+        try {
+            Thread.sleep(300);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        */
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
@@ -394,17 +388,13 @@ public class TestWrappers {
 
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
 
-        } else if (exchangeName.equals(Constant.PEATIO_BTCCNY)) {
+        } else if (exchangeName.equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.INTERNAL_PEATIO_SECRET, Passwords.INTERNAL_PEATIO_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.PEATIO_BTCCNY_API_BASE));
-
-        } else if (exchangeName.equals(Constant.PEATIO_MULTIPAIR)) {
-            LOG.severe("Exchange " + exchangeName + " not supported");
-            System.exit(0);
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
         } else if (exchangeName.equals(Constant.CCEDK)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEDK_SECRET, Passwords.CCEDK_KEY);
@@ -433,6 +423,13 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.ALLCOIN)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.ALLCOIN_SECRET, Passwords.ALLCOIN_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);

@@ -35,7 +35,7 @@ public class BotTask {
     private String name;
 
     public BotTask(TimerTask task, long interval, String name) {
-        this.timer = new Timer();
+        this.timer = new Timer(name);
         this.running = false;
 
         this.name = name;

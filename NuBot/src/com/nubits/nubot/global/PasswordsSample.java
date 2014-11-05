@@ -27,8 +27,8 @@ public class PasswordsSample {
     public static final String CUSTODIAN_PUBLIC_ADDRESS = "xxx"; //testnet elected custodian
     public static final String BTCE_SECRET = "xxx";
     public static final String BTCE_KEY = "xxx";
-    public static final String PEATIO_SECRET = "xxx";
-    public static final String PEATIO_KEY = "xxx";
+    public static final String INTERNAL_PEATIO_SECRET = "xxx";
+    public static final String INTERNAL_PEATIO_KEY = "xxx";
     public static final String CCEDK_SECRET = "xxx";
     public static final String CCEDK_KEY = "xxx";
     public static final String BTER_KEY = "xxx";
@@ -36,6 +36,8 @@ public class PasswordsSample {
     public static final String POLONIEX_SECRET = "xxx";
     public static final String POLONIEX_KEY = "xxx";
     public static final String CCEX_SECRET = "xxx"; //
+    public static final String ALLCOIN_KEY = "xxx";
+    public static final String ALLCOIN_SECRET = "xxx";
     public static final String GMAIL_USERNAME = "xxx"; //used to send mail notifications
     public static final String GMAIL_PASSWORD = "xxx";
     public static final String HIPCHAT_KEY = "xxx"; //not admin

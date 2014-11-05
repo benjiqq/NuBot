@@ -44,6 +44,8 @@ import java.io.IOException;
 import java.util.logging.Logger;
 
 /**
+ * Provides the main class of NuBot. Instantiate this class to start the NuBot
+ * program
  *
  * @author desrever <desrever at nubits.com>
  */
@@ -55,6 +57,13 @@ public class NuBot {
     private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
+    /**
+     * Initialises the NuBot. Check if NuBot has valid parameters and quit if it
+     * doesn't Check if NuBot is already running and Log if that is so
+     *
+     * @author desrever <desrever at nubits.com>
+     * @param args a list of valid arguments
+     */
     public static void main(String args[]) {
         mainThread = Thread.currentThread();
 
@@ -73,6 +82,10 @@ public class NuBot {
         }
     }
 
+    /**
+     *
+     * @author desrever <desrever at nubits.com>
+     */
     private void execute() {
         Global.running = true;
 
@@ -139,10 +152,8 @@ public class NuBot {
         }
 
         String apibase = "";
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_BTCCNY)) {
-            ti.setApiBaseUrl(Constant.PEATIO_BTCCNY_API_BASE);
-        } else if (Global.options.getExchangeName().equalsIgnoreCase(Constant.PEATIO_MULTIPAIR_API_BASE)) {
-            ti.setApiBaseUrl(Constant.PEATIO_MULTIPAIR_API_BASE);
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
         }
 
 

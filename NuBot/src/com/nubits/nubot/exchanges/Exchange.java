@@ -20,12 +20,7 @@ package com.nubits.nubot.exchanges;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.BtceWrapper;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.CcexWrapper;
-import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
+import com.nubits.nubot.trading.wrappers.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -51,11 +46,12 @@ public class Exchange {
     public static boolean isSupported(String name) {
 
         supportedExchanges.put(Constant.BTCE, new BtceWrapper());
-        supportedExchanges.put(Constant.PEATIO_BTCCNY, new PeatioWrapper());
+        supportedExchanges.put(Constant.INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
         supportedExchanges.put(Constant.BTER, new BterWrapper());
         supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
         supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());
         supportedExchanges.put(Constant.CCEX, new CcexWrapper());
+        supportedExchanges.put(Constant.ALLCOIN, new AllCoinWrapper());
 
 
         Iterator it = supportedExchanges.entrySet().iterator();

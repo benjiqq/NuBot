@@ -53,7 +53,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.fine("Executing task : StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
+        LOG.fine("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
 
         recount(); //Count number of active sells and buys
@@ -61,7 +61,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         boolean shiftSuccess = false;
 
         if (needWallShift) {
-            String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+            String message = "Shift needed on " + Global.exchange.getName() + ": " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
                     + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
             HipChatNotifications.sendMessage(message, Color.PURPLE);
             LOG.warning(message);
@@ -80,7 +80,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (mightNeedInit) {
             boolean reset = mightNeedInit && !(ordersAndBalancesOK);
             if (reset) {
-                String message = "Order reset needed";
+                String message = "Order reset needed on " + Global.exchange.getName();
                 HipChatNotifications.sendMessage(message, Color.PURPLE);
                 LOG.warning(message);
                 boolean reinitiateSuccess = reInitiateOrders();

@@ -129,29 +129,6 @@ public class BterWrapper implements TradeInterface {
 
         String path = API_BASE_URL + API_GET_INFO;
         HashMap<String, String> query_args = new HashMap<>();
-        /*Params
-         */
-
-
-        /*Sample result
-         *{
-         "result":"true",
-         "available_funds":{
-         "CNY":"1122.16",
-         "BTC":"0.83337671",
-         "LTC":"94.364",
-         "YAC":"0.07161",
-         "WDC":"82.35029899"
-         },
-         "locked_funds":{
-         "BTC":"0.0002",
-         "YAC":"10.01"
-         }
-         }
-
-         */
-
-
 
         String queryResult = query(path, query_args, false);
         if (queryResult.startsWith(TOKEN_ERR)) {
