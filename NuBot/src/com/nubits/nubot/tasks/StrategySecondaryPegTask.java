@@ -557,7 +557,9 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean shiftWalls() {
         boolean success = true;
 
-        long wait_time = (1000 * (61 + 41 + 8)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
+        //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconda to take down orders
+
+        long wait_time = (1000 * (Global.options.getSecondaryPegOptions().getRefreshTime() + Global.options.getExecuteStrategyInterval() + 10)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
         //Communicate to the priceMonitorTask that a wall shift is in place
         priceMonitorTask.setWallsBeingShifted(true);
