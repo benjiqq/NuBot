@@ -401,8 +401,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
             LOG.severe("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
             System.exit(0);
         }
-
-
     }
 
     public double getWallchangeThreshold() {
