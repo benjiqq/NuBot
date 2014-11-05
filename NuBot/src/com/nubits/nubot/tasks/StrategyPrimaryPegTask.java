@@ -36,9 +36,9 @@ import java.util.logging.Logger;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class StrategyFiatTask extends TimerTask {
+public class StrategyPrimaryPegTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(StrategyFiatTask.class.getName());
+    private static final Logger LOG = Logger.getLogger(StrategyPrimaryPegTask.class.getName());
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
