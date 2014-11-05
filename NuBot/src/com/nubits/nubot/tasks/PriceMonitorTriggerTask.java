@@ -370,10 +370,14 @@ public class PriceMonitorTriggerTask extends TimerTask {
             buyPriceUSD = 1 - (0.01 * txfee);
 
             //Add(remove) the offset % from prices
-            sellPriceUSD = sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
-            buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset());
+            sellPriceUSD = Utils.round(sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset()), 6);
+            buyPriceUSD = Utils.round(buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset()), 6);
 
-            LOG.info("Computing USD prices with offset " + Global.options.getSecondaryPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD + " buy @ " + buyPriceUSD);
+            String message = "Computing USD prices with offset " + Global.options.getSecondaryPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD;
+            if (Global.isDualSide) {
+                message += "buy @ " + buyPriceUSD;
+            }
+            LOG.info(message);
 
             //convert sell price to PEG
             double sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
@@ -382,9 +386,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //store it
             sellPricePEG_old = sellPricePEGInitial;
 
-            LOG.info("Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
-                    + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + ""
-                    + "; buy @" + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode());
+            String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
+                    + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
+
+            if (Global.isDualSide) {
+                message2 += "; buy @ " + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode();
+            }
+            LOG.info(message2);
 
             //Assign prices
             ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(buyPricePEGInitial);
