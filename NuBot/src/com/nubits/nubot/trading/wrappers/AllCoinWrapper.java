@@ -58,6 +58,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_SELL_COIN = "sell_coin";
     private final String API_BUY_COIN = "buy_coin";
     private final String API_OPEN_ORDERS = "myorders";
+    private final String API_CANCEL_ORDERS = "cancel_order";
     //Tokens
     private final String TOKEN_ERR = "error_info";
     private final String TOKEN_CODE = "code";
@@ -77,6 +78,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final int ERROR_SELL_COIN = 12569;
     private final int ERROR_ACTIVE_ORDERS = 12570;
     private final int ERROR_NULL_RETURN = 12571;
+    private final int ERROR_CANCEL_ORDERS = 12572;
 
 
     public AllCoinWrapper() { setupErrors(); }
@@ -132,6 +134,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         query_args.put("num", String.valueOf(amount));
         query_args.put("price", String.valueOf(price));
+        query_args.put("exchange", pair.getPaymentCurrency().getCode().toUpperCase());
         query_args.put("type", pair.getOrderCurrency().getCode().toUpperCase());
 
         String url = API_AUTH_URL;
@@ -400,6 +403,10 @@ public class AllCoinWrapper implements TradeInterface {
                             //the current order doesn't fill that need
                             continue;
                         }
+                        //check that completed orders aren't being returned
+                        if (order.isCompleted()) {
+                            continue;
+                        }
                         orderList.add(order);
                     }
                 }
@@ -438,7 +445,6 @@ public class AllCoinWrapper implements TradeInterface {
             ...
         }
         */
-        LOG.info(data.toString());
         //set the order id
         // A String containing a unique identifier for this order
         order.setId(data.get(TOKEN_ORDER_ID).toString());
@@ -453,7 +459,7 @@ public class AllCoinWrapper implements TradeInterface {
         order.setAmount(thisAmount);
         //set the price
         //Object containing the price for each units traded.
-        Amount thisPrice = new Amount(Double.parseDouble(data.get("price").toString()), thisPair.getOrderCurrency());
+        Amount thisPrice = new Amount(Double.parseDouble(data.get("price").toString()), thisPair.getPaymentCurrency());
         order.setPrice(thisPrice);
         //set the insertedDate
         SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
@@ -475,6 +481,13 @@ public class AllCoinWrapper implements TradeInterface {
         } else {
             order.setType(Constant.BUY);
         }
+        //set the completion state
+        double remainingOnOrder = Double.parseDouble(data.get("rest_total").toString());
+        if (remainingOnOrder > 0) {
+            order.setCompleted(false);
+        } else {
+            order.setCompleted(true);
+        }
         return order;
     }
 
@@ -485,17 +498,88 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        return null;
+        /* Params
+            access_key	String	Yes	Access key
+            created	Timestamp	Yes	UTC Timestamp
+            methodcancel_order	Yes	Function name
+            order_id	Integer	Yes	Order Id
+            sign
+         */
+        ApiResponse apiResponse = new ApiResponse();
+        boolean isGet = false;
+        TreeMap<String, String> query_args = new TreeMap<>();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+        String url = API_AUTH_URL;
+
+        query_args.put("order_id", orderID);
+
+        String queryResult = query(url, API_CANCEL_ORDERS, query_args, isGet);
+        if (queryResult == null) {
+            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDERS));
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            int code = 0;
+            try {
+                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
+            } catch (ClassCastException cce) {
+                LOG.severe(cce.toString());
+            }
+
+            if (code < 0) { //we have an error
+                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                apiResponse.setError(apiError);
+            } else {
+                //we have returned data
+                JSONObject dataJson;
+                String data;
+                try {
+                    dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
+                    data = dataJson.get("order_id").toString();
+                } catch (ClassCastException cce) {
+                    data = (String) httpAnswerJson.get(TOKEN_DATA);
+                }
+                if (data == null) {
+                    ApiError apiError = new ApiError(ERROR_NULL_RETURN, "Null data return");
+                    apiResponse.setError(apiError);
+                } else {
+                    if (data.equals(orderID)) {
+                        apiResponse.setResponseObject(true);
+                    } else {
+                        apiResponse.setResponseObject(false);
+                    }
+                }
+            }
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        double defaultFee = 0.15;
+
+        //AllCoin global txFee is 0.15 not the global setting of 0.2
+
+        //if (Global.options != null) {
+        //    return new ApiResponse(true, Global.options.getTxFee(), null);
+        //} else {
+            return new ApiResponse(true, defaultFee, null);
+        //}
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        LOG.warning("AllCoin uses global TX fee, currency pair not supported. \n"
+                + "now calling getTxFee()");
+        return getTxFee();
     }
 
     @Override
@@ -510,12 +594,66 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse isOrderActive(String id) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        ApiResponse activeOrdersResponse = getActiveOrders();
+
+        apiResponse.setResponseObject(false);
+
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+               Order thisOrder = order.next();
+                if (thisOrder.getId().equals(id)) {
+                    apiResponse.setResponseObject(true);
+                }
+            }
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        //Since there is no API entry point for that, this call will iterate over active orders
+        ApiResponse toReturn = new ApiResponse();
+        boolean ok = true;
+
+        ApiResponse activeOrdersResponse = getActiveOrders();
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                if (tempOrder.getPair().equals(pair)) {
+                    ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
+                    if (deleteOrderResponse.isPositive()) {
+                        boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+
+                        if (deleted) {
+                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        } else {
+                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            ok = false;
+                        }
+
+                    } else {
+                        LOG.severe(deleteOrderResponse.getError().toString());
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        LOG.severe(ex.toString());
+                    }
+                }
+
+            }
+            toReturn.setResponseObject(ok);
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            toReturn.setError(activeOrdersResponse.getError());
+            return toReturn;
+        }
+
+        return toReturn;
     }
 
     private class AllCoinService implements ServiceInterface {
