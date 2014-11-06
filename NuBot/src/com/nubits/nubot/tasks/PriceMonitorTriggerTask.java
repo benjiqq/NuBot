@@ -224,7 +224,16 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     public void updateLastPrice(LastPrice lp) {
-        this.lastPrice = lp;
+        //sanity check on the new latest price issue #28
+        //compare to the last known good price just in case all price feeds have failed simultaneously
+        //if the price to update to is more than 10% different to the last known price,
+        //ignore the update and reset the currently known price
+        double last = this.lastPrice.getPrice().getQuantity();
+        double current = lp.getPrice().getQuantity();
+        if ((((last-current)/((last+current)/2))*100) < 10) {
+            this.lastPrice = lp;
+        }
+
         LOG.fine("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
