@@ -69,7 +69,7 @@ public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
                     if (tempCurrency.equalsIgnoreCase(lookingfor)) {
                         found = true;
                         rate = Utils.getDouble((Double) temp.get("rate"));
-                        rate = Utils.round(1 / rate, 6);
+                        rate = Utils.round(1 / rate, 8);
                     }
                 }
 

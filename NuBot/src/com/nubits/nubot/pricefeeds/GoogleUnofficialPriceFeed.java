@@ -56,7 +56,7 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
                 double last = Utils.getDouble((Double) httpAnswerJson.get("rate"));
-                last = Utils.round(last, 6);
+                last = Utils.round(last, 8);
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
