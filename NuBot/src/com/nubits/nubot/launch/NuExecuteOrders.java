@@ -50,7 +50,7 @@ public class NuExecuteOrders {
     private ArrayList<CsvLine> orderList;
     private ApiKeys keys;
     private static Thread mainThread;
-    private static final String USAGE_STRING = "java  -jar OrderBot <apikey> <secretkey> <exchange-name> <path/to/orders.csv>";
+    private static final String USAGE_STRING = "java -jar OrderBot <apikey> <secretkey> <exchange-name> <path/to/orders.csv>";
 
     public static void main(String[] args) {
         //Load settings
