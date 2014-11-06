@@ -64,7 +64,7 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
                 lastRequest = System.currentTimeMillis();
                 if (rates.containsKey(lookingfor)) {
                     double last = (Double) rates.get(lookingfor);
-                    last = Utils.round(1 / last, 6);
+                    last = Utils.round(1 / last, 8);
                     lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                     return lastPrice;
                 } else {

@@ -59,7 +59,7 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
                 double sell = Double.valueOf((String) httpAnswerJson.get("sell"));
 
                 //Make the average between buy and sell
-                double last = Utils.round((buy + sell) / 2, 5);
+                double last = Utils.round((buy + sell) / 2, 8);
 
 
                 lastRequest = System.currentTimeMillis();
