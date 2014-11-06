@@ -27,9 +27,8 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimerTask;
+
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -55,6 +54,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private String pegPriceDirection;
     private double sellPricePEG_old;
     private boolean wallsBeingShifted = false;
+
+    //set up a Queue to hold the prices used to calculate the moving average of prices
+    private Queue<Double> queueMA = new LinkedList<>();
+    private int MOVING_AVERAGE_SIZE = 30;
 
     @Override
     public void run() {
@@ -223,16 +226,57 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    public void updateLastPrice(LastPrice lp) {
-        //sanity check on the new latest price issue #28
-        //compare to the last known good price just in case all price feeds have failed simultaneously
-        //if the price to update to is more than 10% different to the last known price,
-        //ignore the update and reset the currently known price
-        double last = this.lastPrice.getPrice().getQuantity();
-        double current = lp.getPrice().getQuantity();
-        if ((((last-current)/((last+current)/2))*100) < 10) {
-            this.lastPrice = lp;
+    public double getMovingAverage() {
+        double MA = 0;
+        for (Iterator<Double> price = queueMA.iterator(); price.hasNext();) {
+            MA += price.next();
         }
+        if (MA != 0) {
+            //MA of zero would indicate no data added so empty queue
+            //don't want to divide by zero
+            MA = MA / queueMA.size();
+        }
+        return MA;
+    }
+
+    public void updateMovingAverageQueue(double price) {
+        if (price == 0) {
+            //don't add 0
+            return;
+        }
+        queueMA.add(price);
+        //trim the queue so that it is a moving average over the correct number of data points
+        if (queueMA.size() > MOVING_AVERAGE_SIZE) {
+            queueMA.remove();
+        }
+    }
+
+    public void updateLastPrice(LastPrice lp) {
+        //we check against the moving average
+        double current = lp.getPrice().getQuantity();
+        double MA = getMovingAverage();
+        if (MA == 0) {
+            //indicates no data in MA queue.
+            //likely to be first price so nothing to compare against
+            //compare against self, instant win
+            MA = current;
+        }
+        //calculate the percentage difference
+        double percentageDiff = (((MA-current)/((MA+current)/2))*100);
+        if ((percentageDiff > 10) || (percentageDiff < -10)) {
+            //The potential price is more than 10% different to the moving average
+            //add it to the MA-Queue to raise the Moving Average and re-request the currency data
+            //in this way we can react to a large change in price when we are sure it is not an anomaly
+            updateMovingAverageQueue(current);
+            executeUpdatePrice(1);
+            return;
+        }
+        //the potential price is within the 10% boundary.
+        //add it to the MA-Queue to keep the moving average moving
+        updateMovingAverageQueue(current);
+
+        //carry on with updating the wall price shift
+        this.lastPrice = lp;
 
         LOG.fine("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
