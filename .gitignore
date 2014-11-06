@@ -17,7 +17,6 @@ releases/
 
 #Specific files to ignore
 ssl_readme.txt
-project.properties
 readme.html
 
 #launch configurations
