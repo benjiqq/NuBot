@@ -231,7 +231,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private void aggregateBuySide(Amount balancePEG) {
         //----------------------PEG (Buys)----------------------------
         //Check if PEG balance > 1
-        double oneNBT = Utils.round(1 / Global.conversion, 6);
+        double oneNBT = Utils.round(1 / Global.conversion, 8);
 
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
@@ -391,7 +391,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             totalActiveOrders = activeSellOrders + activeBuyOrders;
 
             ordersAndBalancesOK = false;
-            double oneNBT = Utils.round(1 / Global.conversion, 6);
+            double oneNBT = Utils.round(1 / Global.conversion, 8);
 
             if (Global.options.isDualSide()) {
                 if (Global.options.isAggregate()) {
@@ -518,7 +518,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 double price = 0;
 
                 if (type.equalsIgnoreCase(Constant.BUY)) {
-                    amount = Utils.round(balancePEG.getQuantity() / buyPricePEG, 6);
+                    amount = Utils.round(balancePEG.getQuantity() / buyPricePEG, 8);
                     price = buyPricePEG;
                 } else if (type.equalsIgnoreCase(Constant.SELL)) {
                     amount = balanceNBT.getQuantity();
@@ -676,7 +676,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 balance = (Amount) balancesResponse.getResponseObject();
             } else {
                 balance = TradeUtils.removeFrozenAmount((Amount) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
-                oneNBT = Utils.round(1 / Global.conversion, 6);
+                oneNBT = Utils.round(1 / Global.conversion, 8);
             }
 
             if (balance.getQuantity() > oneNBT) {
@@ -689,12 +689,12 @@ public class StrategySecondaryPegTask extends TimerTask {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
-                    double amount1 = Utils.round(balance.getQuantity() / 2, 6);
+                    double amount1 = Utils.round(balance.getQuantity() / 2, 8);
                     double amount2 = balance.getQuantity() - amount1;
 
                     if (type.equals(Constant.BUY)) {
-                        amount1 = Utils.round(amount1 / price, 6);
-                        amount2 = Utils.round(amount2 / price, 6);
+                        amount1 = Utils.round(amount1 / price, 8);
+                        amount2 = Utils.round(amount2 / price, 8);
                     }
 
                     //Prepare the orders

@@ -151,7 +151,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             NBTBalance = (Amount) NBTBalancesResponse.getResponseObject();
             if (NBTBalance.getQuantity() > 1) {
                 // Divide the  balance 50% 50% in balance1 and balance2
-                double nbtBalance1 = Utils.round(NBTBalance.getQuantity() / 2, 4);
+                double nbtBalance1 = Utils.round(NBTBalance.getQuantity() / 2, 8);
                 double nbtBalance2 = NBTBalance.getQuantity() - nbtBalance1;
 
                 //Update TX fee :
@@ -224,7 +224,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                 if (fiatBalance.getQuantity() > 1) {
                     // Divide the  balance 50% 50% in balance1 and balance2
-                    double fiatBalance1 = Utils.round(fiatBalance.getQuantity() / 2, 4);
+                    double fiatBalance1 = Utils.round(fiatBalance.getQuantity() / 2, 8);
                     double fiatBalance2 = fiatBalance.getQuantity() - fiatBalance1;
 
                     //Update TX fee :
