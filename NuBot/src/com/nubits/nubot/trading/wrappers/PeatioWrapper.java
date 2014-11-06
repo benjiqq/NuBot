@@ -386,6 +386,8 @@ public class PeatioWrapper implements TradeInterface {
 
         /*Sample result
          */
+        LOG.info(queryResult);
+
         JSONArray response = JSONObject.parseArray(queryResult);
         for (Object anOrdersResponse : response) {
             JSONObject orderResponse = (JSONObject) anOrdersResponse;
@@ -608,10 +610,12 @@ public class PeatioWrapper implements TradeInterface {
         order.setAmount(new Amount(jsonObject.getDouble("remaining_volume"), cp.getOrderCurrency()));
         order.setPrice(new Amount(jsonObject.getDouble("price"), cp.getPaymentCurrency()));
 
+        LOG.info("Created Date = " + parseDate(jsonObject.getString("created_at")));
         order.setInsertedDate(parseDate(jsonObject.getString("created_at")));
 
         order.setType(jsonObject.getString("side"));
         //Created at?
+
 
         return order;
 
