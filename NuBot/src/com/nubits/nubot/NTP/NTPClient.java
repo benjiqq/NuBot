@@ -38,6 +38,16 @@ public final class NTPClient {
     public NTPClient() {
     }
 
+    private void initHosts() {
+        hostnames = new ArrayList<>();
+        hostnames.add("ntp.xs4all.nl");
+        hostnames.add("nist1-pa.ustiming.org");
+        hostnames.add("nist-time-server.eoni.com");
+        hostnames.add("time.nist.gov");
+        hostnames.add("utcnist.colorado.edu");
+        hostnames.add("nist.time.nosc.us");
+    }
+
     public Date getTime(String host) {
         try {
             return getTimeImpl(host);
@@ -79,18 +89,5 @@ public final class NTPClient {
         client.close();
 
         return toRet;
-    }
-
-    private void initHosts() {
-        hostnames = new ArrayList<>();
-        hostnames.add("www.bnaa.com");
-        hostnames.add("fa.ke.com");
-        hostnames.add("brok.co.uk");
-        hostnames.add("ntp.xs4all.nl");
-        hostnames.add("nist1-pa.ustiming.org");
-        hostnames.add("nist-time-server.eoni.com");
-        hostnames.add("time.nist.gov");
-        hostnames.add("utcnist.colorado.edu");
-        hostnames.add("nist.time.nosc.us");
     }
 }
