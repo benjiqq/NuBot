@@ -38,8 +38,9 @@ public class PasswordsSample {
     public static final String CCEX_SECRET = "xxx"; //
     public static final String ALLCOIN_KEY = "xxx";
     public static final String ALLCOIN_SECRET = "xxx";
-    public static final String GMAIL_USERNAME = "xxx"; //used to send mail notifications
-    public static final String GMAIL_PASSWORD = "xxx";
+    public static final String SMTP_USERNAME = ""; //used to send mail notifications
+    public static final String SMTP_PASSWORD = "";
+    public static final String SMTP_HOST = "";
     public static final String HIPCHAT_KEY = "xxx"; //not admin
     public static final String HIPCHAT_LIQUIDITY_ROOM_ID = "xxx"; //Liquidity Testing
     public static final String OPEN_EXCHANGE_RATES_APP_ID = "xxx";

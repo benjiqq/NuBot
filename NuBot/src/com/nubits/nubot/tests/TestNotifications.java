@@ -21,7 +21,7 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.notifications.MailNotifications;
 import java.util.logging.Logger;
 
 public class TestNotifications {
@@ -29,7 +29,7 @@ public class TestNotifications {
     private static final Logger LOG = Logger.getLogger(TestNotifications.class.getName());
 
     public static void main(String[] a) {
-        // MailNotifications.send("desrever.nu@gmail.com", "Test Title", "Test Message");
-        HipChatNotifications.sendMessage("Test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RANDOM);
+        MailNotifications.send("pennybreaker@outlook.com", "Test Title", "Test Message");
+        //HipChatNotifications.sendMessage("Test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RANDOM);
     }
 }

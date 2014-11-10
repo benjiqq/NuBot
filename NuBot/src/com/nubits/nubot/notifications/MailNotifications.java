@@ -42,7 +42,7 @@ public class MailNotifications {
     public static void send(String address, String title, String message) {
         if (Global.options == null || Global.options.isSendMails()) {
             try {
-                MailNotifications.Send(Passwords.GMAIL_USERNAME, Passwords.GMAIL_PASSWORD, address, title, message);
+                MailNotifications.Send(address, title, message);
             } catch (AddressException ex) {
                 LOG.severe(ex.toString());
             } catch (MessagingException ex) {
@@ -66,7 +66,7 @@ public class MailNotifications {
      * @throws MessagingException if the connection is dead or not in the
      * connected state or if the message is not a MimeMessage
      */
-    private static void Send(final String username, final String password, String recipientEmail, String title, String message) throws AddressException, MessagingException {
+    private static void Send(String recipientEmail, String title, String message) throws AddressException, MessagingException {
         title = "[NuBot] " + title;
         Date now = new Date();
         String footer = "\n --- \n Message generated at " + now;
@@ -74,14 +74,14 @@ public class MailNotifications {
             footer += "from bot with custodial address " + Global.options.getNubitsAddress() + " on " + Global.options.getExchangeName();
         }
         message = message + footer;
-        MailNotifications.Send(username, password, recipientEmail, "", title, message);
+        MailNotifications.Send(recipientEmail, "", title, message);
     }
 
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username GMail username
-     * @param password GMail password
+     * @param username username
+     * @param password password
      * @param recipientEmail TO recipient
      * @param ccEmail CC recipient. Can be empty if there is no CC recipient
      * @param title title of the message
@@ -90,18 +90,18 @@ public class MailNotifications {
      * @throws MessagingException if the connection is dead or not in the
      * connected state or if the message is not a MimeMessage
      */
-    private static void Send(final String username, final String password, String recipientEmail, String ccEmail, String title, String message) throws AddressException, MessagingException {
+    private static void Send(String recipientEmail, String ccEmail, String title, String message) throws AddressException, MessagingException {
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
         // Get a Properties object
         Properties props = System.getProperties();
-        props.setProperty("mail.smtps.host", "smtp.gmail.com");
+        props.setProperty("mail.smtps.host", Passwords.SMTP_HOST);
         props.setProperty("mail.smtp.socketFactory.class", SSL_FACTORY);
         props.setProperty("mail.smtp.socketFactory.fallback", "false");
         props.setProperty("mail.smtp.port", "465");
         props.setProperty("mail.smtp.socketFactory.port", "465");
-        props.setProperty("mail.smtps.auth", "true");
+        props.setProperty("mail.smtps.auth", "false");
 
         /*
          If set to false, the QUIT command is sent and the connection is immediately closed. If set
@@ -119,7 +119,7 @@ public class MailNotifications {
         final MimeMessage msg = new MimeMessage(session);
 
         // -- Set the FROM and TO fields --
-        msg.setFrom(new InternetAddress(username + "@gmail.com"));
+        msg.setFrom(new InternetAddress(Passwords.SMTP_USERNAME + ""));
         msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail, false));
 
         if (ccEmail.length() > 0) {
@@ -132,7 +132,7 @@ public class MailNotifications {
 
         SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
 
-        t.connect("smtp.gmail.com", username, password);
+        t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME, Passwords.SMTP_PASSWORD);
         t.sendMessage(msg, msg.getAllRecipients());
         t.close();
     }
