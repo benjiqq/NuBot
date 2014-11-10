@@ -146,6 +146,19 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     unableToUpdatePrice(priceList);
                 }
             }
+
+            //We need to fill up the moving average queue sop that 30 data points exist.
+            //for speed we will use everything that's just been retrieved from every exchange
+            // to give a fair spread and make the average more representative
+            if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+                for (Iterator<LastPrice> price = priceList.iterator(); price.hasNext();) {
+                    queueMA.add(price.next().getPrice().getQuantity());
+                }
+                if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+                    executeUpdatePrice(1);
+                }
+            }
+
         } else {
             //Tried more than three times without success
             LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
