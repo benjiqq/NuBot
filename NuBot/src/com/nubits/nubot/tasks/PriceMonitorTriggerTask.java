@@ -173,6 +173,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Tried more than three times without success
             LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
             sendErrorNotification();
+            Global.exchange.getTrade().clearOrders(Global.options.getPair());
         }
     }
 
