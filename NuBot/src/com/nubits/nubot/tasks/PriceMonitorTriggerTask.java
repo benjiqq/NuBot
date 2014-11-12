@@ -161,6 +161,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //for speed we will use everything that's just been retrieved from every exchange
             // to give a fair spread and make the average more representative
             if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+                //LOG.info("Collecting prices from exchanges to update the Moving Average");
                 for (Iterator<LastPrice> price = priceList.iterator(); price.hasNext();) {
                     updateMovingAverageQueue(price.next().getPrice().getQuantity());
                 }
@@ -255,6 +256,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         for (Iterator<Double> price = queueMA.iterator(); price.hasNext();) {
             MA += price.next();
         }
+        MA = MA/queueMA.size();
         return MA;
     }
 
@@ -306,7 +308,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //The potential price is more than % different to the moving average
             //add it to the MA-Queue to raise the Moving Average and re-request the currency data
             //in this way we can react to a large change in price when we are sure it is not an anomaly
-            LOG.warning("Latest price " + Objects.toString(current) + " is outside of " + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average." +
+            LOG.warning("Latest price " + Objects.toString(current) + " is " + Objects.toString(percentageDiff) + "% outside of the moving average of " + Objects.toString(MA) + "." +
                     "\nShifting moving average and re-fetching exchange rate data.");
             updateMovingAverageQueue(current);
             executeUpdatePrice(1);
