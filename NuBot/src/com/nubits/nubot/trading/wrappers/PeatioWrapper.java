@@ -620,12 +620,12 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     private Date parseDate(String dateStr) {
@@ -738,7 +738,7 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     private class PeatioService implements ServiceInterface {
@@ -807,7 +807,7 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String signRequest(String secret, String hash_data) {
-            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters"); //TODO change body of generated methods, choose Tools | Templates.
+            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters"); 
         }
 
         private String getSign(TreeMap<String, String> parameters) {

@@ -289,7 +289,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
@@ -757,12 +757,12 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     private Order parseOrder(JSONObject orderObject) {
@@ -844,7 +844,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
 
     }
 
@@ -983,9 +983,9 @@ public class CcedkWrapper implements TradeInterface {
                     if (wrongNonceCounter == 0) {
                         nonce = createNonce("");
                     } else {
-                        LOG.warning("Re executing query for the " + wrongNonceCounter + " time. "
+                        LOG.info("Re executing query for the " + wrongNonceCounter + " time. "
                                 + "New nonce = " + adjustedNonce
-                                + " while calling : " + method); //TODO, down to log. info when debugging is done
+                                + " while calling : " + method);
                         nonce = adjustedNonce;
                     }
                     args.put("nonce", nonce);

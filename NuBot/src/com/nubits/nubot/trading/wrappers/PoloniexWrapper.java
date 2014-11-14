@@ -230,7 +230,7 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
@@ -635,12 +635,12 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override

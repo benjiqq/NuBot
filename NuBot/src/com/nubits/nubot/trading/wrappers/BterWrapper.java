@@ -872,18 +872,18 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
 
     }
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
@@ -898,7 +898,7 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
 
     }
 
@@ -1149,7 +1149,6 @@ public class BterWrapper implements TradeInterface {
                     response = client.execute(get);
                 }
             } catch (NoRouteToHostException e) {
-                LOG.warning("Debug 1");//TODO remove
                 if (!isGet) {
                     post.abort();
                 } else {
@@ -1158,7 +1157,6 @@ public class BterWrapper implements TradeInterface {
                 LOG.severe(e.toString());
                 return TOKEN_ERR;
             } catch (SocketException e) {
-                LOG.warning("Debug 2"); //TODO remove
                 if (!isGet) {
                     post.abort();
                 } else {
@@ -1167,7 +1165,6 @@ public class BterWrapper implements TradeInterface {
                 LOG.severe(e.toString());
                 return TOKEN_ERR;
             } catch (Exception e) {
-                LOG.warning("Debug 3"); //TODO remove
                 if (!isGet) {
                     post.abort();
                 } else {
@@ -1191,12 +1188,10 @@ public class BterWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                LOG.warning("Debug 4");//TODO remove
 
                 LOG.severe(ex.toString());
                 return TOKEN_ERR;
             } catch (IllegalStateException ex) {
-                LOG.warning("Debug 5"); //TODO remove
 
                 LOG.severe(ex.toString());
                 return TOKEN_ERR;
