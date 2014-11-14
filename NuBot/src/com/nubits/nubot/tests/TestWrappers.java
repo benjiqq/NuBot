@@ -57,7 +57,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.ALLCOIN); //Replace to test a differe API implementation
+        configExchange(Constant.INTERNAL_EXCHANGE_PEATIO); //Replace to test a differe API implementation
 
         runTests();
         System.exit(0);
@@ -66,12 +66,14 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
-        testGetAvailableBalance(Constant.NBT); //
+        //testGetAvailableBalance(Constant.NBT); //
         //testGetAvailableBalances(Constant.BTC_NBT);
-        //testGetActiveOrders(Constant.BTC_NBT)
+        testGetActiveOrders(Constant.BTC_NBT);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
+        testSell(50, 0.00830509, Constant.NBT_BTC);  //ok
+        testBuy(100, 0.000199999, Constant.NBT_BTC);  //ok
+        testSell(50, 0.00930509, Constant.NBT_BTC);  //ok
+        testBuy(100, 0.00199999, Constant.NBT_BTC);  //ok
         //testCancelOrder("4678290", Constant.BTC_NBT);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("41496587");
@@ -85,14 +87,14 @@ public class TestWrappers {
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
 
-        /*for (int i = 0; i < 5000; i++) {
-         LOG.info(TradeUtils.getCCDKEvalidNonce());
-         try {
-         Thread.sleep(300);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         }*/
+        for (int i = 0; i < 5000; i++) {
+            testGetActiveOrders(Constant.BTC_NBT);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
+            }
+        }
 
 
         //stimulating ccedk wrong nonce

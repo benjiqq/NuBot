@@ -386,6 +386,8 @@ public class PeatioWrapper implements TradeInterface {
 
         /*Sample result
          */
+
+
         JSONArray response = JSONObject.parseArray(queryResult);
         for (Object anOrdersResponse : response) {
             JSONObject orderResponse = (JSONObject) anOrdersResponse;
@@ -598,7 +600,6 @@ public class PeatioWrapper implements TradeInterface {
             }
         }
 
-
         //Create a CurrencyPair object
         CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(jsonObject.getString("market"), "");
 
@@ -609,9 +610,9 @@ public class PeatioWrapper implements TradeInterface {
         order.setPrice(new Amount(jsonObject.getDouble("price"), cp.getPaymentCurrency()));
 
         order.setInsertedDate(parseDate(jsonObject.getString("created_at")));
-
         order.setType(jsonObject.getString("side"));
         //Created at?
+
 
         return order;
 
@@ -630,10 +631,10 @@ public class PeatioWrapper implements TradeInterface {
     private Date parseDate(String dateStr) {
         Date toRet = null;
         //Parse the date
-        //Sample 2014-08-19T10:23:49+01:00
+        //Sample 2014-08-19T10:23:49Z
 
         //Remove the Timezone
-        dateStr = dateStr.substring(0, dateStr.length() - 6);
+        dateStr = dateStr.substring(0, dateStr.length() - 1);
         String datePattern = "yyyy-MM-dd'T'HH:mm:ss";
         DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
         try {
