@@ -583,7 +583,8 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.fine("CCEDK uses global TX fee, currency pair not supprted. \n"
+
+        LOG.warning("CCEDK uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -670,7 +671,7 @@ public class CcedkWrapper implements TradeInterface {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-
+                //TODO check that the order belongs to 'pair'
                 ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
