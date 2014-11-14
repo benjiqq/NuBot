@@ -49,7 +49,6 @@ public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
-    //These are the key pair associated with desrever's test account on btc-e
 
     public static void main(String[] args) {
         //Load settings
@@ -57,7 +56,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.INTERNAL_EXCHANGE_PEATIO); //Replace to test a differe API implementation
+        configExchange(Constant.BITSPARK_PEATIO); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
@@ -66,7 +65,7 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
-        //testGetAvailableBalance(Constant.PPC); //
+        //testGetAvailableBalance(Constant.NBT); //
         //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
@@ -78,51 +77,14 @@ public class TestWrappers {
         //testIsOrderActive("2064456");
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
-        //Methods NOT strucly necessary for NuBot to run---------------
+
+        //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC);
         //testGetLastTrades(Constant.BTC_NBT, 1409566800);
 
-
-        for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders(Constant.BTC_NBT);
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-            }
-        }
-
-
-        //stimulating ccedk wrong nonce
-
-        /*
-
-        for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders();
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-        }
-
-        testGetAvailableBalances(Constant.NBT_PPC);
-
-        try {
-            Thread.sleep(100);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        testGetOrderDetail("3454");
-
-        try {
-            Thread.sleep(300);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        */
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
@@ -431,6 +393,13 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.BITSPARK_PEATIO)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.BITSPARK_SECRET, Passwords.BITSPARK_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
