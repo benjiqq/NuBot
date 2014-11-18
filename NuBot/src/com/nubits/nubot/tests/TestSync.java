@@ -45,8 +45,8 @@ import java.util.logging.Logger;
 public class TestSync extends TimerTask {
 
     private static final Logger LOG = Logger.getLogger(TestSync.class.getName());
-    private static final int TASK_INTERVAL = 20;
-    private static final int TASK_MAX_EXECUTION_INTERVAL = 15;
+    private static final int TASK_INTERVAL = 61;
+    private static final int TASK_MAX_EXECUTION_INTERVAL = 50;
     private static String id;
     private static int startTime;
     private static CurrencyPair pair = Constant.BTC_USD;
@@ -57,9 +57,12 @@ public class TestSync extends TimerTask {
         //It sends a notification on hipchat after syncing with a remote time server
         //Change parameters above
 
+
         startTime = (int) (System.currentTimeMillis() / 1000);
         System.out.println("Start-time = " + startTime);
         id = UUID.randomUUID().toString();
+
+        init();
 
         message("Started");
         //Random sleep + 10 seconds
@@ -97,7 +100,7 @@ public class TestSync extends TimerTask {
         return id.substring(id.lastIndexOf("-") + 10) + " , t=" + secondsFromStart + "     - ";
     }
 
-    private void init() {
+    private static void init() {
         Utils.loadProperties("settings.properties");
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
@@ -140,13 +143,11 @@ public class TestSync extends TimerTask {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-
         backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
         backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
         backupFeedList.add(PriceFeedManager.COINBASE);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
-
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
