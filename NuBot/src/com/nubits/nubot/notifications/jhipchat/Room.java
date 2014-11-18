@@ -32,6 +32,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 
 public class Room extends RoomId {
@@ -46,6 +47,7 @@ public class Room extends RoomId {
     private String xmppJId;
     private String guestAccessUrl;
     private List<UserId> participants;
+    private static final Logger LOG = Logger.getLogger(Room.class.getName());
 
     private Room(String id, HipChat origin) {
         super(id, origin);
@@ -218,9 +220,9 @@ public class Room extends RoomId {
             result = UtilParser.parseMessageResult(input);
 
         } catch (MalformedURLException e) {
-            e.printStackTrace();
+            LOG.severe(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.severe(e.getMessage());
         } finally {
             IOUtils.closeQuietly(output);
             connection.disconnect();

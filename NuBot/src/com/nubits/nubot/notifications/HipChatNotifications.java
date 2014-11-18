@@ -54,7 +54,11 @@ public class HipChatNotifications {
         }
 
         if (send) {
-            room.sendMessage(toSend, hipchatUser, notify, color);
+            try {
+                room.sendMessage(toSend, hipchatUser, notify, color);
+            } catch (Exception e) {
+                LOG.severe("Not sending hipchat notification. Network problem");
+            }
         }
     }
 }
