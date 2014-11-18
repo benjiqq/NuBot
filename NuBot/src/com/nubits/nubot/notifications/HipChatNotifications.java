@@ -40,7 +40,7 @@ public class HipChatNotifications {
     public static void sendMessage(String message, Color color) {
         String publicAddress = "";
         boolean send = true; // default send
-        boolean notify = true; //default notify
+        boolean notify = false; //default notify
         if (Global.options != null) {
             publicAddress = Global.options.getNubitsAddress();
             send = Global.options.isSendHipchat();
