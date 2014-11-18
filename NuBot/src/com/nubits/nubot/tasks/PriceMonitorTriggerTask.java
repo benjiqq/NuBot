@@ -27,9 +27,8 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.TimerTask;
+
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -38,6 +37,7 @@ import java.util.logging.Logger;
  *
  */
 public class PriceMonitorTriggerTask extends TimerTask {
+
 
     private int count;
     private final int MAX_ATTEMPTS = 5;
@@ -55,9 +55,22 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private String pegPriceDirection;
     private double sellPricePEG_old;
     private boolean wallsBeingShifted = false;
+    private Long currentTime = null;
+
+    //set up a Queue to hold the prices used to calculate the moving average of prices
+    private Queue<Double> queueMA = new LinkedList<>();
+    private int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
+    private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
+    private static final int PRICE_PERCENTAGE = 10; //this is the percentage at which refresh action is taken
 
     @Override
     public void run() {
+        //take a note of the current time.
+        //sudden changes in price can cause the bot to re-request the price data repeatedly
+        // until the moving average is within 10% of the reported price.
+        //we don't want that process to take longer than the price refresh interval
+        currentTime = System.currentTimeMillis();
+
         LOG.fine("Executing task : PriceMonitorTriggerTask ");
         if (pfm == null || strategy == null) {
             LOG.severe("PriceMonitorTriggerTask task needs a PriceFeedManager and a Strategy to work. Please assign it before running it");
@@ -143,10 +156,25 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     unableToUpdatePrice(priceList);
                 }
             }
+
+            //We need to fill up the moving average queue sop that 30 data points exist.
+            //for speed we will use everything that's just been retrieved from every exchange
+            // to give a fair spread and make the average more representative
+            if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+                //LOG.info("Collecting prices from exchanges to update the Moving Average");
+                for (Iterator<LastPrice> price = priceList.iterator(); price.hasNext();) {
+                    updateMovingAverageQueue(price.next().getPrice().getQuantity());
+                }
+                if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+                    executeUpdatePrice(1);
+                }
+            }
+
         } else {
             //Tried more than three times without success
             LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
             sendErrorNotification();
+            Global.exchange.getTrade().clearOrders(Global.options.getPair());
         }
     }
 
@@ -223,8 +251,84 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
+    public double getMovingAverage() {
+        double MA = 0;
+        for (Iterator<Double> price = queueMA.iterator(); price.hasNext();) {
+            MA += price.next();
+        }
+        MA = MA/queueMA.size();
+        return MA;
+    }
+
+    public void updateMovingAverageQueue(double price) {
+        if (price == 0) {
+            //don't add 0
+            return;
+        }
+        queueMA.add(price);
+        //trim the queue so that it is a moving average over the correct number of data points
+        if (queueMA.size() > MOVING_AVERAGE_SIZE) {
+            queueMA.remove();
+        }
+    }
+
+    public void largePriceDiffGracefulQuit(LastPrice lp) {
+        //This is called is an abnormal price is detected for one whole refresh period
+        //we want to send Hip Chat and mail notifications,
+        // cancel all orders to avoid arbitrage against the bot and
+        // exit execution gracefully
+        LOG.severe("The Fetched Exchange rate data has remained outside of the required price band for " +
+                Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds. The bot will notify and shutdown");
+        LOG.severe("Notifying HipChat");
+        HipChatNotifications.sendMessage("A large price difference was detected at " + Global.exchange.getName()
+                + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
+                + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
+                + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place"
+                , Color.RED);
+        LOG.severe("Sending Email");
+        MailNotifications.send(Global.options.getMailRecipient(), Global.exchange.getName() + " Bot shutdown due to large price difference",
+                "A large price difference was detected at " + Global.exchange.getName()
+                + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
+                + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
+                + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place");
+        LOG.severe("Cancelling Orders to avoid Arbitrage against the bot");
+        Global.exchange.getTrade().clearOrders(Global.options.getPair());
+        LOG.severe("Shutting down");
+        System.exit(0);
+    }
+
     public void updateLastPrice(LastPrice lp) {
+        //we check against the moving average
+        double current = lp.getPrice().getQuantity();
+        double MA = getMovingAverage();
+
+        //calculate the percentage difference
+        double percentageDiff = (((MA-current)/((MA+current)/2))*100);
+        if ((percentageDiff > PRICE_PERCENTAGE) || (percentageDiff < -PRICE_PERCENTAGE)) {
+            //The potential price is more than % different to the moving average
+            //add it to the MA-Queue to raise the Moving Average and re-request the currency data
+            //in this way we can react to a large change in price when we are sure it is not an anomaly
+            LOG.warning("Latest price " + Objects.toString(current) + " is " + Objects.toString(percentageDiff) + "% outside of the moving average of " + Objects.toString(MA) + "." +
+                    "\nShifting moving average and re-fetching exchange rate data.");
+            updateMovingAverageQueue(current);
+            executeUpdatePrice(1);
+            return;
+        }
+        //the potential price is within the % boundary.
+        //add it to the MA-Queue to keep the moving average moving
+        // Only do this if the standard update interval hasn't passed
+        if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000) < Global.options.getSecondaryPegOptions().getRefreshTime()) {
+            updateMovingAverageQueue(current);
+        } else {
+            //If we get here, we haven't had a price within % of the average for as long as a standard update period
+            //the action is to send notifications, cancel all orders and turn off the bot
+            largePriceDiffGracefulQuit(lp);
+            return;
+        }
+
+        //carry on with updating the wall price shift
         this.lastPrice = lp;
+
         LOG.fine("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
