@@ -60,7 +60,7 @@ public final class NTPClient {
 
     public Date getTime() {
         initHosts();
-
+        boolean found = false;
         for (int i = 0; i < hostnames.size(); i++) {
             try {
                 return getTimeImpl(hostnames.get(i));
@@ -72,10 +72,13 @@ public final class NTPClient {
                 }
             }
         }
+        if (!found) {
+            LOG.severe("Cannot update time after querying " + hostnames.size() + " timeservers. ");
+            System.exit(0);
+        }
+        return new Date(); //statement is never reached
 
-        LOG.severe("Cannot update time after querying " + hostnames.size() + " timeservers. ");
-        LOG.severe("Using local time instead.");
-        return new Date();
+
 
     }
 

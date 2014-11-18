@@ -22,7 +22,7 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
-import com.nubits.nubot.pricefeeds.GoogleUnofficialPriceFeed;
+import com.nubits.nubot.pricefeeds.BtcePriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
@@ -48,24 +48,24 @@ public class TestPriceFeed {
 
         test.pair = Constant.BTC_USD;
 
-        //test.executeSingle();
-        test.execute();
+        test.executeSingle();
+        //test.execute();
         //test.executePPC();
     }
 
     private void init() {
         Utils.loadProperties("settings.properties");
         //feed = new BitcoinaveragePriceFeed();
-        String folderName = "tests_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+        String folderName = "tests_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
         try {
-            NuLogger.setup(false,logsFolder);
+            NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
         LOG.setLevel(Level.INFO);
 
-        feed = new GoogleUnofficialPriceFeed(); //REPLACE HERE
+        feed = new BtcePriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));

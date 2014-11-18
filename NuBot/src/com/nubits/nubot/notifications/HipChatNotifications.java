@@ -40,7 +40,7 @@ public class HipChatNotifications {
     public static void sendMessage(String message, Color color) {
         String publicAddress = "";
         boolean send = true; // default send
-        boolean notify = true; //default notify
+        boolean notify = false; //default notify
         if (Global.options != null) {
             publicAddress = Global.options.getNubitsAddress();
             send = Global.options.isSendHipchat();
@@ -54,7 +54,11 @@ public class HipChatNotifications {
         }
 
         if (send) {
-            room.sendMessage(toSend, hipchatUser, notify, color);
+            try {
+                room.sendMessage(toSend, hipchatUser, notify, color);
+            } catch (Exception e) {
+                LOG.severe("Not sending hipchat notification. Network problem");
+            }
         }
     }
 }
