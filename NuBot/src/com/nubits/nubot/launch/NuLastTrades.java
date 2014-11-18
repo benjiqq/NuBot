@@ -41,7 +41,6 @@ public class NuLastTrades {
 
     private static final Logger LOG = Logger.getLogger(NuLastTrades.class.getName());
     private final String USAGE_STRING = "java  -jar NuLastTrades <exchange-name> <apikey> <apisecret> <currency_pair> [<date_from>]";
-    private final String HEADER = "id,order_id,pair,type,price,amount,date";
     private String output;
     private String api;
     private String secret;

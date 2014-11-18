@@ -552,8 +552,14 @@ public class CcexWrapper implements TradeInterface {
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
 
+            JSONArray array;
             //correct
-            JSONArray array = (JSONArray) httpAnswerJson.get("return");
+            try {
+                array = (JSONArray) httpAnswerJson.get("return");
+            } catch (Exception e) {
+                apiResponse.setResponseObject(tradeList);
+                return apiResponse;
+            }
             for (int i = 0; i < array.size(); i++) {
                 tradeList.add(parseTrade((JSONObject) array.get(i), pair));
             }
