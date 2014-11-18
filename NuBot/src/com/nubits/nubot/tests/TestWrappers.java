@@ -56,12 +56,8 @@ public class TestWrappers {
         Utils.loadProperties("settings.properties");
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
-
-<<<<<<< HEAD
         configExchange(Constant.BTER); //Replace to test a differe API implementation
-=======
-        configExchange(Constant.INTERNAL_EXCHANGE_PEATIO); //Replace to test a differe API implementation
->>>>>>> feature/28
+
 
         runTests();
         System.exit(0);
