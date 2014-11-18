@@ -54,13 +54,13 @@ public class BotTask {
     }
 
     public void start() {
-        timer.schedule(task, 0, interval * 1000);
+        timer.scheduleAtFixedRate(task, 0, interval * 1000);
         setRunning(true);
         LOG.fine("Started BotTask " + this.name);
     }
 
     public void start(int delay) {
-        timer.schedule(task, delay * 1000, interval * 1000);
+        timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);
         LOG.fine("Started BotTask " + this.name);
 
