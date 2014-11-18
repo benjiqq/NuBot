@@ -147,8 +147,7 @@ public class Trade {
                 + "\"price\":" + price.getQuantity() + ",\n"
                 + "\"amount\":" + amount.getQuantity() + ",\n"
                 + "\"fee\":" + df.format(fee.getQuantity()) + ",\n"
-                + "\"timestamp\":" + date.getTime() + ",\n"
-                + "\"date\":\"" + date + "\"\n"
+                + "\"timestamp\":" + date.getTime() + "\n"
                 + "}";
     }
 }

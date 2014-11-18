@@ -110,7 +110,6 @@ public class BterWrapper implements TradeInterface {
         errors = new ArrayList<ApiError>();
         errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
         errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
-
     }
 
     @Override
@@ -1038,7 +1037,13 @@ public class BterWrapper implements TradeInterface {
 
             if (!valid) {
                 //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
+                String errorMessage = "";
+                if (httpAnswerJson.containsKey("msg")) {
+                    errorMessage = (String) httpAnswerJson.get("msg");
+                } else if (httpAnswerJson.containsKey("message")) {
+                    errorMessage = (String) httpAnswerJson.get("message");
+                }
+
                 ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
 
                 LOG.severe("Bter API returned an error: " + errorMessage);
