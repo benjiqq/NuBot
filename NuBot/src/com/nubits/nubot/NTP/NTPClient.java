@@ -32,7 +32,6 @@ public final class NTPClient {
 
     private static final Logger LOG = Logger.getLogger(NTPClient.class.getName());
     private ArrayList<String> hostnames;
-    private String hostname;
     private static final int TIMEOUT = 10 * 1000; //10 seconds timeout
 
     public NTPClient() {
