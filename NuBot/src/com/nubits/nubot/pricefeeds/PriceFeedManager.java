@@ -45,6 +45,24 @@ public class PriceFeedManager {
         }
     }
 
+    private void initValidFeeds() {
+        FEED_NAMES_MAP = new HashMap<>();
+
+        FEED_NAMES_MAP.put("blockchain", new BlockchainPriceFeed());
+        FEED_NAMES_MAP.put("bitcoinaverage", new BitcoinaveragePriceFeed());
+        FEED_NAMES_MAP.put("coinbase", new CoinbasePriceFeed());
+        FEED_NAMES_MAP.put("bter", new BterPriceFeed());
+        FEED_NAMES_MAP.put("ccedk", new CcedkPriceFeed());
+        FEED_NAMES_MAP.put("btce", new BtcePriceFeed());
+        FEED_NAMES_MAP.put("coinmarketcap_no", new CoinmarketcapnorthpolePriceFeed());
+        FEED_NAMES_MAP.put("coinmarketcap_ne", new CoinmarketcapnexuistPriceFeed());
+        FEED_NAMES_MAP.put("bitstampeurusd", new BitstampPriceFeed());
+        FEED_NAMES_MAP.put("google-unofficial", new GoogleUnofficialPriceFeed());
+        FEED_NAMES_MAP.put("yahoo", new YahooPriceFeed());
+        FEED_NAMES_MAP.put("openexchangerates", new OpenexchangeratesPriceFeed());
+        FEED_NAMES_MAP.put("exchangeratelab", new ExchangeratelabPriceFeed());
+    }
+
     public LastPriceResponse getLastPrices() {
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;
@@ -119,33 +137,6 @@ public class PriceFeedManager {
 
     public void setPair(CurrencyPair pair) {
         this.pair = pair;
-    }
-
-    private void initValidFeeds() {
-        FEED_NAMES_MAP = new HashMap<>();
-
-        FEED_NAMES_MAP.put("blockchain", new BlockchainPriceFeed());
-        FEED_NAMES_MAP.put("bitcoinaverage", new BitcoinaveragePriceFeed());
-        FEED_NAMES_MAP.put("coinbase", new CoinbasePriceFeed());
-        FEED_NAMES_MAP.put("bter", new BterPriceFeed());
-        FEED_NAMES_MAP.put("ccedk", new CcedkPriceFeed());
-        FEED_NAMES_MAP.put("btce", new BtcePriceFeed());
-        FEED_NAMES_MAP.put("coinmarketcap_no", new CoinmarketcapnorthpolePriceFeed());
-        FEED_NAMES_MAP.put("coinmarketcap_ne", new CoinmarketcapnexuistPriceFeed());
-        FEED_NAMES_MAP.put("bitstampeurusd", new BitstampPriceFeed());
-        FEED_NAMES_MAP.put("google-unofficial", new GoogleUnofficialPriceFeed());
-        FEED_NAMES_MAP.put("yahoo", new YahooPriceFeed());
-        FEED_NAMES_MAP.put("openexchangerates", new OpenexchangeratesPriceFeed());
-        FEED_NAMES_MAP.put("exchangeratelab", new ExchangeratelabPriceFeed());
-
-
-
-
-
-
-
-
-
     }
 
 //class to wrap results from getLastPrices

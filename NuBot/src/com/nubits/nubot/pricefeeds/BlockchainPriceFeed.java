@@ -35,7 +35,7 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(BlockchainPriceFeed.class.getName());
 
     public BlockchainPriceFeed() {
-        name = PriceFeedManager.BLOCKCHAIN;
+        name = "blockchain";
         refreshMinTime = 50 * 1000; //one minutee
     }
 

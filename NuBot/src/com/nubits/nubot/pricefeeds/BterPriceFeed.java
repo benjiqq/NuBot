@@ -38,7 +38,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(BterPriceFeed.class.getName());
 
     public BterPriceFeed() {
-        name = PriceFeedManager.BTER;
+        name = "bter";
         refreshMinTime = 50 * 1000; //one minutee
     }
 
