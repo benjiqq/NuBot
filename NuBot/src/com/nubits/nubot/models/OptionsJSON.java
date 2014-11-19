@@ -38,14 +38,15 @@ public class OptionsJSON {
     private String apiKey;
     private String apiSecret;
     private String mailRecipient;
-    private String rpcUser;
-    private String rpcPass;
-    private String nubitAddress;
     private String exchangeName;
-    private int nudPort;
     private boolean dualSide;
     private CurrencyPair pair;
     private SecondaryPegOptionsJSON secondaryPegOptions;
+    //Conditional settings with a default value
+    private String rpcUser;
+    private String rpcPass;
+    private String nubitAddress;
+    private int nudPort;
     //Optional settings with a default value  ----------------------------
     private String nudIp;
     private boolean sendMails;
@@ -483,19 +484,13 @@ public class OptionsJSON {
 
             String apiKey = (String) optionsJSON.get("apikey");
             String apiSecret = (String) optionsJSON.get("apisecret");
-            String nubitAddress = (String) optionsJSON.get("nubitaddress");
-            String rpcPass = (String) optionsJSON.get("rpcpass");
-            String rpcUser = (String) optionsJSON.get("rpcuser");
+
             String exchangeName = (String) optionsJSON.get("exchangename");
             String mailRecipient = (String) optionsJSON.get("mail-recipient");
 
             String pairStr = (String) optionsJSON.get("pair");
             CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
             boolean dualside = (boolean) optionsJSON.get("dualside");
-
-            long nudPortlong = (long) optionsJSON.get("nudport");
-            int nudPort = (int) nudPortlong;
-
 
 
             //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
@@ -544,6 +539,44 @@ public class OptionsJSON {
                 submitLiquidity = (boolean) optionsJSON.get("submit-liquidity");
             }
 
+            //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
+
+            String nubitAddress = "", rpcPass = "", rpcUser = "";
+            int nudPort = 9091;
+
+            if (submitLiquidity) {
+                if (optionsJSON.containsKey("nubitaddress")) {
+                    nubitAddress = (String) optionsJSON.get("nubitaddress");
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"nubitaddress\" ");
+                }
+
+                if (optionsJSON.containsKey("rpcpass")) {
+                    rpcPass = (String) optionsJSON.get("rpcpass");
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"rpcpass\" ");
+                }
+
+                if (optionsJSON.containsKey("rpcuser")) {
+                    rpcUser = (String) optionsJSON.get("rpcuser");
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"rpcuser\" ");
+                }
+
+                if (optionsJSON.containsKey("nudport")) {
+                    long nudPortlong = (long) optionsJSON.get("nudport");
+                    nudPort = (int) nudPortlong;
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"nudport\" ");
+                }
+
+            }
+
+
             if (optionsJSON.containsKey("executeorders")) {
                 executeOrders = (boolean) optionsJSON.get("executeorders");
             }
@@ -564,14 +597,11 @@ public class OptionsJSON {
                 aggregate = (boolean) optionsJSON.get("aggregate");
             }
 
-
-
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
              if (optionsJSON.containsKey("check-balance-interval")) {
              long checkBalanceIntervallong = (long) optionsJSON.get("check-balance-interval");
              checkBalanceInterval = (int) checkBalanceIntervallong;
              }
-
 
              if (optionsJSON.containsKey("check-orders-interval")) {
              long checkOrdersIntevallong = (long) optionsJSON.get("check-orders-interval");

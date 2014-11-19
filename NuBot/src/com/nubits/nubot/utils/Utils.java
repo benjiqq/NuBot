@@ -284,6 +284,7 @@ public class Utils {
         return 1000 * 60 * 60 * 24;
     }
 
+    //Computes the seconds missing till the next remote minutes clocks
     public static int getSecondsToRemoteMinute() {
         Date remoteDate = new NTPClient().getTime();
         Calendar remoteCalendar = new GregorianCalendar();
@@ -291,5 +292,10 @@ public class Utils {
         int remoteTimeInSeconds = remoteCalendar.get(Calendar.SECOND);
         int delay = (60 - remoteTimeInSeconds);
         return delay;
+    }
+
+    public static void exitWithMessage(String msg) {
+        LOG.severe(msg);
+        System.exit(0);
     }
 }
