@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.pricefeeds;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import java.util.ArrayList;
@@ -33,6 +34,20 @@ public class PriceFeedManager {
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
     public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
+    public final static String BLOCKCHAIN = "blockchain"; //BTC
+    public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
+    public final static String COINBASE = "coinbase"; //BTC
+    public final static String BTER = "bter"; //BTC and PPC
+    public final static String CCEDK = "ccedk"; //BTC and PPC
+    public final static String BTCE = Constant.BTCE;
+    public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
+    public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
+    public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR
+    public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
+    public final static String YAHOO = "yahoo"; //EUR CNY
+    public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
+    public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY
+    //When adding new feed here remember to also add to the hasmap below
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
         initValidFeeds();
@@ -48,19 +63,19 @@ public class PriceFeedManager {
     private void initValidFeeds() {
         FEED_NAMES_MAP = new HashMap<>();
 
-        FEED_NAMES_MAP.put("blockchain", new BlockchainPriceFeed());
-        FEED_NAMES_MAP.put("bitcoinaverage", new BitcoinaveragePriceFeed());
-        FEED_NAMES_MAP.put("coinbase", new CoinbasePriceFeed());
-        FEED_NAMES_MAP.put("bter", new BterPriceFeed());
-        FEED_NAMES_MAP.put("ccedk", new CcedkPriceFeed());
-        FEED_NAMES_MAP.put("btce", new BtcePriceFeed());
-        FEED_NAMES_MAP.put("coinmarketcap_no", new CoinmarketcapnorthpolePriceFeed());
-        FEED_NAMES_MAP.put("coinmarketcap_ne", new CoinmarketcapnexuistPriceFeed());
-        FEED_NAMES_MAP.put("bitstampeurusd", new BitstampPriceFeed());
-        FEED_NAMES_MAP.put("google-unofficial", new GoogleUnofficialPriceFeed());
-        FEED_NAMES_MAP.put("yahoo", new YahooPriceFeed());
-        FEED_NAMES_MAP.put("openexchangerates", new OpenexchangeratesPriceFeed());
-        FEED_NAMES_MAP.put("exchangeratelab", new ExchangeratelabPriceFeed());
+        FEED_NAMES_MAP.put(BLOCKCHAIN, new BlockchainPriceFeed());
+        FEED_NAMES_MAP.put(BITCOINAVERAGE, new BitcoinaveragePriceFeed());
+        FEED_NAMES_MAP.put(COINBASE, new CoinbasePriceFeed());
+        FEED_NAMES_MAP.put(BTER, new BterPriceFeed());
+        FEED_NAMES_MAP.put(CCEDK, new CcedkPriceFeed());
+        FEED_NAMES_MAP.put(BTCE, new BtcePriceFeed());
+        FEED_NAMES_MAP.put(COINMARKETCAP_NO, new CoinmarketcapnorthpolePriceFeed());
+        FEED_NAMES_MAP.put(COINMARKETCAP_NE, new CoinmarketcapnexuistPriceFeed());
+        FEED_NAMES_MAP.put(BITSTAMP_EURUSD, new BitstampPriceFeed());
+        FEED_NAMES_MAP.put(GOOGLE_UNOFFICIAL, new GoogleUnofficialPriceFeed());
+        FEED_NAMES_MAP.put(YAHOO, new YahooPriceFeed());
+        FEED_NAMES_MAP.put(OPENEXCHANGERATES, new OpenexchangeratesPriceFeed());
+        FEED_NAMES_MAP.put(EXCHANGERATELAB, new ExchangeratelabPriceFeed());
     }
 
     public LastPriceResponse getLastPrices() {

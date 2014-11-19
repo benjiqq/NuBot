@@ -85,14 +85,14 @@ public class TestPriceFeed {
 
     private void execute() {
 
-        String mainFeed = "bter";
+        String mainFeed = PriceFeedManager.BTCE;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
 
-        backupFeedList.add("bitcoinaverage");
-        backupFeedList.add("blockchain");
-        backupFeedList.add("coinbase";
+        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
+        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
+        backupFeedList.add(PriceFeedManager.COINBASE);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 
