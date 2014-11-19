@@ -101,7 +101,7 @@ Here is a list of essential options :
 | Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
 | exchangename     | Name of the exchange where the bots operates | "bter" ; "ccedk" ; "btce" ; "peatio" ; "poloniex" ;  "ccex" ;  |
-| apikey      |  Custodian's public key to access the exchange      |  String |
+| apikey      |  Custodian's public key to access the exchange . *this param is optional for ccex*     |  String |
 | apisecret |  Custodian's secret key to access the exchange    | String |
 | dualside |  If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.     | true,false |
 | nubitaddress | The public address where the custodial grant has been received    |   valid custodian NBT addresses (String) |
@@ -181,7 +181,6 @@ It is sufficient to add a JSON object in the standard options file structured in
 | main-feed     | the name of the main price feed that has priority over the others | **see following table |
 | backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 | wallchange-treshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
-| price-distance-threshold | for sanity check, the bot checks the feed prices before using it.   If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanitycheck). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
 #### Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
 
@@ -213,7 +212,7 @@ NuBot can be further configured by adding additional parameters to its config fi
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  f set to false will disable hipchat notifications | boolean |
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |
-| submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info | boolean |
+| submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |

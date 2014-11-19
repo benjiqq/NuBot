@@ -308,10 +308,8 @@ public class NuBot {
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
                 FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
-
                 //set the interval from options
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
-
 
                 //read the delay to sync with remote clock
                 int delay = Utils.getSecondsToRemoteMinute();
