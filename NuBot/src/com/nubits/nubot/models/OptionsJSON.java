@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
@@ -481,11 +482,22 @@ public class OptionsJSON {
 
 
             //First try to parse compulsory parameters
+            String exchangeName = (String) optionsJSON.get("exchangename");
 
-            String apiKey = (String) optionsJSON.get("apikey");
+            String apiKey = "";
+
+
+            if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
+                if (!optionsJSON.containsKey("apikey")) {
+                    Utils.exitWithMessage("The apikey parameter is compulsory.");
+                }
+
+            } else {
+                apiKey = (String) optionsJSON.get("apikey");
+            }
+
             String apiSecret = (String) optionsJSON.get("apisecret");
 
-            String exchangeName = (String) optionsJSON.get("exchangename");
             String mailRecipient = (String) optionsJSON.get("mail-recipient");
 
             String pairStr = (String) optionsJSON.get("pair");
