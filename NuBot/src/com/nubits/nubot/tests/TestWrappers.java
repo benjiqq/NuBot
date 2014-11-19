@@ -56,7 +56,7 @@ public class TestWrappers {
         Utils.loadProperties("settings.properties");
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
+        configExchange(Constant.INTERNAL_EXCHANGE_PEATIO); //Replace to test a differe API implementation
 
 
         runTests();
@@ -64,38 +64,46 @@ public class TestWrappers {
     }
 
     public static void runTests() {
+        /*
+         * When testing please consider the systematic table guideline online @
+         * https://docs.google.com/spreadsheets/d/1WWb7cNstuE_BlJsINLNamO-ozvlDCgBFbm3y_9DbjDU/edit?usp=drive_web
+         */
+
+
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         //testGetAvailableBalance(Constant.NBT); //
         //testGetAvailableBalances(Constant.BTC_NBT);
-        testGetActiveOrders(Constant.BTC_NBT);
+        //testGetActiveOrders(Constant.BTC_NBT);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        testSell(50, 0.00830509, Constant.NBT_BTC);  //ok
-        testBuy(100, 0.000199999, Constant.NBT_BTC);  //ok
-        testSell(50, 0.00930509, Constant.NBT_BTC);  //ok
-        testBuy(100, 0.00199999, Constant.NBT_BTC);  //ok
+        //testSell(50, 0.00830509, Constant.NBT_BTC);  //ok
+        //testBuy(100, 0.000199999, Constant.NBT_BTC);  //ok
+        //testSell(50, 0.00930509, Constant.NBT_BTC);  //ok
+        //testBuy(100, 0.00199999, Constant.NBT_BTC);  //ok
         //testCancelOrder("4678290", Constant.BTC_NBT);
-        //testClearAllOrders(Constant.NBT_BTC);
+        testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("41496587");
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
+
+
         //Methods NOT strucly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC, 1409566800);
-        testGetLastTrades(Constant.NBT_BTC);
+        //testGetLastTrades(Constant.NBT_BTC);
 
-
-        for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders(Constant.BTC_NBT);
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-            }
-        }
-
+        /*
+         for (int i = 0; i < 5000; i++) {
+         testGetActiveOrders(Constant.BTC_NBT);
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
+         }
+         }
+         */
 
         //stimulating ccedk wrong nonce
 
