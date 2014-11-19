@@ -63,7 +63,7 @@ public class BitsparkWrapper implements TradeInterface {
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
     public String checkConnectionUrl;
-    private final String API_BASE_URL = "https://bitspark.io";
+    private final String API_BASE_URL = "https://bitspark.io/";
     private final String API_GET_INFO = "/api/v2/members/me"; //GET
     private final String API_TRADE = "/api/v2/orders"; //POST
     private final String API_ACTIVE_ORDERS = "/api/v2/orders"; //GET
@@ -551,7 +551,7 @@ public class BitsparkWrapper implements TradeInterface {
 
     @Override
     public String getUrlConnectionCheck() {
-        return checkConnectionUrl;
+        return API_BASE_URL;
     }
 
     @Override
