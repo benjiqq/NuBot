@@ -312,9 +312,13 @@ public class NuBot {
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
 
                 //read the delay to sync with remote clock
-                int delay = Utils.getSecondsToRemoteMinute();
-
-                LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP.");
+                int delay = 1;
+                if (Global.options.isWaitBeforeShift()) {
+                    delay = Utils.getSecondsToRemoteMinute();
+                    LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP.");
+                } else {
+                    LOG.warning("NuBot will not try to sync with other bots via remote NTP : wait-before-shift is set to false");
+                }
                 //then start the thread
                 Global.taskManager.getPriceTriggerTask().start(delay);
             }

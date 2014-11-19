@@ -572,7 +572,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         boolean success = true;
 
         //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconda to take down orders
-
         long wait_time = (1000 * (Global.options.getSecondaryPegOptions().getRefreshTime() + Global.options.getExecuteStrategyInterval() + 10)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
         //Communicate to the priceMonitorTask that a wall shift is in place
@@ -599,45 +598,57 @@ public class StrategySecondaryPegTask extends TimerTask {
             priceImmediatelyType = buyPrice;
             priceWaitType = sellPrice;
         }
-        LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " orders");
 
-        //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
-        boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
-        if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
-            boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
-            if (!init1) {
+        if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
+                || Global.isDualSide) {
+            LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " orders");
+            //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
+            boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
+            if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
+                boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
+                if (!init1) {
+                    success = false;
+                }
+            } else {
                 success = false;
             }
-        } else {
-            success = false;
         }
 
         if (success) { //Only move the second type of order if sure that the first have been taken down
-            if (Global.options.isWaitBeforeShift()) {
-                try {
+            if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.BUY))
+                    || Global.isDualSide) {
+                if (Global.options.isWaitBeforeShift()) {
+                    try {
+                        //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
+                        LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
+                                + "Then try to shift " + waitAndShiftOrderType + " orders.");
+                        Thread.sleep(wait_time);
+                    } catch (InterruptedException ex) {
+                        LOG.severe(ex.toString());
+                        success = false;
+                    }
+                } else {
+                    LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
+                }
 
-                    //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                    LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
-                            + "Then try to shift " + waitAndShiftOrderType + " orders.");
-                    Thread.sleep(wait_time);
-                } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
+                //Cancel active <waitAndShiftOrderType> orders
+                boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType, Global.options.getPair());
+
+                if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
+                    boolean init2 = initOrders(waitAndShiftOrderType, priceWaitType);
+                    if (!init2) {
+                        success = false;
+                    }
+                } else {
                     success = false;
                 }
-            } else {
-                LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
+
             }
+        } else { //success false with the first part of the shift
+            if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
+                    || Global.isDualSide) {
+                LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
 
-            //Cancel active <waitAndShiftOrderType> orders
-            boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType, Global.options.getPair());
-
-            if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
-                boolean init2 = initOrders(waitAndShiftOrderType, priceWaitType);
-                if (!init2) {
-                    success = false;
-                }
-            } else {
-                success = false;
             }
         }
 
