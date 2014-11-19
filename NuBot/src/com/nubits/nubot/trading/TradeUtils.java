@@ -39,7 +39,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -215,12 +214,8 @@ public class TradeUtils {
         }
         return result;
     }
-
-
-
     //The two methods below have been amalgamated into the CCDEK wrapper
     //TODO - remove these methods once testing has taken place
-
     public static int offset = 0;
 
     public static String getCCDKEvalidNonce() {
@@ -242,7 +237,7 @@ public class TradeUtils {
                 validNonce = "";
             }
         } else {
-            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) -1);
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) - 1);
         }
         if (!validNonce.equals("")) {
             lastdigits = validNonce.substring(validNonce.length() - 2);
@@ -438,8 +433,8 @@ public class TradeUtils {
         }
     }
 
-    public static void tryKeepProceedingsAside(Amount amountFoundInBalance) {
-        double percentageToSetApart = Utils.round(Global.options.getKeepProceedings() / 100, 4);
+    public static void tryKeepProceedsAside(Amount amountFoundInBalance) {
+        double percentageToSetApart = Utils.round(Global.options.getKeepProceeds() / 100, 4);
 
         if (percentageToSetApart != 0) {
             double quantityToFreeze = percentageToSetApart * amountFoundInBalance.getQuantity();
