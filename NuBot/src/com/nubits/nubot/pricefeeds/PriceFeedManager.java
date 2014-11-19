@@ -17,10 +17,10 @@
  */
 package com.nubits.nubot.pricefeeds;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.logging.Logger;
 
 /**
@@ -32,22 +32,10 @@ public class PriceFeedManager {
     private static final Logger LOG = Logger.getLogger(PriceFeedManager.class.getName());
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
-    //Only BTC
-    public final static String BLOCKCHAIN = "blockchain"; //BTC
-    public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
-    public final static String COINBASE = "coinbase"; //BTC
-    public final static String BTER = "bter"; //BTC and PPC
-    public final static String CCEDK = "ccedk"; //BTC and PPC
-    public final static String BTCE = Constant.BTCE;
-    public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
-    public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
-    public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR
-    public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
-    public final static String YAHOO = "yahoo"; //EUR CNY
-    public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
-    public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY
+    public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
+        initValidFeeds();
         this.pair = pair;
 
         feedList.add(createFeed(mainFeed)); //add the main feed at index 0
@@ -107,58 +95,14 @@ public class PriceFeedManager {
     }
 
     private AbstractPriceFeed createFeed(String feedname) {
-        AbstractPriceFeed tempFeed = null;
-        switch (feedname) {
-            case BTCE:
-                tempFeed = new BtcePriceFeed();
-                break;
-            case BLOCKCHAIN:
-                tempFeed = new BlockchainPriceFeed();
-                break;
-            case COINBASE:
-                tempFeed = new CoinbasePriceFeed();
-                break;
-            case BITCOINAVERAGE:
-                tempFeed = new BitcoinaveragePriceFeed();
-                break;
-            case CCEDK:
-                tempFeed = new CcedkPriceFeed();
-                break;
-            case BTER:
-                tempFeed = new BterPriceFeed();
-                break;
-            case COINMARKETCAP_NE:
-                tempFeed = new CoinmarketcapnexuistPriceFeed();
-                break;
-            case COINMARKETCAP_NO:
-                tempFeed = new CoinmarketcapnorthpolePriceFeed();
-                break;
-
-            case BITSTAMP_EURUSD:
-                tempFeed = new BitstampPriceFeed();
-                break;
-
-            case GOOGLE_UNOFFICIAL:
-                tempFeed = new GoogleUnofficialPriceFeed();
-                break;
-
-            case YAHOO:
-                tempFeed = new YahooPriceFeed();
-                break;
-
-            case OPENEXCHANGERATES:
-                tempFeed = new OpenexchangeratesPriceFeed();
-                break;
-
-            case EXCHANGERATELAB:
-                tempFeed = new ExchangeratelabPriceFeed();
-                break;
-            default:
-                LOG.severe("Error wile adding price seed with name unrecognized : " + feedname);
-                break;
+        if (FEED_NAMES_MAP.containsKey(feedname)) {
+            return FEED_NAMES_MAP.get(feedname);
+        } else {
+            LOG.severe("Error wile adding price seed with name unrecognized : " + feedname);
+            System.exit(0);
         }
+        return null;//never reached
 
-        return tempFeed;
     }
 
     public ArrayList<AbstractPriceFeed> getFeedList() {
@@ -177,7 +121,34 @@ public class PriceFeedManager {
         this.pair = pair;
     }
 
-    //class to wrap results from getLastPrices
+    private void initValidFeeds() {
+        FEED_NAMES_MAP = new HashMap<>();
+
+        FEED_NAMES_MAP.put("blockchain", new BlockchainPriceFeed());
+        FEED_NAMES_MAP.put("bitcoinaverage", new BitcoinaveragePriceFeed());
+        FEED_NAMES_MAP.put("coinbase", new CoinbasePriceFeed());
+        FEED_NAMES_MAP.put("bter", new BterPriceFeed());
+        FEED_NAMES_MAP.put("ccedk", new CcedkPriceFeed());
+        FEED_NAMES_MAP.put("btce", new BtcePriceFeed());
+        FEED_NAMES_MAP.put("coinmarketcap_no", new CoinmarketcapnorthpolePriceFeed());
+        FEED_NAMES_MAP.put("coinmarketcap_ne", new CoinmarketcapnexuistPriceFeed());
+        FEED_NAMES_MAP.put("bitstampeurusd", new BitstampPriceFeed());
+        FEED_NAMES_MAP.put("google-unofficial", new GoogleUnofficialPriceFeed());
+        FEED_NAMES_MAP.put("yahoo", new YahooPriceFeed());
+        FEED_NAMES_MAP.put("openexchangerates", new OpenexchangeratesPriceFeed());
+        FEED_NAMES_MAP.put("exchangeratelab", new ExchangeratelabPriceFeed());
+
+
+
+
+
+
+
+
+
+    }
+
+//class to wrap results from getLastPrices
     public class LastPriceResponse {
 
         private boolean mainFeedValid;
