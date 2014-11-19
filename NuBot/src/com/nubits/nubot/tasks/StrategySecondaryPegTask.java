@@ -235,7 +235,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
-            TradeUtils.tryKeepProceedingsAside(balancePEG);
+            TradeUtils.tryKeepProceedsAside(balancePEG);
             gracefullyRefreshOrders(Constant.BUY, false);
         } else {
             //PEG balance = 0
@@ -645,8 +645,8 @@ public class StrategySecondaryPegTask extends TimerTask {
 
             }
         } else { //success false with the first part of the shift
-            if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
-                    || Global.isDualSide) {
+            if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
+                    || Global.isDualSide) { //dualside
                 LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
 
             }

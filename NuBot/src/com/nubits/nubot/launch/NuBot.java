@@ -114,36 +114,36 @@ public class NuBot {
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
-        LOG.fine("Setting up  NuBot" + Global.settings.getProperty("version"));
+        LOG.info("Setting up  NuBot" + Global.settings.getProperty("version"));
 
-        LOG.fine("Init logging system");
+        LOG.info("Init logging system");
 
-        LOG.fine("Set up SSL certificates");
+        LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
         Utils.printSeparator();
 
-        LOG.fine("Load options from " + optionsPath);
+        LOG.info("Load options from " + optionsPath);
         Utils.printSeparator();
 
 
-        LOG.fine("Wrap the keys into a new ApiKeys object");
+        LOG.info("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         Utils.printSeparator();
 
 
-        LOG.fine("Creating an Exchange object");
+        LOG.info("Creating an Exchange object");
 
         Global.exchange = new Exchange(Global.options.getExchangeName());
         Utils.printSeparator();
 
-        LOG.fine("Create e ExchangeLiveData object to accomodate liveData from the exchange");
+        LOG.info("Create e ExchangeLiveData object to accomodate liveData from the exchange");
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
         Utils.printSeparator();
 
 
-        LOG.fine("Create a new TradeInterface object");
+        LOG.info("Create a new TradeInterface object");
         TradeInterface ti = Exchange.getTradeInterface(Global.options.getExchangeName());
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
@@ -162,29 +162,29 @@ public class NuBot {
         Utils.printSeparator();
 
 
-        LOG.fine("Create a TaskManager ");
+        LOG.info("Create a TaskManager ");
         Global.taskManager = new TaskManager();
         Utils.printSeparator();
 
         if (Global.options.isSendRPC()) {
-            LOG.fine("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
+            LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
             Global.publicAddress = Global.options.getNubitsAddress();
             Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
                     Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
                     Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
 
             Utils.printSeparator();
-            LOG.fine("Starting task : Check connection with Nud  ");
+            LOG.info("Starting task : Check connection with Nud");
             Global.taskManager.getCheckNudTask().start();
         }
 
         Utils.printSeparator();
-        LOG.fine("Starting task : Check connection with exchange  ");
+        LOG.info("Starting task : Check connection with exchange");
         Global.taskManager.getCheckConnectionTask().start(1);
 
 
         Utils.printSeparator();
-        LOG.fine("Waiting  a for the connectionThreads to detect connection");
+        LOG.info("Waiting  a for the connectionThreads to detect connection");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -204,29 +204,12 @@ public class NuBot {
         Global.taskManager.getSendLiquidityTask().start(39);
 
         Utils.printSeparator();
-        /*
-         LOG.fine("Validating API keys" );
-         ApiResponse permissionResponse = exchange.getTrade().getPermissions();
-         if(permissionResponse.isPositive()) {
-         LOG.fine("ApiKeys OK: ");
-         ApiPermissions permissions = (ApiPermissions) permissionResponse.getResponseObject();
 
-         LOG.fine("Keys Valid :"+permissions.isValid_keys() +"\n" +
-         "getinfo : "+ permissions.isGet_info() +"\n" +
-         "trade : "  + permissions.isTrade());
-         }
-         else{
-         LOG.severe("Problem with ApiKeys");
-         permissionResponse.getError().println();
-         System.exit(0);
-         }
-
-         */
         if (Global.options.isSendRPC()) {
             Utils.printSeparator();
-            LOG.fine("Check connection with nud");
+            LOG.info("Check connection with nud");
             if (Global.rpcClient.isConnected()) {
-                LOG.fine("RPC connection OK!");
+                LOG.info("RPC connection OK!");
             } else {
                 LOG.severe("Problem while connecting with nud");
                 System.exit(0);

@@ -368,7 +368,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         //Check if USD balance > 1
         if (balanceFIAT.getQuantity() > 1) {
 
-            TradeUtils.tryKeepProceedingsAside(balanceFIAT);
+            TradeUtils.tryKeepProceedsAside(balanceFIAT);
 
 
             String idToDelete = getSmallerWallID(Constant.BUY);

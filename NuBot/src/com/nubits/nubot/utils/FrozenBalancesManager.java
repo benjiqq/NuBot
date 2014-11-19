@@ -21,6 +21,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
+import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import java.io.File;
@@ -69,8 +70,10 @@ public class FrozenBalancesManager {
         this.frozenAmount = new FrozenAmount(newAmount);
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(8);
-        if (this.frozenAmount.getAmount().getQuantity() != 0) {
-            LOG.info("Setting frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
+        if (Global.options != null) {
+            if (Global.options.getKeepProceeds() != 0) {
+                LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
+            }
         }
         if (writeToFile) {
             updateFrozenFilesystem();
