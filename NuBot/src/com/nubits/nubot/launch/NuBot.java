@@ -312,8 +312,13 @@ public class NuBot {
                 //set the interval from options
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
 
+
+                //read the delay to sync with remote clock
+                int delay = Utils.getSecondsToRemoteMinute();
+
+                LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP.");
                 //then start the thread
-                Global.taskManager.getPriceTriggerTask().start(2);
+                Global.taskManager.getPriceTriggerTask().start(delay);
             }
         } else {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());

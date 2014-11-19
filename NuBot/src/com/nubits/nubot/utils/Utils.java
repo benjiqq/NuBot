@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.utils;
 
+import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.launch.NuBot;
@@ -35,7 +36,9 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
@@ -277,5 +280,14 @@ public class Utils {
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
+    }
+
+    public static int getSecondsToRemoteMinute() {
+        Date remoteDate = new NTPClient().getTime();
+        Calendar remoteCalendar = new GregorianCalendar();
+        remoteCalendar.setTime(remoteDate);
+        int remoteTimeInSeconds = remoteCalendar.get(Calendar.SECOND);
+        int delay = (60 - remoteTimeInSeconds);
+        return delay;
     }
 }

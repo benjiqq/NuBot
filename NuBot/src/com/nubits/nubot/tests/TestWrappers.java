@@ -50,11 +50,13 @@ public class TestWrappers {
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
 
+
     public static void main(String[] args) {
         //Load settings
         Utils.loadProperties("settings.properties");
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
+        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
         configExchange(Constant.BITSPARK_PEATIO); //Replace to test a different API implementation
 
@@ -82,9 +84,47 @@ public class TestWrappers {
         //---------------
         //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
-        //testGetLastTrades(Constant.NBT_BTC);
-        //testGetLastTrades(Constant.BTC_NBT, 1409566800);
+        //testGetLastTrades(Constant.NBT_BTC, 1409566800);
+        testGetLastTrades(Constant.NBT_BTC);
 
+
+        for (int i = 0; i < 5000; i++) {
+            testGetActiveOrders(Constant.BTC_NBT);
+            try {
+                Thread.sleep(300);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
+            }
+        }
+
+
+        //stimulating ccedk wrong nonce
+
+        /*
+
+         for (int i = 0; i < 5000; i++) {
+         testGetActiveOrders();
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+
+         testGetAvailableBalances(Constant.NBT_PPC);
+
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         testGetOrderDetail("3454");
+
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+         }
+         */
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
