@@ -35,7 +35,7 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(GoogleUnofficialPriceFeed.class.getName());
 
     public GoogleUnofficialPriceFeed() {
-        name = PriceFeedManager.GOOGLE_UNOFFICIAL;
+        name = "google-unofficial";
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

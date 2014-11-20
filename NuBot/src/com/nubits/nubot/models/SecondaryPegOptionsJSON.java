@@ -111,6 +111,7 @@ public class SecondaryPegOptionsJSON {
             // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
 
             if (optionsJSON.has("price-offset")) {
+                LOG.warning("You using the \"price-offset\" which is not reccomented by Nu developers for purposes different from testing.");
                 priceOffset = new Double((optionsJSON.get("price-offset")).toString());
             }
 
