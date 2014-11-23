@@ -225,7 +225,7 @@ public class FrozenBalancesManager {
         JSONObject toWriteJ = new JSONObject();
 
         DecimalFormat df = new DecimalFormat("#");
-        df.setMaximumFractionDigits(8);
+        df.setMaximumFractionDigits(10);
 
         toWriteJ.put("frozen-quantity-total", df.format(getFrozenAmount().getAmount().getQuantity()));
         toWriteJ.put("frozen-currency", getFrozenAmount().getAmount().getCurrency().getCode());
@@ -234,11 +234,12 @@ public class FrozenBalancesManager {
             JSONObject tempRow = new JSONObject();
             HistoryRow tempHistory = history.get(i);
 
-            if (tempHistory.getFreezedQuantity() > 0) {
+            if (tempHistory.getFreezedQuantity() > 0.00000001) {
 
                 tempRow.put("timestamp", tempHistory.getTimestamp().toString());
                 tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
                 tempRow.put("currency-code", tempHistory.getCurrencyCode());
+
 
                 historyListJ.add(tempRow);
             }
