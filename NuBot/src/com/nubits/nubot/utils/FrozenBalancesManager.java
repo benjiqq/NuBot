@@ -23,7 +23,11 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -48,6 +52,7 @@ public class FrozenBalancesManager {
     private CurrencyPair pair;
     private String folder;
     private ArrayList<HistoryRow> history;
+    private Amount amountAlreadyThere;
 
     //Call this on bot startup
     public FrozenBalancesManager(String exchangName, CurrencyPair pair, String folder) {
@@ -55,6 +60,7 @@ public class FrozenBalancesManager {
         this.pathToFrozenBalancesFiles = folder + fileName;
         this.exchangeName = exchangName;
         this.pair = pair;
+        this.amountAlreadyThere = new Amount(0, pair.getPaymentCurrency());
         history = new ArrayList<>();
         if (new File(pathToFrozenBalancesFiles).exists()) {
             parseFrozenBalancesFile();
@@ -62,6 +68,88 @@ public class FrozenBalancesManager {
             //Create the file and write 0 on it
             frozenAmount = new FrozenAmount(new Amount(0, pair.getPaymentCurrency()));
             updateFrozenFilesystem();
+        }
+    }
+
+    public Amount removeFrozenAmount(Amount amount, FrozenAmount frozen) {
+        if (frozen.getAmount().getQuantity() == 0) {
+            return amount; //nothing to freeze
+        } else {
+            Currency currentPegCurrency = amount.getCurrency();
+            Currency frozenCurrency = frozen.getAmount().getCurrency();
+
+            if (currentPegCurrency.equals(frozenCurrency)) {
+                double updatedQuantity = amount.getQuantity() - frozen.getAmount().getQuantity();
+                return new Amount(updatedQuantity, currentPegCurrency);
+            } else {
+                LOG.severe("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
+                        + "Returning original balance without freezing value");
+                return amount;
+            }
+        }
+    }
+
+    public void tryKeepProceedsAside(Amount amountFoundInBalance, Amount initialFunds) {
+        if (Global.options.getKeepProceeds() > 0) {
+            double percentageToSetApart = Utils.round(Global.options.getKeepProceeds() / 100, 4);
+
+            if (percentageToSetApart != 0) {
+                double quantityToFreeze = percentageToSetApart * (amountFoundInBalance.getQuantity() - initialFunds.getQuantity());
+
+                DecimalFormat df = new DecimalFormat("#");
+                df.setMaximumFractionDigits(8);
+
+                Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
+                Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
+
+                HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
+                        + percentageToSetApart * 100 + "% of  sale proceedings)"
+                        + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
+            }
+        }
+    }
+
+    public void freezeNewFunds() {
+        if (Global.options.getKeepProceeds() > 0) {
+            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
+
+            if (balancesResponse.isPositive()) {
+                Amount balance = (Amount) balancesResponse.getResponseObject();
+                balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+
+                tryKeepProceedsAside(balance, Global.frozenBalances.getAmountAlreadyThere());
+
+                setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+            } else {
+                LOG.severe("Cannot get the updated balance");
+            }
+        }
+
+    }
+
+    public void setBalanceAlreadyThere(Currency currency) {
+        boolean success = true;
+        //update the balance of the secondary peg after the shift
+        if (Global.options.getKeepProceeds() > 0) {
+
+            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
+            Amount balance = null;
+
+            if (balancesResponse.isPositive()) {
+                //Here its time to compute the balance to put apart, if any
+                balance = (Amount) balancesResponse.getResponseObject();
+                balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                setAmountAlreadyThere(balance);
+            } else {
+                success = false;
+            }
+        }
+        if (success) {
+            LOG.info("Frozen funds already in balance (not proceeds) updated : "
+                    + Global.frozenBalances.getAmountAlreadyThere().getQuantity()
+                    + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency());
+        } else {
+            LOG.severe("An error occurred while trying to set the balance already there (not proceeds)");
         }
     }
 
@@ -146,11 +234,14 @@ public class FrozenBalancesManager {
             JSONObject tempRow = new JSONObject();
             HistoryRow tempHistory = history.get(i);
 
-            tempRow.put("timestamp", tempHistory.getTimestamp().toString());
-            tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
-            tempRow.put("currency-code", tempHistory.getCurrencyCode());
+            if (tempHistory.getFreezedQuantity() > 0) {
 
-            historyListJ.add(tempRow);
+                tempRow.put("timestamp", tempHistory.getTimestamp().toString());
+                tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
+                tempRow.put("currency-code", tempHistory.getCurrencyCode());
+
+                historyListJ.add(tempRow);
+            }
         }
 
         toWriteJ.put("history", historyListJ);
@@ -170,6 +261,14 @@ public class FrozenBalancesManager {
             LOG.severe(ex.toString());
         }
 
+    }
+
+    public Amount getAmountAlreadyThere() {
+        return amountAlreadyThere;
+    }
+
+    public void setAmountAlreadyThere(Amount amountAlreadyThere) {
+        this.amountAlreadyThere = new Amount(Utils.round(amountAlreadyThere.getQuantity(), 8), amountAlreadyThere.getCurrency());
     }
 
     public String getCurrencyCode() {

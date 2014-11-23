@@ -73,6 +73,8 @@ public class StrategySecondaryPegTask extends TimerTask {
                     mightNeedInit = false;
                     needWallShift = false;
                     LOG.info("Wall shift successful");
+
+
                 } else {
                     LOG.severe("Wall shift failed");
                 }
@@ -85,7 +87,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     String message = "Order reset needed on " + Global.exchange.getName();
                     HipChatNotifications.sendMessage(message, Color.PURPLE);
                     LOG.warning(message);
-                    boolean reinitiateSuccess = reInitiateOrders();
+                    boolean reinitiateSuccess = reInitiateOrders(false);
                     if (reinitiateSuccess) {
                         mightNeedInit = false;
                     }
@@ -170,7 +172,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         Amount balanceNBT = balance.getNBTAvailable();
-                        Amount balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                        Amount balancePEG = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                                 + balancePEG.getQuantity() + " " + balancePEG.getCurrency());
@@ -195,7 +197,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             LOG.info("Initializing strategy");
             isFirstTime = false;
             recount();
-            boolean reinitiateSuccess = reInitiateOrders();
+            boolean reinitiateSuccess = reInitiateOrders(true);
             if (!reinitiateSuccess) {
                 LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
                 isFirstTime = true;
@@ -235,7 +237,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         if (balancePEG.getQuantity() > oneNBT) {
             //Here its time to compute the balance to put apart, if any
-            TradeUtils.tryKeepProceedsAside(balancePEG);
+            Global.frozenBalances.tryKeepProceedsAside(balancePEG, new Amount(0, null));
             gracefullyRefreshOrders(Constant.BUY, false);
         } else {
             //PEG balance = 0
@@ -243,7 +245,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
     }
 
-    private boolean reInitiateOrders() {
+    private boolean reInitiateOrders(boolean firstTime) {
         //They are either 0 or need to be cancelled
         if (totalActiveOrders != 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -251,6 +253,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
                     LOG.warning("Clear all orders request succesfully");
+                    if (firstTime) //update the initial balance of the secondary peg
+                    {
+                        Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                    }
                     //Wait until there are no active orders
                     boolean timedOut = false;
                     long timeout = Global.options.getEmergencyTimeout() * 1000;
@@ -294,6 +300,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                 return false;
             }
         } else {
+            if (firstTime) //update the initial balance of the secondary peg
+            {
+                Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+            }
             placeInitialWalls();
         }
         try {
@@ -384,7 +394,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (balancesResponse.isPositive()) {
             Balance balance = (Balance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balancePEG = (TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+            double balancePEG = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 
             activeSellOrders = countActiveOrders(Constant.SELL);
             activeBuyOrders = countActiveOrders(Constant.BUY);
@@ -501,7 +511,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (balancesResponse.isPositive()) {
             Balance balance = (Balance) balancesResponse.getResponseObject();
             balanceNBT = balance.getNBTAvailable();
-            balancePEG = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            balancePEG = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
             LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                     + balancePEG.getQuantity() + " " + balancePEG.getCurrency().getCode());
@@ -605,6 +615,12 @@ public class StrategySecondaryPegTask extends TimerTask {
             //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
             boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
             if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
+
+                if (shiftImmediatelyOrderType.equals(Constant.BUY)) // update the initial balance of the secondary peg
+                {
+                    Global.frozenBalances.freezeNewFunds();
+                }
+
                 boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
                 if (!init1) {
                     success = false;
@@ -635,6 +651,11 @@ public class StrategySecondaryPegTask extends TimerTask {
                 boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType, Global.options.getPair());
 
                 if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
+                    if (waitAndShiftOrderType.equals(Constant.BUY)) // update the initial balance of the secondary peg
+                    {
+                        Global.frozenBalances.freezeNewFunds();
+                    }
+
                     boolean init2 = initOrders(waitAndShiftOrderType, priceWaitType);
                     if (!init2) {
                         success = false;
@@ -686,7 +707,9 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (type.equals(Constant.SELL)) {
                 balance = (Amount) balancesResponse.getResponseObject();
             } else {
-                balance = TradeUtils.removeFrozenAmount((Amount) balancesResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                //Here its time to compute the balance to put apart, if any
+                balance = (Amount) balancesResponse.getResponseObject();
+                balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                 oneNBT = Utils.round(1 / Global.conversion, 8);
             }
 

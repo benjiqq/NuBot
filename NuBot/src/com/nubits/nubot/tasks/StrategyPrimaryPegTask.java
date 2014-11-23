@@ -124,7 +124,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 Balance balance = (Balance) balancesResponse.getResponseObject();
                 Amount balanceNBT = balance.getNBTAvailable();
 
-                Amount balanceFIAT = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
                 LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                         + balanceFIAT.getQuantity() + " USD");
 
@@ -220,7 +220,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             Amount fiatBalance = null;
             ApiResponse fiatBalanceResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
             if (fiatBalanceResponse.isPositive()) {
-                fiatBalance = TradeUtils.removeFrozenAmount((Amount) fiatBalanceResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
+                fiatBalance = Global.frozenBalances.removeFrozenAmount((Amount) fiatBalanceResponse.getResponseObject(), Global.frozenBalances.getFrozenAmount());
 
                 if (fiatBalance.getQuantity() > 1) {
                     // Divide the  balance 50% 50% in balance1 and balance2
@@ -301,7 +301,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         balanceNBT = balance.getNBTAvailable();
-                        Amount balanceFIAT = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                        Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                                 + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
@@ -368,8 +368,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         //Check if USD balance > 1
         if (balanceFIAT.getQuantity() > 1) {
 
-            TradeUtils.tryKeepProceedsAside(balanceFIAT);
-
+            Global.frozenBalances.tryKeepProceedsAside(balanceFIAT, Global.frozenBalances.getAmountAlreadyThere());
 
             String idToDelete = getSmallerWallID(Constant.BUY);
             if (!idToDelete.equals("-1")) {
@@ -381,7 +380,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         Amount balanceNBT = balance.getNBTAvailable();
-                        balanceFIAT = TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                        balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                                 + balanceFIAT.getQuantity() + " USD");
@@ -497,7 +496,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         if (balancesResponse.isPositive()) {
             Balance balance = (Balance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balanceFIAT = (TradeUtils.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+            double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
             activeSellOrders = countActiveOrders(Constant.SELL);
             activeBuyOrders = countActiveOrders(Constant.BUY);
             totalActiveOrders = activeSellOrders + activeBuyOrders;

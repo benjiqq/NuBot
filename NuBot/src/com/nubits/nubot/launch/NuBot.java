@@ -242,7 +242,6 @@ public class NuBot {
         // Set the frozen balance manager in the global variable
         Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.settings.getProperty("frozen_folder"));
 
-
         //Switch strategy for different trading pair
 
 
