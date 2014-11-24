@@ -77,11 +77,13 @@ public class TestWrappers {
         //testGetActiveOrders(Constant.BTC_NBT);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testSell(50, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(100, 0.000199999, Constant.NBT_BTC);  //ok
+        testBuy(100, 0.99, Constant.NBT_USD);  //ok
+        testSell(100, 1.1, Constant.NBT_USD);  //ok
+
         //testSell(50, 0.00930509, Constant.NBT_BTC);  //ok
         //testBuy(100, 0.00199999, Constant.NBT_BTC);  //ok
         //testCancelOrder("4678290", Constant.BTC_NBT);
-        testClearAllOrders(Constant.NBT_BTC);
+        //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("41496587");
         //testGetTxFee();
         //testGetTxFeeWithArgs(Constant.BTC_USD);
