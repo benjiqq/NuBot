@@ -22,6 +22,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OptionsJSON;
@@ -161,6 +162,17 @@ public class NuBot {
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
         Utils.printSeparator();
 
+
+        //For a 0 tx fee market, force a price-offset of 0.1%
+        ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+        if (txFeeResponse.isPositive()) {
+            double txfee = (Double) txFeeResponse.getResponseObject();
+            if (txfee == 0) {
+                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1%");
+                Global.options.getSecondaryPegOptions().setPriceOffset(0.1);
+
+            }
+        }
 
         LOG.info("Create a TaskManager ");
         Global.taskManager = new TaskManager();

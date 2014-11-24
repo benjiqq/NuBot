@@ -27,7 +27,6 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -37,7 +36,6 @@ import java.util.logging.Logger;
  *
  */
 public class PriceMonitorTriggerTask extends TimerTask {
-
 
     private int count;
     private final int MAX_ATTEMPTS = 5;
@@ -56,7 +54,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private double sellPricePEG_old;
     private boolean wallsBeingShifted = false;
     private Long currentTime = null;
-
     //set up a Queue to hold the prices used to calculate the moving average of prices
     private Queue<Double> queueMA = new LinkedList<>();
     private int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
@@ -256,7 +253,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         for (Iterator<Double> price = queueMA.iterator(); price.hasNext();) {
             MA += price.next();
         }
-        MA = MA/queueMA.size();
+        MA = MA / queueMA.size();
         return MA;
     }
 
@@ -277,14 +274,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //we want to send Hip Chat and mail notifications,
         // cancel all orders to avoid arbitrage against the bot and
         // exit execution gracefully
-        LOG.severe("The Fetched Exchange rate data has remained outside of the required price band for " +
-                Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds. The bot will notify and shutdown");
+        LOG.severe("The Fetched Exchange rate data has remained outside of the required price band for "
+                + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds. The bot will notify and shutdown");
         LOG.severe("Notifying HipChat");
         HipChatNotifications.sendMessage("A large price difference was detected at " + Global.exchange.getName()
                 + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
                 + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
-                + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place"
-                , Color.RED);
+                + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place", Color.RED);
         LOG.severe("Sending Email");
         MailNotifications.send(Global.options.getMailRecipient(), Global.exchange.getName() + " Bot shutdown due to large price difference",
                 "A large price difference was detected at " + Global.exchange.getName()
@@ -303,13 +299,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double MA = getMovingAverage();
 
         //calculate the percentage difference
-        double percentageDiff = (((MA-current)/((MA+current)/2))*100);
+        double percentageDiff = (((MA - current) / ((MA + current) / 2)) * 100);
         if ((percentageDiff > PRICE_PERCENTAGE) || (percentageDiff < -PRICE_PERCENTAGE)) {
             //The potential price is more than % different to the moving average
             //add it to the MA-Queue to raise the Moving Average and re-request the currency data
             //in this way we can react to a large change in price when we are sure it is not an anomaly
-            LOG.warning("Latest price " + Objects.toString(current) + " is " + Objects.toString(percentageDiff) + "% outside of the moving average of " + Objects.toString(MA) + "." +
-                    "\nShifting moving average and re-fetching exchange rate data.");
+            LOG.warning("Latest price " + Objects.toString(current) + " is " + Objects.toString(percentageDiff) + "% outside of the moving average of " + Objects.toString(MA) + "."
+                    + "\nShifting moving average and re-fetching exchange rate data.");
             updateMovingAverageQueue(current);
             executeUpdatePrice(1);
             return;
@@ -467,6 +463,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
         if (txFeeNTBPEGResponse.isPositive()) {
             double txfee = (Double) txFeeNTBPEGResponse.getResponseObject();
+
             sellPriceUSD = 1 + (0.01 * txfee);
             if (!Global.options.isDualSide()) {
                 sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();

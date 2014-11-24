@@ -119,7 +119,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
                 mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
             } else {
-
                 ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                 if (balancesResponse.isPositive()) {
                     Balance balance = (Balance) balancesResponse.getResponseObject();
