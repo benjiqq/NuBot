@@ -42,106 +42,116 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
+    private boolean isFirstTime = true;
 
     @Override
     public void run() {
         LOG.fine("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
 
-        recount(); //Count number of active sells and buys
+        if (!isFirstTime) {
+            recount(); //Count number of active sells and buys
 
-        if (mightNeedInit) {
+            if (mightNeedInit) {
 
-            // if there are 2 active orders, do nothing
-            // if there are 0 orders, place initial walls
-            // if there are a number of orders different than 2, cancel all and place initial walls
+                // if there are 2 active orders, do nothing
+                // if there are 0 orders, place initial walls
+                // if there are a number of orders different than 2, cancel all and place initial walls
 
 
-            if (!(ordersAndBalancesOk)) {
-                //They are either 0 or need to be cancelled
-                if (totalActiveOrders != 0) {
-                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                    if (deleteOrdersResponse.isPositive()) {
-                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-                        if (deleted) {
-                            LOG.warning("Clear all orders request succesfully");
-                            //Wait until there are no active orders
-                            boolean timedOut = false;
-                            long timeout = Global.options.getEmergencyTimeout() * 1000;
-                            long wait = 6 * 1000;
-                            long count = 0L;
-                            do {
-                                try {
-                                    Thread.sleep(wait);
-                                    count += wait;
-                                    timedOut = count > timeout;
+                if (!(ordersAndBalancesOk)) {
+                    //They are either 0 or need to be cancelled
+                    if (totalActiveOrders != 0) {
+                        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                        if (deleteOrdersResponse.isPositive()) {
+                            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+                            if (deleted) {
+                                LOG.warning("Clear all orders request succesfully");
+                                //Wait until there are no active orders
+                                boolean timedOut = false;
+                                long timeout = Global.options.getEmergencyTimeout() * 1000;
+                                long wait = 6 * 1000;
+                                long count = 0L;
+                                do {
+                                    try {
+                                        Thread.sleep(wait);
+                                        count += wait;
+                                        timedOut = count > timeout;
 
-                                } catch (InterruptedException ex) {
-                                    LOG.severe(ex.toString());
+                                    } catch (InterruptedException ex) {
+                                        LOG.severe(ex.toString());
+                                    }
+                                } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
+
+                                if (timedOut) {
+                                    String message = "There was a problem cancelling all existing orders";
+                                    LOG.severe(message);
+                                    HipChatNotifications.sendMessage(message, Color.YELLOW);
+                                    MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
+                                    //Continue anyway, maybe there is some balance to put up on order.
                                 }
-                            } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
-
-                            if (timedOut) {
-                                String message = "There was a problem cancelling all existing orders";
+                                //Update the balance
+                                placeInitialWalls();
+                            } else {
+                                String message = "Could not submit request to clear orders";
                                 LOG.severe(message);
-                                HipChatNotifications.sendMessage(message, Color.YELLOW);
-                                MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
-                                //Continue anyway, maybe there is some balance to put up on order.
+                                System.exit(0);
                             }
-                            //Update the balance
-                            placeInitialWalls();
+
                         } else {
+                            LOG.severe(deleteOrdersResponse.getError().toString());
                             String message = "Could not submit request to clear orders";
                             LOG.severe(message);
                             System.exit(0);
                         }
-
                     } else {
-                        LOG.severe(deleteOrdersResponse.getError().toString());
-                        String message = "Could not submit request to clear orders";
-                        LOG.severe(message);
-                        System.exit(0);
+                        placeInitialWalls();
                     }
                 } else {
-                    placeInitialWalls();
+                    LOG.warning("No need to init new orders since current orders seems correct");
                 }
-            } else {
-                LOG.warning("No need to init new orders since current orders seems correct");
+                mightNeedInit = false;
+                recount();
             }
-            mightNeedInit = false;
-            recount();
-        }
 
 
+            //Make sure there are 2 orders per side
+            if (!ordersAndBalancesOk) {
+                LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+                mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
+            } else {
 
-        //Make sure there are 2 orders per side
-        if (!ordersAndBalancesOk) {
-            LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-            mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
+                ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+                if (balancesResponse.isPositive()) {
+                    Balance balance = (Balance) balancesResponse.getResponseObject();
+                    Amount balanceNBT = balance.getNBTAvailable();
+
+                    Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                    LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
+                            + balanceFIAT.getQuantity() + " USD");
+
+                    //Execute sellSide strategy
+                    sellSide(balanceNBT);
+
+                    //Execute buy Side strategy
+                    if (Global.isDualSide) {
+                        buySide(balanceFIAT);
+                    }
+
+                } else {
+                    //Cannot get balance
+                    LOG.severe(balancesResponse.getError().toString());
+                }
+            }
         } else {
-
-            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-            if (balancesResponse.isPositive()) {
-                Balance balance = (Balance) balancesResponse.getResponseObject();
-                Amount balanceNBT = balance.getNBTAvailable();
-
-                Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                        + balanceFIAT.getQuantity() + " USD");
-
-                //Execute sellSide strategy
-                sellSide(balanceNBT);
-
-                //Execute buy Side strategy
-                if (Global.isDualSide) {
-                    buySide(balanceFIAT);
-                }
-
-            } else {
-                //Cannot get balance
-                LOG.severe(balancesResponse.getError().toString());
+            LOG.info("Initializing strategy");
+            isFirstTime = false;
+            recount();
+            boolean reinitiateSuccess = reInitiateOrders(true);
+            if (!reinitiateSuccess) {
+                LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
+                isFirstTime = true;
             }
         }
-
     }
 
     private void placeInitialWalls() {
@@ -518,5 +528,73 @@ public class StrategyPrimaryPegTask extends TimerTask {
         } else {
             LOG.severe(balancesResponse.getError().toString());
         }
+    }
+
+    private boolean reInitiateOrders(boolean firstTime) {
+        if (totalActiveOrders != 0) {
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+                if (deleted) {
+                    LOG.warning("Clear all orders request succesfully");
+                    if (firstTime) //update the initial balance of the secondary peg
+                    {
+                        Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                    }
+                    //Wait until there are no active orders
+                    boolean timedOut = false;
+                    long timeout = Global.options.getEmergencyTimeout() * 1000;
+                    long wait = 5 * 1000;
+                    long count = 0L;
+
+                    boolean areAllOrdersCanceled = false;
+                    do {
+                        try {
+
+                            Thread.sleep(wait);
+                            areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
+                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
+                            count += wait;
+                            timedOut = count > timeout;
+
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.toString());
+                        }
+                    } while (!areAllOrdersCanceled && !timedOut);
+
+                    if (timedOut) {
+                        String message = "There was a problem cancelling all existing orders";
+                        LOG.severe(message);
+                        HipChatNotifications.sendMessage(message, Color.YELLOW);
+                        MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
+                        //Continue anyway, maybe there is some balance to put up on order.
+                    }
+                    //Update the balance
+                    placeInitialWalls();
+                } else {
+                    String message = "Could not submit request to clear orders";
+                    LOG.severe(message);
+                    return false;
+                }
+
+            } else {
+                LOG.severe(deleteOrdersResponse.getError().toString());
+                String message = "Could not submit request to clear orders";
+                LOG.severe(message);
+                return false;
+            }
+        } else {
+            if (firstTime) //update the initial balance of the secondary peg
+            {
+                Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+            }
+            placeInitialWalls();
+        }
+        try {
+            Thread.sleep(4000); //Give the time to new orders to be placed before counting again
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.toString());
+        }
+        return true;
     }
 }

@@ -50,7 +50,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
     private SendLiquidityinfoTask sendLiquidityTask;
-    boolean isFirstTime = true;
+    private boolean isFirstTime = true;
 
     @Override
     public void run() {
@@ -166,32 +166,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (!ordersAndBalancesOK) {
                 LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
                 mightNeedInit = true;
-            } else {
-                if (Global.options.isAggregate()) {
-                    ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-                    if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
-                        Amount balanceNBT = balance.getNBTAvailable();
-                        Amount balancePEG = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-
-                        LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                                + balancePEG.getQuantity() + " " + balancePEG.getCurrency());
-
-                        //Execute sellSide strategy
-                        aggregateSellSide(balanceNBT);
-
-                        //Execute buy Side strategy
-                        if (Global.isDualSide) {
-                            aggregateBuySide(balancePEG);
-                        }
-
-                    } else {
-                        //Cannot get balance
-                        LOG.severe(balancesResponse.getError().toString());
-                    }
-                }
             }
-
         } else //First execution : reset orders and init strategy
         {
             LOG.info("Initializing strategy");
@@ -216,32 +191,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             mightNeedInit = false;
         } else {
             mightNeedInit = true;
-        }
-    }
-
-    private void aggregateSellSide(Amount balanceNBT) {
-        //----------------------NTB (Sells)----------------------------
-        //Check if NBT balance > 1
-        if (balanceNBT.getQuantity() > 1) {
-            gracefullyRefreshOrders(Constant.SELL, false);
-        } else {
-            //NBT balance = 0
-            LOG.fine("NBT balance < 1, no orders to execute");
-        }
-    }
-
-    private void aggregateBuySide(Amount balancePEG) {
-        //----------------------PEG (Buys)----------------------------
-        //Check if PEG balance > 1
-        double oneNBT = Utils.round(1 / Global.conversion, 8);
-
-        if (balancePEG.getQuantity() > oneNBT) {
-            //Here its time to compute the balance to put apart, if any
-            Global.frozenBalances.tryKeepProceedsAside(balancePEG, new Amount(0, null));
-            gracefullyRefreshOrders(Constant.BUY, false);
-        } else {
-            //PEG balance = 0
-            LOG.fine(balancePEG.getCurrency().getCode() + "balance < 1, no orders to execute");
         }
     }
 
