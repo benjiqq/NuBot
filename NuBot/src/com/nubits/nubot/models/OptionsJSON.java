@@ -502,6 +502,14 @@ public class OptionsJSON {
 
             String pairStr = (String) optionsJSON.get("pair");
             CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
+
+            boolean aggregate = true; //true only for USD
+            if (!pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
+                aggregate = false; //default to false
+            }
+
+
+
             boolean dualside = (boolean) optionsJSON.get("dualside");
 
 
@@ -524,7 +532,7 @@ public class OptionsJSON {
             boolean executeOrders = true;
             boolean verbose = false;
             boolean sendHipchat = true;
-            boolean aggregate = true;
+
             boolean waitBeforeShift = true;
             int executeStrategyInterval = 41;
             int sendLiquidityInterval = 181;
@@ -605,9 +613,6 @@ public class OptionsJSON {
                 sendMails = (boolean) optionsJSON.get("mail-notifications");
             }
 
-            if (optionsJSON.containsKey("aggregate")) {
-                aggregate = (boolean) optionsJSON.get("aggregate");
-            }
 
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
              if (optionsJSON.containsKey("check-balance-interval")) {
