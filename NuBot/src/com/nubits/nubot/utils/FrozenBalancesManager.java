@@ -75,15 +75,21 @@ public class FrozenBalancesManager {
         if (frozen.getAmount().getQuantity() == 0) {
             return amount; //nothing to freeze
         } else {
-            Currency currentPegCurrency = amount.getCurrency();
-            Currency frozenCurrency = frozen.getAmount().getCurrency();
+            if (frozen.getAmount().getQuantity() < amount.getQuantity()) {
+                Currency currentPegCurrency = amount.getCurrency();
+                Currency frozenCurrency = frozen.getAmount().getCurrency();
 
-            if (currentPegCurrency.equals(frozenCurrency)) {
-                double updatedQuantity = amount.getQuantity() - frozen.getAmount().getQuantity();
-                return new Amount(updatedQuantity, currentPegCurrency);
+                if (currentPegCurrency.equals(frozenCurrency)) {
+                    double updatedQuantity = amount.getQuantity() - frozen.getAmount().getQuantity();
+                    return new Amount(updatedQuantity, currentPegCurrency);
+                } else {
+                    LOG.severe("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
+                            + "Returning original balance without freezing value");
+                    return amount;
+                }
             } else {
-                LOG.severe("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
-                        + "Returning original balance without freezing value");
+                LOG.severe("The funds to freeze are greater than the amount found in balance. Please stop the bot and analyze the frozen balance log.");
+
                 return amount;
             }
         }
@@ -91,20 +97,24 @@ public class FrozenBalancesManager {
 
     public void tryKeepProceedsAside(Amount amountFoundInBalance, Amount initialFunds) {
         if (Global.options.getKeepProceeds() > 0) {
-            double percentageToSetApart = Utils.round(Global.options.getKeepProceeds() / 100, 4);
+            if (initialFunds.getQuantity() < amountFoundInBalance.getQuantity()) {
+                double percentageToSetApart = Utils.round(Global.options.getKeepProceeds() / 100, 4);
 
-            if (percentageToSetApart != 0) {
-                double quantityToFreeze = percentageToSetApart * (amountFoundInBalance.getQuantity() - initialFunds.getQuantity());
+                if (percentageToSetApart != 0) {
+                    double quantityToFreeze = percentageToSetApart * (amountFoundInBalance.getQuantity() - initialFunds.getQuantity());
 
-                DecimalFormat df = new DecimalFormat("#");
-                df.setMaximumFractionDigits(8);
+                    DecimalFormat df = new DecimalFormat("#");
+                    df.setMaximumFractionDigits(8);
 
-                Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
-                Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
+                    Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
+                    Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
 
-                HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
-                        + percentageToSetApart * 100 + "% of  sale proceedings)"
-                        + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
+                    HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
+                            + percentageToSetApart * 100 + "% of  sale proceedings)"
+                            + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
+                }
+            } else {
+                LOG.severe("The funds initially set apart are greater than the amount found in balance. Please stop the bot and analyze the frozen balance log.");
             }
         }
     }
