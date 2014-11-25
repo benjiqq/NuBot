@@ -51,6 +51,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private PriceMonitorTriggerTask priceMonitorTask;
     private SendLiquidityinfoTask sendLiquidityTask;
     private boolean isFirstTime = true;
+    private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
 
     @Override
     public void run() {
@@ -166,6 +167,24 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (!ordersAndBalancesOK) {
                 LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
                 mightNeedInit = true;
+            } else {
+                if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
+                    //Try to keep proceeds apart
+                    ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+                    if (balancesResponse.isPositive()) {
+                        Balance balance = (Balance) balancesResponse.getResponseObject();
+
+                        Amount balancePEG = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                        //Execute buy Side strategy
+                        if (Global.isDualSide && proceedsInBalance && !needWallShift) {
+                            aggregateAndKeepProceeds();
+                        }
+                    } else {
+                        //Cannot get balance
+                        LOG.severe(balancesResponse.getError().toString());
+                    }
+
+                }
             }
         } else //First execution : reset orders and init strategy
         {
@@ -353,21 +372,18 @@ public class StrategySecondaryPegTask extends TimerTask {
             double oneNBT = Utils.round(1 / Global.conversion, 8);
 
             if (Global.options.isDualSide()) {
-                if (Global.options.isAggregate()) {
-                    ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2 && balancePEG < oneNBT && balanceNBT < 1)
-                            || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                            || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
-                } else {//Ignore the balance
-                    ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
-                            || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                            || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
-                }
+
+                ordersAndBalancesOK = ((activeSellOrders == 2 && activeBuyOrders == 2)
+                        || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
+                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
 
-                if (balancePEG > oneNBT && Global.options.isAggregate()) {
-                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If this is the first executeion, ignore this message. "
-                            + "If the balance represent proceedings from a sale the bot will notice. "
-                            + " If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                if (balancePEG > oneNBT && Global.options.getPair().getPaymentCurrency().isFiat() && !isFirstTime) { //Only for EUR...CNY etc
+                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
+                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                    proceedsInBalance = true;
+                } else {
+                    proceedsInBalance = false;
                 }
             } else {
                 if (Global.options.isAggregate()) {
@@ -428,8 +444,10 @@ public class StrategySecondaryPegTask extends TimerTask {
             boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
             if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
 
-                if (shiftImmediatelyOrderType.equals(Constant.BUY)) // update the initial balance of the secondary peg
+                if (shiftImmediatelyOrderType.equals(Constant.BUY)
+                        && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
                 {
+                    // update the initial balance of the secondary peg
                     Global.frozenBalances.freezeNewFunds();
                 }
 
@@ -463,7 +481,8 @@ public class StrategySecondaryPegTask extends TimerTask {
                 boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType, Global.options.getPair());
 
                 if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
-                    if (waitAndShiftOrderType.equals(Constant.BUY)) // update the initial balance of the secondary peg
+                    if (waitAndShiftOrderType.equals(Constant.BUY)
+                            && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
                     {
                         Global.frozenBalances.freezeNewFunds();
                     }
@@ -602,6 +621,25 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         return success;
+    }
+
+    private void aggregateAndKeepProceeds() {
+        boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
+        if (cancel) {
+            Global.frozenBalances.freezeNewFunds();
+            ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+            if (txFeeNTBFIATResponse.isPositive()) {
+                double txFee = (Double) txFeeNTBFIATResponse.getResponseObject();
+                {
+                    initOrders(Constant.BUY, buyPricePEG);
+                }
+            } else {
+                LOG.severe("An error occurred while attempting to update tx fee.");
+            }
+
+        } else {
+            LOG.severe("An error occurred while attempting to cancel buy orders.");
+        }
     }
 
     //Getters and setters
