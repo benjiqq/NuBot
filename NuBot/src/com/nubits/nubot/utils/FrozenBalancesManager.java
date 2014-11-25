@@ -89,7 +89,6 @@ public class FrozenBalancesManager {
                 }
             } else {
                 LOG.severe("The funds to freeze are greater than the amount found in balance. Please stop the bot and analyze the frozen balance log.");
-
                 return amount;
             }
         }
@@ -114,7 +113,8 @@ public class FrozenBalancesManager {
                             + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
                 }
             } else {
-                LOG.severe("The funds initially set apart are greater than the amount found in balance. Please stop the bot and analyze the frozen balance log.");
+                LOG.info("Nothing to freeze. The funds initially set apart (" + initialFunds.toString() + ") "
+                        + "are greater than the amount found in balance(" + amountFoundInBalance.toString() + ").");
             }
         }
     }
@@ -141,7 +141,6 @@ public class FrozenBalancesManager {
         boolean success = true;
         //update the balance of the secondary peg after the shift
         if (Global.options.getKeepProceeds() > 0) {
-
             ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
             Amount balance = null;
 
@@ -149,7 +148,13 @@ public class FrozenBalancesManager {
                 //Here its time to compute the balance to put apart, if any
                 balance = (Amount) balancesResponse.getResponseObject();
                 balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
-                setAmountAlreadyThere(balance);
+
+                //Only set this value is its greater than prev
+                if (balance.getQuantity() > getAmountAlreadyThere().getQuantity()) {
+                    setAmountAlreadyThere(balance);
+                } else {
+                    LOG.fine("Did not update the balanceAlreadyThere, since its would be smaller(" + balance.toString() + ") than the former value(" + getAmountAlreadyThere().toString() + ") .");
+                }
             } else {
                 success = false;
             }
