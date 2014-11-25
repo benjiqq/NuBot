@@ -75,7 +75,7 @@ public class Amount {
 
     @Override
     public String toString() {
-        return "Amount{" + "quantity=" + quantity + ", currency=" + currency + '}' + "\n";
+        return "" + quantity + " " + currency.getCode() + "\n";
     }
 
     /**

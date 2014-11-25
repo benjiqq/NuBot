@@ -29,11 +29,14 @@ public class TestNTPClient {
     private static final Logger LOG = Logger.getLogger(TestNTPClient.class.getName());
 
     public static void main(String[] args) {
+        NTPClient client = new NTPClient();
+
+
         //Try multiple servers
-        LOG.info("Date (multiple servers) : " + new NTPClient().getTime());
+        LOG.info("Date (multiple servers) : " + client.getTime());
 
         //Try single server
-        LOG.info("Date (single server) : " + new NTPClient().getTime("time.nist.gov"));
+        LOG.info("Date (single server) : " + client.getTime("time.nist.gov"));
 
         System.exit(0);
 
