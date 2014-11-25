@@ -169,21 +169,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                 mightNeedInit = true;
             } else {
                 if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
-                    //Try to keep proceeds apart
-                    ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-                    if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
-
-                        Amount balancePEG = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                        //Execute buy Side strategy
-                        if (Global.isDualSide && proceedsInBalance && !needWallShift) {
-                            aggregateAndKeepProceeds();
-                        }
-                    } else {
-                        //Cannot get balance
-                        LOG.severe(balancesResponse.getError().toString());
+                    //Execute buy Side strategy
+                    if (Global.isDualSide && proceedsInBalance && !needWallShift) {
+                        aggregateAndKeepProceeds();
                     }
-
                 }
             }
         } else //First execution : reset orders and init strategy
@@ -626,6 +615,11 @@ public class StrategySecondaryPegTask extends TimerTask {
     private void aggregateAndKeepProceeds() {
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
+
+            //get the balance and see if it does still require an aggregation
+
+
+
             Global.frozenBalances.freezeNewFunds();
             ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBFIATResponse.isPositive()) {

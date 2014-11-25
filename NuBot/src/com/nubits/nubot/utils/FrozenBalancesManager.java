@@ -126,9 +126,10 @@ public class FrozenBalancesManager {
             if (balancesResponse.isPositive()) {
                 Amount balance = (Amount) balancesResponse.getResponseObject();
                 balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
-
-                tryKeepProceedsAside(balance, Global.frozenBalances.getAmountAlreadyThere());
-
+                double oneNBT = Utils.round(1 / Global.conversion, 8);
+                if (balance.getQuantity() > oneNBT) {
+                    tryKeepProceedsAside(balance, Global.frozenBalances.getAmountAlreadyThere());
+                }
                 setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
             } else {
                 LOG.severe("Cannot get the updated balance");
