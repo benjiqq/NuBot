@@ -17,9 +17,14 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
+//import com.alibaba.fastjson.JSON;
+//import com.alibaba.fastjson.JSONArray;
+//import com.alibaba.fastjson.JSONObject;
+import org.json.JSONString;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.ParseException;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -37,7 +42,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.ParseException;
+//import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -159,90 +164,92 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "GET");
         query_args.put("canonical_uri", path);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
+        String queryResult = query(API_BASE_URL, path, query_args, isGet);
         if (queryResult == null) {
             apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
             return apiResponse;
         }
 
-        JSONObject response = JSON.parseObject(queryResult);
+        LOG.info("queryResult = " + queryResult);
 
-        if (response == null) {
-            apiResponse.setError(new ApiError(3923, "response is null"));
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            if (httpAnswerJson.containsKey("error")) {
+                JSONObject error = (JSONObject) httpAnswerJson.get("error");
+                int code = Integer.parseInt(error.get("code").toString());
+                String msg = error.get("message").toString();
+                apiResponse.setError(new ApiError(code, msg));
+                return apiResponse;
+            }
+            /*Sample result
+             *{"sn":"PEA5TFFOGQHTIO","name":"foo","email":"foo@peatio.dev","activated":true,
+             * "accounts":[
+             *  {"currency":"cny","balance":"100243840.0","locked":"0.0"},
+             *  {"currency":"btc","balance":"99999708.26","locked":"210.8"}
+             *  ]
+             * }
+             */
+            Amount NBTonOrder = null,
+                    NBTAvail = null,
+                    PEGonOrder = null,
+                    PEGAvail = null;
+
+            JSONArray accounts = (JSONArray) httpAnswerJson.get("accounts");
+
+            if (currency == null) { //Get all balances
+                for (int i = 0; i < accounts.size(); i++) {
+                    JSONObject balanceObj = (JSONObject) accounts.get(i);
+                    String tempCurrency = balanceObj.get("currency").toString();
+
+                    String nbtCurrencyCode = pair.getOrderCurrency().getCode();
+                    String pegCurrencyCode = pair.getPaymentCurrency().getCode();
+
+                    if (tempCurrency.equalsIgnoreCase(nbtCurrencyCode)) {
+                        NBTAvail = new Amount(Double.parseDouble(balanceObj.get("balance").toString()), pair.getOrderCurrency());
+                        NBTonOrder = new Amount(Double.parseDouble(balanceObj.get("locked").toString()), pair.getOrderCurrency());
+                    }
+                    if (tempCurrency.equalsIgnoreCase(pegCurrencyCode)) {
+                        PEGAvail = new Amount(Double.parseDouble(balanceObj.get("balance").toString()), pair.getPaymentCurrency());
+                        PEGonOrder = new Amount(Double.parseDouble(balanceObj.get("locked").toString()), pair.getPaymentCurrency());
+                    }
+                }
+                if (NBTAvail != null && NBTonOrder != null
+                        && PEGAvail != null && PEGonOrder != null) {
+                    balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    //Pack it into the ApiResponse
+                    apiResponse.setResponseObject(balance);
+                } else {
+                    apiResponse.setError(getErrorByCode(ERROR_PARSING));
+                }
+            } else {//return available balance for the specific currency
+                boolean found = false;
+                Amount amount = null;
+                for (int i = 0; i < accounts.size(); i++) {
+                    JSONObject balanceObj = (JSONObject) accounts.get(i);
+                    String tempCurrency = balanceObj.get("currency").toString();
+
+                    if (tempCurrency.equalsIgnoreCase(currency.getCode())) {
+                        amount = new Amount((Double.parseDouble(balanceObj.get("balance").toString())-Double.parseDouble(balanceObj.get("locked").toString())), currency);
+                        found = true;
+                    }
+                }
+
+                if (found) {
+                    apiResponse.setResponseObject(amount);
+                } else {
+                    apiResponse.setError(new ApiError(21341, "Can't find balance for"
+                            + " specified currency: " + currency.getCode()));
+                }
+            }
+
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
             return apiResponse;
         }
 
-        if (response.containsKey("error")) {
-            JSONObject error = response.getJSONObject("error");
-            int code = error.getInteger("code");
-            String msg = error.getString("message");
-            apiResponse.setError(new ApiError(code, msg));
-            return apiResponse;
-        }
 
-
-        /*Sample result
-         *{"sn":"PEA5TFFOGQHTIO","name":"foo","email":"foo@peatio.dev","activated":true,
-         * "accounts":[
-         *  {"currency":"cny","balance":"100243840.0","locked":"0.0"},
-         *  {"currency":"btc","balance":"99999708.26","locked":"210.8"}
-         *  ]
-         * }
-         */
-
-
-        Amount NBTonOrder = null,
-                NBTAvail = null,
-                PEGonOrder = null,
-                PEGAvail = null;
-
-        JSONArray accounts = response.getJSONArray("accounts");
-        if (currency == null) { //Get all balances
-            for (int i = 0; i < accounts.size(); i++) {
-                JSONObject balanceObj = accounts.getJSONObject(i);
-                String tempCurrency = balanceObj.getString("currency");
-
-                String nbtCurrencyCode = pair.getOrderCurrency().getCode();
-                String pegCurrencyCode = pair.getPaymentCurrency().getCode();
-
-                if (tempCurrency.equalsIgnoreCase(nbtCurrencyCode)) {
-                    NBTAvail = new Amount(balanceObj.getDouble("balance"), pair.getOrderCurrency());
-                    NBTonOrder = new Amount(balanceObj.getDouble("locked"), pair.getOrderCurrency());
-                }
-                if (tempCurrency.equalsIgnoreCase(pegCurrencyCode)) {
-                    PEGAvail = new Amount(balanceObj.getDouble("balance"), pair.getPaymentCurrency());
-                    PEGonOrder = new Amount(balanceObj.getDouble("locked"), pair.getPaymentCurrency());
-                }
-            }
-
-            if (NBTAvail != null && NBTonOrder != null
-                    && PEGAvail != null && PEGonOrder != null) {
-                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-                //Pack it into the ApiResponse
-                apiResponse.setResponseObject(balance);
-            } else {
-                apiResponse.setError(getErrorByCode(ERROR_PARSING));
-            }
-        } else {//return available balance for the specific currency
-            boolean found = false;
-            Amount amount = null;
-            for (int i = 0; i < accounts.size(); i++) {
-                JSONObject balanceObj = accounts.getJSONObject(i);
-                String tempCurrency = balanceObj.getString("currency");
-
-                if (tempCurrency.equalsIgnoreCase(currency.getCode())) {
-                    amount = new Amount(balanceObj.getDouble("balance") - balanceObj.getDouble("locked"), currency);
-                    found = true;
-                }
-            }
-
-            if (found) {
-                apiResponse.setResponseObject(amount);
-            } else {
-                apiResponse.setError(new ApiError(21341, "Can't find balance for"
-                        + " specified currency: " + currency.getCode()));
-            }
-        }
         return apiResponse;
     }
 
@@ -255,8 +262,8 @@ public class BitSparkWrapper implements TradeInterface {
         double ask = -1;
         double bid = -1;
 
-        String ticker_url = apiBaseUrl + getTickerPath(pair);
-        String text = HttpUtils.getContentForGet(ticker_url, 5000);
+        String ticker_url = API_BASE_URL + getTickerPath(pair);
+        String queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
 
         /*Sample result
          * {"at":1398410899,
@@ -270,19 +277,25 @@ public class BitSparkWrapper implements TradeInterface {
          *      "vol":"0.11"}}
          */
 
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) parser.parse(queryResult);
+            JSONObject tickerOBJ = (JSONObject) httpAnswerJson.get("ticker");
 
-        JSONObject jsonObject = JSONArray.parseObject(text);
-        JSONObject tickerOBJ = jsonObject.getJSONObject("ticker");
+            last = (Double) tickerOBJ.get("last");
+            ask = (Double) tickerOBJ.get("buy");
+            bid = (Double) tickerOBJ.get("sell");
 
-        last = tickerOBJ.getDouble("last");
-        ask = tickerOBJ.getDouble("buy");
-        bid = tickerOBJ.getDouble("sell");
+            ticker.setAsk(ask);
+            ticker.setBid(bid);
+            ticker.setLast(last);
 
-        ticker.setAsk(ask);
-        ticker.setBid(bid);
-        ticker.setLast(last);
-
-        apiResponse.setResponseObject(ticker);
+            apiResponse.setResponseObject(ticker);
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
         return apiResponse;
     }
 
@@ -311,29 +324,36 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", path);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
+        String queryResult = query(API_BASE_URL, path, query_args, isGet);
         if (queryResult == null) {
             apiResponse.setError(getErrorByCode(ERROR_TRADE));
             return apiResponse;
         }
 
-        JSONObject response = JSON.parseObject(queryResult);
-        if (response == null) {
-            apiResponse.setError(getErrorByCode(ERROR_TRADE));
-            return apiResponse;
-        } else if (response.containsKey("error")) {
-            JSONObject error = response.getJSONObject("error");
-            int code = error.getInteger("code");
-            String msg = error.getString("message");
-            apiResponse.setError(new ApiError(code, msg));
-            return apiResponse;
-        } else {
-            //Correct
-            if (response.containsKey("id")) {
-                order_id = response.getLong("id").toString();
-                apiResponse.setResponseObject(order_id);
+        JSONParser parser = new JSONParser();
+        try{
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            if (httpAnswerJson.containsKey("error")) {
+                JSONObject error = (JSONObject) httpAnswerJson.get("error");
+                int code = Integer.parseInt(error.get("code").toString());
+                String msg = error.get("message").toString();
+                apiResponse.setError(new ApiError(code, msg));
+                return apiResponse;
+            } else {
+                //Correct
+                if (httpAnswerJson.containsKey("id")) {
+                    order_id = httpAnswerJson.get("id").toString();
+                    apiResponse.setResponseObject(order_id);
+                }
             }
+
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
         }
+
+
         return apiResponse;
     }
 
@@ -362,38 +382,29 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("market", pair.toString());
         query_args.put("limit", "999"); //default is 10 , max is 1000
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_ORDERS));
-            return apiResponse;
-        }
-
-
-
-        if (queryResult == null) {
-            apiResponse.setError(new ApiError(3923, "response is null"));
-            return apiResponse;
-        } else if (queryResult.contains("error")) {
-            apiResponse.setError(new ApiError(ERROR_GENERIC, queryResult));
-            return apiResponse;
-        }
-
+        String queryResult = query(API_BASE_URL, path, query_args, isGet);
 
         /*Sample result
          */
-        JSONArray response = JSONObject.parseArray(queryResult);
-        for (Object anOrdersResponse : response) {
-            JSONObject orderResponse = (JSONObject) anOrdersResponse;
-            Order tempOrder = parseOrder(orderResponse);
-            if (!tempOrder.isCompleted()) //Do not add executed orders
-            {
-                orderList.add(tempOrder);
+        JSONParser parser = new JSONParser();
+        try {
+            JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+            for (Object anOrdersResponse : httpAnswerJson) {
+                JSONObject orderResponse = (JSONObject) anOrdersResponse;
+                Order tempOrder = parseOrder(orderResponse);
+                if (!tempOrder.isCompleted()) //Do not add executed orders
+                {
+                    orderList.add(tempOrder);
+                }
+
             }
 
+            apiResponse.setResponseObject(orderList);
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
         }
-
-        apiResponse.setResponseObject(orderList);
-
 
         return apiResponse;
     }
@@ -411,29 +422,32 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_uri", "/api/v2/order");
         query_args.put("id", orderID);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
+        String queryResult = query(API_BASE_URL, path, query_args, isGet);
 
         if (queryResult == null) {
             apiResponse.setError(getErrorByCode(ERROR_GET_ORDERDETAIL));
             return apiResponse;
         }
 
-        JSONObject response = JSON.parseObject(queryResult);
-
-        if (response == null) {
-            apiResponse.setError(new ApiError(3923, "response is null"));
-            return apiResponse;
-        } else if (response.containsKey("error")) {
-            JSONObject error = response.getJSONObject("error");
-            int code = error.getInteger("code");
-            String msg = error.getString("message");
-            apiResponse.setError(new ApiError(code, msg));
-            return apiResponse;
-        }
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            if (httpAnswerJson.containsKey("error")) {
+                JSONObject error = (JSONObject) httpAnswerJson.get("error");
+                int code = ~(Integer) error.get("code");
+                String msg = error.get("message").toString();
+                apiResponse.setError(new ApiError(code, msg));
+                return apiResponse;
+            }
         /*Sample result
          * {"id":7,"side":"sell","price":"3100.0","avg_price":"3101.2","state":"wait","market":"btccny","created_at":"2014-04-18T02:02:33Z","volume":"100.0","remaining_volume":"89.8","executed_volume":"10.2","trades":[{"id":2,"price":"3100.0","volume":"10.2","market":"btccny","created_at":"2014-04-18T02:04:49Z","side":"sell"}]}
          */
-        apiResponse.setResponseObject(parseOrder(response));
+            apiResponse.setResponseObject(parseOrder(httpAnswerJson));
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
 
         return apiResponse;
     }
@@ -450,7 +464,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", path);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
+        String queryResult = query(API_BASE_URL, path, query_args, isGet);
 
 
         if (queryResult == null) {
@@ -458,25 +472,28 @@ public class BitSparkWrapper implements TradeInterface {
             return apiResponse;
         }
 
-        JSONObject response = JSON.parseObject(queryResult);
-
-        if (response == null) {
-            apiResponse.setError(new ApiError(3923, "response is null"));
-            return apiResponse;
-        } else if (response.containsKey("error")) {
-            JSONObject error = response.getJSONObject("error");
-            int code = error.getInteger("code");
-            String msg = error.getString("message");
-            apiResponse.setError(new ApiError(code, msg));
-            return apiResponse;
-        }
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            if (httpAnswerJson.containsKey("error")) {
+                JSONObject error = (JSONObject) httpAnswerJson.get("error");
+                int code = (Integer) error.get("code");
+                String msg = error.get("message").toString();
+                apiResponse.setError(new ApiError(code, msg));
+                return apiResponse;
+            }
         /*Sample result
          * Cancel order is an asynchronous operation. A success response only means your cancel
          * request has been accepted, it doesn't mean the order has been cancelled.
          * You should always use /api/v2/order or websocket api to get order's latest state.
          */
 
-        apiResponse.setResponseObject(true);
+            apiResponse.setResponseObject(true);
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            return apiResponse;
+        }
         return apiResponse;
 
     }
@@ -551,7 +568,7 @@ public class BitSparkWrapper implements TradeInterface {
 
     @Override
     public String getUrlConnectionCheck() {
-        return checkConnectionUrl;
+        return API_BASE_URL;
     }
 
     @Override
@@ -575,7 +592,7 @@ public class BitSparkWrapper implements TradeInterface {
 
     private Order parseOrder(JSONObject jsonObject) {
         Order order = new Order();
-        String status = jsonObject.getString("state");
+        String status = jsonObject.get("state").toString();
 
         boolean executed = false;
         switch (status) {
@@ -595,17 +612,17 @@ public class BitSparkWrapper implements TradeInterface {
 
 
         //Create a CurrencyPair object
-        CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(jsonObject.getString("market"), "");
+        CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(jsonObject.get("market").toString(), "");
 
         order.setPair(cp);
         order.setCompleted(executed);
-        order.setId("" + jsonObject.getLong("id"));
-        order.setAmount(new Amount(jsonObject.getDouble("remaining_volume"), cp.getOrderCurrency()));
-        order.setPrice(new Amount(jsonObject.getDouble("price"), cp.getPaymentCurrency()));
+        order.setId("" + jsonObject.get("id"));
+        order.setAmount(new Amount(Double.parseDouble(jsonObject.get("remaining_volume").toString()), cp.getOrderCurrency()));
+        order.setPrice(new Amount(Double.parseDouble(jsonObject.get("price").toString()), cp.getPaymentCurrency()));
 
-        order.setInsertedDate(parseDate(jsonObject.getString("created_at")));
+        order.setInsertedDate(parseDate(jsonObject.get("created_at").toString()));
 
-        order.setType(jsonObject.getString("side"));
+        order.setType(jsonObject.get("side").toString());
         //Created at?
 
         return order;
@@ -633,7 +650,7 @@ public class BitSparkWrapper implements TradeInterface {
         DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
         try {
             toRet = df.parse(dateStr);
-        } catch (ParseException ex) {
+        } catch (java.text.ParseException ex) {
             LOG.severe(ex.toString());
             toRet = new Date();
         }
@@ -651,7 +668,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", path);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
+        String queryResult = query(API_BASE_URL, path, query_args, isGet);
 
 
         if (queryResult == null) {
@@ -762,7 +779,6 @@ public class BitSparkWrapper implements TradeInterface {
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
 
-
             args.put("access_key", keys.getApiKey());
 
             String messageDbg = (String) args.get("canonical_verb") + " " + (String) args.get("canonical_uri");
@@ -774,11 +790,12 @@ public class BitSparkWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.fine("Calling " + canonical_uri + " with params:" + args);
+            LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
-                String url = apiBaseUrl + canonical_uri;
+                String url = base + canonical_uri;
+                LOG.info("url = " + url);
                 Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
 

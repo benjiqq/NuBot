@@ -490,10 +490,9 @@ public class OptionsJSON {
             if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
                 if (!optionsJSON.containsKey("apikey")) {
                     Utils.exitWithMessage("The apikey parameter is compulsory.");
+                } else {
+                    apiKey = (String) optionsJSON.get("apikey");
                 }
-
-            } else {
-                apiKey = (String) optionsJSON.get("apikey");
             }
 
             String apiSecret = (String) optionsJSON.get("apisecret");

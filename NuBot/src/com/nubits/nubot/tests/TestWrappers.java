@@ -58,7 +58,7 @@ public class TestWrappers {
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
         configExchange(Constant.BTER); //Replace to test a differe API implementation
 
-        configExchange(Constant.BITSPARK_PEATIO); //Replace to test a different API implementation
+        configExchange(Constant.INTERNAL_EXCHANGE_PEATIO); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
@@ -71,8 +71,9 @@ public class TestWrappers {
         //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
+        testClearAllOrders(Constant.NBT_BTC);
+        testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
+        testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
         //testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
@@ -85,15 +86,15 @@ public class TestWrappers {
         //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC, 1409566800);
-        testGetLastTrades(Constant.NBT_BTC);
+        //testGetLastTrades(Constant.NBT_BTC);
 
 
         for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders(Constant.BTC_NBT);
-            try {
-                Thread.sleep(300);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+            ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+            if (activeOrdersResponse.isPositive()) {
+                LOG.info("Active orders : " + activeOrdersResponse.getResponseObject());
+            } else {
+                LOG.severe(activeOrdersResponse.getError().toString());
             }
         }
 
