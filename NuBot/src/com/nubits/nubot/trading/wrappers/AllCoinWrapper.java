@@ -12,6 +12,7 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.HttpUtils;
 import com.nubits.nubot.utils.Utils;
 import org.apache.commons.codec.binary.Hex;
+import com.nubits.nubot.utils.ErrorManager;
 import org.json.JSONString;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -34,6 +35,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.Timestamp;
 import java.sql.Time;
 import java.util.*;
+//import java.util.logging.ErrorManager;
 import java.util.logging.Logger;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -67,7 +69,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String TOKEN_BAL_HOLD = "balance_hold";
     private final String TOKEN_ORDER_ID = "order_id";
     //Errors
-    private ArrayList<ApiError> errors;
+    ErrorManager errors = new ErrorManager();
     private final int NO_ERROR = 12059;
     private final int ERROR_UNKNOWN = 12560;
     private final int ERROR_NO_CONNECTION = 12561;
@@ -90,29 +92,12 @@ public class AllCoinWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
     }
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
 
@@ -148,7 +133,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         String queryResult = query(url, method, query_args, isGet);
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_SELL_COIN));
+            apiResponse.setError(errors.nullReturnError);
         }
 
         JSONParser parser = new JSONParser();
@@ -163,7 +148,8 @@ public class AllCoinWrapper implements TradeInterface {
 
             if (code < 0) {
                 String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiError = errors.apiReturnError;
+                apiError.setDescription(errorMessage);
                 //LOG.severe("AllCoin API returned an error : " + errorMessage);
                 apiResponse.setError(apiError);
             } else {
@@ -177,7 +163,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -207,7 +193,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         String queryResult = query(url, API_GET_INFO, query_args, isGet);
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
+            apiResponse.setError(errors.nullReturnError);
         }
 
         LOG.info(queryResult);
@@ -224,8 +210,8 @@ public class AllCoinWrapper implements TradeInterface {
 
             if (code < 0) {
                 String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
-                //LOG.severe("AllCoin API returned an error : " + errorMessage);
+                ApiError apiError = errors.apiReturnError;
+                apiError.setDescription(errorMessage);
                 apiResponse.setError(apiError);
             } else {
                 //we have returned data
@@ -290,7 +276,7 @@ public class AllCoinWrapper implements TradeInterface {
             }
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -370,7 +356,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         String queryResult = query(url, API_OPEN_ORDERS, query_args, isGet);
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_ACTIVE_ORDERS));
+            apiResponse.setError(errors.nullReturnError);
         }
 
         JSONParser parser = new JSONParser();
@@ -385,13 +371,14 @@ public class AllCoinWrapper implements TradeInterface {
 
             if (code < 0) { //we have an error
                 String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiError = errors.apiReturnError;
+                apiError.setDescription(errorMessage);
                 apiResponse.setError(apiError);
             } else {
                 //we have returned data
                 JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
                 if (dataJson == null) {
-                    ApiError apiError = new ApiError(ERROR_NULL_RETURN, "Null data return");
+                    ApiError apiError = errors.nullReturnError;
                     apiResponse.setError(apiError);
                 }
                 else {
@@ -415,7 +402,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -516,7 +503,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         String queryResult = query(url, API_CANCEL_ORDERS, query_args, isGet);
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDERS));
+            apiResponse.setError(errors.nullReturnError);
         }
 
         JSONParser parser = new JSONParser();
@@ -531,7 +518,8 @@ public class AllCoinWrapper implements TradeInterface {
 
             if (code < 0) { //we have an error
                 String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiError = errors.apiReturnError;
+                apiError.setDescription(errorMessage);
                 apiResponse.setError(apiError);
             } else {
                 //we have returned data
@@ -544,7 +532,7 @@ public class AllCoinWrapper implements TradeInterface {
                     data = (String) httpAnswerJson.get(TOKEN_DATA);
                 }
                 if (data == null) {
-                    ApiError apiError = new ApiError(ERROR_NULL_RETURN, "Null data return");
+                    ApiError apiError = errors.nullReturnError;
                     apiResponse.setError(apiError);
                 } else {
                     if (data.equals(orderID)) {
@@ -556,7 +544,7 @@ public class AllCoinWrapper implements TradeInterface {
             }
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
