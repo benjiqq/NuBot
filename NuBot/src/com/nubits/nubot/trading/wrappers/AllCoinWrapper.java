@@ -46,6 +46,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_OPEN_ORDERS = "myorders";
     private final String API_CANCEL_ORDERS = "cancel_order";
     //Tokens
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_ERR = "error_info";
     private final String TOKEN_CODE = "code";
     private final String TOKEN_DATA = "data";
@@ -70,7 +71,7 @@ public class AllCoinWrapper implements TradeInterface {
     private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
-        if (queryResult == null) {
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
         }
         JSONParser parser = new JSONParser();
@@ -271,7 +272,7 @@ public class AllCoinWrapper implements TradeInterface {
             queryResult = query.executeQuery(true, isGet);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
-            queryResult = errors.noConnectionError.getDescription();
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }

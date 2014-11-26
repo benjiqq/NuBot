@@ -33,6 +33,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -88,13 +89,9 @@ public class BterWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "private/cancelorder";
     private final String API_GET_FEE = "http://data.bter.com/api/1/marketinfo";
     // Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_UNKNOWN = 14560;
-    private final int ERROR_NO_CONNECTION = 14561;
-    private final int ERROR_GENERIC = 14562;
-    private final int ERROR_PARSING = 14563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 14567;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
     public BterWrapper() {
         setupErrors();
@@ -107,9 +104,7 @@ public class BterWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
     }
 
     @Override
@@ -130,8 +125,8 @@ public class BterWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
 
         String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -148,10 +143,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -231,7 +224,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -273,8 +266,8 @@ public class BterWrapper implements TradeInterface {
         }
 
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -291,10 +284,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("message");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -308,7 +299,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -350,8 +341,8 @@ public class BterWrapper implements TradeInterface {
          */
 
         String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -377,7 +368,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
 
                 LOG.severe("Bter API returned an error: " + errorMessage);
 
@@ -388,8 +380,9 @@ public class BterWrapper implements TradeInterface {
                 order_id = "" + (long) httpAnswerJson.get("order_id");
                 String msg = (String) httpAnswerJson.get("msg");
                 if (!msg.equals("Success")) {
-                    LOG.severe("BTER : Something went wrong while placing the order :" + msg);
-                    ApiError apiErr = new ApiError(ERROR_GENERIC, msg);
+                    //LOG.severe("BTER : Something went wrong while placing the order :" + msg);
+                    ApiError apiErr = errors.apiReturnError;
+                    apiErr.setDescription(msg);
                     apiResponse.setError(apiErr);
                     return apiResponse;
                 } else {
@@ -399,7 +392,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
     }
@@ -460,8 +453,8 @@ public class BterWrapper implements TradeInterface {
          */
 
         String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -483,7 +476,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
 
                 LOG.severe("Bter API returned an error: " + errorMessage);
 
@@ -523,7 +517,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
     }
@@ -557,8 +551,8 @@ public class BterWrapper implements TradeInterface {
          */
 
         String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -580,10 +574,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                //LOG.severe("Bter API returned an error: " + errorMessage);
-
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -591,8 +583,9 @@ public class BterWrapper implements TradeInterface {
 
                 String msg = (String) httpAnswerJson.get("msg");
                 if (!msg.equals("Success")) {
-                    LOG.severe("BTER : Something went wrong while gettin the order :" + msg);
-                    ApiError apiErr = new ApiError(ERROR_GENERIC, msg);
+                    //LOG.severe("BTER : Something went wrong while gettin the order :" + msg);
+                    ApiError apiErr = errors.apiReturnError;
+                    apiErr.setDescription(msg);
                     apiResponse.setError(apiErr);
                     return apiResponse;
                 } else {
@@ -604,7 +597,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -629,8 +622,8 @@ public class BterWrapper implements TradeInterface {
          */
 
         String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -652,7 +645,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
 
                 LOG.severe("Bter API returned an error: " + errorMessage);
 
@@ -673,15 +667,16 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
     }
 
 //    @Override
     public ApiResponse getTxFee() {
-        return new ApiResponse(false, null,
-                new ApiError(ERROR_UNKNOWN, "For Bter the fee changes with the currency. Please be more specific"));
+        ApiError error = errors.genericError;
+        error.setDescription("For Bter the fee changes with the currency. Please be more specific");
+        return new ApiResponse(false, null, error);
     }
 
     @Override
@@ -704,8 +699,8 @@ public class BterWrapper implements TradeInterface {
 
         String queryResult = query(path, query_args, true);
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -722,7 +717,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
 
                 LOG.severe("Bter API returned an error: " + errorMessage);
 
@@ -748,13 +744,14 @@ public class BterWrapper implements TradeInterface {
                     }
                 }
                 //Not found
-                ApiError err = new ApiError(ERROR_UNKNOWN, "Did not found fee for pair " + searchingFor);
+                ApiError err = errors.genericError;
+                err.setDescription("Did not find fee for pair " + searchingFor);
                 apiResponse.setError(err);
                 return apiResponse;
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
     }
@@ -833,22 +830,7 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -859,12 +841,12 @@ public class BterWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         BterService query = new BterService(url, keys, args);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to bter");
-            queryResult = "error : no connection with Bter";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -1015,8 +997,8 @@ public class BterWrapper implements TradeInterface {
          */
 
         String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -1044,9 +1026,10 @@ public class BterWrapper implements TradeInterface {
                     errorMessage = (String) httpAnswerJson.get("message");
                 }
 
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.genericError;
+                apiErr.setDescription(errorMessage);
 
-                LOG.severe("Bter API returned an error: " + errorMessage);
+                //LOG.severe("Bter API returned an error: " + errorMessage);
 
                 apiResponse.setError(apiErr);
                 return apiResponse;
@@ -1072,7 +1055,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 

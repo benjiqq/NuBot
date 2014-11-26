@@ -32,6 +32,7 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -78,15 +79,10 @@ public class BtceWrapper implements TradeInterface {
     private final String API_GET_FEE = "https://btc-e.com/exchange/";
     private final String API_TICKER_USD = "https://btc-e.com/api/2/btc_usd/ticker";
     // Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_UNKNOWN = 4560;
-    private final int ERROR_NO_CONNECTION = 4561;
-    private final int ERROR_GENERIC = 4562;
-    private final int ERROR_PARSING = 4563;
-    private final int ERROR_ORDER_NOT_FOUND = 4564;
-    private final int ERROR_SCRAPING_HTML = 4565;
-    private final int ERRROR_API = 4566;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
+
 
     public BtceWrapper() {
         setupErrors();
@@ -101,8 +97,7 @@ public class BtceWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
+        errors.setExchangeName(exchange);
 
     }
 
@@ -123,8 +118,8 @@ public class BtceWrapper implements TradeInterface {
          */
 
         String queryResult = query(API_BASE_URL, path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -160,10 +155,9 @@ public class BtceWrapper implements TradeInterface {
             if (success == 0) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("error");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Btce returned an error: " + errorMessage);
-
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
+                //LOG.severe("Btce returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -179,14 +173,13 @@ public class BtceWrapper implements TradeInterface {
 
                 balance = new Balance(NBTTotal, PEGTotal);
 
-
                 //Pack it into the ApiResponse
                 apiResponse.setResponseObject(balance);
 
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -207,8 +200,8 @@ public class BtceWrapper implements TradeInterface {
          */
 
         String queryResult = query(API_BASE_URL, path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -244,10 +237,8 @@ public class BtceWrapper implements TradeInterface {
             if (success == 0) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("error");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Btce returned an error: " + errorMessage);
-
+                ApiError apiErr = errors.genericError;
+                apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -263,13 +254,11 @@ public class BtceWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
         return apiResponse;
-
-
     }
 
     @Override
@@ -303,7 +292,7 @@ public class BtceWrapper implements TradeInterface {
 
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -352,7 +341,9 @@ public class BtceWrapper implements TradeInterface {
                 }
             }
             if (!found) {
-                apiResp.setError(new ApiError(ERROR_ORDER_NOT_FOUND, "Cannot find the order with id " + orderID));
+                ApiError error = errors.genericError;
+                error.setDescription("Cannot find the order with id " + orderID);
+                apiResp.setError(error);
                 return apiResp;
 
             }
@@ -376,7 +367,7 @@ public class BtceWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, path, query_args, false);
         if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -419,7 +410,7 @@ public class BtceWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -448,8 +439,7 @@ public class BtceWrapper implements TradeInterface {
                 double fee = Double.parseDouble(feeString);
                 apiResponse.setResponseObject(fee);
             } else {
-                apiResponse.setError(new ApiError(ERROR_SCRAPING_HTML, "Error scraping HTML"
-                        + " while opening " + API_GET_FEE));
+                apiResponse.setError(errors.genericError);
             }
 
             return apiResponse;
@@ -560,7 +550,7 @@ public class BtceWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, path, query_args, false);
         if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+            apiResponse.setError(errors.noConnectionError);
             return apiResponse;
         }
 
@@ -599,8 +589,8 @@ public class BtceWrapper implements TradeInterface {
                     apiResponse.setResponseObject(new ArrayList<Order>());
                 } else {
                     //error
-                    ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-                    LOG.severe("Btce returned an error: " + errorMessage);
+                    ApiError apiErr = errors.genericError;
+                    apiErr.setDescription(errorMessage);
                     apiResponse.setError(apiErr);
                 }
 
@@ -659,7 +649,7 @@ public class BtceWrapper implements TradeInterface {
             }
         } catch (JSONException ex) {
             LOG.severe(ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         apiResponse.setResponseObject(orderList);
@@ -704,8 +694,10 @@ public class BtceWrapper implements TradeInterface {
             if (success == 0) {
                 //error
                 String error = (String) httpAnswerJson.get("error");
-                LOG.severe("Btce returned an error: " + error);
-                apiResponse.setError(new ApiError(ERROR_GENERIC, error));
+                //LOG.severe("Btce returned an error: " + error);
+                ApiError err = errors.genericError;
+                err.setDescription(error);
+                apiResponse.setError(err);
 
             } else {
                 //correct
@@ -715,29 +707,14 @@ public class BtceWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
         }
         return apiResponse;
     }
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -765,12 +742,12 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         BtceService query = new BtceService(url, args);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to btce");
-            queryResult = "error : no connection with btce";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -778,12 +755,12 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
         BtceService query = new BtceService(base, method, args, keys);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to btce");
-            queryResult = "error : no connection with btce";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -990,7 +967,7 @@ public class BtceWrapper implements TradeInterface {
                 //Global.BtceExchange.setConnected(false);
                 LOG.severe(ex.toString());
 
-                answer = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+                answer = errors.noConnectionError.getDescription();
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
             } finally {

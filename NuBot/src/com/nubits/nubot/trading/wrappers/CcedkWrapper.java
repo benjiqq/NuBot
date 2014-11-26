@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -80,14 +81,9 @@ public class CcedkWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "order/cancel";
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "errors";
-    private final int ERROR_UNKNOWN = 8560;
-    private final int ERROR_NO_CONNECTION = 8561;
-    private final int ERROR_GENERIC = 8562;
-    private final int ERROR_PARSING = 8563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 8564;
-    private final int ERROR_ORDER_NOT_FOUND = 8565;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
 
     public CcedkWrapper() {
@@ -144,9 +140,7 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
     }
 
     @Override
@@ -192,25 +186,25 @@ public class CcedkWrapper implements TradeInterface {
 
 
         String queryResult = query(API_BASE_URL, path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+            boolean hasErrors = true;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
             } catch (ClassCastException e) {
-                errors = true;
+                hasErrors = true;
             }
 
-            if (errors) {
+            if (hasErrors) {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+                ApiError apiErr = errors.apiReturnError;
 
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
@@ -251,8 +245,9 @@ public class CcedkWrapper implements TradeInterface {
                         balance = new Balance(NBTTotal, PEGTotal);
                         apiResponse.setResponseObject(balance);
                     } else {
-                        apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
-                                + "Cannot find a currency with id = " + NBTid + " or " + PEGid));
+                        ApiError err = errors.genericError;
+                        err.setDescription("Cannot find a currency with id = " + NBTid + " or " + PEGid);
+                        apiResponse.setError(err);
                     }
                 } else { //Specific currency requested
                     int id = TradeUtils.getCCDKECurrencyId(currency.getCode().toUpperCase());
@@ -273,14 +268,15 @@ public class CcedkWrapper implements TradeInterface {
                         //Pack it into the ApiResponse
                         apiResponse.setResponseObject(total);
                     } else {
-                        apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
-                                + "Cannot find a currency with id = " + id));
+                        ApiError err = errors.apiReturnError;
+                        err.setDescription("Cannot find a currency with id = " + id);
+                        apiResponse.setError(err);
                     }
                 }
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -321,21 +317,27 @@ public class CcedkWrapper implements TradeInterface {
          *          "transaction_id":"6517"}}}
          */
 
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+
 
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+            boolean hasErrors = true;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
             } catch (ClassCastException e) {
-                errors = true;
+                hasErrors = true;
             }
 
-            if (errors) {
+            if (hasErrors) {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage.toJSONString());
 
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
@@ -350,7 +352,7 @@ public class CcedkWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -379,6 +381,10 @@ public class CcedkWrapper implements TradeInterface {
         }
         String queryResult = query(API_BASE_URL, API_ACTIVE_ORDERS, query_args, false);
 
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
         /* Sample Answer
          * {"errors":false,
          * "response":
@@ -391,17 +397,18 @@ public class CcedkWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+            boolean hasErrors = true;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
             } catch (ClassCastException e) {
-                errors = true;
+                hasErrors = true;
             }
 
-            if (errors) {
+            if (hasErrors) {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage.toJSONString());
 
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
@@ -434,7 +441,7 @@ public class CcedkWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -452,6 +459,10 @@ public class CcedkWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, API_ORDER, query_args, false);
 
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
         /* Sample Answer
          * {"errors":false,
          *  "response":
@@ -465,17 +476,18 @@ public class CcedkWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+            boolean hasErrors = true;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
             } catch (ClassCastException e) {
-                errors = true;
+                hasErrors = true;
             }
 
-            if (errors) {
+            if (hasErrors) {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage.toJSONString());
 
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
@@ -489,7 +501,9 @@ public class CcedkWrapper implements TradeInterface {
                 try {
                     boolean valid = (boolean) dataJson.get("entity");
                     String message = "The order " + orderID + " does not exist";
-                    apiResponse.setError(new ApiError(ERROR_ORDER_NOT_FOUND, message));
+                    ApiError err = errors.apiReturnError;
+                    err.setDescription(message);
+                    apiResponse.setError(err);
                     return apiResponse;
                 } catch (ClassCastException e) {
                     entity = (JSONObject) dataJson.get("entity");
@@ -503,7 +517,7 @@ public class CcedkWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
     }
@@ -520,6 +534,10 @@ public class CcedkWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, API_CANCEL_ORDER, query_args, false);
 
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
         /* Sample Answer
          * {"errors":false,"response":{"entity":{"transaction_id":"6518"}}}
          */
@@ -564,7 +582,7 @@ public class CcedkWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -601,6 +619,10 @@ public class CcedkWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, API_ORDER, query_args, false);
 
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
         /* Sample Answer
          * {"errors":false,
          *  "response":
@@ -614,17 +636,18 @@ public class CcedkWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+            boolean hasErrors = true;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
             } catch (ClassCastException e) {
-                errors = true;
+                hasErrors = true;
             }
 
-            if (errors) {
+            if (hasErrors) {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage.toJSONString());
 
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
@@ -654,7 +677,7 @@ public class CcedkWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -707,22 +730,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -733,12 +741,12 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         CcedkService query = new CcedkService(url, args);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to ccdek");
-            queryResult = "error : no connection with CCEDK";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -746,12 +754,12 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
         CcedkService query = new CcedkService(base, method, args, keys);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to ccdek");
-            queryResult = "error : no connection with CCEDK";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -880,6 +888,10 @@ public class CcedkWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, API_GET_TRADES, query_args, false);
 
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
         /* Sample Answer
          * {
          *    "errors":false,
@@ -895,17 +907,18 @@ public class CcedkWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+            boolean hasErrors = true;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
             } catch (ClassCastException e) {
-                errors = true;
+                hasErrors = true;
             }
 
-            if (errors) {
+            if (hasErrors) {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage.toJSONString());
 
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
@@ -934,7 +947,7 @@ public class CcedkWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
     }
@@ -1070,7 +1083,7 @@ public class CcedkWrapper implements TradeInterface {
                 //Global.BtceExchange.setConnected(false);
                 LOG.severe(ex.toString());
 
-                answer = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+                answer = errors.noConnectionError.getDescription();
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
             } finally {

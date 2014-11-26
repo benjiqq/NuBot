@@ -35,6 +35,7 @@ import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -75,13 +76,9 @@ public class CcexWrapper implements TradeInterface {
     private final String API_BASE = "https://c-cex.com/t/r.html?";
     private String baseUrl;
     //Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_NO_CONNECTION = 16561;
-    private final int ERROR_GENERIC = 16562;
-    private final int ERROR_PARSING = 16563;
-    private final int ERROR_UNKNOWN = 16560;
-    private final int ERROR_AUTH = 16561;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
     public CcexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
@@ -100,11 +97,7 @@ public class CcexWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
-        errors.add(new ApiError(ERROR_AUTH, "Wrong API key. Please verify"));
-
+        errors.setExchangeName(exchange);
     }
 
     @Override
@@ -124,12 +117,12 @@ public class CcexWrapper implements TradeInterface {
 
         String queryResult = query(url, new HashMap<String, String>(), true);
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
         if (queryResult.startsWith("Access denied")) {
-            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            apiResponse.setError(errors.authenticationError);
             return apiResponse;
         }
 
@@ -166,7 +159,8 @@ public class CcexWrapper implements TradeInterface {
                 if (!found) {
                     //Specific currency not found
                     String errorMessage = "Cannot find a balance for currency " + lookingFor;
-                    ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                    ApiError apiErr = errors.genericError;
+                    apiErr.setDescription(errorMessage);
                     apiResponse.setError(apiErr);
                     return apiResponse;
                 }
@@ -219,7 +213,7 @@ public class CcexWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -266,12 +260,12 @@ public class CcexWrapper implements TradeInterface {
 
         String queryResult = query(url, new HashMap<String, String>(), true);
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
         if (queryResult.startsWith("Access denied")) {
-            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            apiResponse.setError(errors.authenticationError);
             return apiResponse;
         }
 
@@ -287,7 +281,8 @@ public class CcexWrapper implements TradeInterface {
             String ret = (String) httpAnswerJson.get("return");
 
             if (ret.contains("not enough funds") || ret.contains(" ")) {
-                ApiError apiErr = new ApiError(ERROR_GENERIC, ret);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(ret);
                 LOG.severe("CCex API returned an error: " + ret);
                 apiResponse.setError(apiErr);
                 return apiResponse;
@@ -299,7 +294,7 @@ public class CcexWrapper implements TradeInterface {
 
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -325,12 +320,12 @@ public class CcexWrapper implements TradeInterface {
 
         String queryResult = query(url, new HashMap<String, String>(), true);
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
         if (queryResult.startsWith("Access denied")) {
-            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            apiResponse.setError(errors.authenticationError);
             return apiResponse;
         }
 
@@ -381,7 +376,7 @@ public class CcexWrapper implements TradeInterface {
 
         } catch (JSONException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -406,7 +401,9 @@ public class CcexWrapper implements TradeInterface {
                 }
             }
             if (!found) {
-                apiResp.setError(new ApiError(ERROR_GENERIC, "Cannot find the order with id " + orderID));
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription("Cannot find the order with id " + orderID);
+                apiResp.setError(apiErr);
                 return apiResp;
 
             }
@@ -431,12 +428,12 @@ public class CcexWrapper implements TradeInterface {
 
         String queryResult = query(url, new HashMap<String, String>(), true);
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
         if (queryResult.startsWith("Access denied")) {
-            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            apiResponse.setError(errors.authenticationError);
             return apiResponse;
         }
 
@@ -453,7 +450,8 @@ public class CcexWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
 
             if (httpAnswerJson.containsKey("error")) {
-                ApiError apiErr = new ApiError(ERROR_GENERIC, (String) httpAnswerJson.get("error"));
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription((String) httpAnswerJson.get("error"));
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -462,7 +460,7 @@ public class CcexWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -531,12 +529,12 @@ public class CcexWrapper implements TradeInterface {
 
         String queryResult = query(url, new HashMap<String, String>(), true);
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
         if (queryResult.startsWith("Access denied")) {
-            apiResponse.setError(getErrorByCode(ERROR_AUTH));
+            apiResponse.setError(errors.authenticationError);
             return apiResponse;
         }
 
@@ -566,7 +564,7 @@ public class CcexWrapper implements TradeInterface {
             apiResponse.setResponseObject(tradeList);
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -638,22 +636,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -664,14 +647,13 @@ public class CcexWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         CcexService query = new CcexService(url);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to CCex");
-            queryResult = "error : no connection with CCex";
+            queryResult = TOKEN_BAD_RETURN;
         }
-
 
         return queryResult;
     }
