@@ -20,6 +20,7 @@ package com.nubits.nubot.trading.wrappers;
 //import com.alibaba.fastjson.JSON;
 //import com.alibaba.fastjson.JSONArray;
 //import com.alibaba.fastjson.JSONObject;
+import com.nubits.nubot.utils.ErrorManager;
 import org.json.JSONString;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -82,17 +83,9 @@ public class PeatioWrapper implements TradeInterface {
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_UNKNOWN = 5560;
-    private final int ERROR_NO_CONNECTION = 5561;
-    private final int ERROR_GENERIC = 5562;
-    private final int ERROR_PARSING = 5563;
-    private final int ERROR_GET_INFO = 5564;
-    private final int ERROR_TRADE = 5566;
-    private final int ERROR_GET_ORDERS = 5567;
-    private final int ERROR_GET_ORDERDETAIL = 5568;
-    private final int ERROR_CANCEL_ORDER = 5569;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
     public PeatioWrapper() {
         setupErrors();
@@ -129,15 +122,7 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_GET_INFO, "Can't get_info"));
-        errors.add(new ApiError(ERROR_GET_INFO, "Can't get ticker"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
-        errors.add(new ApiError(ERROR_TRADE, "Can't trade"));
-        errors.add(new ApiError(ERROR_GET_ORDERS, "Can't get orders"));
-        errors.add(new ApiError(ERROR_GET_ORDERDETAIL, "Can't get order detail"));
-        errors.add(new ApiError(ERROR_CANCEL_ORDER, "Can't cancel order"));
+        errors.setExchangeName(exchange);
 
     }
 
@@ -170,8 +155,8 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_uri", path);
 
         String queryResult = query(apiBaseUrl, path, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -223,7 +208,7 @@ public class PeatioWrapper implements TradeInterface {
                     //Pack it into the ApiResponse
                     apiResponse.setResponseObject(balance);
                 } else {
-                    apiResponse.setError(getErrorByCode(ERROR_PARSING));
+                    apiResponse.setError(errors.apiReturnError);
                 }
             } else {//return available balance for the specific currency
                 boolean found = false;
@@ -241,14 +226,15 @@ public class PeatioWrapper implements TradeInterface {
                 if (found) {
                     apiResponse.setResponseObject(amount);
                 } else {
-                    apiResponse.setError(new ApiError(21341, "Can't find balance for"
-                            + " specified currency: " + currency.getCode()));
+                    ApiError apiErr = errors.apiReturnError;
+                    apiErr.setDescription("Can't find balance for specified currency: " + currency.getCode());
+                    apiResponse.setError(apiErr);
                 }
             }
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -297,7 +283,7 @@ public class PeatioWrapper implements TradeInterface {
             apiResponse.setResponseObject(ticker);
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -329,8 +315,8 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_uri", path);
 
         String queryResult = query(apiBaseUrl, path, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_TRADE));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -353,7 +339,7 @@ public class PeatioWrapper implements TradeInterface {
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -363,8 +349,8 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        ApiError err = new ApiError(ERROR_GENERIC, "In Peatio API you should specify the CurrencyPair"
-                + "\n use getActiveOrders(CurrencyPair pair)");
+        ApiError err = errors.genericError;
+        err.setDescription("In Peatio API you should specify the CurrencyPair\nuse getActiveOrders(CurrencyPair pair)");
         return new ApiResponse(false, null, err);
     }
 
@@ -408,7 +394,7 @@ public class PeatioWrapper implements TradeInterface {
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -430,8 +416,8 @@ public class PeatioWrapper implements TradeInterface {
 
         String queryResult = query(apiBaseUrl, path, query_args, isGet);
 
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_ORDERDETAIL));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -451,7 +437,7 @@ public class PeatioWrapper implements TradeInterface {
             apiResponse.setResponseObject(parseOrder(httpAnswerJson));
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -473,8 +459,8 @@ public class PeatioWrapper implements TradeInterface {
         String queryResult = query(apiBaseUrl, path, query_args, isGet);
 
 
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDER));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -497,7 +483,7 @@ public class PeatioWrapper implements TradeInterface {
             apiResponse.setResponseObject(true);
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -554,22 +540,7 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -585,13 +556,13 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
         PeatioService query = new PeatioService(base, method, args, keys);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
 
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to Peatio");
-            queryResult = "error : no connection with peatio";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -677,8 +648,8 @@ public class PeatioWrapper implements TradeInterface {
         String queryResult = query(apiBaseUrl, path, query_args, isGet);
 
 
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDER));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 

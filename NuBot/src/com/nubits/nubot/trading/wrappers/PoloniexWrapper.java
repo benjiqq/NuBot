@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -82,12 +83,9 @@ public class PoloniexWrapper implements TradeInterface {
     private final String API_BUY = "buy";
     private final String API_CANCEL_ORDER = "cancelOrder";
     //Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_NO_CONNECTION = 15561;
-    private final int ERROR_GENERIC = 15562;
-    private final int ERROR_PARSING = 15563;
-    private final int ERROR_UNKNOWN = 15560;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
     public PoloniexWrapper() {
         setupErrors();
@@ -101,9 +99,7 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
     }
 
     @Override
@@ -135,8 +131,8 @@ public class PoloniexWrapper implements TradeInterface {
          */
 
         String queryResult = query(base, command, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -151,7 +147,8 @@ public class PoloniexWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("error");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 //LOG.severe("Poloniex API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
@@ -166,7 +163,8 @@ public class PoloniexWrapper implements TradeInterface {
                         apiResponse.setResponseObject(new Amount(balanceD, currency));
                     } else {
                         String errorMessage = "Cannot find a balance for currency " + lookingFor;
-                        ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                        ApiError apiErr = errors.apiReturnError;
+                        apiErr.setDescription(errorMessage);
                         apiResponse.setError(apiErr);
                         return apiResponse;
                     }
@@ -221,7 +219,7 @@ public class PoloniexWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -271,8 +269,8 @@ public class PoloniexWrapper implements TradeInterface {
          *{"orderNumber":31226040,"resultingTrades":[{"amount":"338.8732","date":"2014-10-18 23:03:21","rate":"0.00000173","total":"0.00058625","tradeID":"16164","type":"buy"}]}
          */
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -287,7 +285,8 @@ public class PoloniexWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("error");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 //LOG.severe("Poloniex API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
@@ -298,7 +297,7 @@ public class PoloniexWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -332,8 +331,8 @@ public class PoloniexWrapper implements TradeInterface {
 
 
         String queryResult = query(base, command, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -346,7 +345,7 @@ public class PoloniexWrapper implements TradeInterface {
             isArray = true;
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -358,7 +357,7 @@ public class PoloniexWrapper implements TradeInterface {
                 httpAnwerJSONarray = (JSONArray) (parser.parse(queryResult));
             } catch (ParseException ex) {
                 LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-                apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+                apiResponse.setError(errors.parseError);
                 return apiResponse;
             }
         } else {
@@ -366,7 +365,7 @@ public class PoloniexWrapper implements TradeInterface {
                 httpAnswerJSONobject = (JSONObject) (parser.parse(queryResult));
             } catch (ParseException ex) {
                 LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-                apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+                apiResponse.setError(errors.parseError);
                 return apiResponse;
             }
         }
@@ -377,7 +376,8 @@ public class PoloniexWrapper implements TradeInterface {
         if (!valid) {
             //error
             String errorMessage = (String) httpAnswerJSONobject.get("error");
-            ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+            ApiError apiErr = errors.apiReturnError;
+            apiErr.setDescription(errorMessage);
             //LOG.severe("Poloniex API returned an error: " + errorMessage);
             apiResponse.setError(apiErr);
             return apiResponse;
@@ -444,7 +444,9 @@ public class PoloniexWrapper implements TradeInterface {
                 }
             }
             if (!found) {
-                apiResp.setError(new ApiError(ERROR_GENERIC, "Cannot find the order with id " + orderID));
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription("Cannot find the order with id " + orderID);
+                apiResp.setError(apiErr);
                 return apiResp;
 
             }
@@ -477,8 +479,8 @@ public class PoloniexWrapper implements TradeInterface {
          {"success":1}
          */
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -493,7 +495,8 @@ public class PoloniexWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("error");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 LOG.warning("Cannot delete order " + orderID + " :" + errorMessage);
                 apiResponse.setResponseObject(false);
 
@@ -504,7 +507,7 @@ public class PoloniexWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -592,22 +595,7 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -623,12 +611,12 @@ public class PoloniexWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
         PoloniexService query = new PoloniexService(base, method, keys, args);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to Poloniex");
-            queryResult = "error : no connection with Poloniex";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -691,8 +679,8 @@ public class PoloniexWrapper implements TradeInterface {
         query_args.put("start", startDateArg);
 
         String queryResult = query(base, command, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -705,7 +693,7 @@ public class PoloniexWrapper implements TradeInterface {
             isArray = true;
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -716,7 +704,7 @@ public class PoloniexWrapper implements TradeInterface {
                 httpAnwerJSONarray = (JSONArray) (parser.parse(queryResult));
             } catch (ParseException ex) {
                 LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-                apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+                apiResponse.setError(errors.parseError);
                 return apiResponse;
             }
         }
@@ -726,7 +714,8 @@ public class PoloniexWrapper implements TradeInterface {
         if (!valid) {
             //error
             String errorMessage = (String) httpAnswerJSONobject.get("error");
-            ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
+            ApiError apiErr = errors.apiReturnError;
+            apiErr.setDescription(errorMessage);
             //LOG.severe("Poloniex API returned an error: " + errorMessage);
             apiResponse.setError(apiErr);
             return apiResponse;
@@ -920,7 +909,7 @@ public class PoloniexWrapper implements TradeInterface {
                 //Global.BtceExchange.setConnected(false);
                 LOG.severe(ex.toString());
 
-                answer = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+                answer = errors.noConnectionError.getDescription();
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
             } finally {

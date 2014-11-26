@@ -1,5 +1,6 @@
 package com.nubits.nubot.trading.wrappers;
 
+import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -9,33 +10,18 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.HttpUtils;
-import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
-import org.json.JSONString;
+import com.nubits.nubot.utils.ErrorManager;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.jsoup.Connection;
-import org.jsoup.nodes.Document;
-import org.omg.CORBA.TIMEOUT;
-
-import javax.crypto.Mac;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.text.*;
-import java.nio.charset.Charset;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Timestamp;
-import java.sql.Time;
 import java.util.*;
 import java.util.logging.Logger;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
@@ -60,6 +46,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_OPEN_ORDERS = "myorders";
     private final String API_CANCEL_ORDERS = "cancel_order";
     //Tokens
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_ERR = "error_info";
     private final String TOKEN_CODE = "code";
     private final String TOKEN_DATA = "data";
@@ -67,19 +54,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String TOKEN_BAL_HOLD = "balance_hold";
     private final String TOKEN_ORDER_ID = "order_id";
     //Errors
-    private ArrayList<ApiError> errors;
-    private final int NO_ERROR = 12059;
-    private final int ERROR_UNKNOWN = 12560;
-    private final int ERROR_NO_CONNECTION = 12561;
-    private final int ERROR_GENERIC = 12562;
-    private final int ERROR_PARSING = 12563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 12567;
-    private final int ERROR_GET_INFO = 12568;
-    private final int ERROR_SELL_COIN = 12569;
-    private final int ERROR_ACTIVE_ORDERS = 12570;
-    private final int ERROR_NULL_RETURN = 12571;
-    private final int ERROR_CANCEL_ORDERS = 12572;
-
+    ErrorManager errors = new ErrorManager();
 
     public AllCoinWrapper() { setupErrors(); }
 
@@ -90,29 +65,45 @@ public class AllCoinWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
+    }
+
+    private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
+        ApiResponse apiResponse = new ApiResponse();
+        String queryResult = query(url, method, query_args, isGet);
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+        }
+        JSONParser parser = new JSONParser();
+
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            int code = 0;
+            try {
+                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
+            } catch (ClassCastException cce) {
+                apiResponse.setError(errors.genericError);
+            }
+
+            if (code < 0) {
+                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiError = errors.apiReturnError;
+                apiError.setDescription(errorMessage);
+                //LOG.severe("AllCoin API returned an error : " + errorMessage);
+                apiResponse.setError(apiError);
+            } else {
+                apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(errors.parseError);
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
 
@@ -146,39 +137,18 @@ public class AllCoinWrapper implements TradeInterface {
             method = API_SELL_COIN;
         }
 
-        String queryResult = query(url, method, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_SELL_COIN));
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            int code = 0;
-            try {
-                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
-            } catch (ClassCastException cce) {
-                LOG.severe(cce.toString());
-            }
-
-            if (code < 0) {
-                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
-                //LOG.severe("AllCoin API returned an error : " + errorMessage);
-                apiResponse.setError(apiError);
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
+            if (dataJson.containsKey(TOKEN_ORDER_ID)) {
+                order_id = dataJson.get(TOKEN_ORDER_ID).toString();
+                apiResponse.setResponseObject(order_id);
             } else {
-                //we have returned data
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
-                if (dataJson.containsKey(TOKEN_ORDER_ID)) {
-                    order_id = dataJson.get(TOKEN_ORDER_ID).toString();
-                    apiResponse.setResponseObject(order_id);
-                }
+                apiResponse.setError(errors.genericError);
             }
-
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -204,94 +174,71 @@ public class AllCoinWrapper implements TradeInterface {
          */
 
         String url = API_AUTH_URL;
+        String method = API_GET_INFO;
 
-        String queryResult = query(url, API_GET_INFO, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
-        }
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
+            JSONObject availableBal = (JSONObject) dataJson.get(TOKEN_BAL_AVAIL);
 
-        LOG.info(queryResult);
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            int code = 0;
-            try {
-                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
-            } catch (ClassCastException cce) {
-                LOG.severe(cce.toString());
-            }
-
-            if (code < 0) {
-                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
-                //LOG.severe("AllCoin API returned an error : " + errorMessage);
-                apiResponse.setError(apiError);
-            } else {
-                //we have returned data
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
-                JSONObject availableBal = (JSONObject) dataJson.get(TOKEN_BAL_AVAIL);
-
-                //check for returned data
-                if (availableBal == null) {
-                    //we return the balances as 0
-                    if (currency == null) { //all balances were requested
-                        Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
-                        Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
-                        Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                        Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                        Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-                        apiResponse.setResponseObject(balance);
-                    } else {
-                        Amount total = new Amount(0, currency);
-                        apiResponse.setResponseObject(total);
-                    }
-                }
-                else { //we have returned data
-                    String s;
-                    if (currency == null) { //get all balances
-                        JSONObject holdBal = (JSONObject) dataJson.get(TOKEN_BAL_HOLD);
-                        Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
-                        Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
-                        Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                        Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-
-                        if (availableBal.containsKey(pair.getPaymentCurrency().getCode().toUpperCase())) {
-                            s = availableBal.get(pair.getPaymentCurrency().getCode().toUpperCase()).toString();
-                            PEGAvail.setQuantity(Double.parseDouble(s));
-                        }
-
-                        if (availableBal.containsKey(pair.getOrderCurrency().getCode().toUpperCase())) {
-                            s = availableBal.get(pair.getOrderCurrency().getCode().toUpperCase()).toString();
-                            NBTAvail.setQuantity(Double.parseDouble(s));
-                        }
-
-                        if (holdBal != null && holdBal.containsKey(pair.getPaymentCurrency().getCode().toUpperCase())) {
-                            s = holdBal.get(pair.getPaymentCurrency().getCode().toUpperCase()).toString();
-                            PEGonOrder.setQuantity(Double.parseDouble(s));
-                        }
-
-                        if (holdBal != null && holdBal.containsKey((pair.getOrderCurrency().getCode().toUpperCase()))) {
-                            s = holdBal.get(pair.getOrderCurrency().getCode().toUpperCase()).toString();
-                            NBTonOrder.setQuantity(Double.parseDouble(s));
-                        }
-
-                        Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-                        apiResponse.setResponseObject(balance);
-                    } else { //specific currency requested
-                        Amount total = new Amount(0, currency);
-                        if (availableBal.containsKey(currency.getCode().toUpperCase())) {
-                            s = availableBal.get(currency.getCode().toUpperCase()).toString();
-                            total.setQuantity(Double.parseDouble(s));
-                        }
-                        apiResponse.setResponseObject(total);
-                    }
+            //check for returned data
+            if (availableBal == null) {
+                //we return the balances as 0
+                if (currency == null) { //all balances were requested
+                    Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
+                    Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+                    Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
+                    Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+                    Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    apiResponse.setResponseObject(balance);
+                } else {
+                    Amount total = new Amount(0, currency);
+                    apiResponse.setResponseObject(total);
                 }
             }
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            else { //we have returned data
+                String s;
+                if (currency == null) { //get all balances
+                    JSONObject holdBal = (JSONObject) dataJson.get(TOKEN_BAL_HOLD);
+                    Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
+                    Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+                    Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
+                    Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+
+                    if (availableBal.containsKey(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        s = availableBal.get(pair.getPaymentCurrency().getCode().toUpperCase()).toString();
+                        PEGAvail.setQuantity(Double.parseDouble(s));
+                    }
+
+                    if (availableBal.containsKey(pair.getOrderCurrency().getCode().toUpperCase())) {
+                        s = availableBal.get(pair.getOrderCurrency().getCode().toUpperCase()).toString();
+                        NBTAvail.setQuantity(Double.parseDouble(s));
+                    }
+
+                    if (holdBal != null && holdBal.containsKey(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        s = holdBal.get(pair.getPaymentCurrency().getCode().toUpperCase()).toString();
+                        PEGonOrder.setQuantity(Double.parseDouble(s));
+                    }
+
+                    if (holdBal != null && holdBal.containsKey((pair.getOrderCurrency().getCode().toUpperCase()))) {
+                        s = holdBal.get(pair.getOrderCurrency().getCode().toUpperCase()).toString();
+                        NBTonOrder.setQuantity(Double.parseDouble(s));
+                    }
+
+                    Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    apiResponse.setResponseObject(balance);
+                } else { //specific currency requested
+                    Amount total = new Amount(0, currency);
+                    if (availableBal.containsKey(currency.getCode().toUpperCase())) {
+                        s = availableBal.get(currency.getCode().toUpperCase()).toString();
+                        total.setQuantity(Double.parseDouble(s));
+                    }
+                    apiResponse.setResponseObject(total);
+                }
+            }
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -325,7 +272,7 @@ public class AllCoinWrapper implements TradeInterface {
             queryResult = query.executeQuery(true, isGet);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
-            queryResult = "error : no connection with AllCoin";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -367,56 +314,35 @@ public class AllCoinWrapper implements TradeInterface {
         TreeMap<String, String> query_args = new TreeMap<>();
         ArrayList<Order> orderList = new ArrayList<Order>();
         String url = API_AUTH_URL;
+        String method = API_OPEN_ORDERS;
 
-        String queryResult = query(url, API_OPEN_ORDERS, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_ACTIVE_ORDERS));
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            int code = 0;
-            try {
-                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
-            } catch (ClassCastException cce) {
-                LOG.severe(cce.toString());
-            }
-
-            if (code < 0) { //we have an error
-                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
+            if (dataJson == null) {
+                ApiError apiError = errors.nullReturnError;
                 apiResponse.setError(apiError);
-            } else {
-                //we have returned data
-                JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
-                if (dataJson == null) {
-                    ApiError apiError = new ApiError(ERROR_NULL_RETURN, "Null data return");
-                    apiResponse.setError(apiError);
-                }
-                else {
-                    for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
-                        Order order = parseOrder(data.next());
-                        if (pair != null && !order.getPair().equals(pair)) {
-                            LOG.info("|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
-                            //we are only looking for orders with the specified pair.
-                            //the current order doesn't fill that need
-                            continue;
-                        }
-                        //check that completed orders aren't being returned
-                        if (order.isCompleted()) {
-                            continue;
-                        }
-                        orderList.add(order);
+            }
+            else {
+                for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
+                    Order order = parseOrder(data.next());
+                    if (pair != null && !order.getPair().equals(pair)) {
+                        LOG.info("|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
+                        //we are only looking for orders with the specified pair.
+                        //the current order doesn't fill that need
+                        continue;
                     }
+                    //check that completed orders aren't being returned
+                    if (order.isCompleted()) {
+                        continue;
+                    }
+                    orderList.add(order);
                 }
             }
             apiResponse.setResponseObject(orderList);
-
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -511,53 +437,32 @@ public class AllCoinWrapper implements TradeInterface {
         TreeMap<String, String> query_args = new TreeMap<>();
         ArrayList<Order> orderList = new ArrayList<Order>();
         String url = API_AUTH_URL;
-
+        String method = API_CANCEL_ORDERS;
         query_args.put("order_id", orderID);
 
-        String queryResult = query(url, API_CANCEL_ORDERS, query_args, isGet);
-        if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDERS));
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            int code = 0;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson;
+            String data;
             try {
-                code = Integer.parseInt(httpAnswerJson.get(TOKEN_CODE).toString());
+                dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
+                data = dataJson.get("order_id").toString();
             } catch (ClassCastException cce) {
-                LOG.severe(cce.toString());
+                data = (String) httpAnswerJson.get(TOKEN_DATA);
             }
-
-            if (code < 0) { //we have an error
-                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiError = new ApiError(ERROR_GENERIC, errorMessage);
+            if (data == null) {
+                ApiError apiError = errors.nullReturnError;
                 apiResponse.setError(apiError);
             } else {
-                //we have returned data
-                JSONObject dataJson;
-                String data;
-                try {
-                    dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
-                    data = dataJson.get("order_id").toString();
-                } catch (ClassCastException cce) {
-                    data = (String) httpAnswerJson.get(TOKEN_DATA);
-                }
-                if (data == null) {
-                    ApiError apiError = new ApiError(ERROR_NULL_RETURN, "Null data return");
-                    apiResponse.setError(apiError);
+                if (data.equals(orderID)) {
+                    apiResponse.setResponseObject(true);
                 } else {
-                    if (data.equals(orderID)) {
-                        apiResponse.setResponseObject(true);
-                    } else {
-                        apiResponse.setResponseObject(false);
-                    }
+                    apiResponse.setResponseObject(false);
                 }
             }
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
