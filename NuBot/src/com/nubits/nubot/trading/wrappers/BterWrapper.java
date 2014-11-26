@@ -142,7 +142,7 @@ public class BterWrapper implements TradeInterface {
 
             if (!valid) {
                 //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
+                String errorMessage = (String) httpAnswerJson.get("message");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);

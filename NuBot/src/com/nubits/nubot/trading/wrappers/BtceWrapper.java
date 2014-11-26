@@ -168,8 +168,8 @@ public class BtceWrapper implements TradeInterface {
                 String pegCode = pair.getPaymentCurrency().getCode().toLowerCase();
                 String nbtCode = pair.getOrderCurrency().getCode().toLowerCase();
 
-                Amount PEGTotal = new Amount((Double) funds.get(pegCode), Constant.USD);
-                Amount NBTTotal = new Amount((Double) funds.get(nbtCode), Constant.NBT);
+                Amount PEGTotal = new Amount(Double.parseDouble(funds.get(pegCode).toString()), Constant.USD);
+                Amount NBTTotal = new Amount(Double.parseDouble(funds.get(nbtCode).toString()), Constant.NBT);
 
                 balance = new Balance(NBTTotal, PEGTotal);
 
@@ -246,7 +246,7 @@ public class BtceWrapper implements TradeInterface {
                 JSONObject dataJson = (JSONObject) httpAnswerJson.get("return");
                 JSONObject funds = (JSONObject) dataJson.get("funds");
 
-                Amount amount = new Amount((Double) funds.get(currency.getCode().toLowerCase()), currency);
+                Amount amount = new Amount(Double.parseDouble(funds.get(currency.getCode().toLowerCase()).toString()), currency);
 
                 //Pack it into the ApiResponse
                 apiResponse.setResponseObject(amount);

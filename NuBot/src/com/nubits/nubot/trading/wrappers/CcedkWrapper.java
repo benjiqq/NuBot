@@ -205,7 +205,7 @@ public class CcedkWrapper implements TradeInterface {
                 //error
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
                 ApiError apiErr = errors.apiReturnError;
-
+                apiErr.setDescription(errorMessage.toJSONString());
                 LOG.severe("Ccedk API returned an error: " + errorMessage);
 
                 apiResponse.setError(apiErr);

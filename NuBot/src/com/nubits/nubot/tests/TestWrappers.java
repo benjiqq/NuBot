@@ -39,6 +39,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.logging.Logger;
 
 /**
@@ -56,9 +57,8 @@ public class TestWrappers {
         Utils.loadProperties("settings.properties");
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
-        configExchange(Constant.BTER); //Replace to test a differe API implementation
 
-        configExchange(Constant.INTERNAL_EXCHANGE_PEATIO); //Replace to test a different API implementation
+        configExchange(Constant.BTER); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
@@ -68,12 +68,12 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         //testGetAvailableBalance(Constant.NBT); //
-        //testGetAvailableBalances(Constant.NBT_BTC);
+        testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        testClearAllOrders(Constant.NBT_BTC);
-        testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
+        //testClearAllOrders(Constant.NBT_BTC);
+        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
+        //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
         //testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
@@ -89,14 +89,14 @@ public class TestWrappers {
         //testGetLastTrades(Constant.NBT_BTC);
 
 
-        for (int i = 0; i < 5000; i++) {
-            ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-            if (activeOrdersResponse.isPositive()) {
-                LOG.info("Active orders : " + activeOrdersResponse.getResponseObject());
-            } else {
-                LOG.severe(activeOrdersResponse.getError().toString());
-            }
-        }
+        //for (int i = 0; i < 5000; i++) {
+        //   ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        //    if (activeOrdersResponse.isPositive()) {
+        //        LOG.info("Active orders : " + activeOrdersResponse.getResponseObject());
+        //    } else {
+        //        LOG.severe(activeOrdersResponse.getError().toString());
+        //    }
+        //}
 
 
         //stimulating ccedk wrong nonce
