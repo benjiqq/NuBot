@@ -20,6 +20,7 @@ package com.nubits.nubot.trading.wrappers;
 //import com.alibaba.fastjson.JSON;
 //import com.alibaba.fastjson.JSONArray;
 //import com.alibaba.fastjson.JSONObject;
+import com.nubits.nubot.utils.ErrorManager;
 import org.json.JSONString;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -77,17 +78,9 @@ public class BitSparkWrapper implements TradeInterface {
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
-    private ArrayList<ApiError> errors;
+    ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_UNKNOWN = 5560;
-    private final int ERROR_NO_CONNECTION = 5561;
-    private final int ERROR_GENERIC = 5562;
-    private final int ERROR_PARSING = 5563;
-    private final int ERROR_GET_INFO = 5564;
-    private final int ERROR_TRADE = 5566;
-    private final int ERROR_GET_ORDERS = 5567;
-    private final int ERROR_GET_ORDERDETAIL = 5568;
-    private final int ERROR_CANCEL_ORDER = 5569;
+
 
     public BitSparkWrapper() {
         setupErrors();
@@ -124,15 +117,8 @@ public class BitSparkWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_GET_INFO, "Can't get_info"));
-        errors.add(new ApiError(ERROR_GET_INFO, "Can't get ticker"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
-        errors.add(new ApiError(ERROR_TRADE, "Can't trade"));
-        errors.add(new ApiError(ERROR_GET_ORDERS, "Can't get orders"));
-        errors.add(new ApiError(ERROR_GET_ORDERDETAIL, "Can't get order detail"));
-        errors.add(new ApiError(ERROR_CANCEL_ORDER, "Can't cancel order"));
+
+        errors.setExchangeName(exchange);
 
     }
 
@@ -166,7 +152,7 @@ public class BitSparkWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, path, query_args, isGet);
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_INFO));
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -220,7 +206,7 @@ public class BitSparkWrapper implements TradeInterface {
                     //Pack it into the ApiResponse
                     apiResponse.setResponseObject(balance);
                 } else {
-                    apiResponse.setError(getErrorByCode(ERROR_PARSING));
+                    apiResponse.setError(errors.nullReturnError);
                 }
             } else {//return available balance for the specific currency
                 boolean found = false;
@@ -245,7 +231,7 @@ public class BitSparkWrapper implements TradeInterface {
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -293,7 +279,7 @@ public class BitSparkWrapper implements TradeInterface {
             apiResponse.setResponseObject(ticker);
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -326,7 +312,7 @@ public class BitSparkWrapper implements TradeInterface {
 
         String queryResult = query(API_BASE_URL, path, query_args, isGet);
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_TRADE));
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -349,7 +335,7 @@ public class BitSparkWrapper implements TradeInterface {
 
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -359,7 +345,8 @@ public class BitSparkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        ApiError err = new ApiError(ERROR_GENERIC, "For the BitSpark API you should specify the CurrencyPair"
+        ApiError err = errors.genericError;
+        err.setDescription("For the BitSpark API you should specify the CurrencyPair"
                 + "\n use getActiveOrders(CurrencyPair pair)");
         return new ApiResponse(false, null, err);
     }
@@ -383,7 +370,10 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("limit", "999"); //default is 10 , max is 1000
 
         String queryResult = query(API_BASE_URL, path, query_args, isGet);
-
+        if (queryResult == null) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
         /*Sample result
          */
         JSONParser parser = new JSONParser();
@@ -402,7 +392,7 @@ public class BitSparkWrapper implements TradeInterface {
             apiResponse.setResponseObject(orderList);
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -425,7 +415,7 @@ public class BitSparkWrapper implements TradeInterface {
         String queryResult = query(API_BASE_URL, path, query_args, isGet);
 
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_GET_ORDERDETAIL));
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -445,7 +435,7 @@ public class BitSparkWrapper implements TradeInterface {
             apiResponse.setResponseObject(parseOrder(httpAnswerJson));
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -468,7 +458,7 @@ public class BitSparkWrapper implements TradeInterface {
 
 
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDER));
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -491,7 +481,7 @@ public class BitSparkWrapper implements TradeInterface {
             apiResponse.setResponseObject(true);
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
         return apiResponse;
@@ -548,22 +538,7 @@ public class BitSparkWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -579,7 +554,7 @@ public class BitSparkWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
         BitSparkService query = new BitSparkService(base, method, args, keys);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult = errors.noConnectionError.getDescription();
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
 
@@ -672,7 +647,7 @@ public class BitSparkWrapper implements TradeInterface {
 
 
         if (queryResult == null) {
-            apiResponse.setError(getErrorByCode(ERROR_CANCEL_ORDER));
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
