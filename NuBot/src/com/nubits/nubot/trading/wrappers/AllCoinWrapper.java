@@ -9,35 +9,18 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.HttpUtils;
-import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import com.nubits.nubot.utils.ErrorManager;
-import org.json.JSONString;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
-import org.jsoup.Connection;
-import org.jsoup.nodes.Document;
-import org.omg.CORBA.TIMEOUT;
-
-import javax.crypto.Mac;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.text.*;
-import java.nio.charset.Charset;
-import java.security.InvalidKeyException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Timestamp;
-import java.sql.Time;
 import java.util.*;
-//import java.util.logging.ErrorManager;
 import java.util.logging.Logger;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 
 /**
@@ -70,18 +53,6 @@ public class AllCoinWrapper implements TradeInterface {
     private final String TOKEN_ORDER_ID = "order_id";
     //Errors
     ErrorManager errors = new ErrorManager();
-    private final int NO_ERROR = 12059;
-    private final int ERROR_UNKNOWN = 12560;
-    private final int ERROR_NO_CONNECTION = 12561;
-    private final int ERROR_GENERIC = 12562;
-    private final int ERROR_PARSING = 12563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 12567;
-    private final int ERROR_GET_INFO = 12568;
-    private final int ERROR_SELL_COIN = 12569;
-    private final int ERROR_ACTIVE_ORDERS = 12570;
-    private final int ERROR_NULL_RETURN = 12571;
-    private final int ERROR_CANCEL_ORDERS = 12572;
-
 
     public AllCoinWrapper() { setupErrors(); }
 
