@@ -17,6 +17,7 @@ public class ErrorManager {
     public ApiError noConnectionError = new ApiError(3, "No Connection");
     public ApiError nullReturnError = new ApiError(4, "Null Return");
     public ApiError apiReturnError = new ApiError(5, "");
+    public ApiError authenticationError = new ApiError(6, "Authentication Error");
 
 
 
