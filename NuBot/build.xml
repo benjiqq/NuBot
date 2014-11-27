@@ -102,10 +102,8 @@
             <zipfileset src="${store.dir}/temp_final.jar"
             excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
         </zip>
-        
-
-          
-          
+             
+         
         <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
 
           
