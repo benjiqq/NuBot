@@ -707,12 +707,12 @@ public class BitSparkWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.info("Calling " + canonical_uri + " with params:" + args);
+            //LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
                 String url = base + canonical_uri;
-                LOG.info("url = " + url);
+                //LOG.info("url = " + url);
                 Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
 
