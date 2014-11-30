@@ -100,6 +100,14 @@ public class CcexWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+        ApiResponse apiResponse = new ApiResponse();
+
+
+
+        return apiResponse;
+    }
+
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         return getBalanceImpl(pair, null);
