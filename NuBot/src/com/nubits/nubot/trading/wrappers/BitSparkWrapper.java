@@ -77,11 +77,10 @@ public class BitSparkWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "/api/v2/order/delete"; //POST
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
-    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     // Errors
     ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
     public BitSparkWrapper() {
         setupErrors();
