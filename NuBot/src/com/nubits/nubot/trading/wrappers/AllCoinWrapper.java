@@ -29,7 +29,7 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class AllCoinWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(BterWrapper.class.getName());
+    private static final Logger LOG = Logger.getLogger(AllCoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
