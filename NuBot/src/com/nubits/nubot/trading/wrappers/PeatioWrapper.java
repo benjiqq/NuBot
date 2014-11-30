@@ -130,6 +130,32 @@ public class PeatioWrapper implements TradeInterface {
         return "api/v2/tickers/" + pair.toString();
     }
 
+    private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
+        ApiResponse apiResponse = new ApiResponse();
+        String queryResult = query(url, method, query_args, isGet);
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
+        }
+        JSONParser parser = new JSONParser();
+
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            if (httpAnswerJson.containsKey("error")) {
+                JSONObject error = (JSONObject) httpAnswerJson.get("error");
+                int code = Integer.parseInt(error.get("code").toString());
+                String msg = error.get("message").toString();
+                apiResponse.setError(new ApiError(code, msg));
+                return apiResponse;
+            } else {
+                apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(errors.parseError);
+        }
+        return apiResponse;
+    }
+
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         return getBalanceImpl(null, pair);
@@ -144,45 +170,23 @@ public class PeatioWrapper implements TradeInterface {
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = null;
-
-        String path = API_GET_INFO;
+        String url = apiBaseUrl;
+        String method = API_GET_INFO;
         boolean isGet = true;
         TreeMap<String, String> query_args = new TreeMap<>();
         /*Params
          *
          */
         query_args.put("canonical_verb", "GET");
-        query_args.put("canonical_uri", path);
+        query_args.put("canonical_uri", method);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
-            apiResponse.setError(errors.nullReturnError);
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            if (httpAnswerJson.containsKey("error")) {
-                JSONObject error = (JSONObject) httpAnswerJson.get("error");
-                int code = Integer.parseInt(error.get("code").toString());
-                String msg = error.get("message").toString();
-                apiResponse.setError(new ApiError(code, msg));
-                return apiResponse;
-            }
-            /*Sample result
-             *{"sn":"PEA5TFFOGQHTIO","name":"foo","email":"foo@peatio.dev","activated":true,
-             * "accounts":[
-             *  {"currency":"cny","balance":"100243840.0","locked":"0.0"},
-             *  {"currency":"btc","balance":"99999708.26","locked":"210.8"}
-             *  ]
-             * }
-             */
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
             Amount NBTonOrder = null,
                     NBTAvail = null,
                     PEGonOrder = null,
                     PEGAvail = null;
-
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray accounts = (JSONArray) httpAnswerJson.get("accounts");
 
             if (currency == null) { //Get all balances
@@ -208,7 +212,7 @@ public class PeatioWrapper implements TradeInterface {
                     //Pack it into the ApiResponse
                     apiResponse.setResponseObject(balance);
                 } else {
-                    apiResponse.setError(errors.apiReturnError);
+                    apiResponse.setError(errors.nullReturnError);
                 }
             } else {//return available balance for the specific currency
                 boolean found = false;
@@ -226,18 +230,13 @@ public class PeatioWrapper implements TradeInterface {
                 if (found) {
                     apiResponse.setResponseObject(amount);
                 } else {
-                    ApiError apiErr = errors.apiReturnError;
-                    apiErr.setDescription("Can't find balance for specified currency: " + currency.getCode());
-                    apiResponse.setError(apiErr);
+                    apiResponse.setError(new ApiError(21341, "Can't find balance for"
+                            + " specified currency: " + currency.getCode()));
                 }
             }
-
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(errors.parseError);
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
-
 
         return apiResponse;
     }
@@ -302,7 +301,8 @@ public class PeatioWrapper implements TradeInterface {
     public ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
         String order_id = "";
-        String path = API_TRADE;
+        String url = apiBaseUrl;
+        String method = API_TRADE;
         boolean isGet = false;
 
         TreeMap<String, String> query_args = new TreeMap<>();
@@ -312,37 +312,18 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("price", Double.toString(rate));
         query_args.put("market", pair.toString());
         query_args.put("canonical_verb", "POST");
-        query_args.put("canonical_uri", path);
+        query_args.put("canonical_uri", method);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
-            apiResponse.setError(errors.nullReturnError);
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try{
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            if (httpAnswerJson.containsKey("error")) {
-                JSONObject error = (JSONObject) httpAnswerJson.get("error");
-                int code = Integer.parseInt(error.get("code").toString());
-                String msg = error.get("message").toString();
-                apiResponse.setError(new ApiError(code, msg));
-                return apiResponse;
-            } else {
-                //Correct
-                if (httpAnswerJson.containsKey("id")) {
-                    order_id = httpAnswerJson.get("id").toString();
-                    apiResponse.setResponseObject(order_id);
-                }
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            if (httpAnswerJson.containsKey("id")) {
+                order_id = httpAnswerJson.get("id").toString();
+                apiResponse.setResponseObject(order_id);
             }
-
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(errors.parseError);
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
-
 
         return apiResponse;
     }
@@ -358,8 +339,8 @@ public class PeatioWrapper implements TradeInterface {
     public ApiResponse getActiveOrders(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
-
-        String path = API_ACTIVE_ORDERS;
+        String url = apiBaseUrl;
+        String method = API_ACTIVE_ORDERS;
         boolean isGet = true;
         TreeMap<String, String> query_args = new TreeMap<>();
 
@@ -368,18 +349,13 @@ public class PeatioWrapper implements TradeInterface {
          */
 
         query_args.put("canonical_verb", "GET");
-        query_args.put("canonical_uri", path);
+        query_args.put("canonical_uri", method);
         query_args.put("market", pair.toString());
         query_args.put("limit", "999"); //default is 10 , max is 1000
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-
-        /*Sample result
-         */
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Object anOrdersResponse : httpAnswerJson) {
                 JSONObject orderResponse = (JSONObject) anOrdersResponse;
                 Order tempOrder = parseOrder(orderResponse);
@@ -387,15 +363,10 @@ public class PeatioWrapper implements TradeInterface {
                 {
                     orderList.add(tempOrder);
                 }
-
             }
-
             apiResponse.setResponseObject(orderList);
-
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(errors.parseError);
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -405,7 +376,8 @@ public class PeatioWrapper implements TradeInterface {
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         Order order = null;
-        String path = API_ORDER;
+        String url = apiBaseUrl;
+        String method = API_ORDER;
         boolean isGet = true;
 
 
@@ -414,31 +386,22 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_uri", "/api/v2/order");
         query_args.put("id", orderID);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
-            apiResponse.setError(errors.nullReturnError);
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("error")) {
                 JSONObject error = (JSONObject) httpAnswerJson.get("error");
-                int code = Integer.parseInt(error.get("code").toString());
+                int code = ~(Integer) error.get("code");
                 String msg = error.get("message").toString();
                 apiResponse.setError(new ApiError(code, msg));
                 return apiResponse;
             }
-        /*Sample result
-         * {"id":7,"side":"sell","price":"3100.0","avg_price":"3101.2","state":"wait","market":"btccny","created_at":"2014-04-18T02:02:33Z","volume":"100.0","remaining_volume":"89.8","executed_volume":"10.2","trades":[{"id":2,"price":"3100.0","volume":"10.2","market":"btccny","created_at":"2014-04-18T02:04:49Z","side":"sell"}]}
-         */
+            /*Sample result
+            * {"id":7,"side":"sell","price":"3100.0","avg_price":"3101.2","state":"wait","market":"btccny","created_at":"2014-04-18T02:02:33Z","volume":"100.0","remaining_volume":"89.8","executed_volume":"10.2","trades":[{"id":2,"price":"3100.0","volume":"10.2","market":"btccny","created_at":"2014-04-18T02:04:49Z","side":"sell"}]}
+            */
             apiResponse.setResponseObject(parseOrder(httpAnswerJson));
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(errors.parseError);
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -447,47 +410,38 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_CANCEL_ORDER;
+        String url = apiBaseUrl;
+        String method = API_CANCEL_ORDER;
         boolean isGet = false;
 
         TreeMap<String, String> query_args = new TreeMap<>();
 
         query_args.put("id", orderID);
         query_args.put("canonical_verb", "POST");
-        query_args.put("canonical_uri", path);
+        query_args.put("canonical_uri", method);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-
-
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
-            apiResponse.setError(errors.nullReturnError);
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("error")) {
                 JSONObject error = (JSONObject) httpAnswerJson.get("error");
-                int code = Integer.parseInt(error.get("code").toString());
+                int code = (Integer) error.get("code");
                 String msg = error.get("message").toString();
                 apiResponse.setError(new ApiError(code, msg));
                 return apiResponse;
             }
-        /*Sample result
-         * Cancel order is an asynchronous operation. A success response only means your cancel
-         * request has been accepted, it doesn't mean the order has been cancelled.
-         * You should always use /api/v2/order or websocket api to get order's latest state.
-         */
+            /*Sample result
+             * Cancel order is an asynchronous operation. A success response only means your cancel
+             * request has been accepted, it doesn't mean the order has been cancelled.
+             * You should always use /api/v2/order or websocket api to get order's latest state.
+             */
 
             apiResponse.setResponseObject(true);
-        } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
-            apiResponse.setError(errors.parseError);
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
-        return apiResponse;
 
+        return apiResponse;
     }
 
     @Override
@@ -637,34 +591,23 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_CLEAR_ORDERS;
+        String method = API_CLEAR_ORDERS;
+        String url = apiBaseUrl;
         boolean isGet = false;
 
         TreeMap<String, String> query_args = new TreeMap<>();
 
         query_args.put("canonical_verb", "POST");
-        query_args.put("canonical_uri", path);
+        query_args.put("canonical_uri", method);
 
-        String queryResult = query(apiBaseUrl, path, query_args, isGet);
-
-
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
-            apiResponse.setError(errors.nullReturnError);
-            return apiResponse;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            apiResponse.setResponseObject(true);
+        } else {
+            apiResponse = response;
         }
 
-
-
-        /*Sample result
-         * Cancel order is an asynchronous operation. A success response only means your cancel
-         * request has been accepted, it doesn't mean the order has been cancelled.
-         * You should always use /api/v2/order or websocket api to get order's latest state.
-         */
-
-        apiResponse.setResponseObject(true);
         return apiResponse;
-
-
     }
 
     //DO NOT USE THIS METHOD DIRECTLY, use CREATENONCE
