@@ -133,8 +133,13 @@ public class PeatioWrapper implements TradeInterface {
     private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+        if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
         }
         JSONParser parser = new JSONParser();
 
@@ -152,6 +157,7 @@ public class PeatioWrapper implements TradeInterface {
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
+            return apiResponse;
         }
         return apiResponse;
     }
