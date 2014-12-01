@@ -52,7 +52,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private SendLiquidityinfoTask sendLiquidityTask;
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
-    private final long MAX_RANDOM_WAIT_SECONDS = 5;
+    private final int MAX_RANDOM_WAIT_SECONDS = 5;
 
     @Override
     public void run() {
@@ -402,7 +402,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         //Introuce an aleatory sleep time to desync bots at the time of placing orders.
         //This will favour competition in markets with multiple custodians
         try {
-            Thread.sleep(MAX_RANDOM_WAIT_SECONDS * 1000);
+            Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
         } catch (InterruptedException ex) {
             LOG.severe(ex.toString());
         }
@@ -627,18 +627,17 @@ public class StrategySecondaryPegTask extends TimerTask {
 
             //get the balance and see if it does still require an aggregation
 
-
-
             Global.frozenBalances.freezeNewFunds();
-            ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-            if (txFeeNTBFIATResponse.isPositive()) {
-                double txFee = (Double) txFeeNTBFIATResponse.getResponseObject();
-                {
-                    initOrders(Constant.BUY, buyPricePEG);
-                }
-            } else {
-                LOG.severe("An error occurred while attempting to update tx fee.");
+
+            //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+            //This will favour competition in markets with multiple custodians
+            try {
+                Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
             }
+
+            initOrders(Constant.BUY, buyPricePEG);
 
         } else {
             LOG.severe("An error occurred while attempting to cancel buy orders.");
