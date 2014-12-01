@@ -37,21 +37,21 @@ public class SecondaryPegOptionsJSON {
     private ArrayList<String> backupFeedNames;
     //Optional settings with a default value  ----------------------------
     private long refreshTime;
-    private double wallchangeTreshold, priceOffset, distanceTreshold;
+    private double wallchangeTreshold, spread, distanceTreshold;
 
     /**
      *
      * @param refreshTime
      * @param wallchangeTreshold
-     * @param priceOffset
+     * @param spread
      * @param distanceTreshold
      * @param mainFeed
      * @param backupFeedNames
      */
-    public SecondaryPegOptionsJSON(long refreshTime, double wallchangeTreshold, double priceOffset, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
+    public SecondaryPegOptionsJSON(long refreshTime, double wallchangeTreshold, double spread, double distanceTreshold, String mainFeed, ArrayList<String> backupFeedNames) {
         this.refreshTime = refreshTime;
         this.wallchangeTreshold = wallchangeTreshold;
-        this.priceOffset = priceOffset;
+        this.spread = spread;
         this.distanceTreshold = distanceTreshold;
         this.mainFeed = mainFeed;
         this.backupFeedNames = backupFeedNames;
@@ -101,7 +101,7 @@ public class SecondaryPegOptionsJSON {
                 refreshTime = 61;
             }
             double wallchangeTreshold = 3;
-            double priceOffset = 0;
+            double spread = 0;
             double distanceTreshold = 10;
 
             if (optionsJSON.has("wallchange-treshold")) {
@@ -110,10 +110,10 @@ public class SecondaryPegOptionsJSON {
 
             // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
 
-            if (optionsJSON.has("price-offset")) {
-                priceOffset = new Double((optionsJSON.get("price-offset")).toString());
-                if (priceOffset != 0) {
-                    LOG.warning("You are using the \"price-offset\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
+            if (optionsJSON.has("spread")) {
+                spread = new Double((optionsJSON.get("spread")).toString());
+                if (spread != 0) {
+                    LOG.warning("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
                 }
 
             }
@@ -130,7 +130,7 @@ public class SecondaryPegOptionsJSON {
              }
              */
 
-            return new SecondaryPegOptionsJSON(refreshTime, wallchangeTreshold, priceOffset, distanceTreshold, mainFeed, backupFeedNames);
+            return new SecondaryPegOptionsJSON(refreshTime, wallchangeTreshold, spread, distanceTreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
             LOG.severe(ex.toString());
             System.exit(0);
@@ -174,16 +174,16 @@ public class SecondaryPegOptionsJSON {
      *
      * @return
      */
-    public double getPriceOffset() {
-        return priceOffset;
+    public double getSpread() {
+        return spread;
     }
 
     /**
      *
-     * @param priceOffset
+     * @param spread
      */
-    public void setPriceOffset(double priceOffset) {
-        this.priceOffset = priceOffset;
+    public void setPriceOffset(double spread) {
+        this.spread = spread;
     }
 
     /**
@@ -236,10 +236,10 @@ public class SecondaryPegOptionsJSON {
 
     @Override
     public String toString() {
-        return "SecondaryPegOptionsJSON [" + "backupFeedNames " + backupFeedNames + " " + "distanceTreshold " + distanceTreshold + "mainFeed " + mainFeed + " " + "priceOffset " + priceOffset + " " + "refreshTime " + refreshTime + " " + "wallchangeTreshold " + wallchangeTreshold + "]";
+        return "SecondaryPegOptionsJSON [" + "backupFeedNames " + backupFeedNames + " " + "distanceTreshold " + distanceTreshold + "mainFeed " + mainFeed + " " + "spread " + spread + " " + "refreshTime " + refreshTime + " " + "wallchangeTreshold " + wallchangeTreshold + "]";
     }
 
     String toHtmlString() {
-        return "SecondaryPegOptionsJSON : <br>" + "backupFeedNames " + backupFeedNames + " <br>" + "distanceTreshold " + distanceTreshold + "<br>" + "mainFeed " + mainFeed + " <br>" + "priceOffset " + priceOffset + " <br>" + "refreshTime " + refreshTime + " <br>" + "wallchangeTreshold " + wallchangeTreshold;
+        return "SecondaryPegOptionsJSON : <br>" + "backupFeedNames " + backupFeedNames + " <br>" + "distanceTreshold " + distanceTreshold + "<br>" + "mainFeed " + mainFeed + " <br>" + "spread " + spread + " <br>" + "refreshTime " + refreshTime + " <br>" + "wallchangeTreshold " + wallchangeTreshold;
     }
 }

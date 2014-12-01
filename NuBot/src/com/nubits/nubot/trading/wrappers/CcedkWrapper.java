@@ -175,6 +175,15 @@ public class CcedkWrapper implements TradeInterface {
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
             }
+        } catch (ClassCastException cce) {
+            //if casting to a JSON object failed, try a JSON Array
+            try {
+                JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+                apiResponse.setResponseObject(httpAnswerJson);
+            } catch (ParseException pe) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
+            }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);

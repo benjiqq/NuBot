@@ -471,12 +471,18 @@ public class PriceMonitorTriggerTask extends TimerTask {
             buyPriceUSD = 1 - (0.01 * txfee);
 
             //Add(remove) the offset % from prices
-            sellPriceUSD = Utils.round(sellPriceUSD + ((sellPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset()), 6);
-            buyPriceUSD = Utils.round(buyPriceUSD - ((buyPriceUSD / 100) * Global.options.getSecondaryPegOptions().getPriceOffset()), 6);
 
-            String message = "Computing USD prices with offset " + Global.options.getSecondaryPegOptions().getPriceOffset() + "%  : sell @ " + sellPriceUSD;
+            //compute half of the spread
+            double halfSpread = Utils.round(Global.options.getSecondaryPegOptions().getSpread() / 2, 6);
+
+            double offset = Utils.round(halfSpread / 100, 6);
+
+            sellPriceUSD = sellPriceUSD + offset;
+            buyPriceUSD = buyPriceUSD - offset;
+
+            String message = "Computing USD prices with spread " + Global.options.getSecondaryPegOptions().getSpread() + "%  : sell @ " + sellPriceUSD;
             if (Global.isDualSide) {
-                message += "buy @ " + buyPriceUSD;
+                message += " buy @ " + buyPriceUSD;
             }
             LOG.info(message);
 
