@@ -701,7 +701,7 @@ public class BtceWrapper implements TradeInterface {
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
 
-            String answer = "";
+            String answer = null;
             String signature = "";
             String post_data = "";
             boolean httpError = false;
@@ -772,7 +772,7 @@ public class BtceWrapper implements TradeInterface {
                     LOG.fine(output);
                     answer += output;
                 }
-
+                /*
                 if (httpError) {
                     JSONParser parser = new JSONParser();
                     try {
@@ -784,17 +784,19 @@ public class BtceWrapper implements TradeInterface {
 
                     }
                 }
+                */
             } //Capture Exceptions
             catch (IllegalStateException ex) {
                 LOG.severe(ex.toString());
+                return null;
 
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
                 LOG.severe(ex.toString());
-
-                answer = errors.noConnectionError.getDescription();
+                answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
+                return null;
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();

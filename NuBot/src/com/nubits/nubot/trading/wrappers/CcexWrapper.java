@@ -804,6 +804,7 @@ public class CcexWrapper implements TradeInterface {
 
             } catch (Exception e) {
                 LOG.severe(e.toString());
+                return null;
             }
             BufferedReader rd;
 
@@ -818,8 +819,10 @@ public class CcexWrapper implements TradeInterface {
                 answer = buffer.toString();
             } catch (IOException ex) {
                 Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
             } catch (IllegalStateException ex) {
                 Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                return null;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
