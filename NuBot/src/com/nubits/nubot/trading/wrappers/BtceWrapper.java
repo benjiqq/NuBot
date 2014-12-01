@@ -54,6 +54,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import org.apache.commons.codec.binary.Hex;
 import org.json.JSONException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -132,6 +133,15 @@ public class BtceWrapper implements TradeInterface {
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ClassCastException cce) {
+            //if casting to a JSON object failed, try a JSON Array
+            try {
+                JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+                apiResponse.setResponseObject(httpAnswerJson);
+            } catch (ParseException pe) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
