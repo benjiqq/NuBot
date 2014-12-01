@@ -15,13 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.models;
+package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -472,13 +477,14 @@ public class OptionsJSON {
      * @param path
      * @return
      */
-    public static OptionsJSON parseOptions(String path) {
+    public static OptionsJSON parseOptions(String[] paths) {
         OptionsJSON options = null;
-        JSONParser parser = new JSONParser();
-        String optionsString = FileSystem.readFromFile(path);
+        ArrayList<String> filePaths = new ArrayList();
+        filePaths.addAll(Arrays.asList(paths));
+
         try {
-            JSONObject fileJSON = (JSONObject) (parser.parse(optionsString));
-            JSONObject optionsJSON = (JSONObject) fileJSON.get("options");
+            JSONObject inputJSON = parseFiles(filePaths);
+            JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
 
 
             //First try to parse compulsory parameters
@@ -518,10 +524,35 @@ public class OptionsJSON {
             org.json.JSONObject pegOptionsJSON;
             SecondaryPegOptionsJSON cpo = null;
             if (requireCryptoOptions) {
-                org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
-                org.json.JSONObject optionsJSON2 = (org.json.JSONObject) jsonString.get("options");
-                pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("secondary-peg-options");
-                cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
+
+                if (optionsJSON.containsKey("secondary-peg-options")) {
+
+                    Map setMap = new HashMap();
+
+
+                    //convert from simple JSON to org.json.JSONObject
+                    JSONObject oldObject = (JSONObject) optionsJSON.get("secondary-peg-options");
+
+                    Set tempSet = oldObject.entrySet();
+                    for (Object o : tempSet) {
+                        Map.Entry entry = (Map.Entry) o;
+                        setMap.put(entry.getKey(), entry.getValue());
+                    }
+
+
+
+                    pegOptionsJSON = new org.json.JSONObject(setMap);
+                    cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
+                } else {
+                    LOG.severe("secondary-peg-options are required in the options");
+                    System.exit(0);
+                }
+
+                /*
+                 org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
+                 org.json.JSONObject optionsJSON2 = (org.json.JSONObject) jsonString.get("options");
+                 pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("secondary-peg-options");
+                 cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);*/
             }
 
             //Then parse optional settings. If not use the default value declared here
@@ -645,12 +676,41 @@ public class OptionsJSON {
                     sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
                     emergencyTimeout, keepProceeds, aggregate, waitBeforeShift, cpo);
 
-
-
-        } catch (ParseException | NumberFormatException | JSONException e) {
+        } catch (NumberFormatException e) {
             LOG.severe("Error while parsing the options file : " + e);
         }
         return options;
+    }
+
+    /*
+     * Concatenate a list of of files into a JSONObject
+     */
+    public static JSONObject parseFiles(ArrayList<String> filePaths) {
+        JSONObject optionsObject = new JSONObject();
+        Map setMap = new HashMap();
+
+        for (int i = 0; i < filePaths.size(); i++) {
+            try {
+                JSONParser parser = new JSONParser();
+
+                JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filePaths.get(i))));
+                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
+
+                Set tempSet = tempOptions.entrySet();
+                for (Object o : tempSet) {
+                    Map.Entry entry = (Map.Entry) o;
+                    setMap.put(entry.getKey(), entry.getValue());
+                }
+
+            } catch (ParseException ex) {
+                LOG.severe("Parse exception \n" + ex.toString());
+                System.exit(0);
+            }
+        }
+
+        JSONObject content = new JSONObject(setMap);
+        optionsObject.put("options", content);
+        return optionsObject;
     }
 
     /**

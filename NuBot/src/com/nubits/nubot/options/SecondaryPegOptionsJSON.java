@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.models;
+package com.nubits.nubot.options;
 
 /**
  *
  * @author desrever <desrever at nubits.com>
  */
+import com.nubits.nubot.models.CurrencyPair;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.json.JSONException;
