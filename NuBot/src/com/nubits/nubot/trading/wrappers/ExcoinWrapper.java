@@ -127,6 +127,9 @@ public class ExcoinWrapper implements TradeInterface{
         ApiResponse response = getQuery(url);
         if (response.isPositive()) {
             LOG.info(response.toString());
+
+        } else {
+            apiResponse = response;
         }
         return apiResponse;
     }
@@ -203,7 +206,7 @@ public class ExcoinWrapper implements TradeInterface{
 
     @Override
     public String getUrlConnectionCheck() {
-        return null;
+        return API_BASE_URL;
     }
 
     @Override
@@ -302,8 +305,10 @@ public class ExcoinWrapper implements TradeInterface{
                 }
             } catch (ProtocolException pe) {
                 LOG.severe(pe.toString());
+                return answer;
             } catch (IOException io) {
                 LOG.severe((io.toString()));
+                return answer;
             }
 
 
@@ -312,6 +317,7 @@ public class ExcoinWrapper implements TradeInterface{
                 if (connection.getResponseCode() >= 400) {
                     httpError = true;
                     response = connection.getResponseCode();
+                    answer = "";
                     br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
                 } else {
                     answer = "";
@@ -319,6 +325,7 @@ public class ExcoinWrapper implements TradeInterface{
                 }
             } catch (IOException io) {
                 LOG.severe(io.toString());
+                return answer;
             }
 
             if (httpError) {
@@ -332,8 +339,10 @@ public class ExcoinWrapper implements TradeInterface{
                 }
             } catch (IOException io) {
                 LOG.severe(io.toString());
+                return null;
             }
 
+            /*
             if (httpError) {
                 JSONParser parser = new JSONParser();
                 try {
@@ -341,8 +350,10 @@ public class ExcoinWrapper implements TradeInterface{
                     answer = (String) obj.get(TOKEN_ERR);
                 } catch (ParseException pe) {
                     LOG.severe(pe.toString());
+                    return null;
                 }
             }
+            */
 
             connection.disconnect();
             connection = null;
