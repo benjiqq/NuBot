@@ -9,17 +9,25 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import java.io.*;
+import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.text.*;
 import java.util.*;
 import java.util.logging.Logger;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -89,6 +97,7 @@ public class ExcoinWrapper implements TradeInterface{
                 LOG.severe("Exco.in API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
+                //LOG.info("httpAnswerJSON = \n" + httpAnswerJson.toJSONString());
                 apiResponse.setResponseObject(httpAnswerJson);
             }
         } catch (ClassCastException cce) {
@@ -120,14 +129,43 @@ public class ExcoinWrapper implements TradeInterface{
 
     private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance  = new Balance();
 
         String url = API_BASE_URL + "/" + API_SUMMARY;
 
         ApiResponse response = getQuery(url);
         if (response.isPositive()) {
-            LOG.info(response.toString());
-
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray activeWallets = (JSONArray) httpAnswerJson.get("active_wallets");
+            if (currency == null) { //get all balances
+                Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
+                Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+                Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
+                Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext(); ) {
+                    JSONObject thisWallet = wallet.next();
+                    String thisCurrency = thisWallet.get("currency").toString();
+                    if (thisCurrency.equals(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        PEGAvail.setQuantity(Double.parseDouble(thisWallet.get("available_balance").toString()));
+                        PEGonOrder.setQuantity(Double.parseDouble(thisWallet.get("order_balance").toString()));
+                    }
+                    if (thisCurrency.equals(pair.getOrderCurrency().getCode().toUpperCase())) {
+                        NBTAvail.setQuantity(Double.parseDouble(thisWallet.get("available_balance").toString()));
+                        NBTonOrder.setQuantity(Double.parseDouble(thisWallet.get("order_balance").toString()));
+                    }
+                }
+                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                apiResponse.setResponseObject(balance);
+            } else { //get specific balance
+                Amount total = new Amount(0, currency);
+                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext(); ) {
+                    JSONObject thisWallet = wallet.next();
+                    String thisCurrency = thisWallet.get("currency").toString();
+                    if (thisCurrency.equals(currency.getCode().toUpperCase())) {
+                        total.setQuantity(Double.parseDouble(thisWallet.get("available_balance").toString()));
+                    }
+                }
+                apiResponse.setResponseObject(total);
+            }
         } else {
             apiResponse = response;
         }
@@ -258,8 +296,13 @@ public class ExcoinWrapper implements TradeInterface{
         protected ApiKeys keys;
 
         public ExcoinService(String url, ApiKeys keys) {
-            this.url = url;
+            this.url = url + "?expire=" + getExpireTimeStamp();
             this.keys = keys;
+        }
+
+        public String getExpireTimeStamp() {
+            Long timeStamp = ((System.currentTimeMillis() / 1000L) + EXPIRE_TIMESTAMP);
+            return timeStamp.toString();
         }
 
         @Override
@@ -277,7 +320,6 @@ public class ExcoinWrapper implements TradeInterface{
             } catch (MalformedURLException mal) {
                 LOG.severe(mal.toString());
             }
-
 
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
@@ -329,7 +371,7 @@ public class ExcoinWrapper implements TradeInterface{
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + url +
+                LOG.severe("Query to : " + queryUrl +
                         "\nHTTP Response : " + Objects.toString(response));
             }
 
@@ -363,7 +405,25 @@ public class ExcoinWrapper implements TradeInterface{
 
         @Override
         public String signRequest(String secret, String hash_data) {
-            return null;
+            String sign = "";
+            try {
+                Mac mac;
+                SecretKeySpec key;
+                // Create a new secret key
+                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
+                // Create a new mac
+                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
+                // Init mac with key.
+                mac.init(key);
+                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
+            } catch (UnsupportedEncodingException uee) {
+                LOG.severe("Unsupported encoding exception: " + uee.toString());
+            } catch (NoSuchAlgorithmException nsae) {
+                LOG.severe("No such algorithm exception: " + nsae.toString());
+            } catch (InvalidKeyException ike) {
+                LOG.severe("Invalid key exception: " + ike.toString());
+            }
+            return sign;
         }
     }
 }

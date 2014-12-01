@@ -67,8 +67,8 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
-        //testGetAvailableBalance(Constant.NBT); //
-        testGetAvailableBalances(Constant.NBT_BTC);
+        testGetAvailableBalance(Constant.BTC); //
+        //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
