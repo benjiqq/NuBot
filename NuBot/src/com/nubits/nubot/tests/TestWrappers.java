@@ -58,7 +58,7 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a different API implementation
+        configExchange(Constant.EXCOIN); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
@@ -441,6 +441,13 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.EXCOIN)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.EXCOIN_SECRET, Passwords.EXCOIN_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
