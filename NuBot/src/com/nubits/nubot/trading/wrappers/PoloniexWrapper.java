@@ -117,11 +117,7 @@ public class PoloniexWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean valid = true;
             if (httpAnswerJson.containsKey("error")) {
-                valid = false;
-            }
-            if (!valid) {
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
