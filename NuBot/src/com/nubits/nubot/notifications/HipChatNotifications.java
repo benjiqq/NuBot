@@ -35,7 +35,8 @@ public class HipChatNotifications {
     private static String BOT_NAME = "Custodian Bot";
     private static HipChat hipchat = new HipChat(Passwords.HIPCHAT_KEY);
     private static UserId hipchatUser = UserId.create("idbot", BOT_NAME);
-    private static Room room = Room.create(Passwords.HIPCHAT_LIQUIDITY_ROOM_ID, hipchat);
+    private static Room notificationRoom = Room.create(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, hipchat);
+    private static Room criticalNotificationRoom = Room.create(Passwords.HIPCHAT_CRITICAL_ROOM_ID, hipchat);
 
     public static void sendMessage(String message, Color color) {
         String publicAddress = "";
@@ -55,7 +56,12 @@ public class HipChatNotifications {
 
         if (send) {
             try {
-                room.sendMessage(toSend, hipchatUser, notify, color);
+                if (notify) {
+                    criticalNotificationRoom.sendMessage(toSend, hipchatUser, notify, color);
+                } else {
+                    notificationRoom.sendMessage(toSend, hipchatUser, notify, color);
+                }
+
             } catch (Exception e) {
                 LOG.severe("Not sending hipchat notification. Network problem");
             }
