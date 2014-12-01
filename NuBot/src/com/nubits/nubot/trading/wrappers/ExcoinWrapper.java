@@ -1,11 +1,10 @@
 package com.nubits.nubot.trading.wrappers;
 
+import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -56,11 +55,9 @@ public class ExcoinWrapper implements TradeInterface{
         setupErrors();
     }
 
-    public ExcoinWrapper(ApiKeys keys, Exchange exchange, String api_base) {
+    public ExcoinWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
-        this.apiBaseUrl = api_base;
-        this.checkConnectionUrl = api_base;
         setupErrors();
     }
 
@@ -68,15 +65,70 @@ public class ExcoinWrapper implements TradeInterface{
         errors.setExchangeName(exchange);
     }
 
+    private ApiResponse getQuery(String url) {
+        ApiResponse apiResponse = new ApiResponse();
+        HashMap<String, String> query_args = new HashMap<>();
+        boolean isGet = true;
+        String queryResult = query(url, query_args, isGet);
+        if (queryResult == null) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) parser.parse(queryResult);
+            if (httpAnswerJson.containsKey(TOKEN_ERR)) {
+                String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
+                LOG.severe("Exco.in API returned an error: " + errorMessage);
+                apiResponse.setError(apiErr);
+            } else {
+                apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ClassCastException cce) {
+            //if casting to a JSON object failed, try a JSON Array
+            try {
+                JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+                apiResponse.setResponseObject(httpAnswerJson);
+            } catch (ParseException pe) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
+            }
+        } catch (ParseException pe) {
+            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            apiResponse.setError(errors.parseError);
+        }
+
+        return apiResponse;
+    }
 
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
-        return null;
+        return getBalanceImpl(pair, null);
     }
 
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
-        return null;
+        return getBalanceImpl(null, currency);
+    }
+
+    private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
+        ApiResponse apiResponse = new ApiResponse();
+        Balance balance  = new Balance();
+
+        String url = API_BASE_URL + "/" + API_SUMMARY;
+
+        ApiResponse response = getQuery(url);
+        if (response.isPositive()) {
+            LOG.info(response.toString());
+        }
+        return apiResponse;
     }
 
     @Override
