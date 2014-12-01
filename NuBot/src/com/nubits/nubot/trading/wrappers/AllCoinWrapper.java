@@ -612,6 +612,7 @@ public class AllCoinWrapper implements TradeInterface {
                 queryUrl = new URL(url);
             } catch (MalformedURLException mal) {
                 LOG.severe(mal.toString());
+                return null;
             }
 
             if (needAuth) {
@@ -630,6 +631,7 @@ public class AllCoinWrapper implements TradeInterface {
                     queryUrl = new URL(queryUrl + "?" + post_data);
                 } catch (MalformedURLException mal) {
                     LOG.severe(mal.toString());
+                    return null;
                 }
             }
 
@@ -652,8 +654,10 @@ public class AllCoinWrapper implements TradeInterface {
                 }
             } catch (ProtocolException pe) {
                 LOG.severe(pe.toString());
+                return null;
             } catch (IOException io) {
                 LOG.severe((io.toString()));
+                return null;
             }
 
 
@@ -669,6 +673,7 @@ public class AllCoinWrapper implements TradeInterface {
                 }
             } catch (IOException io) {
                 LOG.severe(io.toString());
+                return null;
             }
 
             if (httpError) {
@@ -683,8 +688,10 @@ public class AllCoinWrapper implements TradeInterface {
                 }
             } catch (IOException io) {
                 LOG.severe(io.toString());
+                return null;
             }
 
+            /*
             if (httpError) {
                 JSONParser parser = new JSONParser();
                 try {
@@ -694,6 +701,7 @@ public class AllCoinWrapper implements TradeInterface {
                     LOG.severe(pe.toString());
                 }
             }
+            */
 
             connection.disconnect();
             connection = null;
