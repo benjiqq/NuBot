@@ -23,7 +23,7 @@ package com.nubits.nubot.launch;
  */
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.OptionsJSON;
+import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;

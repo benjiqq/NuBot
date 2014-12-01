@@ -27,9 +27,9 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.OptionsJSON;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -39,7 +39,6 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.logging.Logger;
 
 /**
@@ -51,12 +50,13 @@ public class TestWrappers {
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
 
-
     public static void main(String[] args) {
         //Load settings
         Utils.loadProperties("settings.properties");
         init();
-        Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
+        String[] inputs = new String[1];
+        inputs[0] = TEST_OPTIONS_PATH;
+        Global.options = OptionsJSON.parseOptions(inputs);
 
         configExchange(Constant.BTER); //Replace to test a different API implementation
 
