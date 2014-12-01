@@ -52,6 +52,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private SendLiquidityinfoTask sendLiquidityTask;
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
+    private final long MAX_RANDOM_WAIT_SECONDS = 5;
 
     @Override
     public void run() {
@@ -397,6 +398,14 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     private boolean shiftWalls() {
         boolean success = true;
+
+        //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+        //This will favour competition in markets with multiple custodians
+        try {
+            Thread.sleep(MAX_RANDOM_WAIT_SECONDS * 1000);
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.toString());
+        }
 
         //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconda to take down orders
         long wait_time = (1000 * (Global.options.getSecondaryPegOptions().getRefreshTime() + Global.options.getExecuteStrategyInterval() + 10)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
