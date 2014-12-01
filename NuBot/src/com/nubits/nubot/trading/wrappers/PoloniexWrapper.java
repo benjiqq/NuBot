@@ -711,20 +711,21 @@ public class PoloniexWrapper implements TradeInterface {
 
                     } catch (ParseException ex) {
                         LOG.severe(ex.toString());
-
+                        return null;
                     }
                 }
             } //Capture Exceptions
             catch (IllegalStateException ex) {
                 LOG.severe(ex.toString());
-
+                return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
                 LOG.severe(ex.toString());
 
-                answer = errors.noConnectionError.getDescription();
+                answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
+                return null;
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();

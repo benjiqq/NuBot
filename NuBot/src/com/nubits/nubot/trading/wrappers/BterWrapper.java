@@ -777,7 +777,7 @@ public class BterWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-            String answer = "";
+            String answer = null;
             String signature = "";
             String post_data = "";
 
@@ -810,6 +810,7 @@ public class BterWrapper implements TradeInterface {
                 queryUrl = new URL(url);
             } catch (MalformedURLException ex) {
                 LOG.severe(ex.toString());
+                return null;
             }
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = null;
@@ -835,7 +836,7 @@ public class BterWrapper implements TradeInterface {
                     get.abort();
                 }
                 LOG.severe(e.toString());
-                return TOKEN_ERR;
+                return null;
             } catch (SocketException e) {
                 if (!isGet) {
                     post.abort();
@@ -843,7 +844,7 @@ public class BterWrapper implements TradeInterface {
                     get.abort();
                 }
                 LOG.severe(e.toString());
-                return TOKEN_ERR;
+                return null;
             } catch (Exception e) {
                 if (!isGet) {
                     post.abort();
@@ -851,7 +852,7 @@ public class BterWrapper implements TradeInterface {
                     get.abort();
                 }
                 LOG.severe(e.toString());
-                return TOKEN_ERR;
+                return null;
             }
             BufferedReader rd;
 
@@ -870,11 +871,11 @@ public class BterWrapper implements TradeInterface {
             } catch (IOException ex) {
 
                 LOG.severe(ex.toString());
-                return TOKEN_ERR;
+                return null;
             } catch (IllegalStateException ex) {
 
                 LOG.severe(ex.toString());
-                return TOKEN_ERR;
+                return null;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
