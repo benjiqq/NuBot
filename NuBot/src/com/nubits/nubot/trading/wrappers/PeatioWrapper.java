@@ -139,6 +139,7 @@ public class PeatioWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
 
         try {
+            //assume that a standard JSON Object is returned
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
             if (httpAnswerJson.containsKey("error")) {
                 JSONObject error = (JSONObject) httpAnswerJson.get("error");
@@ -148,6 +149,15 @@ public class PeatioWrapper implements TradeInterface {
                 return apiResponse;
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ClassCastException cce) {
+            //if casting to a JSON object failed, try a JSON Array
+            try {
+                JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+                apiResponse.setResponseObject(httpAnswerJson);
+            } catch (ParseException pe) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
