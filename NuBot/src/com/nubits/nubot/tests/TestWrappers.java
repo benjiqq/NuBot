@@ -51,6 +51,9 @@ public class TestWrappers {
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
 
+    public static final Currency NSR = new Currency("N", false, "NSR", "Nushares");
+    public static final CurrencyPair NSR_BTC = new CurrencyPair(NSR, Constant.BTC);
+
 
     public static void main(String[] args) {
         //Load settings
@@ -67,14 +70,14 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
-        testGetAvailableBalance(Constant.BTC); //
+        //testGetAvailableBalance(Constant.BTC); //
         //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
-        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(1, 0.000199999, Constant.NBT_BTC);  //ok
-        //testGetActiveOrders();
+        //testSell(0.3, 0.00830509, NSR_BTC);  //ok
+        //testBuy(0.0000120, 0.0000120, NSR_BTC);  //ok
+        testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("2064456");
@@ -83,7 +86,7 @@ public class TestWrappers {
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
-        //testGetLastPrice(Constant.NBT_BTC);
+        //testGetLastPrice(NSR_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC, 1409566800);
         //testGetLastTrades(Constant.NBT_BTC);
@@ -161,12 +164,12 @@ public class TestWrappers {
         if (lastPriceResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
-            LOG.info("Last price : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
-                    + ticker.getLast() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
-            LOG.info("ask  : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
-                    + ticker.getAsk() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
-            LOG.info("bid  : 1" + Constant.BTC_USD.getOrderCurrency().getCode() + " = "
-                    + ticker.getBid() + " " + Constant.BTC_USD.getPaymentCurrency().getCode());
+            LOG.info("Last price : 1 " + NSR_BTC.getOrderCurrency().getCode() + " = "
+                    + ticker.getLast() + " " + NSR_BTC.getPaymentCurrency().getCode());
+            LOG.info("ask  : 1 " + NSR_BTC.getOrderCurrency().getCode() + " = "
+                    + ticker.getAsk() + " " + NSR_BTC.getPaymentCurrency().getCode());
+            LOG.info("bid  : 1 " + NSR_BTC.getOrderCurrency().getCode() + " = "
+                    + ticker.getBid() + " " + NSR_BTC.getPaymentCurrency().getCode());
 
         } else {
             LOG.severe(lastPriceResponse.getError().toString());
