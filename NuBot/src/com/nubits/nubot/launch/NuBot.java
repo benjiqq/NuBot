@@ -114,7 +114,7 @@ public class NuBot {
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
-        LOG.info("Setting up  NuBot" + Global.settings.getProperty("version"));
+        LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
         LOG.info("Init logging system");
 
