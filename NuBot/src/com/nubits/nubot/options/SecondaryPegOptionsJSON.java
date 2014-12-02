@@ -109,8 +109,6 @@ public class SecondaryPegOptionsJSON {
                 wallchangeTreshold = new Double((optionsJSON.get("wallchange-treshold")).toString());
             }
 
-            // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
-
             if (optionsJSON.has("spread")) {
                 spread = new Double((optionsJSON.get("spread")).toString());
                 if (spread != 0) {

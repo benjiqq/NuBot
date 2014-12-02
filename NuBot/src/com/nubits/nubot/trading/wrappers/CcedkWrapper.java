@@ -273,7 +273,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -487,7 +487,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        //Since there is no API entry point for that, this call will iterate over actie
+        //Since there is no API entry point for that, this call will iterate over active
         ApiResponse toReturn = new ApiResponse();
         boolean ok = true;
 
@@ -496,20 +496,21 @@ public class CcedkWrapper implements TradeInterface {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                //TODO check that the order belongs to 'pair'
-                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
-                if (deleteOrderResponse.isPositive()) {
-                    boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+                if (pair.equals(tempOrder.getPair())) {
+                    ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
+                    if (deleteOrderResponse.isPositive()) {
+                        boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
-                    if (deleted) {
-                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        if (deleted) {
+                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        } else {
+                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            ok = false;
+                        }
+
                     } else {
-                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
-                        ok = false;
+                        LOG.severe(deleteOrderResponse.getError().toString());
                     }
-
-                } else {
-                    LOG.severe(deleteOrderResponse.getError().toString());
                 }
                 try {
                     Thread.sleep(500);
@@ -566,12 +567,12 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private Order parseOrder(JSONObject orderObject) {
@@ -653,7 +654,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 

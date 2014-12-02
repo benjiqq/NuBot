@@ -48,6 +48,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private boolean proceedsInBalance = false;
     private final int RESET_AFTER_CYCLES = 50;
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
+    private final int SHORT_WAIT_SECONDS = 5;
     private int cycles = 0;
 
     @Override
@@ -480,7 +481,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             placeInitialWalls();
         }
         try {
-            Thread.sleep(4000); //Give the time to new orders to be placed before counting again
+            Thread.sleep(SHORT_WAIT_SECONDS); //Give the time to new orders to be placed before counting again
         } catch (InterruptedException ex) {
             LOG.severe(ex.toString());
         }

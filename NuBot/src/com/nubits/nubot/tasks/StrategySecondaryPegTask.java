@@ -53,6 +53,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
+    private final int SHORT_WAIT_SECONDS = 6;
 
     @Override
     public void run() {
@@ -98,71 +99,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                 }
                 recount();
             }
-
-            /* this was the graceful shift. Restore after standard shifts has been properly tested
-             else {
-             if (needWallShift) {
-
-             //Secondary peg price changed, need to shift walls
-             boolean reinitiateSuccess = true;
-
-             //If orders and balance are not ok, reset them
-             if (!(ordersAndBalancesOK)) {
-             reinitiateSuccess = reInitiateOrders(); //TODO this will cause ignoring frozen proceedings. review
-             if (reinitiateSuccess) {
-             mightNeedInit = false;
-             }
-             } else {
-             //Orders and balances seems ok.
-
-             String message = "Shift needed : " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
-             + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
-             HipChatNotifications.sendMessage(message, Color.PURPLE);
-             LOG.warning(message);
-
-             //First try doing it gracefully, one wall at the time.
-             boolean shiftSellWallsSuccess;
-             boolean shiftBuyWallsSuccess = true; //set it to true in case of sellSide custodians
-
-             //If sell side custodian, move sell walls
-
-             if (!Global.isDualSide) {
-             shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
-             } else {
-             //If dual side :
-             if (pegPriceDirection.equals(Constant.UP)) { //If peg price increased, first move buy walls
-             shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
-             shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
-             } else {  //If peg price decreased, first move sell walls
-             shiftSellWallsSuccess = gracefullyRefreshOrders(Constant.SELL, true);
-             shiftBuyWallsSuccess = gracefullyRefreshOrders(Constant.BUY, true);
-             }
-             }
-
-             if (shiftSellWallsSuccess && shiftBuyWallsSuccess) {
-             LOG.info("Graceful wall shift succesful");
-             mightNeedInit = false;
-             needWallShift = false;
-             //Here I should wait until the two orders are correctly displaied. It can take some seconds
-             try {
-             Thread.sleep(10 * 1000); //TODO wait a dynamic interval.
-             } catch (InterruptedException ex) {
-             LOG.severe(ex.toString());
-             }
-             } else { //If doing it gracefully didn't work
-             LOG.warning("Graceful wall shift failed. Trying to clear all orders");
-             //Simply clear all and restart
-             boolean reinitiateSuccess2 = reInitiateOrders();
-             if (reinitiateSuccess2) {
-             mightNeedInit = false;
-             needWallShift = false;
-             }
-             }
-             }
-
-             }
-             }
-             End graceful */
 
             //Make sure the orders and balances are ok or try to aggregate
             if (!ordersAndBalancesOK) {
@@ -218,7 +154,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     //Wait until there are no active orders
                     boolean timedOut = false;
                     long timeout = Global.options.getEmergencyTimeout() * 1000;
-                    long wait = 5 * 1000;
+                    long wait = SHORT_WAIT_SECONDS * 1000;
                     long count = 0L;
 
                     boolean areAllOrdersCanceled = false;
@@ -265,7 +201,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             placeInitialWalls();
         }
         try {
-            Thread.sleep(4000); //Give the time to new orders to be placed before counting again
+            Thread.sleep(SHORT_WAIT_SECONDS); //Give the time to new orders to be placed before counting again
         } catch (InterruptedException ex) {
             LOG.severe(ex.toString());
         }
@@ -390,7 +326,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
         LOG.warning("Strategy received a price change notification.");
         needWallShift = true;
-        Global.conversion = conversion; //TODO should update this value only after its 100% that the wall has been shifted?
+        Global.conversion = conversion;
         sellPricePEG = new_sellPricePEG;
         buyPricePEG = new_buyPricePEG;
         this.priceDirection = direction;
@@ -504,7 +440,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         //Here I wait until the two orders are correctly displaied. It can take some seconds
         try {
-            Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+            Thread.sleep(SHORT_WAIT_SECONDS * 1000);
         } catch (InterruptedException ex) {
             LOG.severe(ex.toString());
         }

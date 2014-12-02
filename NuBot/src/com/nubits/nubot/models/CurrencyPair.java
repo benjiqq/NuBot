@@ -59,7 +59,6 @@ public class CurrencyPair {
         }
         Currency orderC = new Currency("/", isFiat(orderCurrencyCode), orderCurrencyCode, "//");
         Currency paymentC = new Currency("/", isFiat(paymentCurrencyCode), paymentCurrencyCode, "//");
-        //TODO above I should lookup a list of available currencies instead
         return new CurrencyPair(orderC, paymentC);
 
     }
@@ -152,8 +151,8 @@ public class CurrencyPair {
 
     public static boolean isFiat(String currencyCode) {
         boolean fiat = false;
-        //toto
-        ArrayList<String> knownFiatList = new ArrayList(); //TODO load from some db
+
+        ArrayList<String> knownFiatList = new ArrayList();
         knownFiatList.add("usd");
         knownFiatList.add("eur");
         knownFiatList.add("cny");
