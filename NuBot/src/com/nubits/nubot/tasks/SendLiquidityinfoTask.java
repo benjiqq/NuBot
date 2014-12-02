@@ -100,7 +100,6 @@ public class SendLiquidityinfoTask extends TimerTask {
                 Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
                 Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
 
-
                 //Write to file timestamp,activeOrders, sells,buys, digest
                 String toWrite = new Date().toString() + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
                 FileSystem.writeToFile(toWrite, outputFile, true);

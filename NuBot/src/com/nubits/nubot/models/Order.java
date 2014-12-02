@@ -211,6 +211,6 @@ public class Order {
 
     public String getDigest() {
         //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC }
-        return id + " : { " + type + " " + Utils.round(amount.getQuantity(), 2) + "@" + Utils.round(price.getQuantity(), 8) + "} ";
+        return id + " : { " + type + " " + Utils.round(amount.getQuantity(), 6) + "@" + Utils.round(price.getQuantity(), 8) + "} ";
     }
 }
