@@ -354,13 +354,37 @@ public class NuBot {
             @Override
             public void run() {
 
-                LOG.info("Bot shut down");
+                LOG.info("Bot shutting down..");
+
+                //Try to cancel all orders, if any
+                if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+                    LOG.info("Clearing out active orders ... ");
+
+                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                    if (deleteOrdersResponse.isPositive()) {
+                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                        if (deleted) {
+                            LOG.info("Order clear request succesfully");
+                        } else {
+                            LOG.severe("Could not submit request to clear orders");
+                        }
+
+                    } else {
+                        LOG.severe(deleteOrdersResponse.getError().toString());
+                    }
+
+
+                }
+                LOG.info("Exit. ");
                 NuBot.mainThread.interrupt();
                 if (Global.taskManager != null) {
                     if (Global.taskManager.isInitialized()) {
                         Global.taskManager.stopAll();
                     }
                 }
+
+
                 Thread.currentThread().interrupt();
                 return;
             }
