@@ -25,10 +25,10 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.OptionsJSON;
-import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
+import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SendLiquidityinfoTask;
@@ -52,8 +52,7 @@ import java.util.logging.Logger;
  */
 public class NuBot {
 
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
-    private String optionsPath;
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]";
     private String logsFolder;
     private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
@@ -74,7 +73,7 @@ public class NuBot {
         if (app.readParams(args)) {
             createShutDownHook();
             if (!Global.running) {
-                app.execute();
+                app.execute(args);
             } else {
                 LOG.severe("NuBot is already running. Make sure to terminate other instances.");
             }
@@ -87,7 +86,7 @@ public class NuBot {
      *
      * @author desrever <desrever at nubits.com>
      */
-    private void execute() {
+    private void execute(String args[]) {
         Global.running = true;
 
         //Load settings
@@ -95,7 +94,7 @@ public class NuBot {
 
 
         //Load Options
-        Global.options = OptionsJSON.parseOptions(optionsPath);
+        Global.options = OptionsJSON.parseOptions(args);
         if (Global.options == null) {
             LOG.severe("Error while loading options");
             System.exit(0);
@@ -115,7 +114,7 @@ public class NuBot {
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
-        LOG.info("Setting up  NuBot" + Global.settings.getProperty("version"));
+        LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
         LOG.info("Init logging system");
 
@@ -124,7 +123,16 @@ public class NuBot {
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
         Utils.printSeparator();
 
-        LOG.info("Load options from " + optionsPath);
+
+        String inputFiles = "";
+        for (int i = 0; i < args.length; i++) {
+            if (i != args.length - 1) {
+                inputFiles += args[i] + " ,";
+            } else {
+                inputFiles += args[i];
+            }
+        }
+        LOG.info("Load options from " + args.length + " files : " + inputFiles);
         Utils.printSeparator();
 
 
@@ -333,11 +341,10 @@ public class NuBot {
 
     private boolean readParams(String[] args) {
         boolean ok = false;
-        if (args.length != 1) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+        if (args.length < 1) {
+            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
             System.exit(0);
         }
-        optionsPath = args[0];
         ok = true;
         return ok;
     }
@@ -347,13 +354,37 @@ public class NuBot {
             @Override
             public void run() {
 
-                LOG.info("Bot shut down");
+                LOG.info("Bot shutting down..");
+
+                //Try to cancel all orders, if any
+                if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+                    LOG.info("Clearing out active orders ... ");
+
+                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                    if (deleteOrdersResponse.isPositive()) {
+                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                        if (deleted) {
+                            LOG.info("Order clear request succesfully");
+                        } else {
+                            LOG.severe("Could not submit request to clear orders");
+                        }
+
+                    } else {
+                        LOG.severe(deleteOrdersResponse.getError().toString());
+                    }
+
+
+                }
+                LOG.info("Exit. ");
                 NuBot.mainThread.interrupt();
                 if (Global.taskManager != null) {
                     if (Global.taskManager.isInitialized()) {
                         Global.taskManager.stopAll();
                     }
                 }
+
+
                 Thread.currentThread().interrupt();
                 return;
             }

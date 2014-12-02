@@ -94,7 +94,7 @@ The comand above will unlock the NBT wallet for  9999999999 seconds, ~ 300 years
 
 **Download latest stable builds from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).**
 
-The bot reads options from a *.json* file.
+The bot reads options from one or multiple *.json* file.
 
 Here is a list of essential options : 
 
@@ -131,15 +131,49 @@ With the builds of the bot a sample *options.json* is attached and its will rese
   
 ```
 
+Is it also possible to split the options in several files, to keep some information private or for multiple instances.
+
+In the example below we see how the options presented above can be broken down :
+
+*part1.json*
+```json
+{"options": 
+    {
+    "exchangename":"xxx",
+    "apikey": "xxx",
+    "apisecret": "xxx"
+ }
+}
+```
+
+*part2.json*
+
+```json
+{"options": 
+    {
+    "dualside": false,
+    "nubitaddress": "xxx",
+    "nudport": 9091,
+    "rpcpass": "xxx",
+    "rpcuser": "xxx",
+    "pair":"xxx_xxx",
+    "mail-recipient":"xxx"
+ }
+}
+```
+
+
+
+
 Check the [Under the hood](#hood) section of this document for additional configuration parameters available. 
 
 
 ###3)Run NuBot
 
-Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file you want to use as configuration.
+Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
 
 ```
-java -jar NuBot.jar <path/to/options.json>
+java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]
 ```
 
 The bot will start and output messages on the console and write in the */logs* folder. 

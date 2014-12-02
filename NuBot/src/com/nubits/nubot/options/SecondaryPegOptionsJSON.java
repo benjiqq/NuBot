@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.models;
+package com.nubits.nubot.options;
 
 /**
  *
  * @author desrever <desrever at nubits.com>
  */
+import com.nubits.nubot.models.CurrencyPair;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 import org.json.JSONException;
@@ -107,8 +108,6 @@ public class SecondaryPegOptionsJSON {
             if (optionsJSON.has("wallchange-treshold")) {
                 wallchangeTreshold = new Double((optionsJSON.get("wallchange-treshold")).toString());
             }
-
-            // TODO : to avoid custodians having the freedom of arbitrarily setting their own price, this parameter will be disabled until further decision is taken
 
             if (optionsJSON.has("spread")) {
                 spread = new Double((optionsJSON.get("spread")).toString());
