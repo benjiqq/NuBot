@@ -720,6 +720,7 @@ public class AllCoinWrapper implements TradeInterface {
                 }
                 return sb.toString();
             } catch (java.security.NoSuchAlgorithmException e) {
+                LOG.severe(e.toString());
             }
             return null;
         }
