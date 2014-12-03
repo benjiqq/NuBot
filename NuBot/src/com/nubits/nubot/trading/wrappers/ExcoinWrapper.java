@@ -58,6 +58,8 @@ public class ExcoinWrapper implements TradeInterface{
     private final String API_TRADE = "issue";
     private final String API_ORDER = "order";
     private final String API_CANCEL = "cancel";
+    private final String API_TIMESTAMP = "timestamp";
+    private final int API_MAX_TRADES = 750;
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -321,42 +323,250 @@ public class ExcoinWrapper implements TradeInterface{
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        //https://api.exco.in/v1/account/order/{ORDER_ID}
+        String url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_ORDER + "/" + orderID;
+
+        String[] splitOrderId = orderID.split("-");
+        String pairString = splitOrderId[1] + "_" + splitOrderId[0];
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairString, "_");
+
+        ApiResponse response = getQuery(url);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            Order out = new Order();
+            //set the id
+            out.setId(httpAnswerJson.get("id").toString());
+            //set the inserted date
+            SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+            Date date = null;
+            try {
+                date = sdf.parse(httpAnswerJson.get("timestamp").toString());
+            } catch (java.text.ParseException pe) {
+                LOG.severe(pe.toString());
+            }
+            if (date != null) {
+                long timeStamp = date.getTime();
+                Date insertDate = new Date(timeStamp);
+                out.setInsertedDate(insertDate);
+            }
+            //set the price
+            Amount price = new Amount(Double.parseDouble(httpAnswerJson.get("price").toString()), pair.getPaymentCurrency());
+            out.setPrice(price);
+            //set the amount
+            Amount amount = new Amount(Double.parseDouble(httpAnswerJson.get("commodity_amount").toString()), pair.getOrderCurrency());
+            out.setAmount(amount);
+            //set the type
+            String type = httpAnswerJson.get("type").toString();
+            out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
+            //set the pair
+            out.setPair(pair);
+
+            apiResponse.setResponseObject(out);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        //https://api.exco.in/v1/account/order/{ORDER_ID}/cancel
+        String url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_ORDER + "/" + orderID + "/" + API_CANCEL;
+
+        ApiResponse response = getQuery(url);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            String returnedOrderId = httpAnswerJson.get("id").toString();
+            if (returnedOrderId.equals(orderID)) {
+                apiResponse.setResponseObject(true);
+            } else {
+                apiResponse.setResponseObject(false);
+            }
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        double defaultFee = 0.15;
+
+        //Excoin global txFee is 0.15 not the global setting of 0.2
+
+        //if (Global.options != null) {
+        //    return new ApiResponse(true, Global.options.getTxFee(), null);
+        //} else {
+        return new ApiResponse(true, defaultFee, null);
+        //}
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        LOG.warning("Excoin uses global TX fee, currency pair not supported. \n"
+                + "now calling getTxFee()");
+        return getTxFee();
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+
+
+        String url;
+        if (startTime == 0) { //https://api.exco.in/v1/account/trades(/{COUNT})
+            LOG.info("A maximum of " + API_MAX_TRADES + " trades can be returned from the API");
+            url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_MAX_TRADES;
+        } else { //https://api.exco.in/v1/account/timestamp/{TIMESTAMP}
+            url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TIMESTAMP + "/" + startTime;
+        }
+
+        ApiResponse response = getQuery(url);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray trades = (JSONArray) httpAnswerJson.get("trades");
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                tradeList.add(parseTrade(trade.next()));
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+    }
+
+    public Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+
+        //get and set the pair
+        String commodity = in.get("commodity").toString();
+        String currency = in.get("currency").toString();
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
+        out.setPair(pair);
+        //get and set the type
+        String type = in.get("type").toString();
+        out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
+        //get and set the price
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //get and set the date
+        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("timestamp").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.severe(pe.toString());
+        }
+        if (date != null) {
+            long timeStamp = date.getTime();
+            Date insertDate = new Date(timeStamp);
+            out.setDate(insertDate);
+        }
+        //set the exchangeName
+        out.setExchangeName(exchange.getName());
+        //set the amount
+        Amount amount = new Amount(Double.parseDouble(in.get("received").toString()), pair.getOrderCurrency());
+        out.setAmount(amount);
+
+        //generate the unique id - MD5 hash of datetime and pair concatenation
+        String hash_data = in.get("timestamp").toString()
+                + in.get("commodity").toString()
+                + in.get("currency").toString();
+        String id = null;
+        try {
+            java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
+            byte[] array = md.digest(hash_data.getBytes());
+            StringBuffer sb = new StringBuffer();
+            for (int i = 0; i < array.length; ++i) {
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+            }
+            id = sb.toString();
+        } catch (java.security.NoSuchAlgorithmException e) {
+            LOG.severe(e.toString());
+        }
+        //set the id
+        out.setId(id);
+        //set the order_id
+        out.setOrder_id(id);
+
+        return out;
     }
 
     @Override
     public ApiResponse isOrderActive(String id) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        ApiResponse activeOrdersResponse = getActiveOrders();
+
+        apiResponse.setResponseObject(false);
+
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(id)) {
+                    apiResponse.setResponseObject(true);
+                }
+            }
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        //Since there is no API entry point for that, this call will iterate over active orders
+        ApiResponse toReturn = new ApiResponse();
+        boolean ok = true;
+
+        ApiResponse activeOrdersResponse = getActiveOrders();
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                if (tempOrder.getPair().equals(pair)) {
+                    ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
+                    if (deleteOrderResponse.isPositive()) {
+                        boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+
+                        if (deleted) {
+                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        } else {
+                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            ok = false;
+                        }
+
+                    } else {
+                        LOG.severe(deleteOrderResponse.getError().toString());
+                    }
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException ex) {
+                        LOG.severe(ex.toString());
+                    }
+                }
+
+            }
+            toReturn.setResponseObject(ok);
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            toReturn.setError(activeOrdersResponse.getError());
+            return toReturn;
+        }
+
+        return toReturn;
     }
 
     @Override
@@ -408,9 +618,7 @@ public class ExcoinWrapper implements TradeInterface{
     }
 
     @Override
-    public void setApiBaseUrl(String apiBaseUrl) {
-
-    }
+    public void setApiBaseUrl(String apiBaseUrl) {}
 
     private class ExcoinService implements ServiceInterface {
 
