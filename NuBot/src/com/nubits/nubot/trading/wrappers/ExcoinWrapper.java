@@ -218,6 +218,7 @@ public class ExcoinWrapper implements TradeInterface{
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
+        amount = amount * rate;
         return enterOrder(Constant.BUY, pair, amount, rate);
     }
 
