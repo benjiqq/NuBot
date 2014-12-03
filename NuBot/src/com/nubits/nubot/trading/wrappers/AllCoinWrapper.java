@@ -45,6 +45,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_BUY_COIN = "buy_coin";
     private final String API_OPEN_ORDERS = "myorders";
     private final String API_CANCEL_ORDERS = "cancel_order";
+    private final String API_TRADES = "mytrades";
     //Tokens
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_ERR = "error_info";
@@ -499,12 +500,46 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_AUTH_URL;
+        String method = API_TRADES;
+        boolean isGet = false;
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+        TreeMap<String, String> query_args = new TreeMap<>();
+        query_args.put("page", "1");
+        query_args.put("page_size", "20");
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray trades = (JSONArray) httpAnswerJson.get("data");
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                Trade thisTrade = parseTrade(trade.next());
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+    }
+
+    public Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+
+        //get and set the pair
+
+
+        return out;
     }
 
     @Override
