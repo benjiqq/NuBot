@@ -49,7 +49,6 @@ public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
-
     public static final Currency NSR = new Currency("N", false, "NSR", "Nushares");
     public static final CurrencyPair NSR_BTC = new CurrencyPair(NSR, Constant.BTC);
 
@@ -446,7 +445,7 @@ public class TestWrappers {
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
         } else if (exchangeName.equals(Constant.EXCOIN)) {
             //Wrap the keys into a new ApiKeys object
-            keys = new ApiKeys(Passwords.EXCOIN_SECRET, Passwords.EXCOIN_KEY);
+            keys = new ApiKeys(Passwords.EXCOIN_SECRET, "");
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
