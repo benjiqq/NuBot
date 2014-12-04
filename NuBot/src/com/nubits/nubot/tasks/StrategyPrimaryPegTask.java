@@ -255,6 +255,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         balanceNBT = balance.getNBTAvailable();
+
                         Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
@@ -269,6 +270,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                             //Prepare the sell order
                             double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
+
+                            if (Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
+                            {
+                                if (balanceNBT.getQuantity() > Global.options.getMaxSellVolume()) {
+                                    //put the cap
+                                    balanceNBT.setQuantity(Global.options.getMaxSellVolume());
+                                }
+                            }
 
                             double amountToSell = balanceNBT.getQuantity();
                             if (Global.executeOrders) {
@@ -524,12 +533,29 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
+                    if (type.equals(Constant.SELL) && Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
+                    {
+                        if (balance.getQuantity() > Global.options.getMaxSellVolume()) {
+                            //put the cap
+                            balance.setQuantity(Global.options.getMaxSellVolume());
+                        }
+                    }
+
+                    if (type.equals(Constant.BUY)) {
+                        if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
+                            //put the cap
+                            balance.setQuantity(Global.options.getMaxBuyVolume());
+
+                        }
+                    }
+
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
                     double amount2 = balance.getQuantity() - amount1;
 
                     if (type.equals(Constant.BUY)) {
                         amount1 = Utils.round(amount1 / price, 8);
                         amount2 = Utils.round(amount2 / price, 8);
+
                     }
 
                     //Prepare the orders
