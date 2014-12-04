@@ -458,7 +458,7 @@ public class ExcoinWrapper implements TradeInterface{
         out.setPair(pair);
         //get and set the type
         String type = in.get("type").toString();
-        out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
+        out.setType(type.equals("BUY") ? Constant.BUY : Constant.SELL);
         //get and set the price
         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
         out.setPrice(price);
@@ -478,8 +478,16 @@ public class ExcoinWrapper implements TradeInterface{
         //set the exchangeName
         out.setExchangeName(exchange.getName());
         //set the amount
-        Amount amount = new Amount(Double.parseDouble(in.get("received").toString()), pair.getOrderCurrency());
+        Amount amount;
+        if (type.equals("BUY")) {
+            amount = new Amount(Double.parseDouble(in.get("received").toString()), pair.getOrderCurrency());
+        } else {
+            amount = new Amount(Double.parseDouble(in.get("sent").toString()), pair.getOrderCurrency());
+        }
         out.setAmount(amount);
+        //set the fee
+        Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
+        out.setFee(fee);
 
         //generate the unique id - MD5 hash of datetime and pair concatenation
         String hash_data = in.get("timestamp").toString()
