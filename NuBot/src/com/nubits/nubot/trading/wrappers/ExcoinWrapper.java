@@ -231,7 +231,6 @@ public class ExcoinWrapper implements TradeInterface{
         String details = curs + "/" + (type.equals("BUY") ? "bid" : "ask") + "/" + nf.format(amount) + "/" + nf.format(rate);
         String url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_ORDERS + "/" + API_TRADE + "/" + details;
 
-        LOG.info(url);
         ApiResponse response = getQuery(url);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
