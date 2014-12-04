@@ -68,6 +68,8 @@ public class OptionsJSON {
     private double priceIncrement;
     private int emergencyTimeout;
     private double keepProceeds;
+    private double maxSellVolume;
+    private double maxBuyVolume;
     private SecondaryPegOptionsJSON cpo;
 
     /**
@@ -100,7 +102,7 @@ public class OptionsJSON {
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean waitBeforeShift, SecondaryPegOptionsJSON secondaryPegOptions) {
+            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean waitBeforeShift, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -126,6 +128,8 @@ public class OptionsJSON {
         this.secondaryPegOptions = secondaryPegOptions;
         this.aggregate = aggregate;
         this.waitBeforeShift = waitBeforeShift;
+        this.maxSellVolume = maxSellVolume;
+        this.maxBuyVolume = maxBuyVolume;
     }
 
     /**
@@ -472,6 +476,22 @@ public class OptionsJSON {
         this.waitBeforeShift = waitBeforeShift;
     }
 
+    public double getMaxSellVolume() {
+        return maxSellVolume;
+    }
+
+    public void setMaxSellVolume(double maxSellVolume) {
+        this.maxSellVolume = maxSellVolume;
+    }
+
+    public double getMaxBuyVolume() {
+        return maxBuyVolume;
+    }
+
+    public void setMaxBuyVolume(double maxBuyVolume) {
+        this.maxBuyVolume = maxBuyVolume;
+    }
+
     /**
      *
      * @param path
@@ -539,8 +559,6 @@ public class OptionsJSON {
                         setMap.put(entry.getKey(), entry.getValue());
                     }
 
-
-
                     pegOptionsJSON = new org.json.JSONObject(setMap);
                     cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
                 } else {
@@ -572,6 +590,10 @@ public class OptionsJSON {
             double priceIncrement = 0.0003;
             double keepProceeds = 0;
 
+            double maxSellVolume = 0;
+            double maxBuyVolume = 0;
+
+
             int emergencyTimeout = 60;
 
             if (optionsJSON.containsKey("nudip")) {
@@ -588,6 +610,14 @@ public class OptionsJSON {
 
             if (optionsJSON.containsKey("submit-liquidity")) {
                 submitLiquidity = (boolean) optionsJSON.get("submit-liquidity");
+            }
+
+            if (optionsJSON.containsKey("max-sell-order-volume")) {
+                maxSellVolume = Utils.getDouble(optionsJSON.get("max-sell-order-volume"));
+            }
+
+            if (optionsJSON.containsKey("max-buy-order-volume")) {
+                maxBuyVolume = Utils.getDouble(optionsJSON.get("max-buy-order-volume"));
             }
 
             //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
@@ -674,7 +704,7 @@ public class OptionsJSON {
                     rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                     executeOrders, verbose, pair, executeStrategyInterval,
                     sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
-                    emergencyTimeout, keepProceeds, aggregate, waitBeforeShift, cpo);
+                    emergencyTimeout, keepProceeds, aggregate, waitBeforeShift, maxSellVolume, maxBuyVolume, cpo);
 
         } catch (NumberFormatException e) {
             LOG.severe("Error while parsing the options file : " + e);

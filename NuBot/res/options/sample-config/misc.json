@@ -10,6 +10,8 @@
     "mail-recipient":"xxx@xxx.xxx",
     "emergency-timeout":60,
     "keep-proceeds":0,
+     "max-sell-order-volume" : 0,
+    "max-buy-order-volume" : 0
  }
 }
   
