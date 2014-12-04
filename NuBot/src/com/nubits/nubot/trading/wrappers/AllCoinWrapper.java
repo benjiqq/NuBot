@@ -522,6 +522,7 @@ public class AllCoinWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
+            LOG.info(trades.toJSONString());
             for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
                 Trade thisTrade = parseTrade(trade.next());
             }
@@ -535,8 +536,35 @@ public class AllCoinWrapper implements TradeInterface {
 
     public Trade parseTrade(JSONObject in) {
         Trade out = new Trade();
-
+        /*
+        {
+            "trade_id": "100000",
+                "type": "HIC",
+                "exchange": "BTC",
+                "ctime": "2014-06-01 09:03:42",
+                "price": "0.00001849",
+                "num": "11.12000000",
+                "total": "0.00020561",
+                "fee": "0.016680",
+                "order_id": "139978",
+                "trade_type": "buy"
+        }
+        */
         //get and set the pair
+        String type = in.get("type").toString();
+        String exchange = in.get("exchange").toString();
+        String cPair = type + "_" + exchange;
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(cPair, "_");
+        out.setPair(pair);
+        //set the id
+        out.setId(in.get("trade_id").toString());
+        out.setOrder_id(in.get("trade_id").toString());
+        //set type
+        out.setType(in.get("trade_type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
+        //set price
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getOrderCurrency());
+        out.setPrice(price);
+        //set amount
 
 
         return out;
