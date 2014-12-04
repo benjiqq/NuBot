@@ -105,19 +105,19 @@ public class PoloniexWrapper implements TradeInterface {
     private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, false);
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+        if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.noConnectionError);
             return apiResponse;
         }
 
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean valid = true;
             if (httpAnswerJson.containsKey("error")) {
-                valid = false;
-            }
-            if (!valid) {
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
@@ -138,6 +138,7 @@ public class PoloniexWrapper implements TradeInterface {
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
+            return apiResponse;
         }
         return apiResponse;
     }

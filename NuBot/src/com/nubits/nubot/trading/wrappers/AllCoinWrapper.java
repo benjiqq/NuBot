@@ -29,7 +29,7 @@ import javax.net.ssl.HttpsURLConnection;
  */
 public class AllCoinWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(BterWrapper.class.getName());
+    private static final Logger LOG = Logger.getLogger(AllCoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -72,8 +72,13 @@ public class AllCoinWrapper implements TradeInterface {
     private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+        if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
         }
         JSONParser parser = new JSONParser();
 
@@ -107,6 +112,7 @@ public class AllCoinWrapper implements TradeInterface {
         } catch (ParseException pe) {
             LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
+            return apiResponse;
         }
         return apiResponse;
     }
@@ -803,6 +809,7 @@ public class AllCoinWrapper implements TradeInterface {
                 }
                 return sb.toString();
             } catch (java.security.NoSuchAlgorithmException e) {
+                LOG.severe(e.toString());
             }
             return null;
         }
