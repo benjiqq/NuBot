@@ -525,6 +525,13 @@ public class AllCoinWrapper implements TradeInterface {
             LOG.info(trades.toJSONString());
             for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
                 Trade thisTrade = parseTrade(trade.next());
+                if (!thisTrade.getPair().equals(pair)) {
+                    continue;
+                }
+                if (thisTrade.getDate().getTime() < startTime) {
+                    continue;
+                }
+                tradeList.add(thisTrade);
             }
             apiResponse.setResponseObject(tradeList);
         } else {
@@ -551,9 +558,9 @@ public class AllCoinWrapper implements TradeInterface {
         }
         */
         //get and set the pair
-        String type = in.get("type").toString();
-        String exchange = in.get("exchange").toString();
-        String cPair = type + "_" + exchange;
+        String cur = in.get("type").toString();
+        String com = in.get("exchange").toString();
+        String cPair = cur + "_" + com;
         CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(cPair, "_");
         out.setPair(pair);
         //set the id
@@ -562,9 +569,28 @@ public class AllCoinWrapper implements TradeInterface {
         //set type
         out.setType(in.get("trade_type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
         //set price
-        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getOrderCurrency());
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
         out.setPrice(price);
         //set amount
+        Amount amount = new Amount(Double.parseDouble(in.get("num").toString()), pair.getOrderCurrency());
+        //set the Date
+        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("ctime").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.severe(pe.toString());
+        }
+        if (date != null) {
+            long ctime = date.getTime();
+            Date insertDate = new Date(ctime);
+            out.setDate(insertDate);
+        }
+        //set the exchange name
+        out.setExchangeName(exchange.getName());
+        //set the fee
+        Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
+        out.setFee(fee);
 
 
         return out;
