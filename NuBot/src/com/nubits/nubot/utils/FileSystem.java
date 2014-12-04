@@ -110,7 +110,8 @@ public class FileSystem {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.severe("File not found " + path + "\n "
+                        + ex.toString());
             }
         }
 
