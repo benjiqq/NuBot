@@ -1,0 +1,13 @@
+{"options": 
+    {
+    "wallchange-treshold": 0.05,
+    "secondary-peg-options":
+    {
+            "main-feed":"blockchain",
+            "backup-feeds": {
+                "backup1" : { "name" : "coinbase"},
+                "backup2" : { "name" : "btce"}
+                }
+    }
+ }
+}
