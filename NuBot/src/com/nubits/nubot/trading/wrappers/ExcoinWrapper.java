@@ -1,6 +1,5 @@
 package com.nubits.nubot.trading.wrappers;
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -11,14 +10,7 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import java.io.*;
-import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
@@ -28,16 +20,18 @@ import java.text.*;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
-import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.util.HashMap;
-import java.util.TreeMap;
+import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Created by sammoth on 30/11/14.
  */
-public class ExcoinWrapper implements TradeInterface{
+public class ExcoinWrapper implements TradeInterface {
 
     private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
     //Class fields
@@ -150,7 +144,7 @@ public class ExcoinWrapper implements TradeInterface{
                 Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
                 Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
                 Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext(); ) {
+                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext();) {
                     JSONObject thisWallet = wallet.next();
                     String thisCurrency = thisWallet.get("currency").toString();
                     if (thisCurrency.equals(pair.getPaymentCurrency().getCode().toUpperCase())) {
@@ -166,7 +160,7 @@ public class ExcoinWrapper implements TradeInterface{
                 apiResponse.setResponseObject(balance);
             } else { //get specific balance
                 Amount total = new Amount(0, currency);
-                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext(); ) {
+                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext();) {
                     JSONObject thisWallet = wallet.next();
                     String thisCurrency = thisWallet.get("currency").toString();
                     if (thisCurrency.equals(currency.getCode().toUpperCase())) {
@@ -244,7 +238,9 @@ public class ExcoinWrapper implements TradeInterface{
     }
 
     @Override
-    public ApiResponse getActiveOrders() { return getActiveOrdersImpl(null); }
+    public ApiResponse getActiveOrders() {
+        return getActiveOrdersImpl(null);
+    }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
@@ -286,7 +282,7 @@ public class ExcoinWrapper implements TradeInterface{
                         //set the id
                         out.setId(in.get("id").toString());
                         //set the inserted date
-                        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
                         Date date = null;
                         try {
                             date = sdf.parse(in.get("timestamp").toString());
@@ -338,7 +334,7 @@ public class ExcoinWrapper implements TradeInterface{
             //set the id
             out.setId(httpAnswerJson.get("id").toString());
             //set the inserted date
-            SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
             Date date = null;
             try {
                 date = sdf.parse(httpAnswerJson.get("timestamp").toString());
@@ -393,19 +389,13 @@ public class ExcoinWrapper implements TradeInterface{
     @Override
     public ApiResponse getTxFee() {
         double defaultFee = 0.15;
-
-        //Excoin global txFee is 0.15 not the global setting of 0.2
-
-        //if (Global.options != null) {
-        //    return new ApiResponse(true, Global.options.getTxFee(), null);
-        //} else {
         return new ApiResponse(true, defaultFee, null);
-        //}
+
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warning("Excoin uses global TX fee, currency pair not supported. \n"
+        LOG.fine("Excoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -463,7 +453,7 @@ public class ExcoinWrapper implements TradeInterface{
         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
         out.setPrice(price);
         //get and set the date
-        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
         Date date = null;
         try {
             date = sdf.parse(in.get("timestamp").toString());
@@ -491,7 +481,7 @@ public class ExcoinWrapper implements TradeInterface{
             byte[] array = md.digest(hash_data.getBytes());
             StringBuffer sb = new StringBuffer();
             for (int i = 0; i < array.length; ++i) {
-                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+                sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
             }
             id = sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
@@ -618,7 +608,8 @@ public class ExcoinWrapper implements TradeInterface{
     }
 
     @Override
-    public void setApiBaseUrl(String apiBaseUrl) {}
+    public void setApiBaseUrl(String apiBaseUrl) {
+    }
 
     private class ExcoinService implements ServiceInterface {
 
@@ -701,8 +692,8 @@ public class ExcoinWrapper implements TradeInterface{
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + queryUrl +
-                        "\nHTTP Response : " + Objects.toString(response));
+                LOG.severe("Query to : " + queryUrl
+                        + "\nHTTP Response : " + Objects.toString(response));
             }
 
             try {
@@ -715,17 +706,17 @@ public class ExcoinWrapper implements TradeInterface{
             }
 
             /*
-            if (httpError) {
-                JSONParser parser = new JSONParser();
-                try {
-                    JSONObject obj = (JSONObject) (parser.parse(answer));
-                    answer = (String) obj.get(TOKEN_ERR);
-                } catch (ParseException pe) {
-                    LOG.severe(pe.toString());
-                    return null;
-                }
-            }
-            */
+             if (httpError) {
+             JSONParser parser = new JSONParser();
+             try {
+             JSONObject obj = (JSONObject) (parser.parse(answer));
+             answer = (String) obj.get(TOKEN_ERR);
+             } catch (ParseException pe) {
+             LOG.severe(pe.toString());
+             return null;
+             }
+             }
+             */
 
             connection.disconnect();
             connection = null;
