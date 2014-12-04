@@ -74,7 +74,7 @@ public class ApiError {
 
     @Override
     public String toString() {
-        return "ApiError [" + "getCode " + getCode() + " "
-                + "getDescription " + getDescription() + "]";
+        return "ApiError [" + getCode() + " : "
+                + getDescription() + "]";
     }
 }

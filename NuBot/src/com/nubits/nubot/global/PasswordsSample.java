@@ -43,6 +43,7 @@ public class PasswordsSample {
     public static final String SMTP_HOST = "";
     public static final String BITSPARK_KEY = "xxx";
     public static final String BITSPARK_SECRET = "xxx";
+    public static final String EXCOIN_KEY = "xxx";
     public static final String EXCOIN_SECRET = "xxx";
     public static final String GMAIL_USERNAME = "xxx"; //used to send mail notifications
     public static final String GMAIL_PASSWORD = "xxx";
