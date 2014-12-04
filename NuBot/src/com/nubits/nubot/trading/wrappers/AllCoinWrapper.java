@@ -45,6 +45,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_BUY_COIN = "buy_coin";
     private final String API_OPEN_ORDERS = "myorders";
     private final String API_CANCEL_ORDERS = "cancel_order";
+    private final String API_TRADES = "mytrades";
     //Tokens
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_ERR = "error_info";
@@ -499,12 +500,100 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_AUTH_URL;
+        String method = API_TRADES;
+        boolean isGet = false;
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+        TreeMap<String, String> query_args = new TreeMap<>();
+        query_args.put("page", "1");
+        query_args.put("page_size", "20");
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray trades = (JSONArray) httpAnswerJson.get("data");
+            LOG.info(trades.toJSONString());
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                Trade thisTrade = parseTrade(trade.next());
+                if (!thisTrade.getPair().equals(pair)) {
+                    continue;
+                }
+                if (thisTrade.getDate().getTime() < startTime) {
+                    continue;
+                }
+                tradeList.add(thisTrade);
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+    }
+
+    public Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+        /*
+        {
+            "trade_id": "100000",
+                "type": "HIC",
+                "exchange": "BTC",
+                "ctime": "2014-06-01 09:03:42",
+                "price": "0.00001849",
+                "num": "11.12000000",
+                "total": "0.00020561",
+                "fee": "0.016680",
+                "order_id": "139978",
+                "trade_type": "buy"
+        }
+        */
+        //get and set the pair
+        String cur = in.get("type").toString();
+        String com = in.get("exchange").toString();
+        String cPair = cur + "_" + com;
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(cPair, "_");
+        out.setPair(pair);
+        //set the id
+        out.setId(in.get("trade_id").toString());
+        out.setOrder_id(in.get("trade_id").toString());
+        //set type
+        out.setType(in.get("trade_type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
+        //set price
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //set amount
+        Amount amount = new Amount(Double.parseDouble(in.get("num").toString()), pair.getOrderCurrency());
+        //set the Date
+        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("ctime").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.severe(pe.toString());
+        }
+        if (date != null) {
+            long ctime = date.getTime();
+            Date insertDate = new Date(ctime);
+            out.setDate(insertDate);
+        }
+        //set the exchange name
+        out.setExchangeName(exchange.getName());
+        //set the fee
+        Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
+        out.setFee(fee);
+
+
+        return out;
     }
 
     @Override
