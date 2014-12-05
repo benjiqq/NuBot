@@ -23,7 +23,7 @@ In the case of *sell side custodians*, the liquidity they provide is secondary t
 NuBot permits a user to indicate they are either a sell side or dual side custodian. This effect the trading bots behavior is detailed in the use cases below.
 
 
-## Dual-side strategy
+##Dual-side strategy
 
 First, someone who wishes to fulfill this role must seek shareholder approval via the custodial grant mechanism.  
 Say a particular liquidity provider or *LP* custodian has 10 million USD he wishes to use to provide NuBit liquidity. He would expect compensation for lost opportunity cost (he could otherwise invest those funds in rental property, stocks or bonds) and for the risk of loss via an exchange default, such as we have seen with Mt. Gox and others.  
@@ -38,7 +38,7 @@ When an order is placed, canceled or filled (even partially), the *liquidityinfo
 
 See [Attached Diagrams](#markdown-header-dual-side-logic) for a visual flowchart. 
 
-## Sell-side strategy 
+##Sell-side strategy 
 
 In some cases custodians will spend the NuBits directly and not use the trading bot at all.  
 For instance, if core developers accept NuBits as compensation then Jordan Lee will simply distribute NuBits granted to him directly without the need for any exchange.
@@ -53,7 +53,7 @@ Calling *liquidityinfo* will have the effect of transmitting the size of the buy
 
 See [Attached Diagrams](#markdown-header-sell-side-logic) for a visual flowchart. 
 
-## Other strategies
+##Other strategies
 
 There might be adjusted versions of the two strategies explained above.  
 To request a custom build of NuBot to fulfil a particular custodial grant, [get in touch](http://discuss.nubits.com/category/nubits/automated-trading).
@@ -79,7 +79,7 @@ By using NuBot you declare to have accepted the afore-mentioned risks.
 * Before running the bot on a market where another instance of NuBot is operating, make sure to reach an agreement with the other operator on the price-feed to be used.
 * For NBT_EUR pair, only one instance per market is currently allowed.
 
-### 1)Prepare the NuBits client client
+###1) Prepare the NuBits client client
 
 To function correctly, NuBot needs to communicate with the NuBits client of the custodian.  
 The bot needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have real-time information about active orders in the network across custodians, and react to it.  
@@ -112,7 +112,7 @@ walletpassphrase <your passphrase> 9999999999
 The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg!
 
 
-### 2) Configure the NuBot
+###2) Configure the NuBot
 
 **Download latest stable builds from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).**
 
@@ -156,7 +156,7 @@ With the builds of the bot a sample *options.json* is attached and its will rese
 Check the [Under the hood](#markdown-header-under-the-hood) section of this document for additional configuration parameters available. 
 
 
-###3)Run NuBot
+###3) Run NuBot
 
 Now open a terminal, navigate to the folder of NuBot and execute the .jar, specifying the path to the *.json* file you want to use as configuration.
 
@@ -175,7 +175,7 @@ Download Java JRE:1.7 [from oracle] (http://www.oracle.com/technetwork/java/java
 
 
 
-# Under the hood
+#Under the hood
 ##Additional configuration parameters
 
 
@@ -209,7 +209,7 @@ It is sufficient to add a JSON object in the standard options file structured in
 | wallchange-threshold |  how much the price needs to change in order to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 | price-distance-threshold | for sanity check, the bot checks the feed prices before using it. If the last price differs for more than <price-distance-threshold%> from the majority of backups, then the bot skips it and tries to use a backup source instead (performing the same sanity check). |    double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%  |
 
-#### Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
+####Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
 
 | Feed name        | Currencies available for tracking   |  Feed |   
 | ------------- |:-------------:| -------------:| 
