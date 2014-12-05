@@ -171,7 +171,7 @@ To terminate the bot, exit the process with "Ctrl+C"
 *Requirements* 
 NuBot comes as a cross platform executable jar file to run from command line.  
 It only requires a recent Java Runtime Environment to be installed.  
-Download Java JRE:1.7 [from oracle] (http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html)
+Download Java JRE:1.7 [from oracle](http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html)
 
 
 
