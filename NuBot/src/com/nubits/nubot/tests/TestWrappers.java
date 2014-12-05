@@ -49,8 +49,7 @@ public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final Currency NSR = new Currency("N", false, "NSR", "Nushares");
-    public static final CurrencyPair NSR_BTC = new CurrencyPair(NSR, Constant.BTC);
+    public static final CurrencyPair NSR_BTC = new CurrencyPair(Constant.NSR, Constant.BTC);
 
     public static void main(String[] args) {
         //Load settings

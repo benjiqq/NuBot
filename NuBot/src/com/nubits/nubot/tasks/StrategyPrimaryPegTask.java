@@ -282,7 +282,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             double amountToSell = balanceNBT.getQuantity();
                             if (Global.executeOrders) {
                                 //execute the order
-                                String orderString = "sell " + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                                         + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
                                 LOG.warning("Strategy : Submit order : " + orderString);
 
@@ -560,9 +560,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                     //Prepare the orders
 
-                    String orderString1 = type + " " + amount1 + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    String orderString1 = type + " " + Utils.round(amount1, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-                    String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    String orderString2 = type + " " + Utils.round(amount2, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
                     if (Global.options.isExecuteOrders()) {

@@ -45,6 +45,9 @@
         <!-- Copy SSL keystore -->
         <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
 
+        <!-- Copy currencies.csv -->
+        <copy file="res/currencies.csv" tofile="${store.dir}/res/currencies.csv"/>
+        
         <!--Compile README.md to html , requires grip https://github.com/joeyespo/grip-->
         <exec dir="../" executable="bash">  
             <arg value="compileReadme.sh"/>  
