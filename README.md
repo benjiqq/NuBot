@@ -26,7 +26,7 @@ First someone who wishes to fulfill this role must seek shareholder approval via
 Now he is ready to make use of the trading bot. An appropriate exchange will expose a trading API and our trading bot implements the API for that specific exchange. Each implementation of a specific exchange API implements an interface to standardize the way the trading bot interacts with these diverse exchange APIs. Doing this will allow the LP custodian to enter authentication information into the trading bot for his exchange account. He will then use the user interface in our trading bot to place an buy order for 10,000,000 NBT on the exchange. The price will not be exactly one USD. It will be one USD minus the exchange transaction fee. If the exchange charges a 0.2% transaction fee, he will place a buy order for 10,000,000 NBT at a price of 0.998 USD. Let us suppose his order is partially filled in the amount of 1,000,000 NBT. Now his exchange account will contain 9,000,000 USD used to fund an order for 9,000,000 NBT. There will also be 1,000,000 NBT in the account. The trading bot automatically and immediately place these 1,000,000 NBT for sale at a price of 1.002 USD (one USD + a 0.2% transaction fee). If this order fills, then the bot should use the USD proceeds to immediately place a buy order for NBT at 0.998 USD. All funds should be continually on order and the LP custodian's funds should not be depleted by transaction fees.
 When an order is placed, canceled or filled (even partially), the liquidityinfo RPC is called Nu client.
 
-See [Attached Diagrams](#diagram-dual) for a visual flowchart. 
+See [Attached Diagrams](#markdown-header-Dual-sidelogic) for a visual flowchart. 
 
 ## Sell-side strategy 
 
