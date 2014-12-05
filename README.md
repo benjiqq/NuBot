@@ -7,11 +7,9 @@
 
 #What is NuBot?
 
-
-NuBot is a tool that helps [NuBits](https://www.nubits.com) custodians to automate trades. 
-As explained in the [white paper](https://nubits.com/about/white-paper), custodian's core mission is to **help maintain the peg while introducing new currency into the market**.
-
-NuBot is a cross-platform automated trading bot written in java. 
+NuBot is a cross-platform automated trading bot written in java.  
+NuBot is a tool that helps [NuBits](https://www.nubits.com) custodians to automate trades.  
+As explained in the [white paper](https://nubits.com/about/white-paper), custodian's core mission is to **help maintain the peg while introducing new currency into the market**.  
 
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
