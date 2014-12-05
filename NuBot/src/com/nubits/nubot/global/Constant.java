@@ -44,15 +44,13 @@ public class Constant {
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
     //Currencies
-    public static final Currency USD = new Currency("$", true, "USD", "US Dollar");
-    public static final Currency CNY = new Currency("C", true, "CNY", "CNY");
-    public static final Currency EUR = new Currency("€", true, "EUR", "Euro");
-    public static final Currency BTC = new Currency("B", false, "BTC", "Bitcoin");
-    public static final Currency NBT = new Currency("N", false, "NBT", "Nubits");
-    public static final Currency PPC = new Currency("P", false, "PPC", "Peercoin");
-    public static final Currency LTC = new Currency("L", false, "LTC", "Litecoin");
-    public static final Currency BITUSD = new Currency("busd", false, "BITUSD", "Bitshare X BitUSD");
-    public static final Currency BTSX = new Currency("bx", false, "BTSX", "Bitshares X");
+    public static final Currency USD = new Currency(true, "USD", "US Dollar");
+    public static final Currency CNY = new Currency(true, "CNY", "CNY");
+    public static final Currency EUR = new Currency(true, "EUR", "Euro");
+    public static final Currency BTC = new Currency(false, "BTC", "Bitcoin");
+    public static final Currency NBT = new Currency(false, "NBT", "Nubits");
+    public static final Currency PPC = new Currency(false, "PPC", "Peercoin");
+    public static final Currency LTC = new Currency(false, "LTC", "Litecoin");
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
@@ -65,10 +63,6 @@ public class Constant {
     public static final CurrencyPair PPC_BTC = new CurrencyPair(PPC, BTC);
     public static final CurrencyPair PPC_LTC = new CurrencyPair(PPC, LTC);
     public static final CurrencyPair BTC_CNY = new CurrencyPair(BTC, CNY);
-    public static final CurrencyPair BTSX_USD = new CurrencyPair(BTSX, USD);
-    public static final CurrencyPair BTSX_BTC = new CurrencyPair(BTSX, BTC);
-    public static final CurrencyPair BITUSD_BTC = new CurrencyPair(BITUSD, BTC);
-    public static final CurrencyPair BTC_BITUSD = new CurrencyPair(BTC, BITUSD);
     public static final CurrencyPair EUR_USD = new CurrencyPair(EUR, USD);
     public static final CurrencyPair CNY_USD = new CurrencyPair(CNY, USD);
     //Direction of price
@@ -99,12 +93,6 @@ public class Constant {
                 break;
             case "NBT":
                 toRet = NBT;
-                break;
-            case "BITUSD":
-                toRet = BITUSD;
-                break;
-            case "BTSX":
-                toRet = BTSX;
                 break;
             default:
                 LOG.severe("Currency " + codeString + " not available");

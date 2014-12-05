@@ -24,7 +24,6 @@ package com.nubits.nubot.models;
 public class Currency {
 
 //Class Variables
-    private String symbol; // i.e. $
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
@@ -37,27 +36,10 @@ public class Currency {
      * @param code
      * @param extendedName
      */
-    public Currency(String symbol, boolean fiat, String code, String extendedName) {
-        this.symbol = symbol;
+    public Currency(boolean fiat, String code, String extendedName) {
         this.fiat = fiat;
         this.code = code;
         this.extendedName = extendedName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getSymbol() {
-        return symbol;
-    }
-
-    /**
-     *
-     * @param symbol
-     */
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
     }
 
     /**
@@ -110,6 +92,6 @@ public class Currency {
 
     @Override
     public String toString() {
-        return "Currency{" + "symbol=" + symbol + ", fiat=" + fiat + ", code=" + code + ", extendedName=" + extendedName + '}';
+        return "Currency{fiat=" + fiat + ", code=" + code + ", extendedName=" + extendedName + '}';
     }
 }
