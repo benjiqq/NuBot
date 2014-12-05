@@ -230,7 +230,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -668,17 +668,17 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -693,7 +693,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
 
     }
@@ -714,7 +714,7 @@ public class CcexWrapper implements TradeInterface {
             String c1 = orderObject.getString("c1");
             String c2 = orderObject.getString("c2");
 
-            CurrencyPair cp = new CurrencyPair(new Currency("", CurrencyPair.isFiat(c1), c1, ""), new Currency("", CurrencyPair.isFiat(c2), c2, ""));
+            CurrencyPair cp = new CurrencyPair(Currency.createCurrency(c1), Currency.createCurrency(c2));
 
             order.setPair(cp);
             order.setType((orderObject.getString("type")).toUpperCase());
