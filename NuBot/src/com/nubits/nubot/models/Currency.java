@@ -17,6 +17,10 @@
  */
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.utils.FileSystem;
+import java.util.ArrayList;
+import java.util.logging.Logger;
+
 /**
  *
  * @author desrever <desrever at nubits.com>
@@ -24,11 +28,13 @@ package com.nubits.nubot.models;
 public class Currency {
 
 //Class Variables
+    private static final Logger LOG = Logger.getLogger(Currency.class.getName());
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
-
+    private final static String PATH_TO_CURRENCIES = "res/currencies.csv";
 //Constructor
+
     /**
      *
      * @param symbol
@@ -38,6 +44,23 @@ public class Currency {
      */
     public static Currency createCurrency(String code) {
         Currency toRet = null;
+        ArrayList<String[]> currencyList = FileSystem.parseCsvFromFile(PATH_TO_CURRENCIES);
+        boolean found = false;
+        for (int j = 1; j < currencyList.size(); j++) {
+            String[] tempLine = currencyList.get(j);
+
+            if (tempLine[0].equalsIgnoreCase(code)) {
+                return new Currency(Boolean.parseBoolean(tempLine[2]), tempLine[0], tempLine[1]);
+            }
+        }
+
+        if (!found) {
+            LOG.warning("Didn't find a currency with code " + code + " in lookup table " + PATH_TO_CURRENCIES
+                    + "\nUpdate the currency file to avoid malfunctionings.");
+
+            return new Currency(false, code, "");
+
+        }
 
         return toRet;
     }

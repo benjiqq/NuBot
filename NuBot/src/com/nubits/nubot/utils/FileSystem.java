@@ -19,6 +19,7 @@ package com.nubits.nubot.utils;
 
 import com.nubits.nubot.utils.FileSystem;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -116,5 +117,38 @@ public class FileSystem {
         }
 
         return fileContent.toString();
+    }
+
+    public static ArrayList<String[]> parseCsvFromFile(String path) {
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        ArrayList<String[]> toReturn = new ArrayList<>();
+        try {
+
+            br = new BufferedReader(new FileReader(path));
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] tempLine = line.split(cvsSplitBy);
+                toReturn.add(tempLine);
+
+            }
+
+        } catch (FileNotFoundException e) {
+            LOG.severe(e.toString());
+        } catch (IOException e) {
+            LOG.severe(e.toString());
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    LOG.severe(e.toString());
+                }
+            }
+        }
+
+        return toReturn;
     }
 }
