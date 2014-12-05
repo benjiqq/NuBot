@@ -36,7 +36,13 @@ public class Currency {
      * @param code
      * @param extendedName
      */
-    public Currency(boolean fiat, String code, String extendedName) {
+    public static Currency createCurrency(String code) {
+        Currency toRet = null;
+
+        return toRet;
+    }
+
+    private Currency(boolean fiat, String code, String extendedName) {
         this.fiat = fiat;
         this.code = code;
         this.extendedName = extendedName;

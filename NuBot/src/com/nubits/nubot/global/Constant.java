@@ -44,13 +44,14 @@ public class Constant {
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
     //Currencies
-    public static final Currency USD = new Currency(true, "USD", "US Dollar");
-    public static final Currency CNY = new Currency(true, "CNY", "CNY");
-    public static final Currency EUR = new Currency(true, "EUR", "Euro");
-    public static final Currency BTC = new Currency(false, "BTC", "Bitcoin");
-    public static final Currency NBT = new Currency(false, "NBT", "Nubits");
-    public static final Currency PPC = new Currency(false, "PPC", "Peercoin");
-    public static final Currency LTC = new Currency(false, "LTC", "Litecoin");
+    public static final Currency USD = Currency.createCurrency("USD");
+    public static final Currency CNY = Currency.createCurrency("CNY");
+    public static final Currency EUR = Currency.createCurrency("EUR");
+    public static final Currency BTC = Currency.createCurrency("BTC");
+    public static final Currency NBT = Currency.createCurrency("NBT");
+    public static final Currency NSR = Currency.createCurrency("NSR");
+    public static final Currency PPC = Currency.createCurrency("PPC");
+    public static final Currency LTC = Currency.createCurrency("LTC");
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
@@ -68,37 +69,4 @@ public class Constant {
     //Direction of price
     public static final String UP = "up";
     public static final String DOWN = "down";
-
-    public static Currency getCurrencyFromCode(String codeString) {
-        Currency toRet = null;
-        codeString = codeString.toUpperCase();
-        switch (codeString) {
-            case "USD":
-                toRet = USD;
-                break;
-            case "EUR":
-                toRet = EUR;
-                break;
-            case "LTC":
-                toRet = LTC;
-                break;
-            case "CNY":
-                toRet = CNY;
-                break;
-            case "BTC":
-                toRet = BTC;
-                break;
-            case "PPC":
-                toRet = PPC;
-                break;
-            case "NBT":
-                toRet = NBT;
-                break;
-            default:
-                LOG.severe("Currency " + codeString + " not available");
-                break;
-        }
-
-        return toRet;
-    }
 }

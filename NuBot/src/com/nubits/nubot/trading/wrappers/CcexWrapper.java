@@ -714,7 +714,7 @@ public class CcexWrapper implements TradeInterface {
             String c1 = orderObject.getString("c1");
             String c2 = orderObject.getString("c2");
 
-            CurrencyPair cp = new CurrencyPair(new Currency(CurrencyPair.isFiat(c1), c1, ""), new Currency(CurrencyPair.isFiat(c2), c2, ""));
+            CurrencyPair cp = new CurrencyPair(Currency.createCurrency(c1), Currency.createCurrency(c2));
 
             order.setPair(cp);
             order.setType((orderObject.getString("type")).toUpperCase());

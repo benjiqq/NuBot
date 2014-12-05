@@ -57,8 +57,10 @@ public class CurrencyPair {
             orderCurrencyCode = pairString.substring(0, 3);
             paymentCurrencyCode = pairString.substring(3);
         }
-        Currency orderC = new Currency(isFiat(orderCurrencyCode), orderCurrencyCode, "//");
-        Currency paymentC = new Currency(isFiat(paymentCurrencyCode), paymentCurrencyCode, "//");
+
+
+        Currency orderC = Currency.createCurrency(orderCurrencyCode);
+        Currency paymentC = Currency.createCurrency(paymentCurrencyCode);
         return new CurrencyPair(orderC, paymentC);
 
     }
