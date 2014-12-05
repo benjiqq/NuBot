@@ -235,7 +235,7 @@ NuBot can be further configured by adding additional parameters to its config fi
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| 
-| nudip    | "127.0.0.1"  |   | The IP address of the machine that hosts the Nu Client |
+| nudip    | "127.0.0.1"  |  The IP address of the machine that hosts the Nu Client |
 | verbose    | false |  if set to true, NuBot will print additional debug messages  | boolean |
 | hipchat    | true |  if set to false, NuBot will disable hipchat notifications | boolean |
 | mail-notifications    | true |  if set to false, NuBot will disable email notifications | boolean |
