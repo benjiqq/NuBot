@@ -288,7 +288,15 @@ public class NuBot {
                 }
 
                 //Peg to a USD price via crypto pair
-                Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                Currency toTrackCurrency;
+
+                if (Global.swappedPair) { //NBT as paymentCurrency
+                    toTrackCurrency = Global.options.getPair().getOrderCurrency();
+
+                } else {
+                    toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                }
+
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
 
