@@ -281,7 +281,6 @@ public class ExcoinWrapper implements TradeInterface {
                 JSONObject thisExchange = exchange.next();
                 commodity = thisExchange.get("commodity").toString();
                 currency = thisExchange.get("currency").toString();
-                returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
                 //only valid pair if a pair is specified
                 if ((pair != null)
                         && (!currency.equals(pair.getPaymentCurrency().getCode().toUpperCase())
@@ -312,6 +311,8 @@ public class ExcoinWrapper implements TradeInterface {
                             out.setInsertedDate(insertDate);
                         }
                         //set the price
+                        returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
+
                         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), returnedPair.getPaymentCurrency());
                         out.setPrice(price);
                         //set the amount
