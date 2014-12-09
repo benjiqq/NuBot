@@ -19,6 +19,7 @@ package com.nubits.nubot.models;
 
 import com.nubits.nubot.utils.FileSystem;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 /**
@@ -122,5 +123,20 @@ public class Currency {
     @Override
     public String toString() {
         return "Currency{fiat=" + fiat + ", code=" + code + ", extendedName=" + extendedName + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Currency other = (Currency) obj;
+        if (!Objects.equals(this.code, other.code)) {
+            return false;
+        }
+        return true;
     }
 }

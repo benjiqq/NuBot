@@ -160,6 +160,17 @@ public class NuBot {
             ((CcexWrapper) (ti)).initBaseUrl();;
         }
 
+
+        if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
+            Global.swappedPair = true;
+
+        } else {
+            Global.swappedPair = false;
+        }
+
+        LOG.info("Swapped pair mode : " + Global.swappedPair);
+
+
         String apibase = "";
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
