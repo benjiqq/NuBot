@@ -549,6 +549,11 @@ public class StrategySecondaryPegTask extends TimerTask {
                     if (type.equals(Constant.BUY)) {
                         amount1 = Utils.round(amount1 / price, 8);
                         amount2 = Utils.round(amount2 / price, 8);
+
+                        //HOTFIX#123 TODO : remove after bitspark gets its things together
+                        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.BITSPARK_PEATIO)) {
+                            amount2 = amount2 - (amount2 * 0.005); //remove an additional 0.5%
+                        }
                     }
 
                     //Prepare the orders
