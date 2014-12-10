@@ -497,7 +497,7 @@ public class BterWrapper implements TradeInterface {
         double fee = 0;
 
         String url = API_GET_FEE;
-        boolean isGet = false;
+        boolean isGet = true;
         HashMap<String, String> query_args = new HashMap<>();
 
         ApiResponse response = getQuery(url, query_args, isGet);
