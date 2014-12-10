@@ -522,7 +522,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
 
         if (balancesResponse.isPositive()) {
-
             double oneNBT = 1;
             if (type.equals(Constant.SELL)) {
                 balance = (Amount) balancesResponse.getResponseObject();
@@ -534,8 +533,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
 
             if (balance.getQuantity() > oneNBT) {
-                // Divide the  balance 50% 50% in balance1 and balance2
-
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
@@ -544,24 +541,17 @@ public class StrategySecondaryPegTask extends TimerTask {
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
-                    double amount2 = balance.getQuantity() - amount1;
 
                     if (type.equals(Constant.BUY)) {
                         amount1 = Utils.round(amount1 / price, 8);
-                        amount2 = Utils.round(amount2 / price, 8);
 
-                        //HOTFIX#123 TODO : remove after bitspark gets its things together
-                        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.BITSPARK_PEATIO)) {
-                            amount2 = amount2 - (amount2 * 0.005); //remove an additional 0.5%
-                        }
                     }
 
                     //Prepare the orders
 
                     String orderString1 = type + " " + amount1 + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-                    String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
-                            + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+
 
                     if (Global.options.isExecuteOrders()) {
                         LOG.warning("Strategy - Submit order : " + orderString1);
@@ -582,28 +572,59 @@ public class StrategySecondaryPegTask extends TimerTask {
                             success = false;
                         }
 
-                        LOG.warning("Strategy - Submit order : " + orderString2);
+                        //wait a while to give the time to the new amount to update
 
-                        ApiResponse order2Response;
-                        if (type.equals(Constant.SELL)) {
-                            order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
-                        } else {
-                            order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+                        try {
+                            Thread.sleep(5 * 1000);
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.toString());
                         }
+                        //read balance again
+                        ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
+                        if (balancesResponse2.isPositive()) {
+                            if (type.equals(Constant.SELL)) {
+                                balance = (Amount) balancesResponse2.getResponseObject();
+                            } else {
+                                //Here its time to compute the balance to put apart, if any
+                                balance = (Amount) balancesResponse2.getResponseObject();
+                                balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                            }
+
+                            double amount2 = balance.getQuantity();
+                            if (type.equals(Constant.BUY)) {
+                                amount2 = Utils.round(amount2 / price, 8);
+                            }
 
 
-                        if (order2Response.isPositive()) {
-                            HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, Message.Color.YELLOW);
-                            String response2String = (String) order2Response.getResponseObject();
-                            LOG.warning("Strategy : " + type + " Response2 = " + response2String);
+                            String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+
+                            //put it on order
+
+                            LOG.warning("Strategy - Submit order : " + orderString2);
+
+                            ApiResponse order2Response;
+                            if (type.equals(Constant.SELL)) {
+                                order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
+                            } else {
+                                order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+                            }
+
+                            if (order2Response.isPositive()) {
+                                HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, Message.Color.YELLOW);
+                                String response2String = (String) order2Response.getResponseObject();
+                                LOG.warning("Strategy : " + type + " Response2 = " + response2String);
+                            } else {
+                                LOG.severe(order2Response.getError().toString());
+                                success = false;
+                            }
+
                         } else {
-                            LOG.severe(order2Response.getError().toString());
-                            success = false;
+                            LOG.severe("Error while reading the balance the second time " + balancesResponse2.getError().toString());
                         }
-
                     } else {
                         //Just print the order without executing it
-                        LOG.warning("Should execute : " + orderString1 + "\n and " + orderString2);
+                        LOG.warning("Should execute orders");
                     }
                 }
             } else {
