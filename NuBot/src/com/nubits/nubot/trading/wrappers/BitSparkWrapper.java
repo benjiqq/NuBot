@@ -583,7 +583,7 @@ public class BitSparkWrapper implements TradeInterface {
         //Sample 2014-08-19T10:23:49+01:00
 
         //Remove the Timezone
-        dateStr = dateStr.substring(0, dateStr.length() - 6);
+        dateStr = dateStr.substring(0, dateStr.length() - 1);
         String datePattern = "yyyy-MM-dd'T'HH:mm:ss";
         DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
         try {
