@@ -229,7 +229,7 @@ public class PeatioWrapper implements TradeInterface {
                     String tempCurrency = balanceObj.get("currency").toString();
 
                     if (tempCurrency.equalsIgnoreCase(currency.getCode())) {
-                        amount = new Amount((Double.parseDouble(balanceObj.get("balance").toString())-Double.parseDouble(balanceObj.get("locked").toString())), currency);
+                        amount = new Amount(Double.parseDouble(balanceObj.get("balance").toString()), currency);
                         found = true;
                     }
                 }
