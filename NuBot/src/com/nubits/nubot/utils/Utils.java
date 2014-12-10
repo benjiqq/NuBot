@@ -31,6 +31,7 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -179,17 +180,23 @@ public class Utils {
     public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
         String line = "", all = "";
         URL myUrl = null;
-        BufferedReader in = null;
+        BufferedReader br = null;
         try {
             myUrl = new URL(url);
-            in = new BufferedReader(new InputStreamReader(myUrl.openStream(), "UTF-8"));
 
-            while ((line = in.readLine()) != null) {
+            URLConnection con = myUrl.openConnection();
+            con.setConnectTimeout(1000 * 8);
+            con.setReadTimeout(1000 * 8);
+            InputStream in = con.getInputStream();
+
+            br = new BufferedReader(new InputStreamReader(in));
+
+            while ((line = br.readLine()) != null) {
                 all += line;
             }
         } finally {
-            if (in != null) {
-                in.close();
+            if (br != null) {
+                br.close();
             }
         }
 
