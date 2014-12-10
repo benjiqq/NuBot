@@ -37,7 +37,7 @@ public class Amount {
      * @param currency
      */
     public Amount(double quantity, Currency currency) {
-        this.quantity = quantity;
+        this.quantity = Utils.round(quantity, 8);
         this.currency = currency;
     }
 
@@ -55,7 +55,7 @@ public class Amount {
      * @param quantity
      */
     public void setQuantity(double quantity) {
-        this.quantity = quantity;
+        this.quantity = Utils.round(quantity, 8);
     }
 
     /**
