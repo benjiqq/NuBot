@@ -92,6 +92,7 @@ public class BterWrapper implements TradeInterface {
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
+    private final String TOKEN_ERROR_HTML_405 = "<title>405 Method Not Allowed</title>";
 
     public BterWrapper() {
         setupErrors();
@@ -116,6 +117,12 @@ public class BterWrapper implements TradeInterface {
         }
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
+        }
+        if (queryResult.contains(TOKEN_ERROR_HTML_405)) {
+            ApiError error = errors.apiReturnError;
+            error.setDescription("BTER returned http error 405 - method not allowed");
+            apiResponse.setError(error);
             return apiResponse;
         }
 
