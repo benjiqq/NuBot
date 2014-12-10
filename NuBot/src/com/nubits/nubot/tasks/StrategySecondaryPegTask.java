@@ -591,12 +591,14 @@ public class StrategySecondaryPegTask extends TimerTask {
                             }
 
                             double amount2 = balance.getQuantity();
+
                             if (type.equals(Constant.BUY)) {
+                                //hotfix
+                                amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
                                 amount2 = Utils.round(amount2 / price, 8);
                             }
 
-                            //hotfix
-                            amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+
 
                             String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
                                     + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();

@@ -17,7 +17,6 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -110,7 +109,7 @@ public class BterWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, query_args, false);
+        String queryResult = query(url, query_args, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -484,7 +483,7 @@ public class BterWrapper implements TradeInterface {
         return apiResponse;
     }
 
-//    @Override
+    @Override
     public ApiResponse getTxFee() {
         ApiError error = errors.genericError;
         error.setDescription("For Bter the fee changes with the currency. Please be more specific");
@@ -626,18 +625,18 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -652,7 +651,7 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
