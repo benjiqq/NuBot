@@ -596,7 +596,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                             }
 
                             //hotfix
-                            amount2 = amount2 - oneNBT;
+                            amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
 
                             String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
                                     + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
