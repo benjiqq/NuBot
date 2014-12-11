@@ -17,6 +17,8 @@
  */
 package com.nubits.nubot.tasks;
 
+//import com.alibaba.fastjson.JSON;
+//import com.alibaba.fastjson.JSONArray;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
@@ -24,11 +26,17 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.utils.FileSystem;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -39,6 +47,7 @@ public class SendLiquidityinfoTask extends TimerTask {
     private static final Logger LOG = Logger.getLogger(SendLiquidityinfoTask.class.getName());
     private boolean verbose;
     private String outputFile;
+    private String jsonFile;
     private boolean wallsBeingShifted = false;
 
     public SendLiquidityinfoTask(boolean verbose) {
@@ -100,9 +109,49 @@ public class SendLiquidityinfoTask extends TimerTask {
                 Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
                 Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
 
+
                 //Write to file timestamp,activeOrders, sells,buys, digest
-                String toWrite = new Date().toString() + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
+                Date timeStamp = new Date();
+                String timeStampString = timeStamp.toString();
+                Long timeStampLong = timeStamp.getTime();
+                String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
                 FileSystem.writeToFile(toWrite, outputFile, true);
+
+                //Also update a json version of the output file
+                //build the latest data into a JSONObject
+                JSONObject latestOrders = new JSONObject();
+                latestOrders.put("time_stamp", timeStampLong);
+                latestOrders.put("active_orders", orderList.size());
+                JSONArray jsonDigest = new JSONArray();
+                for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                    JSONObject thisOrder = new JSONObject();
+                    Order _order = order.next();
+                    thisOrder.put("order_id", _order.getId());
+                    thisOrder.put("time", _order.getInsertedDate().getTime());
+                    thisOrder.put("order_type", _order.getType());
+                    thisOrder.put("order_currency", _order.getPair().getOrderCurrency().getCode());
+                    thisOrder.put("amount", _order.getAmount().getQuantity());
+                    thisOrder.put("payment_currency", _order.getPair().getPaymentCurrency().getCode());
+                    thisOrder.put("price", _order.getPrice().getQuantity());
+                    jsonDigest.add(thisOrder);
+                }
+                latestOrders.put("digest", jsonDigest);
+                //now read the existing object if one exists
+                JSONParser parser = new JSONParser();
+                JSONObject orderHistory = new JSONObject();
+                JSONArray orders = new JSONArray();
+                try { //object already exists in file
+                    orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
+                    orders = (JSONArray) orderHistory.get("orders");
+                } catch (ParseException pe) {
+                    LOG.severe("Unable to parse order_history.json");
+                }
+                //add the latest orders to the orders array
+                orders.add(latestOrders);
+                //then save
+                FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile, false);
+
+
 
                 if (verbose) {
                     LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
@@ -151,6 +200,15 @@ public class SendLiquidityinfoTask extends TimerTask {
 
     public void setOutputFile(String outputFile) {
         this.outputFile = outputFile;
+        this.jsonFile = this.outputFile.replace(".csv", ".json");
+        //create json file if it doesn't already exist
+        File json = new File(this.jsonFile);
+        if (!json.exists()) {
+            JSONObject history = new JSONObject();
+            JSONArray orders = new JSONArray();
+            history.put("orders", orders);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
+        }
     }
 
     public boolean isVerbose() {
