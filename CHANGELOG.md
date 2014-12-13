@@ -1,3 +1,36 @@
+## v0.1.4 (2014-11-30)
+
+#### New Features:
+  - Implemented an additional system to prevent the risk of NuBot placing orders at low price.
+  - Added a configuration parameter  ("keep-proceeds" ) that lets the custodian specify an amount of proceeds from sale to be put apart. This feature is designed specifically for custodians acting in a way similar to KTm.
+  - Added support for multiple custodians on the same non-USD pair. 
+  - Bitspark API wrappers
+  - AllCoin API wrappers
+
+#### Improvements:
+  - On exchanges with a 0 transaction fee, force a price spread of 0.1% 
+  - Removed the aggregate parameter and made it automatic.
+  - NTP Client makes the bots sync.
+  - Reset or cancel all orders after price failing to update
+  - When computing the initial USD price, take the TX fee into account
+  - Computed wait_time on wall shifts
+  - Changed the API error-handling system
+  - Refactored PriceFeedManager
+  - Reduce damount of compulsory option parameters by introducing conditions
+  - The bot now uses a dedicated SMTP server to send email notifications
+  - Removed debug messages from bterwrapper
+  - Removed printing warnings for non-global TX fee
+  - Forced order reset on firstTime execution
+  - Assigned a name to threads for better runtime debugging
+  - Avoid printing buy prices if SELL side only
+
+#### Bug fixes:
+  - Bot doesn't stop when connection lost with Peatio. 
+  - Solved a problm that led to wrong pricing with a sell-side and a dual-side custodian working on the same market/pair. 
+  - Solved Peatio wrapper problems while parsing some date
+  - Part of the balance was not placed on  (buy) order
+
+
 ## v0.1.3 (2014-10-28)
 
 #### New Features:

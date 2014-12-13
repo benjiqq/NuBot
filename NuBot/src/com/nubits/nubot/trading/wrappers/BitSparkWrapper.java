@@ -231,6 +231,7 @@ public class BitSparkWrapper implements TradeInterface {
 
                     if (tempCurrency.equalsIgnoreCase(currency.getCode())) {
                         amount = new Amount(Double.parseDouble(balanceObj.get("balance").toString()), currency);
+
                         found = true;
                     }
                 }
@@ -584,7 +585,7 @@ public class BitSparkWrapper implements TradeInterface {
         //Sample 2014-08-19T10:23:49+01:00
 
         //Remove the Timezone
-        dateStr = dateStr.substring(0, dateStr.length() - 6);
+        dateStr = dateStr.substring(0, dateStr.length() - 1);
         String datePattern = "yyyy-MM-dd'T'HH:mm:ss";
         DateFormat df = new SimpleDateFormat(datePattern, Locale.ENGLISH);
         try {
@@ -714,15 +715,15 @@ public class BitSparkWrapper implements TradeInterface {
     public Trade parseTrade(JSONObject in) {
         Trade out = new Trade();
         /*
-        {
-          "id":273,
-          "market":"nbtbtc",
-          "funds":"0.00005536",
-          "price":"0.002768",
-          "side":"ask",
-          "volume":"0.02",
-          "created_at":"2014-12-04T17:32:55+08:00"
-        }
+         {
+         "id":273,
+         "market":"nbtbtc",
+         "funds":"0.00005536",
+         "price":"0.002768",
+         "side":"ask",
+         "volume":"0.02",
+         "created_at":"2014-12-04T17:32:55+08:00"
+         }
          */
         //set id and order_id
         out.setId(in.get("id").toString());

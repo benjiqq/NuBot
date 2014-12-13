@@ -50,6 +50,7 @@ public class TestWrappers {
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
     private static final String TEST_OPTIONS_PATH = "options.json";
     public static final CurrencyPair NSR_BTC = new CurrencyPair(Constant.NSR, Constant.BTC);
+    private static final String TEST_OPTIONS_PATH2 = "res/options/private/old/options-full.json";
 
     public static void main(String[] args) {
         //Load settings
@@ -69,6 +70,8 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         //testGetAvailableBalance(Constant.BTC); //
+        //testGetAvailableBalance(Constant.NBT); //
+
         //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
@@ -79,17 +82,14 @@ public class TestWrappers {
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("2064456");
-        //testGetTxFee();
-        //testGetTxFeeWithArgs(Constant.BTC_USD);
-
+        testGetTxFee();
+        testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(NSR_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC, 1409566800);
         //testGetLastTrades(Constant.NBT_BTC);
-
-
         //for (int i = 0; i < 5000; i++) {
         //   ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         //    if (activeOrdersResponse.isPositive()) {
@@ -98,8 +98,6 @@ public class TestWrappers {
         //        LOG.severe(activeOrdersResponse.getError().toString());
         //    }
         //}
-
-
         //stimulating ccedk wrong nonce
 
         /*

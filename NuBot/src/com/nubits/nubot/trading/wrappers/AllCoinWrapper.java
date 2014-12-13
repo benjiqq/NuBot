@@ -795,6 +795,7 @@ public class AllCoinWrapper implements TradeInterface {
             }
 
             /*
+
              if (httpError) {
              JSONParser parser = new JSONParser();
              try {
@@ -805,6 +806,7 @@ public class AllCoinWrapper implements TradeInterface {
              }
              }
              */
+
 
             connection.disconnect();
             connection = null;

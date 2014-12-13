@@ -204,7 +204,6 @@ It is sufficient to add a JSON object in the standard options file structured in
                 "backup3" : { "name" : "blockchain"}
                 },
             "wallchange-treshold": 0.1,
-            "price-distance-threshold":10       
          }
 ```
 

@@ -355,6 +355,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else {
             LOG.fine("No need to move walls");
+            currentTime = System.currentTimeMillis();
             if (isWallsBeingShifted() && needToMoveWalls) {
                 LOG.warning("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
             }
@@ -559,6 +560,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     public void setWallsBeingShifted(boolean wallsBeingShifted) {
+        currentTime = System.currentTimeMillis();
         this.wallsBeingShifted = wallsBeingShifted;
     }
 

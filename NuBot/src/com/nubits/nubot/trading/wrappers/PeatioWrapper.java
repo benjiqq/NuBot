@@ -20,30 +20,28 @@ package com.nubits.nubot.trading.wrappers;
 //import com.alibaba.fastjson.JSON;
 //import com.alibaba.fastjson.JSONArray;
 //import com.alibaba.fastjson.JSONObject;
-import com.nubits.nubot.models.*;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.utils.ErrorManager;
-import org.json.JSONString;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
 import java.math.BigInteger;
 import java.text.DateFormat;
-//import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 
@@ -121,7 +119,8 @@ public class PeatioWrapper implements TradeInterface {
         return "api/v2/tickers/" + pair.toString();
     }
 
-    private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
+
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
         if (queryResult == null) {
@@ -229,7 +228,8 @@ public class PeatioWrapper implements TradeInterface {
                     String tempCurrency = balanceObj.get("currency").toString();
 
                     if (tempCurrency.equalsIgnoreCase(currency.getCode())) {
-                        amount = new Amount(Double.parseDouble(balanceObj.get("balance").toString()), currency);
+                        amount = new Amount((Double.parseDouble(balanceObj.get("balance").toString())), currency);
+
                         found = true;
                     }
                 }
@@ -404,8 +404,9 @@ public class PeatioWrapper implements TradeInterface {
                 return apiResponse;
             }
             /*Sample result
-            * {"id":7,"side":"sell","price":"3100.0","avg_price":"3101.2","state":"wait","market":"btccny","created_at":"2014-04-18T02:02:33Z","volume":"100.0","remaining_volume":"89.8","executed_volume":"10.2","trades":[{"id":2,"price":"3100.0","volume":"10.2","market":"btccny","created_at":"2014-04-18T02:04:49Z","side":"sell"}]}
-            */
+             * {"id":7,"side":"sell","price":"3100.0","avg_price":"3101.2","state":"wait","market":"btccny","created_at":"2014-04-18T02:02:33Z","volume":"100.0","remaining_volume":"89.8","executed_volume":"10.2","trades":[{"id":2,"price":"3100.0","volume":"10.2","market":"btccny","created_at":"2014-04-18T02:04:49Z","side":"sell"}]}
+             */
+
             apiResponse.setResponseObject(parseOrder(httpAnswerJson));
         } else {
             apiResponse = response;
@@ -569,12 +570,12 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private Date parseDate(String dateStr) {
@@ -713,15 +714,15 @@ public class PeatioWrapper implements TradeInterface {
     public Trade parseTrade(JSONObject in) {
         Trade out = new Trade();
         /*
-        {
-          "id":273,
-          "market":"nbtbtc",
-          "funds":"0.00005536",
-          "price":"0.002768",
-          "side":"ask",
-          "volume":"0.02",
-          "created_at":"2014-12-04T17:32:55+08:00"
-        }
+         {
+         "id":273,
+         "market":"nbtbtc",
+         "funds":"0.00005536",
+         "price":"0.002768",
+         "side":"ask",
+         "volume":"0.02",
+         "created_at":"2014-12-04T17:32:55+08:00"
+         }
          */
         //set id and order_id
         out.setId(in.get("id").toString());
@@ -743,6 +744,7 @@ public class PeatioWrapper implements TradeInterface {
         out.setExchangeName(exchange.getName());
 
         return out;
+
     }
 
     private class PeatioService implements ServiceInterface {
@@ -811,7 +813,7 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String signRequest(String secret, String hash_data) {
-            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters"); 
+            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters");
         }
 
         private String getSign(TreeMap<String, String> parameters) {

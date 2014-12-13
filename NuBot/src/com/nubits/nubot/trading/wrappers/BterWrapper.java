@@ -17,7 +17,6 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -92,6 +91,7 @@ public class BterWrapper implements TradeInterface {
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
+    private final String TOKEN_ERROR_HTML_405 = "<title>405 Method Not Allowed</title>";
 
     public BterWrapper() {
         setupErrors();
@@ -109,13 +109,21 @@ public class BterWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, query_args, false);
+        String queryResult = query(url, query_args, isGet);
+
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
+        }
+
+        if (queryResult.contains(TOKEN_ERROR_HTML_405)) {
+            ApiError error = errors.apiReturnError;
+            error.setDescription("BTER returned http error 405 - method not allowed");
+            apiResponse.setError(error);
             return apiResponse;
         }
 
@@ -477,7 +485,7 @@ public class BterWrapper implements TradeInterface {
         return apiResponse;
     }
 
-//    @Override
+    @Override
     public ApiResponse getTxFee() {
         ApiError error = errors.genericError;
         error.setDescription("For Bter the fee changes with the currency. Please be more specific");
@@ -490,7 +498,8 @@ public class BterWrapper implements TradeInterface {
         double fee = 0;
 
         String url = API_GET_FEE;
-        boolean isGet = false;
+        boolean isGet = true;
+
         HashMap<String, String> query_args = new HashMap<>();
 
         ApiResponse response = getQuery(url, query_args, isGet);
@@ -619,18 +628,18 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -645,7 +654,7 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 

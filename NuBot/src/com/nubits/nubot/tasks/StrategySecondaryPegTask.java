@@ -467,7 +467,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
 
         if (balancesResponse.isPositive()) {
-
             double oneNBT = 1;
             if (type.equals(Constant.SELL)) {
                 balance = (Amount) balancesResponse.getResponseObject();
@@ -479,8 +478,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
 
             if (balance.getQuantity() > oneNBT) {
-                // Divide the  balance 50% 50% in balance1 and balance2
-
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
@@ -512,8 +509,10 @@ public class StrategySecondaryPegTask extends TimerTask {
 
                     //Prepare the orders
 
+
                     String orderString1 = type + " " + Utils.round(amount1, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+
 
 
                     if (Global.options.isExecuteOrders()) {
@@ -535,7 +534,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                             success = false;
                         }
 
-
                         //wait a while to give the time to the new amount to update
 
                         try {
@@ -543,7 +541,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                         } catch (InterruptedException ex) {
                             LOG.severe(ex.toString());
                         }
-
                         //read balance again
                         ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
                         if (balancesResponse2.isPositive()) {
@@ -556,9 +553,13 @@ public class StrategySecondaryPegTask extends TimerTask {
                             }
 
                             double amount2 = balance.getQuantity();
+
                             if (type.equals(Constant.BUY)) {
+                                //hotfix
+                                amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
                                 amount2 = Utils.round(amount2 / price, 8);
                             }
+
 
 
                             String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
@@ -583,9 +584,10 @@ public class StrategySecondaryPegTask extends TimerTask {
                                 LOG.severe(order2Response.getError().toString());
                                 success = false;
                             }
+
                         } else {
                             LOG.severe("Error while reading the balance the second time " + balancesResponse2.getError().toString());
-                            success = false;
+
                         }
                     } else {
                         //Just print the order without executing it
