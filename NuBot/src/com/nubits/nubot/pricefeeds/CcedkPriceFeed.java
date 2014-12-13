@@ -36,7 +36,7 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(CcedkPriceFeed.class.getName());
 
     public CcedkPriceFeed() {
-        name = PriceFeedManager.CCEDK;
+        name = "ccedk";
         refreshMinTime = 50 * 1000; //one minutee
     }
 

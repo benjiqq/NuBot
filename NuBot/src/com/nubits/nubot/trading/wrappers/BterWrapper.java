@@ -17,7 +17,6 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -33,6 +32,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -88,13 +88,10 @@ public class BterWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "private/cancelorder";
     private final String API_GET_FEE = "http://data.bter.com/api/1/marketinfo";
     // Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
-    private final int ERROR_UNKNOWN = 14560;
-    private final int ERROR_NO_CONNECTION = 14561;
-    private final int ERROR_GENERIC = 14562;
-    private final int ERROR_PARSING = 14563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 14567;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
+    private final String TOKEN_ERROR_HTML_405 = "<title>405 Method Not Allowed</title>";
 
     public BterWrapper() {
         setupErrors();
@@ -107,10 +104,60 @@ public class BterWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
+    }
 
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+        ApiResponse apiResponse = new ApiResponse();
+        String queryResult = query(url, query_args, isGet);
+        if (queryResult == null) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
+        }
+        if (queryResult.contains(TOKEN_ERROR_HTML_405)) {
+            ApiError error = errors.apiReturnError;
+            error.setDescription("BTER returned http error 405 - method not allowed");
+            apiResponse.setError(error);
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean valid;
+            try {
+                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
+            } catch (ClassCastException e) {
+                valid = true;
+            }
+
+            if (!valid) {
+                String errorMessage = (String) httpAnswerJson.get("message");
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
+                apiResponse.setError(apiErr);
+            } else {
+                apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ClassCastException cce) {
+            //if casting to a JSON object failed, try a JSON Array
+            try {
+                JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+                apiResponse.setResponseObject(httpAnswerJson);
+            } catch (ParseException pe) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            apiResponse.setError(errors.parseError);
+            return apiResponse;
+        }
+        return apiResponse;
     }
 
     @Override
@@ -126,114 +173,76 @@ public class BterWrapper implements TradeInterface {
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = new Balance();
-
-        String path = API_BASE_URL + API_GET_INFO;
+        String url = API_BASE_URL + API_GET_INFO;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
 
-        String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            boolean somethingLocked = false;
+            JSONObject lockedFundsJSON = null;
+            JSONObject availableFundsJSON = (JSONObject) httpAnswerJson.get("available_funds");
 
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean valid = true;
-            try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (ClassCastException e) {
-                valid = true;
+            if (httpAnswerJson.containsKey("locked_funds")) {
+                lockedFundsJSON = (JSONObject) httpAnswerJson.get("locked_funds");
+                somethingLocked = true;
             }
 
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                boolean somethingLocked = false;
-                JSONObject lockedFundsJSON = null;
-                JSONObject availableFundsJSON = (JSONObject) httpAnswerJson.get("available_funds");
-
-                if (httpAnswerJson.containsKey("locked_funds")) {
-                    lockedFundsJSON = (JSONObject) httpAnswerJson.get("locked_funds");
-                    somethingLocked = true;
+            if (currency == null) { //Get all balances
+                boolean foundNBTavail = false;
+                boolean foundPEGavail = false;
+                Amount NBTAvail = new Amount(0, pair.getOrderCurrency()),
+                        PEGAvail = new Amount(0, pair.getPaymentCurrency());
+                Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
+                Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+                String NBTcode = pair.getOrderCurrency().getCode().toUpperCase();
+                String PEGcode = pair.getPaymentCurrency().getCode().toUpperCase();
+                if (availableFundsJSON.containsKey(NBTcode)) {
+                    double tempbalance = Double.parseDouble((String) availableFundsJSON.get(NBTcode));
+                    NBTAvail = new Amount(tempbalance, pair.getOrderCurrency());
+                    foundNBTavail = true;
                 }
-
-
-                if (currency == null) { //Get all balances
-
-                    boolean foundNBTavail = false;
-                    boolean foundPEGavail = false;
-
-                    Amount NBTAvail = new Amount(0, pair.getOrderCurrency()),
-                            PEGAvail = new Amount(0, pair.getPaymentCurrency());
-
-                    Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                    Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-
-                    String NBTcode = pair.getOrderCurrency().getCode().toUpperCase();
-                    String PEGcode = pair.getPaymentCurrency().getCode().toUpperCase();
-                    if (availableFundsJSON.containsKey(NBTcode)) {
-                        double tempbalance = Double.parseDouble((String) availableFundsJSON.get(NBTcode));
-                        NBTAvail = new Amount(tempbalance, pair.getOrderCurrency());
-                        foundNBTavail = true;
+                if (availableFundsJSON.containsKey(PEGcode)) {
+                    double tempbalance = Double.parseDouble((String) availableFundsJSON.get(PEGcode));
+                    PEGAvail = new Amount(tempbalance, pair.getPaymentCurrency());
+                    foundPEGavail = true;
+                }
+                if (somethingLocked) {
+                    if (lockedFundsJSON.containsKey(NBTcode)) {
+                        double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(NBTcode));
+                        NBTonOrder = new Amount(tempbalance, pair.getOrderCurrency());
                     }
 
-                    if (availableFundsJSON.containsKey(PEGcode)) {
-                        double tempbalance = Double.parseDouble((String) availableFundsJSON.get(PEGcode));
-                        PEGAvail = new Amount(tempbalance, pair.getPaymentCurrency());
-                        foundPEGavail = true;
+                    if (lockedFundsJSON.containsKey(PEGcode)) {
+                        double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(PEGcode));
+                        PEGonOrder = new Amount(tempbalance, pair.getOrderCurrency());
                     }
-
-                    if (somethingLocked) {
-                        if (lockedFundsJSON.containsKey(NBTcode)) {
-                            double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(NBTcode));
-                            NBTonOrder = new Amount(tempbalance, pair.getOrderCurrency());
-                        }
-
-                        if (lockedFundsJSON.containsKey(PEGcode)) {
-                            double tempbalance = Double.parseDouble((String) lockedFundsJSON.get(PEGcode));
-                            PEGonOrder = new Amount(tempbalance, pair.getOrderCurrency());
-                        }
-                    }
-
-                    balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-                    apiResponse.setResponseObject(balance);
-                    if (!foundNBTavail || !foundPEGavail) {
-                        LOG.info("Cannot find a balance for currency with code "
-                                + "" + NBTcode + " or " + PEGcode + " in your balance. "
-                                + "NuBot assumes that balance is 0");
-
-                    }
-
-                } else { //Get specific balance
-
-                    boolean found = false;
-                    Amount avail = new Amount(0, currency);
-                    String code = currency.getCode().toUpperCase();
-                    if (availableFundsJSON.containsKey(code)) {
-                        double tempbalance = Double.parseDouble((String) availableFundsJSON.get(code));
-                        avail = new Amount(tempbalance, currency);
-                        found = true;
-                    }
-                    apiResponse.setResponseObject(avail);
-                    if (!found) {
-                        LOG.warning("Cannot find a balance for currency with code "
-                                + code + " in your balance. NuBot assumes that balance is 0");
-                    }
+                }
+                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                apiResponse.setResponseObject(balance);
+                if (!foundNBTavail || !foundPEGavail) {
+                    LOG.info("Cannot find a balance for currency with code "
+                            + "" + NBTcode + " or " + PEGcode + " in your balance. "
+                            + "NuBot assumes that balance is 0");
+                }
+            } else { //Get specific balance
+                boolean found = false;
+                Amount avail = new Amount(0, currency);
+                String code = currency.getCode().toUpperCase();
+                if (availableFundsJSON.containsKey(code)) {
+                    double tempbalance = Double.parseDouble((String) availableFundsJSON.get(code));
+                    avail = new Amount(tempbalance, currency);
+                    found = true;
+                }
+                apiResponse.setResponseObject(avail);
+                if (!found) {
+                    LOG.warning("Cannot find a balance for currency with code "
+                            + code + " in your balance. NuBot assumes that balance is 0");
                 }
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -266,7 +275,7 @@ public class BterWrapper implements TradeInterface {
          */
 
         String queryResult = "";
-        if (bypass) { //sed by BterPriceFeed only
+        if (bypass) { //used by BterPriceFeed only
             BterService query = new BterService(ticker_url, keys, query_args);
             queryResult = query.executeQuery(true, true);
         } else {
@@ -274,8 +283,8 @@ public class BterWrapper implements TradeInterface {
         }
 
 
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
 
@@ -292,10 +301,8 @@ public class BterWrapper implements TradeInterface {
             if (!valid) {
                 //error
                 String errorMessage = (String) httpAnswerJson.get("message");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -309,7 +316,7 @@ public class BterWrapper implements TradeInterface {
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
+            apiResponse.setError(errors.parseError);
             return apiResponse;
         }
 
@@ -333,8 +340,8 @@ public class BterWrapper implements TradeInterface {
 
     private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_BASE_URL + API_TRADE;
-
+        String url = API_BASE_URL + API_TRADE;
+        boolean isGet = false;
         String order_id = "";
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("pair", pair.toString("_").toLowerCase());
@@ -342,67 +349,26 @@ public class BterWrapper implements TradeInterface {
         query_args.put("rate", Double.toString(rate));
         query_args.put("amount", Double.toString(amount));
 
-        /* Sample response
-         * {
-         "result":"true",
-         "order_id":"123456",
-         "msg":"Success"
-         }
-         */
-
-        String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /* NOTE TO SELF. Contact Bter support
-             * httpAnswerJson.get("result") contains "true" or false.
-             * one is a String the other is boolean
-             */
-
-            boolean valid = false;
-            try {
-                valid = (boolean) httpAnswerJson.get("result");
-            } catch (Exception e) {
-                try {
-                    valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-                } catch (ClassCastException ex) {
-                    valid = true;
-                }
-            }
-
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            order_id = "" + (long) httpAnswerJson.get("order_id");
+            String msg = (String) httpAnswerJson.get("msg");
+            if (!msg.equals("Success")) {
+                //LOG.severe("BTER : Something went wrong while placing the order :" + msg);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(msg);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
-                //correct
-                order_id = "" + (long) httpAnswerJson.get("order_id");
-                String msg = (String) httpAnswerJson.get("msg");
-                if (!msg.equals("Success")) {
-                    LOG.severe("BTER : Something went wrong while placing the order :" + msg);
-                    ApiError apiErr = new ApiError(ERROR_GENERIC, msg);
-                    apiResponse.setError(apiErr);
-                    return apiResponse;
-                } else {
-                    apiResponse.setResponseObject(order_id);
-                    return apiResponse;
-                }
+                apiResponse.setResponseObject(order_id);
+                return apiResponse;
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
+
+        return apiResponse;
     }
 
     @Override
@@ -417,272 +383,111 @@ public class BterWrapper implements TradeInterface {
 
     public ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_BASE_URL + API_ACTIVE_ORDERS;
+        String url = API_BASE_URL + API_ACTIVE_ORDERS;
+        boolean isGet = false;
         ArrayList<Order> orderList = new ArrayList<Order>();
 
         HashMap<String, String> query_args = new HashMap<>();
 
-        /* Sample response
-         *{
-         "result":true,
-         "orders":[
-         {
-         "id":"15088",
-         "sell_type":"BTC",
-         "buy_type":"LTC",
-         "sell_amount":"0.39901357",
-         "buy_amount":"12.0",
-         "pair":"ltc_btc",
-         "type":"buy",
-         "rate":0.033251,
-         "amount":"0.39901357",
-         "initial_rate":0.033251,
-         "initial_amount":"1"
-         "status":"open"
-         },
-         {
-         "id":"15092",
-         "sell_type":"LTC",
-         "buy_type":"BTC",
-         "sell_amount":"13.0",
-         "buy_amount":"0.4210",
-         "pair":"ltc_btc",
-         "type":"buy",
-         "rate":0.0323846,
-         "amount":"0.4210",
-         "initial_rate":0.0323846,
-         "initial_amount":"1"
-         "status":"open"
-         }
-         ]
-         "msg":"Success"
-         }
-         }
-         */
-
-        String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /*NOTE TO SELF. Contact Bter support
-             * httpAnswerJson.get("result") contains "true" or false.
-             * one is a String the other is boolean
-             */
-
-            boolean valid = false;
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray orders;
             try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (java.lang.ClassCastException e) {
-                valid = true;
+                orders = (JSONArray) httpAnswerJson.get("orders");
+            } catch (ClassCastException e) { //Empty order list?
+                apiResponse.setResponseObject(orderList);
+                return apiResponse;
             }
 
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONArray orders;
-                try {
-                    orders = (JSONArray) httpAnswerJson.get("orders");
-                } catch (ClassCastException e) { //Empty order list?
-                    apiResponse.setResponseObject(orderList);
-                    return apiResponse;
-                }
-
-                for (int i = 0; i < orders.size(); i++) {
-                    JSONObject orderObject = (JSONObject) orders.get(i);
-                    Order tempOrder = parseOrder(orderObject);
+            for (int i = 0; i < orders.size(); i++) {
+                JSONObject orderObject = (JSONObject) orders.get(i);
+                Order tempOrder = parseOrder(orderObject);
 
 
-                    if (!tempOrder.isCompleted()) //Do not add executed orders
-                    {
-                        //check if a specific currencypair is set
-                        if (pair != null) {
-                            if (tempOrder.getPair().equals(pair)) {
-                                orderList.add(tempOrder);
-                            }
-                        } else {
+                if (!tempOrder.isCompleted()) //Do not add executed orders
+                {
+                    //check if a specific currencypair is set
+                    if (pair != null) {
+                        if (tempOrder.getPair().equals(pair)) {
                             orderList.add(tempOrder);
                         }
+                    } else {
+                        orderList.add(tempOrder);
                     }
                 }
-                apiResponse.setResponseObject(orderList);
-
-                return apiResponse;
-
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
-            return apiResponse;
+            apiResponse.setResponseObject(orderList);
+        } else {
+            apiResponse = response;
         }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_BASE_URL + API_ORDER;
-
+        String url = API_BASE_URL + API_ORDER;
+        boolean isGet = false;
 
         String order_id = "";
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-
-        /* Sample response
-         * {
-         "result":true,
-         "order":{
-         "id":"15088",
-         "status":"cancelled",
-         "pair":"btc_cny",
-         "type":"sell",
-         "rate":811,
-         "amount":"0.39901357",
-         "initial_rate":811,
-         "initial_amount":"1"
-         },
-         "msg":"Success"
-         }
-         */
-
-        String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /*NOTE TO SELF. Contact Bter support
-             * httpAnswerJson.get("result") contains "true" or false.
-             * one is a String the other is boolean
-             */
-
-            boolean valid = false;
-            try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (java.lang.ClassCastException e) {
-                valid = true;
-            }
-
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                //LOG.severe("Bter API returned an error: " + errorMessage);
-
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            String msg = (String) httpAnswerJson.get("msg");
+            if (!msg.equals("Success")) {
+                //LOG.severe("BTER : Something went wrong while gettin the order :" + msg);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(msg);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
-                //correct
-
-                String msg = (String) httpAnswerJson.get("msg");
-                if (!msg.equals("Success")) {
-                    LOG.severe("BTER : Something went wrong while gettin the order :" + msg);
-                    ApiError apiErr = new ApiError(ERROR_GENERIC, msg);
-                    apiResponse.setError(apiErr);
-                    return apiResponse;
-                } else {
-                    JSONObject orderObject = (JSONObject) httpAnswerJson.get("order");
-                    Order order = parseOrder(orderObject);
-                    apiResponse.setResponseObject(order);
-                    return apiResponse;
-                }
+                JSONObject orderObject = (JSONObject) httpAnswerJson.get("order");
+                Order order = parseOrder(orderObject);
+                apiResponse.setResponseObject(order);
+                return apiResponse;
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
-
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_BASE_URL + API_CANCEL_ORDER;
-
+        String url = API_BASE_URL + API_CANCEL_ORDER;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-
-        /* Sample response
-         * {
-         {
-         "result":"true",
-         "msg":"Success"
-         }
-         */
-
-        String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /*NOTE TO SELF. Contact Bter support
-             * httpAnswerJson.get("result") contains "true" or false.
-             * one is a String the other is boolean
-             */
-
-            boolean valid = false;
-            try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (java.lang.ClassCastException e) {
-                valid = true;
-            }
-
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            String msg = (String) httpAnswerJson.get("msg");
+            if (!msg.equals("Success")) {
+                LOG.severe("BTER : Something went wrong while deleting the order :" + msg);
+                apiResponse.setResponseObject(false);
             } else {
-                //correct
-
-                String msg = (String) httpAnswerJson.get("msg");
-                if (!msg.equals("Success")) {
-                    LOG.severe("BTER : Something went wrong while deleting the order :" + msg);
-                    apiResponse.setResponseObject(false);
-                    return apiResponse;
-                } else {
-                    apiResponse.setResponseObject(true);
-                    return apiResponse;
-                }
+                apiResponse.setResponseObject(true);
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
+
+        return apiResponse;
     }
 
-//    @Override
+    @Override
     public ApiResponse getTxFee() {
-        return new ApiResponse(false, null,
-                new ApiError(ERROR_UNKNOWN, "For Bter the fee changes with the currency. Please be more specific"));
+        ApiError error = errors.genericError;
+        error.setDescription("For Bter the fee changes with the currency. Please be more specific");
+        return new ApiResponse(false, null, error);
     }
 
     @Override
@@ -690,74 +495,37 @@ public class BterWrapper implements TradeInterface {
         ApiResponse apiResponse = new ApiResponse();
         double fee = 0;
 
-        String path = API_GET_FEE;
-
+        String url = API_GET_FEE;
+        boolean isGet = true;
         HashMap<String, String> query_args = new HashMap<>();
 
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray array = (JSONArray) httpAnswerJson.get("pairs");
 
-        /* Sample response
-         * {"result":"true",
-         * "pairs":[{"btc_cny":{"decimal_places":2,"min_amount":0.5,"fee":0}},
-         *  {"ltc_cny":{"decimal_places":2,"min_amount":0.5,"fee":0}},
-         *  {"bc_cny":{"decimal_places":3,"min_amount":0.5,"fee":0.2}}....
-         }
-         */
+            String searchingFor = pair.toString("_").toLowerCase();
 
-        String queryResult = query(path, query_args, true);
-
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean valid = true;
-            try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (ClassCastException e) {
-                valid = true;
-            }
-
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-
-                com.alibaba.fastjson.JSONObject response = JSON.parseObject(queryResult);
-                com.alibaba.fastjson.JSONArray array = response.getJSONArray("pairs");
-
-                String searchingFor = pair.toString("_").toLowerCase();
-
-                for (int i = 0; i < array.size(); i++) {
-                    com.alibaba.fastjson.JSONObject tempObj = array.getJSONObject(i);
-                    if (tempObj.containsKey(searchingFor)) {
-                        {
-                            com.alibaba.fastjson.JSONObject tempObjCorrect = (com.alibaba.fastjson.JSONObject) tempObj.get(searchingFor);
-                            fee = tempObjCorrect.getDoubleValue("fee");
-                            apiResponse.setResponseObject(fee);
-                            return apiResponse;
-                        }
+            for (int i = 0; i < array.size(); i++) {
+                JSONObject tempObj = (JSONObject) array.get(i);
+                if (tempObj.containsKey(searchingFor)) {
+                    {
+                        JSONObject tempObjCorrect = (JSONObject) tempObj.get(searchingFor);
+                        fee = Double.parseDouble(tempObjCorrect.get("fee").toString());
+                        apiResponse.setResponseObject(fee);
+                        return apiResponse;
                     }
                 }
-                //Not found
-                ApiError err = new ApiError(ERROR_UNKNOWN, "Did not found fee for pair " + searchingFor);
-                apiResponse.setError(err);
-                return apiResponse;
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            //Not found
+            ApiError err = errors.genericError;
+            err.setDescription("Did not find fee for pair " + searchingFor);
+            apiResponse.setError(err);
+        } else {
+            apiResponse = response;
         }
+
+        return apiResponse;
     }
 
     public static String getTickerPath(CurrencyPair pair) {
@@ -834,22 +602,7 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -860,30 +613,30 @@ public class BterWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         BterService query = new BterService(url, keys, args);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to bter");
-            queryResult = "error : no connection with Bter";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -898,7 +651,7 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
@@ -963,7 +716,6 @@ public class BterWrapper implements TradeInterface {
         trade.setOrder_id((String) orderObject.get("orderid"));
 
 
-        //TODO currencypair
         CurrencyPair cp = CurrencyPair.getCurrencyPairFromString((String) orderObject.get("pair"), "_");
         trade.setPair(cp);
 
@@ -981,97 +733,35 @@ public class BterWrapper implements TradeInterface {
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String path = API_BASE_URL + API_GET_TRADES;
+        String url = API_BASE_URL + API_GET_TRADES;
+        boolean isGet = false;
         ArrayList<Trade> tradeList = new ArrayList<Trade>();
 
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("pair", pair.toString("_").toLowerCase());
-        /* Sample response
-         *{
-         {
-         "result":true,
-         "trades":[
-         {
-         "id":"7942422"
-         "orderid":"38100777"
-         "pair":"ltc_btc"
-         "type":"sell"
-         "rate":"0.01719"
-         "amount":"0.0588"
-         "time":"06-12 02:49:11"
-         "time_unix":"1402512551"
-         }
-         {
-         "id":"7942422"
-         "orderid":"38100491"
-         "pair":"ltc_btc"
-         "type":"buy"
-         "rate":"0.01719"
-         "amount":"0.0588"
-         "time":"06-12 02:49:11"
-         "time_unix":"1402512551"
-         }
-         ]
-         "msg":"Success"
-         }
-         */
 
-        String queryResult = query(path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            /*NOTE TO SELF. Contact Bter support
-             * httpAnswerJson.get("result") contains "true" or false.
-             * one is a String the other is boolean
-             */
-
-            boolean valid = false;
+        ApiResponse response = getQuery(url, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray orders;
             try {
-                valid = Boolean.parseBoolean((String) httpAnswerJson.get("result"));
-            } catch (java.lang.ClassCastException e) {
-                valid = true;
-            }
-
-            if (!valid) {
-                //error
-                String errorMessage = (String) httpAnswerJson.get("msg");
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage);
-
-                LOG.severe("Bter API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONArray orders;
-                try {
-                    orders = (JSONArray) httpAnswerJson.get("trades");
-                } catch (ClassCastException e) { //Empty order list?
-                    apiResponse.setResponseObject(tradeList);
-                    return apiResponse;
-                }
-
-                for (int i = 0; i < orders.size(); i++) {
-                    JSONObject tradeObject = (JSONObject) orders.get(i);
-                    Trade tempTrade = parseTrade(tradeObject);
-                    tradeList.add(tempTrade);
-                }
+                orders = (JSONArray) httpAnswerJson.get("trades");
+            } catch (ClassCastException e) { //Empty order list?
                 apiResponse.setResponseObject(tradeList);
-
                 return apiResponse;
-
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing response"));
-            return apiResponse;
+
+            for (int i = 0; i < orders.size(); i++) {
+                JSONObject tradeObject = (JSONObject) orders.get(i);
+                Trade tempTrade = parseTrade(tradeObject);
+                tradeList.add(tempTrade);
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
         }
 
+        return apiResponse;
     }
 
     @Override
@@ -1098,7 +788,7 @@ public class BterWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-            String answer = "";
+            String answer = null;
             String signature = "";
             String post_data = "";
 
@@ -1131,6 +821,7 @@ public class BterWrapper implements TradeInterface {
                 queryUrl = new URL(url);
             } catch (MalformedURLException ex) {
                 LOG.severe(ex.toString());
+                return null;
             }
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = null;
@@ -1150,32 +841,29 @@ public class BterWrapper implements TradeInterface {
                     response = client.execute(get);
                 }
             } catch (NoRouteToHostException e) {
-                LOG.warning("Debug 1");//TODO remove
                 if (!isGet) {
                     post.abort();
                 } else {
                     get.abort();
                 }
                 LOG.severe(e.toString());
-                return TOKEN_ERR;
+                return null;
             } catch (SocketException e) {
-                LOG.warning("Debug 2"); //TODO remove
                 if (!isGet) {
                     post.abort();
                 } else {
                     get.abort();
                 }
                 LOG.severe(e.toString());
-                return TOKEN_ERR;
+                return null;
             } catch (Exception e) {
-                LOG.warning("Debug 3"); //TODO remove
                 if (!isGet) {
                     post.abort();
                 } else {
                     get.abort();
                 }
                 LOG.severe(e.toString());
-                return TOKEN_ERR;
+                return null;
             }
             BufferedReader rd;
 
@@ -1192,15 +880,13 @@ public class BterWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                LOG.warning("Debug 4");//TODO remove
 
                 LOG.severe(ex.toString());
-                return TOKEN_ERR;
+                return null;
             } catch (IllegalStateException ex) {
-                LOG.warning("Debug 5"); //TODO remove
 
                 LOG.severe(ex.toString());
-                return TOKEN_ERR;
+                return null;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {

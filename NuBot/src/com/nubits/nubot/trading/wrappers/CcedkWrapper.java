@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -48,7 +49,6 @@ import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -81,14 +81,9 @@ public class CcedkWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "order/cancel";
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
-    private ArrayList<ApiError> errors;
+    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "errors";
-    private final int ERROR_UNKNOWN = 8560;
-    private final int ERROR_NO_CONNECTION = 8561;
-    private final int ERROR_GENERIC = 8562;
-    private final int ERROR_PARSING = 8563;
-    private final int ERROR_CURRENCY_NOT_FOUND = 8564;
-    private final int ERROR_ORDER_NOT_FOUND = 8565;
+    private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
 
     public CcedkWrapper() {
@@ -145,9 +140,56 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
-        errors = new ArrayList<ApiError>();
-        errors.add(new ApiError(ERROR_NO_CONNECTION, "Failed to connect to the exchange entrypoint. Verify your connection"));
-        errors.add(new ApiError(ERROR_PARSING, "Parsing error"));
+        errors.setExchangeName(exchange);
+    }
+
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
+        ApiResponse apiResponse = new ApiResponse();
+
+        String queryResult = query(url, method, query_args, isGet);
+        if (queryResult == null) {
+            apiResponse.setError(errors.nullReturnError);
+            return apiResponse;
+        }
+        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+            apiResponse.setError(errors.noConnectionError);
+            return apiResponse;
+        }
+
+        JSONParser parser = new JSONParser();
+        try {
+            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            boolean hasErrors;
+            try {
+                hasErrors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+            } catch (ClassCastException e) {
+                hasErrors = true;
+            }
+
+            if (hasErrors) {
+                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage.toJSONString());
+                LOG.severe("Ccedk API returned an error: " + errorMessage);
+                apiResponse.setError(apiErr);
+            } else {
+                apiResponse.setResponseObject(httpAnswerJson);
+            }
+        } catch (ClassCastException cce) {
+            //if casting to a JSON object failed, try a JSON Array
+            try {
+                JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
+                apiResponse.setResponseObject(httpAnswerJson);
+            } catch (ParseException pe) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
+            }
+        } catch (ParseException ex) {
+            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            apiResponse.setError(errors.parseError);
+            return apiResponse;
+        }
+        return apiResponse;
     }
 
     @Override
@@ -163,126 +205,72 @@ public class CcedkWrapper implements TradeInterface {
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = new Balance();
-
-        String path = API_GET_INFO;
+        String url = API_BASE_URL;
+        String method = API_GET_INFO;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-        /*Params
-         * nonce=<\d{10}>
-         * order_by=<'field_name'>:'balance_id'
-         * order_direction=<ASC|DESC>:ASC i
-         * tems_per_page=<\d+>:100
-         * page=<\d+>:1
-         */
 
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONArray entities = (JSONArray) dataJson.get("entities");
 
-        /*Sample result
-         *{"errors":false,
-         * "response":
-         *  {"entities":
-         *      [{"currency_id":"1",
-         *      "balance":"0.00000000",
-         *      "address":"LLHVnrXrQP1sjxNXLrRQTnZmnpc9N33KL6"},
-         *      {"currency_id":"2","balance":"0.75000000","address":"1GzUJoStC9CHpzFPBGtZF7D7or9c3PdsG7"},
-         *      {"currency_id":"3","balance":"90.00000000","address":null},
-         *      {"currency_id":"4","balance":"10.00000000","address":null},
-         *      {"currency_id":"5","balance":"0.00000000","address":null}]},
-         * "pagination":{"total_items":13,"items_per_page":5,"current_page":1,"total_pages":3}
-         * }
-         */
-
-
-
-        String queryResult = query(API_BASE_URL, path, query_args, false);
-        if (queryResult.startsWith(TOKEN_ERR)) {
-            apiResponse.setError(getErrorByCode(ERROR_NO_CONNECTION));
-            return apiResponse;
-        }
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
-            try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
-            } catch (ClassCastException e) {
-                errors = true;
-            }
-
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
-
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONArray entities = (JSONArray) dataJson.get("entities");
-
-                //iterate on all currencies to find what I want
-                if (currency == null) { //Get all balances
-                    int NBTid = TradeUtils.getCCDKECurrencyId(pair.getOrderCurrency().getCode().toUpperCase());
-                    int PEGid = TradeUtils.getCCDKECurrencyId(pair.getPaymentCurrency().getCode().toUpperCase());
-
-
-                    boolean foundNBT = false;
-                    boolean foundPEG = false;
-
-                    Amount NBTTotal = new Amount(-1, pair.getOrderCurrency());
-                    Amount PEGTotal = new Amount(-1, pair.getPaymentCurrency());
-                    for (int i = 0; i < entities.size(); i++) {
-                        JSONObject temp = (JSONObject) entities.get(i);
-                        int tempid = Integer.parseInt((String) temp.get("currency_id"));
-                        if (tempid == NBTid) {
-                            foundNBT = true;
-                            double tempbalance = Double.parseDouble((String) temp.get("balance"));
-                            NBTTotal = new Amount(tempbalance, pair.getOrderCurrency());
-                        } else if (tempid == PEGid) {
-                            double tempbalance = Double.parseDouble((String) temp.get("balance"));
-                            PEGTotal = new Amount(tempbalance, pair.getPaymentCurrency());
-                            foundPEG = true;
-                        }
-                    }
-
-                    if (foundNBT && foundPEG) {
-                        //Pack it into the ApiResponse
-                        balance = new Balance(NBTTotal, PEGTotal);
-                        apiResponse.setResponseObject(balance);
-                    } else {
-                        apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
-                                + "Cannot find a currency with id = " + NBTid + " or " + PEGid));
-                    }
-                } else { //Specific currency requested
-                    int id = TradeUtils.getCCDKECurrencyId(currency.getCode().toUpperCase());
-                    boolean found = false;
-
-                    Amount total = new Amount(-1, currency);
-                    for (int i = 0; i < entities.size(); i++) {
-                        JSONObject temp = (JSONObject) entities.get(i);
-                        int tempid = Integer.parseInt((String) temp.get("currency_id"));
-                        if (tempid == id) {
-                            found = true;
-                            double tempbalance = Double.parseDouble((String) temp.get("balance"));
-                            total = new Amount(tempbalance, currency);
-                        }
-                    }
-
-                    if (found) {
-                        //Pack it into the ApiResponse
-                        apiResponse.setResponseObject(total);
-                    } else {
-                        apiResponse.setError(new ApiError(ERROR_CURRENCY_NOT_FOUND, ""
-                                + "Cannot find a currency with id = " + id));
+            //iterate on all currencies to find what I want
+            if (currency == null) { //Get all balances
+                int NBTid = TradeUtils.getCCDKECurrencyId(pair.getOrderCurrency().getCode().toUpperCase());
+                int PEGid = TradeUtils.getCCDKECurrencyId(pair.getPaymentCurrency().getCode().toUpperCase());
+                boolean foundNBT = false;
+                boolean foundPEG = false;
+                Amount NBTTotal = new Amount(-1, pair.getOrderCurrency());
+                Amount PEGTotal = new Amount(-1, pair.getPaymentCurrency());
+                for (int i = 0; i < entities.size(); i++) {
+                    JSONObject temp = (JSONObject) entities.get(i);
+                    int tempid = Integer.parseInt((String) temp.get("currency_id"));
+                    if (tempid == NBTid) {
+                        foundNBT = true;
+                        double tempbalance = Double.parseDouble((String) temp.get("balance"));
+                        NBTTotal = new Amount(tempbalance, pair.getOrderCurrency());
+                    } else if (tempid == PEGid) {
+                        double tempbalance = Double.parseDouble((String) temp.get("balance"));
+                        PEGTotal = new Amount(tempbalance, pair.getPaymentCurrency());
+                        foundPEG = true;
                     }
                 }
+                if (foundNBT && foundPEG) {
+                    //Pack it into the ApiResponse
+                    balance = new Balance(NBTTotal, PEGTotal);
+                    apiResponse.setResponseObject(balance);
+                } else {
+                    ApiError err = errors.genericError;
+                    err.setDescription("Cannot find a currency with id = " + NBTid + " or " + PEGid);
+                    apiResponse.setError(err);
+                }
+            } else { //Specific currency requested
+                int id = TradeUtils.getCCDKECurrencyId(currency.getCode().toUpperCase());
+                boolean found = false;
+
+                Amount total = new Amount(-1, currency);
+                for (int i = 0; i < entities.size(); i++) {
+                    JSONObject temp = (JSONObject) entities.get(i);
+                    int tempid = Integer.parseInt((String) temp.get("currency_id"));
+                    if (tempid == id) {
+                        found = true;
+                        double tempbalance = Double.parseDouble((String) temp.get("balance"));
+                        total = new Amount(tempbalance, currency);
+                    }
+                }
+                if (found) {
+                    //Pack it into the ApiResponse
+                    apiResponse.setResponseObject(total);
+                } else {
+                    ApiError err = errors.apiReturnError;
+                    err.setDescription("Cannot find a currency with id = " + id);
+                    apiResponse.setError(err);
+                }
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the balance response"));
-            return apiResponse;
+        } else {
+            apiResponse = response;
         }
 
         return apiResponse;
@@ -290,7 +278,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
@@ -306,56 +294,27 @@ public class CcedkWrapper implements TradeInterface {
     private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double price) {
         ApiResponse apiResponse = new ApiResponse();
         String order_id = "";
+        String url = API_BASE_URL;
+        String method = API_TRADE;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("pair_id", Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair)));
         query_args.put("type", type);
         query_args.put("price", Double.toString(price));
         query_args.put("volume", Double.toString(amount));
 
-        String queryResult = query(API_BASE_URL, API_TRADE, query_args, false);
-
-        /* Sample Answer
-         * {"errors":false,
-         * "response":
-         *     {"entity":
-         *         {"order_id":"2011",
-         *          "transaction_id":"6517"}}}
-         */
-
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
-            try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
-            } catch (ClassCastException e) {
-                errors = true;
-            }
-
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
-
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONObject entity = (JSONObject) dataJson.get("entity");
-                order_id = (String) entity.get("order_id");
-                apiResponse.setResponseObject(order_id);
-            }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONObject entity = (JSONObject) dataJson.get("entity");
+            order_id = (String) entity.get("order_id");
+            apiResponse.setResponseObject(order_id);
+        } else {
+            apiResponse = response;
         }
-        return apiResponse;
 
+        return apiResponse;
     }
 
     @Override
@@ -371,204 +330,111 @@ public class CcedkWrapper implements TradeInterface {
     private ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
-
+        String url = API_BASE_URL;
+        String method = API_ACTIVE_ORDERS;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
 
         if (pair != null) {
             String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
             query_args.put("pair_id", pair_id);
         }
-        String queryResult = query(API_BASE_URL, API_ACTIVE_ORDERS, query_args, false);
 
-        /* Sample Answer
-         * {"errors":false,
-         * "response":
-         *     {"entity":
-         *         {"order_id":"2011",
-         *          "transaction_id":"6517"}}}
-         */
-
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONArray entities;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
-            } catch (ClassCastException e) {
-                errors = true;
-            }
-
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
-
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONArray entities;
-                try {
-                    entities = (JSONArray) dataJson.get("entities");
-                } catch (ClassCastException e) { //Empty order list returns {"errors":false,"response":{"entities":false},
-                    apiResponse.setResponseObject(orderList);
-                    return apiResponse;
-                }
-
-                for (int i = 0; i < entities.size(); i++) {
-                    JSONObject orderObject = (JSONObject) entities.get(i);
-                    Order tempOrder = parseOrder(orderObject);
-
-
-                    if (!tempOrder.isCompleted()) //Do not add executed orders
-                    {
-                        orderList.add(tempOrder);
-                    }
-                }
+                entities = (JSONArray) dataJson.get("entities");
+            } catch (ClassCastException e) { //Empty order list returns {"errors":false,"response":{"entities":false},
                 apiResponse.setResponseObject(orderList);
-
                 return apiResponse;
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            for (int i = 0; i < entities.size(); i++) {
+                JSONObject orderObject = (JSONObject) entities.get(i);
+                Order tempOrder = parseOrder(orderObject);
+
+
+                if (!tempOrder.isCompleted()) //Do not add executed orders
+                {
+                    orderList.add(tempOrder);
+                }
+            }
+            apiResponse.setResponseObject(orderList);
+        } else {
+            apiResponse = response;
         }
 
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
-
+        String url = API_BASE_URL;
+        String method = API_ORDER;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-
-
         query_args.put("order_id", orderID);
 
-        String queryResult = query(API_BASE_URL, API_ORDER, query_args, false);
-
-        /* Sample Answer
-         * {"errors":false,
-         *  "response":
-         * {"entity":
-         * {"order_id":"1617","pair_id":"3","type":"sell","volume":"48.00000000","price":"9.5000000 0","fee":"0.91 200000","active":"1","created":"1406098537"}
-         * }
-         * }
-         */
-
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONObject entity;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                boolean valid = (boolean) dataJson.get("entity");
+                String message = "The order " + orderID + " does not exist";
+                ApiError err = errors.apiReturnError;
+                err.setDescription(message);
+                apiResponse.setError(err);
+                return apiResponse;
             } catch (ClassCastException e) {
-                errors = true;
+                entity = (JSONObject) dataJson.get("entity");
             }
 
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
+            Order order = parseOrder(entity);
 
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONObject entity;
-
-                try {
-                    boolean valid = (boolean) dataJson.get("entity");
-                    String message = "The order " + orderID + " does not exist";
-                    apiResponse.setError(new ApiError(ERROR_ORDER_NOT_FOUND, message));
-                    return apiResponse;
-                } catch (ClassCastException e) {
-                    entity = (JSONObject) dataJson.get("entity");
-                }
-
-                Order order = parseOrder(entity);
-
-                apiResponse.setResponseObject(order);
-
-                return apiResponse;
-            }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            apiResponse.setResponseObject(order);
+        } else {
+            apiResponse = response;
         }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
-
+        String url = API_BASE_URL;
+        String method = API_CANCEL_ORDER;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-
-
         query_args.put("order_id", orderID);
 
-        String queryResult = query(API_BASE_URL, API_CANCEL_ORDER, query_args, false);
-
-        /* Sample Answer
-         * {"errors":false,"response":{"entity":{"transaction_id":"6518"}}}
-         */
-
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONObject entity;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
-            } catch (ClassCastException e) {
-                errors = true;
-            }
-
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
+                boolean valid = (boolean) dataJson.get("entity");
+                String message = "The order " + orderID + " does not exist";
+                LOG.severe(message);
                 apiResponse.setResponseObject(false);
                 return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONObject entity;
-
-                try {
-                    boolean valid = (boolean) dataJson.get("entity");
-                    String message = "The order " + orderID + " does not exist";
-                    LOG.severe(message);
-                    apiResponse.setResponseObject(false);
-                    return apiResponse;
-                } catch (ClassCastException e) {
-                    entity = (JSONObject) dataJson.get("entity");
-                }
-
-                apiResponse.setResponseObject(true);
-
-                return apiResponse;
+            } catch (ClassCastException e) {
+                entity = (JSONObject) dataJson.get("entity");
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            apiResponse.setResponseObject(true);
+        } else {
+            apiResponse = response;
         }
 
+        return apiResponse;
     }
 
     @Override
@@ -584,7 +450,8 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warning("CCEDK uses global TX fee, currency pair not supprted. \n"
+
+        LOG.warning("CCEDK uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -593,71 +460,34 @@ public class CcedkWrapper implements TradeInterface {
     public ApiResponse isOrderActive(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
-
+        String url = API_BASE_URL;
+        String method = API_ORDER;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-
-
         query_args.put("order_id", orderID);
 
-        String queryResult = query(API_BASE_URL, API_ORDER, query_args, false);
-
-        /* Sample Answer
-         * {"errors":false,
-         *  "response":
-         * {"entity":
-         * {"order_id":"1617","pair_id":"3","type":"sell","volume":"48.00000000","price":"9.5000000 0","fee":"0.91 200000","active":"1","created":"1406098537"}
-         * }
-         * }
-         */
-
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONObject entity;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
+                boolean valid = (boolean) dataJson.get("entity");
+                String message = "The order " + orderID + " does not exist";
+                LOG.info(message);
+
+                apiResponse.setResponseObject(false);
+                return apiResponse;
             } catch (ClassCastException e) {
-                errors = true;
+                entity = (JSONObject) dataJson.get("entity");
             }
-
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
-
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONObject entity;
-
-                try {
-                    boolean valid = (boolean) dataJson.get("entity");
-                    String message = "The order " + orderID + " does not exist";
-                    LOG.info(message);
-
-                    apiResponse.setResponseObject(false);
-                    return apiResponse;
-                } catch (ClassCastException e) {
-                    entity = (JSONObject) dataJson.get("entity");
-                }
-
-                Order order = parseOrder(entity);
-
-                apiResponse.setResponseObject(true);
-
-                return apiResponse;
-            }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            Order order = parseOrder(entity);
+            apiResponse.setResponseObject(true);
+        } else {
+            apiResponse = response;
         }
 
+        return apiResponse;
     }
 
     @Override
@@ -671,7 +501,7 @@ public class CcedkWrapper implements TradeInterface {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-
+                //TODO check that the order belongs to 'pair'
                 ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
@@ -701,28 +531,11 @@ public class CcedkWrapper implements TradeInterface {
         }
 
         return toReturn;
-
-
     }
 
     @Override
     public ApiError getErrorByCode(int code) {
-        boolean found = false;
-        ApiError toReturn = null;;
-        for (int i = 0; i < errors.size(); i++) {
-            ApiError temp = errors.get(i);
-            if (code == temp.getCode()) {
-                found = true;
-                toReturn = temp;
-                break;
-            }
-        }
-
-        if (found) {
-            return toReturn;
-        } else {
-            return new ApiError(ERROR_UNKNOWN, "Unknown API error");
-        }
+        return null;
     }
 
     @Override
@@ -733,12 +546,12 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         CcedkService query = new CcedkService(url, args);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to ccdek");
-            queryResult = "error : no connection with CCEDK";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
@@ -746,24 +559,24 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
         CcedkService query = new CcedkService(base, method, args, keys);
-        String queryResult = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+        String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, false);
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to ccdek");
-            queryResult = "error : no connection with CCEDK";
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
     }
 
     private Order parseOrder(JSONObject orderObject) {
@@ -845,7 +658,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
+        throw new UnsupportedOperationException("Not supported yet."); 
 
     }
 
@@ -862,9 +675,10 @@ public class CcedkWrapper implements TradeInterface {
     public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Trade> tradesList = new ArrayList<Trade>();
-
+        String url = API_BASE_URL;
+        String method = API_GET_TRADES;
+        boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-
         String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
 
         String startDateArg;
@@ -878,65 +692,29 @@ public class CcedkWrapper implements TradeInterface {
 
         query_args.put("date_from", startDateArg);
 
-        String queryResult = query(API_BASE_URL, API_GET_TRADES, query_args, false);
-
-        /* Sample Answer
-         * {
-         *    "errors":false,
-         *    "response":{
-         *       "entities":[
-         *          {
-         *             "trade_id":"1710",
-         *             "pair_id":"30",
-         *             "type":"buy",
-         *             "is_buyer":"0","is_seller":"1","price":"0.00005505","vo lume":"1.22320232","fee":"0.00000013","created":"1405787314"},{"trade_id":"1714","pair_id":"30","type":"buy","is_buyer":"0","is_seller":" 1","price":"0.00005505","volume":"1.00000000","fee":"0.00000011","created":"1405787314"},{"trade_id":"1718","pair_id":"30","type":"buy ","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"1.03679768","fee":"0.00000011","created":"1405787314"},{"trade_id":"1720 ","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00005505","volume":"2.22000000","fee":"0.00000024","created":"140 5787369"},{"trade_id":"1780","pair_id":"30","type":"buy","is_buyer":"0","is_seller":"1","price":"0.00007600","volume":"5000.00000000","fe e":"0.00076000","created":"1405964079"}]},"pagination":{"total_items":5,"items_per_page":10,"current_page":1,"total_pages":1}}
-         */
-
-        JSONParser parser = new JSONParser();
-        try {
-            JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            boolean errors = true;
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+            JSONArray entities;
             try {
-                errors = (boolean) httpAnswerJson.get(TOKEN_ERR);
-            } catch (ClassCastException e) {
-                errors = true;
-            }
-
-            if (errors) {
-                //error
-                JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
-                ApiError apiErr = new ApiError(ERROR_GENERIC, errorMessage.toJSONString());
-
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
-
-                apiResponse.setError(apiErr);
-                return apiResponse;
-            } else {
-                //correct
-                JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-                JSONArray entities;
-                try {
-                    entities = (JSONArray) dataJson.get("entities");
-                } catch (ClassCastException e) { //Empty order list returns {"errors":false,"response":{"entities":false},
-                    apiResponse.setResponseObject(tradesList);
-                    return apiResponse;
-                }
-
-                for (int i = 0; i < entities.size(); i++) {
-                    JSONObject tradeObject = (JSONObject) entities.get(i);
-                    Trade tempTrade = parseTrade(tradeObject);
-                    tradesList.add(tempTrade);
-
-                }
+                entities = (JSONArray) dataJson.get("entities");
+            } catch (ClassCastException e) { //Empty order list returns {"errors":false,"response":{"entities":false},
                 apiResponse.setResponseObject(tradesList);
-
                 return apiResponse;
             }
-        } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
-            apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing the response"));
-            return apiResponse;
+            for (int i = 0; i < entities.size(); i++) {
+                JSONObject tradeObject = (JSONObject) entities.get(i);
+                Trade tempTrade = parseTrade(tradeObject);
+                tradesList.add(tempTrade);
+
+            }
+            apiResponse.setResponseObject(tradesList);
+        } else {
+            apiResponse = response;
         }
+
+        return apiResponse;
     }
 
     private class CcedkService implements ServiceInterface {
@@ -984,9 +762,9 @@ public class CcedkWrapper implements TradeInterface {
                     if (wrongNonceCounter == 0) {
                         nonce = createNonce("");
                     } else {
-                        LOG.warning("Re executing query for the " + wrongNonceCounter + " time. "
+                        LOG.info("Re executing query for the " + wrongNonceCounter + " time. "
                                 + "New nonce = " + adjustedNonce
-                                + " while calling : " + method); //TODO, down to log. info when debugging is done
+                                + " while calling : " + method);
                         nonce = adjustedNonce;
                     }
                     args.put("nonce", nonce);
@@ -1065,14 +843,15 @@ public class CcedkWrapper implements TradeInterface {
             } //Capture Exceptions
             catch (IllegalStateException ex) {
                 LOG.severe(ex.toString());
-
+                return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
                 LOG.severe(ex.toString());
 
-                answer = getErrorByCode(ERROR_NO_CONNECTION).getDescription();
+                answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
                 LOG.severe(ex.toString());
+                return null;
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();

@@ -35,7 +35,7 @@ public class BtcePriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(BtcePriceFeed.class.getName());
 
     public BtcePriceFeed() {
-        name = PriceFeedManager.BTCE;
+        name = "btce";
         refreshMinTime = 50 * 1000; //one minutee
     }
 

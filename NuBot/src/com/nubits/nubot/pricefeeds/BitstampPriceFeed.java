@@ -35,7 +35,7 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(BitstampPriceFeed.class.getName());
 
     public BitstampPriceFeed() {
-        name = PriceFeedManager.BITSTAMP_EURUSD;
+        name = "bitstampeurusd";
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

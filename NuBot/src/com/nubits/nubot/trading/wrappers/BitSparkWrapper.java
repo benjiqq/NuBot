@@ -23,13 +23,8 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
@@ -39,12 +34,7 @@ import com.nubits.nubot.utils.HttpUtils;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -59,9 +49,11 @@ import org.jsoup.nodes.Document;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class PeatioWrapper implements TradeInterface {
+public class BitSparkWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(PeatioWrapper.class.getName());
+    //It seems that BitSpark also have a reversed pairing for NBT_BTC.
+    //to correctly return a pair balance the pair needs to be NBT_BTC instead of BTC_NBT
+    private static final Logger LOG = Logger.getLogger(BitSparkWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -73,6 +65,7 @@ public class PeatioWrapper implements TradeInterface {
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
     public String checkConnectionUrl;
+    private final String API_BASE_URL = "https://bitspark.io";
     private final String API_GET_INFO = "/api/v2/members/me"; //GET
     private final String API_TRADE = "/api/v2/orders"; //POST
     private final String API_ACTIVE_ORDERS = "/api/v2/orders"; //GET
@@ -80,21 +73,21 @@ public class PeatioWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "/api/v2/order/delete"; //POST
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
-    // Errors
-    private ErrorManager errors = new ErrorManager();
-    private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
+    // Errors
+    ErrorManager errors = new ErrorManager();
+    private final String TOKEN_ERR = "error";
 
-    public PeatioWrapper() {
+    public BitSparkWrapper() {
         setupErrors();
 
     }
 
-    public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
+    public BitSparkWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
-        this.apiBaseUrl = api_base;
-        this.checkConnectionUrl = api_base;
+        this.apiBaseUrl = API_BASE_URL;
+        this.checkConnectionUrl = API_BASE_URL;
         setupErrors();
 
     }
@@ -120,6 +113,7 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     private void setupErrors() {
+
         errors.setExchangeName(exchange);
 
     }
@@ -142,7 +136,6 @@ public class PeatioWrapper implements TradeInterface {
         JSONParser parser = new JSONParser();
 
         try {
-            //assume that a standard JSON Object is returned
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
             if (httpAnswerJson.containsKey("error")) {
                 JSONObject error = (JSONObject) httpAnswerJson.get("error");
@@ -184,7 +177,7 @@ public class PeatioWrapper implements TradeInterface {
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = null;
-        String url = apiBaseUrl;
+        String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = true;
         TreeMap<String, String> query_args = new TreeMap<>();
@@ -264,7 +257,7 @@ public class PeatioWrapper implements TradeInterface {
         double ask = -1;
         double bid = -1;
 
-        String ticker_url = apiBaseUrl + getTickerPath(pair);
+        String ticker_url = API_BASE_URL + getTickerPath(pair);
         String queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
 
         /*Sample result
@@ -279,15 +272,14 @@ public class PeatioWrapper implements TradeInterface {
          *      "vol":"0.11"}}
          */
 
-
         JSONParser parser = new JSONParser();
         try {
             JSONObject httpAnswerJson = (JSONObject) parser.parse(queryResult);
             JSONObject tickerOBJ = (JSONObject) httpAnswerJson.get("ticker");
 
-            last = Double.parseDouble(tickerOBJ.get("last").toString());
-            ask = Double.parseDouble(tickerOBJ.get("buy").toString());
-            bid = Double.parseDouble(tickerOBJ.get("sell").toString());
+            last = (Double) tickerOBJ.get("last");
+            ask = (Double) tickerOBJ.get("buy");
+            bid = (Double) tickerOBJ.get("sell");
 
             ticker.setAsk(ask);
             ticker.setBid(bid);
@@ -315,7 +307,7 @@ public class PeatioWrapper implements TradeInterface {
     public ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
         String order_id = "";
-        String url = apiBaseUrl;
+        String url = API_BASE_URL;
         String method = API_TRADE;
         boolean isGet = false;
 
@@ -345,7 +337,8 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public ApiResponse getActiveOrders() {
         ApiError err = errors.genericError;
-        err.setDescription("In Peatio API you should specify the CurrencyPair\nuse getActiveOrders(CurrencyPair pair)");
+        err.setDescription("For the BitSpark API you should specify the CurrencyPair"
+                + "\n use getActiveOrders(CurrencyPair pair)");
         return new ApiResponse(false, null, err);
     }
 
@@ -353,7 +346,7 @@ public class PeatioWrapper implements TradeInterface {
     public ApiResponse getActiveOrders(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> orderList = new ArrayList<Order>();
-        String url = apiBaseUrl;
+        String url = API_BASE_URL;
         String method = API_ACTIVE_ORDERS;
         boolean isGet = true;
         TreeMap<String, String> query_args = new TreeMap<>();
@@ -390,7 +383,7 @@ public class PeatioWrapper implements TradeInterface {
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         Order order = null;
-        String url = apiBaseUrl;
+        String url = API_BASE_URL;
         String method = API_ORDER;
         boolean isGet = true;
 
@@ -424,7 +417,7 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String url = apiBaseUrl;
+        String url = API_BASE_URL;
         String method = API_CANCEL_ORDER;
         boolean isGet = false;
 
@@ -513,7 +506,7 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public String getUrlConnectionCheck() {
-        return checkConnectionUrl;
+        return API_BASE_URL;
     }
 
     @Override
@@ -523,13 +516,13 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        PeatioService query = new PeatioService(base, method, args, keys);
+        BitSparkService query = new BitSparkService(base, method, args, keys);
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
 
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to Peatio");
+            LOG.severe("The bot will not execute the query, there is no connection to BitSpark");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -576,18 +569,18 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
     private Date parseDate(String dateStr) {
         Date toRet = null;
         //Parse the date
-        //Sample 2014-08-19T10:23:49Z
+        //Sample 2014-08-19T10:23:49+01:00
 
         //Remove the Timezone
         dateStr = dateStr.substring(0, dateStr.length() - 1);
@@ -605,8 +598,8 @@ public class PeatioWrapper implements TradeInterface {
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
         String method = API_CLEAR_ORDERS;
-        String url = apiBaseUrl;
         boolean isGet = false;
 
         TreeMap<String, String> query_args = new TreeMap<>();
@@ -683,10 +676,10 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not supported yet."); //TODO change body of generated methods, choose Tools | Templates.
     }
 
-    private class PeatioService implements ServiceInterface {
+    private class BitSparkService implements ServiceInterface {
 
         protected String base;
         protected String method;
@@ -694,7 +687,7 @@ public class PeatioWrapper implements TradeInterface {
         protected ApiKeys keys;
         protected String url;
 
-        public PeatioService(String base, String method, TreeMap<String, String> args, ApiKeys keys) {
+        public BitSparkService(String base, String method, TreeMap<String, String> args, ApiKeys keys) {
             this.base = base;
             this.method = method;
             this.args = args;
@@ -702,7 +695,7 @@ public class PeatioWrapper implements TradeInterface {
 
         }
 
-        private PeatioService(String url, TreeMap<String, String> args) {
+        private BitSparkService(String url, TreeMap<String, String> args) {
             //Used for ticker, does not require auth
             this.url = url;
             this.args = args;
@@ -712,7 +705,6 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-
 
             args.put("access_key", keys.getApiKey());
 
@@ -725,11 +717,12 @@ public class PeatioWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.fine("Calling " + canonical_uri + " with params:" + args);
+            //LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
-                String url = apiBaseUrl + canonical_uri;
+                String url = base + canonical_uri;
+                //LOG.info("url = " + url);
                 Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
 
@@ -752,7 +745,7 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String signRequest(String secret, String hash_data) {
-            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters");
+            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters"); //TODO change body of generated methods, choose Tools | Templates.
         }
 
         private String getSign(TreeMap<String, String> parameters) {

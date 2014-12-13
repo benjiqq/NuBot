@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.utils;
 
+import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.launch.NuBot;
@@ -30,12 +31,15 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URL;
+import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
@@ -176,17 +180,23 @@ public class Utils {
     public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
         String line = "", all = "";
         URL myUrl = null;
-        BufferedReader in = null;
+        BufferedReader br = null;
         try {
             myUrl = new URL(url);
-            in = new BufferedReader(new InputStreamReader(myUrl.openStream(), "UTF-8"));
 
-            while ((line = in.readLine()) != null) {
+            URLConnection con = myUrl.openConnection();
+            con.setConnectTimeout(1000 * 8);
+            con.setReadTimeout(1000 * 8);
+            InputStream in = con.getInputStream();
+
+            br = new BufferedReader(new InputStreamReader(in));
+
+            while ((line = br.readLine()) != null) {
                 all += line;
             }
         } finally {
-            if (in != null) {
-                in.close();
+            if (br != null) {
+                br.close();
             }
         }
 
@@ -202,7 +212,6 @@ public class Utils {
 
     public static boolean isSupported(CurrencyPair pair) {
         if (pair.equals(Constant.NBT_USD)
-                || pair.equals(Constant.BTC_CNY)//TODO this is only for testing purposes on our internal exchange
                 || pair.equals(Constant.NBT_BTC)
                 || pair.equals(Constant.BTC_NBT)
                 || pair.equals(Constant.NBT_EUR)
@@ -216,8 +225,7 @@ public class Utils {
 
     public static boolean requiresSecondaryPegStrategy(CurrencyPair pair) {
         //Return TRUE when it requires a dedicated NBT peg to something that is not USD
-        if (pair.equals(Constant.NBT_USD)
-                || pair.equals(Constant.BTC_CNY)) { //TODO this is only for testing purposes on our internal exchange
+        if (pair.equals(Constant.NBT_USD)) {
             return false;
         } else {
             return true;
@@ -279,5 +287,20 @@ public class Utils {
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
+    }
+
+    //Computes the seconds missing till the next remote minutes clocks
+    public static int getSecondsToRemoteMinute() {
+        Date remoteDate = new NTPClient().getTime();
+        Calendar remoteCalendar = new GregorianCalendar();
+        remoteCalendar.setTime(remoteDate);
+        int remoteTimeInSeconds = remoteCalendar.get(Calendar.SECOND);
+        int delay = (60 - remoteTimeInSeconds);
+        return delay;
+    }
+
+    public static void exitWithMessage(String msg) {
+        LOG.severe(msg);
+        System.exit(0);
     }
 }

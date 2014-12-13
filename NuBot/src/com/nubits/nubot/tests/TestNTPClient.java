@@ -21,15 +21,24 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.NTP.NTPClient;
 import java.util.logging.Logger;
 
-public class TestNotifications {
+public class TestNTPClient {
 
-    private static final Logger LOG = Logger.getLogger(TestNotifications.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestNTPClient.class.getName());
 
-    public static void main(String[] a) {
-        MailNotifications.send("pennybreaker@outlook.com", "Test Title", "Test Message");
-        //HipChatNotifications.sendMessage("Test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RANDOM);
+    public static void main(String[] args) {
+        NTPClient client = new NTPClient();
+
+
+        //Try multiple servers
+        LOG.info("Date (multiple servers) : " + client.getTime());
+
+        //Try single server
+        LOG.info("Date (single server) : " + client.getTime("time.nist.gov"));
+
+        System.exit(0);
+
     }
 }

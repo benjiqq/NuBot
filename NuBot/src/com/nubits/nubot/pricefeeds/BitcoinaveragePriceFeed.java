@@ -35,7 +35,7 @@ public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(BitcoinaveragePriceFeed.class.getName());
 
     public BitcoinaveragePriceFeed() {
-        name = PriceFeedManager.BITCOINAVERAGE;
+        name = "bitcoinaverage";
         refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }

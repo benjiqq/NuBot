@@ -23,23 +23,16 @@ package com.nubits.nubot.trading;
  */
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
-import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.utils.FrozenBalancesManager.FrozenAmount;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -215,12 +208,8 @@ public class TradeUtils {
         }
         return result;
     }
-
-
-
     //The two methods below have been amalgamated into the CCDEK wrapper
     //TODO - remove these methods once testing has taken place
-
     public static int offset = 0;
 
     public static String getCCDKEvalidNonce() {
@@ -242,7 +231,7 @@ public class TradeUtils {
                 validNonce = "";
             }
         } else {
-            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) -1);
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) - 1);
         }
         if (!validNonce.equals("")) {
             lastdigits = validNonce.substring(validNonce.length() - 2);
@@ -418,42 +407,6 @@ public class TradeUtils {
         }
         return toRet;
 
-    }
-
-    public static Amount removeFrozenAmount(Amount amount, FrozenAmount frozen) {
-        if (frozen.getAmount().getQuantity() == 0) {
-            return amount; //nothing to freeze
-        } else {
-            Currency currentPegCurrency = amount.getCurrency();
-            Currency frozenCurrency = frozen.getAmount().getCurrency();
-
-            if (currentPegCurrency.equals(frozenCurrency)) {
-                double updatedQuantity = amount.getQuantity() - frozen.getAmount().getQuantity();
-                return new Amount(updatedQuantity, currentPegCurrency);
-            } else {
-                LOG.severe("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
-                        + "Returning original balance without freezing value");
-                return amount;
-            }
-        }
-    }
-
-    public static void tryKeepProceedingsAside(Amount amountFoundInBalance) {
-        double percentageToSetApart = Utils.round(Global.options.getKeepProceedings() / 100, 4);
-
-        if (percentageToSetApart != 0) {
-            double quantityToFreeze = percentageToSetApart * amountFoundInBalance.getQuantity();
-
-            DecimalFormat df = new DecimalFormat("#");
-            df.setMaximumFractionDigits(8);
-
-            Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
-            Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
-
-            HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
-                    + percentageToSetApart * 100 + "% of  sale proceedings)"
-                    + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
-        }
     }
 
     public static String getCCEDKTickerUrl(CurrencyPair pair) {

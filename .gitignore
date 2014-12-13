@@ -8,6 +8,7 @@ releases/
 #Directories to ignore
 
 /NuBot/res/options/test/
+/NuBot/res/options/private/
 /NuBot/nbproject/private/
 /NuBot/build/
 /NuBot/dist/

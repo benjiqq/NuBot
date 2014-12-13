@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
@@ -38,14 +39,15 @@ public class OptionsJSON {
     private String apiKey;
     private String apiSecret;
     private String mailRecipient;
-    private String rpcUser;
-    private String rpcPass;
-    private String nubitAddress;
     private String exchangeName;
-    private int nudPort;
     private boolean dualSide;
     private CurrencyPair pair;
     private SecondaryPegOptionsJSON secondaryPegOptions;
+    //Conditional settings with a default value
+    private String rpcUser;
+    private String rpcPass;
+    private String nubitAddress;
+    private int nudPort;
     //Optional settings with a default value  ----------------------------
     private String nudIp;
     private boolean sendMails;
@@ -60,7 +62,7 @@ public class OptionsJSON {
     private double txFee;
     private double priceIncrement;
     private int emergencyTimeout;
-    private double keepProceedings;
+    private double keepProceeds;
     private SecondaryPegOptionsJSON cpo;
 
     /**
@@ -93,7 +95,7 @@ public class OptionsJSON {
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceedings, boolean aggregate, boolean waitBeforeShift, SecondaryPegOptionsJSON secondaryPegOptions) {
+            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean waitBeforeShift, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -115,7 +117,7 @@ public class OptionsJSON {
         this.sendMails = sendMails;
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
-        this.keepProceedings = keepProceedings;
+        this.keepProceeds = keepProceeds;
         this.secondaryPegOptions = secondaryPegOptions;
         this.aggregate = aggregate;
         this.waitBeforeShift = waitBeforeShift;
@@ -480,22 +482,35 @@ public class OptionsJSON {
 
 
             //First try to parse compulsory parameters
-
-            String apiKey = (String) optionsJSON.get("apikey");
-            String apiSecret = (String) optionsJSON.get("apisecret");
-            String nubitAddress = (String) optionsJSON.get("nubitaddress");
-            String rpcPass = (String) optionsJSON.get("rpcpass");
-            String rpcUser = (String) optionsJSON.get("rpcuser");
             String exchangeName = (String) optionsJSON.get("exchangename");
+
+            String apiKey = "";
+
+
+            if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
+                if (!optionsJSON.containsKey("apikey")) {
+                    Utils.exitWithMessage("The apikey parameter is compulsory.");
+                } else {
+                    apiKey = (String) optionsJSON.get("apikey");
+                }
+
+            }
+
+            String apiSecret = (String) optionsJSON.get("apisecret");
+
             String mailRecipient = (String) optionsJSON.get("mail-recipient");
 
             String pairStr = (String) optionsJSON.get("pair");
             CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
+
+            boolean aggregate = true; //true only for USD
+            if (!pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
+                aggregate = false; //default to false
+            }
+
+
+
             boolean dualside = (boolean) optionsJSON.get("dualside");
-
-            long nudPortlong = (long) optionsJSON.get("nudport");
-            int nudPort = (int) nudPortlong;
-
 
 
             //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
@@ -517,14 +532,14 @@ public class OptionsJSON {
             boolean executeOrders = true;
             boolean verbose = false;
             boolean sendHipchat = true;
-            boolean aggregate = true;
+
             boolean waitBeforeShift = true;
             int executeStrategyInterval = 41;
             int sendLiquidityInterval = 181;
 
             double txFee = 0.2;
             double priceIncrement = 0.0003;
-            double keepProceedings = 0;
+            double keepProceeds = 0;
 
             int emergencyTimeout = 60;
 
@@ -544,6 +559,44 @@ public class OptionsJSON {
                 submitLiquidity = (boolean) optionsJSON.get("submit-liquidity");
             }
 
+            //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
+
+            String nubitAddress = "", rpcPass = "", rpcUser = "";
+            int nudPort = 9091;
+
+            if (submitLiquidity) {
+                if (optionsJSON.containsKey("nubitaddress")) {
+                    nubitAddress = (String) optionsJSON.get("nubitaddress");
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"nubitaddress\" ");
+                }
+
+                if (optionsJSON.containsKey("rpcpass")) {
+                    rpcPass = (String) optionsJSON.get("rpcpass");
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"rpcpass\" ");
+                }
+
+                if (optionsJSON.containsKey("rpcuser")) {
+                    rpcUser = (String) optionsJSON.get("rpcuser");
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"rpcuser\" ");
+                }
+
+                if (optionsJSON.containsKey("nudport")) {
+                    long nudPortlong = (long) optionsJSON.get("nudport");
+                    nudPort = (int) nudPortlong;
+                } else {
+                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"nudport\" ");
+                }
+
+            }
+
+
             if (optionsJSON.containsKey("executeorders")) {
                 executeOrders = (boolean) optionsJSON.get("executeorders");
             }
@@ -560,18 +613,12 @@ public class OptionsJSON {
                 sendMails = (boolean) optionsJSON.get("mail-notifications");
             }
 
-            if (optionsJSON.containsKey("aggregate")) {
-                aggregate = (boolean) optionsJSON.get("aggregate");
-            }
-
-
 
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
              if (optionsJSON.containsKey("check-balance-interval")) {
              long checkBalanceIntervallong = (long) optionsJSON.get("check-balance-interval");
              checkBalanceInterval = (int) checkBalanceIntervallong;
              }
-
 
              if (optionsJSON.containsKey("check-orders-interval")) {
              long checkOrdersIntevallong = (long) optionsJSON.get("check-orders-interval");
@@ -584,8 +631,8 @@ public class OptionsJSON {
                 emergencyTimeout = (int) emergencyTimeoutLong;
             }
 
-            if (optionsJSON.containsKey("keep-proceedings")) {
-                keepProceedings = Utils.getDouble((optionsJSON.get("keep-proceedings")));
+            if (optionsJSON.containsKey("keep-proceeds")) {
+                keepProceeds = Utils.getDouble((optionsJSON.get("keep-proceeds")));
             }
 
             if (optionsJSON.containsKey("wait-before-shift")) {
@@ -596,7 +643,7 @@ public class OptionsJSON {
                     rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                     executeOrders, verbose, pair, executeStrategyInterval,
                     sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
-                    emergencyTimeout, keepProceedings, aggregate, waitBeforeShift, cpo);
+                    emergencyTimeout, keepProceeds, aggregate, waitBeforeShift, cpo);
 
 
 
@@ -622,12 +669,12 @@ public class OptionsJSON {
         this.emergencyTimeout = emergencyTimeoutMinutes;
     }
 
-    public double getKeepProceedings() {
-        return keepProceedings;
+    public double getKeepProceeds() {
+        return keepProceeds;
     }
 
-    public void setKeepProceedings(double keepProceedings) {
-        this.keepProceedings = keepProceedings;
+    public void setKeepProceeds(double keepProceeds) {
+        this.keepProceeds = keepProceeds;
     }
 
     public String getNubitAddress() {
@@ -652,7 +699,7 @@ public class OptionsJSON {
         if (secondaryPegOptions != null) {
             cryptoOptions = secondaryPegOptions.toString();
         }
-        return "OptionsJSON{" + "dualSide=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceedings=" + keepProceedings + "aggregate=" + aggregate + " , waitBeforeShift=" + waitBeforeShift + " , cryptoPegOptions=" + cryptoOptions + '}';
+        return "OptionsJSON{" + "dualSide=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + waitBeforeShift + " , cryptoPegOptions=" + cryptoOptions + '}';
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
@@ -665,6 +712,6 @@ public class OptionsJSON {
         if (secondaryPegOptions != null) {
             cryptoOptions = secondaryPegOptions.toHtmlString();
         }
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceedings=" + keepProceedings + "<br> aggregate=" + aggregate + " <br><br>" + cryptoOptions + '}';
+        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + " <br><br>" + cryptoOptions + '}';
     }
 }

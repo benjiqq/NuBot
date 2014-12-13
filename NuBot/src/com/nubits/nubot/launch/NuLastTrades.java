@@ -26,10 +26,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.BtceWrapper;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.PeatioWrapper;
+import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
@@ -40,7 +37,7 @@ import java.util.logging.Logger;
 public class NuLastTrades {
 
     private static final Logger LOG = Logger.getLogger(NuLastTrades.class.getName());
-    private final String USAGE_STRING = "java  -jar NuLastTrades <exchange-name> <apikey> <apisecret> <currency_pair> [<date_from>]";
+    private final String USAGE_STRING = "java -jar NuLastTrades <exchange-name> <apikey> <apisecret> <currency_pair> [<date_from>]";
     private final String HEADER = "id,order_id,pair,type,price,amount,date";
     private String output;
     private String api;
@@ -98,6 +95,14 @@ public class NuLastTrades {
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
         } else if (exchangename.equals(Constant.BTER)) {
             Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
+        } else if (exchangename.equals(Constant.ALLCOIN)) {
+            Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
+        } else if (exchangename.equals(Constant.BITSPARK_PEATIO)) {
+            Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
+        } else if (exchangename.equals(Constant.POLONIEX)) {
+            Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
+        } else if (exchangename.equals(Constant.CCEX)) {
+            Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangename + " not supported");
             System.exit(0);

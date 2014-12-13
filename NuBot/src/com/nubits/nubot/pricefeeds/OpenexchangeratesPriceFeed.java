@@ -37,7 +37,7 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(OpenexchangeratesPriceFeed.class.getName());
 
     public OpenexchangeratesPriceFeed() {
-        name = PriceFeedManager.OPENEXCHANGERATES;
+        name = "openexchangerates";
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

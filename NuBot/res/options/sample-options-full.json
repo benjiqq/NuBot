@@ -19,8 +19,7 @@
     "mail-notifications":false,
     "mail-recipient":"xxx",
     "emergency-timeout":60,
-    "keep-proceedings":0,
-    "aggregate":false,
+    "keep-proceeds":0,
     "secondary-peg-options":
         {
             "main-feed":"blockchain",
@@ -34,4 +33,3 @@
          }
  }
 }
-  

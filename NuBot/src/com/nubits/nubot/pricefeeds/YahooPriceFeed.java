@@ -35,7 +35,7 @@ public class YahooPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(YahooPriceFeed.class.getName());
 
     public YahooPriceFeed() {
-        name = PriceFeedManager.YAHOO;
+        name = "yahoo";
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

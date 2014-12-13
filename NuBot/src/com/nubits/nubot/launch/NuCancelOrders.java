@@ -44,7 +44,7 @@ public class NuCancelOrders {
     private String exchangename;
     private CurrencyPair pair;
     private ApiKeys keys;
-    public static final String USAGE_STRING = "java  -jar NuCancelOrders <apikey> <secretkey> <exchange-name> <pair>";
+    public static final String USAGE_STRING = "java -jar NuCancelOrders <apikey> <secretkey> <exchange-name> <pair>";
 
     public static void main(String[] args) {
         //Load settings

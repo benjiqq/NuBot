@@ -102,17 +102,10 @@
             <zipfileset src="${store.dir}/temp_final.jar"
             excludes="META-INF/*.SF, META-INF/*.DSA, META-INF/*.RSA"/>
         </zip>
-        
+             
+         
+        <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
 
-          <copy todir="${store.dir}/res/ssl" >  
-            <fileset dir="res/ssl">  
-            </fileset>
-            <resources>
-                <file file="res/ssl/nubot_keystore.jks"/>
-            </resources>
-
-          </copy>
-          
           
           <copy file="res/options/sample-options-reduced.json" tofile="${store.dir}/options-sample-min.json"/>
           <copy file="res/options/sample-options-full.json" tofile="${store.dir}/options-sample-extended.json"/>

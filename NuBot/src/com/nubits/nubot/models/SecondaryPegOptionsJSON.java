@@ -112,6 +112,10 @@ public class SecondaryPegOptionsJSON {
 
             if (optionsJSON.has("price-offset")) {
                 priceOffset = new Double((optionsJSON.get("price-offset")).toString());
+                if (priceOffset != 0) {
+                    LOG.warning("You are using the \"price-offset\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
+                }
+
             }
 
 

@@ -83,7 +83,7 @@ public class TaskManager {
         taskList.add(checkNudTask);
 
         strategyFiatTask = new BotTask(
-                new StrategyFiatTask(), executeStrategyInterval, STRATEGY_FIAT);
+                new StrategyPrimaryPegTask(), executeStrategyInterval, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
 
         secondaryPegTask = new BotTask(

@@ -52,6 +52,7 @@ public class Exchange {
         supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());
         supportedExchanges.put(Constant.CCEX, new CcexWrapper());
         supportedExchanges.put(Constant.ALLCOIN, new AllCoinWrapper());
+        supportedExchanges.put(Constant.BITSPARK_PEATIO, new BitSparkWrapper());
 
 
         Iterator it = supportedExchanges.entrySet().iterator();
