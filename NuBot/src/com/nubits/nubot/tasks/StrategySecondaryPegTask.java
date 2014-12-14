@@ -493,7 +493,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                         }
                     }
 
-                    if (type.equals(Constant.BUY)) {
+                    if (type.equals(Constant.BUY) && Global.options.getMaxBuyVolume() > 0) {
                         if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
                             //put the cap
                             balance.setQuantity(Global.options.getMaxBuyVolume());

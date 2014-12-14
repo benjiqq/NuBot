@@ -31,6 +31,7 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
@@ -541,7 +542,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         }
                     }
 
-                    if (type.equals(Constant.BUY)) {
+                    if (type.equals(Constant.BUY) && Global.options.getMaxBuyVolume() > 0) {
                         if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
                             //put the cap
                             balance.setQuantity(Global.options.getMaxBuyVolume());
