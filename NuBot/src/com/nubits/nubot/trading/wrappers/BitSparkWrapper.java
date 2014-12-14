@@ -141,7 +141,9 @@ public class BitSparkWrapper implements TradeInterface {
                 JSONObject error = (JSONObject) httpAnswerJson.get("error");
                 int code = Integer.parseInt(error.get("code").toString());
                 String msg = error.get("message").toString();
-                apiResponse.setError(new ApiError(code, msg));
+                ApiError errorObj = errors.apiReturnError;
+                errorObj.setDescription(msg);
+                apiResponse.setError(errorObj);
                 return apiResponse;
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
