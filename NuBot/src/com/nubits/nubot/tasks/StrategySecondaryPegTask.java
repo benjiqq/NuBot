@@ -49,7 +49,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private double buyPricePEG;
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
-    private SendLiquidityinfoTask sendLiquidityTask;
+    private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
@@ -621,11 +621,11 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.priceMonitorTask = priceMonitorTask;
     }
 
-    public SendLiquidityinfoTask getSendLiquidityTask() {
+    public SubmitLiquidityinfoTask getSendLiquidityTask() {
         return sendLiquidityTask;
     }
 
-    public void setSendLiquidityTask(SendLiquidityinfoTask sendLiquidityTask) {
+    public void setSendLiquidityTask(SubmitLiquidityinfoTask sendLiquidityTask) {
         this.sendLiquidityTask = sendLiquidityTask;
     }
 }

@@ -34,14 +34,14 @@ import org.json.simple.JSONObject;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class SendLiquidityinfoTask extends TimerTask {
+public class SubmitLiquidityinfoTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(SendLiquidityinfoTask.class.getName());
+    private static final Logger LOG = Logger.getLogger(SubmitLiquidityinfoTask.class.getName());
     private boolean verbose;
     private String outputFile;
     private boolean wallsBeingShifted = false;
 
-    public SendLiquidityinfoTask(boolean verbose) {
+    public SubmitLiquidityinfoTask(boolean verbose) {
         this.verbose = verbose;
     }
 
