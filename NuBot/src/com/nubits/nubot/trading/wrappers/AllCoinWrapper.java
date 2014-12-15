@@ -542,16 +542,18 @@ public class AllCoinWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
-            LOG.info(trades.toJSONString());
-            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
-                Trade thisTrade = parseTrade(trade.next());
-                if (!thisTrade.getPair().equals(pair)) {
-                    continue;
+            if (trades != null) {
+                //LOG.info(trades.toJSONString());
+                for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                    Trade thisTrade = parseTrade(trade.next());
+                    if (!thisTrade.getPair().equals(pair)) {
+                        continue;
+                    }
+                    if (thisTrade.getDate().getTime() < startTime) {
+                        continue;
+                    }
+                    tradeList.add(thisTrade);
                 }
-                if (thisTrade.getDate().getTime() < startTime) {
-                    continue;
-                }
-                tradeList.add(thisTrade);
             }
             apiResponse.setResponseObject(tradeList);
         } else {
