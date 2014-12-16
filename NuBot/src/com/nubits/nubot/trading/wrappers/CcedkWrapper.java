@@ -692,6 +692,7 @@ public class CcedkWrapper implements TradeInterface {
         }
 
         query_args.put("date_from", startDateArg);
+        query_args.put("items_per_page", "10000");
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
