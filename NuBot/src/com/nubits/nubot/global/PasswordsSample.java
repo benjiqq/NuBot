@@ -22,9 +22,15 @@ package com.nubits.nubot.global;
  */
 public class PasswordsSample {
 
+    /*
+     * RPC - Necessary for testing only
+     */
     public static final String NUD_RPC_USER = "xxx";
     public static final String NUD_RPC_PASS = "xxx";
     public static final String CUSTODIAN_PUBLIC_ADDRESS = "xxx"; //testnet elected custodian
+     /*
+     * Exchanges - Necessary for testing only
+     */
     public static final String BTCE_SECRET = "xxx";
     public static final String BTCE_KEY = "xxx";
     public static final String INTERNAL_PEATIO_SECRET = "xxx";
@@ -38,15 +44,16 @@ public class PasswordsSample {
     public static final String CCEX_SECRET = "xxx"; //
     public static final String ALLCOIN_KEY = "xxx";
     public static final String ALLCOIN_SECRET = "xxx";
-    public static final String SMTP_USERNAME = ""; //used to send mail notifications
-    public static final String SMTP_PASSWORD = "";
-    public static final String SMTP_HOST = "";
     public static final String BITSPARK_KEY = "xxx";
     public static final String BITSPARK_SECRET = "xxx";
     public static final String EXCOIN_KEY = "xxx";
     public static final String EXCOIN_SECRET = "xxx";
-    public static final String GMAIL_USERNAME = "xxx"; //used to send mail notifications
-    public static final String GMAIL_PASSWORD = "xxx";
+    /*
+     * Misc - Necessary for build
+     */
+    public static final String SMTP_USERNAME = "xxx"; //used to send mail notifications
+    public static final String SMTP_PASSWORD = "xxx";
+    public static final String SMTP_HOST = "xxx";
     public static final String HIPCHAT_KEY = "xxx"; //not admin
     public static final String HIPCHAT_NOTIFICATIONS_ROOM_ID = "xxx";
     public static final String HIPCHAT_CRITICAL_ROOM_ID = "xxx"; //use for critical notifications
