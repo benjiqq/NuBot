@@ -78,7 +78,7 @@ public class TestWrappers {
         //testClearAllOrders(Constant.NBT_BTC);
         //testSell(0.3, 0.00830509, NSR_BTC);  //ok
         //testBuy(0.0000120, 0.0000120, NSR_BTC);  //ok
-        testGetActiveOrders();
+        //testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("2064456");
