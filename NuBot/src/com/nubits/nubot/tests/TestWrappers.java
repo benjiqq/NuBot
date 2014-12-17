@@ -67,21 +67,24 @@ public class TestWrappers {
     }
 
     public static void runTests() {
+
+        CurrencyPair testPair = Constant.BTC_NBT;
+
+
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         //testGetAvailableBalance(Constant.BTC); //
-        //testGetAvailableBalances(Constant.NBT_BTC);
-        //testGetActiveOrders(Constant.NBT_BTC);
-        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //testClearAllOrders(Constant.NBT_BTC);
-        //testSell(0.3, 0.00830509, NSR_BTC);  //ok
-        //testBuy(0.0000120, 0.0000120, NSR_BTC);  //ok
-        testGetActiveOrders();
-        //testCancelOrder("2063803", Constant.NBT_BTC);
-        //testClearAllOrders(Constant.NBT_BTC);
+        //testGetAvailableBalances(testPair);
+        //stestGetActiveOrders(testPair);
+        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //testClearAllOrders(testPair);
+        //testSell(0.3, 0.00830509, testPair);  //ok
+        //testBuy(0.0000120, 0.0000120, testPair);  //ok
+        //testCancelOrder("2063803", testPair);
+        //testClearAllOrders(testPair);
         //testIsOrderActive("2064456");
         //testGetTxFee();
-        //testGetTxFeeWithArgs(Constant.BTC_USD);
+        //testGetTxFeeWithArgs(testPair);
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
