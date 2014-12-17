@@ -70,7 +70,7 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run---------------
         //---------------
         //testGetAvailableBalance(Constant.BTC); //
-        //testGetAvailableBalance(Constant.NBT); //
+        testGetAvailableBalance(Constant.NBT); //
 
         //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
