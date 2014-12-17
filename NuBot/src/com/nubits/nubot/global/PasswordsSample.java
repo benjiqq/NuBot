@@ -50,7 +50,7 @@ public class PasswordsSample {
     public static final String EXCOIN_SECRET = "xxx";
     /*
      * Misc - Necessary for build
-     * ! Remember to add to build process in Jenkins !
+     * ! Remember to add to build process in Jenkins !!
      */
     public static final String SMTP_USERNAME = "xxx"; //used to send mail notifications
     public static final String SMTP_PASSWORD = "xxx";
