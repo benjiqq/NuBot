@@ -67,7 +67,7 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-        //Methods strictly necessary for NuBot to run---------------
+        //Methods strictly necessary for NuBot to run--------------
         //--------------
         //testGetAvailableBalance(Constant.BTC);
         //testGetAvailableBalance(Constant.NBT);
