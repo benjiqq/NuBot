@@ -442,7 +442,7 @@ public class TestWrappers {
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
         } else if (exchangeName.equals(Constant.EXCOIN)) {
             //Wrap the keys into a new ApiKeys object
-            keys = new ApiKeys(Passwords.EXCOIN_SECRET, "");
+            keys = new ApiKeys(Passwords.EXCOIN_SECRET, Passwords.EXCOIN_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
