@@ -31,8 +31,8 @@ import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -43,6 +43,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
 
 /**
  * Provides the main class of NuBot. Instantiate this class to start the NuBot
@@ -373,34 +374,46 @@ public class NuBot {
 
                 LOG.info("Bot shutting down..");
 
-                //Try to cancel all orders, if any
-                if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
-                    LOG.info("Clearing out active orders ... ");
+                if (Global.options != null) {
+                    //Try to cancel all orders, if any
+                    if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+                        LOG.info("Clearing out active orders ... ");
 
-                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                    if (deleteOrdersResponse.isPositive()) {
-                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+                        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                        if (deleteOrdersResponse.isPositive()) {
+                            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
-                        if (deleted) {
-                            LOG.info("Order clear request succesfully");
+                            if (deleted) {
+                                LOG.info("Order clear request succesfully");
+                            } else {
+                                LOG.severe("Could not submit request to clear orders");
+                            }
+
                         } else {
-                            LOG.severe("Could not submit request to clear orders");
+                            LOG.severe(deleteOrdersResponse.getError().toString());
                         }
-
-                    } else {
-                        LOG.severe(deleteOrdersResponse.getError().toString());
                     }
 
+                    //reset liquidity info
+                    if (Global.rpcClient.isConnected() && Global.options.isSendRPC()) {
+                        JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0);
+                        LOG.info("Resetting Liquidity Info before quit");
+                        if (null == responseObject) {
+                            LOG.severe("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.fine(responseObject.toJSONString());
+                        }
+                    }
 
-                }
-                LOG.info("Exit. ");
-                NuBot.mainThread.interrupt();
-                if (Global.taskManager != null) {
-                    if (Global.taskManager.isInitialized()) {
-                        Global.taskManager.stopAll();
+                    LOG.info("Exit. ");
+                    NuBot.mainThread.interrupt();
+                    if (Global.taskManager != null) {
+                        if (Global.taskManager.isInitialized()) {
+                            Global.taskManager.stopAll();
+                        }
                     }
                 }
-
 
                 Thread.currentThread().interrupt();
                 return;
