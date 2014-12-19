@@ -27,6 +27,12 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -49,6 +55,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private double wallchangeThreshold;
     private double sellPriceUSD, buyPriceUSD;
     private String outputPath;
+    private String jsonFile;
     private String emailHistory = "";
     private String pegPriceDirection;
     private double sellPricePEG_old;
@@ -430,7 +437,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Store values in class variable
         sellPricePEG_old = sellPricePEG_new;
 
-        String row = new Date() + ","
+        Date currentDate = new Date();
+        String row = currentDate + ","
                 + source + ","
                 + crypto + ","
                 + price + ","
@@ -438,16 +446,47 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 + sellPricePEG_new + ","
                 + buyPricePEG_new + ",";
 
-        String otherPricesAtThisTime = "";
+        JSONArray backup_feeds = new JSONArray();
+        JSONObject otherPricesAtThisTime = new JSONObject();
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-            otherPricesAtThisTime += "{ feed : " + tempPrice.getSource() + " - price : " + tempPrice.getPrice().getQuantity() + "}  ";
+            otherPricesAtThisTime.put("feed", tempPrice.getSource());
+            otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
-        row += otherPricesAtThisTime + "\n";
+        row += otherPricesAtThisTime.toString() + "\n";
+        backup_feeds.add(otherPricesAtThisTime);
         LOG.warning(row);
+        FileSystem.writeToFile(row, outputPath, true);
+
+        //Also update a json version of the output file
+        //build the latest data into a JSONObject
+        JSONObject wall_shift = new JSONObject();
+        wall_shift.put("timestamp", currentDate.getTime());
+        wall_shift.put("feed", source);
+        wall_shift.put("crypto", crypto);
+        wall_shift.put("price", price);
+        wall_shift.put("currency", currency);
+        wall_shift.put("sell_price", sellPricePEG_new);
+        wall_shift.put("buy_price", buyPricePEG_new);
+        wall_shift.put("backup_feed", backup_feeds);
+        //now read the existing object if one exists
+        JSONParser parser = new JSONParser();
+        JSONObject wall_shift_file = new JSONObject();
+        JSONArray wall_shifts = new JSONArray();
+        try { //object already exists in file
+            wall_shift_file = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
+            wall_shifts = (JSONArray) wall_shift_file.get("wall_shifts");
+        } catch (ParseException pe) {
+            LOG.severe("Unable to parse order_history.json");
+        }
+        //add the latest orders to the orders array
+        wall_shifts.add(wall_shift);
+        //then save
+        FileSystem.writeToFile(wall_shifts.toJSONString(), jsonFile, false);
+
 
         if (Global.options.isSendMails()) {
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
@@ -455,7 +494,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
             String messageNow = row;
             emailHistory += messageNow;
-
 
 
             String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
@@ -468,11 +506,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
 
 
-
-
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
         }
-        FileSystem.writeToFile(row, outputPath, true);
     }
 
     private void initStrategy(double peg_price) {
@@ -582,6 +617,15 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     public void setOutputPath(String outputPath) {
         this.outputPath = outputPath;
+        this.jsonFile = this.outputPath.replace(".csv", ".json");
+        //create json file if it doesn't already exist
+        File json = new File(this.jsonFile);
+        if (!json.exists()) {
+            JSONObject history = new JSONObject();
+            JSONArray wall_shifts = new JSONArray();
+            history.put("wall_shifts", wall_shifts);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
+        }
     }
 
     public void setStrategy(StrategySecondaryPegTask strategy) {
