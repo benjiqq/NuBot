@@ -48,9 +48,9 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    private static final String TEST_OPTIONS_PATH = "options.json";
+    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final CurrencyPair NSR_BTC = new CurrencyPair(Constant.NSR, Constant.BTC);
-    private static final String TEST_OPTIONS_PATH2 = "res/options/private/old/options-full.json";
 
     public static void main(String[] args) {
         //Load settings
@@ -67,6 +67,7 @@ public class TestWrappers {
     }
 
     public static void runTests() {
+
         //Methods strictly necessary for NuBot to run-------------
         //-------------
         //testGetAvailableBalance(Constant.BTC);
@@ -84,6 +85,7 @@ public class TestWrappers {
         //testIsOrderActive("2064456");
         testGetTxFee();
         testGetTxFeeWithArgs(Constant.BTC_USD);
+
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(NSR_BTC);

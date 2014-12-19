@@ -44,4 +44,5 @@ public class Global {
     public static OptionsJSON options;
     public static double conversion = 1; //Change this? update SendLiquidityinfoTask
     public static FrozenBalancesManager frozenBalances;
+    public static boolean swappedPair; //true if paymen currency is NBT
 }

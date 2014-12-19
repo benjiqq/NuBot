@@ -48,25 +48,26 @@ public class FrozenBalancesManager {
     private static final Logger LOG = Logger.getLogger(FrozenBalancesManager.class.getName());
     private String pathToFrozenBalancesFiles;
     private FrozenAmount frozenAmount;
-    private String exchangeName;
-    private CurrencyPair pair;
-    private String folder;
     private ArrayList<HistoryRow> history;
     private Amount amountAlreadyThere;
+    private Currency toFreezeCurrency;
 
     //Call this on bot startup
     public FrozenBalancesManager(String exchangName, CurrencyPair pair, String folder) {
         String fileName = pair.toString("_") + "-" + exchangName + "-frozen.json";
         this.pathToFrozenBalancesFiles = folder + fileName;
-        this.exchangeName = exchangName;
-        this.pair = pair;
-        this.amountAlreadyThere = new Amount(0, pair.getPaymentCurrency());
+        if (Global.swappedPair) {
+            toFreezeCurrency = pair.getOrderCurrency();
+        } else {
+            toFreezeCurrency = pair.getPaymentCurrency();
+        }
+        this.amountAlreadyThere = new Amount(0, toFreezeCurrency);
         history = new ArrayList<>();
         if (new File(pathToFrozenBalancesFiles).exists()) {
             parseFrozenBalancesFile();
         } else {
             //Create the file and write 0 on it
-            frozenAmount = new FrozenAmount(new Amount(0, pair.getPaymentCurrency()));
+            frozenAmount = new FrozenAmount(new Amount(0, toFreezeCurrency));
             updateFrozenFilesystem();
         }
     }
@@ -121,7 +122,7 @@ public class FrozenBalancesManager {
 
     public void freezeNewFunds() {
         if (Global.options.getKeepProceeds() > 0) {
-            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
+            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(toFreezeCurrency);
 
             if (balancesResponse.isPositive()) {
                 Amount balance = (Amount) balancesResponse.getResponseObject();
@@ -130,7 +131,7 @@ public class FrozenBalancesManager {
                 if (balance.getQuantity() > oneNBT) {
                     tryKeepProceedsAside(balance, Global.frozenBalances.getAmountAlreadyThere());
                 }
-                setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                setBalanceAlreadyThere(toFreezeCurrency);
             } else {
                 LOG.severe("Cannot get the updated balance");
             }
@@ -176,7 +177,7 @@ public class FrozenBalancesManager {
         df.setMaximumFractionDigits(8);
         if (Global.options != null) {
             if (Global.options.getKeepProceeds() != 0) {
-                LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
+                LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
             }
         }
         if (writeToFile) {
@@ -188,11 +189,11 @@ public class FrozenBalancesManager {
     public void updateFrozenBalance(Amount toAdd) {
         double oldQuantity = this.frozenAmount.getAmount().getQuantity();
         double quantityToAdd = toAdd.getQuantity();
-        Amount newAmount = new Amount(oldQuantity + quantityToAdd, pair.getPaymentCurrency());
+        Amount newAmount = new Amount(oldQuantity + quantityToAdd, toFreezeCurrency);
         this.frozenAmount = new FrozenAmount(newAmount);
         //here I could log the history
 
-        HistoryRow historyRow = new HistoryRow(new Date(), quantityToAdd, pair.getPaymentCurrency().getCode());
+        HistoryRow historyRow = new HistoryRow(new Date(), quantityToAdd, toFreezeCurrency.getCode());
         history.add(historyRow);
 
         updateFrozenFilesystem();
@@ -204,7 +205,7 @@ public class FrozenBalancesManager {
     }
 
     public void reset() {
-        this.frozenAmount = new FrozenAmount(new Amount(0, pair.getPaymentCurrency()));
+        this.frozenAmount = new FrozenAmount(new Amount(0, toFreezeCurrency));
         updateFrozenFilesystem();
     }
 
@@ -214,7 +215,7 @@ public class FrozenBalancesManager {
         try {
             JSONObject frozenBalancesJSON = (JSONObject) (parser.parse(FrozenBalancesManagerString));
             double quantity = Double.parseDouble((String) frozenBalancesJSON.get("frozen-quantity-total"));
-            Amount frozenAmount = new Amount(quantity, pair.getPaymentCurrency());
+            Amount frozenAmount = new Amount(quantity, toFreezeCurrency);
             setInitialFrozenAmount(frozenAmount, false);
 
             JSONArray historyArr = (JSONArray) frozenBalancesJSON.get("history");
@@ -273,7 +274,7 @@ public class FrozenBalancesManager {
 
         try {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
-            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + pair.getPaymentCurrency().getCode());
+            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
@@ -289,7 +290,7 @@ public class FrozenBalancesManager {
     }
 
     public String getCurrencyCode() {
-        return pair.getPaymentCurrency().getCode();
+        return toFreezeCurrency.getCode();
     }
 
     public class FrozenAmount {

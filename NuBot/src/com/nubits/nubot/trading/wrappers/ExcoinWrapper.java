@@ -174,6 +174,8 @@ public class ExcoinWrapper implements TradeInterface {
                     }
                 }
                 Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+
+                balance = Balance.getSwapedBalance(balance); //Swap here for BTC_NBT
                 apiResponse.setResponseObject(balance);
             } else { //get specific balance
                 Amount total = new Amount(0, currency);
@@ -281,7 +283,6 @@ public class ExcoinWrapper implements TradeInterface {
                 JSONObject thisExchange = exchange.next();
                 commodity = thisExchange.get("commodity").toString();
                 currency = thisExchange.get("currency").toString();
-                returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
                 //only valid pair if a pair is specified
                 if ((pair != null)
                         && (!currency.equals(pair.getPaymentCurrency().getCode().toUpperCase())
@@ -312,6 +313,8 @@ public class ExcoinWrapper implements TradeInterface {
                             out.setInsertedDate(insertDate);
                         }
                         //set the price
+                        returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
+
                         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), returnedPair.getPaymentCurrency());
                         out.setPrice(price);
                         //set the amount
@@ -406,6 +409,9 @@ public class ExcoinWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee() {
         double defaultFee = 0.15;
+        if (Global.options != null) {
+            defaultFee = Global.options.getTxFee();
+        }
         return new ApiResponse(true, defaultFee, null);
 
     }

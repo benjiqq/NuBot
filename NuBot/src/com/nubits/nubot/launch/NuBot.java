@@ -31,7 +31,7 @@ import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.SendLiquidityinfoTask;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
@@ -160,6 +160,17 @@ public class NuBot {
             ((CcexWrapper) (ti)).initBaseUrl();;
         }
 
+
+        if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
+            Global.swappedPair = true;
+
+        } else {
+            Global.swappedPair = false;
+        }
+
+        LOG.info("Swapped pair mode : " + Global.swappedPair);
+
+
         String apibase = "";
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
@@ -216,7 +227,7 @@ public class NuBot {
 
 
         String orders_outputPath = logsFolder + "orders_history.csv";
-        ((SendLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFile(orders_outputPath);
+        ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFile(orders_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
 
 
@@ -264,7 +275,6 @@ public class NuBot {
 
         //Switch strategy for different trading pair
 
-
         if (Utils.isSupported(Global.options.getPair())) {
             if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
                 Global.taskManager.getStrategyFiatTask().start(7);
@@ -277,7 +287,14 @@ public class NuBot {
                 }
 
                 //Peg to a USD price via crypto pair
-                Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                Currency toTrackCurrency;
+
+                if (Global.swappedPair) { //NBT as paymentCurrency
+                    toTrackCurrency = Global.options.getPair().getOrderCurrency();
+                } else {
+                    toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                }
+
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
 
@@ -292,7 +309,7 @@ public class NuBot {
                 // set liquidityinfo task to the strategy
 
                 ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                        .setSendLiquidityTask(((SendLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
+                        .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
 
                 PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
                 //Then set the pfm

@@ -488,8 +488,16 @@ public class PriceMonitorTriggerTask extends TimerTask {
             LOG.info(message);
 
             //convert sell price to PEG
-            double sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
-            double buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+
+            double sellPricePEGInitial;
+            double buyPricePEGInitial;
+            if (Global.swappedPair) { //NBT as paymentCurrency
+                sellPricePEGInitial = sellPriceUSD;
+                buyPricePEGInitial = buyPriceUSD;
+            } else {
+                sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
+                buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+            }
 
             //store it
             sellPricePEG_old = sellPricePEGInitial;
