@@ -354,12 +354,19 @@ public class ExcoinWrapper implements TradeInterface {
             //set the id
             out.setId(httpAnswerJson.get("id").toString());
             //set the inserted date
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
             Date date = null;
             try {
                 date = sdf.parse(httpAnswerJson.get("timestamp").toString());
             } catch (java.text.ParseException pe) {
-                LOG.severe(pe.toString());
+                //sometimes timestamp in this format are returned
+                //2014-12-19T16:02:07.961Z
+                sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SZ");
+                try {
+                    date = sdf.parse(httpAnswerJson.get("timestamp").toString());
+                } catch (java.text.ParseException pe1) {
+                    LOG.severe(pe1.toString());
+                }
             }
             if (date != null) {
                 long timeStamp = date.getTime();
@@ -481,7 +488,14 @@ public class ExcoinWrapper implements TradeInterface {
         try {
             date = sdf.parse(in.get("timestamp").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            //sometimes timestamp in this format are returned
+            //2014-12-19T16:02:07.961Z
+            sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SZ");
+            try {
+                date = sdf.parse(in.get("timestamp").toString());
+            } catch (java.text.ParseException pe1) {
+                LOG.severe(pe1.toString());
+            }
         }
         if (date != null) {
             long timeStamp = date.getTime();
