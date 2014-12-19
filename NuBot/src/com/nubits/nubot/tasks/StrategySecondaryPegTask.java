@@ -128,6 +128,8 @@ public class StrategySecondaryPegTask extends TimerTask {
     private void placeInitialWalls() {
         boolean buysOrdersOk = true;
         boolean sellsOrdersOk = initOrders(Constant.SELL, sellPricePEG);
+
+
         if (Global.options.isDualSide()) {
             buysOrdersOk = initOrders(Constant.BUY, buyPricePEG);
         }
@@ -327,8 +329,13 @@ public class StrategySecondaryPegTask extends TimerTask {
         LOG.warning("Strategy received a price change notification.");
         needWallShift = true;
         Global.conversion = conversion;
-        sellPricePEG = new_sellPricePEG;
-        buyPricePEG = new_buyPricePEG;
+        if (!Global.swappedPair) {
+            sellPricePEG = new_sellPricePEG;
+            buyPricePEG = new_buyPricePEG;
+        } else {
+            sellPricePEG = new_buyPricePEG;
+            buyPricePEG = new_sellPricePEG;
+        }
         this.priceDirection = direction;
     }
 
@@ -458,12 +465,19 @@ public class StrategySecondaryPegTask extends TimerTask {
         //Update the available balance
         Currency currency;
 
-        if (type.equals(Constant.SELL)) {
-            currency = Global.options.getPair().getOrderCurrency();
+        if (!Global.swappedPair) {
+            if (type.equals(Constant.SELL)) {
+                currency = Global.options.getPair().getOrderCurrency();
+            } else {
+                currency = Global.options.getPair().getPaymentCurrency();
+            }
         } else {
-            currency = Global.options.getPair().getPaymentCurrency();
+            if (type.equals(Constant.SELL)) {
+                currency = Global.options.getPair().getPaymentCurrency();
+            } else {
+                currency = Global.options.getPair().getOrderCurrency();
+            }
         }
-
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
 
         if (balancesResponse.isPositive()) {
@@ -501,28 +515,55 @@ public class StrategySecondaryPegTask extends TimerTask {
                         }
                     }
 
+
+                    if (Global.swappedPair) {
+                        price = Utils.round(price * Global.conversion, 8);
+                    }
+
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
 
-                    if (type.equals(Constant.BUY)) {
+                    if (type.equals(Constant.BUY) && !Global.swappedPair) {
                         amount1 = Utils.round(amount1 / price, 8);
                     }
 
                     //Prepare the orders
 
+                    String orderString1;
+                    String sideStr = type + " side order : ";
 
-                    String orderString1 = type + " " + Utils.round(amount1, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                            + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                    if (!Global.swappedPair) {
+                        orderString1 = sideStr + " " + type + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
+                    } else { //Swapped
+                        String typeStr;
+                        if (type.equals(Constant.SELL)) {
+                            typeStr = Constant.BUY;
+                            amount1 = Utils.round(amount1 / Global.conversion, 8);
+                        } else {
+                            typeStr = Constant.SELL;
+                        }
+                        orderString1 = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
+                    }
 
                     if (Global.options.isExecuteOrders()) {
                         LOG.warning("Strategy - Submit order : " + orderString1);
 
                         ApiResponse order1Response;
-                        if (type.equals(Constant.SELL)) {
-                            order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
-                        } else {
-                            order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
+                        if (type.equals(Constant.SELL)) { //Place sellSide order 1
+                            if (Global.swappedPair) {
+                                order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
+                            } else {
+                                order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
+                            }
+                        } else { //Place buySide order 1
+                            if (Global.swappedPair) {
+                                order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
+                            } else {
+                                order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
+                            }
                         }
 
                         if (order1Response.isPositive()) {
@@ -554,27 +595,49 @@ public class StrategySecondaryPegTask extends TimerTask {
 
                             double amount2 = balance.getQuantity();
 
-                            if (type.equals(Constant.BUY)) {
+                            if ((type.equals(Constant.BUY) && !Global.swappedPair)
+                                    || (type.equals(Constant.SELL) && Global.swappedPair)) {
                                 //hotfix
                                 amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
                                 amount2 = Utils.round(amount2 / price, 8);
                             }
 
 
+                            String orderString2;
+                            if (!Global.swappedPair) {
+                                orderString2 = sideStr + " " + type + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                        + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
-                            String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                            } else { //Swapped
+                                String typeStr;
+                                if (type.equals(Constant.SELL)) {
+                                    typeStr = Constant.BUY;
+                                } else {
+                                    typeStr = Constant.SELL;
+                                }
+                                orderString2 = sideStr + " " + typeStr + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                        + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+                            }
 
                             //put it on order
 
                             LOG.warning("Strategy - Submit order : " + orderString2);
 
                             ApiResponse order2Response;
-                            if (type.equals(Constant.SELL)) {
-                                order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
-                            } else {
-                                order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+                            if (type.equals(Constant.SELL)) { //Place sellSide order 2
+                                if (Global.swappedPair) {
+                                    order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+                                } else {
+                                    order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
+                                }
+                            } else {//Place buySide order 2
+                                if (Global.swappedPair) {
+                                    order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
+                                } else {
+                                    order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+                                }
                             }
+
 
                             if (order2Response.isPositive()) {
                                 HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, Message.Color.YELLOW);
