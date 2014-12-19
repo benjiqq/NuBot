@@ -269,28 +269,48 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    public void largePriceDiffGracefulQuit(LastPrice lp) {
+    public void gracefulQuit(LastPrice lp) {
         //This is called is an abnormal price is detected for one whole refresh period
+        String logMessage;
+        String notification;
+        String subject;
+        Color notificationColor;
+        boolean shutDown = false;
+
+        //we need to check the reason that the refresh took a whole period.
+        //if it's because of a no connection issue, we need to wait to see if connection restarts
+        if (!Global.exchange.getLiveData().isConnected()) {
+            currentTime = System.currentTimeMillis();
+            logMessage = "There has been a connection issue for " + Global.options.getSecondaryPegOptions().getRefreshTime() + " seconds\n" +
+                    "Consider restarting the bot if the connection issue persists";
+            notification = "";
+            notificationColor = Color.YELLOW;
+            subject = Global.exchange.getName() + " Bot is suffering a connection issue";
+        } else { //otherwise somthing bad has happened so we shutdown.
+            logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
+                    + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds.\nThe bot will notify and shutdown";
+            notification = "A large price difference was detected at " + Global.exchange.getName()
+                    + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
+                    + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
+                    + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place";
+            notificationColor = Color.RED;
+            subject = Global.exchange.getName() + " Bot shutdown due to large price difference";
+            shutDown = true;
+        }
         //we want to send Hip Chat and mail notifications,
         // cancel all orders to avoid arbitrage against the bot and
         // exit execution gracefully
-        LOG.severe("The Fetched Exchange rate data has remained outside of the required price band for "
-                + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds. The bot will notify and shutdown");
+        LOG.severe(logMessage);
         LOG.severe("Notifying HipChat");
-        HipChatNotifications.sendMessage("A large price difference was detected at " + Global.exchange.getName()
-                + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
-                + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
-                + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place", Color.RED);
+        HipChatNotifications.sendMessage(notification, notificationColor);
         LOG.severe("Sending Email");
-        MailNotifications.send(Global.options.getMailRecipient(), Global.exchange.getName() + " Bot shutdown due to large price difference",
-                "A large price difference was detected at " + Global.exchange.getName()
-                + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
-                + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
-                + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place");
-        LOG.severe("Cancelling Orders to avoid Arbitrage against the bot");
-        Global.exchange.getTrade().clearOrders(Global.options.getPair());
-        LOG.severe("Shutting down");
-        System.exit(0);
+        MailNotifications.send(Global.options.getMailRecipient(), subject, notification);
+        if (shutDown) {
+            LOG.severe("Cancelling Orders to avoid Arbitrage against the bot");
+            Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            LOG.severe("Shutting down");
+            System.exit(0);
+        }
     }
 
     public void updateLastPrice(LastPrice lp) {
@@ -318,7 +338,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         } else {
             //If we get here, we haven't had a price within % of the average for as long as a standard update period
             //the action is to send notifications, cancel all orders and turn off the bot
-            largePriceDiffGracefulQuit(lp);
+            gracefulQuit(lp);
             return;
         }
 
