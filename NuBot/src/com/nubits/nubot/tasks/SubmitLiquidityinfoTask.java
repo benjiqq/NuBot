@@ -26,15 +26,14 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.utils.FileSystem;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
 import java.util.logging.Logger;
-import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -175,8 +174,14 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void sendLiquidityInfo(Exchange exchange) {
         if (Global.rpcClient.isConnected()) {
-            JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                    Global.exchange.getLiveData().getNBTonbuy(), Global.exchange.getLiveData().getNBTonsell());
+            JSONObject responseObject;
+            if (!Global.swappedPair) {
+                responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                        Global.exchange.getLiveData().getNBTonbuy(), Global.exchange.getLiveData().getNBTonsell());
+            } else {
+                responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                        Global.exchange.getLiveData().getNBTonsell(), Global.exchange.getLiveData().getNBTonbuy());
+            }
             LOG.info("sending Liquidity Info :\n" + Global.exchange.getLiveData().getNBTonbuy() + "\n" + Global.exchange.getLiveData().getNBTonsell() + "\n" + responseObject.toJSONString());
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
