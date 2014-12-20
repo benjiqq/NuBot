@@ -98,7 +98,17 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 }
                 //Update the order
                 Global.exchange.getLiveData().setOrdersList(orderList);
+
+
                 if (Global.conversion != 1
+                        && Global.swappedPair) {  //For swapped pair, need to convert the amounts to NBT
+                    nbt_onbuy = nbt_onbuy * Global.conversion;
+                    nbt_onsell = nbt_onsell * Global.conversion;
+                }
+
+                //Some exchanges return the buy orders amount expressed in payment currency, need conversion
+                if (Global.conversion != 1
+                        && !Global.swappedPair //for swapped pair already converted above
                         && !Global.options.getExchangeName().equals(Constant.CCEDK)
                         && !Global.options.getExchangeName().equals(Constant.POLONIEX)
                         && !Global.options.getExchangeName().equals(Constant.CCEX)
@@ -106,9 +116,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                     //if the bot is running on Strategy Secondary Peg, we need to convert this value
                     nbt_onbuy = nbt_onbuy * Global.conversion;
                 }
+
                 Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
                 Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
-
 
                 //Write to file timestamp,activeOrders, sells,buys, digest
                 Date timeStamp = new Date();
@@ -150,8 +160,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 orders.add(latestOrders);
                 //then save
                 FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile, false);
-
-
 
                 if (verbose) {
                     LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
