@@ -483,6 +483,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
         //add the latest orders to the orders array
         wall_shifts.add(wall_shift);
+        wall_shift_file.put("wall_shifts", wall_shifts);
         //then save
         FileSystem.writeToFile(wall_shifts.toJSONString(), jsonFile, false);
 
