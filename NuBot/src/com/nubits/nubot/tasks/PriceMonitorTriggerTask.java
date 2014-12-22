@@ -27,14 +27,13 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import java.io.File;
+import java.util.*;
+import java.util.logging.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
-import java.io.File;
-import java.util.*;
-import java.util.logging.Logger;
 
 /**
  *
@@ -288,8 +287,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //if it's because of a no connection issue, we need to wait to see if connection restarts
         if (!Global.exchange.getLiveData().isConnected()) {
             currentTime = System.currentTimeMillis();
-            logMessage = "There has been a connection issue for " + Global.options.getSecondaryPegOptions().getRefreshTime() + " seconds\n" +
-                    "Consider restarting the bot if the connection issue persists";
+            logMessage = "There has been a connection issue for " + Global.options.getSecondaryPegOptions().getRefreshTime() + " seconds\n"
+                    + "Consider restarting the bot if the connection issue persists";
             notification = "";
             notificationColor = Color.YELLOW;
             subject = Global.exchange.getName() + " Bot is suffering a connection issue";
@@ -579,7 +578,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Send email notification
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
             String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
-                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + "%.";
+                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + "%.";
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
         } else {
             LOG.severe("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
