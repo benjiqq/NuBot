@@ -1,8 +1,8 @@
 {"options": 
     {
-    "wallchange-treshold": 0.05,
     "secondary-peg-options":
     {
+            "wallshift-threshold": 0.05,
             "main-feed":"blockchain",
             "backup-feeds": {
                 "backup1" : { "name" : "coinbase"},

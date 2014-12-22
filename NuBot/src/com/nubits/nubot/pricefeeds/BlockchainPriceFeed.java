@@ -41,7 +41,7 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = "http://blockchain.info/ticker";
+        String url = "https://blockchain.info/ticker";
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {

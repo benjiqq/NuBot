@@ -162,10 +162,9 @@ In the example below we see how the options presented above can be broken down :
 }
 ```
 
-
-
-
 Check the Under the hood section of this document for additional configuration parameters available. 
+
+Its good practice separating configuration parameters in different files : market, price-tracking, rpc, and settings  is a possible good grouping of optional parameters.
 
 
 ###3)Run NuBot
@@ -203,7 +202,7 @@ It is sufficient to add a JSON object in the standard options file structured in
                 "backup2" : { "name" : "coinbase"},
                 "backup3" : { "name" : "blockchain"}
                 },
-            "wallchange-treshold": 0.1,
+            "wallshift-threshold": 0.1,
          }
 ```
 
@@ -213,7 +212,7 @@ It is sufficient to add a JSON object in the standard options file structured in
 | ------------- |:-------------:| -----:|
 | main-feed     | the name of the main price feed that has priority over the others | **see following table |
 | backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
-| wallchange-treshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
+| wallshift-threshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 
 #### Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
 

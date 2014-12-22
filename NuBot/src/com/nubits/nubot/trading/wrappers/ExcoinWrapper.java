@@ -305,7 +305,14 @@ public class ExcoinWrapper implements TradeInterface {
                         try {
                             date = sdf.parse(in.get("timestamp").toString());
                         } catch (java.text.ParseException pe) {
-                            LOG.severe(pe.toString());
+                            //sometimes timestamp in this format are returned
+                            //2014-12-19T16:02:07.961Z
+                            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+                            try {
+                                date = sdf.parse(in.get("timestamp").toString());
+                            } catch (java.text.ParseException pe1) {
+                                LOG.severe(pe1.toString());
+                            }
                         }
                         if (date != null) {
                             long timeStamp = date.getTime();
@@ -361,7 +368,7 @@ public class ExcoinWrapper implements TradeInterface {
             } catch (java.text.ParseException pe) {
                 //sometimes timestamp in this format are returned
                 //2014-12-19T16:02:07.961Z
-                sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.SZ");
+                sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
                 try {
                     date = sdf.parse(httpAnswerJson.get("timestamp").toString());
                 } catch (java.text.ParseException pe1) {

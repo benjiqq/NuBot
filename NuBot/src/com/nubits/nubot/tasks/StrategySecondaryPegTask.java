@@ -67,7 +67,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
             if (needWallShift) {
                 String message = "Shift needed on " + Global.exchange.getName() + ": " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
-                        + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeTreshold() + " %";
+                        + "price changed more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
                 HipChatNotifications.sendMessage(message, Color.PURPLE);
                 LOG.warning(message);
 
