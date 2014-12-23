@@ -342,12 +342,14 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean shiftWalls() {
         boolean success = true;
 
-        //Introuce an aleatory sleep time to desync bots at the time of placing orders.
-        //This will favour competition in markets with multiple custodians
-        try {
-            Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
-        } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+        if (Global.options.isWaitBeforeShift()) {
+            //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+            //This will favour competition in markets with multiple custodians
+            try {
+                Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
+            }
         }
 
         //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconda to take down orders
@@ -369,14 +371,26 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (priceDirection.equals(Constant.UP)) {
             shiftImmediatelyOrderType = Constant.SELL;
             waitAndShiftOrderType = Constant.BUY;
-            priceImmediatelyType = sellPrice;
-            priceWaitType = buyPrice;
+            if (!Global.swappedPair) {
+                priceImmediatelyType = sellPrice;
+                priceWaitType = buyPrice;
+            } else {
+                priceImmediatelyType = buyPrice;
+                priceWaitType = sellPrice;
+            }
         } else {
             shiftImmediatelyOrderType = Constant.BUY;
             waitAndShiftOrderType = Constant.SELL;
-            priceImmediatelyType = buyPrice;
-            priceWaitType = sellPrice;
+            if (!Global.swappedPair) {
+                priceImmediatelyType = buyPrice;
+                priceWaitType = sellPrice;
+            } else {
+                priceImmediatelyType = sellPrice;
+                priceWaitType = buyPrice;
+            }
         }
+
+
 
         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
                 || Global.isDualSide) {
@@ -384,7 +398,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
             boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
             if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
-
                 if (shiftImmediatelyOrderType.equals(Constant.BUY)
                         && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
                 {
@@ -392,7 +405,12 @@ public class StrategySecondaryPegTask extends TimerTask {
                     Global.frozenBalances.freezeNewFunds();
                 }
 
-                boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
+                boolean init1;
+                if (!Global.swappedPair) {
+                    init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
+                } else {
+                    init1 = initOrders(waitAndShiftOrderType, priceImmediatelyType);
+                }
                 if (!init1) {
                     success = false;
                 }
@@ -428,7 +446,12 @@ public class StrategySecondaryPegTask extends TimerTask {
                         Global.frozenBalances.freezeNewFunds();
                     }
 
-                    boolean init2 = initOrders(waitAndShiftOrderType, priceWaitType);
+                    boolean init2;
+                    if (!Global.swappedPair) {
+                        init2 = initOrders(waitAndShiftOrderType, priceWaitType);
+                    } else {
+                        init2 = initOrders(shiftImmediatelyOrderType, priceWaitType);
+                    }
                     if (!init2) {
                         success = false;
                     }
@@ -441,7 +464,6 @@ public class StrategySecondaryPegTask extends TimerTask {
             if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
                     || Global.isDualSide) { //dualside
                 LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
-
             }
         }
 
@@ -513,11 +535,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                             balance.setQuantity(Global.options.getMaxBuyVolume());
 
                         }
-                    }
-
-
-                    if (Global.swappedPair) {
-                        price = Utils.round(price * Global.conversion, 8);
                     }
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);

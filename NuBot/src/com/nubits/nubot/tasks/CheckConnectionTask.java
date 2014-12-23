@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -62,7 +62,9 @@ public class CheckConnectionTask extends TimerTask {
             connected = true;
         } catch (NoRouteToHostException | UnknownHostException ex) {
             connected = false;
+            LOG.severe(ex.toString());
         } catch (IOException ex) {
+            connected = false;
             LOG.severe(ex.toString());
         }
         return connected;

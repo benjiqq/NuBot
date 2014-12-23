@@ -407,9 +407,17 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         double peg_price = lastPrice.getPrice().getQuantity();
 
-        //convert sell price to PEG
-        double sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, 8);
-        double buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, 8);
+        double sellPricePEG_new;
+        double buyPricePEG_new;
+
+        if (Global.swappedPair) { //NBT as paymentCurrency
+            sellPricePEG_new = Utils.round(sellPriceUSD * Global.conversion, 8);
+            buyPricePEG_new = Utils.round(buyPriceUSD * Global.conversion, 8);
+        } else {
+            //convert sell price to PEG
+            sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, 8);
+            buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, 8);
+        }
 
         //check if the price increased or decreased
         if ((sellPricePEG_new - sellPricePEG_old) > 0) {
@@ -485,7 +493,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         wall_shifts.add(wall_shift);
         wall_shift_file.put("wall_shifts", wall_shifts);
         //then save
-        FileSystem.writeToFile(wall_shifts.toJSONString(), jsonFile, false);
+        FileSystem.writeToFile(wall_shift_file.toJSONString(), jsonFile, false);
 
 
         if (Global.options.isSendMails()) {
@@ -547,8 +555,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
             double sellPricePEGInitial;
             double buyPricePEGInitial;
             if (Global.swappedPair) { //NBT as paymentCurrency
-                sellPricePEGInitial = sellPriceUSD;
-                buyPricePEGInitial = buyPriceUSD;
+                sellPricePEGInitial = Utils.round(Global.conversion * sellPriceUSD, 8);
+                buyPricePEGInitial = Utils.round(Global.conversion * buyPriceUSD, 8);
             } else {
                 sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
                 buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
