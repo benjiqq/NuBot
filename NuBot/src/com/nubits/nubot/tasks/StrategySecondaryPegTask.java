@@ -129,7 +129,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         boolean buysOrdersOk = true;
         boolean sellsOrdersOk = initOrders(Constant.SELL, sellPricePEG);
 
-
         if (Global.options.isDualSide()) {
             buysOrdersOk = initOrders(Constant.BUY, buyPricePEG);
         }

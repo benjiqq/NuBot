@@ -190,7 +190,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                         Global.exchange.getLiveData().getNBTonsell(), Global.exchange.getLiveData().getNBTonbuy());
             }
-            LOG.info("sending Liquidity Info :\n" + Global.exchange.getLiveData().getNBTonbuy() + "\n" + Global.exchange.getLiveData().getNBTonsell() + "\n" + responseObject.toJSONString());
+            LOG.fine("sending Liquidity Info :\n" + Global.exchange.getLiveData().getNBTonbuy() + "\n" + Global.exchange.getLiveData().getNBTonsell() + "\n" + responseObject.toJSONString());
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
