@@ -295,43 +295,9 @@ public class ExcoinWrapper implements TradeInterface {
                     type = thisTyp.get("type").toString();
                     JSONArray orders = (JSONArray) thisTyp.get("orders");
                     for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
-                        JSONObject in = order.next();
-                        Order out = new Order();
-                        //set the id
-                        out.setId(in.get("id").toString());
-                        //set the inserted date
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss z");
-                        Date date = null;
-                        try {
-                            date = sdf.parse(in.get("timestamp").toString());
-                        } catch (java.text.ParseException pe) {
-                            //sometimes timestamp in this format are returned
-                            //2014-12-19T16:02:07.961Z
-                            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-                            try {
-                                date = sdf.parse(in.get("timestamp").toString());
-                            } catch (java.text.ParseException pe1) {
-                                LOG.severe(pe1.toString());
-                            }
-                        }
-                        if (date != null) {
-                            long timeStamp = date.getTime();
-                            Date insertDate = new Date(timeStamp);
-                            out.setInsertedDate(insertDate);
-                        }
-                        //set the price
+                        JSONObject orderJson = order.next();
                         returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
-
-                        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), returnedPair.getPaymentCurrency());
-                        out.setPrice(price);
-                        //set the amount
-                        Amount amount = new Amount(Double.parseDouble(in.get("commodity_amount").toString()), returnedPair.getOrderCurrency());
-                        out.setAmount(amount);
-                        //set the type
-                        out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
-                        //set the pair
-                        out.setPair(returnedPair);
-
+                        Order out = parseOrder(orderJson, returnedPair);
                         orderList.add(out);
                     }
                 }
@@ -357,46 +323,51 @@ public class ExcoinWrapper implements TradeInterface {
         ApiResponse response = getQuery(url);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            Order out = new Order();
-            //set the id
-            out.setId(httpAnswerJson.get("id").toString());
-            //set the inserted date
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
-            Date date = null;
-            try {
-                date = sdf.parse(httpAnswerJson.get("timestamp").toString());
-            } catch (java.text.ParseException pe) {
-                //sometimes timestamp in this format are returned
-                //2014-12-19T16:02:07.961Z
-                sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
-                try {
-                    date = sdf.parse(httpAnswerJson.get("timestamp").toString());
-                } catch (java.text.ParseException pe1) {
-                    LOG.severe(pe1.toString());
-                }
-            }
-            if (date != null) {
-                long timeStamp = date.getTime();
-                Date insertDate = new Date(timeStamp);
-                out.setInsertedDate(insertDate);
-            }
-            //set the price
-            Amount price = new Amount(Double.parseDouble(httpAnswerJson.get("price").toString()), pair.getPaymentCurrency());
-            out.setPrice(price);
-            //set the amount
-            Amount amount = new Amount(Double.parseDouble(httpAnswerJson.get("commodity_amount").toString()), pair.getOrderCurrency());
-            out.setAmount(amount);
-            //set the type
-            String type = httpAnswerJson.get("type").toString();
-            out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
-            //set the pair
-            out.setPair(pair);
-
+            Order out = parseOrder(httpAnswerJson, pair);
             apiResponse.setResponseObject(out);
         } else {
             apiResponse = response;
         }
         return apiResponse;
+    }
+
+    public Order parseOrder(JSONObject in, CurrencyPair pair) {
+        Order out = new Order();
+        //set the id
+        out.setId(in.get("id").toString());
+        //set the inserted date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss z");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("timestamp").toString());
+        } catch (java.text.ParseException pe) {
+            //sometimes timestamp in this format are returned
+            //2014-12-19T16:02:07.961Z
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S'Z'");
+            try {
+                date = sdf.parse(in.get("timestamp").toString());
+            } catch (java.text.ParseException pe1) {
+                LOG.severe(pe1.toString());
+            }
+        }
+        if (date != null) {
+            long timeStamp = date.getTime();
+            Date insertDate = new Date(timeStamp);
+            out.setInsertedDate(insertDate);
+        }
+        //set the price
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //set the amount
+        Amount amount = new Amount(Double.parseDouble(in.get("commodity_amount").toString()), pair.getOrderCurrency());
+        out.setAmount(amount);
+        //set the type
+        String type = in.get("type").toString();
+        out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
+        //set the pair
+        out.setPair(pair);
+
+        return out;
     }
 
     @Override
