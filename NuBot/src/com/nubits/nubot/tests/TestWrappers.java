@@ -38,7 +38,9 @@ import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -48,8 +50,8 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
-    //private static final String TEST_OPTIONS_PATH = "options.json";
+    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "options.json";
     public static final CurrencyPair NSR_BTC = new CurrencyPair(Constant.NSR, Constant.BTC);
 
     public static void main(String[] args) {
@@ -67,7 +69,6 @@ public class TestWrappers {
     }
 
     public static void runTests() {
-
         //Methods strictly necessary for NuBot to run-------------
         //-------------
         //testGetAvailableBalance(Constant.BTC);
@@ -83,8 +84,8 @@ public class TestWrappers {
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("2064456");
-        testGetTxFee();
-        testGetTxFeeWithArgs(Constant.BTC_USD);
+        //testGetTxFee();
+        //testGetTxFeeWithArgs(Constant.BTC_USD);
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
