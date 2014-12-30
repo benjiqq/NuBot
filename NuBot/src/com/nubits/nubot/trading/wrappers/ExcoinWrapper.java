@@ -238,7 +238,7 @@ public class ExcoinWrapper implements TradeInterface {
     public ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
 
-        NumberFormat nf = DecimalFormat.getInstance();
+        DecimalFormat nf = new DecimalFormat("#");
         nf.setMinimumFractionDigits(8);
         String curs = pair.getPaymentCurrency().getCode().toUpperCase() + "/" + pair.getOrderCurrency().getCode().toUpperCase();
         String details = curs + "/" + (type.equals("BUY") ? "bid" : "ask") + "/" + nf.format(amount) + "/" + nf.format(rate);
