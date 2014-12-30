@@ -277,6 +277,47 @@ public class ExcoinWrapper implements TradeInterface {
         ArrayList<Order> orderList = new ArrayList<Order>();
 
         ApiResponse response = getQuery(url);
+
+        /*
+        [
+          {
+            "currency": "NBT",
+            "commodity": "BTC",
+            "orders": [
+              {
+                "count": "23",
+                "type": "BID",
+                "orders": [
+                  {
+                    "id": "BLK-DRK-BID-Qjclkj34GKmc4gDXKc",
+                    "timestamp": "2014-12-06T07:03:53.584Z",
+                    "price": "0.00000023",
+                    "commodity_amount": "22446985.14519785",
+                    "currency_amount": "5.16280655",
+                    "status": "OPEN"
+                  },
+                  ...
+                ]
+              },
+              {
+                "count": "23",
+                "type": "ASK",
+                "orders": [
+                  {
+                    "id": "BLK-DRK-ASK-Qjc03d5dlKmc4gDXKc",
+                    "timestamp": "2014-12-06T07:03:53.584Z",
+                    "price": "0.00000023",
+                    "commodity_amount": "22446985.14519785",
+                    "currency_amount": "5.16280655",
+                    "status": "OPEN"
+                  },
+                  ...
+                ]
+              }
+            ]
+          }
+        */
+
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Iterator<JSONObject> exchange = httpAnswerJson.iterator(); exchange.hasNext();) {
@@ -297,7 +338,7 @@ public class ExcoinWrapper implements TradeInterface {
                     for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
                         JSONObject orderJson = order.next();
                         returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
-                        Order out = parseOrder(orderJson, returnedPair);
+                        Order out = parseOrder(orderJson, returnedPair, type);
                         orderList.add(out);
                     }
                 }
@@ -323,7 +364,7 @@ public class ExcoinWrapper implements TradeInterface {
         ApiResponse response = getQuery(url);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            Order out = parseOrder(httpAnswerJson, pair);
+            Order out = parseOrder(httpAnswerJson, pair, null);
             apiResponse.setResponseObject(out);
         } else {
             apiResponse = response;
@@ -331,7 +372,7 @@ public class ExcoinWrapper implements TradeInterface {
         return apiResponse;
     }
 
-    public Order parseOrder(JSONObject in, CurrencyPair pair) {
+    public Order parseOrder(JSONObject in, CurrencyPair pair, String type) {
         Order out = new Order();
         //set the id
         out.setId(in.get("id").toString());
@@ -362,7 +403,9 @@ public class ExcoinWrapper implements TradeInterface {
         Amount amount = new Amount(Double.parseDouble(in.get("commodity_amount").toString()), pair.getOrderCurrency());
         out.setAmount(amount);
         //set the type
-        String type = in.get("type").toString();
+        if (type == null) {
+            type = in.get("type").toString();
+        }
         out.setType(type.equals("BID") ? Constant.BUY : Constant.SELL);
         //set the pair
         out.setPair(pair);
