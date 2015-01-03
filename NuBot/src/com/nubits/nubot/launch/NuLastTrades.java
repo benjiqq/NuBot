@@ -103,6 +103,8 @@ public class NuLastTrades {
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
         } else if (exchangename.equals(Constant.CCEX)) {
             Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
+        } else if (exchangename.equals(Constant.EXCOIN)) {
+            Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangename + " not supported");
             System.exit(0);
