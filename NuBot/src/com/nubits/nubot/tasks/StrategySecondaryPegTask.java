@@ -512,7 +512,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 oneNBT = Utils.round(1 / Global.conversion, 8);
             }
 
-            if (balance.getQuantity() > oneNBT) {
+            if (balance.getQuantity() > oneNBT * 2) {
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
