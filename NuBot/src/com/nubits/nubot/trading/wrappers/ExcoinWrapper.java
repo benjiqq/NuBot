@@ -238,7 +238,7 @@ public class ExcoinWrapper implements TradeInterface {
     public ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
 
-        DecimalFormat nf = new DecimalFormat("#");
+        DecimalFormat nf = new DecimalFormat("0");
         nf.setMinimumFractionDigits(8);
         String curs = pair.getPaymentCurrency().getCode().toUpperCase() + "/" + pair.getOrderCurrency().getCode().toUpperCase();
         String details = curs + "/" + (type.equals("BUY") ? "bid" : "ask") + "/" + nf.format(amount) + "/" + nf.format(rate);
@@ -279,44 +279,44 @@ public class ExcoinWrapper implements TradeInterface {
         ApiResponse response = getQuery(url);
 
         /*
-        [
-          {
-            "currency": "NBT",
-            "commodity": "BTC",
-            "orders": [
-              {
-                "count": "23",
-                "type": "BID",
-                "orders": [
-                  {
-                    "id": "BLK-DRK-BID-Qjclkj34GKmc4gDXKc",
-                    "timestamp": "2014-12-06T07:03:53.584Z",
-                    "price": "0.00000023",
-                    "commodity_amount": "22446985.14519785",
-                    "currency_amount": "5.16280655",
-                    "status": "OPEN"
-                  },
-                  ...
-                ]
-              },
-              {
-                "count": "23",
-                "type": "ASK",
-                "orders": [
-                  {
-                    "id": "BLK-DRK-ASK-Qjc03d5dlKmc4gDXKc",
-                    "timestamp": "2014-12-06T07:03:53.584Z",
-                    "price": "0.00000023",
-                    "commodity_amount": "22446985.14519785",
-                    "currency_amount": "5.16280655",
-                    "status": "OPEN"
-                  },
-                  ...
-                ]
-              }
-            ]
-          }
-        */
+         [
+         {
+         "currency": "NBT",
+         "commodity": "BTC",
+         "orders": [
+         {
+         "count": "23",
+         "type": "BID",
+         "orders": [
+         {
+         "id": "BLK-DRK-BID-Qjclkj34GKmc4gDXKc",
+         "timestamp": "2014-12-06T07:03:53.584Z",
+         "price": "0.00000023",
+         "commodity_amount": "22446985.14519785",
+         "currency_amount": "5.16280655",
+         "status": "OPEN"
+         },
+         ...
+         ]
+         },
+         {
+         "count": "23",
+         "type": "ASK",
+         "orders": [
+         {
+         "id": "BLK-DRK-ASK-Qjc03d5dlKmc4gDXKc",
+         "timestamp": "2014-12-06T07:03:53.584Z",
+         "price": "0.00000023",
+         "commodity_amount": "22446985.14519785",
+         "currency_amount": "5.16280655",
+         "status": "OPEN"
+         },
+         ...
+         ]
+         }
+         ]
+         }
+         */
 
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
