@@ -124,7 +124,7 @@
               <arg value="compileReadme.sh"/>  
           </exec>  
           
-          <copy file="../README.html" tofile="${store.dir}/README.html"/>
+          <copy file="../readme.html" tofile="${store.dir}/readme.html"/>
         
         <mkdir dir="${store.dir}/logs"/>
 
