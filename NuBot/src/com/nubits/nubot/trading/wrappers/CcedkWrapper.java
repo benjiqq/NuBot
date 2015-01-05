@@ -62,7 +62,6 @@ import org.json.simple.parser.ParseException;
 public class CcedkWrapper implements TradeInterface {
 
 
-    private static final int ROUND_CUTOFF = 4;
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -88,6 +87,8 @@ public class CcedkWrapper implements TradeInterface {
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
     private static final String INVALID_NONCE_ERROR = "Invalid Nonce value detected";
+    private static final int ROUND_CUTOFF = 4;
+    private static int INVALID_NONCE_COUNT = 1;
 
     public CcedkWrapper() {
         setupErrors();
@@ -166,8 +167,14 @@ public class CcedkWrapper implements TradeInterface {
             ApiError error = errors.genericError;
             error.setDescription(queryResult);
             apiResponse.setError(error);
+            if (INVALID_NONCE_COUNT < 5) {
+                getQuery(url, method, query_args, isGet);
+                INVALID_NONCE_COUNT++;
+            }
             return apiResponse;
         }
+
+        INVALID_NONCE_COUNT = 1;
 
         JSONParser parser = new JSONParser();
         try {
