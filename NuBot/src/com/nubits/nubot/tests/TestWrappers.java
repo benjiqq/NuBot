@@ -102,32 +102,41 @@ public class TestWrappers {
         //    }
         //}
         //stimulating ccedk wrong nonce
-
-        /*
+/*
+        for (int i = 0; i < 60; i++) {
+            try {
+                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=1234567891", false);
+                LOG.warning(htmlString);
+            } catch (IOException io) {
+                LOG.severe(io.toString());
+            }
+        }
+*/
 
          for (int i = 0; i < 5000; i++) {
-         testGetActiveOrders();
-         try {
-         Thread.sleep(100);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
+             testGetActiveOrders();
+             try {
+                 Thread.sleep(100);
+             } catch (InterruptedException ex) {
+                 LOG.severe(ex.toString());
+             }
+
+             testGetAvailableBalances(Constant.NBT_BTC);
+
+             try {
+                 Thread.sleep(100);
+             } catch (InterruptedException ex) {
+                 LOG.severe(ex.toString());
+             }
+             testGetOrderDetail("3454");
+
+             try {
+                 Thread.sleep(300);
+             } catch (InterruptedException ex) {
+                 LOG.severe(ex.toString());
+             }
          }
 
-         testGetAvailableBalances(Constant.NBT_PPC);
-
-         try {
-         Thread.sleep(100);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         testGetOrderDetail("3454");
-
-         try {
-         Thread.sleep(300);
-         } catch (InterruptedException ex) {
-         Logger.getLogger(TestWrappers.class.getName()).log(Level.SEVERE, null, ex);
-         }
-         */
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
