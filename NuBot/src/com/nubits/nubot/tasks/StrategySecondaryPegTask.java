@@ -341,7 +341,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private boolean shiftWalls() {
         boolean success = true;
 
-        if (Global.options.isWaitBeforeShift()) {
+        if (Global.options.isMultipleCustodians()) {
             //Introuce an aleatory sleep time to desync bots at the time of placing orders.
             //This will favour competition in markets with multiple custodians
             try {
@@ -421,7 +421,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (success) { //Only move the second type of order if sure that the first have been taken down
             if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.BUY))
                     || Global.isDualSide) {
-                if (Global.options.isWaitBeforeShift()) {
+                if (Global.options.isMultipleCustodians()) {
                     try {
                         //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
                         LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
