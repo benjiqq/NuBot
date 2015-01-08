@@ -21,26 +21,28 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.utils.Utils;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
-public class TestNTPClient {
+public class TestQuick {
 
-    private static final Logger LOG = Logger.getLogger(TestNTPClient.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestQuick.class.getName());
 
-    public static void main(String[] args) {
-        NTPClient client = new NTPClient();
+    public static void main(String[] a) {
+        String date = "2014-12-22T17:55:25.107Z";
+        String pattern = "yyyy-MM-dd'T'HH:mm:ss";
 
-        LOG.info("Seconds untile next window : " + Utils.getSecondsToNextwindow(3));
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        try {
+            Date d = sdf.parse(date);
+        } catch (java.text.ParseException pe1) {
+            LOG.severe(pe1.toString());
+        }
 
-        //Try multiple servers
-        LOG.info("Date (multiple servers) : " + client.getTime());
+        System.out.println("done");
 
-        //Try single server
-        LOG.info("Date (single server) : " + client.getTime("time.nist.gov"));
 
-        System.exit(0);
 
     }
 }

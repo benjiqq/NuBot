@@ -241,6 +241,7 @@ NuBot can be further configured by adding additional parameters to its config fi
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| 
 | nudip    | "127.0.0.1"  |   | The IP address of the machine that hosts the Nu Client |
+| multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  f set to false will disable hipchat notifications | boolean |
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |

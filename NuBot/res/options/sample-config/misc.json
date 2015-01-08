@@ -1,6 +1,7 @@
 {"options": 
     {
     "dualside": true,  
+    "multiple-custodians":true,
     "priceincrement": 0.1,
     "submit-liquidity":true,
     "executeorders":false,

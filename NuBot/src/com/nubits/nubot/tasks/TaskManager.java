@@ -17,6 +17,9 @@
  */
 package com.nubits.nubot.tasks;
 
+import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
+import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
+import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
@@ -63,10 +66,6 @@ public class TaskManager {
             sendLiquidityInterval = Global.options.getSendLiquidityInteval();
             executeStrategyInterval = Global.options.getExecuteStrategyInterval();
             verbose = Global.options.isVerbose();
-            if (Global.options.getSecondaryPegOptions() != null) {
-                //If global option have been loaded
-                checkPriceInterval = Global.options.getSecondaryPegOptions().getRefreshTime();
-            }
         }
 
 

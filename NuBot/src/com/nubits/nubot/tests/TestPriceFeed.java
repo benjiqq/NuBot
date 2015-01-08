@@ -22,7 +22,7 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
-import com.nubits.nubot.pricefeeds.BtcePriceFeed;
+import com.nubits.nubot.pricefeeds.BitcoinaveragePriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
@@ -65,7 +65,7 @@ public class TestPriceFeed {
         }
         LOG.setLevel(Level.INFO);
 
-        feed = new BtcePriceFeed(); //REPLACE HERE
+        feed = new BitcoinaveragePriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
