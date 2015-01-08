@@ -63,10 +63,6 @@ public class TaskManager {
             sendLiquidityInterval = Global.options.getSendLiquidityInteval();
             executeStrategyInterval = Global.options.getExecuteStrategyInterval();
             verbose = Global.options.isVerbose();
-            if (Global.options.getSecondaryPegOptions() != null) {
-                //If global option have been loaded
-                checkPriceInterval = Global.options.getSecondaryPegOptions().getRefreshTime();
-            }
         }
 
 
