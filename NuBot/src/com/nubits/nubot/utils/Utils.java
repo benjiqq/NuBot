@@ -327,4 +327,22 @@ public class Utils {
 
         return randomNum;
     }
+
+    /**
+     * For use with the multi-custodian option. The walls are removed and
+     * re-added every three minutes. The bot needs to wait for the next 3 minute
+     * window before placing walls
+     *
+     * @return delay
+     */
+    public static int getSecondsToNextwindow(int windowWidthSeconds) {
+        Date remoteDate = new NTPClient().getTime();
+        Calendar remoteCalendar = new GregorianCalendar();
+        remoteCalendar.setTime(remoteDate);
+        int remoteTimeInSeconds = remoteCalendar.get(Calendar.SECOND);
+        int remoteTimeInMinutes = remoteCalendar.get(Calendar.MINUTE);
+        int minutesTillWindow = windowWidthSeconds - (remoteTimeInMinutes % windowWidthSeconds);
+        int delay = ((60 * minutesTillWindow) - remoteTimeInSeconds);
+        return delay;
+    }
 }

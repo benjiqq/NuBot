@@ -332,10 +332,14 @@ public class NuBot {
                 Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
 
                 //read the delay to sync with remote clock
+                //issue 136 - multi custodians on a pair.
+                //walls are removed and re-added every three minutes.
+                //Bot needs to wait for next 3 min window before placing walls
                 int delay = 1;
+
                 if (Global.options.isMultipleCustodians()) {
-                    delay = Utils.getSecondsToRemoteMinute();
-                    LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP.");
+                    delay = Utils.getSecondsToNextwindow(3);
+                    LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP and place walls during next wall shift window.");
                 } else {
                     LOG.warning("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
                 }
