@@ -54,7 +54,6 @@
         </exec>  
         <copy file="../readme.html" tofile="${store.dir}/readme.html"/>
         
-        
         <!-- Create empty /logs directory -->
         <mkdir dir="${store.dir}/logs"/>
 
