@@ -61,6 +61,7 @@ import org.json.simple.parser.ParseException;
 
 public class CcedkWrapper implements TradeInterface {
 
+
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -85,6 +86,9 @@ public class CcedkWrapper implements TradeInterface {
     private final String TOKEN_ERR = "errors";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
+    private static final String INVALID_NONCE_ERROR = "Invalid Nonce value detected";
+    private static final int ROUND_CUTOFF = 4;
+    private static int INVALID_NONCE_COUNT = 1;
 
     public CcedkWrapper() {
         setupErrors();
@@ -100,41 +104,45 @@ public class CcedkWrapper implements TradeInterface {
 
     public String createNonce(String requester) {
         //This is a  workaround waiting for clarifications from CCEDK team
-        String lastdigits;
+        int lastdigit;
         String validNonce;
+        int numericalNonce;
         String startvalid = " till";
         int indexStart;
+        int upperEdge;
         String nonceError;
         if (offset == -1000000000) {
             JSONParser parser = new JSONParser();
             try {
                 String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=1234567891", false);
-                try {
-                    //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
-                    JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                    JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
-                    nonceError = (String) errors.get("nonce");
-                    indexStart = nonceError.lastIndexOf(startvalid) + startvalid.length() + 2;
-                    validNonce = nonceError.substring(indexStart, indexStart + 10);
-                } catch (ParseException ex) {
-                    validNonce = "1234567891";
-                }
-                offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
+                //{"errors":{"nonce":"incorrect range `nonce`=`1234567891`, must be from `1411036100` till `1411036141`"}
+                JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
+                JSONObject errors = (JSONObject) httpAnswerJson.get("errors");
+                nonceError = (String) errors.get("nonce");
+                indexStart = nonceError.lastIndexOf(startvalid) + startvalid.length() + 2;
+                upperEdge = Integer.parseInt(nonceError.substring(indexStart, indexStart + 10));
+                offset = upperEdge - (int) (System.currentTimeMillis() / 1000L);
+            } catch (ParseException ex) {
+                LOG.severe(ex.toString());
             } catch (IOException io) {
-                validNonce = "1234567891";
+                LOG.severe(io.toString());
             }
-        } else {
-            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) - 1);
         }
-        if (!validNonce.equals("")) {
-            lastdigits = validNonce.substring(validNonce.length() - 2);
-            if (lastdigits.equals("98") || lastdigits.equals("99")) {
-                offset = -1000000000;
-                validNonce = createNonce("self");
+        if (offset != -1000000000) {
+            numericalNonce = (int) (System.currentTimeMillis() / 1000L) + offset;
+            //LOG.warning("validNonce = " + Objects.toString(numericalNonce));
+            lastdigit = numericalNonce % 10;
+            //LOG.warning("lastdigit = " + Objects.toString(lastdigit));
+            if (lastdigit < ROUND_CUTOFF) {
+                numericalNonce -= lastdigit;
+            } else {
+                numericalNonce += (10 - lastdigit);
             }
+            validNonce = Objects.toString(numericalNonce);
+            //LOG.warning("validNonce = " + validNonce);
         } else {
-            offset = -1000000000;
-            validNonce = createNonce("self");
+            LOG.severe("Error calculating nonce");
+            validNonce = "1234567891";
         }
         return validNonce;
     }
@@ -155,6 +163,18 @@ public class CcedkWrapper implements TradeInterface {
             apiResponse.setError(errors.noConnectionError);
             return apiResponse;
         }
+        if (queryResult.contains(INVALID_NONCE_ERROR)) {
+            ApiError error = errors.genericError;
+            error.setDescription(queryResult);
+            apiResponse.setError(error);
+            if (INVALID_NONCE_COUNT < 5) {
+                getQuery(url, method, query_args, isGet);
+                INVALID_NONCE_COUNT++;
+            }
+            return apiResponse;
+        }
+
+        INVALID_NONCE_COUNT = 1;
 
         JSONParser parser = new JSONParser();
         try {
@@ -827,6 +847,12 @@ public class CcedkWrapper implements TradeInterface {
                 while ((output = br.readLine()) != null) {
                     LOG.fine(output);
                     answer += output;
+                }
+
+                //LOG.severe("answer = " + answer);
+                if (answer.contains("\"nonce\":\"incorrect range")) {
+                    //executeQuery(needAuth, isGet);
+                    return INVALID_NONCE_ERROR + " " + answer;
                 }
 
                 if (httpError) {

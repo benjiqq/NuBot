@@ -31,6 +31,7 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
+import java.util.Objects;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
@@ -462,6 +463,25 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 if (txFeeNTBPEGResponse.isPositive()) {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
+
+                    /*
+                    if (type.equals(Constant.SELL) && Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
+                    {
+                        if (balance.getQuantity() > Global.options.getMaxSellVolume()) {
+                            //put the cap
+                            balance.setQuantity(Global.options.getMaxSellVolume());
+                        }
+                    }
+
+                    if (type.equals(Constant.BUY) && Global.options.getMaxBuyVolume() > 0) {
+                        if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
+                            //put the cap
+                            balance.setQuantity(Global.options.getMaxBuyVolume());
+
+                        }
+                    }
+                    */
+
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
                     double amount2 = balance.getQuantity() - amount1;
