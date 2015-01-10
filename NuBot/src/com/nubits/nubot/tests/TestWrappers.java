@@ -56,7 +56,8 @@ public class TestWrappers {
         init();
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
-        configExchange(Constant.BTER); //Replace to test a different API implementation
+        configExchange(Constant.CCEDK); //Replace to test a different API implementation
+
 
         runTests();
         System.exit(0);
@@ -83,13 +84,13 @@ public class TestWrappers {
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("2064456");
-        testGetTxFee();
-        testGetTxFeeWithArgs(Constant.BTC_USD);
+        //testGetTxFee();
+        //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
-        //testGetLastTrades(Constant.NBT_BTC, 1409566800);
+        //testGetLastTrades(Constant.NBT_BTC, 1388534400);
         //testGetLastTrades(Constant.NBT_BTC);
         //for (int i = 0; i < 5000; i++) {
         //   ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
