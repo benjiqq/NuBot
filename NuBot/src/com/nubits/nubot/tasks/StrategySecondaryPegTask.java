@@ -429,47 +429,49 @@ public class StrategySecondaryPegTask extends TimerTask {
         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
                 || Global.isDualSide) {
             LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " orders");
-            //immediately try to : cancel their active <shiftImmediatelyOrderType> orders
-            boolean cancel1 = TradeUtils.takeDownOrders(shiftImmediatelyOrderType, Global.options.getPair());
-            if (cancel1) {//re-place their <shiftImmediatelyOrderType> orders at new price
+            //immediately try to : cancel their active orders
 
-                if (shiftImmediatelyOrderType.equals(Constant.BUY)
-                        && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
-                {
-                    // update the initial balance of the secondary peg
-                    Global.frozenBalances.freezeNewFunds();
-                }
+            //HOTFIX 0.1.4b
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+                if (deleted) {//re-place their <shiftImmediatelyOrderType> orders at new price
+                    if (shiftImmediatelyOrderType.equals(Constant.BUY)
+                            && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
+                    {
+                        // update the initial balance of the secondary peg
+                        Global.frozenBalances.freezeNewFunds();
+                    }
 
-                boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
-                if (!init1) {
+                    boolean init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
+                    if (!init1) {
+                        success = false;
+                    }
+                } else {
                     success = false;
                 }
             } else {
                 success = false;
             }
-        }
 
-        if (success) { //Only move the second type of order if sure that the first have been taken down
-            if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.BUY))
-                    || Global.isDualSide) {
-                if (Global.options.isWaitBeforeShift()) {
-                    try {
-                        //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                        LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
-                                + "Then try to shift " + waitAndShiftOrderType + " orders.");
-                        Thread.sleep(wait_time);
-                    } catch (InterruptedException ex) {
-                        LOG.severe(ex.toString());
-                        success = false;
+            if (success) { //Only move the second type of order if sure that the first have been taken down
+                if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.BUY))
+                        || Global.isDualSide) {
+                    if (Global.options.isWaitBeforeShift()) {
+                        try {
+                            //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
+                            LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
+                                    + "Then try to shift " + waitAndShiftOrderType + " orders.");
+                            Thread.sleep(wait_time);
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.toString());
+                            success = false;
+                        }
+                    } else {
+                        LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
                     }
-                } else {
-                    LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
-                }
 
-                //Cancel active <waitAndShiftOrderType> orders
-                boolean cancel2 = TradeUtils.takeDownOrders(waitAndShiftOrderType, Global.options.getPair());
 
-                if (cancel2) {//re-place <waitAndShiftOrderType> orders at new price
                     if (waitAndShiftOrderType.equals(Constant.BUY)
                             && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
                     {
@@ -480,32 +482,38 @@ public class StrategySecondaryPegTask extends TimerTask {
                     if (!init2) {
                         success = false;
                     }
-                } else {
-                    success = false;
+
+
                 }
+            } else { //success false with the first part of the shift
+                if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
+                        || Global.isDualSide) { //dualside
+                    LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
 
+                }
             }
-        } else { //success false with the first part of the shift
-            if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
-                    || Global.isDualSide) { //dualside
-                LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
 
+            //Here I wait until the two orders are correctly displaied. It can take some seconds
+            try {
+                Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
             }
+
+            //Communicate to the priceMonitorTask that the wall shift is over
+            priceMonitorTask.setWallsBeingShifted(false);
+            sendLiquidityTask.setWallsBeingShifted(false);
+
+            return success;
         }
 
-        //Here I wait until the two orders are correctly displaied. It can take some seconds
-        try {
-            Thread.sleep(6 * 1000); //TODO wait a dynamic interval.
-        } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
-        }
 
-        //Communicate to the priceMonitorTask that the wall shift is over
-        priceMonitorTask.setWallsBeingShifted(false);
-        sendLiquidityTask.setWallsBeingShifted(false);
 
-        return success;
-    }
+
+
+
+
+
 
     private boolean initOrders(String type, double price) {
         boolean success = true;
@@ -541,22 +549,22 @@ public class StrategySecondaryPegTask extends TimerTask {
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                     /*
-                    if (type.equals(Constant.SELL) && Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
-                    {
-                        if (balance.getQuantity() > Global.options.getMaxSellVolume()) {
-                            //put the cap
-                            balance.setQuantity(Global.options.getMaxSellVolume());
-                        }
-                    }
+                     if (type.equals(Constant.SELL) && Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
+                     {
+                     if (balance.getQuantity() > Global.options.getMaxSellVolume()) {
+                     //put the cap
+                     balance.setQuantity(Global.options.getMaxSellVolume());
+                     }
+                     }
 
-                    if (type.equals(Constant.BUY) && Global.options.getMaxBuyVolume() > 0) {
-                        if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
-                            //put the cap
-                            balance.setQuantity(Global.options.getMaxBuyVolume());
+                     if (type.equals(Constant.BUY) && Global.options.getMaxBuyVolume() > 0) {
+                     if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
+                     //put the cap
+                     balance.setQuantity(Global.options.getMaxBuyVolume());
 
-                        }
-                    }
-                    */
+                     }
+                     }
+                     */
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
 
