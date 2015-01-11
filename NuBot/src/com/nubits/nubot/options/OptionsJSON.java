@@ -582,7 +582,7 @@ public class OptionsJSON {
             boolean verbose = false;
             boolean sendHipchat = true;
 
-            boolean multipleCustodians = true;
+            boolean multipleCustodians = false;
             int executeStrategyInterval = 41;
             int sendLiquidityInterval = 181;
 
