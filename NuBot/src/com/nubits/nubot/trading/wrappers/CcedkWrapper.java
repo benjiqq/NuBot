@@ -138,7 +138,7 @@ public class CcedkWrapper implements TradeInterface {
             if (lastdigit < ROUND_CUTOFF) {
                 numericalNonce -= lastdigit;
             } else {
-                numericalNonce += (10 - lastdigit);
+                numericalNonce += (100 - lastdigit);
             }
             validNonce = Objects.toString(numericalNonce);
             //LOG.warning("validNonce = " + validNonce);
