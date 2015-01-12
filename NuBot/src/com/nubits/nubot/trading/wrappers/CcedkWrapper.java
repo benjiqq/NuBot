@@ -87,7 +87,7 @@ public class CcedkWrapper implements TradeInterface {
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
     private static final String INVALID_NONCE_ERROR = "Invalid Nonce value detected";
-    private static final int ROUND_CUTOFF = 98;
+    private static final int ROUND_CUTOFF = 99;
     private static int INVALID_NONCE_COUNT = 1;
 
     public CcedkWrapper() {

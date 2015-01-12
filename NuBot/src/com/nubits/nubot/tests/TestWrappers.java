@@ -48,7 +48,8 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "options.json";
 
     public static void main(String[] args) {
         //Load settings
@@ -111,13 +112,16 @@ public class TestWrappers {
          */
 
         for (int i = 0; i < 5000; i++) {
-            testGetActiveOrders();
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-            }
-
+            //testGetActiveOrders();
+            //System.out.println(i);
+            testGetAvailableBalances(Constant.NBT_BTC);
+            //try {
+            //    Thread.sleep(100);
+            //} catch (InterruptedException ex) {
+            //LOG.severe(ex.toString());
+            //}
+        }
+        /*
             testGetAvailableBalances(Constant.NBT_BTC);
 
             try {
@@ -133,6 +137,7 @@ public class TestWrappers {
                 LOG.severe(ex.toString());
             }
         }
+        */
 
     }
 
@@ -140,10 +145,10 @@ public class TestWrappers {
         //Get all the balances  associated with the account
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
+            //LOG.info("\nPositive response  from TradeInterface.getBalance() ");
             Balance balance = (Balance) balancesResponse.getResponseObject();
 
-            LOG.info(balance.toString());
+            //LOG.info(balance.toString());
 
         } else {
             LOG.severe(balancesResponse.getError().toString());
@@ -222,13 +227,13 @@ public class TestWrappers {
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
+            //LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.info("Active orders : " + orderList.size());
+            //LOG.info("Active orders : " + orderList.size());
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                LOG.info(tempOrder.toString());
+                //LOG.info(tempOrder.toString());
             }
 
         } else {
