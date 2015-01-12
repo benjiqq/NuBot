@@ -57,7 +57,6 @@ public class TestWrappers {
         Global.options = OptionsJSON.parseOptions(TEST_OPTIONS_PATH);
 
         configExchange(Constant.CCEDK); //Replace to test a different API implementation
-
         runTests();
         System.exit(0);
     }
@@ -89,7 +88,7 @@ public class TestWrappers {
         //---------------
         //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
-        //testGetLastTrades(Constant.NBT_BTC, 1409566800);
+        //testGetLastTrades(Constant.NBT_BTC, 1388534400);
         //testGetLastTrades(Constant.NBT_BTC);
         //for (int i = 0; i < 5000; i++) {
         //   ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());

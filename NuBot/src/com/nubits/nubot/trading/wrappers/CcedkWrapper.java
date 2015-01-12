@@ -87,7 +87,7 @@ public class CcedkWrapper implements TradeInterface {
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
     private static final String INVALID_NONCE_ERROR = "Invalid Nonce value detected";
-    private static final int ROUND_CUTOFF = 4;
+    private static final int ROUND_CUTOFF = 98;
     private static int INVALID_NONCE_COUNT = 1;
 
     public CcedkWrapper() {
@@ -131,7 +131,9 @@ public class CcedkWrapper implements TradeInterface {
         if (offset != -1000000000) {
             numericalNonce = (int) (System.currentTimeMillis() / 1000L) + offset;
             //LOG.warning("validNonce = " + Objects.toString(numericalNonce));
-            lastdigit = numericalNonce % 10;
+            //lastdigit = numericalNonce % 10;
+            String testNonce = Objects.toString(numericalNonce);
+            lastdigit = Integer.parseInt(testNonce.substring((testNonce.length()) - 2));
             //LOG.warning("lastdigit = " + Objects.toString(lastdigit));
             if (lastdigit < ROUND_CUTOFF) {
                 numericalNonce -= lastdigit;
@@ -615,7 +617,7 @@ public class CcedkWrapper implements TradeInterface {
         CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
         order.setPair(cp);
 
-        order.setType(((String) orderObject.get("type")).toUpperCase());
+        order.setType(orderObject.get("is_seller").equals("1") ? Constant.SELL : Constant.BUY);
         order.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
         order.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
 
@@ -646,7 +648,6 @@ public class CcedkWrapper implements TradeInterface {
          "fee":<\d{1,8}\.d{0,8}>,
          "created":<\d{10}>
          */
-
         trade.setId((String) orderObject.get("trade_id"));
 
         trade.setExchangeName(Constant.CCEDK);
@@ -654,11 +655,10 @@ public class CcedkWrapper implements TradeInterface {
         CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
         trade.setPair(cp);
 
-        trade.setType(((String) orderObject.get("type")).toUpperCase());
+        trade.setType(orderObject.get("is_seller").equals("1") ? Constant.SELL : Constant.BUY);
         trade.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
         trade.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
         trade.setFee(new Amount(Double.parseDouble((String) orderObject.get("fee")), cp.getPaymentCurrency()));
-
 
         long date = Long.parseLong(((String) orderObject.get("created")) + "000");
         trade.setDate(new Date(date));
@@ -709,6 +709,8 @@ public class CcedkWrapper implements TradeInterface {
         } else {
             startDateArg = Long.toString(startTime);
         }
+
+        startDateArg = startDateArg.substring(0, 10);
 
         query_args.put("date_from", startDateArg);
 
