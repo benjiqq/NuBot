@@ -472,7 +472,6 @@ public class StrategySecondaryPegTask extends TimerTask {
                     LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
                 }
 
-
                 if (waitAndShiftOrderType.equals(Constant.BUY)
                         && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
                 {
@@ -483,14 +482,11 @@ public class StrategySecondaryPegTask extends TimerTask {
                 if (!init2) {
                     success = false;
                 }
-
-
             }
         } else { //success false with the first part of the shift
             if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
                     || Global.isDualSide) { //dualside
                 LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
-
             }
         }
 
