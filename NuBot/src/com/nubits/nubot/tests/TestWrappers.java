@@ -98,15 +98,18 @@ public class TestWrappers {
         //stimulating ccedk wrong nonce
 
 
-        //test clear all orders
+        /* test clear all orders
+         *
+         * [start]
+         *
+         */
+
 
         //clear old orders if any
         testClearAllOrders(Constant.NBT_BTC);
 
-        //first place a few orders
+        // place a few orders
         for (int i = 0; i <= 5; i++) {
-
-            testGetOrderDetail("3454");
             testSell(0.1, 0.004, Constant.NBT_BTC);
             try {
                 Thread.sleep(400);
@@ -133,6 +136,15 @@ public class TestWrappers {
 
         //try to clear orders
         testClearAllOrders(Constant.NBT_BTC);
+
+
+        /* test clear all orders
+         *
+         * [stop]
+         *
+         */
+
+
         /*
          for (int i = 0; i < 60; i++) {
          try {

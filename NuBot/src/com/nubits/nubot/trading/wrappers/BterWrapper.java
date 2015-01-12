@@ -572,7 +572,7 @@ public class BterWrapper implements TradeInterface {
 
                 //Wait to avoid placing requests too fast
                 try {
-                    Thread.sleep(1500);
+                    Thread.sleep(1200);
                 } catch (InterruptedException ex) {
                     LOG.severe(ex.toString());
                 }
