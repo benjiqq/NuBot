@@ -617,7 +617,7 @@ public class CcedkWrapper implements TradeInterface {
         CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
         order.setPair(cp);
 
-        order.setType(orderObject.get("is_seller").equals("1") ? Constant.SELL : Constant.BUY);
+        order.setType(orderObject.get("type").toString());
         order.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
         order.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
 
