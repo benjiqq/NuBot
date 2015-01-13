@@ -130,16 +130,6 @@ public class CcedkWrapper implements TradeInterface {
         }
         if (offset != -1000000000) {
             numericalNonce = (int) (System.currentTimeMillis() / 1000L) + offset;
-            //LOG.warning("validNonce = " + Objects.toString(numericalNonce));
-            //lastdigit = numericalNonce % 10;
-            String testNonce = Objects.toString(numericalNonce);
-            lastdigit = Integer.parseInt(testNonce.substring((testNonce.length()) - 2));
-            //LOG.warning("lastdigit = " + Objects.toString(lastdigit));
-            if (lastdigit < ROUND_CUTOFF) {
-                numericalNonce -= lastdigit;
-            } else {
-                numericalNonce += (100 - lastdigit);
-            }
             validNonce = Objects.toString(numericalNonce);
             //LOG.warning("validNonce = " + validNonce);
         } else {
