@@ -461,7 +461,6 @@ public class SecondaryPegStrategyUtils {
 
     public boolean shiftWalls() {
         boolean success = true;
-
         if (Global.options.isMultipleCustodians()) {
             //Introuce an aleatory sleep time to desync bots at the time of placing orders.
             //This will favour competition in markets with multiple custodians
@@ -512,7 +511,7 @@ public class SecondaryPegStrategyUtils {
 
         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
                 || Global.isDualSide) {
-            LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " orders");
+            LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " side orders");
             //immediately try to : cancel all active orders
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
@@ -550,7 +549,7 @@ public class SecondaryPegStrategyUtils {
                                     success = false;
                                 }
                             } else {
-                                LOG.warning("Skipping the waiting time : wait-before-shift option have been set to false");
+                                LOG.warning("Skipping the waiting time : multipleCustodians option have been set to false");
                             }
 
 
@@ -569,8 +568,6 @@ public class SecondaryPegStrategyUtils {
                             if (!init2) {
                                 success = false;
                             }
-
-
                         }
                     } else { //success false with the first part of the shift
                         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
