@@ -38,9 +38,7 @@ import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.logging.Logger;
 
 /**
@@ -62,18 +60,22 @@ public class TestWrappers {
         inputs[0] = TEST_OPTIONS_PATH;
         Global.options = OptionsJSON.parseOptions(inputs);
 
-        configExchange(Constant.CCEDK); //Replace to test a different API implementation
+        configExchange(Constant.BTER); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
     }
 
     public static void runTests() {
+
+        //Methods strictly necessary for NuBot to run---------------
+        //---------------
+        //testGetAvailableBalance(Constant.NBT); //
+
         //Methods strictly necessary for NuBot to run-------------
         //-------------
         //testGetAvailableBalance(Constant.BTC);
         //testGetAvailableBalance(Constant.NBT);
-
         //testGetAvailableBalances(Constant.NBT_BTC);
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
@@ -101,51 +103,104 @@ public class TestWrappers {
         //    }
         //}
         //stimulating ccedk wrong nonce
-/*
-        for (int i = 0; i < 60; i++) {
+
+
+        /* test clear all orders
+         *
+         * [start]
+         *
+         */
+
+
+
+        //clear old orders if any
+        testClearAllOrders(Constant.NBT_BTC);
+
+
+        // place a few orders
+        for (int i = 0; i <= 5; i++) {
+            testSell(0.1, 0.004, Constant.NBT_BTC);
             try {
-                String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=1234567891", false);
-                LOG.warning(htmlString);
-            } catch (IOException io) {
-                LOG.severe(io.toString());
+                Thread.sleep(400);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
             }
         }
-*/
 
+        for (int i = 0; i <= 5; i++) {
+            testBuy(0.1, 0.001, Constant.NBT_BTC);
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
+            }
+        }
+
+
+        //Wait 4 secs
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.toString());
+        }
+
+        //try to clear orders
+        testClearAllOrders(Constant.NBT_BTC);
+
+
+        /* test clear all orders
+         *
+         * [stop]
+         *
+         */
+
+
+        /*
+         for (int i = 0; i < 60; i++) {
+         try {
+         String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=1234567891", false);
+         LOG.warning(htmlString);
+         } catch (IOException io) {
+         LOG.severe(io.toString());
+         }
+         }
+         */
+
+        /* stress test start
          for (int i = 0; i < 5000; i++) {
-             testGetActiveOrders();
-             try {
-                 Thread.sleep(100);
-             } catch (InterruptedException ex) {
-                 LOG.severe(ex.toString());
-             }
-
-             testGetAvailableBalances(Constant.NBT_BTC);
-
-             try {
-                 Thread.sleep(100);
-             } catch (InterruptedException ex) {
-                 LOG.severe(ex.toString());
-             }
-             testGetOrderDetail("3454");
-
-             try {
-                 Thread.sleep(300);
-             } catch (InterruptedException ex) {
-                 LOG.severe(ex.toString());
-             }
+         testGetActiveOrders();
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
          }
 
+         testGetAvailableBalances(Constant.NBT_BTC);
+
+         try {
+         Thread.sleep(100);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
+         }
+         testGetOrderDetail("3454");
+
+         try {
+         Thread.sleep(300);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
+         }
+         }
+         * Stress test stop*/
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
+            //LOG.info("\nPositive response  from TradeInterface.getBalance() ");
             Balance balance = (Balance) balancesResponse.getResponseObject();
 
-            LOG.info(balance.toString());
+            //LOG.info(balance.toString());
 
         } else {
             LOG.severe(balancesResponse.getError().toString());
@@ -224,13 +279,13 @@ public class TestWrappers {
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
+            //LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.info("Active orders : " + orderList.size());
+            //LOG.info("Active orders : " + orderList.size());
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                LOG.info(tempOrder.toString());
+                //LOG.info(tempOrder.toString());
             }
 
         } else {

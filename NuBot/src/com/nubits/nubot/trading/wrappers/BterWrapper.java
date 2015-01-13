@@ -138,7 +138,12 @@ public class BterWrapper implements TradeInterface {
             }
 
             if (!valid) {
-                String errorMessage = (String) httpAnswerJson.get("message");
+                String errorMessage = "";
+                if (httpAnswerJson.containsKey("message")) {
+                    errorMessage = (String) httpAnswerJson.get("message");
+                } else if (httpAnswerJson.containsKey("msg")) {
+                    errorMessage = (String) httpAnswerJson.get("msg");
+                }
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
                 apiResponse.setError(apiErr);
@@ -271,7 +276,6 @@ public class BterWrapper implements TradeInterface {
 
         HashMap<String, String> query_args = new HashMap<>();
 
-
         /* Sample response
          * {"result":"true","last":2599,"high":2620,"low":2406,"avg":2526.11,"sell":2598,"buy":2578,"vol_btc":544.5027,"vol_cny":1375475.92}
          */
@@ -283,7 +287,6 @@ public class BterWrapper implements TradeInterface {
         } else {
             queryResult = query(ticker_url, query_args, true);
         }
-
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -313,8 +316,6 @@ public class BterWrapper implements TradeInterface {
                 last = Utils.getDouble(httpAnswerJson.get("last"));
                 bid = Utils.getDouble(httpAnswerJson.get("sell"));
                 ask = Utils.getDouble(httpAnswerJson.get("buy"));
-
-
             }
         } catch (ParseException ex) {
             LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
@@ -572,6 +573,13 @@ public class BterWrapper implements TradeInterface {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
 
+                //Wait to avoid placing requests too fast
+                try {
+                    Thread.sleep(1200);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.toString());
+                }
+
                 ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
                 if (deleteOrderResponse.isPositive()) {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
@@ -585,13 +593,15 @@ public class BterWrapper implements TradeInterface {
 
                 } else {
                     LOG.severe(deleteOrderResponse.getError().toString());
+                    toReturn.setError(deleteOrderResponse.getError());
+                    return toReturn;
                 }
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
-                }
-
+            }
+            //Wait to avoid placing requests too fast
+            try {
+                Thread.sleep(800);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
             }
             toReturn.setResponseObject(ok);
         } else {
