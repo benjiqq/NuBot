@@ -144,7 +144,7 @@ public class Trade {
         }
 
 
-        return "\"Trade_" + this.order_id + "\":{\n"
+        return "\"Trade_" + this.id + "\":{\n"
                 + "\"id\":\"" + this.id + "\",\n"
                 + "\"order_id\":\"" + this.order_id + "\",\n"
                 + "\"exchange\":\"" + this.exchangeName + "\",\n"
