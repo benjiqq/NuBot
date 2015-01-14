@@ -31,7 +31,6 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
@@ -157,6 +156,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 if (!reinitiateSuccess) {
                     LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
                     isFirstTime = true;
+                } else {
+                    LOG.info("Initial walls placed");
                 }
             }
         } else {

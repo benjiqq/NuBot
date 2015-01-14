@@ -126,6 +126,7 @@ public class SecondaryPegStrategyUtils {
 
         if (buysOrdersOk && sellsOrdersOk) {
             strategy.setMightNeedInit(false);
+            LOG.info("Initial walls placed");
         } else {
             strategy.setMightNeedInit(true);
         }
