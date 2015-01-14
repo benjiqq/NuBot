@@ -152,7 +152,6 @@ public class SecondaryPegStrategyUtils {
             }
         }
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
-
         if (balancesResponse.isPositive()) {
             double oneNBT = 1;
             if (type.equals(Constant.SELL)) {
@@ -163,7 +162,6 @@ public class SecondaryPegStrategyUtils {
                 balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                 oneNBT = Utils.round(1 / Global.conversion, 8);
             }
-
             if (balance.getQuantity() > oneNBT * 2) {
                 //Update TX fee :
                 //Get the current transaction fee associated with a specific CurrencyPair
@@ -177,7 +175,6 @@ public class SecondaryPegStrategyUtils {
                     if (type.equals(Constant.BUY) && !Global.swappedPair) {
                         amount1 = Utils.round(amount1 / price, 8);
                     }
-
                     //Prepare the orders
 
                     String orderString1;
@@ -197,7 +194,6 @@ public class SecondaryPegStrategyUtils {
                         }
                         orderString1 = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
                                 + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-
                     }
 
                     if (Global.options.isExecuteOrders()) {
@@ -217,7 +213,6 @@ public class SecondaryPegStrategyUtils {
                                 order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
                             }
                         }
-
                         if (order1Response.isPositive()) {
                             HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, Message.Color.YELLOW);
                             String response1String = (String) order1Response.getResponseObject();
@@ -226,7 +221,6 @@ public class SecondaryPegStrategyUtils {
                             LOG.severe(order1Response.getError().toString());
                             success = false;
                         }
-
                         //wait a while to give the time to the new amount to update
 
                         try {
@@ -244,7 +238,6 @@ public class SecondaryPegStrategyUtils {
                                 balance = (Amount) balancesResponse2.getResponseObject();
                                 balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                             }
-
                             double amount2 = balance.getQuantity();
 
                             if ((type.equals(Constant.BUY) && !Global.swappedPair)
@@ -253,7 +246,6 @@ public class SecondaryPegStrategyUtils {
                                 amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
                                 amount2 = Utils.round(amount2 / price, 8);
                             }
-
 
                             String orderString2;
                             if (!Global.swappedPair) {
@@ -270,11 +262,9 @@ public class SecondaryPegStrategyUtils {
                                 orderString2 = sideStr + " " + typeStr + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
                                         + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
                             }
-
                             //put it on order
 
                             LOG.warning("Strategy - Submit order : " + orderString2);
-
                             ApiResponse order2Response;
                             if (type.equals(Constant.SELL)) { //Place sellSide order 2
                                 if (Global.swappedPair) {
@@ -289,8 +279,6 @@ public class SecondaryPegStrategyUtils {
                                     order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
                                 }
                             }
-
-
                             if (order2Response.isPositive()) {
                                 HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, Message.Color.YELLOW);
                                 String response2String = (String) order2Response.getResponseObject();
@@ -299,10 +287,8 @@ public class SecondaryPegStrategyUtils {
                                 LOG.severe(order2Response.getError().toString());
                                 success = false;
                             }
-
                         } else {
                             LOG.severe("Error while reading the balance the second time " + balancesResponse2.getError().toString());
-
                         }
                     } else {
                         //Just print the order without executing it
@@ -316,7 +302,6 @@ public class SecondaryPegStrategyUtils {
             LOG.severe(balancesResponse.getError().toString());
             success = false;
         }
-
         return success;
     }
 
@@ -462,6 +447,10 @@ public class SecondaryPegStrategyUtils {
 
     public boolean shiftWalls() {
         boolean success = true;
+
+        //TODO Fix 156 -- reduce this value as excoin API get more responsive
+        int WAIT_TIME_FIX_156_EXCOIN = 4000; //ms
+
         if (Global.options.isMultipleCustodians()) {
             //Introuce an aleatory sleep time to desync bots at the time of placing orders.
             //This will favour competition in markets with multiple custodians
@@ -530,6 +519,12 @@ public class SecondaryPegStrategyUtils {
                     if (!Global.swappedPair) {
                         init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
                     } else {
+                        //fix 256
+                        try {
+                            Thread.sleep(WAIT_TIME_FIX_156_EXCOIN);
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.toString());
+                        }
                         init1 = initOrders(waitAndShiftOrderType, priceImmediatelyType);
                     }
                     if (!init1) {
@@ -553,7 +548,6 @@ public class SecondaryPegStrategyUtils {
                                 LOG.warning("Skipping the waiting time : multipleCustodians option have been set to false");
                             }
 
-
                             if (waitAndShiftOrderType.equals(Constant.BUY)
                                     && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
                             {
@@ -561,9 +555,18 @@ public class SecondaryPegStrategyUtils {
                             }
 
                             boolean init2;
+
+
+
                             if (!Global.swappedPair) {
                                 init2 = initOrders(waitAndShiftOrderType, priceWaitType);
                             } else {
+                                //fix 256
+                                try {
+                                    Thread.sleep(WAIT_TIME_FIX_156_EXCOIN);
+                                } catch (InterruptedException ex) {
+                                    LOG.severe(ex.toString());
+                                }
                                 init2 = initOrders(shiftImmediatelyOrderType, priceWaitType);
                             }
                             if (!init2) {
