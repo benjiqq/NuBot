@@ -471,7 +471,7 @@ public class ExcoinWrapper implements TradeInterface {
             LOG.info("A maximum of " + API_MAX_TRADES + " trades can be returned from the API");
             url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_MAX_TRADES;
         } else { //https://api.exco.in/v1/account/timestamp/{TIMESTAMP}
-            url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TIMESTAMP + "/" + startTime;
+            url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_TIMESTAMP + "/" + startTime;
         }
 
         ApiResponse response = getQuery(url);
