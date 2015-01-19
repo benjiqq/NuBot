@@ -60,17 +60,13 @@ public class TestWrappers {
         inputs[0] = TEST_OPTIONS_PATH;
         Global.options = OptionsJSON.parseOptions(inputs);
 
-        configExchange(Constant.BTER); //Replace to test a different API implementation
+        configExchange(Constant.BITCOINCOID); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
     }
 
     public static void runTests() {
-
-        //Methods strictly necessary for NuBot to run---------------
-        //---------------
-        //testGetAvailableBalance(Constant.NBT); //
 
         //Methods strictly necessary for NuBot to run-------------
         //-------------
@@ -80,8 +76,8 @@ public class TestWrappers {
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
-        //testSell(0.3, 0.00830509, NSR_BTC);  //ok
-        //testBuy(0.0000120, 0.0000120, NSR_BTC);  //ok
+        testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
+        testBuy(0.0000120, 0.0000120, Constant.NBT_BTC);  //ok
         //testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
@@ -90,7 +86,7 @@ public class TestWrappers {
         //testGetTxFeeWithArgs(Constant.BTC_USD);
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
-        //testGetLastPrice(NSR_BTC);
+        //testGetLastPrice(Constant.NBT_BTC);
         //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(Constant.NBT_BTC, 1388534400);
         //testGetLastTrades(Constant.NBT_BTC);
@@ -112,7 +108,7 @@ public class TestWrappers {
          */
 
 
-
+/*
         //clear old orders if any
         testClearAllOrders(Constant.NBT_BTC);
 
@@ -197,10 +193,10 @@ public class TestWrappers {
         //Get all the balances  associated with the account
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
-            //LOG.info("\nPositive response  from TradeInterface.getBalance() ");
+            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
             Balance balance = (Balance) balancesResponse.getResponseObject();
 
-            //LOG.info(balance.toString());
+            LOG.info(balance.toString());
 
         } else {
             LOG.severe(balancesResponse.getError().toString());
@@ -513,6 +509,13 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.BITCOINCOID)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.BITCOINCOID_SECRET, Passwords.BITCOINCOID_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
