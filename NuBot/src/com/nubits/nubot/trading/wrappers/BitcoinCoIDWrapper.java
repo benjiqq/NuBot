@@ -4,6 +4,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
@@ -26,9 +27,7 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -48,6 +47,8 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     private final String API_TICKER = "ticker";
     private final String API_GET_INFO = "getInfo";
     private final String API_TRADE = "trade";
+    private final String API_OPEN_ORDERS = "openOrders";
+    private final String API_CANCEL_ORDER = "cancelOrder";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -238,32 +239,117 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        return null;
+        return getActiveOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        return null;
+        return getActiveOrdersImpl(pair);
     }
+
+    private ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_OPEN_ORDERS;
+        ArrayList<Order> orderList = new ArrayList<>();
+        HashMap<String, String> query_args = new HashMap<>();
+        boolean isGet = false;
+
+
+        //only handles openOrders with given pair
+        if (pair != null) {
+            query_args.put("pair", pair.toString("_"));
+        } else {
+            query_args.put("pair", Global.options.getPair().toString("_"));
+        }
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject data = (JSONObject) httpAnswerJson.get("return");
+            JSONArray orders = (JSONArray) data.get("orders");
+            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+                JSONObject thisOrder = order.next();
+                orderList.add(parseOrder(thisOrder));
+            }
+            apiResponse.setResponseObject(orderList);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
+    }
+
+
+    private Order parseOrder(JSONObject in) {
+        Order out = new Order();
+
+        out.setId(in.get("order_id").toString());
+        Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()));
+        out.setInsertedDate(insertedDate);
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), Global.options.getPair().getPaymentCurrency());
+        out.setPrice(price);
+        out.setType(in.get("type") == "buy" ? Constant.BUY : Constant.SELL);
+        //Todo - does the text of the amount depend on which currency was traded?
+        Amount amount = new Amount(Double.parseDouble(in.get("order_idr").toString()), Global.options.getPair().getOrderCurrency());
+        out.setAmount(amount);
+        return out;
+    }
+
+
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
+        for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
+            Order thisOrder = order.next();
+            if (thisOrder.getId().equals(orderID)) {
+                apiResponse.setResponseObject(thisOrder);
+                break;
+            }
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_CANCEL_ORDER;
+        boolean isGet = false;
+        HashMap<String, String> query_args = new HashMap<>();
+
+        query_args.put("pair", pair.toString("_"));
+        query_args.put("order_id", orderID);
+        Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
+        query_args.put("type", currentOrder.getType());
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject data = (JSONObject) httpAnswerJson.get("return");
+            if (data.get("order_id").toString().equals(orderID)) {
+                apiResponse.setResponseObject(true);
+            } else {
+                apiResponse.setResponseObject(false);
+            }
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        double defaultFee = 0.0;
+        return new ApiResponse(true, defaultFee, null);
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        double defaultFee = 0.0;
+        return new ApiResponse(true, defaultFee, null);
     }
 
     @Override
