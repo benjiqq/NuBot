@@ -689,7 +689,7 @@ public class BitSparkWrapper implements TradeInterface {
         String method = API_GET_TRADES;
         boolean isGet = true;
         TreeMap<String, String> query_args = new TreeMap<>();
-        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+        ArrayList<Trade> tradeList = new ArrayList<>();
 
         query_args.put("canonical_verb", "GET");
         query_args.put("canonical_uri", method);
@@ -702,7 +702,7 @@ public class BitSparkWrapper implements TradeInterface {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext();) {
                 Trade thisTrade = parseTrade(trade.next());
-                if (thisTrade.getDate().getTime() < startTime) {
+                if (thisTrade.getDate().getTime() < (startTime * 1000L)) {
                     continue;
                 }
                 tradeList.add(thisTrade);
