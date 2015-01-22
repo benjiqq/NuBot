@@ -25,6 +25,7 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.io.File;
@@ -65,9 +66,16 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
     private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
     private static final int PRICE_PERCENTAGE = 10; //this is the percentage at which refresh action is taken
+    private static int SLEEP_COUNT = 0;
 
     @Override
     public void run() {
+        //if a problem occurred we sleep for a period using the SLEEP_COUNTER
+        if (SLEEP_COUNT > 0) {
+            SLEEP_COUNT --;
+            return;
+        }
+
         //take a note of the current time.
         //sudden changes in price can cause the bot to re-request the price data repeatedly
         // until the moving average is within 10% of the reported price.
@@ -164,13 +172,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //for speed we will use everything that's just been retrieved from every exchange
             // to give a fair spread and make the average more representative
             if (queueMA.size() < MOVING_AVERAGE_SIZE) {
-                //LOG.info("Collecting prices from exchanges to update the Moving Average");
-                for (Iterator<LastPrice> price = priceList.iterator(); price.hasNext();) {
-                    updateMovingAverageQueue(price.next().getPrice().getQuantity());
-                }
-                if (queueMA.size() < MOVING_AVERAGE_SIZE) {
-                    executeUpdatePrice(1);
-                }
+                initMA(priceList);
             }
 
         } else {
@@ -178,6 +180,16 @@ public class PriceMonitorTriggerTask extends TimerTask {
             LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
             sendErrorNotification();
             Global.exchange.getTrade().clearOrders(Global.options.getPair());
+        }
+    }
+
+    private void initMA(ArrayList<LastPrice> priceList) {
+        //LOG.info("Collecting prices from exchanges to update the Moving Average");
+        for (Iterator<LastPrice> price = priceList.iterator(); price.hasNext();) {
+            updateMovingAverageQueue(price.next().getPrice().getQuantity());
+        }
+        if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+            executeUpdatePrice(1);
         }
     }
 
@@ -275,13 +287,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    public void gracefulQuit(LastPrice lp) {
+    public void gracefulPause(LastPrice lp) {
         //This is called is an abnormal price is detected for one whole refresh period
         String logMessage;
         String notification;
         String subject;
         Color notificationColor;
-        boolean shutDown = false;
+        double sleepTime = 0;
 
         //we need to check the reason that the refresh took a whole period.
         //if it's because of a no connection issue, we need to wait to see if connection restarts
@@ -292,16 +304,20 @@ public class PriceMonitorTriggerTask extends TimerTask {
             notification = "";
             notificationColor = Color.YELLOW;
             subject = Global.exchange.getName() + " Bot is suffering a connection issue";
-        } else { //otherwise somthing bad has happened so we shutdown.
+        } else { //otherwise something bad has happened so we shutdown.
+            sleepTime = (Global.options.getSecondaryPegOptions().getRefreshTime() * 3);
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
-                    + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds.\nThe bot will notify and shutdown";
+                    + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds.\nThe bot will notify and restart in "
+                    + sleepTime + "seconds."
+                    ;
             notification = "A large price difference was detected at " + Global.exchange.getName()
                     + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
                     + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
-                    + ".\nAs a precautionary measure the walls have been removed and the bot shutdown until a manual check can take place";
-            notificationColor = Color.RED;
-            subject = Global.exchange.getName() + " Bot shutdown due to large price difference";
-            shutDown = true;
+                    + ".\nNuBot will remove the current orders and replace them in "
+                    + sleepTime + "seconds.";
+            notificationColor = Color.PURPLE;
+            subject = Global.exchange.getName() + " Moving Average issue. Bot will replace orders in "
+                    + sleepTime + "seconds.";
         }
         //we want to send Hip Chat and mail notifications,
         // cancel all orders to avoid arbitrage against the bot and
@@ -311,11 +327,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         HipChatNotifications.sendMessage(notification, notificationColor);
         LOG.severe("Sending Email");
         MailNotifications.send(Global.options.getMailRecipient(), subject, notification);
-        if (shutDown) {
+        if (sleepTime > 0) {
             LOG.severe("Cancelling Orders to avoid Arbitrage against the bot");
             Global.exchange.getTrade().clearOrders(Global.options.getPair());
-            LOG.severe("Shutting down");
-            System.exit(0);
+            //clear the moving average so the restart is fresh
+            queueMA.clear();
+            LOG.severe("Sleeping for " + sleepTime);
+            SLEEP_COUNT = 3;
         }
     }
 
@@ -344,7 +362,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         } else {
             //If we get here, we haven't had a price within % of the average for as long as a standard update period
             //the action is to send notifications, cancel all orders and turn off the bot
-            gracefulQuit(lp);
+            gracefulPause(lp);
             return;
         }
 
