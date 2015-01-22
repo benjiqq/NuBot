@@ -628,6 +628,9 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     private Trade parseTrade(JSONObject orderObject) {
+        //hotfix for Ben request
+        //FileSystem.writeToFile(orderObject.toJSONString(), "raw-trades.json", true);
+
         Trade trade = new Trade();
 
         /*
