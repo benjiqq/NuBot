@@ -357,12 +357,12 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
     }
 
     private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
