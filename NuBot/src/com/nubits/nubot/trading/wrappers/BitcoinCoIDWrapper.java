@@ -49,6 +49,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     private final String API_TRADE = "trade";
     private final String API_OPEN_ORDERS = "openOrders";
     private final String API_CANCEL_ORDER = "cancelOrder";
+    private final String API_TRADE_HISTORY = "tradeHistory";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -292,6 +293,8 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         //Todo - does the text of the amount depend on which currency was traded?
         Amount amount = new Amount(Double.parseDouble(in.get("order_idr").toString()), Global.options.getPair().getOrderCurrency());
         out.setAmount(amount);
+        out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_idr").toString()));
+
         return out;
     }
 
@@ -362,14 +365,86 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         return null;
     }
 
+    private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_TRADE_HISTORY;
+        boolean isGet = false;
+        HashMap<String, String > query_args = new HashMap<>();
+        ArrayList<Trade> tradeList = new ArrayList<>();
+
+        query_args.put("pair", pair.toString("_"));
+        if (startTime > 0) {
+            query_args.put("since", Objects.toString(startTime));
+        }
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject data = (JSONObject) httpAnswerJson.get("return");
+            JSONArray trades = (JSONArray) data.get("trades");
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                JSONObject thisTrade = trade.next();
+                tradeList.add(parseTrade(thisTrade, pair));
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+
+
+        return apiResponse;
+    }
+
+    private Trade parseTrade(JSONObject in, CurrencyPair pair) {
+        Trade out = new Trade();
+
+        out.setId(in.get("trade_id").toString());
+        out.setType(in.get("type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
+        Date tradeDate = new Date(Long.parseLong(in.get("trade_time").toString()));
+        out.setDate(tradeDate);
+        out.setExchangeName(Global.exchange.getName());
+        Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
+        out.setFee(fee);
+        Amount amount = new Amount(Double.parseDouble(in.get(pair.getOrderCurrency().getCode().toLowerCase()).toString()), pair.getOrderCurrency());
+        out.setAmount(amount);
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        out.setPair(pair);
+
+        return out;
+    }
+
     @Override
     public ApiResponse isOrderActive(String id) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        Order order = (Order) getOrderDetail(id).getResponseObject();
+        if (order.isCompleted()) {
+            apiResponse.setResponseObject(true);
+        } else {
+            apiResponse.setResponseObject(false);
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setResponseObject(true);
+        ApiResponse getOrders = getActiveOrders();
+
+        if (getOrders.isPositive()) {
+            ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
+                if (!(boolean) cancelOrder(order.next().getId(), pair).getResponseObject()) {
+                    apiResponse.setResponseObject(false);
+                }
+            }
+        } else {
+            apiResponse = getOrders;
+        }
+
+        return apiResponse;
     }
 
     @Override
