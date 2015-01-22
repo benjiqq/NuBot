@@ -31,13 +31,14 @@ import java.util.logging.Logger;
 public class StrategySecondaryPegTask extends TimerTask {
 
     private static final Logger LOG = Logger.getLogger(StrategySecondaryPegTask.class.getName());
-    private SecondaryPegStrategyUtils strategyUtils = new SecondaryPegStrategyUtils(this);
+    private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOK;
     private boolean needWallShift;
     private double sellPricePEG;
     private double buyPricePEG;
+    private boolean shiftingWalls = false;
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
     private SubmitLiquidityinfoTask sendLiquidityTask;
@@ -47,55 +48,35 @@ public class StrategySecondaryPegTask extends TimerTask {
     @Override
     public void run() {
         LOG.fine("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
-
         if (!isFirstTime) {
-
-            strategyUtils.recount(); //Count number of active sells and buys
-            boolean shiftSuccess = false;
-            if (needWallShift) {
-                String message = "Shift needed on " + Global.exchange.getName() + ": " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
-                        + "price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
-                HipChatNotifications.sendMessage(message, Color.PURPLE);
-                LOG.warning(message);
-
-                shiftSuccess = strategyUtils.shiftWalls();
-                if (shiftSuccess) {
-                    mightNeedInit = false;
-                    needWallShift = false;
-                    LOG.info("Wall shift successful");
-
-
-                } else {
-                    LOG.severe("Wall shift failed");
-                }
-                strategyUtils.recount();
-            }
-
-            if (mightNeedInit) {
-                boolean reset = mightNeedInit && !(ordersAndBalancesOK);
-                if (reset) {
-                    String message = "Order reset needed on " + Global.exchange.getName();
-                    HipChatNotifications.sendMessage(message, Color.PURPLE);
-                    LOG.warning(message);
-                    boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
-                    if (reinitiateSuccess) {
-                        mightNeedInit = false;
+            if (!shiftingWalls) {
+                strategyUtils.recount(); //Count number of active sells and buys
+                if (mightNeedInit) {
+                    boolean reset = mightNeedInit && !(ordersAndBalancesOK);
+                    if (reset) {
+                        String message = "Order reset needed on " + Global.exchange.getName();
+                        HipChatNotifications.sendMessage(message, Color.PURPLE);
+                        LOG.warning(message);
+                        boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
+                        if (reinitiateSuccess) {
+                            mightNeedInit = false;
+                        }
+                    } else {
+                        LOG.fine("No need to init new orders since current orders seems correct");
                     }
-                } else {
-                    LOG.fine("No need to init new orders since current orders seems correct");
+                    strategyUtils.recount();
                 }
-                strategyUtils.recount();
-            }
 
-            //Make sure the orders and balances are ok or try to aggregate
-            if (!ordersAndBalancesOK) {
-                LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-                mightNeedInit = true;
-            } else {
-                if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
-                    //Execute buy Side strategy
-                    if (Global.isDualSide && proceedsInBalance && !needWallShift) {
-                        strategyUtils.aggregateAndKeepProceeds();
+                //Make sure the orders and balances are ok or try to aggregate
+                if (!ordersAndBalancesOK) {
+                    LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+                    mightNeedInit = true;
+                } else {
+                    if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
+                        //Execute buy Side strategy
+                        if (Global.isDualSide && proceedsInBalance && !needWallShift) {
+                            strategyUtils.aggregateAndKeepProceeds();
+                        }
                     }
                 }
             }
@@ -113,17 +94,41 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
-        LOG.warning("Strategy received a price change notification.");
-        needWallShift = true;
-        Global.conversion = conversion;
-        if (!Global.swappedPair) {
-            sellPricePEG = new_sellPricePEG;
-            buyPricePEG = new_buyPricePEG;
+        if (!shiftingWalls) {
+            shiftingWalls = true;
+
+            LOG.warning("Strategy received a price change notification.");
+            needWallShift = true;
+
+            if (!Global.swappedPair) {
+                sellPricePEG = new_sellPricePEG;
+                buyPricePEG = new_buyPricePEG;
+            } else {
+                sellPricePEG = new_buyPricePEG;
+                buyPricePEG = new_sellPricePEG;
+            }
+            this.priceDirection = direction;
+
+            //execute immediately
+            boolean shiftSuccess = false;
+
+            String message = "Shift needed on " + Global.exchange.getName() + ": " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+                    + "price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
+            HipChatNotifications.sendMessage(message, Color.PURPLE);
+            LOG.warning(message);
+
+            shiftSuccess = strategyUtils.shiftWalls();
+            if (shiftSuccess) {
+                mightNeedInit = false;
+                needWallShift = false;
+                LOG.info("Wall shift successful");
+            } else {
+                LOG.severe("Wall shift failed");
+            }
+            shiftingWalls = false;
         } else {
-            sellPricePEG = new_buyPricePEG;
-            buyPricePEG = new_sellPricePEG;
+            LOG.warning("Shift request failed, shift in progress.");
         }
-        this.priceDirection = direction;
     }
 
     //Getters and setters ----------------------------------------

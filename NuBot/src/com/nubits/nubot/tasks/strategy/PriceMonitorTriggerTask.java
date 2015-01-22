@@ -25,7 +25,6 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.io.File;
@@ -72,7 +71,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     public void run() {
         //if a problem occurred we sleep for a period using the SLEEP_COUNTER
         if (SLEEP_COUNT > 0) {
-            SLEEP_COUNT --;
+            SLEEP_COUNT--;
             return;
         }
 
@@ -308,8 +307,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             sleepTime = (Global.options.getSecondaryPegOptions().getRefreshTime() * 3);
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
                     + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds.\nThe bot will notify and restart in "
-                    + sleepTime + "seconds."
-                    ;
+                    + sleepTime + "seconds.";
             notification = "A large price difference was detected at " + Global.exchange.getName()
                     + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
                     + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
@@ -458,7 +456,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Call
 
         strategy.notifyPriceChanged(sellPricePEG_new, buyPricePEG_new, price, pegPriceDirection);
-
+        Global.conversion = price;
         //Store values in class variable
         sellPricePEG_old = sellPricePEG_new;
 
