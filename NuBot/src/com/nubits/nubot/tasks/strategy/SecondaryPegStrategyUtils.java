@@ -597,6 +597,9 @@ public class SecondaryPegStrategyUtils {
                 }
             } else {
                 success = false;
+                //Communicate to the priceMonitorTask that the wall shift is over
+                strategy.getPriceMonitorTask().setWallsBeingShifted(false);
+                strategy.getSendLiquidityTask().setWallsBeingShifted(false);
                 LOG.severe(deleteOrdersResponse.getError().toString());
             }
         }
