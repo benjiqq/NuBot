@@ -740,7 +740,6 @@ public class ExcoinWrapper implements TradeInterface {
                 return answer;
             }
 
-
             BufferedReader br = null;
             try {
                 if (connection.getResponseCode() >= 400) {

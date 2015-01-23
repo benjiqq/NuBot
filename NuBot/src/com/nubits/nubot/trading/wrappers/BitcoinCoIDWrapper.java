@@ -11,15 +11,6 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
-import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -29,6 +20,14 @@ import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
+import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Created by sammoth on 19/01/15.
@@ -282,10 +281,9 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         return apiResponse;
     }
 
-
     private Order parseOrder(JSONObject in) {
         Order out = new Order();
-        LOG.severe(in.toJSONString());
+
         out.setId(in.get("order_id").toString());
         Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()) * 1000L);
         out.setInsertedDate(insertedDate);
@@ -299,8 +297,6 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         return out;
     }
-
-
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
@@ -372,7 +368,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         String url = API_BASE_URL;
         String method = API_TRADE_HISTORY;
         boolean isGet = false;
-        HashMap<String, String > query_args = new HashMap<>();
+        HashMap<String, String> query_args = new HashMap<>();
         ArrayList<Trade> tradeList = new ArrayList<>();
 
         query_args.put("pair", pair.toString("_"));
@@ -437,7 +433,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         if (getOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
-            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
                 if (!(boolean) cancelOrder(order.next().getId(), pair).getResponseObject()) {
                     apiResponse.setResponseObject(false);
                 }
@@ -497,17 +493,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public void setKeys(ApiKeys keys) {
-
     }
 
     @Override
     public void setExchange(Exchange exchange) {
-
     }
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-
     }
 
     private class BitcoinCoIdService implements ServiceInterface {
