@@ -144,9 +144,19 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 Amount PEGAvail = new Amount(pegAvail, pair.getPaymentCurrency());
                 double nbtAvail = Double.parseDouble(balances.get(pair.getOrderCurrency().getCode().toLowerCase()).toString());
                 Amount NBTAvail = new Amount(nbtAvail, pair.getOrderCurrency());
-                //TODO - getinfo only returns the available balance
-                Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+                double pegOnOrder = 0;
+                double nbtOnOrder = 0;
+                ArrayList<Order> orders = (ArrayList) getActiveOrders(pair).getResponseObject();
+                for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                    Order thisOrder = order.next();
+                    if (thisOrder.getType().equals(Constant.SELL)) {
+                        nbtOnOrder += thisOrder.getAmount().getQuantity();
+                    } else {
+                        pegOnOrder += thisOrder.getAmount().getQuantity();
+                    }
+                }
+                Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());
+                Amount NBTonOrder = new Amount(nbtOnOrder, pair.getOrderCurrency());
                 Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
             } else {
@@ -283,16 +293,23 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     private Order parseOrder(JSONObject in) {
         Order out = new Order();
-
+;
         out.setId(in.get("order_id").toString());
         Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()) * 1000L);
         out.setInsertedDate(insertedDate);
+        out.setType(in.get("type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
+        String cur;
+        Amount amount;
         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), Global.options.getPair().getPaymentCurrency());
-        out.setPrice(price);
-        out.setType(in.get("type") == "buy" ? Constant.BUY : Constant.SELL);
-        String cur = Global.options.getPair().getOrderCurrency().getCode().toLowerCase();
-        Amount amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getOrderCurrency());
+        if (out.getType().equals(Constant.BUY)) {
+            cur = Global.options.getPair().getPaymentCurrency().getCode().toLowerCase();
+            amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()) / price.getQuantity(), Global.options.getPair().getOrderCurrency());
+        } else {
+            cur = Global.options.getPair().getOrderCurrency().getCode().toLowerCase();
+            amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getOrderCurrency());
+        }
         out.setAmount(amount);
+        out.setPrice(price);
         out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_" + cur).toString()));
 
         return out;

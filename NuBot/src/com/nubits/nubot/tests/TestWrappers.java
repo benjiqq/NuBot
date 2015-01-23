@@ -51,8 +51,8 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
-    //private static final String TEST_OPTIONS_PATH = "options.json";
+    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = Constant.BITCOINCOID;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
@@ -74,25 +74,22 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
-        //testGetAvailableBalance(testCurrency);
-        //testGetAvailableBalances(testPair);
+        testGetAvailableBalance(testCurrency);
+        testGetAvailableBalances(testPair);
         //testGetActiveOrders(testPair);
-        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-<<<<<<< HEAD
+        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
         //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(0.3, 0.0000120, Constant.NBT_BTC);  //ok
-        testGetActiveOrders();
+        //testBuy(0.003, 0.0000120, Constant.NBT_BTC);  //ok
+        //testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
-=======
         //testSell(1, 0.1830509, testPair);  //ok
-        testBuy(0.0000120, 0.0000120, testPair);  //ok
+        //testBuy(0.0000120, 0.0000120, testPair);  //ok
         //testClearAllOrders(testPair);
         //testGetActiveOrders();
         //testCancelOrder("2063803", testPair);
         //testClearAllOrders(testPair);
->>>>>>> f08c0167d38cc9e224c16aa16a995d1c39278219
         //testIsOrderActive("2064456");
         //testGetTxFee();
         //testGetTxFeeWithArgs(testPair);
