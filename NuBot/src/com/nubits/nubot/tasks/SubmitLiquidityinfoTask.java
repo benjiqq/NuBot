@@ -172,9 +172,13 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                     LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
                     LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
                 }
+
+
                 if (Global.options.isSendRPC()) {
                     //Call RPC
                     sendLiquidityInfo(Global.exchange);
+                } else {
+                    //LOG.fine("\n\n\n buy : " + Global.exchange.getLiveData().getNBTonbuy() + "\n\n\n");
                 }
 
             } else {
@@ -253,7 +257,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 && !Global.options.getExchangeName().equals(Constant.CCEDK)
                 && !Global.options.getExchangeName().equals(Constant.POLONIEX)
                 && !Global.options.getExchangeName().equals(Constant.CCEX)
-                && !Global.options.getExchangeName().equals(Constant.ALLCOIN)) {
+                && !Global.options.getExchangeName().equals(Constant.ALLCOIN)
+                && !Global.options.getExchangeName().equals(Constant.BITSPARK_PEATIO)
+                && !Global.options.getExchangeName().equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             //if the bot is running on Strategy Secondary Peg, we need to convert this value
             return nbt_onbuy * Global.conversion;
         } else {
