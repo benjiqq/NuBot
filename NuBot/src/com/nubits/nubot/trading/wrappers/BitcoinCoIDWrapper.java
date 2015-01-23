@@ -269,9 +269,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
             JSONArray orders = (JSONArray) data.get("orders");
-            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
-                JSONObject thisOrder = order.next();
-                orderList.add(parseOrder(thisOrder));
+            if (orders != null) {
+                for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
+                    JSONObject thisOrder = order.next();
+                    orderList.add(parseOrder(thisOrder));
+                }
             }
             apiResponse.setResponseObject(orderList);
         } else {
@@ -283,17 +285,17 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     private Order parseOrder(JSONObject in) {
         Order out = new Order();
-
+        LOG.severe(in.toJSONString());
         out.setId(in.get("order_id").toString());
-        Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()));
+        Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()) * 1000L);
         out.setInsertedDate(insertedDate);
         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), Global.options.getPair().getPaymentCurrency());
         out.setPrice(price);
         out.setType(in.get("type") == "buy" ? Constant.BUY : Constant.SELL);
-        //Todo - does the text of the amount depend on which currency was traded?
-        Amount amount = new Amount(Double.parseDouble(in.get("order_idr").toString()), Global.options.getPair().getOrderCurrency());
+        String cur = Global.options.getPair().getOrderCurrency().getCode().toLowerCase();
+        Amount amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getOrderCurrency());
         out.setAmount(amount);
-        out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_idr").toString()));
+        out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_" + cur).toString()));
 
         return out;
     }
@@ -401,7 +403,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         out.setId(in.get("trade_id").toString());
         out.setType(in.get("type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
-        Date tradeDate = new Date(Long.parseLong(in.get("trade_time").toString()));
+        Date tradeDate = new Date(Long.parseLong(in.get("trade_time").toString()) * 1000L);
         out.setDate(tradeDate);
         out.setExchangeName(Global.exchange.getName());
         Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
@@ -464,7 +466,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
+            LOG.severe("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -477,7 +479,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
+            LOG.severe("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;

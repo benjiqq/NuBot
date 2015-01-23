@@ -76,9 +76,9 @@ public class TestWrappers {
         //testGetActiveOrders(Constant.NBT_BTC);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
-        testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        testBuy(0.0000120, 0.0000120, Constant.NBT_BTC);  //ok
-        //testGetActiveOrders();
+        //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
+        //testBuy(0.3, 0.0000120, Constant.NBT_BTC);  //ok
+        testGetActiveOrders();
         //testCancelOrder("2063803", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testIsOrderActive("2064456");
@@ -275,13 +275,13 @@ public class TestWrappers {
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
-            //LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
+            LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            //LOG.info("Active orders : " + orderList.size());
+            LOG.info("Active orders : " + orderList.size());
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                //LOG.info(tempOrder.toString());
+                LOG.info(tempOrder.toString());
             }
 
         } else {
