@@ -99,23 +99,13 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 //Update the order
                 Global.exchange.getLiveData().setOrdersList(orderList);
 
-
                 if (Global.conversion != 1
                         && Global.swappedPair) {  //For swapped pair, need to convert the amounts to NBT
                     nbt_onbuy = nbt_onbuy * Global.conversion;
                     nbt_onsell = nbt_onsell * Global.conversion;
                 }
 
-                //Some exchanges return the buy orders amount expressed in payment currency, need conversion
-                if (Global.conversion != 1
-                        && !Global.swappedPair //for swapped pair already converted above
-                        && !Global.options.getExchangeName().equals(Constant.CCEDK)
-                        && !Global.options.getExchangeName().equals(Constant.POLONIEX)
-                        && !Global.options.getExchangeName().equals(Constant.CCEX)
-                        && !Global.options.getExchangeName().equals(Constant.ALLCOIN)) {
-                    //if the bot is running on Strategy Secondary Peg, we need to convert this value
-                    nbt_onbuy = nbt_onbuy * Global.conversion;
-                }
+                nbt_onbuy = convertIfNecessary(nbt_onbuy);
 
                 Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
                 Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
@@ -134,13 +124,30 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 latestOrders.put("active_orders", orderList.size());
                 JSONArray jsonDigest = new JSONArray();
                 for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+
                     JSONObject thisOrder = new JSONObject();
                     Order _order = order.next();
+
+                    //issue 160 - convert all amounts in NBT
+
+                    double amount = _order.getAmount().getQuantity();
+                    //special case: swapped pair
+                    if (Global.conversion != 1) {
+                        if (Global.swappedPair)//For swapped pair, need to convert the amounts to NBT
+                        {
+                            amount = _order.getAmount().getQuantity() * Global.conversion;
+                        } else { //For non swapped pair it, try only with buy orders
+                            if (_order.getType().equalsIgnoreCase(Constant.BUY)) {
+                                amount = convertIfNecessary(_order.getAmount().getQuantity());
+                            }
+                        }
+                    }
+
                     thisOrder.put("order_id", _order.getId());
                     thisOrder.put("time", _order.getInsertedDate().getTime());
                     thisOrder.put("order_type", _order.getType());
                     thisOrder.put("order_currency", _order.getPair().getOrderCurrency().getCode());
-                    thisOrder.put("amount", _order.getAmount().getQuantity());
+                    thisOrder.put("amount", amount);
                     thisOrder.put("payment_currency", _order.getPair().getPaymentCurrency().getCode());
                     thisOrder.put("price", _order.getPrice().getQuantity());
                     jsonDigest.add(thisOrder);
@@ -165,18 +172,20 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                     LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
                     LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
                 }
+
+
                 if (Global.options.isSendRPC()) {
                     //Call RPC
                     sendLiquidityInfo(Global.exchange);
+                } else {
+                    //LOG.fine("\n\n\n buy : " + Global.exchange.getLiveData().getNBTonbuy() + "\n\n\n");
                 }
 
             } else {
                 LOG.severe(activeOrdersResponse.getError().toString());
             }
         } else {
-            if (isWallsBeingShifted()) {
-                LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
-            }
+            LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
         }
     }
 
@@ -239,5 +248,22 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     public void setWallsBeingShifted(boolean wallsBeingShifted) {
         this.wallsBeingShifted = wallsBeingShifted;
+    }
+
+    private double convertIfNecessary(double nbt_onbuy) {
+        //Some exchanges return the buy orders amount expressed in payment currency, need conversion
+        if (Global.conversion != 1
+                && !Global.swappedPair //for swapped pair already converted above
+                && !Global.options.getExchangeName().equals(Constant.CCEDK)
+                && !Global.options.getExchangeName().equals(Constant.POLONIEX)
+                && !Global.options.getExchangeName().equals(Constant.CCEX)
+                && !Global.options.getExchangeName().equals(Constant.ALLCOIN)
+                && !Global.options.getExchangeName().equals(Constant.BITSPARK_PEATIO)
+                && !Global.options.getExchangeName().equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            //if the bot is running on Strategy Secondary Peg, we need to convert this value
+            return nbt_onbuy * Global.conversion;
+        } else {
+            return nbt_onbuy;
+        }
     }
 }

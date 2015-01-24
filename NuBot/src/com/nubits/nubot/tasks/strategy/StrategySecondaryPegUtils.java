@@ -36,14 +36,14 @@ import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
-public class SecondaryPegStrategyUtils {
+public class StrategySecondaryPegUtils {
 
-    private static final Logger LOG = Logger.getLogger(SecondaryPegStrategyUtils.class.getName());
+    private static final Logger LOG = Logger.getLogger(StrategySecondaryPegUtils.class.getName());
     private StrategySecondaryPegTask strategy;
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
     private final int SHORT_WAIT_SECONDS = 6;
 
-    public SecondaryPegStrategyUtils(StrategySecondaryPegTask strategy) {
+    public StrategySecondaryPegUtils(StrategySecondaryPegTask strategy) {
         this.strategy = strategy;
     }
 
@@ -597,6 +597,9 @@ public class SecondaryPegStrategyUtils {
                 }
             } else {
                 success = false;
+                //Communicate to the priceMonitorTask that the wall shift is over
+                strategy.getPriceMonitorTask().setWallsBeingShifted(false);
+                strategy.getSendLiquidityTask().setWallsBeingShifted(false);
                 LOG.severe(deleteOrdersResponse.getError().toString());
             }
         }
