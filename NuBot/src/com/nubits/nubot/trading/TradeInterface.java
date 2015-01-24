@@ -78,7 +78,7 @@ public interface TradeInterface {
      *
      * @param pair pair.orderCurrency is the currency to order and
      * pair.paymentCurrency is unit for its redeem
-     * @param amount the amount to sell
+     * @param amount the amount of pair.OrderCurrency to sell
      * @param rate the price rate for the order expressed in
      * pair.paymentCurrency
      * @return the String message of the response, containing the order id . an
@@ -91,7 +91,7 @@ public interface TradeInterface {
      *
      * @param pair pair.orderCurrency is the currency to order and
      * pair.paymentCurrency is unit for its payment
-     * @param amount the amount to buy
+     * @param amount the amount of pair.OrderCurrency to buy
      * @param rate the price rate for the order pair.paymentCurrency
      * @return the String message of the response, containing the order id an
      * ApiError in case of error.
