@@ -380,27 +380,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     public Order parseOrder(JSONObject data) {
         Order order = new Order();
-        /*
-         {
-         "code": 1,
-         "data": [
-         {
-         "order_id": "1410027",
-         "user_id": "100000",
-         "type": "DOGE",
-         "exchange": "BTC",
-         "ctime": "2014-06-15 14:42:36",
-         "price": "0.00000060",
-         "num": "1000.00000000",
-         "total": "0.00060000",
-         "rest_num": "1000.00000000", // the remaining DOGE of the order
-         "rest_total": "0.00060000", //the remaining BTC of the order
-         "fee": "0.00000090", // about fees, please visit here https://www.allcoin.com/pub/fee
-         "order_type": "sell"
-         },
-         ...
-         }
-         */
+
         //set the order id
         // A String containing a unique identifier for this order
         order.setId(data.get(TOKEN_ORDER_ID).toString());
