@@ -430,7 +430,21 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+
+        ApiResponse activeOrders = getActiveOrders();
+        if (activeOrders.isPositive()) {
+            ArrayList<Order> orders = (ArrayList) activeOrders.getResponseObject();
+            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(orderID)) {
+                    apiResponse.setResponseObject(thisOrder);
+                }
+            }
+        } else {
+            apiResponse = activeOrders;
+        }
+        return apiResponse;
     }
 
     @Override
