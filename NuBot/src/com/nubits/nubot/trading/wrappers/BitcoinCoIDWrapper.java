@@ -319,12 +319,20 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
+        boolean found = false;
         for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
             Order thisOrder = order.next();
             if (thisOrder.getId().equals(orderID)) {
+                found = true;
                 apiResponse.setResponseObject(thisOrder);
                 break;
             }
+        }
+
+        if (!found) {
+            ApiError err = errors.apiReturnError;
+            err.setDescription("Order " + orderID + " does not exists");
+            apiResponse.setError(err);
         }
         return apiResponse;
     }
@@ -433,11 +441,18 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     @Override
     public ApiResponse isOrderActive(String id) {
         ApiResponse apiResponse = new ApiResponse();
-        Order order = (Order) getOrderDetail(id).getResponseObject();
-        if (order.isCompleted()) {
-            apiResponse.setResponseObject(true);
+        apiResponse = getOrderDetail(id);
+        if (apiResponse.isPositive()) {
+            Order order = (Order) apiResponse.getResponseObject();
+            if (order.isCompleted()) {
+                apiResponse.setResponseObject(true);
+            } else {
+                apiResponse.setResponseObject(false);
+            }
         } else {
-            apiResponse.setResponseObject(false);
+            ApiError err = errors.apiReturnError;
+            err.setDescription("Order " + id + " does not exists");
+            apiResponse.setError(err);
         }
         return apiResponse;
     }
