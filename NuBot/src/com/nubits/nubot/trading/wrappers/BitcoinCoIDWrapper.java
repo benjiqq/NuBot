@@ -450,9 +450,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 apiResponse.setResponseObject(false);
             }
         } else {
-            ApiError err = errors.apiReturnError;
-            err.setDescription("Order " + id + " does not exists");
-            apiResponse.setError(err);
+            apiResponse.setResponseObject(false);
         }
         return apiResponse;
     }
