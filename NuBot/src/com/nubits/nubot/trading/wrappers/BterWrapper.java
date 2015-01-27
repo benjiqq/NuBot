@@ -698,7 +698,12 @@ public class BterWrapper implements TradeInterface {
         order.setPair(cp);
 
         order.setType(((String) orderObject.get("type")).toUpperCase());
-        order.setAmount(new Amount(Utils.getDouble(orderObject.get("amount")), cp.getOrderCurrency()));
+
+        String amountString = "amount";
+        if (order.getType().equals(Constant.BUY)) {
+            amountString = "buy_amount";
+        }
+        order.setAmount(new Amount(Utils.getDouble(orderObject.get(amountString)), cp.getOrderCurrency()));
         order.setPrice(new Amount(Utils.getDouble(orderObject.get("rate")), cp.getPaymentCurrency()));
 
         String status = (String) orderObject.get("status");
