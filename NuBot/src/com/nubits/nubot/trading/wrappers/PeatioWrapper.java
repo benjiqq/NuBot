@@ -121,6 +121,8 @@ public class PeatioWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
 
+        //LOG.warning("\nurl: " + url + "\nmethod: " + method + "\nquery_args: " + query_args.toString() + "\nisGet: " + isGet);
+
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
         if (queryResult == null) {

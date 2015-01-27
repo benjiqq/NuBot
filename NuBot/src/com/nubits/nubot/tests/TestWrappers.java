@@ -48,9 +48,14 @@ import java.util.logging.Logger;
 public class TestWrappers {
 
     private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
-    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
-    private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final CurrencyPair NSR_BTC = new CurrencyPair(Constant.NSR, Constant.BTC);
+    /**
+     * Configure tests
+     */
+    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    //private static final String TEST_OPTIONS_PATH = "options.json";
+    public static final String testExchange = Constant.BITCOINCOID;
+    public static final CurrencyPair testPair = Constant.NBT_BTC;
+    public static final Currency testCurrency = Constant.NBT;
 
     public static void main(String[] args) {
         //Load settings
@@ -60,36 +65,40 @@ public class TestWrappers {
         inputs[0] = TEST_OPTIONS_PATH;
         Global.options = OptionsJSON.parseOptions(inputs);
 
-        configExchange(Constant.BITSPARK_PEATIO); //Replace to test a different API implementation
+        configExchange(testExchange); //Replace to test a different API implementation
 
         runTests();
         System.exit(0);
     }
 
     public static void runTests() {
-
         //Methods strictly necessary for NuBot to run-------------
         //-------------
-        //testGetAvailableBalance(Constant.BTC);
-        //testGetAvailableBalance(Constant.NBT);
-        //testGetAvailableBalances(Constant.NBT_BTC);
-        //testGetActiveOrders(Constant.NBT_BTC);
+        //testGetAvailableBalance(testCurrency);
+        //testGetAvailableBalances(testPair);
+        //testGetActiveOrders(testPair);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
+        //testGetAvailableBalances(testPair);
         //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //testBuy(0.0000120, 0.0000120, Constant.NBT_BTC);  //ok
+        //testBuy(0.003, 0.0000120, Constant.NBT_BTC);  //ok
         //testGetActiveOrders();
-        //testCancelOrder("2063803", Constant.NBT_BTC);
+        //testCancelOrder("1139", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
-        //testIsOrderActive("2064456");
+        //testSell(1, 0.1830509, testPair);  //ok
+        //testBuy(0.0000120, 0.0000120, testPair);  //ok
+        //testGetActiveOrders();
+        //testCancelOrder("2063803", testPair);
+        //testClearAllOrders(testPair);
+        //testGetOrderDetail("1139");
+        testIsOrderActive("1139");
         //testGetTxFee();
-        //testGetTxFeeWithArgs(Constant.BTC_USD);
+        //testGetTxFeeWithArgs(testPair);
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
-        //testGetLastPrice(Constant.NBT_BTC);
-        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
-        testGetLastTrades(Constant.NBT_BTC, (System.currentTimeMillis() / 1000L));
-        //testGetLastTrades(Constant.NBT_BTC);
+        //testGetLastPrice(testPair);
+        //testGetLastTrades(testPair, 1388534400);
+        //testGetLastTrades(testPair);
         //for (int i = 0; i < 5000; i++) {
         //   ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         //    if (activeOrdersResponse.isPositive()) {
@@ -99,58 +108,52 @@ public class TestWrappers {
         //    }
         //}
         //stimulating ccedk wrong nonce
-
-
         /* test clear all orders
          *
          * [start]
          *
          */
+        /*
+         //clear old orders if any
+         testClearAllOrders(Constant.NBT_BTC);
 
 
-/*
-        //clear old orders if any
-        testClearAllOrders(Constant.NBT_BTC);
+         // place a few orders
+         for (int i = 0; i <= 5; i++) {
+         testSell(0.1, 0.004, Constant.NBT_BTC);
+         try {
+         Thread.sleep(400);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
+         }
+         }
+
+         for (int i = 0; i <= 5; i++) {
+         testBuy(0.1, 0.001, Constant.NBT_BTC);
+         try {
+         Thread.sleep(400);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
+         }
+         }
 
 
-        // place a few orders
-        for (int i = 0; i <= 5; i++) {
-            testSell(0.1, 0.004, Constant.NBT_BTC);
-            try {
-                Thread.sleep(400);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-            }
-        }
+         //Wait 4 secs
+         try {
+         Thread.sleep(4000);
+         } catch (InterruptedException ex) {
+         LOG.severe(ex.toString());
+         }
 
-        for (int i = 0; i <= 5; i++) {
-            testBuy(0.1, 0.001, Constant.NBT_BTC);
-            try {
-                Thread.sleep(400);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-            }
-        }
+         //try to clear orders
+         testClearAllOrders(Constant.NBT_BTC);
 
 
-        //Wait 4 secs
-        try {
-            Thread.sleep(4000);
-        } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
-        }
-
-        //try to clear orders
-        testClearAllOrders(Constant.NBT_BTC);
-
-
-        /* test clear all orders
+         /* test clear all orders
          *
          * [stop]
          *
          */
-
-
         /*
          for (int i = 0; i < 60; i++) {
          try {
@@ -222,12 +225,12 @@ public class TestWrappers {
         if (lastPriceResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
-            LOG.info("Last price : 1 " + NSR_BTC.getOrderCurrency().getCode() + " = "
-                    + ticker.getLast() + " " + NSR_BTC.getPaymentCurrency().getCode());
-            LOG.info("ask  : 1 " + NSR_BTC.getOrderCurrency().getCode() + " = "
-                    + ticker.getAsk() + " " + NSR_BTC.getPaymentCurrency().getCode());
-            LOG.info("bid  : 1 " + NSR_BTC.getOrderCurrency().getCode() + " = "
-                    + ticker.getBid() + " " + NSR_BTC.getPaymentCurrency().getCode());
+            LOG.info("Last price : 1 " + testPair.getOrderCurrency().getCode() + " = "
+                    + ticker.getLast() + " " + testPair.getPaymentCurrency().getCode());
+            LOG.info("ask  : 1 " + testPair.getOrderCurrency().getCode() + " = "
+                    + ticker.getAsk() + " " + testPair.getPaymentCurrency().getCode());
+            LOG.info("bid  : 1 " + testPair.getOrderCurrency().getCode() + " = "
+                    + ticker.getBid() + " " + testPair.getPaymentCurrency().getCode());
 
         } else {
             LOG.severe(lastPriceResponse.getError().toString());
@@ -275,13 +278,13 @@ public class TestWrappers {
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
-            //LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
+            LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            //LOG.info("Active orders : " + orderList.size());
+            LOG.info("Active orders : " + orderList.size());
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                //LOG.info(tempOrder.toString());
+                LOG.info(tempOrder.toString());
             }
 
         } else {

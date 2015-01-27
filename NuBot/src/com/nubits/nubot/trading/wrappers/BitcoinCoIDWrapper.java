@@ -11,15 +11,6 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
-import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -29,6 +20,14 @@ import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.*;
 import java.util.logging.Logger;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
+import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Created by sammoth on 19/01/15.
@@ -145,9 +144,19 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 Amount PEGAvail = new Amount(pegAvail, pair.getPaymentCurrency());
                 double nbtAvail = Double.parseDouble(balances.get(pair.getOrderCurrency().getCode().toLowerCase()).toString());
                 Amount NBTAvail = new Amount(nbtAvail, pair.getOrderCurrency());
-                //TODO - getinfo only returns the available balance
-                Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+                double pegOnOrder = 0;
+                double nbtOnOrder = 0;
+                ArrayList<Order> orders = (ArrayList) getActiveOrders(pair).getResponseObject();
+                for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                    Order thisOrder = order.next();
+                    if (thisOrder.getType().equals(Constant.SELL)) {
+                        nbtOnOrder += thisOrder.getAmount().getQuantity();
+                    } else {
+                        pegOnOrder += thisOrder.getAmount().getQuantity();
+                    }
+                }
+                Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());
+                Amount NBTonOrder = new Amount(nbtOnOrder, pair.getOrderCurrency());
                 Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
             } else {
@@ -269,9 +278,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
             JSONArray orders = (JSONArray) data.get("orders");
-            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
-                JSONObject thisOrder = order.next();
-                orderList.add(parseOrder(thisOrder));
+            if (orders != null) {
+                for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+                    JSONObject thisOrder = order.next();
+                    orderList.add(parseOrder(thisOrder));
+                }
             }
             apiResponse.setResponseObject(orderList);
         } else {
@@ -280,36 +291,48 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         return apiResponse;
     }
 
-
     private Order parseOrder(JSONObject in) {
         Order out = new Order();
-
+        ;
         out.setId(in.get("order_id").toString());
-        Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()));
+        Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()) * 1000L);
         out.setInsertedDate(insertedDate);
+        out.setType(in.get("type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
+        String cur;
+        Amount amount;
         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), Global.options.getPair().getPaymentCurrency());
-        out.setPrice(price);
-        out.setType(in.get("type") == "buy" ? Constant.BUY : Constant.SELL);
-        //Todo - does the text of the amount depend on which currency was traded?
-        Amount amount = new Amount(Double.parseDouble(in.get("order_idr").toString()), Global.options.getPair().getOrderCurrency());
+        if (out.getType().equals(Constant.BUY)) {
+            cur = Global.options.getPair().getPaymentCurrency().getCode().toLowerCase();
+            amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()) / price.getQuantity(), Global.options.getPair().getOrderCurrency());
+        } else {
+            cur = Global.options.getPair().getOrderCurrency().getCode().toLowerCase();
+            amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getOrderCurrency());
+        }
         out.setAmount(amount);
-        out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_idr").toString()));
+        out.setPrice(price);
+        out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_" + cur).toString()));
 
         return out;
     }
-
-
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
+        boolean found = false;
         for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
             Order thisOrder = order.next();
             if (thisOrder.getId().equals(orderID)) {
+                found = true;
                 apiResponse.setResponseObject(thisOrder);
                 break;
             }
+        }
+
+        if (!found) {
+            ApiError err = errors.apiReturnError;
+            err.setDescription("Order " + orderID + " does not exists");
+            apiResponse.setError(err);
         }
         return apiResponse;
     }
@@ -325,7 +348,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         query_args.put("pair", pair.toString("_"));
         query_args.put("order_id", orderID);
         Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
-        query_args.put("type", currentOrder.getType());
+        query_args.put("type", currentOrder.getType().toLowerCase());
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
@@ -370,7 +393,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         String url = API_BASE_URL;
         String method = API_TRADE_HISTORY;
         boolean isGet = false;
-        HashMap<String, String > query_args = new HashMap<>();
+        HashMap<String, String> query_args = new HashMap<>();
         ArrayList<Trade> tradeList = new ArrayList<>();
 
         query_args.put("pair", pair.toString("_"));
@@ -401,7 +424,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         out.setId(in.get("trade_id").toString());
         out.setType(in.get("type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
-        Date tradeDate = new Date(Long.parseLong(in.get("trade_time").toString()));
+        Date tradeDate = new Date(Long.parseLong(in.get("trade_time").toString()) * 1000L);
         out.setDate(tradeDate);
         out.setExchangeName(Global.exchange.getName());
         Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
@@ -418,9 +441,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     @Override
     public ApiResponse isOrderActive(String id) {
         ApiResponse apiResponse = new ApiResponse();
-        Order order = (Order) getOrderDetail(id).getResponseObject();
-        if (order.isCompleted()) {
-            apiResponse.setResponseObject(true);
+        apiResponse = getOrderDetail(id);
+        if (apiResponse.isPositive()) {
+            Order order = (Order) apiResponse.getResponseObject();
+            if (order.isCompleted()) {
+                apiResponse.setResponseObject(true);
+            } else {
+                apiResponse.setResponseObject(false);
+            }
         } else {
             apiResponse.setResponseObject(false);
         }
@@ -435,7 +463,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         if (getOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
-            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
                 if (!(boolean) cancelOrder(order.next().getId(), pair).getResponseObject()) {
                     apiResponse.setResponseObject(false);
                 }
@@ -464,7 +492,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
+            LOG.severe("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -477,7 +505,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
+            LOG.severe("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -495,17 +523,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public void setKeys(ApiKeys keys) {
-
     }
 
     @Override
     public void setExchange(Exchange exchange) {
-
     }
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-
     }
 
     private class BitcoinCoIdService implements ServiceInterface {
