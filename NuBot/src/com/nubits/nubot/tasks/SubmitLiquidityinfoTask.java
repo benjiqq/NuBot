@@ -105,7 +105,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                     nbt_onsell = nbt_onsell * Global.conversion;
                 }
 
-                nbt_onbuy = convertIfNecessary(nbt_onbuy);
 
                 Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
                 Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
@@ -136,10 +135,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                         if (Global.swappedPair)//For swapped pair, need to convert the amounts to NBT
                         {
                             amount = _order.getAmount().getQuantity() * Global.conversion;
-                        } else { //For non swapped pair it, try only with buy orders
-                            if (_order.getType().equalsIgnoreCase(Constant.BUY)) {
-                                amount = convertIfNecessary(_order.getAmount().getQuantity());
-                            }
                         }
                     }
 
@@ -248,22 +243,5 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     public void setWallsBeingShifted(boolean wallsBeingShifted) {
         this.wallsBeingShifted = wallsBeingShifted;
-    }
-
-    private double convertIfNecessary(double nbt_onbuy) {
-        //Some exchanges return the buy orders amount expressed in payment currency, need conversion
-        if (Global.conversion != 1
-                && !Global.swappedPair //for swapped pair already converted above
-                && !Global.options.getExchangeName().equals(Constant.CCEDK)
-                && !Global.options.getExchangeName().equals(Constant.POLONIEX)
-                && !Global.options.getExchangeName().equals(Constant.CCEX)
-                && !Global.options.getExchangeName().equals(Constant.ALLCOIN)
-                && !Global.options.getExchangeName().equals(Constant.BITSPARK_PEATIO)
-                && !Global.options.getExchangeName().equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
-            //if the bot is running on Strategy Secondary Peg, we need to convert this value
-            return nbt_onbuy * Global.conversion;
-        } else {
-            return nbt_onbuy;
-        }
     }
 }
