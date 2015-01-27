@@ -51,8 +51,8 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
-    private static final String TEST_OPTIONS_PATH = "options.json";
+    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = Constant.BITCOINCOID;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
@@ -74,29 +74,29 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
-        testGetAvailableBalance(testCurrency);
-        testGetAvailableBalances(testPair);
+        //testGetAvailableBalance(testCurrency);
+        //testGetAvailableBalances(testPair);
         //testGetActiveOrders(testPair);
-        testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
+        //testGetAvailableBalances(testPair);
         //testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
         //testBuy(0.003, 0.0000120, Constant.NBT_BTC);  //ok
         //testGetActiveOrders();
-        //testCancelOrder("2063803", Constant.NBT_BTC);
+        //testCancelOrder("1139", Constant.NBT_BTC);
         //testClearAllOrders(Constant.NBT_BTC);
         //testSell(1, 0.1830509, testPair);  //ok
         //testBuy(0.0000120, 0.0000120, testPair);  //ok
-        //testClearAllOrders(testPair);
         //testGetActiveOrders();
         //testCancelOrder("2063803", testPair);
         //testClearAllOrders(testPair);
-        //testIsOrderActive("2064456");
+        //testGetOrderDetail("1139");
+        testIsOrderActive("1139");
         //testGetTxFee();
         //testGetTxFeeWithArgs(testPair);
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(testPair);
-        //testGetOrderDetail("681944811"); //Try getting an existing order,  a non-existing order, and putting a wrong id "DKos3"
         //testGetLastTrades(testPair, 1388534400);
         //testGetLastTrades(testPair);
         //for (int i = 0; i < 5000; i++) {
