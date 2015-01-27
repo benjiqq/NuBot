@@ -279,7 +279,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
             JSONArray orders = (JSONArray) data.get("orders");
             if (orders != null) {
-                for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
+                for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
                     JSONObject thisOrder = order.next();
                     orderList.add(parseOrder(thisOrder));
                 }
@@ -293,7 +293,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     private Order parseOrder(JSONObject in) {
         Order out = new Order();
-;
+        ;
         out.setId(in.get("order_id").toString());
         Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()) * 1000L);
         out.setInsertedDate(insertedDate);
@@ -340,7 +340,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         query_args.put("pair", pair.toString("_"));
         query_args.put("order_id", orderID);
         Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
-        query_args.put("type", currentOrder.getType());
+        query_args.put("type", currentOrder.getType().toLowerCase());
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
