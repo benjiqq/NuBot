@@ -30,10 +30,10 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.CcexWrapper;
@@ -335,16 +335,18 @@ public class NuBot {
                 //issue 136 - multi custodians on a pair.
                 //walls are removed and re-added every three minutes.
                 //Bot needs to wait for next 3 min window before placing walls
-                int delay = 1;
 
+                int delaySeconds = 0;
+
+                int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every")); //read from propeprties file
                 if (Global.options.isMultipleCustodians()) {
-                    delay = Utils.getSecondsToNextwindow(3);
-                    LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP and place walls during next wall shift window.");
+                    delaySeconds = Utils.getSecondsToNextwindow(reset_every);
+                    LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
                 } else {
                     LOG.warning("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
                 }
                 //then start the thread
-                Global.taskManager.getPriceTriggerTask().start(delay);
+                Global.taskManager.getPriceTriggerTask().start(delaySeconds);
             }
         } else {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
