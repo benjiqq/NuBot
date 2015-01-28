@@ -448,21 +448,12 @@ public class StrategySecondaryPegUtils {
     public boolean shiftWalls() {
         boolean success = true;
 
-        //TODO Fix 156 -- reduce this value as excoin API get more responsive
-        int WAIT_TIME_FIX_156_EXCOIN = 4000; //ms
+        // Fix 156 -- reduce this value as excoin API get more responsive
+        int WAIT_TIME_FIX_156_EXCOIN = 3500; //ms
 
-        if (Global.options.isMultipleCustodians()) {
-            //Introuce an aleatory sleep time to desync bots at the time of placing orders.
-            //This will favour competition in markets with multiple custodians
-            try {
-                Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
-            } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
-            }
-        }
+        //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconds to take down orders
+        int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
 
-        //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconda to take down orders
-        long wait_time = (1000 * (Global.options.getSecondaryPegOptions().getRefreshTime() + Global.options.getExecuteStrategyInterval() + 10)); // this is with priceRefresh 61, balance-interval 40  and assuming it will take 10 seconds for the other to cancel
 
         //Communicate to the priceMonitorTask that a wall shift is in place
         strategy.getPriceMonitorTask().setWallsBeingShifted(true);
@@ -501,13 +492,29 @@ public class StrategySecondaryPegUtils {
 
         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
                 || Global.isDualSide) {
-            LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " side orders");
+            LOG.info("Immediately try to cancel all orders");
+
             //immediately try to : cancel all active orders
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+
+
+
+
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                 if (deleted) {
+
+                    if (Global.options.isMultipleCustodians()) {
+                        //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+                        //This will favour competition in markets with multiple custodians
+                        try {
+                            Thread.sleep(SHORT_WAIT_SECONDS + Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000); //SHORT_WAIT_SECONDS gives the time to other bots to take down their order
+                        } catch (InterruptedException ex) {
+                            LOG.severe(ex.toString());
+                        }
+                    }
+
                     if (shiftImmediatelyOrderType.equals(Constant.BUY)
                             && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
                     {
@@ -534,20 +541,6 @@ public class StrategySecondaryPegUtils {
                     if (success) { //Only move the second type of order if sure that the first have been taken down
                         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.BUY))
                                 || Global.isDualSide) {
-                            if (Global.options.isMultipleCustodians()) {
-                                try {
-                                    //wait <wait_time> seconds, to avoid eating others' custodians orders (issue #11)
-                                    LOG.info("Wait " + Math.round(wait_time / 1000) + " seconds to make sure all the bots shif their " + shiftImmediatelyOrderType + " own orders. "
-                                            + "Then try to shift " + waitAndShiftOrderType + " orders.");
-                                    Thread.sleep(wait_time);
-                                } catch (InterruptedException ex) {
-                                    LOG.severe(ex.toString());
-                                    success = false;
-                                }
-                            } else {
-                                LOG.warning("Skipping the waiting time : multipleCustodians option have been set to false");
-                            }
-
                             if (waitAndShiftOrderType.equals(Constant.BUY)
                                     && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
                             {

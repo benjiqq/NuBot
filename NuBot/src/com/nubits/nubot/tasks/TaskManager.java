@@ -17,12 +17,12 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
-import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
+import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
+import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -56,8 +56,8 @@ public class TaskManager {
         taskList = new ArrayList<BotTask>();
         //assign default values just for testing without Global.options loaded
         int sendLiquidityInterval = 181,
-                executeStrategyInterval = 41;
-        long checkPriceInterval = 61;
+                executeStrategyInterval = 41,
+                checkPriceInterval = 61;
 
         boolean verbose = false;
 

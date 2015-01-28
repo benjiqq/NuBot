@@ -213,7 +213,7 @@ public class TradeUtils {
         return result;
     }
     //The two methods below have been amalgamated into the CCDEK wrapper
-    //TODO - remove these methods once testing has taken place
+    //TODO - get rid of these ccedk =methods once testing has taken place
     public static int offset = 0;
 
     public static String getCCDKEvalidNonce() {

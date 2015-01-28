@@ -49,37 +49,39 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void run() {
         LOG.fine("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
         if (!isFirstTime) {
-            if (!shiftingWalls) {
-                strategyUtils.recount(); //Count number of active sells and buys
-                if (mightNeedInit) {
-                    boolean reset = mightNeedInit && !(ordersAndBalancesOK);
-                    if (reset) {
-                        String message = "Order reset needed on " + Global.exchange.getName();
-                        HipChatNotifications.sendMessage(message, Color.PURPLE);
-                        LOG.warning(message);
-                        boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
-                        if (reinitiateSuccess) {
-                            mightNeedInit = false;
+            if (!Global.options.isMultipleCustodians()) {
+                if (!shiftingWalls) {
+                    strategyUtils.recount(); //Count number of active sells and buys
+                    if (mightNeedInit) {
+                        boolean reset = mightNeedInit && !(ordersAndBalancesOK);
+                        if (reset) {
+                            String message = "Order reset needed on " + Global.exchange.getName();
+                            HipChatNotifications.sendMessage(message, Color.PURPLE);
+                            LOG.warning(message);
+                            boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
+                            if (reinitiateSuccess) {
+                                mightNeedInit = false;
+                            }
+                        } else {
+                            LOG.fine("No need to init new orders since current orders seems correct");
                         }
-                    } else {
-                        LOG.fine("No need to init new orders since current orders seems correct");
+                        strategyUtils.recount();
                     }
-                    strategyUtils.recount();
-                }
 
-                //Make sure the orders and balances are ok or try to aggregate
-                if (!ordersAndBalancesOK) {
-                    LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-                    mightNeedInit = true;
-                } else {
-                    if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
-                        //Execute buy Side strategy
-                        if (Global.isDualSide && proceedsInBalance && !needWallShift) {
-                            strategyUtils.aggregateAndKeepProceeds();
+                    //Make sure the orders and balances are ok or try to aggregate
+                    if (!ordersAndBalancesOK) {
+                        LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+                        mightNeedInit = true;
+                    } else {
+                        if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
+                            //Execute buy Side strategy
+                            if (Global.isDualSide && proceedsInBalance && !needWallShift) {
+                                strategyUtils.aggregateAndKeepProceeds();
+                            }
                         }
                     }
                 }
-            }
+            } //multiple custodians do not need strategy exec
         } else //First execution : reset orders and init strategy
         {
             LOG.info("Initializing strategy");
@@ -112,7 +114,14 @@ public class StrategySecondaryPegTask extends TimerTask {
             //execute immediately
             boolean shiftSuccess = false;
 
-            String message = "Shift needed on " + Global.exchange.getName() + ": " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+            String currencyTracked = "";
+            if (Global.swappedPair) {
+                currencyTracked = Global.options.getPair().getOrderCurrency().getCode().toUpperCase();
+            } else {
+                currencyTracked = Global.options.getPair().getPaymentCurrency().getCode().toUpperCase();
+            }
+
+            String message = "Shift needed on " + Global.exchange.getName() + ": " + currencyTracked + " "
                     + "price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
             HipChatNotifications.sendMessage(message, Color.PURPLE);
             LOG.warning(message);
