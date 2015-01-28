@@ -75,8 +75,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
             return;
         }
 
-        //TODO remove
-        HipChatNotifications.sendMessage(Global.sessionId + " Started price checking : ", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
 
         //take a note of the current time.
         //sudden changes in price can cause the bot to re-request the price data repeatedly

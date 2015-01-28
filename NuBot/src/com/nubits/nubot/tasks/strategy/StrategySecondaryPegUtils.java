@@ -504,8 +504,6 @@ public class StrategySecondaryPegUtils {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                 if (deleted) {
-                    //TODO remove
-                    HipChatNotifications.sendMessage(Global.sessionId + " shift: orders deleted : ", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
 
                     if (Global.options.isMultipleCustodians()) {
                         //Introuce an aleatory sleep time to desync bots at the time of placing orders.
@@ -523,9 +521,6 @@ public class StrategySecondaryPegUtils {
                         // update the initial balance of the secondary peg
                         Global.frozenBalances.freezeNewFunds();
                     }
-
-                    //TODO remove
-                    HipChatNotifications.sendMessage(Global.sessionId + " Placing new orders @  " + priceImmediatelyType, com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
 
 
                     boolean init1;
