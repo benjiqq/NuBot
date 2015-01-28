@@ -37,7 +37,6 @@ public class SecondaryPegOptionsJSON {
     private String mainFeed;
     private ArrayList<String> backupFeedNames;
     //Optional settings with a default value  ----------------------------
-    private long refreshTime;
     private double wallchangeThreshold, spread, distanceThreshold;
 
     /**
@@ -49,8 +48,7 @@ public class SecondaryPegOptionsJSON {
      * @param mainFeed
      * @param backupFeedNames
      */
-    public SecondaryPegOptionsJSON(long refreshTime, double wallchangeThreshold, double spread, double distanceThreshold, String mainFeed, ArrayList<String> backupFeedNames) {
-        this.refreshTime = refreshTime;
+    public SecondaryPegOptionsJSON(double wallchangeThreshold, double spread, double distanceThreshold, String mainFeed, ArrayList<String> backupFeedNames) {
         this.wallchangeThreshold = wallchangeThreshold;
         this.spread = spread;
         this.distanceThreshold = distanceThreshold;
@@ -129,28 +127,12 @@ public class SecondaryPegOptionsJSON {
              }
              */
 
-            return new SecondaryPegOptionsJSON(refreshTime, wallchangeThreshold, spread, distanceThreshold, mainFeed, backupFeedNames);
+            return new SecondaryPegOptionsJSON(wallchangeThreshold, spread, distanceThreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
             LOG.severe(ex.toString());
             System.exit(0);
         }
         return null; //never reached
-    }
-
-    /**
-     *
-     * @return
-     */
-    public long getRefreshTime() {
-        return refreshTime;
-    }
-
-    /**
-     *
-     * @param refreshTime
-     */
-    public void setRefreshTime(int refreshTime) {
-        this.refreshTime = refreshTime;
     }
 
     /**
@@ -235,10 +217,10 @@ public class SecondaryPegOptionsJSON {
 
     @Override
     public String toString() {
-        return "SecondaryPegOptionsJSON [" + "backupFeedNames " + backupFeedNames + " " + "distanceThreshold " + distanceThreshold + "mainFeed " + mainFeed + " " + "spread " + spread + " " + "refreshTime " + refreshTime + " " + "wallchangeThreshold " + wallchangeThreshold + "]";
+        return "SecondaryPegOptionsJSON [" + "backupFeedNames " + backupFeedNames + " " + "distanceThreshold " + distanceThreshold + "mainFeed " + mainFeed + " " + "spread " + spread + "  " + "wallchangeThreshold " + wallchangeThreshold + "]";
     }
 
     String toHtmlString() {
-        return "SecondaryPegOptionsJSON : <br>" + "backupFeedNames " + backupFeedNames + " <br>" + "distanceThreshold " + distanceThreshold + "<br>" + "mainFeed " + mainFeed + " <br>" + "spread " + spread + " <br>" + "refreshTime " + refreshTime + " <br>" + "wallchangeThreshold " + wallchangeThreshold;
+        return "SecondaryPegOptionsJSON : <br>" + "backupFeedNames " + backupFeedNames + " <br>" + "distanceThreshold " + distanceThreshold + "<br>" + "mainFeed " + mainFeed + " <br>" + "spread " + spread + " <br>" + "wallchangeThreshold " + wallchangeThreshold;
     }
 }

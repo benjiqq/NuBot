@@ -328,17 +328,31 @@ public class NuBot {
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
                 FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
-                //set the interval from options
-                Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
+
+
+
 
                 //read the delay to sync with remote clock
                 //issue 136 - multi custodians on a pair.
                 //walls are removed and re-added every three minutes.
                 //Bot needs to wait for next 3 min window before placing walls
+                //set the interval from settings
+
+                int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes")); //read from propeprties file
+                int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
+
+                int interval = 1;
+                if (!Global.options.isMultipleCustodians()) {
+                    interval = refresh_time_seconds;
+                } else {
+                    interval = 60 * reset_every;
+                }
+
+                Global.taskManager.getPriceTriggerTask().setInterval(interval);
+
 
                 int delaySeconds = 0;
 
-                int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every")); //read from propeprties file
                 if (Global.options.isMultipleCustodians()) {
                     delaySeconds = Utils.getSecondsToNextwindow(reset_every);
                     LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
