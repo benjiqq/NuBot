@@ -346,6 +346,10 @@ public class NuBot {
                     interval = refresh_time_seconds;
                 } else {
                     interval = 60 * reset_every;
+                    //Force the a spread to avoid collisions
+                    double forcedSpread = 0.5;
+                    LOG.info("Forcing a " + forcedSpread + "% spread to protect from collisions");
+                    Global.options.getSecondaryPegOptions().setPriceOffset(forcedSpread);
                 }
 
                 Global.taskManager.getPriceTriggerTask().setInterval(interval);

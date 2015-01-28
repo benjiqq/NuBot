@@ -522,7 +522,6 @@ public class StrategySecondaryPegUtils {
                         Global.frozenBalances.freezeNewFunds();
                     }
 
-
                     boolean init1;
                     if (!Global.swappedPair) {
                         init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
