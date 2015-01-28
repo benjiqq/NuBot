@@ -19,6 +19,7 @@ package com.nubits.nubot.tasks.strategy;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
@@ -72,6 +73,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //if a problem occurred we sleep for a period using the SLEEP_COUNTER
         if (SLEEP_COUNT > 0) {
             SLEEP_COUNT--;
+            currentTime = System.currentTimeMillis();
             return;
         }
 
@@ -167,13 +169,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 }
             }
 
-            //We need to fill up the moving average queue sop that 30 data points exist.
-            //for speed we will use everything that's just been retrieved from every exchange
-            // to give a fair spread and make the average more representative
-            if (queueMA.size() < MOVING_AVERAGE_SIZE) {
-                initMA(priceList);
-            }
-
         } else {
             //Tried more than three times without success
             LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
@@ -182,13 +177,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    private void initMA(ArrayList<LastPrice> priceList) {
-        //LOG.info("Collecting prices from exchanges to update the Moving Average");
-        for (Iterator<LastPrice> price = priceList.iterator(); price.hasNext();) {
-            updateMovingAverageQueue(price.next().getPrice().getQuantity());
-        }
-        if (queueMA.size() < MOVING_AVERAGE_SIZE) {
-            executeUpdatePrice(1);
+    private void initMA(double price) {
+        for (int i = 0; i <= 30; i++) {
+            updateMovingAverageQueue(price);
         }
     }
 
@@ -303,7 +294,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             notification = "";
             notificationColor = Color.YELLOW;
             subject = Global.exchange.getName() + " Bot is suffering a connection issue";
-        } else { //otherwise something bad has happened so we shutdown.
+        } else { //otherwise something bad has happened so we pause.
             sleepTime = (Global.options.getSecondaryPegOptions().getRefreshTime() * 3);
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
                     + Global.options.getSecondaryPegOptions().getRefreshTime() + "seconds.\nThe bot will notify and restart in "
@@ -333,9 +324,15 @@ public class PriceMonitorTriggerTask extends TimerTask {
             LOG.severe("Sleeping for " + sleepTime);
             SLEEP_COUNT = 3;
         }
+        currentTime = System.currentTimeMillis();
     }
 
     public void updateLastPrice(LastPrice lp) {
+        //We need to fill up the moving average queue so that 30 data points exist.
+        if (queueMA.size() < MOVING_AVERAGE_SIZE) {
+            initMA(lp.getPrice().getQuantity());
+        }
+
         //we check against the moving average
         double current = lp.getPrice().getQuantity();
         double MA = getMovingAverage();
@@ -355,7 +352,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //the potential price is within the % boundary.
         //add it to the MA-Queue to keep the moving average moving
         // Only do this if the standard update interval hasn't passed
-        if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000) < Global.options.getSecondaryPegOptions().getRefreshTime()) {
+        if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < Global.options.getSecondaryPegOptions().getRefreshTime()) {
             updateMovingAverageQueue(current);
         } else {
             //If we get here, we haven't had a price within % of the average for as long as a standard update period

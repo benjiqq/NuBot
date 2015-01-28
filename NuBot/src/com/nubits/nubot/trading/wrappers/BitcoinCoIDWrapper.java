@@ -318,13 +318,19 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
-        ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
-        for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
-            Order thisOrder = order.next();
-            if (thisOrder.getId().equals(orderID)) {
-                apiResponse.setResponseObject(thisOrder);
-                break;
+        ApiResponse activeOrdersReq = getActiveOrders();
+
+        if (activeOrdersReq.isPositive()) {
+            ArrayList<Order> activeOrders = (ArrayList<Order>) activeOrdersReq.getResponseObject();
+            for (Iterator<Order> order = activeOrders.iterator(); order.hasNext(); ) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(orderID)) {
+                    apiResponse.setResponseObject(thisOrder);
+                    break;
+                }
             }
+        } else {
+            apiResponse = activeOrdersReq;
         }
         return apiResponse;
     }
@@ -340,7 +346,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         query_args.put("pair", pair.toString("_"));
         query_args.put("order_id", orderID);
         Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
-        query_args.put("type", currentOrder.getType());
+        query_args.put("type", currentOrder.getType().toLowerCase());
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
