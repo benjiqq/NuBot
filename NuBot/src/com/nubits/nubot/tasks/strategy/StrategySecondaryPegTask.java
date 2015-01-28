@@ -114,7 +114,14 @@ public class StrategySecondaryPegTask extends TimerTask {
             //execute immediately
             boolean shiftSuccess = false;
 
-            String message = "Shift needed on " + Global.exchange.getName() + ": " + Global.options.getPair().getPaymentCurrency().getCode().toUpperCase() + " "
+            String currencyTracked = "";
+            if (Global.swappedPair) {
+                currencyTracked = Global.options.getPair().getOrderCurrency().getCode().toUpperCase();
+            } else {
+                currencyTracked = Global.options.getPair().getPaymentCurrency().getCode().toUpperCase();
+            }
+
+            String message = "Shift needed on " + Global.exchange.getName() + ": " + currencyTracked + " "
                     + "price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
             HipChatNotifications.sendMessage(message, Color.PURPLE);
             LOG.warning(message);

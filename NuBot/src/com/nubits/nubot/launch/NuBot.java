@@ -354,7 +354,6 @@ public class NuBot {
 
                 Global.taskManager.getPriceTriggerTask().setInterval(interval);
 
-
                 int delaySeconds = 0;
 
                 if (Global.options.isMultipleCustodians()) {

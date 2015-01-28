@@ -492,7 +492,7 @@ public class StrategySecondaryPegUtils {
 
         if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
                 || Global.isDualSide) {
-            LOG.info("Immediately try to shift " + shiftImmediatelyOrderType + " side orders");
+            LOG.info("Immediately try to cancel all orders");
 
             //immediately try to : cancel all active orders
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
