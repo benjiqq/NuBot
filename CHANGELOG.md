@@ -1,3 +1,45 @@
+## v0.1.5 (2015-01-29)
+
+#### New Features:
+  - Multi-custodian mode will sync with remote NTP and reset orders every three minutes
+  - Support for NBT-denominated pairs (swapped logic and pricing)
+  - Bitcoin.co.id API wrappers
+  - exco.in API wrappers
+  - Added config parameter(s) to manually adjust the  maximum wall sizes.
+  - The bot accept a list of input json files as input and combines them internally
+
+#### Improvements:
+  - Reduced time between price-check and wall-shift to close-to-zero
+  - Detecting a large price different will pause the bot for one cycle instead of shutting it down
+  - BitSpark reporting tool 
+  - Debug message at the end of order initialization
+  - On shift, cancel orders in a random order to avoid revealing the following movement direction
+  - Enhance wall_shifts reporting with .json
+  - Reset liquidityinfo on quit
+  - Implemented getLastTrades for all supported wrappers
+  - Reduced wait time during wall shifts
+  - Keep 1NBT-equivalent aside to avoid "not enough balance" error
+  - Polished build.xml ant script
+  - In HipChat and Emails round numbers to two decimal digits
+  - Send critical notifications to a different hipchat room
+  - Load fiat currencies from database in CurrencyPair.java
+  - GetCurrencyPairFromString, add a lookup table for names
+  - Refactored the Strategy extracting re-usable methods to a different class
+  - Try to cancel all orders before shutting down the bot
+  - Cancel existing orders on startup
+  - Sleep time parametrized
+  - Display bot version number in logs
+  - Renamed price-Offset parameter into price-spread (and compute it as 50% per side)
+  - Wait random time before placing an order to ensure competitivity with multiple bots
+
+#### Bug fixes:
+  - Looping on moving average detection
+  - Bitspark wrong  liquidity reported
+  - Reporting open orders in wrong unit
+  - BTER handle small amounts of orders
+  - BitSpark reporting tool ignoring timestamp 
+  - Broken internal links in read.me
+
 ## v0.1.4 (2014-11-30)
 
 #### New Features:
