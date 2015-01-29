@@ -81,7 +81,6 @@ public class PriceFeedManager {
         FEED_NAMES_MAP.put(EXCHANGERATELAB, new ExchangeratelabPriceFeed());
         FEED_NAMES_MAP.put(BITFINEX, new BitfinexPriceFeed());
 
-
     }
 
     public LastPriceResponse getLastPrices() {

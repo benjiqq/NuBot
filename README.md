@@ -251,6 +251,8 @@ It is sufficient to add a JSON object in the standard options file structured in
 | blockchain    | BTC  |  https://blockchain.info |
 | bitcoinaverage    | BTC  |  https://api.bitcoinaverage.com |
 | coinbase    | BTC  |  https://coinbase.com |
+| bitstamp    | BTC  |  https://bitstamp.com |
+| bitfinex    | BTC  |  https://api.bitfinex.com |
 | btce  | BTC, PPC, ...  |  https://btc-e.com |
 | bter    | BTC  |  http://data.bter.com |
 | ccedk    | BTC |  https://www.ccedk.com |

@@ -7,6 +7,7 @@
   - exco.in API wrappers
   - Added config parameter(s) to manually adjust the  maximum wall sizes.
   - The bot accept a list of input json files as input and combines them internally
+  - Bitfinex and Bitstamp price feeds
 
 #### Improvements:
   - Reduced time between price-check and wall-shift to close-to-zero
