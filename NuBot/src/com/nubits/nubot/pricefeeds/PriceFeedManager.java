@@ -37,13 +37,14 @@ public class PriceFeedManager {
     public final static String BLOCKCHAIN = "blockchain"; //BTC
     public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
     public final static String COINBASE = "coinbase"; //BTC
+    public final static String BITSTAMP = "bitstamp"; // BTC
+    public final static String BITFINEX = "bitfinex"; // BTC
     public final static String BTER = "bter"; //BTC and PPC
     public final static String CCEDK = "ccedk"; //BTC and PPC
     public final static String BTCE = Constant.BTCE;
     public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
     public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
     public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR
-    public final static String BITSTAMP = "bitstampe"; // BTC
     public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
     public final static String YAHOO = "yahoo"; //EUR CNY
     public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
@@ -78,6 +79,7 @@ public class PriceFeedManager {
         FEED_NAMES_MAP.put(YAHOO, new YahooPriceFeed());
         FEED_NAMES_MAP.put(OPENEXCHANGERATES, new OpenexchangeratesPriceFeed());
         FEED_NAMES_MAP.put(EXCHANGERATELAB, new ExchangeratelabPriceFeed());
+        FEED_NAMES_MAP.put(BITFINEX, new BitfinexPriceFeed());
 
 
     }

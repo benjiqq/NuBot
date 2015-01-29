@@ -22,7 +22,7 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
-import com.nubits.nubot.pricefeeds.BitcoinaveragePriceFeed;
+import com.nubits.nubot.pricefeeds.BitstampEURPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
@@ -48,8 +48,8 @@ public class TestPriceFeed {
 
         test.pair = Constant.BTC_USD;
 
-        test.executeSingle();
-        //test.execute();
+        //test.executeSingle();
+        test.execute();
         //test.executePPC();
     }
 
@@ -65,7 +65,7 @@ public class TestPriceFeed {
         }
         LOG.setLevel(Level.INFO);
 
-        feed = new BitcoinaveragePriceFeed(); //REPLACE HERE
+        feed = new BitstampEURPriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
@@ -89,15 +89,17 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-
         backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
         backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
         backupFeedList.add(PriceFeedManager.COINBASE);
+        backupFeedList.add(PriceFeedManager.BTER);
+        backupFeedList.add(PriceFeedManager.CCEDK);
+        backupFeedList.add(PriceFeedManager.BITSTAMP);
+        backupFeedList.add(PriceFeedManager.BITFINEX);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 
         LastPriceResponse lpr = pfm.getLastPrices();
-
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
