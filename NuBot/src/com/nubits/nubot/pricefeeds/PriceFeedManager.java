@@ -43,6 +43,7 @@ public class PriceFeedManager {
     public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
     public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
     public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR
+    public final static String BITSTAMP = "bitstampe"; // BTC
     public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
     public final static String YAHOO = "yahoo"; //EUR CNY
     public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
@@ -71,11 +72,14 @@ public class PriceFeedManager {
         FEED_NAMES_MAP.put(BTCE, new BtcePriceFeed());
         FEED_NAMES_MAP.put(COINMARKETCAP_NO, new CoinmarketcapnorthpolePriceFeed());
         FEED_NAMES_MAP.put(COINMARKETCAP_NE, new CoinmarketcapnexuistPriceFeed());
-        FEED_NAMES_MAP.put(BITSTAMP_EURUSD, new BitstampPriceFeed());
+        FEED_NAMES_MAP.put(BITSTAMP, new BitstampPriceFeed());
+        FEED_NAMES_MAP.put(BITSTAMP_EURUSD, new BitstampEURPriceFeed());
         FEED_NAMES_MAP.put(GOOGLE_UNOFFICIAL, new GoogleUnofficialPriceFeed());
         FEED_NAMES_MAP.put(YAHOO, new YahooPriceFeed());
         FEED_NAMES_MAP.put(OPENEXCHANGERATES, new OpenexchangeratesPriceFeed());
         FEED_NAMES_MAP.put(EXCHANGERATELAB, new ExchangeratelabPriceFeed());
+
+
     }
 
     public LastPriceResponse getLastPrices() {
