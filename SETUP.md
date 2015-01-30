@@ -22,7 +22,7 @@ Detailed tutorial below :
 
 ###0) Setup the machine
 
-NuBot can run on a computer, on a raspberry pi, or a remote VPN, as long as it has a permanent connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java Runtime Environment to be installed.  
+NuBot can run on a computer, on a raspberry pi, or a remote VPS, as long as it has a permanent connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java Runtime Environment to be installed.
 NuBot comes as a cross platform executable jar file to run from command line. 
 
 Type `java -version` in your terminal to make sure you have JRE >= 1.7 installed on your machine, otherwise download Java JRE:1.7 [from oracle's download page](http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html)
@@ -68,11 +68,11 @@ Please make sure you fully understand in which way changing a setting will affec
 
 Its good practice separating configuration parameters in different files. In this tutorial we will use the following grouping : 
 * market options: exchange keys and market-related settings ;  
-* misc options: miscellaneus configuration parameters ;
-* liquidity-info options :  define nubits client communication ;
-* price-tracking options:  for non-USD pairs, define price feeds ;
+* misc options: miscellaneous configuration parameters ;
+* liquidity-info options: define nubits client communication ;
+* price-tracking options: for non-USD pairs, define price feeds ;
 
-The same structure is used in the `config-sample`files provided with the bot.  You can edit the provided sample file or create new configuration files.
+The same structure is used in the `config-sample` files provided with the bot. You can edit the provided sample file or create new configuration files.
 
 ---
 #### Market options 
@@ -81,7 +81,7 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| exchangename     | / | Name of the exchange where the bots operates |  see list of accepted exchangenames* |
+| exchangename     | / | Name of the exchange where the bots operates |  see list of accepted exchange names* |
 | apikey      |  / | Custodian's public key to access the exchange . *this param is optional for ccex*     |  String |
 | apisecret |  / |  Custodian's secret key to access the exchange    | String |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
@@ -115,11 +115,11 @@ Parameters :
 | multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
-| hipchat    | true |  f set to false will disable hipchat notifications | boolean |
+| hipchat    | true |  if set to false will disable hipchat notifications | boolean |
 | mail-notifications    | true |  if set to false will disable email notifications | boolean |
-| mail-recipient | / |  the email at which emergency email are sent  |  String  |
-| emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
-| keep-proceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified procees from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
+| mail-recipient | / |  the email to which emergency email are sent  |  String  |
+| emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
+| keep-proceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
 | max-sell-order-volume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT  |
 | max-buy-order-volume | 0 | maximum volume to put on buy walls.  |  double , expressed in the peg currency  |
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD |
@@ -203,7 +203,7 @@ Sample file : *price-tracking.json*:
     {
             "wallshift-threshold": 0.3,
             "spread": 0,
-            "main-feed":"bitfinex",
+            "main-feed": "bitfinex",
             "backup-feeds": {
                 "backup1" : { "name" : "blockchain"},
                 "backup2" : { "name" : "coinbase"},
@@ -231,7 +231,7 @@ java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [pat
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-nuhop java -jar NuBot.jar market.json misc.json liquidity-info.jon price-tracking.json  & 
+nohup java -jar NuBot.jar market.json misc.json liquidity-info.jon price-tracking.json  &
 ```
 
 The bot will start and write output in the */logs* folder. 
