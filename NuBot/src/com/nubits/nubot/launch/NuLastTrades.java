@@ -153,6 +153,21 @@ public class NuLastTrades {
     private void execute() {
         //FileSystem.writeToFile(HEADER, output, false); //uncomment for csv outputs
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, dateFrom);
+
+        if (pair.getPaymentCurrency().equals(Constant.NBT)) {
+            Global.swappedPair = true;
+        } else {
+            Global.swappedPair = false;
+        }
+
+        int count = 0;
+        int countSell = 0, countBuy = 0;
+        int totalAmountPEG = 0;
+        int totalAmountNBT = 0;
+        int threshold = 1000; //NBT
+        int countLargeOrders = 0;
+        int paidInFees = 0;
+
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
             FileSystem.writeToFile("{\n", output, false);
@@ -161,6 +176,34 @@ public class NuLastTrades {
             LOG.info("Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
+
+                //Added for excoin only
+
+                if (tempTrade.getType().equalsIgnoreCase(Constant.SELL)) {
+                    countSell++;
+                } else {
+                    countBuy++;
+                }
+
+                count++;
+
+                double amountNBT;
+
+                if (Global.swappedPair) {
+                    amountNBT = tempTrade.getAmount().getQuantity() * tempTrade.getPrice().getQuantity();
+                    totalAmountNBT += amountNBT;
+                    totalAmountPEG += tempTrade.getAmount().getQuantity();
+                } else {
+                    amountNBT = tempTrade.getAmount().getQuantity();
+                    totalAmountPEG += amountNBT * tempTrade.getPrice().getQuantity();
+                    totalAmountNBT += tempTrade.getAmount().getQuantity();
+                }
+
+                if (amountNBT >= threshold) {
+                    countLargeOrders++;
+                }
+
+                paidInFees += tempTrade.getFee().getQuantity();
                 LOG.info(tempTrade.toString());
                 String comma = ",\n";
                 if (i == tradeList.size() - 1) {
@@ -173,5 +216,19 @@ public class NuLastTrades {
             LOG.severe(activeOrdersResponse.getError().toString());
         }
 
+        //Report :
+        String currencyCode = "";
+        if (Global.swappedPair) {
+            currencyCode = pair.getOrderCurrency().getCode();
+        } else {
+            currencyCode = pair.getPaymentCurrency().getCode();
+        }
+
+        String report = "Executed orders : " + count + " (sells : " + countSell + ";  buys : " + countBuy + ")"
+                + "\nTotal volume transacted : " + totalAmountPEG + " BTC ; " + totalAmountNBT + " NBT )"
+                + "\nOrders > " + threshold + " NBT : " + countLargeOrders
+                + "\nPaid in fees : " + paidInFees;
+        LOG.info(report);
+        FileSystem.writeToFile(report, output + "_report.txt", false);
     }
 }
