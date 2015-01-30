@@ -53,7 +53,15 @@
             <arg value="compileReadme.sh"/>  
         </exec>  
         <copy file="../readme.html" tofile="${store.dir}/readme.html"/>
+        <copy file="../setup.html" tofile="${store.dir}/setup.html"/>
+        <copy file="../feeds.html" tofile="${store.dir}/feeds.html"/>
+
         
+        <!-- Delete html files from original location -->
+        <delete file="../readme.html"/>
+        <delete file="../setup.html"/>
+        <delete file="../feeds.html"/>
+
         <!-- Create empty /logs directory -->
         <mkdir dir="${store.dir}/logs"/>
 

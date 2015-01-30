@@ -15,7 +15,7 @@ By using NuBot you declare to have accepted the afore-mentioned risks.
 * To communicate *liquidityinfo*, the custodian should possess an unlocked NuBit client which controls the custodial grant address. 
 * Before running the bot on a market where another instance of NuBot is operating, make sure to reach an agreement with the other operator on the price-feed to be used.
 
-###) Setup overview.
+### Setup overview.
 TL; DR  Make sure you run both the NuBits client and NuBot  on a machine connected to the internet 24/7, configure NuBits client to accept RCP commands, configure NuBot, launch it and monitor it.
 
 Detailed tutorial below : 
