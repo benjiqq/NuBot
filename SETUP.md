@@ -74,8 +74,8 @@ Its good practice separating configuration parameters in different files. In thi
 
 The same structure is used in the `config-sample`files provided with the bot.  You can edit the provided sample file or create new configuration files.
 
-
-#### market options 
+---
+#### Market options 
 
 Parameters : 
 
@@ -103,7 +103,9 @@ Sample file : *markets.json*:
   
 ```
 
-#### misc options
+---
+
+#### Misc options
 
 Parameters : 
 
@@ -144,8 +146,9 @@ Sample file : *misc.json*:
   
 ```
 
+---
 
-#### liquidity-info options
+#### Liquidity-info options
 
 Parameters : 
 
@@ -173,7 +176,9 @@ Sample file : *liquidity-info.json*:
   
 ```
 
-#### price-tracking options 
+---
+
+#### Price-tracking options 
 When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.   
 The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.   
 The price feed will track the live rate between the *secondary peg* currency and USD.
@@ -210,6 +215,7 @@ Sample file : *price-tracking.json*:
   
 ```
 
+---
 
 You can also merge all the configuration parameter under a unique .json file, although we do not recommend it.
 
