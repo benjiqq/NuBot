@@ -163,7 +163,7 @@ public class SecondaryPegOptionsJSON {
      *
      * @param spread
      */
-    public void setPriceOffset(double spread) {
+    public void setSpread(double spread) {
         this.spread = spread;
     }
 
