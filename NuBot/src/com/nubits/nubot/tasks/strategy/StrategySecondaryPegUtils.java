@@ -168,12 +168,21 @@ public class StrategySecondaryPegUtils {
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                 if (txFeeNTBPEGResponse.isPositive()) {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                    LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                    LOG.fine("Updated Transaction fee = " + txFeePEGNTB + "%");
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
+                    //check the calculated amount against the set maximum sell amount set in the options.json file
+                    if (Global.options.getMaxSellVolume() > 0) {
+                        amount1 = amount1 > Global.options.getMaxSellVolume() ? Global.options.getMaxSellVolume() : amount1;
+                    }
 
                     if (type.equals(Constant.BUY) && !Global.swappedPair) {
                         amount1 = Utils.round(amount1 / price, 8);
+                        //check the calculated amount against the max buy amount option, if any.
+                        if (Global.options.getMaxBuyVolume() > 0 ) {
+                            amount1 = amount1 > Global.options.getMaxBuyVolume() ? Global.options.getMaxBuyVolume() : amount1;
+                        }
+
                     }
                     //Prepare the orders
 
@@ -189,6 +198,9 @@ public class StrategySecondaryPegUtils {
                         if (type.equals(Constant.SELL)) {
                             typeStr = Constant.BUY;
                             amount1 = Utils.round(amount1 / Global.conversion, 8);
+                            if (Global.options.getMaxSellVolume() > 0) {
+                                amount1 = amount1 > Global.options.getMaxSellVolume() ? Global.options.getMaxSellVolume() : amount1;
+                            }
                         } else {
                             typeStr = Constant.SELL;
                         }

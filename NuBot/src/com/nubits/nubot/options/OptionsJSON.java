@@ -95,7 +95,7 @@ public class OptionsJSON {
      * @param sendMails
      * @param mailRecipient
      * @param emergencyTimeout
-     * @param keepProceedings
+     * @param keepProceeds
      * @param secondaryPegOptions
      */
     public OptionsJSON(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
@@ -382,7 +382,7 @@ public class OptionsJSON {
 
     /**
      *
-     * @param checkBalanceInterval
+     * @param executeStrategyInterval
      */
     public void getExecuteStrategyInterval(int executeStrategyInterval) {
         this.executeStrategyInterval = executeStrategyInterval;
@@ -398,7 +398,7 @@ public class OptionsJSON {
 
     /**
      *
-     * @param checkOrdersInteval
+     * @param sendLiquidityInterval
      */
     public void setSendLiquidityInteval(int sendLiquidityInterval) {
         this.sendLiquidityInterval = sendLiquidityInterval;
@@ -464,8 +464,8 @@ public class OptionsJSON {
      *
      * @param secondaryPegOptions
      */
-    public void setCryptoPegOptions(SecondaryPegOptionsJSON cryptoPegOptions) {
-        this.secondaryPegOptions = cryptoPegOptions;
+    public void setCryptoPegOptions(SecondaryPegOptionsJSON secondaryPegOptions) {
+        this.secondaryPegOptions = secondaryPegOptions;
     }
 
     public boolean isMultipleCustodians() {
@@ -494,7 +494,7 @@ public class OptionsJSON {
 
     /**
      *
-     * @param path
+     * @param paths
      * @return
      */
     public static OptionsJSON parseOptions(String[] paths) {
