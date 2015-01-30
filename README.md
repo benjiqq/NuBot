@@ -4,6 +4,7 @@
 
 *Disclaimer : this documentation is currently under-development and is therefore subject to sudden changes*
 
+
 #What is NuBot?
 
 NuBot is a cross-platform automated trading bot written in java.  
@@ -11,6 +12,10 @@ NuBot is a tool that helps [NuBits](https://www.nubits.com) custodians to automa
 As explained in the [white paper](https://nubits.com/about/white-paper), a custodian's core mission is to **help maintain the peg while introducing new currency into the market**.  
 
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
+
+#Changelogs
+See [changelog.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
+
 
 #How does it work?
 
@@ -23,11 +28,6 @@ NuBot permits a user to indicate they are either a sell side or dual side custod
 #Using NuBot
 
 See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/SETUP.md?at=master)
-
-#Price Feeds
-
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
-
 
 ##Dual-side strategy
 
@@ -122,9 +122,8 @@ keytool -list -v -keystore Nubot_keystore.jks
 We are committed to keep the *java keystore* always updated with most recent certificates available.  
 To get the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/f82fc9c98ff044afa4af0eaef95199a563cc6250/NuBot/res/ssl/nubot_keystore.jks?at=master) and place it in the *res/ssl* folder of NuBot.
 
-
-#Changelogs
-See [changelog.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
+#Price Feeds
+See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
 
 #Contribute
 *coming soon*
