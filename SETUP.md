@@ -61,7 +61,7 @@ The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years
 
 ###2) Configure the NuBot
 
-**Download and unzip the latest stable build from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).**
+*Download and unzip the latest stable build from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).*
 
 The bot reads configuration options from one or multiple *.json* files.  Below you can find a list of all the available options parameter along a brief description. 
 Please make sure you fully understand in which way changing a setting will affect the bot before doing anything that can lead to losses. 
