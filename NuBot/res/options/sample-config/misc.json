@@ -2,7 +2,6 @@
     {
     "dualside": true,  
     "multiple-custodians":false,
-    "submit-liquidity":true,
     "executeorders":false,
     "verbose":false,
     "hipchat":true,
@@ -11,7 +10,7 @@
     "emergency-timeout":60,
     "keep-proceeds":0,
     "max-sell-order-volume" : 0,
-    "max-buy-order-volume" : 0
+    "max-buy-order-volume" : 0,
     "priceincrement": 0.1,
  }
 }
