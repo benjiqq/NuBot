@@ -172,15 +172,15 @@ public class StrategySecondaryPegUtils {
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
                     //check the calculated amount against the set maximum sell amount set in the options.json file
-                    if (Global.options.getMaxSellVolume() > 0) {
-                        amount1 = amount1 > Global.options.getMaxSellVolume() ? Global.options.getMaxSellVolume() : amount1;
+                    if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                        amount1 = amount1 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount1;
                     }
 
                     if (type.equals(Constant.BUY) && !Global.swappedPair) {
                         amount1 = Utils.round(amount1 / price, 8);
                         //check the calculated amount against the max buy amount option, if any.
-                        if (Global.options.getMaxBuyVolume() > 0 ) {
-                            amount1 = amount1 > Global.options.getMaxBuyVolume() ? Global.options.getMaxBuyVolume() : amount1;
+                        if (Global.options.getMaxBuyVolume() > 0) {
+                            amount1 = amount1 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount1;
                         }
 
                     }
@@ -243,20 +243,35 @@ public class StrategySecondaryPegUtils {
                         //read balance again
                         ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
                         if (balancesResponse2.isPositive()) {
-                            if (type.equals(Constant.SELL)) {
-                                balance = (Amount) balancesResponse2.getResponseObject();
-                            } else {
-                                //Here its time to compute the balance to put apart, if any
-                                balance = (Amount) balancesResponse2.getResponseObject();
+
+                            balance = (Amount) balancesResponse2.getResponseObject();
+
+
+                            if (type.equals(Constant.BUY)) {
                                 balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                             }
+
+
                             double amount2 = balance.getQuantity();
+
+                            //check the calculated amount against the set maximum sell amount set in the options.json file
+
+                            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                                amount2 = amount2 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount2;
+                            }
 
                             if ((type.equals(Constant.BUY) && !Global.swappedPair)
                                     || (type.equals(Constant.SELL) && Global.swappedPair)) {
                                 //hotfix
                                 amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+
                                 amount2 = Utils.round(amount2 / price, 8);
+
+                                //check the calculated amount against the max buy amount option, if any.
+                                if (Global.options.getMaxBuyVolume() > 0) {
+                                    amount2 = amount2 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount2;
+                                }
+
                             }
 
                             String orderString2;

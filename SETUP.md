@@ -120,8 +120,8 @@ Parameters :
 | mail-recipient | / |  the email to which emergency email are sent  |  String  |
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
 | keep-proceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| max-sell-order-volume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT  |
-| max-buy-order-volume | 0 | maximum volume to put on buy walls.  |  double , expressed in the peg currency  |
+| max-sell-order-volume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT . 0=no limit; |
+| max-buy-order-volume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD |
 
 Sample file : *misc.json*: 

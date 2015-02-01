@@ -60,7 +60,6 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
                 JSONObject tickerObject = (JSONObject) httpAnswerJson.get("response");
                 JSONObject entityObject = (JSONObject) tickerObject.get("entity");
 
-
                 double last = Double.valueOf((String) entityObject.get("avg"));
 
                 lastRequest = System.currentTimeMillis();
