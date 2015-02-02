@@ -51,6 +51,17 @@ public class MailNotifications {
         }
     }
 
+    public static void sendCritical(String address, String title, String message) {
+        if (Global.options == null || Global.options.isSendMails()) {
+            try {
+                MailNotifications.Send(address, title, message);
+            } catch (AddressException ex) {
+                LOG.severe(ex.toString());
+            } catch (MessagingException ex) {
+                LOG.severe(ex.toString());
+            }
+        }
+    }
     private MailNotifications() {
     }
 

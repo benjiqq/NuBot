@@ -56,6 +56,7 @@ public class OptionsJSON {
     //Optional settings with a default value  ----------------------------
     private String nudIp;
     private boolean sendMails;
+    private boolean sendMailsCritical;
     private boolean submitLiquidity;
     private boolean executeOrders;
     private boolean verbose;
@@ -102,7 +103,7 @@ public class OptionsJSON {
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
+            boolean sendMails, boolean sendMailsCritical, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -122,6 +123,7 @@ public class OptionsJSON {
         this.executeStrategyInterval = executeStrategyInterval;
         this.sendHipchat = sendHipchat;
         this.sendMails = sendMails;
+        this.sendMailsCritical = sendMailsCritical;        
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
@@ -435,6 +437,22 @@ public class OptionsJSON {
     public void setSendMails(boolean sendMails) {
         this.sendMails = sendMails;
     }
+    
+    /**
+    *
+    * @return
+    */
+   public boolean isSendMailsCritical() {
+       return sendMailsCritical;
+   }
+
+   /**
+    *
+    * @param sendMails
+    */
+   public void setSendMailsCritical(boolean sendMailsCritical) {
+       this.sendMailsCritical = sendMailsCritical;
+   }
 
     /**
      *
@@ -577,6 +595,7 @@ public class OptionsJSON {
 
             String nudIp = "127.0.0.1";
             boolean sendMails = true;
+            boolean sendMailsCritical = true;
             boolean submitLiquidity = true;
             boolean executeOrders = true;
             boolean verbose = false;
@@ -703,7 +722,7 @@ public class OptionsJSON {
             options = new OptionsJSON(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                     rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                     executeOrders, verbose, pair, executeStrategyInterval,
-                    sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
+                    sendLiquidityInterval, sendHipchat, sendMails, sendMailsCritical, mailRecipient,
                     emergencyTimeout, keepProceeds, aggregate, multipleCustodians, maxSellVolume, maxBuyVolume, cpo);
 
         } catch (NumberFormatException e) {
