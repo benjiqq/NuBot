@@ -533,6 +533,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     public void setApiBaseUrl(String apiBaseUrl) {
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("BitcoinCoIDWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class BitcoinCoIdService implements ServiceInterface {
 
         protected String url;

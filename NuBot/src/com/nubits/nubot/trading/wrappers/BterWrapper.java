@@ -793,6 +793,11 @@ public class BterWrapper implements TradeInterface {
         return getLastTrades(pair);
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("BterWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class BterService implements ServiceInterface {
 
         protected String base;

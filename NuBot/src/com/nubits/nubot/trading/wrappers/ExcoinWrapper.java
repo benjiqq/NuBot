@@ -677,6 +677,11 @@ public class ExcoinWrapper implements TradeInterface {
     public void setApiBaseUrl(String apiBaseUrl) {
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("ExcoinWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class ExcoinService implements ServiceInterface {
 
         protected String url;

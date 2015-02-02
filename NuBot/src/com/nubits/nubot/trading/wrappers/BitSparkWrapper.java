@@ -749,6 +749,11 @@ public class BitSparkWrapper implements TradeInterface {
         return out;
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("BitSparkWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class BitSparkService implements ServiceInterface {
 
         protected String base;
