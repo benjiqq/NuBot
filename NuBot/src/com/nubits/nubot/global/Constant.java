@@ -48,6 +48,9 @@ public class Constant {
     public static final Currency USD = Currency.createCurrency("USD");
     public static final Currency CNY = Currency.createCurrency("CNY");
     public static final Currency EUR = Currency.createCurrency("EUR");
+    public static final Currency PHP = Currency.createCurrency("PHP");
+    public static final Currency HKD = Currency.createCurrency("HKD");
+    
     public static final Currency BTC = Currency.createCurrency("BTC");
     public static final Currency NBT = Currency.createCurrency("NBT");
     public static final Currency NSR = Currency.createCurrency("NSR");
@@ -67,6 +70,9 @@ public class Constant {
     public static final CurrencyPair BTC_CNY = new CurrencyPair(BTC, CNY);
     public static final CurrencyPair EUR_USD = new CurrencyPair(EUR, USD);
     public static final CurrencyPair CNY_USD = new CurrencyPair(CNY, USD);
+    public static final CurrencyPair PHP_USD = new CurrencyPair(PHP, USD);
+    public static final CurrencyPair HKD_USD = new CurrencyPair(HKD, USD);
+    
     //Direction of price
     public static final String UP = "up";
     public static final String DOWN = "down";
