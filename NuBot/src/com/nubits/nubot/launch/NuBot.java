@@ -188,9 +188,10 @@ public class NuBot {
         if (txFeeResponse.isPositive()) {
             double txfee = (Double) txFeeResponse.getResponseObject();
             if (txfee == 0) {
-                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1%");
-                Global.options.getSecondaryPegOptions().setSpread(0.1);
-
+                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
+                if (Global.options.getSecondaryPegOptions().getSpread() < 0.1) {
+                    Global.options.getSecondaryPegOptions().setSpread(0.1);
+                }
             }
         }
 
@@ -347,9 +348,11 @@ public class NuBot {
                 } else {
                     interval = 60 * reset_every;
                     //Force the a spread to avoid collisions
-                    double forcedSpread = 0.5;
-                    LOG.info("Forcing a " + forcedSpread + "% spread to protect from collisions");
-                    Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
+                    double forcedSpread = 0.9;
+                    LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
+                    if (Global.options.getSecondaryPegOptions().getSpread() < forcedSpread) {
+                        Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
+                    }
                 }
 
                 Global.taskManager.getPriceTriggerTask().setInterval(interval);
