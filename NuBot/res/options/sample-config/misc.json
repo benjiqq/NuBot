@@ -1,6 +1,6 @@
-{"options": 
+{"options":
     {
-    "dualside": true,  
+    "dualside": true,
     "multiple-custodians":true,
     "priceincrement": 0.1,
     "submit-liquidity":true,
@@ -8,6 +8,7 @@
     "verbose":false,
     "hipchat":true,
     "mail-notifications":false,
+    "mail-notifications-critical":false,
     "mail-recipient":"xxx@xxx.xxx",
     "emergency-timeout":60,
     "keep-proceeds":0,
@@ -15,4 +16,3 @@
     "max-buy-order-volume" : 0
  }
 }
-  
