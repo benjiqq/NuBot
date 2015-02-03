@@ -24,15 +24,15 @@ NuBot is developed in Java7. There is no recommendation about an IDE. Commonly u
 
 After clone nubot and preparing the dependencies an exchange account is needed.
 
-Also the following password settings have to be set. Create a new class under src/global/Passwords.java and add:
+You should also create a new class under src/global/Passwords.java by and copy the content of  src/global/PasswordsSample java . Fill the placeholder passwords with values of your choice. Get in touch with development team applying for receiving keys used by nubot in production. 
 
 public static final String SMTP_USERNAME = "nubot@example.com"; //used to send mail notifications
-public static final String SMTP_PASSWORD = ":asdfasdf:";
+public static final String SMTP_PASSWORD = "xyz";
 public static final String SMTP_HOST = "mail.example.com";
 public static final String HIPCHAT_KEY = "xyz"; //not admin
 public static final String HIPCHAT_NOTIFICATIONS_ROOM_ID = "826590";
 public static final String HIPCHAT_CRITICAL_ROOM_ID = "1016112"; //use for critical notifications
-public static final String OPEN_EXCHANGE_RATES_APP_ID = "abc"; //https://openexchangerates.org/api/latest.json?app_id=<here>
+public static final String OPEN_EXCHANGE_RATES_APP_ID = "xyz"; //https://openexchangerates.org/api/latest.json?app_id=<here>
 public static final String EXCHANGE_RATE_LAB = "xyz"; //http://api.exchangeratelab.com/api/current?apikey=<here>
 
 ## Test Exchange
