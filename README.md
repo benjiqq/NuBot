@@ -126,7 +126,8 @@ To get the latest available download the most recent version from the repository
 See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
 
 #Contribute
-*coming soon*
+See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CONTRIBUTE.md?at=master)
+
 
 #License 
 NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
