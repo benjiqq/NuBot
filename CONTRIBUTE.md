@@ -46,3 +46,7 @@ HipChat is used for notifications.
 ## Jenkins
 
 Jenkins is used. TODO: more info here.
+
+## Trello
+
+currently not in use. Management takes place over the forum or Hipchat or Bitbucket.
