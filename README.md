@@ -7,58 +7,58 @@
 
 #What is NuBot?
 
-NuBot is a cross-platform automated trading bot written in java.  
-NuBot is a tool that helps [NuBits](https://www.nubits.com) custodians to automate trades.  
-As explained in the [white paper](https://nubits.com/about/white-paper), a custodian's core mission is to **help maintain the peg while introducing new currency into the market**.  
+NuBot is a cross-platform automated trading bot written in java.
+NuBot is a tool that helps [NuBits](https://www.nubits.com) custodians to automate trades.
+As explained in the [white paper](https://nubits.com/about/white-paper), a custodian's core mission is to **help maintain the peg while introducing new currency into the market**.
 
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
 
 #How does it work?
 
-Only custodians will use the trading bot and relay liquidity data to other Nu clients. 
-Within the Nu system there are two types of custodians: **sell side** and **dual side** custodians. 
-*Dual side custodians* are custodians whose specific function is to provide liquidity for compensation, and they will initially only provide buy side price support. Once their buy order for NBT is partially filled, the bot should then create a sell order for that NBT. 
-In the case of *sell side custodians*, the liquidity they provide is secondary to another goal such as funding core development, marketing NBT or distributing Peercoin dividends. They want to spend the proceeds of their NBT, so under no circumstance will they provide buy side liquidity.  
+Only custodians will use the trading bot and relay liquidity data to other Nu clients.
+Within the Nu system there are two types of custodians: **sell side** and **dual side** custodians.
+*Dual side custodians* are custodians whose specific function is to provide liquidity for compensation, and they will initially only provide buy side price support. Once their buy order for NBT is partially filled, the bot should then create a sell order for that NBT.
+In the case of *sell side custodians*, the liquidity they provide is secondary to another goal such as funding core development, marketing NBT or distributing Peercoin dividends. They want to spend the proceeds of their NBT, so under no circumstance will they provide buy side liquidity.
 NuBot permits a user to indicate they are either a sell side or dual side custodian. This effect the trading bots behavior is detailed in the use cases below.
 
 
 ##Dual-side strategy
 
-First, someone who wishes to fulfill this role must seek shareholder approval via the custodial grant mechanism.  
-Say a particular liquidity provider or *LP* custodian has 10 million USD he wishes to use to provide NuBit liquidity. He would expect compensation for lost opportunity cost (he could otherwise invest those funds in rental property, stocks or bonds) and for the risk of loss via an exchange default, such as we have seen with Mt. Gox and others.  
-While the market will continually reprice this, let's say in our case the prospective LP custodian decides a 5% return every six months is fair compensation for lost opportunity cost and risk of exchange default. So, he promises shareholders to provide 10 million USD/NBT worth of liquidity for one year in exchange for 500,000 NBT. Shareholders approve this using the grant mechanism and he is granted 500,000 NBT. Now he must provide 10 million in liquidity constantly over the next year. He may do this through a single exchange or multiple exchanges.  
+First, someone who wishes to fulfill this role must seek shareholder approval via the custodial grant mechanism.
+Say a particular liquidity provider or *LP* custodian has 10 million USD he wishes to use to provide NuBit liquidity. He would expect compensation for lost opportunity cost (he could otherwise invest those funds in rental property, stocks or bonds) and for the risk of loss via an exchange default, such as we have seen with Mt. Gox and others.
+While the market will continually reprice this, let's say in our case the prospective LP custodian decides a 5% return every six months is fair compensation for lost opportunity cost and risk of exchange default. So, he promises shareholders to provide 10 million USD/NBT worth of liquidity for one year in exchange for 500,000 NBT. Shareholders approve this using the grant mechanism and he is granted 500,000 NBT. Now he must provide 10 million in liquidity constantly over the next year. He may do this through a single exchange or multiple exchanges.
 Let's say he does this with a single exchange. He opens an account with the exchange, then deposits $10 million worth of BTC and exchanges the BTC for USD.
-Now he is ready to make use of the trading bot.  
-An appropriate exchange will expose a trading API and our trading bot implements the API for that specific exchange. Each implementation of a specific exchange API implements an interface to standardize the way the trading bot interacts with these diverse exchange APIs.  
-Doing this will allow the LP custodian to enter authentication information into the trading bot for his exchange account. He will then use the user interface in our trading bot to place an buy order for 10,000,000 NBT on the exchange.  
-The price will not be exactly one USD, it will be one USD minus the exchange transaction fee. If the exchange charges a 0.2% transaction fee, he will place a buy order for 10,000,000 NBT at a price of 0.998 USD.  
+Now he is ready to make use of the trading bot.
+An appropriate exchange will expose a trading API and our trading bot implements the API for that specific exchange. Each implementation of a specific exchange API implements an interface to standardize the way the trading bot interacts with these diverse exchange APIs.
+Doing this will allow the LP custodian to enter authentication information into the trading bot for his exchange account. He will then use the user interface in our trading bot to place an buy order for 10,000,000 NBT on the exchange.
+The price will not be exactly one USD, it will be one USD minus the exchange transaction fee. If the exchange charges a 0.2% transaction fee, he will place a buy order for 10,000,000 NBT at a price of 0.998 USD.
 Let us suppose his order is partially filled in the amount of 1,000,000 NBT. Now his exchange account will contain 9,000,000 USD used to fund an order for 9,000,000 NBT. There will also be 1,000,000 NBT in the account. The trading bot automatically and immediately place these 1,000,000 NBT for sale at a price of 1.002 USD (one USD + a 0.2% transaction fee). If this order fills, then the bot should use the USD proceeds to immediately place a buy order for NBT at 0.998 USD. All funds should be continually on order and the LP custodian's funds should not be depleted by transaction fees.
 When an order is placed, canceled or filled (even partially), the *liquidityinfo* RPC method is called in the Nu client.
 
 
-See [Attached Diagrams](#markdown-header-dual-side-logic) for a visual flowchart. 
+See [Attached Diagrams](#markdown-header-dual-side-logic) for a visual flowchart.
 
 
-##Sell-side strategy 
+##Sell-side strategy
 
-In some cases custodians will spend the NuBits directly and not use the trading bot at all.  
+In some cases custodians will spend the NuBits directly and not use the trading bot at all.
 For instance, if core developers accept NuBits as compensation then Jordan Lee will simply distribute NuBits granted to him directly without the need for any exchange.
-Let's examine the case where a 10,000,000 NBT custodial grant is given for the purpose of distributing a shareholder dividend in Peercoin.  
-Such a custodian will deposit 10,000,000 NBT in a single or multiple exchanges. In our use case we will use a single exchange. Once the NBT deposit is credited, the custodian will start the trading bot, indicate they are a sell side custodian and indicate that orders should be created, although nothing specific about the order should be entered by the user.  
-The trading bot should offer the entire balance of NBT for sale using the formula of one USD + transaction fee + one pricing increment.  
-Some exchanges allow the fee to be discovered through their API, while others do not. If the fee can be found through the API, it will. If not, the user should be asked to specify the transaction fee.  
-Let's say our exchange has a transaction fee of 0.2% and supports 4 decimal places in its order book on the NBT/USD pair. Using our formula above, the trading bot would place an sell order for 10,000,000 NBT at a price of 1.0021.  
+Let's examine the case where a 10,000,000 NBT custodial grant is given for the purpose of distributing a shareholder dividend in Peercoin.
+Such a custodian will deposit 10,000,000 NBT in a single or multiple exchanges. In our use case we will use a single exchange. Once the NBT deposit is credited, the custodian will start the trading bot, indicate they are a sell side custodian and indicate that orders should be created, although nothing specific about the order should be entered by the user.
+The trading bot should offer the entire balance of NBT for sale using the formula of one USD + transaction fee + one pricing increment.
+Some exchanges allow the fee to be discovered through their API, while others do not. If the fee can be found through the API, it will. If not, the user should be asked to specify the transaction fee.
+Let's say our exchange has a transaction fee of 0.2% and supports 4 decimal places in its order book on the NBT/USD pair. Using our formula above, the trading bot would place an sell order for 10,000,000 NBT at a price of 1.0021.
 The reason it should be 1.0021 instead of 1.002 is that we want dual side sell orders to be executed first, so their funds can be returned to providing buy side liquidity.
-Each time an order is placed, cancelled or filled (even partially), the *liquidityinfo* Nu client RPC method is called. Details about this method can be found in the Liquidity Pool Tracking section. 
-Calling *liquidityinfo* will have the effect of transmitting the size of the buy and sell liquidity pool the local trading bot is managing to all known Nu peers. 
+Each time an order is placed, cancelled or filled (even partially), the *liquidityinfo* Nu client RPC method is called. Details about this method can be found in the Liquidity Pool Tracking section.
+Calling *liquidityinfo* will have the effect of transmitting the size of the buy and sell liquidity pool the local trading bot is managing to all known Nu peers.
 
 
-See [Attached Diagrams](#markdown-header-sell-side-logic) for a visual flowchart. 
+See [Attached Diagrams](#markdown-header-sell-side-logic) for a visual flowchart.
 
 ##Other strategies
 
-There might be adjusted versions of the two strategies explained above.  
+There might be adjusted versions of the two strategies explained above.
 To request a custom build of NuBot to fulfil a particular custodial grant, [get in touch](http://discuss.nubits.com/category/nubits/automated-trading).
 
 Alternative strategies  :
@@ -72,25 +72,25 @@ Alternative strategies  :
 
 By using NuBot you declare to have accepted the afore-mentioned risks.
 
-##Assumption for a correct functioning 
+##Assumption for a correct functioning
 
 * The computer that runs NuBot must be connected to the internet
 * The custodian must provide the bot with access to market exchanges where NuBits are traded
-* The custodian must avoid manual interaction with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
+* The custodian must avoid manual interaction with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds.
 * The custodian must avoid opening multiple instances of the Nu client in control of the custodian address at the same time.
-* To communicate *liquidityinfo*, the custodian should possess an unlocked NuBit client which controls the custodial grant address. 
+* To communicate *liquidityinfo*, the custodian should possess an unlocked NuBit client which controls the custodial grant address.
 * Before running the bot on a market where another instance of NuBot is operating, make sure to reach an agreement with the other operator on the price-feed to be used.
 * For NBT_EUR pair, only one instance per market is currently allowed.
 
 ###1) Prepare the NuBits client client
 
-To function correctly, NuBot needs to communicate with the NuBits client of the custodian.  
-The bot needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have real-time information about active orders in the network across custodians, and react to it.  
-It does so by interacting via the *NuBits client of the custodian*. 
+To function correctly, NuBot needs to communicate with the NuBits client of the custodian.
+The bot needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have real-time information about active orders in the network across custodians, and react to it.
+It does so by interacting via the *NuBits client of the custodian*.
 
 *NOTE: Is it also possible to test NuBot without being a custodian and setting the `"submit-liquidity":false` in the option file. In this case you can ignore this section.*
 
-The bot communicates with the Nu client via RCP over HTTP.  
+The bot communicates with the Nu client via RCP over HTTP.
 If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client. In order to do that, open your *nu.conf* and add make sure you have it properly configured.
 
 
@@ -105,12 +105,12 @@ rpcallowip=<ip_of_machine_running_the_bot>
 
 *NOTE: if using NuBot and NuBits on the same machine, the last parameter can be omitted*
 
-Launch Nu client and, if the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Unlocking the wallet *for minting only* is not enough.  
-Also, make sure that the NuBit client controls a public address which received a custodial grant.  
-  
+Launch Nu client and, if the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Unlocking the wallet *for minting only* is not enough.
+Also, make sure that the NuBit client controls a public address which received a custodial grant.
+
 The two Nu wallets are locked/unlocked separately. To unlock the NuBits wallets, first make sure the client is displaying the NuBits units, then open the console and type:
 ```
-walletpassphrase <your passphrase> 9999999999 
+walletpassphrase <your passphrase> 9999999999
 ```
 The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg!
 
@@ -121,7 +121,7 @@ The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years
 
 The bot reads options from one or multiple *.json* file.
 
-Here is a list of essential options : 
+Here is a list of essential options :
 
 | Parameter        | Description          |  Admitted values  |
 | ------------- |:-------------:| -----:|
@@ -139,7 +139,7 @@ Here is a list of essential options :
 With the builds of the bot a sample *options.json* is attached and its will resemble the snippet below :
 
 ```json
-{"options": 
+{"options":
     {
     "exchangename":"xxx",
     "apikey": "xxx",
@@ -153,7 +153,7 @@ With the builds of the bot a sample *options.json* is attached and its will rese
     "mail-recipient":"xxx"
  }
 }
-  
+
 ```
 
 Is it also possible to split the options in several files, to keep some information private or for multiple instances.
@@ -162,7 +162,7 @@ In the example below we see how the options presented above can be broken down :
 
 *part1.json*
 ```json
-{"options": 
+{"options":
     {
     "exchangename":"xxx",
     "apikey": "xxx",
@@ -174,7 +174,7 @@ In the example below we see how the options presented above can be broken down :
 *part2.json*
 
 ```json
-{"options": 
+{"options":
     {
     "dualside": false,
     "nubitaddress": "xxx",
@@ -201,13 +201,13 @@ Now open a terminal, navigate to the folder of NuBot and execute the jar, specif
 java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]
 ```
 
-The bot will start and output messages on the console and write in the */logs* folder. 
+The bot will start and output messages on the console and write in the */logs* folder.
 
 To terminate the bot, exit the process with "Ctrl+C"
 
-*Requirements* 
-NuBot comes as a cross platform executable jar file to run from command line.  
-It only requires a recent Java Runtime Environment to be installed.  
+*Requirements*
+NuBot comes as a cross platform executable jar file to run from command line.
+It only requires a recent Java Runtime Environment to be installed.
 Download Java JRE:1.7 [from oracle](http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html)
 
 
@@ -217,8 +217,8 @@ Download Java JRE:1.7 [from oracle](http://www.oracle.com/technetwork/java/javas
 
 
 ###Secondary Peg Parameters
-When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.   
-The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.   
+When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.
+The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.
 The price feed will track the live rate between the *secondary peg* currency and USD.
 
 It is sufficient to add a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
@@ -246,8 +246,8 @@ It is sufficient to add a JSON object in the standard options file structured in
 
 ####Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
 
-| Feed name        | Currencies available for tracking   |  Feed |   
-| ------------- |:-------------:| -------------:| 
+| Feed name        | Currencies available for tracking   |  Feed |
+| ------------- |:-------------:| -------------:|
 | blockchain    | BTC  |  https://blockchain.info |
 | bitcoinaverage    | BTC  |  https://api.bitcoinaverage.com |
 | coinbase    | BTC  |  https://coinbase.com |
@@ -265,11 +265,11 @@ It is sufficient to add a JSON object in the standard options file structured in
 
 ###Additional parameters
 
-NuBot can be further configured by adding additional parameters to its config file. Below a table with an explanation of each parameter and its default value. 
+NuBot can be further configured by adding additional parameters to its config file. Below a table with an explanation of each parameter and its default value.
 
 
-| Parameter      |  Default value  |  Description  |   Admitted values  | 
-| ------------- |:-------------:| -------------:| 
+| Parameter      |  Default value  |  Description  |   Admitted values  |
+| ------------- |:-------------:| -------------:|
 | nudip    | "127.0.0.1"  |   | The IP address of the machine that hosts the Nu Client |
 | multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
@@ -304,17 +304,17 @@ NuBot can be further configured by adding additional parameters to its config fi
 *coming soon*
 
 ##Adding SSL certificates for an exchange
-In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.  
+In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.
 NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](../master/NuBot/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
 
-Using the keytool we can create the keystore 
+Using the keytool we can create the keystore
 ```
 keytool -genkey -alias signFiles -keystore nubot_keystore.jks
 ```
 You will be prompted to enter passwords for the key and keystore.
 
-To add a certificate we first need to get the SSL certificate (usually .cer) from the Exchange.  
-An easy way is navigate with the browser to the API entry-point, click on the lock icon, and drag the certificate locally.  
+To add a certificate we first need to get the SSL certificate (usually .cer) from the Exchange.
+An easy way is navigate with the browser to the API entry-point, click on the lock icon, and drag the certificate locally.
 After that the certificate can be added to the bot using keytool:
 
 ```
@@ -336,26 +336,26 @@ keytool -list -v -keystore Nubot_keystore.jks
 
 ##Download the latest version of the keystore
 
-We are committed to keep the *java keystore* always updated with most recent certificates available.  
+We are committed to keep the *java keystore* always updated with most recent certificates available.
 To get the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/f82fc9c98ff044afa4af0eaef95199a563cc6250/NuBot/res/ssl/nubot_keystore.jks?at=master) and place it in the *res/ssl* folder of NuBot.
 
 
 ##Logging on HTML and csv
 
-The bot produces different output log files, all stored in a special folder created for each session under *logs/*.  
-The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. 
+The bot produces different output log files, all stored in a special folder created for each session under *logs/*.
+The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*.
 *fine* are never logged to file (only to console).
-*info* are logged to file if we set`"verbose"=true`. 
+*info* are logged to file if we set`"verbose"=true`.
 *warning* are used for logging trading-related messages.
 *severe* are used for errors.
 
-Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
+Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders.
 
 #Changelogs
 See [changelog.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
 
 #Contribute
-*coming soon*
+see CONTRIBUTE.md
 
-#License 
+#License
 NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
