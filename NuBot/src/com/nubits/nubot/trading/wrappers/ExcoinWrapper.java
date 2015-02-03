@@ -46,7 +46,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * Created by sammoth on 30/11/14.
+ * Created by woolly_sammoth on 30/11/14.
  */
 public class ExcoinWrapper implements TradeInterface {
 

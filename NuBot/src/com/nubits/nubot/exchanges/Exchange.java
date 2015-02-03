@@ -55,6 +55,7 @@ public class Exchange {
         supportedExchanges.put(Constant.BITSPARK_PEATIO, new BitSparkWrapper());
         supportedExchanges.put(Constant.EXCOIN, new ExcoinWrapper());
         supportedExchanges.put(Constant.BITCOINCOID, new BitcoinCoIDWrapper());
+        supportedExchanges.put(Constant.COMKORT, new ComkortWrapper());
 
         Iterator it = supportedExchanges.entrySet().iterator();
         while (it.hasNext()) {

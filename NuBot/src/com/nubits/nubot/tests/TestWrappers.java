@@ -51,9 +51,9 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
-    //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.BITCOINCOID;
+    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "options.json";
+    public static final String testExchange = Constant.COMKORT;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
 
@@ -74,8 +74,8 @@ public class TestWrappers {
     public static void runTests() {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
-        //testGetAvailableBalance(testCurrency);
-        //testGetAvailableBalances(testPair);
+        testGetAvailableBalance(testCurrency);
+        testGetAvailableBalances(testPair);
         //testGetActiveOrders(testPair);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
@@ -91,7 +91,7 @@ public class TestWrappers {
         //testCancelOrder("2063803", testPair);
         //testClearAllOrders(testPair);
         //testGetOrderDetail("1139");
-        testIsOrderActive("1139");
+        //testIsOrderActive("1139");
         //testGetTxFee();
         //testGetTxFeeWithArgs(testPair);
         //Methods NOT strictly necessary for NuBot to run---------------
@@ -519,7 +519,14 @@ public class TestWrappers {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
-        } else {
+        } else if (exchangeName.equals(Constant.COMKORT)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.COMKORT_SECRET, Passwords.COMKORT_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new ComkortWrapper(keys, Global.exchange));
+        }else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
         }
