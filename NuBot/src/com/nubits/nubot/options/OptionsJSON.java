@@ -692,6 +692,10 @@ public class OptionsJSON {
             if (optionsJSON.containsKey("mail-notifications")) {
                 sendMails = (boolean) optionsJSON.get("mail-notifications");
             }
+            
+            if (optionsJSON.containsKey("mail-notifications-critical")) {
+                sendMails = (boolean) optionsJSON.get("mail-notifications-critical");
+            }
 
 
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
