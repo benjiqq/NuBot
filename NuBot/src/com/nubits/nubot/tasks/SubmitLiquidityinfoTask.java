@@ -64,14 +64,17 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void checkOrders() {
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
-            reportTier1();
-            reportTier2();
+            String response1 = reportTier1();
+            String response2 = reportTier2();
+            LOG.info(response1 + "\n" + response2);
         } else {
             LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
         }
     }
 
-    private void reportTier1() {
+    private String reportTier1() {
+        String toReturn = "";
+
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
@@ -192,15 +195,18 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                     sellSide = Global.exchange.getLiveData().getNBTonbuy();
                 }
 
-                sendLiquidityInfoImpl(buySide, sellSide, 1);
+                toReturn = sendLiquidityInfoImpl(buySide, sellSide, 1);
             }
 
         } else {
             LOG.severe(activeOrdersResponse.getError().toString());
         }
+        return toReturn;
+
     }
 
-    private void reportTier2() {
+    private String reportTier2() {
+        String toReturn = "";
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
             Balance balance = (Balance) balancesResponse.getResponseObject();
@@ -215,16 +221,18 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             if (Global.options.isSendRPC()) {
                 //Call RPC
-                sendLiquidityInfoImpl(buyside, sellside, 1);
+                toReturn = sendLiquidityInfoImpl(buyside, sellside, 1);
             }
 
 
         } else {
             LOG.severe(balancesResponse.getError().toString());
         }
+        return toReturn;
     }
 
-    private void sendLiquidityInfoImpl(double buySide, double sellSide, int tier) {
+    private String sendLiquidityInfoImpl(double buySide, double sellSide, int tier) {
+        String toReturn = "";
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject;
 
@@ -232,7 +240,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                     buySide, sellSide, tier);
 
-            LOG.info("buy : " + buySide + " sell:" + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString());
+            toReturn = "buy : " + buySide + " sell:" + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString();
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
@@ -250,9 +258,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             }
         } else {
             LOG.severe("Client offline. ");
-
         }
-
+        return toReturn;
     }
 
     public void setOutputFile(String outputFile) {
