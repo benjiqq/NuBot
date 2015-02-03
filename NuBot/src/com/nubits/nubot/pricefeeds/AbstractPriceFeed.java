@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
@@ -34,4 +34,8 @@ public abstract class AbstractPriceFeed {
 //Methods
 
     public abstract LastPrice getLastPrice(CurrencyPair pair);
+
+    public String getName() {
+        return name;
+    }
 }
