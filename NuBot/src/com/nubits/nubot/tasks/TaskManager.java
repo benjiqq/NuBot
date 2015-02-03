@@ -121,7 +121,7 @@ public class TaskManager {
                     if (Global.options != null) {
                         additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toString("_");
                     }
-                    //send mail here ?
+                    //dpn't send mail here for now
                     HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
                     sentNotification = true;
                 }
