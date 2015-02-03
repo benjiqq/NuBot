@@ -370,14 +370,17 @@ public class NuBot {
             System.exit(0);
         }
 
-
-
-
+        
+        notifyOnline();
+    }
+    
+    private static void notifyOnline(){
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";
         }
-        HipChatNotifications.sendMessage("A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")", Message.Color.GREEN);
+        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")";
+        HipChatNotifications.sendMessage(msg, Message.Color.GREEN);
     }
 
     private boolean readParams(String[] args) {

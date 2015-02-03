@@ -123,8 +123,8 @@ public class TestSync extends TimerTask {
         //Send hipchat notification
         message("Run");
 
-        HipChatNotifications.sendMessage(getIdString() + " test price reading : 1BTC =" + readPrice()
-                + "$ ", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
+        HipChatNotifications.sendMessageCritical(getIdString() + " test price reading : 1BTC =" + readPrice()
+                + "$ ");
 
         //Add a random sleep after the notification to see if the keep sync
 

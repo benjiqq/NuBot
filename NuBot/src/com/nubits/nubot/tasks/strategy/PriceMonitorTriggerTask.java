@@ -205,7 +205,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
                     + " price. Please restart the bot and get in touch with Nu Dev team";
             MailNotifications.send(Global.options.getMailRecipient(), title, message);
-            HipChatNotifications.sendMessage(title + message, Color.RED);
+            HipChatNotifications.sendMessageCritical(title + message);
             LOG.severe(title + message);
         }
     }

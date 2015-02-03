@@ -121,7 +121,7 @@ public class TaskManager {
                     if (Global.options != null) {
                         additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toString("_");
                     }
-                    HipChatNotifications.sendMessage("Bot shut-down ( " + additionalInfo + " )", Color.RED);
+                    HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
                     sentNotification = true;
                 }
             }

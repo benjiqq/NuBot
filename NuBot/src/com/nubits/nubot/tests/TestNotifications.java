@@ -31,7 +31,7 @@ public class TestNotifications {
     public static void main(String[] a) {
         //MailNotifications.send("pennybreaker@outlook.com", "Test Title", "Test Message");
         //USE RED FOR CRITICAL, ANYTHING ELSE FOR STANDARD
-        HipChatNotifications.sendMessage("Critical notification test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
+        HipChatNotifications.sendMessageCritical("Critical notification test");
         HipChatNotifications.sendMessage("Standard notification test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.GREEN);
 
     }
