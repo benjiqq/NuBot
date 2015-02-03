@@ -34,6 +34,8 @@
   - Display bot version number in logs
   - Renamed price-Offset parameter into price-spread (and compute it as 50% per side)
   - Wait random time before placing an order to ensure competitivity with multiple bots
+  - LOG timestamp in UTC
+  - Logging format improvements
 
 #### Bug fixes:
   - Looping on moving average detection
