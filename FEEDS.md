@@ -13,7 +13,7 @@
 | coinmarketcap_no    | PPC |  http://coinmarketcap.northpole.ro |
 | coinmarketcap_ne    | PPC |  http://coinmarketcap-nexuist.rhcloud.com |
 | bitstampeurusd    | EUR  |  https://bitstamp.com |
-| google-unofficial    | EUR,CNY, ...  |  http://rate-exchange.appspot.com |
-| yahoo    | EUR,CNY, ...  |  https://yahooapis.com |
-| openexchangerates    | EUR,CNY, ...  |  https://openexchangerates.org |
+| google-unofficial    | EUR,CNY,PHP,HKD ...  |  http://rate-exchange.appspot.com |
+| yahoo    | EUR,CNY,PHP,HKD ...  |  https://yahooapis.com |
+| openexchangerates    | EUR,CNY, PHP,HKD...  |  https://openexchangerates.org |
 | exchangeratelab    | EUR,CNY, ...  |  https://exchangeratelab.com
