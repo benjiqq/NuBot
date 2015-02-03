@@ -37,29 +37,55 @@ import javax.mail.internet.MimeMessage;
  */
 public class MailNotifications {
 
+    public static String level_none = "NONE";
+    public static String level_all = "ALL";
+    public static String level_severe = "SEVERE";
+
     private static final Logger LOG = Logger.getLogger(MailNotifications.class
             .getName());
 
+    /**
+     * send to recipient if level is set to all
+     * @param address
+     * @param title
+     * @param message
+     */
     public static void send(String address, String title, String message) {
-        sendImpl(address, title, message);
+        boolean any = Global.options.sendMailsLevel().equals(level_all);
+        if (any)
+            sendImpl(address, title, message);
     }
 
+    /**
+     * send to recipient only if level is severe
+     * @param address
+     * @param title
+     * @param message
+     */
     public static void sendCritical(String address, String title, String message) {
-        if (Global.options == null || Global.options.isSendMailsCritical()) {
+        boolean isCritical = Global.options.sendMailsLevel().equals(level_all)
+                || Global.options.sendMailsLevel().equals(level_severe);
+        if (Global.options == null || isCritical) {
             sendImpl(address, title, message);
         }
     }
 
+    /**
+     * send mail
+     * @param address
+     * @param title
+     * @param message
+     */
     private static void sendImpl(String address, String title, String message) {
-        if (Global.options == null || Global.options.isSendMails()) {
-            try {
-                MailNotifications.Send(address, title, message);
-            } catch (AddressException ex) {
-                LOG.severe(ex.toString());
-            } catch (MessagingException ex) {
-                LOG.severe(ex.toString());
-            }
+
+        try {
+            MailNotifications.Send(address, title, message);
+        } catch (AddressException ex) {
+            LOG.severe(ex.toString());
+        } catch (MessagingException ex) {
+            LOG.severe(ex.toString());
         }
+
     }
 
     private MailNotifications() {

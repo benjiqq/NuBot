@@ -55,8 +55,7 @@ public class OptionsJSON {
     private int nudPort;
     //Optional settings with a default value  ----------------------------
     private String nudIp;
-    private boolean sendMails;
-    private boolean sendMailsCritical;
+    private String sendMails;
     private boolean submitLiquidity;
     private boolean executeOrders;
     private boolean verbose;
@@ -103,7 +102,7 @@ public class OptionsJSON {
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-            boolean sendMails, boolean sendMailsCritical, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
+            String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -123,7 +122,6 @@ public class OptionsJSON {
         this.executeStrategyInterval = executeStrategyInterval;
         this.sendHipchat = sendHipchat;
         this.sendMails = sendMails;
-        this.sendMailsCritical = sendMailsCritical;        
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
@@ -426,7 +424,7 @@ public class OptionsJSON {
      *
      * @return
      */
-    public boolean isSendMails() {
+    public String sendMailsLevel() {
         return sendMails;
     }
 
@@ -434,26 +432,10 @@ public class OptionsJSON {
      *
      * @param sendMails
      */
-    public void setSendMails(boolean sendMails) {
+    public void setSendMailsLevel(String sendMails) {
         this.sendMails = sendMails;
     }
     
-    /**
-    *
-    * @return
-    */
-   public boolean isSendMailsCritical() {
-       return sendMailsCritical;
-   }
-
-   /**
-    *
-    * @param sendMails
-    */
-   public void setSendMailsCritical(boolean sendMailsCritical) {
-       this.sendMailsCritical = sendMailsCritical;
-   }
-
     /**
      *
      * @return
@@ -594,8 +576,7 @@ public class OptionsJSON {
             //Then parse optional settings. If not use the default value declared here
 
             String nudIp = "127.0.0.1";
-            boolean sendMails = true;
-            boolean sendMailsCritical = true;
+            String sendMails = "all";
             boolean submitLiquidity = true;
             boolean executeOrders = true;
             boolean verbose = false;
@@ -690,12 +671,9 @@ public class OptionsJSON {
             }
 
             if (optionsJSON.containsKey("mail-notifications")) {
-                sendMails = (boolean) optionsJSON.get("mail-notifications");
+                sendMails = (String)optionsJSON.get("mail-notifications");
             }
             
-            if (optionsJSON.containsKey("mail-notifications-critical")) {
-                sendMails = (boolean) optionsJSON.get("mail-notifications-critical");
-            }
 
 
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
@@ -726,7 +704,7 @@ public class OptionsJSON {
             options = new OptionsJSON(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                     rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                     executeOrders, verbose, pair, executeStrategyInterval,
-                    sendLiquidityInterval, sendHipchat, sendMails, sendMailsCritical, mailRecipient,
+                    sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
                     emergencyTimeout, keepProceeds, aggregate, multipleCustodians, maxSellVolume, maxBuyVolume, cpo);
 
         } catch (NumberFormatException e) {

@@ -36,14 +36,14 @@ import java.util.logging.Logger;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class TestPriceFeed {
+public class TestPriceFeedBtce {
 
-    private static final Logger LOG = Logger.getLogger(TestPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestPriceFeedBtce.class.getName());
     AbstractPriceFeed feed;
     CurrencyPair pair;
 
     public static void main(String a[]) {
-        TestPriceFeed test = new TestPriceFeed();
+        TestPriceFeedBtce test = new TestPriceFeedBtce();
         test.init();
 
         test.pair = Constant.BTC_USD;
@@ -89,10 +89,6 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-
-        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
-        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
-        backupFeedList.add(PriceFeedManager.COINBASE);
 
         PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
 
