@@ -94,6 +94,7 @@ public class ComkortWrapper implements TradeInterface {
             apiResponse.setError(errors.noConnectionError);
             return apiResponse;
         }
+
         JSONParser parser = new JSONParser();
 
         try {
@@ -367,6 +368,7 @@ public class ComkortWrapper implements TradeInterface {
                 LOG.severe("Query to : " + url
                         + "\nData : " + post_data
                         + "\nHTTP Response : " + Objects.toString(response));
+                return "{'error': 'httpError', 'response': Objects.toString(response)}";
             }
 
             try {
