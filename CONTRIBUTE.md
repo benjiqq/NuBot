@@ -50,3 +50,7 @@ Jenkins is used. TODO: more info here.
 ## Trello
 
 currently not in use. Management takes place over the forum or Hipchat or Bitbucket.
+
+## AssitantBot
+
+see https://bitbucket.org/mj2p/assistantbot
