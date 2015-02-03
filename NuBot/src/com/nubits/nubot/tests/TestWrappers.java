@@ -53,7 +53,7 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.BITCOINCOID;
+    public static final String testExchange = Constant.CCEDK;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
 
@@ -75,7 +75,7 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
         //testGetAvailableBalance(testCurrency);
-        //testGetAvailableBalances(testPair);
+        testGetAvailableBalances(testPair);
         //testGetActiveOrders(testPair);
         //testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //testClearAllOrders(Constant.NBT_BTC);
@@ -91,7 +91,7 @@ public class TestWrappers {
         //testCancelOrder("2063803", testPair);
         //testClearAllOrders(testPair);
         //testGetOrderDetail("1139");
-        testIsOrderActive("1139");
+        //testIsOrderActive("1139");
         //testGetTxFee();
         //testGetTxFeeWithArgs(testPair);
         //Methods NOT strictly necessary for NuBot to run---------------

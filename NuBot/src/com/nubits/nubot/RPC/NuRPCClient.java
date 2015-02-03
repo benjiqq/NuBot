@@ -80,7 +80,7 @@ public class NuRPCClient {
     }
 
     //Public Methods
-    public JSONObject submitLiquidityInfo(String currencyChar, double buyamount, double sellamount) {
+    public JSONObject submitLiquidityInfo(String currencyChar, double buyamount, double sellamount, int tier) {
 
         /*
          * String[] params = { USDchar,buyamount,sellamount,custodianPublicAddress, identifier* };
@@ -90,7 +90,7 @@ public class NuRPCClient {
 
         List params;
         if (useIdentifier) {
-            params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress, identifier);
+            params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress, identifier + "_tier_" + tier);
         } else {
             params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress);
         }

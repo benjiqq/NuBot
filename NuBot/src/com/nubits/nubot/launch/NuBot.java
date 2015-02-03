@@ -422,13 +422,23 @@ public class NuBot {
 
                     //reset liquidity info
                     if (Global.rpcClient.isConnected() && Global.options.isSendRPC()) {
-                        JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0);
+                        //tier 1
                         LOG.info("Resetting Liquidity Info before quit");
-                        if (null == responseObject) {
+
+                        JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0, 1);
+                        if (null == responseObject1) {
                             LOG.severe("Something went wrong while sending liquidityinfo");
                         } else {
-                            LOG.fine(responseObject.toJSONString());
+                            LOG.fine(responseObject1.toJSONString());
+                        }
+
+                        JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0, 2);
+                        if (null == responseObject2) {
+                            LOG.severe("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.fine(responseObject2.toJSONString());
                         }
                     }
 
