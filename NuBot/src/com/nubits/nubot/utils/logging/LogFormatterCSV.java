@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -17,8 +17,7 @@
  */
 package com.nubits.nubot.utils.logging;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.nubits.nubot.utils.Utils;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.Level;
@@ -35,17 +34,11 @@ public class LogFormatterCSV extends Formatter {
     public String format(LogRecord rec) {
         if (rec.getLevel().intValue() >= Level.INFO.intValue()) {
             StringBuffer buf = new StringBuffer(1000);
-            buf.append((formatMessage(rec)).replaceAll(",", " ") + "," + rec.getLevel() + "," + rec.getSourceClassName() + "," + rec.getSourceMethodName() + "," + calcDate(rec.getMillis()) + "\n");
+            buf.append((formatMessage(rec)).replaceAll(",", " ") + "," + rec.getLevel() + "," + rec.getSourceClassName() + "," + rec.getSourceMethodName() + "," + Utils.calcDate(rec.getMillis()) + "\n");
             return buf.toString();
         } else {
             return "";
         }
-    }
-
-    private String calcDate(long millisecs) {
-        SimpleDateFormat date_format = new SimpleDateFormat("MMM_dd_HH_mm_ss");
-        Date resultdate = new Date(millisecs);
-        return date_format.format(resultdate);
     }
 
     // This method is called just after the handler using this

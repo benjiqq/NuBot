@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -344,5 +345,13 @@ public class Utils {
         int minutesTillWindow = windowWidthSeconds - (remoteTimeInMinutes % windowWidthSeconds);
         int delay = ((60 * minutesTillWindow) - remoteTimeInSeconds);
         return delay;
+    }
+
+    public static String calcDate(long millisecs) {
+        String timezone = "UTC";
+        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd yyyy HH:mm:ss.SSS");
+        date_format.setTimeZone(TimeZone.getTimeZone("timezone"));
+        Date resultdate = new Date(millisecs);
+        return date_format.format(resultdate) + " " + timezone;
     }
 }

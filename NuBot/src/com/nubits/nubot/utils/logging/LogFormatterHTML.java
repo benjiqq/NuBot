@@ -22,7 +22,7 @@ package com.nubits.nubot.utils.logging;
  * @author desrever , credits
  * http://www.vogella.com/articles/Logging/article.html#overview_logger
  */
-import java.text.SimpleDateFormat;
+import com.nubits.nubot.utils.Utils;
 import java.util.Date;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
@@ -65,7 +65,7 @@ class LogFormatterHTML extends Formatter {
 
 
             buf.append("<td class='tim' rel='time'>");
-            buf.append(calcDate(rec.getMillis()));
+            buf.append(Utils.calcDate(rec.getMillis()));
             buf.append("</td>\n");
 
             buf.append("</tr>\n");
@@ -75,12 +75,6 @@ class LogFormatterHTML extends Formatter {
         }
 
 
-    }
-
-    private String calcDate(long millisecs) {
-        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd,yyyy HH:mm");
-        Date resultdate = new Date(millisecs);
-        return date_format.format(resultdate);
     }
 
     // This method is called just after the handler using this

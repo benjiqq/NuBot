@@ -456,7 +456,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             this.pegPriceDirection = Constant.DOWN;
         }
 
-        LOG.info(" Sell Price " + sellPricePEG_new + "\n"
+        LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
 
 
@@ -494,9 +494,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("feed", tempPrice.getSource());
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
+        LOG.warning(row);
+
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
-        LOG.warning(row);
         FileSystem.writeToFile(row, outputPath, true);
 
         //Also update a json version of the output file

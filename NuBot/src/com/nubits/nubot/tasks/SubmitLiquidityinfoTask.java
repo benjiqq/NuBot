@@ -193,8 +193,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 }
 
                 sendLiquidityInfoImpl(buySide, sellSide, 1);
-            } else {
-                //LOG.fine("\n\n\n buy : " + Global.exchange.getLiveData().getNBTonbuy() + "\n\n\n");
             }
 
         } else {
@@ -234,7 +232,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                     buySide, sellSide, tier);
 
-            LOG.fine("sending Liquidity Info :\n" + buySide + "\n" + sellSide + "\n" + responseObject.toJSONString());
+            LOG.info("buy : " + buySide + " sell:" + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString());
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
