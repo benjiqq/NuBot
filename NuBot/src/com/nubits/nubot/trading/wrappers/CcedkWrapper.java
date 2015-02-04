@@ -736,6 +736,11 @@ public class CcedkWrapper implements TradeInterface {
         return apiResponse;
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("CcedkWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class CcedkService implements ServiceInterface {
 
         protected String base;

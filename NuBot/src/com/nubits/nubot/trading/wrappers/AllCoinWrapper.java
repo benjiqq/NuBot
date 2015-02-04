@@ -676,6 +676,11 @@ public class AllCoinWrapper implements TradeInterface {
         return toReturn;
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("AllCoinWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class AllCoinService implements ServiceInterface {
 
         protected String url;

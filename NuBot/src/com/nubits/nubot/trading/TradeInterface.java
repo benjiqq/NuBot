@@ -188,6 +188,15 @@ public interface TradeInterface {
     public ApiResponse isOrderActive(String id);
 
     /**
+     * Get the the order book associated with a trading pair
+     *
+     * @param id The order id
+     * @return an ApiResponse object with an OrderBook object, ApiError in case
+     * of error.
+     */
+    public ApiResponse getOrderBook(CurrencyPair pair);
+
+    /**
      * Delete all active orders. Async
      *
      * @param pair The currency pair of the order. Ignored by most exchanged,

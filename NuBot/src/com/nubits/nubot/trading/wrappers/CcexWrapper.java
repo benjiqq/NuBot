@@ -766,6 +766,11 @@ public class CcexWrapper implements TradeInterface {
         return toRet;
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("CcexWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class CcexService implements ServiceInterface {
 
         protected ApiKeys keys;

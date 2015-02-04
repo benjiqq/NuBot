@@ -751,6 +751,11 @@ public class PeatioWrapper implements TradeInterface {
 
     }
 
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("PeatioWrapper.getOrderBook() not implemented yet.");
+    }
+
     private class PeatioService implements ServiceInterface {
 
         protected String base;
