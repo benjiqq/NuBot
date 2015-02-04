@@ -32,7 +32,7 @@ public class LiquidityCurveLog extends LiquidityCurve {
     }
 
     @Override
-    double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double wallPrice) {
+    double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double wallPrice, double pegPrice) {
         throw new UnsupportedOperationException("LiquidityCurveLog.computeOrderSize() not implemented yet.");
     }
 }

@@ -32,6 +32,7 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
+import static easyjcckit.QuickPlot.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -96,7 +97,7 @@ public class TestLiquidityDistribution {
         double buyWallHeight = 1000;
         double buyWallWidth = 0.2;
         double buyWallDensity = 0.025;
-        String buyCurveSteepness = LiquidityCurve.STEEPNESS_LOW;
+        String buyCurveSteepness = LiquidityCurve.STEEPNESS_HIGH;
 
         sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, new LiquidityCurveLin(sellCurveSteepness));
         buyParams = new ModelParameters(buyOffset, buyWallHeight, buyWallWidth, buyWallDensity, new LiquidityCurveLin(buyCurveSteepness));
@@ -136,13 +137,35 @@ public class TestLiquidityDistribution {
         String toReturn = "----- " + type + " order book\n";
         for (int i = 0; i < orders.size(); i++) {
             OrderToPlace tempOrder = orders.get(i);
-            toReturn += tempOrder.getPrice() + "," + tempOrder.getSize() + "\n";
+            toReturn += Utils.round(tempOrder.getPrice() * pegPrice, 6) + "," + tempOrder.getPrice() + "," + tempOrder.getSize() + "\n";
         }
         toReturn += "----- ";
         return toReturn;
     }
 
     private void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders) {
-        throw new UnsupportedOperationException("TestLiquidityDistribution.drawOrderBook() not implemented yet.");
+        double[] xSell = new double[sellOrders.size()];
+        double[] ySell = new double[sellOrders.size()];
+        double[] xBuy = new double[buyOrders.size()];
+        double[] yBuy = new double[buyOrders.size()];
+
+
+        for (int i = 0; i < sellOrders.size(); i++) {
+            OrderToPlace tempOrder = sellOrders.get(i);
+            xSell[i] = tempOrder.getPrice() * pegPrice;
+            ySell[i] = tempOrder.getSize();
+
+        }
+
+        for (int i = 0; i < buyOrders.size(); i++) {
+            OrderToPlace tempOrder = buyOrders.get(i);
+            xBuy[i] = tempOrder.getPrice() * pegPrice;
+            yBuy[i] = tempOrder.getSize();
+
+        }
+
+        plot(xSell, ySell); // create a plot using xaxis and yvalues
+        addPlot(xBuy, yBuy); // create a second plot on top of first
+
     }
 }

@@ -77,7 +77,7 @@ public class LiquidityDistributionModel {
 
         //Compute the array of prices
         double[] prices = getPriceArray(wallPrice, endPrice, wallType, params.getDensity(), pegPrice);
-        double[] sizes = params.getCurve().computeOrderSize(prices, params.getWallHeight(), wallType, wallPrice);
+        double[] sizes = params.getCurve().computeOrderSize(prices, params.getWallHeight(), wallType, wallPrice, pegPrice);
 
         //TODO remove after testing
         //System.out.println("\n Prices for " + wallType + " liquidity: ");

@@ -45,5 +45,5 @@ public abstract class LiquidityCurve {
         }
     }
 
-    abstract double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double startPrice);
+    abstract double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double startPrice, double pegPrice);
 }
