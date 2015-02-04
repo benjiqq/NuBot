@@ -39,11 +39,6 @@ public class LiquidityDistributionModel {
         this.buyParams = buyParams;
     }
 
-    //Generate basic order distribution model
-    public static LiquidityDistributionModel generateStaticDistribution() {
-        return new LiquidityDistributionModel(ModelParameters.generateTestParams(), ModelParameters.generateTestParams());
-    }
-
     public ArrayList<OrderToPlace> getOrdersToPlace(String type, Amount fundsAvailable, double pegPrice, CurrencyPair pair, double txFee) {
         if (type.equals(Constant.SELL)) {
             return getOrdersToPlaceImpl(this.sellParams, fundsAvailable, Constant.SELL, pegPrice, pair, txFee);
@@ -52,17 +47,10 @@ public class LiquidityDistributionModel {
         }
     }
 
-    //TODO implement this
     private ArrayList<OrderToPlace> getOrdersToPlaceImpl(ModelParameters params, Amount funds, String wallType, double pegPrice, CurrencyPair pair, double txFee) {
         ArrayList<OrderToPlace> toReturn = new ArrayList();
 
         //First create the wall order and add it to the list
-        toReturn.add(buildWall(pegPrice, params, txFee, wallType, pair));
-
-        return toReturn;
-    }
-
-    private OrderToPlace buildWall(double pegPrice, ModelParameters params, double txFee, String wallType, CurrencyPair pair) {
         double oneUSD = Utils.round(1 / pegPrice, 8); //one $ expressed in the peg currency
         double wallPrice = oneUSD;
 
@@ -71,14 +59,57 @@ public class LiquidityDistributionModel {
 
         double totalOffset = offset + fee;//Compute the total offset by adding spread+fee
 
+        double endPrice; // The last price of the book
+        double wallWidthPeg = Utils.round(params.getWallWidth() * oneUSD, 8);
+
+
         //Add it or remove it from the price, based on the type of order
         if (wallType.equals(Constant.SELL)) {
             wallPrice += totalOffset;
+            endPrice = wallPrice + wallWidthPeg;
         } else {
             wallPrice -= totalOffset;
+            endPrice = wallPrice - wallWidthPeg;
+        }
+        wallPrice = Utils.round(wallPrice, 8);
+
+        toReturn.add(new OrderToPlace(wallType, pair, params.getWallHeight(), wallPrice));        //Add first order
+
+        //Compute the array of prices
+        double[] prices = getPriceArray(wallPrice, endPrice, wallType, params.getDensity(), pegPrice);
+        double[] sizes = params.getCurve().computeOrderSize(prices, params.getWallHeight(), wallType, wallPrice);
+
+        //TODO remove after testing
+        //System.out.println("\n Prices for " + wallType + " liquidity: ");
+        //System.out.println(wallPrice + " - " + Utils.round(wallPrice * pegPrice, 5) + " $");
+
+        for (int i = 0; i < prices.length; i++) {
+            //System.out.println(prices[i] + " - " + Utils.round(prices[i] * pegPrice, 5) + " $");
+            toReturn.add(new OrderToPlace(wallType, pair, sizes[i], prices[i]));
+        }
+        System.out.println("\n");
+
+
+        return toReturn;
+    }
+
+    private double[] getPriceArray(double startPrice, double endPrice, String type, double density, double pegPrice) {
+        double oneUSD = Utils.round(1 / pegPrice, 8); //one $ expressed in the peg currency
+        double distanceAmongOrders = Utils.round(density * oneUSD, 8); //Convert the distance in the peg currency
+        int numberOfElements = Utils.safeLongToInt(Math.round((Math.abs(startPrice - endPrice)) / distanceAmongOrders));
+        double[] toReturn = new double[numberOfElements];
+
+        for (int i = 0; i < numberOfElements; i++) {
+            if (type.equals(Constant.SELL)) {
+                toReturn[i] = Utils.round(startPrice + ((i + 1) * distanceAmongOrders), 8);
+            } else {
+                toReturn[i] = Utils.round(startPrice - ((i + 1) * distanceAmongOrders), 8);
+            }
         }
 
-        return new OrderToPlace(wallType, pair, params.getWallHeight(), wallPrice);
+
+
+        return toReturn;
     }
 
     public ModelParameters getSellParams() {

@@ -26,6 +26,7 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
+import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
@@ -86,19 +87,19 @@ public class TestLiquidityDistribution {
         //Configure sell Params
         double sellOffset = 0.05;
         double sellWallHeight = 1000;
-        double sellWallWidth = 0.3;
-        double sellWallDensity = 0.01;
-        double sellAngle = 45;
+        double sellWallWidth = 0.2;
+        double sellWallDensity = 0.025;
+        String sellCurveSteepness = LiquidityCurve.STEEPNESS_MID;
 
         //Configure buy Params
         double buyOffset = 0.05;
         double buyWallHeight = 1000;
-        double buyWallWidth = 0.3;
-        double buyWallDensity = 0.01;
-        double buyAngle = 45;
+        double buyWallWidth = 0.2;
+        double buyWallDensity = 0.025;
+        String buyCurveSteepness = LiquidityCurve.STEEPNESS_LOW;
 
-        sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, new LiquidityCurveLin(sellAngle));
-        buyParams = new ModelParameters(buyOffset, buyWallHeight, buyWallWidth, buyWallDensity, new LiquidityCurveLin(buyAngle));
+        sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, new LiquidityCurveLin(sellCurveSteepness));
+        buyParams = new ModelParameters(buyOffset, buyWallHeight, buyWallWidth, buyWallDensity, new LiquidityCurveLin(buyCurveSteepness));
 
         String config = "Sell order book configuration : " + sellParams.toString();
         config += "Buy order book configuration : " + buyParams.toString();

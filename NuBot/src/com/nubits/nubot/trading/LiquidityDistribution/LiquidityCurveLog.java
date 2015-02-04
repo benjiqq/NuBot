@@ -26,4 +26,13 @@ import java.util.logging.Logger;
 public class LiquidityCurveLog extends LiquidityCurve {
 
     private static final Logger LOG = Logger.getLogger(LiquidityCurveLog.class.getName());
+
+    public LiquidityCurveLog(String steepness) {
+        super(steepness);
+    }
+
+    @Override
+    double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double wallPrice) {
+        throw new UnsupportedOperationException("LiquidityCurveLog.computeOrderSize() not implemented yet.");
+    }
 }

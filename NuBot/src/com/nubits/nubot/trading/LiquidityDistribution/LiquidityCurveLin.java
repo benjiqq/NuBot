@@ -21,14 +21,46 @@ package com.nubits.nubot.trading.LiquidityDistribution;
  *
  * @author desrever <desrever at nubits.com>
  */
+import com.nubits.nubot.global.Constant;
 import java.util.logging.Logger;
 
 public class LiquidityCurveLin extends LiquidityCurve {
 
     private static final Logger LOG = Logger.getLogger(LiquidityCurveLin.class.getName());
-    private double angle;
 
-    public LiquidityCurveLin(double angle) {
-        this.angle = angle;
+    public LiquidityCurveLin(String steepness) {
+        super(steepness);
+    }
+
+    @Override
+    double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double wallPrice) {
+        double[] toReturn = new double[prices.length];
+
+        double m = computeAngularCoefficient();
+        double q = wallHeight;
+
+        if (wallType.equals(Constant.BUY)) {
+            m = m * -1;
+        }
+
+        for (int i = 0; i < prices.length; i++) {
+            toReturn[i] = m * (prices[i] - wallPrice) + q;
+        }
+
+        return toReturn;
+    }
+
+    private double computeAngularCoefficient() {
+        switch (steepness) {
+            case LiquidityCurve.STEEPNESS_HIGH:
+                return 1;
+            case LiquidityCurve.STEEPNESS_MID:
+                return 0.5;
+            case LiquidityCurve.STEEPNESS_LOW:
+                return 0.2;
+            default:
+                LOG.severe("Not supported steepness : " + steepness);
+        }
+        return 0;
     }
 }
