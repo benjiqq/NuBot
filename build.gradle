@@ -87,6 +87,12 @@ sourceSets {
             srcDir 'NuBot/src'
         }
     }
+    
+    test {
+    	java {
+        srcDir 'NuBot/src/com/nubits/nubot/tests' 
+    	}
+    }
 }
 
 
@@ -94,6 +100,7 @@ test {
 	/*testLogging {
 		events 'started', 'passed'
 	}*/
+	
 	reports {
         junitXml.enabled = false
         html.enabled = true
