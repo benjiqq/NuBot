@@ -29,13 +29,13 @@ public class OrderToPlace {
     private static final Logger LOG = Logger.getLogger(OrderToPlace.class.getName());
     private String type; // string value containing either Constant.BUY or Constant.SELL
     private CurrencyPair pair; //Object containing currency pair
-    private Amount amount;    //Object containing the number of units for this trade (without fees). Expressed in pair.OrderCurrency
-    private Amount price; //Object containing the price for each units traded. Expressed in pair.PaymentCurrency
+    private double size;    //Object containing the number of units for this trade (without fees). Expressed in pair.OrderCurrency
+    private double price; //Object containing the price for each units traded. Expressed in pair.PaymentCurrency
 
-    public OrderToPlace(String type, CurrencyPair pair, Amount amount, Amount price) {
+    public OrderToPlace(String type, CurrencyPair pair, double size, double price) {
         this.type = type;
         this.pair = pair;
-        this.amount = amount;
+        this.size = size;
         this.price = price;
     }
 
@@ -75,23 +75,23 @@ public class OrderToPlace {
      *
      * @return
      */
-    public Amount getAmount() {
-        return amount;
+    public double getSize() {
+        return size;
     }
 
     /**
      *
      * @param amount
      */
-    public void setAmount(Amount amount) {
-        this.amount = amount;
+    public void setSize(double size) {
+        this.size = size;
     }
 
     /**
      *
      * @return
      */
-    public Amount getPrice() {
+    public double getPrice() {
         return price;
     }
 
@@ -99,12 +99,12 @@ public class OrderToPlace {
      *
      * @param price
      */
-    public void setPrice(Amount price) {
+    public void setPrice(double price) {
         this.price = price;
     }
 
     @Override
     public String toString() {
-        return "OrderToPlace{" + "type=" + type + ", pair=" + pair + ", amount=" + amount + ", price=" + price + '}';
+        return "OrderToPlace{" + "type=" + type + ", pair=" + pair + ", size=" + size + ", price=" + price + '}';
     }
 }
