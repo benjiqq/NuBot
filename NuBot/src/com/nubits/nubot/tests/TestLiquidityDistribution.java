@@ -78,7 +78,7 @@ public class TestLiquidityDistribution {
 
         pair = Constant.NBT_BTC;
         //Custodian balance simulation
-        balanceNBT = new Amount(10000, Constant.NBT);
+        balanceNBT = new Amount(27100.0, Constant.NBT);
         balancePEG = new Amount(100, Constant.BTC);
 
         pegPrice = 300; // value of 1 unit expressed in USD
@@ -88,7 +88,7 @@ public class TestLiquidityDistribution {
         //Configure sell Params
         double sellOffset = 0.01;
         double sellWallHeight = 1000;
-        double sellWallWidth = 0.4;
+        double sellWallWidth = 0.25;
         double sellWallDensity = 0.025;
         String sellCurveSteepness = LiquidityCurve.STEEPNESS_HIGH;
 

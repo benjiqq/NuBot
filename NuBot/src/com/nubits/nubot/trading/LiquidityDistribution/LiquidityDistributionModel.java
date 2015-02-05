@@ -63,6 +63,7 @@ public class LiquidityDistributionModel {
         double wallWidthPeg = Utils.round(params.getWallWidth() * oneUSD, 8);
 
 
+        double totalFundsAvailNBT = funds.getQuantity();
         //Add it or remove it from the price, based on the type of order
         if (wallType.equals(Constant.SELL)) {
             wallPrice += totalOffset;
@@ -70,26 +71,48 @@ public class LiquidityDistributionModel {
         } else {
             wallPrice -= totalOffset;
             endPrice = wallPrice - wallWidthPeg;
+            totalFundsAvailNBT = Utils.round(totalFundsAvailNBT * pegPrice, 8);
         }
         wallPrice = Utils.round(wallPrice, 8);
 
-        toReturn.add(new OrderToPlace(wallType, pair, params.getWallHeight(), wallPrice));        //Add first order
 
-        //Compute the array of prices
-        double[] prices = getPriceArray(wallPrice, endPrice, wallType, params.getDensity(), pegPrice);
-        double[] sizes = params.getCurve().computeOrderSize(prices, params.getWallHeight(), wallType, wallPrice, pegPrice);
+        double wallHeight = params.getWallHeight();
+        boolean tailAvailable = true;
+        if (wallHeight > totalFundsAvailNBT) {
+            LOG.warning("The current balance equivalent " + totalFundsAvailNBT
+                    + " NBT is not enought to place the full " + wallType + "wall"
+                    + " defined in the liquidity model (" + wallHeight + "). "
+                    + "\nResizing the size of the order, and not adding the tail");
 
-        //TODO remove after testing
-        //System.out.println("\n Prices for " + wallType + " liquidity: ");
-        //System.out.println(wallPrice + " - " + Utils.round(wallPrice * pegPrice, 5) + " $");
-
-        for (int i = 0; i < prices.length; i++) {
-            //System.out.println(prices[i] + " - " + Utils.round(prices[i] * pegPrice, 5) + " $");
-            toReturn.add(new OrderToPlace(wallType, pair, sizes[i], prices[i]));
+            tailAvailable = false;
+            wallHeight = totalFundsAvailNBT - 1;
         }
-        System.out.println("\n");
 
+        toReturn.add(new OrderToPlace(wallType, pair, wallHeight, wallPrice));        //Add first order
+        totalFundsAvailNBT -= wallHeight;
 
+        if (tailAvailable) {
+            //Compute the array of prices
+            double[] prices = getPriceArray(wallPrice, endPrice, wallType, params.getDensity(), pegPrice);
+            double[] sizes = params.getCurve().computeOrderSize(prices, params.getWallHeight(), wallType, wallPrice, pegPrice);
+
+            boolean prepareNext = true;
+            for (int i = 0; i < prices.length; i++) {
+                if (prepareNext) {
+                    if (sizes[i] < totalFundsAvailNBT) {
+                        toReturn.add(new OrderToPlace(wallType, pair, sizes[i], prices[i]));
+                        totalFundsAvailNBT -= sizes[i];
+                    } else {
+                        LOG.warning("Not enough liquidity to place the full tail as defined in the model. Skipping the rest of the tail"
+                                + "\ntotalFundsAvailNBT = " + totalFundsAvailNBT + " ; sizes[i] = " + sizes[i]);
+                        break;
+                    }
+
+                }
+            }
+            System.out.println("\n");
+
+        }
         return toReturn;
     }
 

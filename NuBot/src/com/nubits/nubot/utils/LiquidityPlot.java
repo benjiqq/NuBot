@@ -62,9 +62,7 @@ public class LiquidityPlot {
                 ymin = Math.min(ymin, curveData.yvalues[i]);
                 ymax = Math.max(ymax, curveData.yvalues[i]);
             }
-            if (xmin == xmax) {
-                throw new RuntimeException("xaxis is singular");
-            }
+
         }
         if (ymin == ymax) {
             if (ymin > 0) {
