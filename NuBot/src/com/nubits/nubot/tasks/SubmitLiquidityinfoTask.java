@@ -240,7 +240,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                     buySide, sellSide, tier);
 
-            toReturn = "buy : " + buySide + " sell:" + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString();
+            toReturn = "buy : " + buySide + " sell : " + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString();
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {
