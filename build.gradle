@@ -64,9 +64,6 @@ repositories {
 }
 
 dependencies {
-    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
-    compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.3.4'
-    
     //deps. obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
     //except 3 jars, see below
     compile 'commons-codec:commons-codec:1.7'
@@ -81,6 +78,13 @@ dependencies {
 	compile 'javax.mail:mail:1.4.4'
 	compile 'com.googlecode.json-simple:json-simple:1.1.1'
 	compile 'org.jsoup:jsoup:1.7.3'
+	
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    
+    compile 'org.zeromq:jeromq:0.3.4'
+    
+    //compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.3.4' 
+	//compile 'com.typesafe.akka:akka-camel_2.11:2.3.9'
     
     //local repo
     //FIX needed: these 3 have to be included manually
@@ -124,6 +128,29 @@ test {
         html.enabled = true
     }
 }
+
+//TODO
+//init
+def classesDir = new File('build/classes')
+
+task resources << {
+    classesDir.mkdirs()
+    // do something
+}
+/*task compile(dependsOn: 'resources') << {
+    if (classesDir.isDirectory()) {
+        println 'The class directory exists. I can operate'
+    }
+    // do something
+}*/
+
+task copyDocs(type: Copy) {
+    from 'src/main/doc'
+    into 'build/target/doc'
+}
+
+
+
 
 
 
