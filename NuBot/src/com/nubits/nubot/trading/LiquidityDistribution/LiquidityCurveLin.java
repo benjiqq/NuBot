@@ -36,7 +36,7 @@ public class LiquidityCurveLin extends LiquidityCurve {
     double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double wallPrice, double pegPrice) {
         double[] toReturn = new double[prices.length];
 
-        double m = computeAngularCoefficient();
+        double m = computeCoefficient();
 
         double increment = m * wallHeight;
         for (int i = 0; i < prices.length; i++) {
@@ -46,13 +46,13 @@ public class LiquidityCurveLin extends LiquidityCurve {
         return toReturn;
     }
 
-    private double computeAngularCoefficient() {
+    private double computeCoefficient() {
         switch (steepness) {
-            case LiquidityCurve.STEEPNESS_HIGH:
-                return 0.5;
-            case LiquidityCurve.STEEPNESS_MID:
-                return 0.25;
-            case LiquidityCurve.STEEPNESS_LOW:
+            case STEEPNESS_HIGH:
+                return 0.3;
+            case STEEPNESS_MID:
+                return 0.2;
+            case STEEPNESS_LOW:
                 return 0.1;
             default:
                 LOG.severe("Not supported steepness : " + steepness);

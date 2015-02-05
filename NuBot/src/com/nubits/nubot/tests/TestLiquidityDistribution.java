@@ -78,26 +78,26 @@ public class TestLiquidityDistribution {
 
         pair = Constant.NBT_BTC;
         //Custodian balance simulation
-        Amount balanceNBT = new Amount(10000, Constant.NBT);
-        Amount balancePEG = new Amount(100, Constant.BTC);
+        balanceNBT = new Amount(10000, Constant.NBT);
+        balancePEG = new Amount(100, Constant.BTC);
 
         pegPrice = 300; // value of 1 unit expressed in USD
 
         txFee = 0.2; // %
 
         //Configure sell Params
-        double sellOffset = 0.05;
+        double sellOffset = 0.01;
         double sellWallHeight = 1000;
-        double sellWallWidth = 0.2;
+        double sellWallWidth = 0.4;
         double sellWallDensity = 0.025;
-        String sellCurveSteepness = LiquidityCurve.STEEPNESS_MID;
+        String sellCurveSteepness = LiquidityCurve.STEEPNESS_HIGH;
 
         //Configure buy Params
-        double buyOffset = 0.05;
-        double buyWallHeight = 1000;
+        double buyOffset = 0.01;
+        double buyWallHeight = 500;
         double buyWallWidth = 0.2;
         double buyWallDensity = 0.025;
-        String buyCurveSteepness = LiquidityCurve.STEEPNESS_HIGH;
+        String buyCurveSteepness = LiquidityCurve.STEEPNESS_LOW;
 
         sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, new LiquidityCurveLin(sellCurveSteepness));
         buyParams = new ModelParameters(buyOffset, buyWallHeight, buyWallWidth, buyWallDensity, new LiquidityCurveLin(buyCurveSteepness));
@@ -105,8 +105,8 @@ public class TestLiquidityDistribution {
         String config = "Sell order book configuration : " + sellParams.toString();
         config += "Buy order book configuration : " + buyParams.toString();
         config += "Pair : " + pair.toString();
-        config += "\nbalanceNBT : " + balanceNBT.toString();
-        config += "\nbalancePEG : " + balancePEG.toString();
+        config += "\nbalanceNBT : " + balanceNBT.getQuantity();
+        config += "\nbalancePEG : " + balancePEG.getQuantity();
         config += "\npegPrice : " + pegPrice;
         config += "\ntxFee : " + txFee;
         config += "\n\n -------------------";
@@ -142,6 +142,24 @@ public class TestLiquidityDistribution {
             sumSize += tempOrder.getSize();
         }
         toReturn += "Order book size = " + sumSize + " NBT ";
+
+        double buyBalanceNBT = Utils.round(balancePEG.getQuantity() * pegPrice, 8);
+        double sellBalanceNBT = balanceNBT.getQuantity();
+
+        boolean overThreshold = false;
+        if (type.equals(Constant.SELL) && sumSize > sellBalanceNBT) {
+            overThreshold = true;
+        }
+
+        if (type.equals(Constant.BUY) && sumSize > buyBalanceNBT) {
+            overThreshold = true;
+        }
+
+        if (overThreshold) {
+            toReturn += "\n\n!The funds are not sufficient to satisfy current order books configuration!";
+        }
+
+
         toReturn += "----- ";
         return toReturn;
     }
