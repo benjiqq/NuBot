@@ -30,9 +30,9 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
+import static com.nubits.nubot.utils.LiquidityPlot.*;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
-import static easyjcckit.QuickPlot.*;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -135,10 +135,13 @@ public class TestLiquidityDistribution {
 
     private String printOrderBook(ArrayList<OrderToPlace> orders, String type) {
         String toReturn = "----- " + type + " order book\n";
+        double sumSize = 0;
         for (int i = 0; i < orders.size(); i++) {
             OrderToPlace tempOrder = orders.get(i);
             toReturn += Utils.round(tempOrder.getPrice() * pegPrice, 6) + "," + tempOrder.getPrice() + "," + tempOrder.getSize() + "\n";
+            sumSize += tempOrder.getSize();
         }
+        toReturn += "Order book size = " + sumSize + " NBT ";
         toReturn += "----- ";
         return toReturn;
     }
@@ -152,20 +155,21 @@ public class TestLiquidityDistribution {
 
         for (int i = 0; i < sellOrders.size(); i++) {
             OrderToPlace tempOrder = sellOrders.get(i);
-            xSell[i] = tempOrder.getPrice() * pegPrice;
+            xSell[i] = tempOrder.getPrice() * pegPrice * 100;
             ySell[i] = tempOrder.getSize();
 
         }
 
         for (int i = 0; i < buyOrders.size(); i++) {
             OrderToPlace tempOrder = buyOrders.get(i);
-            xBuy[i] = tempOrder.getPrice() * pegPrice;
+            xBuy[i] = tempOrder.getPrice() * pegPrice * 100;
             yBuy[i] = tempOrder.getSize();
 
         }
 
         plot(xSell, ySell); // create a plot using xaxis and yvalues
         addPlot(xBuy, yBuy); // create a second plot on top of first
+
 
     }
 }
