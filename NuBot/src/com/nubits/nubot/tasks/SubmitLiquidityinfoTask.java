@@ -64,8 +64,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void checkOrders() {
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
-            String response1 = reportTier1();
-            String response2 = reportTier2();
+            String response1 = reportTier1(); //active orders
+            String response2 = reportTier2(); //balance
             LOG.info(response1 + "\n" + response2);
         } else {
             LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
@@ -221,7 +221,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             if (Global.options.isSendRPC()) {
                 //Call RPC
-                toReturn = sendLiquidityInfoImpl(buyside, sellside, 1);
+                toReturn = sendLiquidityInfoImpl(buyside, sellside, 2);
             }
 
 
