@@ -1,0 +1,244 @@
+/*
+ * Copyright (C) 2014-2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+ 
+ /* 
+ * NuBot gradle build
+ *
+ * version 0.1
+ *
+ * to use, install gradle, version at least 2.0, see http://gradle.org
+ * 
+ * ----------
+ * commands
+ * ----------
+ * to run Unit tests: gradle test
+ * 
+ * TODO: to run Bot: gradle runBot  
+ * TODO: to run Streaming server: gradle runStream  
+ *
+ * 
+ * FIX needed: 3 libraries have to added by hand, because they are not found in the maven repos (?!)
+ * TODO's in the file  
+ * ------------------
+ *
+ * ------------------
+ * more info:
+ * https://gradle-ssh-plugin.github.io/
+ * how to include local repo: http://stackoverflow.com/questions/20700053/how-to-add-local-jar-file-dependency-to-build-gradle-file
+ */
+ 
+//TODO correct versioning
+version = '0.1' 
+ 
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'eclipse'
+
+sourceCompatibility = 1.7 // java version
+
+
+
+repositories {
+  maven { url "http://build-squid.eng.vmware.com/nexus/content/groups/repo" }
+  maven { url "http://build-maven-repo.eng.vmware.com:8081/nexus/content/groups/repo" }
+  maven { url "http://mvnrepository.com/artifact" }
+  mavenCentral()
+  flatDir {
+       dirs 'NuBot/lib/nubot-dependancies'
+   }
+}
+
+dependencies {
+    //deps. obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
+    //except 3 jars, see below
+    compile 'commons-codec:commons-codec:1.7'
+	compile 'commons-io:commons-io:2.4'
+	compile 'commons-logging:commons-logging:1.2'
+	compile 'commons-net:commons-net:3.3' //note: 3.3., instead of 1.2.0	
+	compile 'com.alibaba:fastjson:1.1.36'
+	compile 'com.google.code.gson:gson:2.2.3'
+	compile 'org.apache.httpcomponents:httpclient:4.3.4'
+	compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
+	compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+	compile 'javax.mail:mail:1.4.4'
+	compile 'com.googlecode.json-simple:json-simple:1.1.1'
+	compile 'org.jsoup:jsoup:1.7.3'
+	
+    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    
+    compile 'org.zeromq:jeromq:0.3.4'
+    
+    //compile group: 'com.typesafe.akka', name: 'akka-actor_2.11', version: '2.3.4' 
+	//compile 'com.typesafe.akka:akka-camel_2.11:2.3.9'
+    
+    //local repo
+    //FIX needed: these 3 have to be included manually
+        
+    compile files('NuBot/lib/nubot-dependancies/mail.jar')
+    compile files('NuBot/lib/nubot-dependancies/org-netbeans-modules-java-j2seproject-copylibstask.jar')
+    compile files('NuBot/lib/nubot-dependancies/org.json-20120521.jar')
+
+	//dependencies for testing
+    testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: '2.3.4'
+    testCompile group: 'org.testng', name: 'testng', version: '6.8.8'    
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+test {
+    systemProperties 'property': 'value'
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir 'NuBot/src'
+        }
+    }
+    
+    test {
+    	java {
+        srcDir 'NuBot/src/com/nubits/nubot/tests' 
+    	}
+    }
+}
+
+
+test {
+	/*testLogging {
+		events 'started', 'passed'
+	}*/
+	
+	reports {
+        junitXml.enabled = false
+        html.enabled = true
+    }
+}
+
+//TODO
+//init
+def classesDir = new File('build/classes')
+
+task resources << {
+    classesDir.mkdirs()
+    // do something
+}
+/*task compile(dependsOn: 'resources') << {
+    if (classesDir.isDirectory()) {
+        println 'The class directory exists. I can operate'
+    }
+    // do something
+}*/
+
+task copyDocs(type: Copy) {
+    from 'src/main/doc'
+    into 'build/target/doc'
+}
+
+
+
+
+
+
+//TODO: integrate with server credentials
+/*runStream {
+  mainClassName = "com.nubits.nuservice.HelloAkkaJava"
+  // applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
+}*/
+
+
+
+/*
+------------------------------------------------------------------------------------
+more features not in use, but for backup here
+------------------------------------------------------------------------------------
+
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }){
+    		exclude 'META-INF/MANIFEST.MF'
+			exclude 'META-INF/*.SF'
+			exclude 'META-INF/*.DSA'
+			exclude 'META-INF/*.RSA'
+    }
+    with jar
+    manifest.attributes("Main-Class":"com.nubits.MainRunner")
+}
+
+remotes {
+  nuservice {
+    host = '1xx....'
+    //TODO add user not root
+    user = 'root'
+  }
+  anotherserver {
+    host = '188.x.x.x'
+    //TODO add user not root
+    user = 'root'
+  }
+}
+
+//SSH tasks
+
+task ls(type: SshTask) {
+  description = 'tests server.'
+  ssh {
+    pty = true     // Enable PTY allocation for sudo
+  }
+  session(remotes.nuservice) {
+    execute 'ls /home'
+  }
+}
+
+task testall(type: Test) {
+  // explicitly include or exclude tests
+  include 'components/**'
+  exclude 'components/TestStartStop**'
+
+  // show standard out and standard error of the test JVM(s) on the console
+  testLogging.showStandardStreams = true
+
+  // set a system property for the test JVM(s)
+  //systemProperty 'some.prop', 'value'
+  // set heap size for the test JVM(s)
+  //minHeapSize = "128m"
+  //maxHeapSize = "512m"
+
+  // set JVM arguments for the test JVM(s)
+  //jvmArgs '-XX:MaxPermSize=256m'
+
+  // listen to events in the test execution lifecycle
+  beforeTest { descriptor ->
+     logger.lifecycle("###### Running test: " + descriptor)
+  }
+
+  // listen to standard out and standard error of the test JVM(s)
+  onOutput { descriptor, event ->
+     logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+  }
+
+  //testResultsDir = "/Users/xyz/"
+}
+
+uploadArchives {
+    repositories {
+       flatDir {
+           dirs 'repos'
+       }
+    }
+}
+*/
