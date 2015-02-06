@@ -22,6 +22,11 @@
  * version 0.1
  *
  * to use, install gradle, version at least 2.0, see http://gradle.org
+ * 
+ * //obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
+ * //except 3 jars, see below
+ * FIX needed: 3 libraries have to added by hand, because they are not found in the maven repos (?!)
+ * TODO's in the file
  *
  * to install on linux:
  * sudo add-apt-repository ppa:cwchien/gradle
@@ -33,18 +38,10 @@
  * ----------
  * to run Unit tests: gradle test
  *
+ * TODO: build jar
  * TODO: to run Bot: gradle runBot
  * TODO: to run Streaming server: gradle runStream
  *
- *
- * FIX needed: 3 libraries have to added by hand, because they are not found in the maven repos (?!)
- * TODO's in the file
- * ------------------
- *
- * ------------------
- * more info:
- * https://gradle-ssh-plugin.github.io/
- * how to include local repo: http://stackoverflow.com/questions/20700053/how-to-add-local-jar-file-dependency-to-build-gradle-file
  */
 
 //TODO correct versioning
@@ -68,9 +65,6 @@ repositories {
    }
 }
 
-//deps. obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
-//except 3 jars, see below
-
 dependencies {
 
     compile 'commons-codec:commons-codec:1.7'
@@ -85,12 +79,10 @@ dependencies {
     compile 'javax.mail:mail:1.4.4'
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
-    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    compile 'commons-collections:commons-collections:3.2'
     
-    //new
     compile 'org.zeromq:jeromq:0.3.4'
-    compile 'com.h2database:h2:1.4.185'
-    
+    compile 'com.h2database:h2:1.4.185'    
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
