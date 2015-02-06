@@ -5,18 +5,17 @@
 	<appender name="STDOUT" level="all"
 		class="ch.qos.logback.core.ConsoleAppender">
 
-		<!-- <filter class="util.TradeLogFilter" /> -->
-
 		<encoder>
 			<pattern>%d{HH:mm:ss} %logger{36} - %msg%n</pattern>
 		</encoder>
+		
 		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>INFO</level> 
 			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
 	</appender>
 
 
 	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
-		<file>log/Client.log</file>
+		<file>logs/NuBot.log</file>
 
 		<encoder>
 			<pattern>%date %level - %msg%n
