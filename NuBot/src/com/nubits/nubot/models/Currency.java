@@ -17,10 +17,14 @@
  */
 package com.nubits.nubot.models;
 
-import com.nubits.nubot.utils.FileSystem;
+import java.io.InputStream;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import com.nubits.nubot.utils.FileSystem;
 
 /**
  *
@@ -45,7 +49,18 @@ public class Currency {
      */
     public static Currency createCurrency(String code) {
         Currency toRet = null;
-        ArrayList<String[]> currencyList = FileSystem.parseCsvFromFile(PATH_TO_CURRENCIES);
+        String udir = System.getProperty("user.dir");
+        String fp = udir + "/NuBot/res/currencies.csv";
+        //System.out.println(fp);
+        InputStream stream = Currency.class.getResourceAsStream("currencies.csv");
+        //System.out.println("> " 
+          //       + stream);
+        
+        Path currentRelativePath = Paths.get("");
+        String s = currentRelativePath.toAbsolutePath().toString();
+        //System.out.println("Current relative path is: " + s);
+        
+        ArrayList<String[]> currencyList = FileSystem.parseCsvFromFile(udir + "/NuBot/" + PATH_TO_CURRENCIES);
         boolean found = false;
         for (int j = 1; j < currencyList.size(); j++) {
             String[] tempLine = currencyList.get(j);

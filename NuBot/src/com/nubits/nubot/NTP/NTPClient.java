@@ -2,6 +2,7 @@ package com.nubits.nubot.NTP;
 
 /*
  * Copyright (C) 2014-2015 Nu Development Team
+
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -22,6 +23,7 @@ package com.nubits.nubot.NTP;
  * @author desrever <desrever at nubits.com>
  */
 import java.io.IOException;
+
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;

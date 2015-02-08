@@ -23,7 +23,6 @@ readme.html
 /NuBot/nbproject/configs/*.properties
 
 #Prevent test passwords to be pushed
-Passwords.java
 
 #Mac trash files
 .DS_Store

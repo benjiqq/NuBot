@@ -54,10 +54,7 @@ apply plugin: 'eclipse'
 sourceCompatibility = 1.7 // java version
 
 
-
 repositories {
-  maven { url "http://build-squid.eng.vmware.com/nexus/content/groups/repo" }
-  maven { url "http://build-maven-repo.eng.vmware.com:8081/nexus/content/groups/repo" }
   maven { url "http://mvnrepository.com/artifact" }
   mavenCentral()
   flatDir {
@@ -154,13 +151,16 @@ task copyDocs(type: Copy) {
 
 
 
+task runStream(type:JavaExec) {
+   main = "com.nubits.nuservice.Streamer
+   classpath = sourceSets.main.runtimeClasspath
+}
 
-//TODO: integrate with server credentials
-/*runStream {
-  mainClassName = "com.nubits.nuservice.HelloAkkaJava"
-  // applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
-}*/
 
+task runCollector(type:JavaExec) {
+   main = "com.nubits.nuservice.CollectService"
+   classpath = sourceSets.main.runtimeClasspath
+}
 
 
 /*
