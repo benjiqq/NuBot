@@ -19,15 +19,17 @@
  /*
  * NuBot gradle build
  *
- * version 0.1
+ * version 0.2
  *
  * to use, install gradle, version at least 2.0, see http://gradle.org
  * 
  * //obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
- * //except 3 jars, see below
- * FIX needed: 3 libraries have to added by hand, because they are not found in the maven repos (?!)
- * TODO's in the file
- *
+ * FIX done
+    //compile files('NuBot/lib/nubot-dependancies/mail.jar')
+    //this is a bugfix jar, which should not be needed in gradle
+    //compile files('NuBot/lib/nubot-dependancies/org-netbeans-modules-java-j2seproject-copylibstask.jar')    
+    //compile files('NuBot/lib/nubot-dependancies/org.json-20120521.jar') 
+ 
  * to install on linux:
  * sudo add-apt-repository ppa:cwchien/gradle
  * sudo apt-get update
@@ -56,9 +58,7 @@ sourceCompatibility = 1.7 // java version
 
 
 repositories {
-  maven { url "http://build-squid.eng.vmware.com/nexus/content/groups/repo" }
-  maven { url "http://build-maven-repo.eng.vmware.com:8081/nexus/content/groups/repo" }
-  maven { url "http://mvnrepository.com/artifact" }
+  //maven { url "http://mvnrepository.com/artifact" }
   mavenCentral()
   flatDir {
        dirs 'NuBot/lib/nubot-dependancies'
@@ -87,12 +87,7 @@ dependencies {
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
     
-    //local repo
-    //FIX needed: these 3 have to be included manually
-    
-    compile files('NuBot/lib/nubot-dependancies/mail.jar')
-    compile files('NuBot/lib/nubot-dependancies/org-netbeans-modules-java-j2seproject-copylibstask.jar')
-    compile files('NuBot/lib/nubot-dependancies/org.json-20120521.jar')
+    compile 'org.codeartisans:org.json:20131017'
     
     //dependencies for testing
     testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: '2.3.4'
@@ -100,9 +95,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.+'
 }
 
-test {
+/*test {
     systemProperties 'property': 'value'
-}
+}*/
 
 sourceSets {
     main {
@@ -130,14 +125,29 @@ test {
     }
 }
 
+task runCollector(type:JavaExec) {
+   main = "com.nubits.nuservice.CollectService"
+   classpath = sourceSets.main.runtimeClasspath
+}
+
+
+/*
+
+def defaultprops = new Properties()
+file("conf/settings.properties").withInputStream { 
+    stream -> defaultprops.load(stream) 
+}
+*/
+
 //TODO
 //init
-def classesDir = new File('build/classes')
+//def classesDir = new File('build/classes')
 
-task resources << {
+/*task resources << {
     classesDir.mkdirs()
     // do something
-}
+}*/
+
 /*task compile(dependsOn: 'resources') << {
     if (classesDir.isDirectory()) {
         println 'The class directory exists. I can operate'
@@ -145,21 +155,12 @@ task resources << {
     // do something
 }*/
 
-task copyDocs(type: Copy) {
+/*task copyDocs(type: Copy) {
     from 'src/main/doc'
     into 'build/target/doc'
-}
-
-
-
-
-
-
-//TODO: integrate with server credentials
-/*runStream {
-  mainClassName = "com.nubits.nuservice.HelloAkkaJava"
-  // applicationDefaultJvmArgs = ["-Dgreeting.language=en"]
 }*/
+
+
 
 
 
