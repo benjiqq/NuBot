@@ -3,8 +3,7 @@ package com.nubits.nubot.tests;
 
 /**
  *
- * @author desr
-ever <desrever at nubits.com>
+ * @author desrever <desrever at nubits.com>
  */
 import java.util.logging.Logger;
 

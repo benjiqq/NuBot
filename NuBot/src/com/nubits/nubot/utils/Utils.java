@@ -269,12 +269,9 @@ public class Utils {
                 LOG.severe("Sorry, unable to find " + filename);
                 System.exit(0);
             }
-            
-            LOG.info("loading properties from " + filename);
 
             //load a properties file from class path, inside static method
             Global.settings.load(input);
-            System.out.println(Global.settings);
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         } finally {
