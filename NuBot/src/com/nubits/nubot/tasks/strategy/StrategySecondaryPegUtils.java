@@ -378,7 +378,10 @@ public class StrategySecondaryPegUtils {
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
 
-                if (balancePEG > oneNBT && Global.options.getPair().getPaymentCurrency().isFiat() && !strategy.isFirstTime()) { //Only for EUR...CNY etc
+                if (balancePEG > oneNBT
+                        && Global.options.getPair().getPaymentCurrency().isFiat()
+                        && !strategy.isFirstTime()
+                        && Global.options.getMaxBuyVolume() != 0) { //Only for EUR...CNY etc
                     LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
                             + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                     strategy.setProceedsInBalance(true);
