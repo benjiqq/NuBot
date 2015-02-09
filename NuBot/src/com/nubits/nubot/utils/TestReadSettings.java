@@ -12,7 +12,7 @@ public class TestReadSettings {
 
     public static void main(String[] a) {
         SetEclipse.setEclipseLogback("logback.xml");
-        Properties prop = Utils.loadProperties("settings.properties");
-        System.out.println(prop);
+        Utils.loadProperties("settings.properties");
+        //System.out.println(prop);
     }
 }
