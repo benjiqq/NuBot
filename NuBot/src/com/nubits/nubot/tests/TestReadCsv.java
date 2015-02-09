@@ -21,16 +21,20 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.utils.FileSystem;
 import java.util.ArrayList;
 import java.util.logging.Logger;
+
+import org.junit.Test;
+
+import com.nubits.nubot.utils.FileSystem;
 
 public class TestReadCsv {
 
     private static final Logger LOG = Logger.getLogger(TestReadCsv.class.getName());
-    private static final String TEST_FILE_PATH = "res/currencies.csv";
+    private static final String TEST_FILE_PATH = "currencies.csv";
 
-    public static void main(String[] a) {
+    @Test
+    public void testReadCSV(){
         ArrayList<String[]> parsedCsv = FileSystem.parseCsvFromFile(TEST_FILE_PATH);
         for (int j = 0; j < parsedCsv.size(); j++) {
             String[] tempLine = parsedCsv.get(j);
