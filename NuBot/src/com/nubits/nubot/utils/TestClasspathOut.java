@@ -12,15 +12,23 @@ import java.util.List;
 public class TestClasspathOut {
 
     public static void main(String[] a) {
+        
+        System.out.println("++++ system arguments...");
+        for (int i = 0; i < a.length; i++) {
+            System.out.println(a[i]);
+        }
+        
+        //-cp .:conf
+        
         RuntimeMXBean runtimeMxBean = ManagementFactory.getRuntimeMXBean();
         List<String> arguments = runtimeMxBean.getInputArguments();
 
-        System.out.println("vm arguments...");
+        System.out.println("++++ vm arguments... " + arguments.size());
         for (int i = 0; i < arguments.size(); i++) {
             System.out.println(arguments.get(i));
         }
 
-        System.out.println("classpath...");
+        System.out.println("++++ classpath...");
         System.out.println(a.length);
 
         String classpath = System.getProperty("java.class.path");
