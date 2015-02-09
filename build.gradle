@@ -19,17 +19,12 @@
  /*
  * NuBot gradle build
  *
- * version 0.2
+ * version 0.15
  *
  * to use, install gradle, version at least 2.0, see http://gradle.org
- * 
+ *
  * //obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
- * FIX done
-    //compile files('NuBot/lib/nubot-dependancies/mail.jar')
-    //this is a bugfix jar, which should not be needed in gradle
-    //compile files('NuBot/lib/nubot-dependancies/org-netbeans-modules-java-j2seproject-copylibstask.jar')    
-    //compile files('NuBot/lib/nubot-dependancies/org.json-20120521.jar') 
- 
+ *
  * to install on linux:
  * sudo add-apt-repository ppa:cwchien/gradle
  * sudo apt-get update
@@ -56,9 +51,8 @@ apply plugin: 'eclipse'
 sourceCompatibility = 1.7 // java version
 
 
-
 repositories {
-  //maven { url "http://mvnrepository.com/artifact" }
+  maven { url "http://mvnrepository.com/artifact" }
   mavenCentral()
   flatDir {
        dirs 'NuBot/lib/nubot-dependancies'
@@ -76,28 +70,23 @@ dependencies {
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
     compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
-    compile 'javax.mail:mail:1.4.4'
+    compile 'javax.mail:mail:1.4.4' //replaces mail.jar
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'commons-collections:commons-collections:3.2'
-    
+    compile 'org.codeartisans:org.json:20131017'
+
+    //dependencies with develop branch
     compile 'org.zeromq:jeromq:0.3.4'
-    compile 'com.h2database:h2:1.4.185'    
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
-    
-    compile 'org.codeartisans:org.json:20131017'
-    
+
     //dependencies for testing
-    testCompile group: 'com.typesafe.akka', name: 'akka-testkit_2.11', version: '2.3.4'
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
     testCompile group: 'junit', name: 'junit', version: '4.+'
-}
 
-/*test {
-    systemProperties 'property': 'value'
-}*/
+}
 
 sourceSets {
     main {
@@ -115,162 +104,14 @@ sourceSets {
 
 
 test {
-    /*testLogging {
-        events 'started', 'passed'
-    }*/
-
     reports {
         junitXml.enabled = false
         html.enabled = true
     }
 }
 
+
 task runCollector(type:JavaExec) {
    main = "com.nubits.nuservice.CollectService"
    classpath = sourceSets.main.runtimeClasspath
 }
-
-
-/*
-
-def defaultprops = new Properties()
-file("conf/settings.properties").withInputStream { 
-    stream -> defaultprops.load(stream) 
-}
-*/
-
-//TODO
-//init
-//def classesDir = new File('build/classes')
-
-/*task resources << {
-    classesDir.mkdirs()
-    // do something
-}*/
-
-/*task compile(dependsOn: 'resources') << {
-    if (classesDir.isDirectory()) {
-        println 'The class directory exists. I can operate'
-    }
-    // do something
-}*/
-
-/*task copyDocs(type: Copy) {
-    from 'src/main/doc'
-    into 'build/target/doc'
-}*/
-
-
-remotes {
-  nuservice {
-    host = '104.236.209.185'
-    user = 'root'
-  }
-}
-
-task ls(type: SshTask) {
-  description = 'tests server.'
-  ssh {
-    pty = true     // Enable PTY allocation for sudo
-  }
-  session(remotes.nuservice) {
-    execute 'ls /'
-  }
-}
-
-
-
-/*
-------------------------------------------------------------------------------------
-more features not in use, but for backup here
-------------------------------------------------------------------------------------
-//SSH remote
-//https://github.com/int128/gradle-ssh-plugin
-plugins {
-  id 'org.hidetake.ssh' version '1.0.4'
-}
-remotes {
-  webServer {
-    host = '192.168.1.101'
-    user = 'jenkins'
-    identity = file('id_rsa')
-  }
-}
-
-task deploy << {
-  ssh.run {
-    session(remotes.webServer) {
-      put 'example.war', '/webapps'
-      execute 'sudo service tomcat restart'
-    }
-  }
-}
-
-
-task fatJar(type: Jar) {
-    baseName = project.name + '-all'
-    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }){
-            exclude 'META-INF/MANIFEST.MF'
-            exclude 'META-INF/*.SF'
-            exclude 'META-INF/*.DSA'
-            exclude 'META-INF/*.RSA'
-    }
-    with jar
-    manifest.attributes("Main-Class":"com.nubits.MainRunner")
-}
-
-
-
-//SSH tasks
-
-task ls(type: SshTask) {
-  description = 'tests server.'
-  ssh {
-    pty = true     // Enable PTY allocation for sudo
-  }
-  session(remotes.nuservice) {
-    execute 'ls /home'
-  }
-}
-
-task testall(type: Test) {
-  // explicitly include or exclude tests
-  include 'components/**'
-  exclude 'components/TestStartStop**'
-
-  // show standard out and standard error of the test JVM(s) on the console
-  testLogging.showStandardStreams = true
-
-  // set a system property for the test JVM(s)
-  //systemProperty 'some.prop', 'value'
-  // set heap size for the test JVM(s)
-  //minHeapSize = "128m"
-  //maxHeapSize = "512m"
-
-  // set JVM arguments for the test JVM(s)
-  //jvmArgs '-XX:MaxPermSize=256m'
-
-  // listen to events in the test execution lifecycle
-  beforeTest { descriptor ->
-     logger.lifecycle("###### Running test: " + descriptor)
-  }
-
-  // listen to standard out and standard error of the test JVM(s)
-  onOutput { descriptor, event ->
-     logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
-  }
-
-  //testResultsDir = "/Users/xyz/"
-}
-
-uploadArchives {
-    repositories {
-       flatDir {
-           dirs 'repos'
-       }
-    }
-}
-
-
-
-*/
