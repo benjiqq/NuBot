@@ -53,7 +53,7 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.CCEDK;
+    public static final String testExchange = Constant.BTER;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
 
@@ -99,6 +99,10 @@ public class TestWrappers {
         //testGetLastPrice(testPair);
         //testGetLastTrades(testPair, 1388534400);
         //testGetLastTrades(testPair);
+
+        testStressClearAllorders();
+
+
         //for (int i = 0; i < 5000; i++) {
         //   ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         //    if (activeOrdersResponse.isPositive()) {
@@ -108,52 +112,7 @@ public class TestWrappers {
         //    }
         //}
         //stimulating ccedk wrong nonce
-        /* test clear all orders
-         *
-         * [start]
-         *
-         */
-        /*
-         //clear old orders if any
-         testClearAllOrders(Constant.NBT_BTC);
 
-
-         // place a few orders
-         for (int i = 0; i <= 5; i++) {
-         testSell(0.1, 0.004, Constant.NBT_BTC);
-         try {
-         Thread.sleep(400);
-         } catch (InterruptedException ex) {
-         LOG.severe(ex.toString());
-         }
-         }
-
-         for (int i = 0; i <= 5; i++) {
-         testBuy(0.1, 0.001, Constant.NBT_BTC);
-         try {
-         Thread.sleep(400);
-         } catch (InterruptedException ex) {
-         LOG.severe(ex.toString());
-         }
-         }
-
-
-         //Wait 4 secs
-         try {
-         Thread.sleep(4000);
-         } catch (InterruptedException ex) {
-         LOG.severe(ex.toString());
-         }
-
-         //try to clear orders
-         testClearAllOrders(Constant.NBT_BTC);
-
-
-         /* test clear all orders
-         *
-         * [stop]
-         *
-         */
         /*
          for (int i = 0; i < 60; i++) {
          try {
@@ -190,6 +149,42 @@ public class TestWrappers {
          }
          }
          * Stress test stop*/
+    }
+
+    private static void testStressClearAllorders() {
+        //clear old orders if any
+        testClearAllOrders(testPair);
+
+
+        // place a few orders
+        for (int i = 0; i <= 5; i++) {
+            testSell(0.1, 0.004, testPair);
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
+            }
+        }
+
+        for (int i = 0; i <= 5; i++) {
+            testBuy(0.1, 0.001, testPair);
+            try {
+                Thread.sleep(400);
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.toString());
+            }
+        }
+
+
+        //Wait 4 secs
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException ex) {
+            LOG.severe(ex.toString());
+        }
+
+        //try to clear orders
+        testClearAllOrders(testPair);
     }
 
     private static void testGetAvailableBalances(CurrencyPair pair) {
