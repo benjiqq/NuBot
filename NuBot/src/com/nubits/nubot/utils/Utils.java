@@ -257,7 +257,7 @@ public class Utils {
         return toRet;
     }
 
-    public static Properties loadProperties(String filename) {
+    public static void loadProperties(String filename) {
         Global.settings = new Properties();
         InputStream input = null;
 
@@ -283,7 +283,7 @@ public class Utils {
                 }
             }
         }
-        return null;
+        
     }
 
     public static long getOneDayInMillis() {
