@@ -274,7 +274,7 @@ NuBot can be further configured by adding additional parameters to its config fi
 | multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  f set to false will disable hipchat notifications | boolean |
-| mail-notifications    | none, all, severe |  set to notification level: none at all, all: including non-critical, severe: only critical | String |
+| mail-notifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
 | submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |

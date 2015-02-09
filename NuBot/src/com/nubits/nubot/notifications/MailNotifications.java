@@ -37,41 +37,52 @@ import javax.mail.internet.MimeMessage;
  */
 public class MailNotifications {
 
-    public static String level_none = "NONE";
-    public static String level_all = "ALL";
-    public static String level_severe = "SEVERE";
-
+    public static final String MAIL_LEVEL_NONE = "NONE";
+    public static final String MAIL_LEVEL_ALL = "ALL";
+    public static final String MAIL_LEVEL_SEVERE = "SEVERE";
     private static final Logger LOG = Logger.getLogger(MailNotifications.class
             .getName());
 
     /**
      * send to recipient if level is set to all
+     *
      * @param address
      * @param title
      * @param message
      */
     public static void send(String address, String title, String message) {
-        boolean any = Global.options.sendMailsLevel().equals(level_all);
-        if (any)
+        boolean any = true; //Default to severe
+
+        if (Global.options != null) {
+            any = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL);
+        }
+        if (any) {
             sendImpl(address, title, message);
+        }
     }
 
     /**
      * send to recipient only if level is severe
+     *
      * @param address
      * @param title
      * @param message
      */
     public static void sendCritical(String address, String title, String message) {
-        boolean isCritical = Global.options.sendMailsLevel().equals(level_all)
-                || Global.options.sendMailsLevel().equals(level_severe);
-        if (Global.options == null || isCritical) {
+        boolean isCritical = true;
+
+        if (Global.options != null) {
+            isCritical = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL)
+                    || Global.options.sendMailsLevel().equals(MAIL_LEVEL_SEVERE);
+        }
+        if (isCritical) {
             sendImpl(address, title, message);
         }
     }
 
     /**
      * send mail
+     *
      * @param address
      * @param title
      * @param message
@@ -94,21 +105,14 @@ public class MailNotifications {
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username
-     *            GMail username
-     * @param password
-     *            GMail password
-     * @param recipientEmail
-     *            TO recipient
-     * @param title
-     *            title of the message
-     * @param message
-     *            message to be sent
-     * @throws AddressException
-     *             if the email address parse failed
-     * @throws MessagingException
-     *             if the connection is dead or not in the connected state or if
-     *             the message is not a MimeMessage
+     * @param username GMail username
+     * @param password GMail password
+     * @param recipientEmail TO recipient
+     * @param title title of the message
+     * @param message message to be sent
+     * @throws AddressException if the email address parse failed
+     * @throws MessagingException if the connection is dead or not in the
+     * connected state or if the message is not a MimeMessage
      */
     private static void Send(String recipientEmail, String title, String message)
             throws AddressException, MessagingException {
@@ -127,23 +131,15 @@ public class MailNotifications {
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username
-     *            username
-     * @param password
-     *            password
-     * @param recipientEmail
-     *            TO recipient
-     * @param ccEmail
-     *            CC recipient. Can be empty if there is no CC recipient
-     * @param title
-     *            title of the message
-     * @param message
-     *            message to be sent
-     * @throws AddressException
-     *             if the email address parse failed
-     * @throws MessagingException
-     *             if the connection is dead or not in the connected state or if
-     *             the message is not a MimeMessage
+     * @param username username
+     * @param password password
+     * @param recipientEmail TO recipient
+     * @param ccEmail CC recipient. Can be empty if there is no CC recipient
+     * @param title title of the message
+     * @param message message to be sent
+     * @throws AddressException if the email address parse failed
+     * @throws MessagingException if the connection is dead or not in the
+     * connected state or if the message is not a MimeMessage
      */
     private static void Send(String recipientEmail, String ccEmail,
             String title, String message) throws AddressException,
@@ -164,7 +160,7 @@ public class MailNotifications {
          * If set to false, the QUIT command is sent and the connection is
          * immediately closed. If set to true (the default), causes the
          * transport to wait for the response to the QUIT command.
-         * 
+         *
          * ref :
          * http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp
          * /package-summary.html

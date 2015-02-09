@@ -19,6 +19,7 @@ package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
@@ -435,7 +436,7 @@ public class OptionsJSON {
     public void setSendMailsLevel(String sendMails) {
         this.sendMails = sendMails;
     }
-    
+
     /**
      *
      * @return
@@ -576,7 +577,7 @@ public class OptionsJSON {
             //Then parse optional settings. If not use the default value declared here
 
             String nudIp = "127.0.0.1";
-            String sendMails = "all";
+            String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
             boolean submitLiquidity = true;
             boolean executeOrders = true;
             boolean verbose = false;
@@ -671,9 +672,20 @@ public class OptionsJSON {
             }
 
             if (optionsJSON.containsKey("mail-notifications")) {
-                sendMails = (String)optionsJSON.get("mail-notifications");
+                sendMails = (String) optionsJSON.get("mail-notifications");
+                if (sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
+                        || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
+                        || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
+                    sendMails = sendMails.toUpperCase(); //Convert to upper case 
+                } else {
+                    LOG.severe("Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
+                            + MailNotifications.MAIL_LEVEL_ALL + " , "
+                            + MailNotifications.MAIL_LEVEL_SEVERE + " or "
+                            + MailNotifications.MAIL_LEVEL_NONE);
+                    System.exit(0);
+                }
             }
-            
+
 
 
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)

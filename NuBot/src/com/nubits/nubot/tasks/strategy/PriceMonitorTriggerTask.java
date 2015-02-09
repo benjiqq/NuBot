@@ -527,9 +527,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         FileSystem.writeToFile(wall_shift_file.toJSONString(), jsonFile, false);
 
 
-        if (Global.options.sendMailsLevel()) {
+        if (!Global.options.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_NONE)) {
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
-
 
             String messageNow = row;
             emailHistory += messageNow;
