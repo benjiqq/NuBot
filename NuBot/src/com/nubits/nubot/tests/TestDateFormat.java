@@ -25,23 +25,26 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
-public class TestQuick {
+import org.junit.Test;
 
-    private static final Logger LOG = Logger.getLogger(TestQuick.class.getName());
+public class TestDateFormat {
 
-    public static void main(String[] a) {
+    private static final Logger LOG = Logger.getLogger(TestDateFormat.class
+            .getName());
+
+    @Test
+    public void testDate() {
+
         String date = "2014-12-22T17:55:25.107Z";
         String pattern = "yyyy-MM-dd'T'HH:mm:ss";
 
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
         try {
             Date d = sdf.parse(date);
+            assert(d.equals("Mon Dec 22 17:55:25 CET 2014"));
         } catch (java.text.ParseException pe1) {
             LOG.severe(pe1.toString());
         }
-
-        System.out.println("done");
-
 
 
     }
