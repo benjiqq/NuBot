@@ -31,40 +31,50 @@ import java.util.logging.Logger;
 
 public class HipChatNotifications {
 
-    private static final Logger LOG = Logger.getLogger(HipChatNotifications.class.getName());
+    private static final Logger LOG = Logger
+            .getLogger(HipChatNotifications.class.getName());
     private static String BOT_NAME = "Custodian Bot";
     private static HipChat hipchat = new HipChat(Passwords.HIPCHAT_KEY);
     private static UserId hipchatUser = UserId.create("idbot", BOT_NAME);
-    private static Room notificationRoom = Room.create(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, hipchat);
-    private static Room criticalNotificationRoom = Room.create(Passwords.HIPCHAT_CRITICAL_ROOM_ID, hipchat);
+    private static Room notificationRoom = Room.create(
+            Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, hipchat);
+    private static Room criticalNotificationRoom = Room.create(
+            Passwords.HIPCHAT_CRITICAL_ROOM_ID, hipchat);
 
     public static void sendMessage(String message, Color color) {
+        sendMessageImpl(message, color, false);
+    }
+
+    public static void sendMessageCritical(String message) {
+        sendMessageImpl(message, Color.RED, true);
+    }
+
+    private static void sendMessageImpl(String message, Color color,
+            boolean critical) {
+        
         String publicAddress = "";
-        boolean send = true; // default send
-        boolean notify = false; //default notify
+
         if (Global.options != null) {
             publicAddress = Global.options.getNubitsAddress();
-            send = Global.options.isSendHipchat();
-            notify = false;
+            boolean send = Global.options.isSendHipchat();
+            if (!send)
+                return;
         }
 
         String toSend = message + " (" + publicAddress + ")";
 
-        if (color == Color.RED) {
-            notify = true;
-        }
-
-        if (send) {
-            try {
-                if (notify) {
-                    criticalNotificationRoom.sendMessage(toSend, hipchatUser, notify, color);
-                } else {
-                    notificationRoom.sendMessage(toSend, hipchatUser, notify, color);
-                }
-
-            } catch (Exception e) {
-                LOG.severe("Not sending hipchat notification. Network problem");
+        try {
+            if (critical) {
+                criticalNotificationRoom.sendMessage(toSend, hipchatUser,
+                        critical, color);
+            } else {
+                notificationRoom.sendMessage(toSend, hipchatUser, critical,
+                        color);
             }
+
+        } catch (Exception e) {
+            LOG.severe("Not sending hipchat notification. Network problem");
         }
+
     }
 }

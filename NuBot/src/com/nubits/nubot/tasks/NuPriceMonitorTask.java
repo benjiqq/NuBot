@@ -110,8 +110,9 @@ public class NuPriceMonitorTask extends TimerTask {
 
 
 
-                            MailNotifications.send(Global.options.getMailRecipient(), title, message);
-                            HipChatNotifications.sendMessage(title + message, Color.RED);
+                            MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
+                            HipChatNotifications.sendMessageCritical(title + message);
+                            
                             LOG.severe(title + message);
                         }
                     }
