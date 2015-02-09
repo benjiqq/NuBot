@@ -21,27 +21,60 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
+import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.TestClasspathOut;
 
 public class TestReadCsv {
 
-    private static final Logger LOG = Logger.getLogger(TestReadCsv.class.getName());
-    private static final String TEST_FILE_PATH = "currencies.csv";
+    private static final Logger LOG = Logger.getLogger(TestReadCsv.class
+            .getName());
+    private static final String TEST_FILE_PATH = "/currencies.csv";
+    private static final String TEST_FILE = "currencies.csv";
 
     @Test
-    public void testReadCSV(){
-        ArrayList<String[]> parsedCsv = FileSystem.parseCsvFromFile(TEST_FILE_PATH);
+    public void testFile() {
+        // try {
+        // TestClasspathOut.addPath("/conf");
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+
+        // TestClasspathOut.printCpInfo();
+
+        final File dic = FileUtils.getFile("NuBot", "res", TEST_FILE);
+        System.out.println(dic.getAbsolutePath());
+        assert (dic.exists());
+
+        // InputStream ins = TestReadCsv.class.getClass().
+        // getResourceAsStream(TEST_FIL);
+        // System.out.println(ins);
+    }
+
+    @Test
+    public void testReadCSV() {
+        // getResourceAsStream
+        final File f = FileUtils.getFile("NuBot", "res", TEST_FILE);
+        
+        ArrayList<String[]> parsedCsv = FileSystem
+                .parseCsvFromFile(f.getAbsolutePath());
+        assert(parsedCsv.size()>5);
         for (int j = 0; j < parsedCsv.size(); j++) {
             String[] tempLine = parsedCsv.get(j);
             String message = "Line " + j + 1 + "/" + parsedCsv.size() + " = ";
             for (int i = 0; i < tempLine.length; i++) {
                 message += "[" + i + "]=" + tempLine[i];
             }
+            assert(message.length()>10);
+            assert(message.contains("USD"));
+            assert(message.contains("NBT"));
             LOG.info(message);
         }
 
