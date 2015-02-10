@@ -43,6 +43,7 @@ Passwords.java
 
 # Package Files #
 *.jar
+!EasyJccKit.jar
 *.war
 *.ear
 
@@ -53,3 +54,6 @@ hs_err_pid*
 
 # MacOS junk
 .DS_STORE
+=======
+/bin/
+
