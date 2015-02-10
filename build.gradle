@@ -82,7 +82,7 @@ dependencies {
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
     
-    compile files('staticlib/EasyJccKit.jar')
+    compile files('lib/EasyJccKit.jar')
         
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
