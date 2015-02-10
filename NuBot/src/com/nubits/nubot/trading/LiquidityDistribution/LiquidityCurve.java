@@ -29,6 +29,7 @@ public abstract class LiquidityCurve {
     public static final String STEEPNESS_LOW = "s_low";
     public static final String STEEPNESS_MID = "s_mid";
     public static final String STEEPNESS_HIGH = "s_high";
+    public static final String STEEPNESS_FLAT = "s_flat";
     public static final String TYPE_LIN = "t_lin";
     public static final String TYPE_EXP = "t_exp";
     public static final String TYPE_LOG = "t_log";
@@ -37,7 +38,7 @@ public abstract class LiquidityCurve {
     //Abstract methods
 
     public LiquidityCurve(String steepness) {
-        if (steepness.equals(STEEPNESS_LOW) || steepness.equals(STEEPNESS_MID) || steepness.equals(STEEPNESS_HIGH)) {
+        if (steepness.equals(STEEPNESS_LOW) || steepness.equals(STEEPNESS_MID) || steepness.equals(STEEPNESS_HIGH) || steepness.equals(STEEPNESS_FLAT)) {
             this.steepness = steepness;
         } else {
             LOG.severe("Value not accepted for steepness : " + steepness);
@@ -46,4 +47,8 @@ public abstract class LiquidityCurve {
     }
 
     abstract double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double startPrice, double pegPrice);
+
+    abstract double computeCoefficient();
+
+    abstract double computeIncrement(int index, double wallHeight);
 }

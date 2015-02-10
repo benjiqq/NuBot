@@ -21,6 +21,7 @@ package com.nubits.nubot.trading.LiquidityDistribution;
  *
  * @author desrever <desrever at nubits.com>
  */
+import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_FLAT;
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_HIGH;
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_LOW;
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_MID;
@@ -39,17 +40,15 @@ public class LiquidityCurveExp extends LiquidityCurve {
     double[] computeOrderSize(double[] prices, double wallHeight, String wallType, double wallPrice, double pegPrice) {
         double[] toReturn = new double[prices.length];
 
-        double m = computeCoefficient();
-
-        double increment = m * wallHeight;
         for (int i = 0; i < prices.length; i++) {
-            toReturn[i] = Utils.round(wallHeight + ((i + 1) * increment * (i + 1)), 8);
+            toReturn[i] = Utils.round(wallHeight + (computeIncrement(i, wallHeight)), 8);
         }
 
         return toReturn;
     }
 
-    private double computeCoefficient() {
+    @Override
+    double computeCoefficient() {
         switch (steepness) {
             case STEEPNESS_HIGH:
                 return 0.25;
@@ -57,9 +56,16 @@ public class LiquidityCurveExp extends LiquidityCurve {
                 return 0.17;
             case STEEPNESS_LOW:
                 return 0.06;
+            case STEEPNESS_FLAT:
+                return 0;
             default:
                 LOG.severe("Not supported steepness : " + steepness);
         }
         return 0;
+    }
+
+    @Override
+    double computeIncrement(int index, double wallHeight) {
+        return computeCoefficient() * wallHeight * Math.pow(index + 1, 2);
     }
 }

@@ -27,7 +27,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveExp;
+import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import static com.nubits.nubot.utils.LiquidityPlot.*;
@@ -92,17 +92,19 @@ public class TestLiquidityDistribution {
         double sellWallDensity = 0.025;
 
         //Configure Liquidity curve
-        //LiquidityCurve sellCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_HIGH);
-        LiquidityCurve sellCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_LOW);
+        //LiquidityCurve sellCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_FLAT); //Linear
+        //LiquidityCurve sellCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_LOW); //Exponential
+        LiquidityCurve sellCurve = new LiquidityCurveLog(LiquidityCurve.STEEPNESS_HIGH); //Logarithmic
 
         //Configure buy Params
         double buyOffset = 0.01;
-        double buyWallHeight = 500;
-        double buyWallWidth = 0.3;
-        double buyWallDensity = 0.025;
+        double buyWallHeight = 2500;
+        double buyWallWidth = 0.5;
+        double buyWallDensity = 0.015;
         //Configure Liquidity curve
-        //LiquidityCurve buyCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_LOW);
-        LiquidityCurve buyCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_MID);
+        //LiquidityCurve buyCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_LOW); //Linear
+        //LiquidityCurve buyCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_HIGH); //Exponential
+        LiquidityCurve buyCurve = new LiquidityCurveLog(LiquidityCurve.STEEPNESS_LOW);//Logarithmic
 
 
         sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, sellCurve);
@@ -129,6 +131,7 @@ public class TestLiquidityDistribution {
 
         printOrderBooks(sellOrders, buyOrders);
         drawOrderBooks(sellOrders, buyOrders);
+
     }
 
     private void printOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders) {
