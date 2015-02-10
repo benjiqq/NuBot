@@ -420,7 +420,8 @@ public class TradeUtils {
     }
 
     //Init the order
-    public boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
+    public static boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
+        //Observation : it can take between 15 and 20 seconds to place 10 orders
         boolean success = true;
 
         LOG.info(orders.size() + "need to be placed ");
@@ -432,17 +433,19 @@ public class TradeUtils {
 
             if (tempResponse.isPositive()) {
                 String buyResponseString = (String) tempResponse.getResponseObject();
-                LOG.info("Response " + i + "= " + buyResponseString);
+                LOG.info("Order " + i + "/" + orders.size() + " response = " + buyResponseString);
                 countSuccess++;
             } else {
                 success = false;
                 failureString += "Order " + i + " failed : " + tempResponse.getError().toString() + "\n";
             }
+
             try {
-                Thread.sleep(550); //sleepto avoid getting banned
+                Thread.sleep(300); //sleep to avoid getting banned
             } catch (InterruptedException ex) {
                 LOG.severe(ex.getMessage());
             }
+
         }
         if (success) {
             LOG.info(orders.size() + " orders placed succesfully");
@@ -455,7 +458,7 @@ public class TradeUtils {
     }
 
     //TODO move into the trade interface when tested and ready
-    private ApiResponse placeOrder(OrderToPlace order) {
+    private static ApiResponse placeOrder(OrderToPlace order) {
 
         LOG.info(": Submit order : "
                 + order.getType() + " " + order.getSize() + " " + order.getPair().getOrderCurrency().getCode()

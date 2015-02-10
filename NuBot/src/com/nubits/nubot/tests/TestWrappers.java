@@ -28,10 +28,12 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
@@ -53,7 +55,7 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.BITCOINCOID;
+    public static final String testExchange = Constant.INTERNAL_EXCHANGE_PEATIO;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
 
@@ -91,9 +93,14 @@ public class TestWrappers {
         //testCancelOrder("2063803", testPair);
         //testClearAllOrders(testPair);
         //testGetOrderDetail("1139");
-        testIsOrderActive("1139");
+        //testIsOrderActive("1139");
         //testGetTxFee();
         //testGetTxFeeWithArgs(testPair);
+
+        testClearAllOrders(testPair);
+        testMultipleOrders();
+
+
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //testGetLastPrice(testPair);
@@ -540,5 +547,21 @@ public class TestWrappers {
         }
 
         /* Setup (end) ------------------------------------------------------------------------------------------------------ */
+    }
+
+    private static void testMultipleOrders() {
+        ArrayList<OrderToPlace> orders = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            orders.add(new OrderToPlace(Constant.BUY, testPair, 0.5, 0.001));
+        }
+
+        for (int i = 0; i < 10; i++) {
+            orders.add(new OrderToPlace(Constant.SELL, testPair, 0.5, 0.009));
+        }
+        long startTime = System.nanoTime();
+        boolean success = TradeUtils.placeMultipleOrders(orders);
+        LOG.info("Multiple orders (" + orders + ") placed. success = " + success);
+        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms");
+
     }
 }
