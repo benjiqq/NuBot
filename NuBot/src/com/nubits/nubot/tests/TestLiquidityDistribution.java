@@ -27,7 +27,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
+import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveExp;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import static com.nubits.nubot.utils.LiquidityPlot.*;
@@ -90,17 +90,23 @@ public class TestLiquidityDistribution {
         double sellWallHeight = 1000;
         double sellWallWidth = 0.25;
         double sellWallDensity = 0.025;
-        String sellCurveSteepness = LiquidityCurve.STEEPNESS_HIGH;
+
+        //Configure Liquidity curve
+        //LiquidityCurve sellCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_HIGH);
+        LiquidityCurve sellCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_LOW);
 
         //Configure buy Params
         double buyOffset = 0.01;
         double buyWallHeight = 500;
-        double buyWallWidth = 0.2;
+        double buyWallWidth = 0.3;
         double buyWallDensity = 0.025;
-        String buyCurveSteepness = LiquidityCurve.STEEPNESS_LOW;
+        //Configure Liquidity curve
+        //LiquidityCurve buyCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_LOW);
+        LiquidityCurve buyCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_MID);
 
-        sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, new LiquidityCurveLin(sellCurveSteepness));
-        buyParams = new ModelParameters(buyOffset, buyWallHeight, buyWallWidth, buyWallDensity, new LiquidityCurveLin(buyCurveSteepness));
+
+        sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, sellCurve);
+        buyParams = new ModelParameters(buyOffset, buyWallHeight, buyWallWidth, buyWallDensity, buyCurve);
 
         String config = "Sell order book configuration : " + sellParams.toString();
         config += "Buy order book configuration : " + buyParams.toString();
