@@ -26,6 +26,7 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import java.net.URLEncoder;
@@ -416,5 +417,57 @@ public class TradeUtils {
     public static String getCCEDKTickerUrl(CurrencyPair pair) {
         String nonce = TradeUtils.getCCDKEvalidNonce();
         return "https://www.ccedk.com/api/v1/stats/marketdepth?nonce=" + nonce + "&pair_id=" + getCCDKECurrencyPairId(pair);
+    }
+
+    //Init the order
+    public boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
+        boolean success = true;
+
+        LOG.info(orders.size() + "need to be placed ");
+
+        int countSuccess = 0;
+        String failureString = "";
+        for (int i = 0; i < orders.size(); i++) {
+            ApiResponse tempResponse = placeOrder(orders.get(i));
+
+            if (tempResponse.isPositive()) {
+                String buyResponseString = (String) tempResponse.getResponseObject();
+                LOG.info("Response " + i + "= " + buyResponseString);
+                countSuccess++;
+            } else {
+                success = false;
+                failureString += "Order " + i + " failed : " + tempResponse.getError().toString() + "\n";
+            }
+            try {
+                Thread.sleep(550); //sleepto avoid getting banned
+            } catch (InterruptedException ex) {
+                LOG.severe(ex.getMessage());
+            }
+        }
+        if (success) {
+            LOG.info(orders.size() + " orders placed succesfully");
+        } else {
+            LOG.warning(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
+                    + "\nDetails : \n" + failureString);
+        }
+
+        return success;
+    }
+
+    //TODO move into the trade interface when tested and ready
+    private ApiResponse placeOrder(OrderToPlace order) {
+
+        LOG.info(": Submit order : "
+                + order.getType() + " " + order.getSize() + " " + order.getPair().getOrderCurrency().getCode()
+                + " @ " + order.getPrice() + " " + order.getPair().getPaymentCurrency().getCode());
+
+        ApiResponse toReturn;
+        if (order.getType().equalsIgnoreCase(Constant.BUY)) {
+            toReturn = Global.exchange.getTrade().buy(order.getPair(), order.getSize(), order.getPrice());
+        } else {
+            toReturn = Global.exchange.getTrade().sell(order.getPair(), order.getSize(), order.getPrice());
+        }
+
+        return toReturn;
     }
 }
