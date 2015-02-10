@@ -41,12 +41,6 @@ public class ModelParameters {
         this.curve = curve;
     }
 
-    //Return a static model for testing purpuses
-    public static ModelParameters generateTestParams() {
-        LiquidityCurve curve = new LiquidityCurveLin(45);
-        return new ModelParameters(0.02, 500, 0.2, 4, curve);
-    }
-
     public double getOffset() {
         return offset;
     }
