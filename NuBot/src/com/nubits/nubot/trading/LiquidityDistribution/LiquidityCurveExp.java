@@ -43,7 +43,7 @@ public class LiquidityCurveExp extends LiquidityCurve {
 
         double increment = m * wallHeight;
         for (int i = 0; i < prices.length; i++) {
-            toReturn[i] = Utils.round(wallHeight + ((i + 1) * increment * i), 8);
+            toReturn[i] = Utils.round(wallHeight + ((i + 1) * increment * (i + 1)), 8);
         }
 
         return toReturn;
