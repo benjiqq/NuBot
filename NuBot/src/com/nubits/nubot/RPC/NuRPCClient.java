@@ -319,6 +319,6 @@ public class NuRPCClient {
     }
 
     private String generateIdentifier() {
-        return custodianPublicAddress + "_" + exchangeName + "_" + pair.toString().toUpperCase();
+        return Global.sessionId + "_" + exchangeName + "_" + pair.toString().toUpperCase();
     }
 }

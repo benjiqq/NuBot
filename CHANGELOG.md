@@ -36,6 +36,7 @@
   - Wait random time before placing an order to ensure competitivity with multiple bots
   - LOG timestamp in UTC
   - Logging format improvements
+  - In RPC identifier replaced custodianAddress with sessionId
 
 #### Bug fixes:
   - Looping on moving average detection
