@@ -176,7 +176,7 @@ task init << {
    
 	copy {
     	from "NuBot/res/logs_assets"
-    	into "${storedir}/res/logs_assets""
+    	into "${storedir}/res/logs_assets"
     }
     
     delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
