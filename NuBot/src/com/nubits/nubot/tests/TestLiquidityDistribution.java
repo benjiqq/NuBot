@@ -24,9 +24,12 @@ package com.nubits.nubot.tests;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
+import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
+import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
@@ -41,6 +44,7 @@ import java.util.logging.Logger;
 public class TestLiquidityDistribution {
 
     private static final Logger LOG = Logger.getLogger(TestLiquidityDistribution.class.getName());
+    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     private LiquidityDistributionModel ldm;
     private ModelParameters sellParams;
     private ModelParameters buyParams;
@@ -48,19 +52,21 @@ public class TestLiquidityDistribution {
     private Amount balancePEG;
     private CurrencyPair pair;
     private double txFee;
+    private boolean execOrders;
     double pegPrice;
 
     public static void main(String a[]) {
         TestLiquidityDistribution test = new TestLiquidityDistribution();
-        test.init();
-
+        String[] inputs = new String[1];
+        inputs[0] = TEST_OPTIONS_PATH;
+        Global.options = OptionsJSON.parseOptions(inputs);
+        test.init(Constant.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
-
         test.exec();
 
     }
 
-    private void init() {
+    private void init(String exchangeName) {
         Utils.loadProperties("settings.properties");
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
@@ -71,15 +77,28 @@ public class TestLiquidityDistribution {
             LOG.severe(ex.toString());
         }
         LOG.setLevel(Level.INFO);
+
+        execOrders = false;
+        if (!exchangeName.equals("")) {
+            //Setup the exchange
+            execOrders = true;
+            pair = Constant.NBT_BTC;
+            WrapperTestUtils.configExchange(exchangeName);
+            WrapperTestUtils.testClearAllOrders(pair);
+        }
+
+
     }
 
     private void configureTest() {
         LOG.info("Configuring test");
 
-        pair = Constant.NBT_BTC;
         //Custodian balance simulation
         balanceNBT = new Amount(27100.0, Constant.NBT);
         balancePEG = new Amount(100, Constant.BTC);
+        if (execOrders) {
+            configureBalances(pair);
+        }
 
         pegPrice = 300; // value of 1 unit expressed in USD
 
@@ -87,24 +106,24 @@ public class TestLiquidityDistribution {
 
         //Configure sell Params
         double sellOffset = 0.01;
-        double sellWallHeight = 1000;
-        double sellWallWidth = 0.25;
-        double sellWallDensity = 0.025;
+        double sellWallHeight = 60;
+        double sellWallWidth = 0.15;
+        double sellWallDensity = 0.020;
 
         //Configure Liquidity curve
-        //LiquidityCurve sellCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_FLAT); //Linear
+        //LiquidityCurve sellCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_MID); //Linear
         //LiquidityCurve sellCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_LOW); //Exponential
-        LiquidityCurve sellCurve = new LiquidityCurveLog(LiquidityCurve.STEEPNESS_HIGH); //Logarithmic
+        LiquidityCurve sellCurve = new LiquidityCurveLog(LiquidityCurve.STEEPNESS_LOW); //Logarithmic
 
         //Configure buy Params
         double buyOffset = 0.01;
-        double buyWallHeight = 2500;
-        double buyWallWidth = 0.5;
-        double buyWallDensity = 0.015;
+        double buyWallHeight = 4;
+        double buyWallWidth = 0.15;
+        double buyWallDensity = 0.020;
         //Configure Liquidity curve
-        //LiquidityCurve buyCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_LOW); //Linear
+        LiquidityCurve buyCurve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_MID); //Linear
         //LiquidityCurve buyCurve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_HIGH); //Exponential
-        LiquidityCurve buyCurve = new LiquidityCurveLog(LiquidityCurve.STEEPNESS_LOW);//Logarithmic
+        //LiquidityCurve buyCurve = new LiquidityCurveLog(LiquidityCurve.STEEPNESS_LOW);//Logarithmic
 
 
         sellParams = new ModelParameters(sellOffset, sellWallHeight, sellWallWidth, sellWallDensity, sellCurve);
@@ -131,6 +150,10 @@ public class TestLiquidityDistribution {
 
         printOrderBooks(sellOrders, buyOrders);
         drawOrderBooks(sellOrders, buyOrders);
+
+        if (execOrders) {
+            placeOrders(sellOrders, buyOrders);
+        }
 
     }
 
@@ -198,5 +221,44 @@ public class TestLiquidityDistribution {
         addPlot(xBuy, yBuy); // create a second plot on top of first
 
 
+    }
+
+    private void placeOrders(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders) {
+
+        long startTime = System.nanoTime(); //TIC
+
+        LOG.info("Placing sell orders on " + Global.exchange.getName());
+        WrapperTestUtils.testMultipleOrders(sellOrders, pair);
+
+        LOG.info("Placing buy orders on " + Global.exchange.getName());
+        WrapperTestUtils.testMultipleOrders(buyOrders, pair);
+
+        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
+
+    }
+
+    private boolean configureBalances(CurrencyPair pair) {
+        boolean success = true;
+        ApiResponse balanceNBTResponse = Global.exchange.getTrade().getAvailableBalance(Constant.NBT);
+        if (balanceNBTResponse.isPositive()) {
+            Amount balance = (Amount) balanceNBTResponse.getResponseObject();
+            LOG.info("NBT Balance : " + balance.toString());
+            balanceNBT = balance;
+        } else {
+            LOG.severe(balanceNBTResponse.getError().toString());
+            success = false;
+        }
+
+        ApiResponse balancePEGResponse = Global.exchange.getTrade().getAvailableBalance(pair.getPaymentCurrency());
+        if (balancePEGResponse.isPositive()) {
+            Amount balance = (Amount) balancePEGResponse.getResponseObject();
+            LOG.info(pair.getPaymentCurrency().getCode() + " Balance : " + balance.toString());
+            balancePEG = balance;
+        } else {
+            LOG.severe(balancePEGResponse.getError().toString());
+            success = false;
+        }
+
+        return success;
     }
 }

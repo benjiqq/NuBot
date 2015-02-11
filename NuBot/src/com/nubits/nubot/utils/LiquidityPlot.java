@@ -150,6 +150,7 @@ public class LiquidityPlot {
         jframe.addWindowListener(new WindowAdapter() {
             public void windowClosing(WindowEvent ev) {
                 jframe.dispose();
+                System.exit(0);
             }
         });
         jframe.setVisible(true);
