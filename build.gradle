@@ -29,6 +29,8 @@
  * sudo apt-get update
  * sudo apt-get install -y gradle
  *
+ * ant build could be imported with 
+ * ant.importBuild 'NuBot/build.xml'
  * ----------
  * commands
  * ----------
@@ -189,6 +191,11 @@ task init << {
 	
 }
 
+task hello(type: Exec) {
+  executable "sh"
+  args "-c", "echo 'hello from your shell'"
+}
+
 task NuBotJar(type: Jar) {
 	dependsOn << init
     archiveName = "Nu.jar"
@@ -203,6 +210,7 @@ task NuBotJar(type: Jar) {
     manifest.attributes("Main-Class":mainclass)
     println 'jar created: ' + archivePath
 }
+
 
 task runCollector(type:JavaExec) {
    main = "com.nubits.nuservice.CollectService"
