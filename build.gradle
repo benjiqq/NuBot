@@ -24,7 +24,7 @@
  * dependencies online, except the jars in lib
  * (lib-repo not needed https://bitbucket.org/mj2p/nubot-dependancies)
  *
- * to install on linux:
+ * to install gradle on linux:
  * sudo add-apt-repository ppa:cwchien/gradle
  * sudo apt-get update
  * sudo apt-get install -y gradle
@@ -32,15 +32,24 @@
  * ----------
  * commands
  * ----------
- * gradle nubot-package => package the jar
+ * gradle NuBotJar => package the jar
  * 
  * gradle test => run Unit tests
  *
  *
  *
- * TODO: 
+ * ----------
+ * dist layout
+ * ----------
+ * NuBot.jar
+ * /config-sample
+ * /logs
+ * /res
+ * readme.html
+ * setup.html
+ * LICENSE.md
+ * CHANGELOG.md
  * 
- * (run Bot: gradle runBot)
  *
  */
 
@@ -123,7 +132,7 @@ test {
 }
 
 //definitions
-def storedir = new File(project.buildDir, "dist-packaged")
+def storedir = new File("dist-packaged") //project.buildDir
 def jarname = "NuBot.jar"
 def storejar = new File(storedir, jarname)
 def mainclass = "com.nubits.nubot.launch.NuBot"
@@ -145,10 +154,38 @@ task init << {
 	    	println("succeeded in creating " + storedir)
 	    }
     }
-        
+    
+    
+    copy {
+    	from 'LICENSE.md'
+    	into storedir
+    }
+    
+    copy {
+    	from 'CHANGELOG.md'
+    	into storedir
+    }
+    
+    copy {
+    	from 'NuBot/res/ssl/nubot_keystore.jks' 
+    	into '${storedir}/res/ssl/'
+    }
+
+    copy {
+    	from 'NuBot/res/logs_assets' 
+    	into '${storedir}/res/logs_assets/'
+    }
+	    
+    //<copy file="res/currencies.csv" tofile="${store.dir}/res/currencies.csv"/>
+    //<exec "compileReadme.sh"/>  
+	//<copy file="../readme.html" tofile="${store.dir}/readme.html"/>
+	//<mkdir dir="${store.dir}/logs"/>
+	// <copy todir="${store.dir}/res/logs_assets" >
+	
 }
 
 task NuBotJar(type: Jar) {
+	dependsOn << init
     archiveName = "Nu.jar"
     destinationDir project.file(jarout)
     from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }){
