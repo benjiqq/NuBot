@@ -21,11 +21,13 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -59,6 +61,8 @@ public class TestWrappers {
     }
 
     public static void runTests() {
+        long startTime = System.nanoTime(); //TIC
+
         //Methods strictly necessary for NuBot to run-------------
         //-------------
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
@@ -83,7 +87,19 @@ public class TestWrappers {
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
 
         WrapperTestUtils.testClearAllOrders(testPair);
-        WrapperTestUtils.testMultipleOrders(testPair);
+
+
+        //Create multiple orders for testing
+        ArrayList<OrderToPlace> orders = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            orders.add(new OrderToPlace(Constant.BUY, testPair, 0.5, 0.001));
+        }
+
+        for (int i = 0; i < 10; i++) {
+            orders.add(new OrderToPlace(Constant.SELL, testPair, 0.5, 0.009));
+        }
+
+        WrapperTestUtils.testMultipleOrders(orders, testPair);
 
 
         //Methods NOT strictly necessary for NuBot to run---------------
@@ -91,6 +107,9 @@ public class TestWrappers {
         //WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
         //WrapperTestUtils.testGetLastTrades(testPair);
+
+
+        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
     }
 
