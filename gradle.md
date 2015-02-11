@@ -1,5 +1,15 @@
 # Gradle build info
 
+## Usage
+
+After gradle is installed, run gradle tasks. The relevant tasks appear at the end:
+
+Other tasks
+-----------
+compileReadme - compile the HTML readme
+NuBotJar - create the jar in .../dist-packaged
+runCollector - run the collector service on a server
+
 ## Install
 
 install gradle, version at least 2.0, see http://gradle.org
