@@ -18,7 +18,6 @@ import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.tasks.TaskManager;
-import static com.nubits.nubot.tests.TestWrappers.testPair;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -72,12 +71,12 @@ public class WrapperTestUtils {
         if (lastPriceResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
-            LOG.info("Last price : 1 " + testPair.getOrderCurrency().getCode() + " = "
-                    + ticker.getLast() + " " + testPair.getPaymentCurrency().getCode());
-            LOG.info("ask  : 1 " + testPair.getOrderCurrency().getCode() + " = "
-                    + ticker.getAsk() + " " + testPair.getPaymentCurrency().getCode());
-            LOG.info("bid  : 1 " + testPair.getOrderCurrency().getCode() + " = "
-                    + ticker.getBid() + " " + testPair.getPaymentCurrency().getCode());
+            LOG.info("Last price : 1 " + pair.getOrderCurrency().getCode() + " = "
+                    + ticker.getLast() + " " + pair.getPaymentCurrency().getCode());
+            LOG.info("ask  : 1 " + pair.getOrderCurrency().getCode() + " = "
+                    + ticker.getAsk() + " " + pair.getPaymentCurrency().getCode());
+            LOG.info("bid  : 1 " + pair.getOrderCurrency().getCode() + " = "
+                    + ticker.getBid() + " " + pair.getPaymentCurrency().getCode());
 
         } else {
             LOG.severe(lastPriceResponse.getError().toString());
@@ -269,14 +268,14 @@ public class WrapperTestUtils {
         }
     }
 
-    public static void testMultipleOrders() {
+    public static void testMultipleOrders(CurrencyPair pair) {
         ArrayList<OrderToPlace> orders = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
-            orders.add(new OrderToPlace(Constant.BUY, testPair, 0.5, 0.001));
+            orders.add(new OrderToPlace(Constant.BUY, pair, 0.5, 0.001));
         }
 
         for (int i = 0; i < 10; i++) {
-            orders.add(new OrderToPlace(Constant.SELL, testPair, 0.5, 0.009));
+            orders.add(new OrderToPlace(Constant.SELL, pair, 0.5, 0.009));
         }
         long startTime = System.nanoTime();
         boolean success = TradeUtils.placeMultipleOrders(orders);
