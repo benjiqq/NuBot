@@ -45,7 +45,9 @@ HipChat is used for notifications.
 
 ## Jenkins
 
-Jenkins is used. TODO: more info here.
+Jenkins is used. http://build.mj2p.co.uk/
+
+TODO: more info here.
 
 ## Trello
 
