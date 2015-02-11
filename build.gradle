@@ -176,11 +176,16 @@ task init << {
     	into '${storedir}/res/logs_assets/'
     }
 	    
+	//TODO    
+	//<copy todir="${store.dir}/res/sources/src/" >    
     //<copy file="res/currencies.csv" tofile="${store.dir}/res/currencies.csv"/>
     //<exec "compileReadme.sh"/>  
 	//<copy file="../readme.html" tofile="${store.dir}/readme.html"/>
 	//<mkdir dir="${store.dir}/logs"/>
 	// <copy todir="${store.dir}/res/logs_assets" >
+	//<!-- Delete files with sentitive information -->
+    //<delete file="${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"/>      
+	//<delete file="${store.dir}/NuBot_temp.jar"/>
 	
 }
 
@@ -198,22 +203,6 @@ task NuBotJar(type: Jar) {
     manifest.attributes("Main-Class":mainclass)
     println 'jar created: ' + archivePath
 }
-
-
-task rescopy(type: Copy) {
-	dependsOn << init
-    from('LICENSE.md')
-    //into(storedir + '/res/sources/LICENSE.md')
-    //include('*.war')
-}
-
-
-
-
-
-
-
-
 
 task runCollector(type:JavaExec) {
    main = "com.nubits.nuservice.CollectService"
