@@ -21,7 +21,7 @@ dependency: Grip
 
  gradle NuBotJar => package the jar
  
- gradle test => run Unit tests
+ gradle test => run Unit tests. HTML Testout under build/reports/tests/index.html
 
 ## dist layout
 
