@@ -29,6 +29,11 @@
  * sudo apt-get update
  * sudo apt-get install -y gradle
  *
+ * dependency: Grip
+ * https://github.com/joeyespo/grip
+ * pip install grip
+ * 
+ *
  * ant build could be imported with 
  * ant.importBuild 'NuBot/build.xml'
  * ----------
@@ -134,14 +139,22 @@ test {
 }
 
 //definitions
-def storedir = new File("dist-packaged") //project.buildDir
+def storedir = new File("dist-packaged")
+def logdir = new File("logs")
 def jarname = "NuBot.jar"
 def storejar = new File(storedir, jarname)
 def mainclass = "com.nubits.nubot.launch.NuBot"
 def jarout = 'jarout'
 
+
+task compileReadme(type: Exec) {
+  executable "sh"
+  args "-c", "/bin/bash compileReadme.sh"
+}
+
 task init << {
-	println 'init build'
+	dependsOn << compileReadme
+	println "init build"
 	
 	if( !storedir.exists() ) {
     	println("creating storedir")
@@ -155,46 +168,63 @@ task init << {
     	if(storedir.mkdirs()) {
 	    	println("succeeded in creating " + storedir)
 	    }
-    }
-    
+    }    
     
     copy {
-    	from 'LICENSE.md'
+    	from "LICENSE.md"
     	into storedir
     }
     
     copy {
-    	from 'CHANGELOG.md'
+    	from "CHANGELOG.md"
     	into storedir
     }
     
     copy {
-    	from 'NuBot/res/ssl/nubot_keystore.jks' 
-    	into '${storedir}/res/ssl/'
+    	from "NuBot/res/ssl/nubot_keystore.jks" 
+    	into "$storedir/res/ssl/"
     }
 
     copy {
-    	from 'NuBot/res/logs_assets' 
-    	into '${storedir}/res/logs_assets/'
+    	from "NuBot/res/logs_assets" 
+    	into "${storedir}/res/logs_assets/"
     }
-	    
-	//TODO    
-	//<copy todir="${store.dir}/res/sources/src/" >    
-    //<copy file="res/currencies.csv" tofile="${store.dir}/res/currencies.csv"/>
-    //<exec "compileReadme.sh"/>  
-	//<copy file="../readme.html" tofile="${store.dir}/readme.html"/>
-	//<mkdir dir="${store.dir}/logs"/>
-	// <copy todir="${store.dir}/res/logs_assets" >
-	//<!-- Delete files with sentitive information -->
-    //<delete file="${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"/>      
+    
+	copy {
+    	from "NuBot/res/currencies.csv" 
+    	into "${storedir}/res/"
+    }
+
+	copy {
+    	from "NuBot/src" 
+    	into "${storedir}/res/sources/src"
+    }
+
+	copy {
+    	from "readme.html" 
+    	into "${storedir}/readme.html"
+    }
+        
+	if( !logdir.exists() ) {
+    	println("creating logdir")
+
+    	if(logdir.mkdirs()) {
+	    	println("succeeded in creating " + logdir)
+	    }
+    }         
+   
+	copy {
+    	from "NuBot/res/logs_assets"
+    	into "${storedir}/res/logs_assets""
+    }
+    
+    delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+        
+	//not needed    
 	//<delete file="${store.dir}/NuBot_temp.jar"/>
 	
 }
 
-task hello(type: Exec) {
-  executable "sh"
-  args "-c", "echo 'hello from your shell'"
-}
 
 task NuBotJar(type: Jar) {
 	dependsOn << init
@@ -208,7 +238,7 @@ task NuBotJar(type: Jar) {
     }
     with jar
     manifest.attributes("Main-Class":mainclass)
-    println 'jar created: ' + archivePath
+    //println 'jar created: ' + archivePath
 }
 
 
