@@ -83,7 +83,7 @@ public class TestWrappers {
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
 
         WrapperTestUtils.testClearAllOrders(testPair);
-        WrapperTestUtils.testMultipleOrders();
+        WrapperTestUtils.testMultipleOrders(testPair);
 
 
         //Methods NOT strictly necessary for NuBot to run---------------
