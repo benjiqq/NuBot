@@ -19,11 +19,10 @@
  /*
  * NuBot gradle build
  *
- * version 0.15
- *
  * to use, install gradle, version at least 2.0, see http://gradle.org
  *
- * //obsoletes the repo: https://bitbucket.org/mj2p/nubot-dependancies
+ * dependencies online, except the jars in lib
+ * (lib-repo not needed https://bitbucket.org/mj2p/nubot-dependancies)
  *
  * to install on linux:
  * sudo add-apt-repository ppa:cwchien/gradle
@@ -33,23 +32,25 @@
  * ----------
  * commands
  * ----------
- * to run Unit tests: gradle test
+ * gradle nubot-package => package the jar
+ * 
+ * gradle test => run Unit tests
  *
- * TODO: build jar
- * TODO: to run Bot: gradle runBot
- * TODO: to run Streaming server: gradle runStream
+ *
+ *
+ * TODO: 
+ * 
+ * (run Bot: gradle runBot)
  *
  */
 
-//TODO correct versioning
-version = '0.1'
+version = '0.15' //current project version
 
 apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
 
-//sourceCompatibility = 1.7 // java version
-
+sourceCompatibility = 1.7 // java version
 
 
 repositories {
@@ -105,6 +106,14 @@ sourceSets {
     }
 }
 
+compileJava {
+  //enable compilation in a separate daemon process
+  options.fork = true
+
+  //enable incremental compilation
+  options.incremental = true
+}
+
 
 test {
     reports {
@@ -113,9 +122,12 @@ test {
     }
 }
 
-
+//definitions
 def storedir = new File(project.buildDir, "dist-packaged")
-
+def jarname = "NuBot.jar"
+def storejar = new File(storedir, jarname)
+def mainclass = "com.nubits.nubot.launch.NuBot"
+def jarout = 'jarout'
 
 task init << {
 	println 'init build'
@@ -135,6 +147,21 @@ task init << {
     }
         
 }
+
+task NuBotJar(type: Jar) {
+    archiveName = "Nu.jar"
+    destinationDir project.file(jarout)
+    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }){
+    		exclude 'META-INF/MANIFEST.MF'
+			exclude 'META-INF/*.SF'
+			exclude 'META-INF/*.DSA'
+			exclude 'META-INF/*.RSA'
+    }
+    with jar
+    manifest.attributes("Main-Class":mainclass)
+    println 'jar created: ' + archivePath
+}
+
 
 task rescopy(type: Copy) {
 	dependsOn << init
