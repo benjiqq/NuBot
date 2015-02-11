@@ -19,9 +19,11 @@ dependency: Grip
  
 ## commands
 
- gradle NuBotJar => package the jar
+gradle tasks => show the tasks available
+
+gradle NuBotJar => package the jar
  
- gradle test => run Unit tests. HTML Testout under build/reports/tests/index.html
+gradle test => run Unit tests. HTML Testout under build/reports/tests/index.html
 
 ## dist layout
 

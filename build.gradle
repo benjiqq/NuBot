@@ -18,7 +18,7 @@
 
  /*
  * NuBot gradle build
- *
+ * see gradle.md for details on usage
  */
 
 version = '0.15' //current project version
@@ -105,15 +105,17 @@ def logdir = new File("logs")
 def jarname = "NuBot.jar"
 def storejar = new File(storedir, jarname)
 def mainclass = "com.nubits.nubot.launch.NuBot"
-def jarout = 'jarout'
+
 
 
 task compileReadme(type: Exec) {
+  description 'compile the HTML readme'
   executable "sh"
   args "-c", "/bin/bash compileReadme.sh"
 }
 
 task init << {
+    description 'init for build'
 	dependsOn << compileReadme
 	println "init build"
 	
@@ -188,9 +190,10 @@ task init << {
 
 
 task NuBotJar(type: Jar) {
+    description 'create the jar in ' + project.file(storedir)
 	dependsOn << init
     archiveName = "Nu.jar"
-    destinationDir project.file(jarout)
+    destinationDir project.file(storedir)
     from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }){
     		exclude 'META-INF/MANIFEST.MF'
 			exclude 'META-INF/*.SF'
@@ -204,6 +207,7 @@ task NuBotJar(type: Jar) {
 
 
 task runCollector(type:JavaExec) {
+   description 'run the collector service on a server'
    main = "com.nubits.nuservice.CollectService"
    classpath = sourceSets.main.runtimeClasspath
 }
