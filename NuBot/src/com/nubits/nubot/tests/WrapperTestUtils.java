@@ -270,10 +270,8 @@ public class WrapperTestUtils {
 
     public static void testMultipleOrders(ArrayList<OrderToPlace> orders, CurrencyPair pair) {
 
-        long startTime = System.nanoTime();
         boolean success = TradeUtils.placeMultipleOrders(orders);
         LOG.info("Multiple orders (" + orders + ") placed. success = " + success);
-        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms");
 
     }
 
