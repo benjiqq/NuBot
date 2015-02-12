@@ -267,10 +267,12 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
 
         //only handles openOrders with given pair
+
         if (pair != null) {
             query_args.put("pair", pair.toString("_"));
         } else {
-            query_args.put("pair", Global.options.getPair().toString("_"));
+            pair = Global.options.getPair();
+            query_args.put("pair", pair.toString("_"));
         }
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
@@ -281,7 +283,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             if (orders != null) {
                 for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
                     JSONObject thisOrder = order.next();
-                    orderList.add(parseOrder(thisOrder));
+                    orderList.add(parseOrder(thisOrder, pair));
                 }
             }
             apiResponse.setResponseObject(orderList);
@@ -291,9 +293,9 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         return apiResponse;
     }
 
-    private Order parseOrder(JSONObject in) {
+    private Order parseOrder(JSONObject in, CurrencyPair cp) {
         Order out = new Order();
-        ;
+
         out.setId(in.get("order_id").toString());
         Date insertedDate = new Date(Long.parseLong(in.get("submit_time").toString()) * 1000L);
         out.setInsertedDate(insertedDate);
@@ -308,6 +310,8 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             cur = Global.options.getPair().getOrderCurrency().getCode().toLowerCase();
             amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getOrderCurrency());
         }
+        out.setPair(cp);
+
         out.setAmount(amount);
         out.setPrice(price);
         out.setCompleted(amount.getQuantity() == Double.parseDouble(in.get("remain_" + cur).toString()));
