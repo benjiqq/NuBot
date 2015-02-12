@@ -67,7 +67,7 @@ dependencies {
     //compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
     //compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
     
-    compile files('lib/EasyJccKit.jar')
+    compile files('NuBot/lib/EasyJccKit.jar')
         
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
