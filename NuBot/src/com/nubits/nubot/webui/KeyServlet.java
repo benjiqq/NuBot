@@ -63,7 +63,7 @@ public class KeyServlet extends HttpServlet {
 
     JSONObject demo(String abc) {
         JSONObject json = new JSONObject();
-        json.put("abc", "abc");
+        json.put("apikey", "abc");
         return json;
     }
 
