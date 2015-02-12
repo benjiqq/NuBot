@@ -21,7 +21,7 @@ import com.nubits.nubot.global.Constant;
 
 /**
  *
- * @author desrever < desrever@NBTTotal.com >
+ * @author desrever < desrever@nubits.com >
  */
 public class Balance {
 
