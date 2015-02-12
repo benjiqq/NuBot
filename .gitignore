@@ -52,15 +52,10 @@ hs_err_pid*
 /build/
 /bin/
 
-# MacOS junk
-.DS_STORE
-=======
-/bin/
-
 #Gradle
 .gradle
 
-# Eclipse
+#Eclipse
 NuBot/.classpath
 NuBot/.gitignore
 NuBot/.project
