@@ -57,3 +57,11 @@ hs_err_pid*
 =======
 /bin/
 
+#Gradle
+.gradle
+
+# Eclipse
+NuBot/.classpath
+NuBot/.gitignore
+NuBot/.project
+NuBot/.settings
