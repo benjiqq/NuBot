@@ -33,10 +33,35 @@ hr {
         <script>
             function changeKey() {
             //document.getElementById("bter_key").style.color = "red";
-                alert("input");
+               // alert("input");
+
+                $.ajax({
+                  dataType: "json",
+                  url: "http://localhost:8080/keys",
+                  /*beforeSend: function( xhr ) {
+                    xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
+                  }*/
+                })
+                  .done(function( data ) {
+                    if ( console && console.log ) {
+                        //var j = JSON.loads(data);
+                        //console.log( "Sample of data:", data.slice( 0, 100 ) );
+
+                        var s = data["secret"];
+                        console.log(s);
+                        $('#k').html(s);
+
+                        var pp = $("#k").attr("placeholder");
+                        $("#k").attr("placeholder", s);
+                        console.log(pp);
+                    }
+                  });
+
             }
         </script>
 
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
@@ -75,7 +100,7 @@ hr {
     <h3>CCEDK</h3>
 
     <div class="input-group">
-      <input type="text" class="form-control" placeholder="API Key">
+      <input id="k" type="text" class="form-control" placeholder="API Key">
       <span class="input-group-btn">
         <button class="btn btn-default" type="button" onclick="changeKey()">Change</button>
       </span>
