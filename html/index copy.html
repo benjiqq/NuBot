@@ -8,14 +8,6 @@
             }
 
 
-            body {
-  min-height: 2000px;
-  padding-top: 70px;
-}
-
-/*
-table.table.table-bordered tr td{ width:50% }
-*/
 
 .row {
   margin-bottom: 20px;
@@ -27,8 +19,8 @@ table.table.table-bordered tr td{ width:50% }
 [class*="col-"] {
   padding-top: 2px;
   padding-bottom: 2px;
-  border: 0px solid #ddd;
-  border: 0px solid rgba(86,61,124,.2);
+  border: 1px solid #ddd;
+  border: 1px solid rgba(86,61,124,.2);
 }
 
 hr {
@@ -76,44 +68,31 @@ hr {
     <body onLoad="changeKey()">
 
 
+<div class="container">
 
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
-        <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="#">NuBot</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li class="active"><a href="#">Exchange Config</a></li>
-            <li><a href="#about">About</a></li>
 
-          </ul>
-
-        </div><!--/.nav-collapse -->
+      <div class="page-header">
+        <h1>NuBot</h1>
+        <p class="lead">version 0.15</p>
       </div>
-    </nav>
 
+      <h2>Exchange config</h2>
+<br>
+      <div class="row">
+        <div class="col-md-12">
 
-    <div class="container">
 
 
 <div class="row">
-  <div class="col-xs-12 col-md-8">
+
+  <div class="col-lg-8">
 
     <h3>CCEDK</h3>
 
-<table class="table table-bordered" width="500">
+<table border="1">
 <tr>
-    <td class="col-md-2">API key</td>
-
-<td class="col-md-8">
+    <td>API key</td>
+<td>
     <div class="input-group">
 
       <input id="apikey" type="text" class="form-control" placeholder="API Key">
@@ -127,6 +106,7 @@ hr {
     <td>API secret</td>
 <td>
 
+      <br>
     <div class="input-group">
 
         <input id="apisecret" type="text" class="form-control" placeholder="API Secret">
@@ -138,16 +118,19 @@ hr {
 </td></tr>
 </table>
 
-    </div>
-
-
-  <div class="col-xs-6 col-md-4"></div>
-</div>
+  </div><!-- /.col-lg-6 -->
 
 
 
 
-    </div> <!-- /container -->
+</div><!-- /.row -->
+
+<hr>
+
+      <h2>Live Information</h2>
+      <p>
+         Exchanges
+      </p>
 
 
 </div>
