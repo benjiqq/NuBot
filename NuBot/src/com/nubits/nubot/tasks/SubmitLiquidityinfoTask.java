@@ -47,8 +47,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private static final Logger LOG = Logger.getLogger(SubmitLiquidityinfoTask.class.getName());
     private boolean verbose;
-    private String outputFile;
-    private String jsonFile;
+    private String outputFile_orders;
+    private String jsonFile_orders;
+    private String jsonFile_balances;
     private boolean wallsBeingShifted = false;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
@@ -125,9 +126,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             //Write to file timestamp,activeOrders, sells,buys, digest
             Date timeStamp = new Date();
             String timeStampString = timeStamp.toString();
-            Long timeStampLong = timeStamp.getTime();
+            Long timeStampLong = Utils.getTimestampLong();
             String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
-            FileSystem.writeToFile(toWrite, outputFile, true);
+            FileSystem.writeToFile(toWrite, outputFile_orders, true);
 
             //Also update a json version of the output file
             //build the latest data into a JSONObject
@@ -161,20 +162,22 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 jsonDigest.add(thisOrder);
             }
             latestOrders.put("digest", jsonDigest);
+
+
             //now read the existing object if one exists
             JSONParser parser = new JSONParser();
             JSONObject orderHistory = new JSONObject();
             JSONArray orders = new JSONArray();
             try { //object already exists in file
-                orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
+                orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_orders));
                 orders = (JSONArray) orderHistory.get("orders");
             } catch (ParseException pe) {
-                LOG.severe("Unable to parse order_history.json");
+                LOG.severe("Unable to parse " + this.jsonFile_orders);
             }
             //add the latest orders to the orders array
             orders.add(latestOrders);
             //then save
-            FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile, false);
+            FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
 
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
@@ -216,6 +219,39 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             double buyside = PEGbalance.getQuantity();
             double sellside = NBTbalance.getQuantity();
+
+            //Log balances
+            JSONObject latestBalances = new JSONObject();
+            latestBalances.put("time_stamp", Utils.getTimestampLong());
+
+            JSONArray availableBalancesArray = new JSONArray();
+            JSONObject NBTBalanceJSON = new JSONObject();
+            NBTBalanceJSON.put("amount", sellside);
+            NBTBalanceJSON.put("currency", NBTbalance.getCurrency().getCode().toUpperCase());
+
+            JSONObject PEGBalanceJSON = new JSONObject();
+            PEGBalanceJSON.put("amount", buyside);
+            PEGBalanceJSON.put("currency", PEGbalance.getCurrency().getCode().toUpperCase());
+
+            availableBalancesArray.add(PEGBalanceJSON);
+            availableBalancesArray.add(NBTBalanceJSON);
+
+            latestBalances.put("balance-not-on-order", availableBalancesArray);
+
+            //now read the existing object if one exists
+            JSONParser parser = new JSONParser();
+            JSONObject balanceHistory = new JSONObject();
+            JSONArray balances = new JSONArray();
+            try { //object already exists in file
+                balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
+                balances = (JSONArray) balanceHistory.get("balances");
+            } catch (ParseException pe) {
+                LOG.severe("Unable to parse " + this.jsonFile_balances);
+            }
+            //add the latest orders to the orders array
+            balances.add(latestBalances);
+            //then save
+            FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
 
             buyside = Utils.round(buyside * Global.conversion, 2);
 
@@ -262,16 +298,30 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         return toReturn;
     }
 
-    public void setOutputFile(String outputFile) {
-        this.outputFile = outputFile;
-        this.jsonFile = this.outputFile.replace(".csv", ".json");
+    public void setOutputFiles(String outputFileOrders, String outputFileBalances) {
+        this.outputFile_orders = outputFileOrders;
+        this.jsonFile_orders = this.outputFile_orders.replace(".csv", ".json");
+
+
+
         //create json file if it doesn't already exist
-        File json = new File(this.jsonFile);
-        if (!json.exists()) {
+        File jsonF1 = new File(this.jsonFile_orders);
+        if (!jsonF1.exists()) {
             JSONObject history = new JSONObject();
             JSONArray orders = new JSONArray();
             history.put("orders", orders);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
+        }
+
+        this.jsonFile_balances = outputFileBalances;
+
+        //create json file if it doesn't already exist
+        File jsonF2 = new File(this.jsonFile_balances);
+        if (!jsonF2.exists()) {
+            JSONObject history = new JSONObject();
+            JSONArray balances = new JSONArray();
+            history.put("balances", balances);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
         }
     }
 

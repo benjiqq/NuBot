@@ -173,10 +173,16 @@ public class Utils {
      *
      * @return
      */
-    public static String getTimestamp() {
+    public static String getTimestampString() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    public static long getTimestampLong() {
+        Date timeStamp = new Date();
+        return timeStamp.getTime();
+
     }
 
     public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {

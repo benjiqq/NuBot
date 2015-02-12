@@ -9,6 +9,7 @@
   - The bot accept a list of input json files as input and combines them internally
   - Bitfinex and Bitstamp price feeds
   - Submit liquidity info tier 1 and tier 2 using a different identifier
+  - Logging the balance history
 
 
 #### Improvements:
