@@ -1,13 +1,5 @@
 package com.nubits.nubot.webui;
 
-import java.io.IOException;
-import java.io.PrintWriter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -67,15 +59,11 @@ public class UIServer {
         try {
             server.start();
             server.join();
+            // LOG
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // userServer.setStopAtShutdown(true);
-        //
-        //
-        // userServer.start();
-        // Logger.logMessage("Started user interface server at " + host + ":" +
-        // port);
+        // server.setStopAtShutdown(true);
 
     }
 }
