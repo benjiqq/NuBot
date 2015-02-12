@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONObject;
 import org.json.simple.JSONStreamAware;
 
+import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.utils.FileSystem;
 
 @SuppressWarnings("serial")
@@ -25,6 +29,9 @@ import com.nubits.nubot.utils.FileSystem;
 public class KeyServlet extends HttpServlet {
 
     private String keyfile = "keys.txt";
+    
+    private static String exchangeFile = "config.json";
+
 
     public void putKeys(String key, String secret, String exchange) {
         // TODO: for testing only
@@ -63,7 +70,16 @@ public class KeyServlet extends HttpServlet {
 
     JSONObject demo(String abc) {
         JSONObject json = new JSONObject();
-        json.put("apikey", "abc");
+        //json.put("apikey", "abc");
+        Map m = new HashMap(); 
+        m = OptionsJSON.getOptionsFromSingleFile(exchangeFile);
+        Iterator<String> it = m.keySet().iterator();
+        while(it.hasNext()){
+            String k = it.next();
+            Object o = m.get(k);
+            json.put(k, "" + o);
+            System.out.println(k + ": " + o);
+        }
         return json;
     }
 
