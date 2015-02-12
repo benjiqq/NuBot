@@ -1,6 +1,7 @@
 package com.nubits.nubot.webui;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -21,63 +22,68 @@ import org.eclipse.jetty.servlet.ServletHolder;
  */
 public class UIServer {
 
-    private static final int TESTNET_UI_PORT = 2875;
+    private static final int UI_PORT = 8080;
 
     private static Server server;
 
-    public static class HelloServlet extends HttpServlet {
-        private static final String greeting = "Hello World";
+    @SuppressWarnings("serial")
+    public static class ChangeKeyServlet extends HttpServlet {
 
-        protected void doGet(HttpServletRequest request,
-                HttpServletResponse response) throws ServletException,
-                IOException {
+        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+                throws ServletException, IOException {
+            String key = req.getParameter("key");
+            String secret = req.getParameter("secret");
 
-            response.setContentType("text/html");
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().println(greeting);
+            PrintWriter out = resp.getWriter();
+
+            // TODO wrap in html
+
+            out.println("<html>");
+            out.println("<body>");
+            out.println("Key \"" + key + "\"<br>");
+            out.println("Secret \"" + secret + "\"");
+            out.println("</body>");
+            out.println("</html>");
         }
-
     }
 
     public static void main(String[] args) {
 
-        int port = 8080;
-
-        // final String host = getStringProperty("uiServerHost");
+        // we're always serving from localhost for now
         String host = "localhost";
         server = new Server();
 
         ServerConnector connector = new ServerConnector(server);
-        connector.setPort(port);
+        connector.setPort(UI_PORT);
         connector.setHost(host);
 
+        // keeping it simple, no advanced config
         // connector.setIdleTimeout(getIntProperty("uiServerIdleTimeout"));
         // connector.setReuseAddress(true);
 
         server.addConnector(connector);
 
-        HandlerList userHandlers = new HandlerList();
+        HandlerList uiHandlers = new HandlerList();
 
         ResourceHandler userFileHandler = new ResourceHandler();
         userFileHandler.setDirectoriesListed(false);
         userFileHandler.setWelcomeFiles(new String[] { "index.html" });
-        // userFileHandler.setResourceBase(getStringProperty("uiResourceBase"));
-        userFileHandler.setResourceBase("html");
+        // folder path
+        String htmlPath = "html";
+        userFileHandler.setResourceBase(htmlPath);
 
-        userHandlers.addHandler(userFileHandler);
+        uiHandlers.addHandler(userFileHandler);
 
-        ServletHandler userHandler = new ServletHandler();
-        // ServletHolder userHolder =
-        // userHandler.addServletWithMapping(UserServlet.class, "/nu");
-        ServletHolder u = userHandler.addServletWithMapping(HelloServlet.class,
-                "/");
+        ServletHandler srvHandler = new ServletHandler();
+        ServletHolder ch = srvHandler.addServletWithMapping(
+                ChangeKeyServlet.class, "/keys");
         // u.setAsyncSupported(true);
 
-        userHandlers.addHandler(userHandler);
+        uiHandlers.addHandler(srvHandler);
 
-        userHandlers.addHandler(new DefaultHandler());
+        uiHandlers.addHandler(new DefaultHandler());
 
-        server.setHandler(userHandlers);
+        server.setHandler(uiHandlers);
 
         try {
             server.start();
