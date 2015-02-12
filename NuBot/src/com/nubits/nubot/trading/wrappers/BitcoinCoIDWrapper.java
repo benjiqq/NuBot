@@ -523,14 +523,17 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public void setKeys(ApiKeys keys) {
+        this.keys = keys;
     }
 
     @Override
     public void setExchange(Exchange exchange) {
+        this.exchange = exchange;
     }
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private class BitcoinCoIdService implements ServiceInterface {
