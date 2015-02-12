@@ -168,7 +168,7 @@ public class Balance {
         return "Balance{" + "PEGTotal=" + PEGTotal + ", PEGonOrder=" + PEGonOrder + ", PEGAvailable=" + PEGAvailable + ", NBTTotal=" + NBTTotal + ", NBTonOrder=" + NBTonOrder + ", NBTAvailable=" + NBTAvailable + '}';
     }
 
-    public static Balance getSwapedBalance(Balance original) {
+    public static Balance getSwappedBalance(Balance original) {
         return new Balance(original.NBTAvailable, original.getPEGAvailableBalance(), original.getNBTonOrder(), original.getPEGBalanceonOrder());
     }
 }
