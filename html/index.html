@@ -56,6 +56,14 @@ hr {
                   });
 
             }
+
+            function showModal(){
+                console.log("modal");
+                BootstrapDialog.show({
+                    message: 'Hi Apple!'
+                });
+            }
+
         </script>
 
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
@@ -74,6 +82,27 @@ hr {
 
     </head>
     <body onLoad="changeKey()">
+
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="myModalLabel">API key</h4>
+      </div>
+      <div class="modal-body">
+        asdfasdfasdf
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 
@@ -109,6 +138,10 @@ hr {
 
     <h3>CCEDK</h3>
 
+
+
+
+
 <table class="table table-bordered" width="500">
 <tr>
     <td class="col-md-2">API key</td>
@@ -116,10 +149,18 @@ hr {
 <td class="col-md-8">
     <div class="input-group">
 
-      <input id="apikey" type="text" class="form-control" placeholder="API Key">
+      <input id="apikey" size="100" type="text" class="form-control" placeholder="API Key">
+<!--
       <span class="input-group-btn">
-         <button class="btn btn-default" type="button" onclick="changeKey()">Change</button>
+         <button class="btn btn-default" type="button" onclick="showModal()">Change</button>
+
       </span>
+-->
+    </td><td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change API key
+</button>
+
     </div><!-- /input-group -->
 </td></tr>
 
@@ -129,10 +170,12 @@ hr {
 
     <div class="input-group">
 
-        <input id="apisecret" type="text" class="form-control" placeholder="API Secret">
-      <span class="input-group-btn">
-      <button class="btn btn-default" type="button" onclick="changeKey()">Change</button>
-      </span>
+        <input size="100" id="apisecret" type="text" class="form-control" placeholder="API Secret">
+
+    </td><td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change API key
+</button>
     </div><!-- /input-group -->
 
 </td></tr>
@@ -141,23 +184,24 @@ hr {
     </div>
 
 
+
   <div class="col-xs-6 col-md-4"></div>
-</div>
-
-
+    <!-- spacer -->
+    </div>
 
 
     </div> <!-- /container -->
 
-
 </div>
-
-
-
 
       </div>
 
     </div> <!-- /container -->
+
+
+
+
+
 
     </body>
 </html>
