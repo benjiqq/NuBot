@@ -17,7 +17,7 @@ import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
 /**
- * basic server for setting up a WebUI
+ * basic server for WebUI
  *
  */
 public class UIServer {
@@ -25,27 +25,6 @@ public class UIServer {
     private static final int UI_PORT = 8080;
 
     private static Server server;
-
-    @SuppressWarnings("serial")
-    public static class ChangeKeyServlet extends HttpServlet {
-
-        protected void doPost(HttpServletRequest req, HttpServletResponse resp)
-                throws ServletException, IOException {
-            String key = req.getParameter("key");
-            String secret = req.getParameter("secret");
-
-            PrintWriter out = resp.getWriter();
-
-            // TODO wrap in html
-
-            out.println("<html>");
-            out.println("<body>");
-            out.println("Key \"" + key + "\"<br>");
-            out.println("Secret \"" + secret + "\"");
-            out.println("</body>");
-            out.println("</html>");
-        }
-    }
 
     public static void main(String[] args) {
 
@@ -75,8 +54,8 @@ public class UIServer {
         uiHandlers.addHandler(userFileHandler);
 
         ServletHandler srvHandler = new ServletHandler();
-        ServletHolder ch = srvHandler.addServletWithMapping(
-                ChangeKeyServlet.class, "/keys");
+        ServletHolder ch = srvHandler.addServletWithMapping(KeyServlet.class,
+                "/keys");
         // u.setAsyncSupported(true);
 
         uiHandlers.addHandler(srvHandler);
