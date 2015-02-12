@@ -25,6 +25,8 @@ readme.html
 #Prevent test passwords to be pushed
 Passwords.java
 
+#Mac trash files
+.DS_Store
 
 #Sublime-Text files
 *.sublime-project
@@ -41,6 +43,7 @@ Passwords.java
 
 # Package Files #
 *.jar
+!EasyJccKit.jar
 *.war
 *.ear
 
