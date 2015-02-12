@@ -28,33 +28,22 @@ hr {
   margin-bottom: 20px;
 }
 
+
+
         </style>
 
         <script>
             function changeKey() {
-            //document.getElementById("bter_key").style.color = "red";
-               // alert("input");
 
                 $.ajax({
                   dataType: "json",
                   url: "http://localhost:8080/keys",
-                  /*beforeSend: function( xhr ) {
-                    xhr.overrideMimeType( "text/plain; charset=x-user-defined" );
-                  }*/
                 })
                   .done(function( data ) {
-                    if ( console && console.log ) {
-                        //var j = JSON.loads(data);
-                        //console.log( "Sample of data:", data.slice( 0, 100 ) );
+                    var s = data["secret"];
+                    var pp = $("#k").attr("placeholder");
+                    $("#k").attr("placeholder", s);
 
-                        var s = data["secret"];
-                        console.log(s);
-                        $('#k').html(s);
-
-                        var pp = $("#k").attr("placeholder");
-                        $("#k").attr("placeholder", s);
-                        console.log(pp);
-                    }
                   });
 
             }
@@ -75,7 +64,7 @@ hr {
 
 
     </head>
-    <body>
+    <body onLoad="changeKey()">
 
 
 <div class="container">
@@ -137,6 +126,7 @@ hr {
 </div><!-- /.row -->
 
 <hr>
+
       <h2>Live Information</h2>
       <p>
          Exchanges
@@ -144,7 +134,6 @@ hr {
 
 
 </div>
-
 
 
 
