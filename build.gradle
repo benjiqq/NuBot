@@ -60,6 +60,12 @@ dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
+
+    compile "javax.servlet:servlet-api:2.5"        
+    compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
+    //compile 'javax.websocket:javax.websocket-api:1.1'
+    //compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
+    //compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
     
     compile files('lib/EasyJccKit.jar')
         
