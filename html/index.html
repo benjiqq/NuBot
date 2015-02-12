@@ -7,9 +7,54 @@
                 font-family: Helvetica;
             }
 
+
+            h4 {
+  margin-top: 25px;
+}
+.row {
+  margin-bottom: 20px;
+}
+.row .row {
+  margin-top: 10px;
+  margin-bottom: 0;
+}
+[class*="col-"] {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  border: 1px solid #ddd;
+  border: 1px solid rgba(86,61,124,.2);
+}
+
+hr {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
         </style>
+
+        <script>
+            function changeKey() {
+            //document.getElementById("bter_key").style.color = "red";
+                alert("input");
+            }
+        </script>
+
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+
+
     </head>
     <body>
+
+<!--
       <h1>NuBot</h1>
       <p>version 0.15. more info: http://nubits.com</p>
 
@@ -18,16 +63,55 @@
          Exchanges
       </p>
 
-      <h2>Configuration</h2>
-      <p>
-        CCEDK.
-          <form action="/keys" method="post">
-              API key: <input type="text" name="key" size="30">
-              <br><br>
-              API secret: <input type="text" name="secret" maxlength="4" size="30"><br>
-              <br>
-              <input type="submit" value="Submit">
-        </form>
-      </p>
+
+    -->
+
+
+
+<div class="container">
+
+      <div class="page-header">
+        <h1>NuBot</h1>
+        <p class="lead">version 0.15</p>
+      </div>
+
+      <h2>Exchange config</h2>
+<br>
+      <div class="row">
+        <div class="col-md-12">
+<h3>BTER</h3>
+
+
+<div class="row">
+
+  <div class="col-lg-6">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="API Key">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" onclick="changeKey()">Change</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+
+
+<div class="row">
+
+  <div class="col-lg-6">
+    <div class="input-group">
+      <input type="text" class="form-control" placeholder="API Secret">
+      <span class="input-group-btn">
+        <button class="btn btn-default" type="button" onclick="changeKey()">Change</button>
+      </span>
+    </div><!-- /input-group -->
+  </div><!-- /.col-lg-6 -->
+</div><!-- /.row -->
+
+
+</div>
+      </div>
+
+    </div> <!-- /container -->
+
     </body>
 </html>
