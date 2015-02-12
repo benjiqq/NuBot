@@ -18,6 +18,9 @@ releases/
 #Specific files to ignore
 ssl_readme.txt
 readme.html
+changelog.html
+setup.html
+feeds.html
 
 #launch configurations
 /NuBot/nbproject/configs/*.properties

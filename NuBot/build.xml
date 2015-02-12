@@ -37,10 +37,7 @@
         </zip>
  
         <!-- Copy LICENSE.md -->
-        <copy file="../LICENSE.md" tofile="${store.dir}/res/sources/LICENSE.md"/>
-        
-        <!-- Copy CHANGELOG.md -->
-        <copy file="../CHANGELOG.md" tofile="${store.dir}/res/sources/CHANGELOG.md"/>
+        <copy file="../LICENSE.md" tofile="${store.dir}/res/sources/LICENSE.md"/> 
 
         <!-- Copy SSL keystore -->
         <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
@@ -55,6 +52,7 @@
         <copy file="../readme.html" tofile="${store.dir}/readme.html"/>
         <copy file="../setup.html" tofile="${store.dir}/setup.html"/>
         <copy file="../feeds.html" tofile="${store.dir}/feeds.html"/>
+        <copy file="../changelog.html" tofile="${store.dir}/changelog.html"/>
 
         
         <!-- Delete html files from original location -->
