@@ -18,6 +18,7 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -584,7 +585,7 @@ public class OptionsJSON {
 
             boolean multipleCustodians = false;
             int executeStrategyInterval = 41;
-            int sendLiquidityInterval = 181;
+            int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
 
             double txFee = 0.2;
             double priceIncrement = 0.0003;

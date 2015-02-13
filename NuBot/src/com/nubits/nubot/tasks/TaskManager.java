@@ -55,7 +55,7 @@ public class TaskManager {
         this.running = false;
         taskList = new ArrayList<BotTask>();
         //assign default values just for testing without Global.options loaded
-        int sendLiquidityInterval = 181,
+        int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds")),
                 executeStrategyInterval = 41,
                 checkPriceInterval = 61;
 
