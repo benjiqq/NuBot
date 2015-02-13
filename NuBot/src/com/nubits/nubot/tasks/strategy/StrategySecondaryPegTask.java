@@ -92,6 +92,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
                 isFirstTime = true;
             }
+            getSendLiquidityTask().setFirstOrdersPlaced(true);
         }
     }
 
@@ -125,7 +126,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             if (!Global.options.isMultipleCustodians()) {
                 message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
             } else {
-                message += Integer.parseInt(Global.settings.getProperty("reset_every_minutes")) + "minutes elapsed since last shift";
+                message += Integer.parseInt(Global.settings.getProperty("reset_every_minutes")) + " minutes elapsed since last shift";
             }
             HipChatNotifications.sendMessage(message, Color.PURPLE);
             LOG.warning(message);

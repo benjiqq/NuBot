@@ -51,6 +51,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private String jsonFile_orders;
     private String jsonFile_balances;
     private boolean wallsBeingShifted = false;
+    private boolean firstOrdersPlaced = false;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
         this.verbose = verbose;
@@ -65,9 +66,14 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void checkOrders() {
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
-            String response1 = reportTier1(); //active orders
-            String response2 = reportTier2(); //balance
-            LOG.info(response1 + "\n" + response2);
+            if (isFirstOrdersPlaced()) {
+                String response1 = reportTier1(); //active orders
+                String response2 = reportTier2(); //balance
+                LOG.info(response1 + "\n" + response2);
+            } else {
+                LOG.warning("Liquidity is not being sent : orders are not yet initialized");
+
+            }
         } else {
             LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
         }
@@ -339,5 +345,13 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     public void setWallsBeingShifted(boolean wallsBeingShifted) {
         this.wallsBeingShifted = wallsBeingShifted;
+    }
+
+    public boolean isFirstOrdersPlaced() {
+        return firstOrdersPlaced;
+    }
+
+    public void setFirstOrdersPlaced(boolean firstOrdersPlaced) {
+        this.firstOrdersPlaced = firstOrdersPlaced;
     }
 }
