@@ -44,7 +44,7 @@ hr {
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
         <script>
-            function changeKey() {
+            function loadVals() {
 
                 $.ajax({
                   dataType: "json",
@@ -67,23 +67,23 @@ hr {
 
             }
 
-            function showModal(){
-                console.log("modal");
-                BootstrapDialog.show({
-                    message: 'Hi Apple!'
-                });
+
+            function save(elmnt) {
+
+                var x = elmnt.attr('placeholder');
+
+                //make HTTP post to server
+
+                /*$.post( "http://localhost:8080/keys", { apikey: "zzzzz" } )
+
+                  .done(function( data ) {
+
+                    elmnt.css( 'border-color', '#993333' );
+                }*/
+
+
             }
 
-
-            $('#savechanges').on(
-            'click',
-            function(evt)
-            {
-                var v = $('#modalcontent').val()
-
-                console.log('save ' + v);
-            }
-            );
 
         </script>
 
@@ -100,29 +100,7 @@ hr {
 
 
     </head>
-    <body onLoad="changeKey()">
-
-
-<!-- Modal -->
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">API key</h4>
-      </div>
-      <div class="modal-body" id="modalcontent">
-        asdfasdfasdf
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary" id="savechanges">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
+    <body onLoad="loadVals()">
 
 
     <!-- Fixed navbar -->
@@ -176,7 +154,7 @@ hr {
       </span>
 -->
     </td><td>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+<button type="button" class="btn btn-primary" onclick="save()">
   Change
 </button>
 
@@ -194,7 +172,7 @@ hr {
 
     </td>
 <td>
-<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+<button type="button" class="btn btn-primary"  onclick="save($('#apisecret'))">
   Change
 </button>
     </div><!-- /input-group -->
