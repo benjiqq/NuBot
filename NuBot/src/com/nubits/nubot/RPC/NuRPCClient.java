@@ -319,6 +319,7 @@ public class NuRPCClient {
     }
 
     private String generateIdentifier() {
-        return Global.sessionId + "_" + exchangeName + "_" + pair.toString().toUpperCase();
+        String id = Global.sessionId + "_" + exchangeName + "_" + pair.toString().toUpperCase();
+        return id;
     }
 }
