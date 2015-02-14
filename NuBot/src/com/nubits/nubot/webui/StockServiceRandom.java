@@ -5,8 +5,11 @@ import java.time.LocalTime;
 import java.util.Iterator;
 import java.util.Random;
 
-// A sample class that generates fake stock information.
-public class StockService {
+/**
+ * A sample class that generates random stock prices
+ *
+ */
+public class StockServiceRandom {
 
     // Random stock value generators. One for each sample stock
     private static Random rnd = new Random();

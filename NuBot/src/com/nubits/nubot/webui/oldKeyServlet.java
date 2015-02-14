@@ -92,23 +92,4 @@ public class oldKeyServlet extends HttpServlet {
 
     }
 
-    // TODO
-    // public void doPost(HttpServletRequest req, HttpServletResponse resp)
-    // throws ServletException, IOException {
-    // String key = req.getParameter("key");
-    // String secret = req.getParameter("secret");
-    //
-    // PrintWriter out = resp.getWriter();
-    //
-    // // TODO wrap in html
-    // String exc = "test";
-    // putKeys(key, secret, exc);
-    //
-    // out.println("<html>");
-    // out.println("<body>");
-    // out.println("Key \"" + key + "\"<br>");
-    // out.println("Secret \"" + secret + "\"");
-    // out.println("</body>");
-    // out.println("</html>");
-    // }
 }

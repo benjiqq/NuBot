@@ -9,6 +9,10 @@ import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 
+/**
+ * example use of template, model and view with Mustache and Spark
+ *
+ */
 public class ExampleTemplate {
 
     List<Item> items() {
@@ -40,7 +44,7 @@ public class ExampleTemplate {
 
     public static void main(String[] args) throws IOException {
         MustacheFactory mf = new DefaultMustacheFactory();
-        //TODO: use relative path 
+        // TODO: use relative path
         Mustache mustache = mf.compile("./html/tmpl/template.mustache");
         StringWriter writer = new StringWriter();
         mustache.execute(writer, new ExampleTemplate()).flush();
