@@ -21,17 +21,14 @@ import com.nubits.nubot.utils.FileSystem;
 
 @SuppressWarnings("serial")
 /**
- * manage keys
- * TODO: use keypair object
- * TODO: use proper file paths (Json)
+ * get config and set config
  * TODO: for exchange
  */
 public class KeyServlet extends HttpServlet {
 
     private String keyfile = "keys.txt";
-    
-    private static String exchangeFile = "config.json";
 
+    private static String exchangeFile = "config.json";
 
     public void putKeys(String key, String secret, String exchange) {
         // TODO: for testing only
@@ -68,17 +65,16 @@ public class KeyServlet extends HttpServlet {
         };
     }
 
-    JSONObject demo(String abc) {
+    // TODO refactor and put in OptionJSON
+    JSONObject configJson() {
         JSONObject json = new JSONObject();
-        //json.put("apikey", "abc");
-        Map m = new HashMap(); 
+        Map m = new HashMap();
         m = OptionsJSON.getOptionsFromSingleFile(exchangeFile);
         Iterator<String> it = m.keySet().iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             String k = it.next();
             Object o = m.get(k);
             json.put(k, "" + o);
-            System.out.println(k + ": " + o);
         }
         return json;
     }
@@ -88,32 +84,31 @@ public class KeyServlet extends HttpServlet {
     public void doGet(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
 
-        JSONStreamAware response = prepare(demo("testasdf")); //emptyJSON;
+        JSONStreamAware response = prepare(configJson());
         resp.setContentType("text/plain; charset=UTF-8");
         try (Writer writer = resp.getWriter()) {
             response.writeJSONString(writer);
         }
 
-        //response.setStatus(HttpServletResponse.SC_OK);
-        //response.getWriter().println(greeting);
     }
 
-    public void doPost(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-        String key = req.getParameter("key");
-        String secret = req.getParameter("secret");
-
-        PrintWriter out = resp.getWriter();
-
-        // TODO wrap in html
-        String exc = "test";
-        putKeys(key, secret, exc);
-
-        out.println("<html>");
-        out.println("<body>");
-        out.println("Key \"" + key + "\"<br>");
-        out.println("Secret \"" + secret + "\"");
-        out.println("</body>");
-        out.println("</html>");
-    }
+    // TODO
+    // public void doPost(HttpServletRequest req, HttpServletResponse resp)
+    // throws ServletException, IOException {
+    // String key = req.getParameter("key");
+    // String secret = req.getParameter("secret");
+    //
+    // PrintWriter out = resp.getWriter();
+    //
+    // // TODO wrap in html
+    // String exc = "test";
+    // putKeys(key, secret, exc);
+    //
+    // out.println("<html>");
+    // out.println("<body>");
+    // out.println("Key \"" + key + "\"<br>");
+    // out.println("Secret \"" + secret + "\"");
+    // out.println("</body>");
+    // out.println("</html>");
+    // }
 }

@@ -5,6 +5,7 @@ import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.handler.DefaultHandler;
 import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.servlet.DefaultServlet;
 import org.eclipse.jetty.servlet.ServletHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 
@@ -28,10 +29,6 @@ public class UIServer {
         connector.setPort(UI_PORT);
         connector.setHost(host);
 
-        // keeping it simple, no advanced config
-        // connector.setIdleTimeout(getIntProperty("uiServerIdleTimeout"));
-        // connector.setReuseAddress(true);
-
         server.addConnector(connector);
 
         HandlerList uiHandlers = new HandlerList();
@@ -49,6 +46,7 @@ public class UIServer {
         ServletHolder ch = srvHandler.addServletWithMapping(KeyServlet.class,
                 "/keys");
         // u.setAsyncSupported(true);
+        
 
         uiHandlers.addHandler(srvHandler);
 
