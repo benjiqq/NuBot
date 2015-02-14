@@ -74,12 +74,18 @@ sourceSets {
         java {
             srcDir 'NuBot/src'
         }
+        resources {
+        	srcDir 'NuBot/res'
+    	}
     }
 
     test {
         java {
         srcDir 'NuBot/src/com/nubits/nubot/tests'
         }
+        resources {
+        	srcDir 'NuBot/res'
+    	}        
     }
 }
 
