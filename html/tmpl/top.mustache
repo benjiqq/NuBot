@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+            body {
+                font-family: Helvetica;
+            }
+
+
+            body {
+              min-height: 2000px;
+              padding-top: 70px;
+            }
+
+          .row {
+            margin-bottom: 20px;
+          }
+          .row .row {
+            margin-top: -20px;
+            margin-bottom: 0;
+          }
+          [class*="col-"] {
+            padding-top: 2px;
+            padding-bottom: 2px;
+            border: 0px solid #ddd;
+            border: 0px solid rgba(86,61,124,.2);
+          }
+
+          hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+          }
+
+        </style>
+
+
+<script>
+// establish the communication channel over a websocket
+var ws = new WebSocket("ws://127.0.0.1:8090/stocks");
+
+// called when socket connection established
+ws.onopen = function() {
+    appendLog("Connected to stock service! Press 'Start' to get stock info.")
+};
+
+// called when a message received from server
+ws.onmessage = function (evt) {
+    appendLog(evt.data)
+};
+
+// called when socket connection closed
+ws.onclose = function() {
+    appendLog("Disconnected from stock service!")
+};
+
+// called in case of an error
+ws.onerror = function(err) {
+    console.log("ERROR!", err )
+};
+
+// appends logText to log text area
+function appendLog(logText) {
+    var log = document.getElementById("log");
+    log.value = log.value + logText + "\n"
+}
+
+// sends msg to the server over websocket
+function sendToServer(msg) {
+    ws.send(msg);
+}
+</script>
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+
+      <script>
+            function loadVals() {
+
+                $.ajax({
+                  dataType: "json",
+                  url: "http://localhost:8080/keys",
+                })
+                  .done(function( data ) {
+                    //var pp = $("#key").attr("placeholder");
+
+                    $("#apikey").attr("placeholder", data["apikey"]);
+                    $("#apisecret").attr("placeholder", data["apisecret"]);
+                    $("#dualside").attr("placeholder", data["dualside"]);
+                    $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
+                    $("#nudport").attr("placeholder", data["nudport"]);
+                    $("#rpcpass").attr("placeholder", data["rpcpass"]);
+                    $("#rpcuser").attr("placeholder", data["rpcuser"]);
+                    $("#pair").attr("placeholder", data["pair"]);
+                    $("#mail-recipient").attr("placeholder", data["mail-recipient"]);
+
+                  });
+
+            }
+
+
+            function save(elmnt) {
+
+                var x = elmnt.attr('placeholder');
+
+                //make HTTP post to server
+
+                /*$.post( "http://localhost:8080/keys", { apikey: "zzzzz" } )
+
+                  .done(function( data ) {
+
+                    elmnt.css( 'border-color', '#993333' );
+                }*/
+
+
+            }
+
+
+        </script>
+
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+
+
+    </head>

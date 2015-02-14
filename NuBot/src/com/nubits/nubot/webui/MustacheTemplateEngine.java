@@ -46,6 +46,7 @@ public class MustacheTemplateEngine extends TemplateEngine {
         this.mustacheFactory = mustacheFactory;
     }
 
+    
     @Override
     public String render(ModelAndView modelAndView) {
         String viewName = modelAndView.getViewName();

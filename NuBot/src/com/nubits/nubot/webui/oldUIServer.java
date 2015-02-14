@@ -13,7 +13,7 @@ import org.eclipse.jetty.servlet.ServletHolder;
  * basic server for WebUI
  *
  */
-public class UIServer {
+public class oldUIServer {
 
     private static final int UI_PORT = 8080;
 
@@ -43,7 +43,7 @@ public class UIServer {
         uiHandlers.addHandler(userFileHandler);
 
         ServletHandler srvHandler = new ServletHandler();
-        ServletHolder ch = srvHandler.addServletWithMapping(KeyServlet.class,
+        ServletHolder ch = srvHandler.addServletWithMapping(oldKeyServlet.class,
                 "/keys");
         // u.setAsyncSupported(true);
         

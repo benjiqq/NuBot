@@ -5,8 +5,10 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.servlet.WebSocketServlet;
 import org.eclipse.jetty.websocket.servlet.WebSocketServletFactory;
 
-public class StockServiceServer {
-    public static void main(String[] args) throws Exception {
+public class StockServiceServer implements Runnable {
+    
+    @Override
+    public void run(){
         Server server = new Server(8090);
 
         ServletContextHandler ctx = new ServletContextHandler();
@@ -15,8 +17,21 @@ public class StockServiceServer {
 
         server.setHandler(ctx);
 
-        server.start();
-        server.join();
+        try {
+            server.start();
+            //server.join();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
+    }
+    
+    public static void main(String[] args)  {
+        try {
+            new StockServiceServer().run();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public static class StockServiceSocketServlet extends WebSocketServlet {

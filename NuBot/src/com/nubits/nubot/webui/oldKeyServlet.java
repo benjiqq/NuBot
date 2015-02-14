@@ -24,7 +24,7 @@ import com.nubits.nubot.utils.FileSystem;
  * get config and set config
  * TODO: for exchange
  */
-public class KeyServlet extends HttpServlet {
+public class oldKeyServlet extends HttpServlet {
 
     private String keyfile = "keys.txt";
 
