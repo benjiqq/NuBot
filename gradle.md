@@ -76,5 +76,3 @@ Copy the compile 'xyz' line
 
 ant build could be imported with
 ant.importBuild 'NuBot/build.xml'
-
-
