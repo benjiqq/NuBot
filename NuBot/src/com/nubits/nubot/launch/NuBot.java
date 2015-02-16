@@ -25,15 +25,15 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.OptionsJSON;
-import com.nubits.nubot.models.SecondaryPegOptionsJSON;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
+import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.SendLiquidityinfoTask;
-import com.nubits.nubot.tasks.StrategySecondaryPegTask;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.CcexWrapper;
@@ -43,6 +43,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
 
 /**
  * Provides the main class of NuBot. Instantiate this class to start the NuBot
@@ -52,8 +53,7 @@ import java.util.logging.Logger;
  */
 public class NuBot {
 
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
-    private String optionsPath;
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]";
     private String logsFolder;
     private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
@@ -74,7 +74,7 @@ public class NuBot {
         if (app.readParams(args)) {
             createShutDownHook();
             if (!Global.running) {
-                app.execute();
+                app.execute(args);
             } else {
                 LOG.severe("NuBot is already running. Make sure to terminate other instances.");
             }
@@ -87,7 +87,7 @@ public class NuBot {
      *
      * @author desrever <desrever at nubits.com>
      */
-    private void execute() {
+    private void execute(String args[]) {
         Global.running = true;
 
         //Load settings
@@ -95,7 +95,7 @@ public class NuBot {
 
 
         //Load Options
-        Global.options = OptionsJSON.parseOptions(optionsPath);
+        Global.options = OptionsJSON.parseOptions(args);
         if (Global.options == null) {
             LOG.severe("Error while loading options");
             System.exit(0);
@@ -115,7 +115,7 @@ public class NuBot {
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
-        LOG.info("Setting up  NuBot" + Global.settings.getProperty("version"));
+        LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
         LOG.info("Init logging system");
 
@@ -124,7 +124,16 @@ public class NuBot {
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
         Utils.printSeparator();
 
-        LOG.info("Load options from " + optionsPath);
+
+        String inputFiles = "";
+        for (int i = 0; i < args.length; i++) {
+            if (i != args.length - 1) {
+                inputFiles += args[i] + " ,";
+            } else {
+                inputFiles += args[i];
+            }
+        }
+        LOG.info("Load options from " + args.length + " files : " + inputFiles);
         Utils.printSeparator();
 
 
@@ -152,6 +161,17 @@ public class NuBot {
             ((CcexWrapper) (ti)).initBaseUrl();;
         }
 
+
+        if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
+            Global.swappedPair = true;
+
+        } else {
+            Global.swappedPair = false;
+        }
+
+        LOG.info("Swapped pair mode : " + Global.swappedPair);
+
+
         String apibase = "";
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
@@ -168,9 +188,10 @@ public class NuBot {
         if (txFeeResponse.isPositive()) {
             double txfee = (Double) txFeeResponse.getResponseObject();
             if (txfee == 0) {
-                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1%");
-                Global.options.getSecondaryPegOptions().setPriceOffset(0.1);
-
+                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
+                if (Global.options.getSecondaryPegOptions().getSpread() < 0.1) {
+                    Global.options.getSecondaryPegOptions().setSpread(0.1);
+                }
             }
         }
 
@@ -208,7 +229,9 @@ public class NuBot {
 
 
         String orders_outputPath = logsFolder + "orders_history.csv";
-        ((SendLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFile(orders_outputPath);
+        String balances_outputPath = logsFolder + "balance_history.json";
+
+        ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFiles(orders_outputPath, balances_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
 
 
@@ -256,7 +279,6 @@ public class NuBot {
 
         //Switch strategy for different trading pair
 
-
         if (Utils.isSupported(Global.options.getPair())) {
             if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
                 Global.taskManager.getStrategyFiatTask().start(7);
@@ -269,7 +291,14 @@ public class NuBot {
                 }
 
                 //Peg to a USD price via crypto pair
-                Currency toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                Currency toTrackCurrency;
+
+                if (Global.swappedPair) { //NBT as paymentCurrency
+                    toTrackCurrency = Global.options.getPair().getOrderCurrency();
+                } else {
+                    toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+                }
+
                 CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
 
@@ -284,17 +313,17 @@ public class NuBot {
                 // set liquidityinfo task to the strategy
 
                 ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                        .setSendLiquidityTask(((SendLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
+                        .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
 
                 PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
                 //Then set the pfm
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
 
                 //Set the priceDistance threshold
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(cpo.getDistanceTreshold());
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(cpo.getDistanceThreshold());
 
                 //Set the wallet shift threshold
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeTreshold());
+                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeThreshold());
 
                 //Set the outputpath for wallshifts
 
@@ -302,19 +331,44 @@ public class NuBot {
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
                 FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
-                //set the interval from options
-                Global.taskManager.getPriceTriggerTask().setInterval(cpo.getRefreshTime());
+
+
+
 
                 //read the delay to sync with remote clock
-                int delay = 1;
-                if (Global.options.isWaitBeforeShift()) {
-                    delay = Utils.getSecondsToRemoteMinute();
-                    LOG.info("NuBot will be start running in " + delay + " seconds, to sync with remote NTP.");
+                //issue 136 - multi custodians on a pair.
+                //walls are removed and re-added every three minutes.
+                //Bot needs to wait for next 3 min window before placing walls
+                //set the interval from settings
+
+                int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes")); //read from propeprties file
+                int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
+
+                int interval = 1;
+                if (!Global.options.isMultipleCustodians()) {
+                    interval = refresh_time_seconds;
                 } else {
-                    LOG.warning("NuBot will not try to sync with other bots via remote NTP : wait-before-shift is set to false");
+                    interval = 60 * reset_every;
+                    //Force the a spread to avoid collisions
+                    double forcedSpread = 0.9;
+                    LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
+                    if (Global.options.getSecondaryPegOptions().getSpread() < forcedSpread) {
+                        Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
+                    }
+                }
+
+                Global.taskManager.getPriceTriggerTask().setInterval(interval);
+
+                int delaySeconds = 0;
+
+                if (Global.options.isMultipleCustodians()) {
+                    delaySeconds = Utils.getSecondsToNextwindow(reset_every);
+                    LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
+                } else {
+                    LOG.warning("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
                 }
                 //then start the thread
-                Global.taskManager.getPriceTriggerTask().start(delay);
+                Global.taskManager.getPriceTriggerTask().start(delaySeconds);
             }
         } else {
             LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
@@ -333,11 +387,10 @@ public class NuBot {
 
     private boolean readParams(String[] args) {
         boolean ok = false;
-        if (args.length != 1) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+        if (args.length < 1) {
+            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
             System.exit(0);
         }
-        optionsPath = args[0];
         ok = true;
         return ok;
     }
@@ -347,13 +400,59 @@ public class NuBot {
             @Override
             public void run() {
 
-                LOG.info("Bot shut down");
-                NuBot.mainThread.interrupt();
-                if (Global.taskManager != null) {
-                    if (Global.taskManager.isInitialized()) {
-                        Global.taskManager.stopAll();
+                LOG.info("Bot shutting down..");
+
+                if (Global.options != null) {
+                    //Try to cancel all orders, if any
+                    if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+                        LOG.info("Clearing out active orders ... ");
+
+                        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                        if (deleteOrdersResponse.isPositive()) {
+                            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                            if (deleted) {
+                                LOG.info("Order clear request succesfully");
+                            } else {
+                                LOG.severe("Could not submit request to clear orders");
+                            }
+
+                        } else {
+                            LOG.severe(deleteOrdersResponse.getError().toString());
+                        }
+                    }
+
+                    //reset liquidity info
+                    if (Global.rpcClient.isConnected() && Global.options.isSendRPC()) {
+                        //tier 1
+                        LOG.info("Resetting Liquidity Info before quit");
+
+                        JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0, 1);
+                        if (null == responseObject1) {
+                            LOG.severe("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.fine(responseObject1.toJSONString());
+                        }
+
+                        JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0, 2);
+                        if (null == responseObject2) {
+                            LOG.severe("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.fine(responseObject2.toJSONString());
+                        }
+                    }
+
+                    LOG.info("Exit. ");
+                    NuBot.mainThread.interrupt();
+                    if (Global.taskManager != null) {
+                        if (Global.taskManager.isInitialized()) {
+                            Global.taskManager.stopAll();
+                        }
                     }
                 }
+
                 Thread.currentThread().interrupt();
                 return;
             }

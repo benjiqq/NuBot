@@ -48,7 +48,7 @@ public class Balance {
     public Balance(Amount NBTTotal, Amount PEGTotal) {
         this.NBTTotal = NBTTotal;
         this.PEGTotal = PEGTotal;
-        this.PEGonOrder = new Amount(0, Constant.getCurrencyFromCode(PEGTotal.getCurrency().getCode()));
+        this.PEGonOrder = new Amount(0, Currency.createCurrency(PEGTotal.getCurrency().getCode()));
         this.NBTonOrder = new Amount(0, Constant.NBT);
         this.PEGAvailable = PEGTotal;
         this.NBTAvailable = NBTTotal;
@@ -66,7 +66,7 @@ public class Balance {
         this.NBTAvailable = NBTAvail;
         this.PEGonOrder = PEGonOrder;
         this.NBTonOrder = NBTonOrder;
-        this.PEGTotal = new Amount(PEGAvailable.getQuantity() + PEGonOrder.getQuantity(), Constant.getCurrencyFromCode(PEGonOrder.getCurrency().getCode()));
+        this.PEGTotal = new Amount(PEGAvailable.getQuantity() + PEGonOrder.getQuantity(), Currency.createCurrency(PEGonOrder.getCurrency().getCode()));
         this.NBTTotal = new Amount(NBTAvailable.getQuantity() + NBTonOrder.getQuantity(), Constant.NBT);
     }
 
@@ -166,5 +166,9 @@ public class Balance {
     @Override
     public String toString() {
         return "Balance{" + "PEGTotal=" + PEGTotal + ", PEGonOrder=" + PEGonOrder + ", PEGAvailable=" + PEGAvailable + ", NBTTotal=" + NBTTotal + ", NBTonOrder=" + NBTonOrder + ", NBTAvailable=" + NBTAvailable + '}';
+    }
+
+    public static Balance getSwapedBalance(Balance original) {
+        return new Balance(original.NBTAvailable, original.getPEGAvailableBalance(), original.getNBTonOrder(), original.getPEGBalanceonOrder());
     }
 }

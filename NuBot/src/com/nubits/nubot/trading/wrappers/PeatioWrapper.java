@@ -23,13 +23,8 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
@@ -39,12 +34,7 @@ import com.nubits.nubot.utils.HttpUtils;
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -79,6 +69,7 @@ public class PeatioWrapper implements TradeInterface {
     private final String API_ORDER = "/api/v2/order"; //GET
     private final String API_CANCEL_ORDER = "/api/v2/order/delete"; //POST
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
+    private final String API_GET_TRADES = "/api/v2/trades/my.json"; //GET
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
     private ErrorManager errors = new ErrorManager();
@@ -129,6 +120,9 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
+
+        //LOG.warning("\nurl: " + url + "\nmethod: " + method + "\nquery_args: " + query_args.toString() + "\nisGet: " + isGet);
+
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
         if (queryResult == null) {
@@ -239,6 +233,7 @@ public class PeatioWrapper implements TradeInterface {
 
                     if (tempCurrency.equalsIgnoreCase(currency.getCode())) {
                         amount = new Amount((Double.parseDouble(balanceObj.get("balance").toString())), currency);
+
                         found = true;
                     }
                 }
@@ -415,6 +410,7 @@ public class PeatioWrapper implements TradeInterface {
             /*Sample result
              * {"id":7,"side":"sell","price":"3100.0","avg_price":"3101.2","state":"wait","market":"btccny","created_at":"2014-04-18T02:02:33Z","volume":"100.0","remaining_volume":"89.8","executed_volume":"10.2","trades":[{"id":2,"price":"3100.0","volume":"10.2","market":"btccny","created_at":"2014-04-18T02:04:49Z","side":"sell"}]}
              */
+
             apiResponse.setResponseObject(parseOrder(httpAnswerJson));
         } else {
             apiResponse = response;
@@ -680,12 +676,79 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = apiBaseUrl;
+        String method = API_GET_TRADES;
+        boolean isGet = true;
+        TreeMap<String, String> query_args = new TreeMap<>();
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+
+        query_args.put("canonical_verb", "GET");
+        query_args.put("canonical_uri", method);
+        query_args.put("market", pair.toString());
+        query_args.put("limit", "1000");
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            LOG.info("A maximum of 1000 trades can be returned from the BitSpark API");
+            JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
+            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext();) {
+                Trade thisTrade = parseTrade(trade.next());
+                if (thisTrade.getDate().getTime() < startTime) {
+                    continue;
+                }
+                tradeList.add(thisTrade);
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
+    }
+
+    public Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+        /*
+         {
+         "id":273,
+         "market":"nbtbtc",
+         "funds":"0.00005536",
+         "price":"0.002768",
+         "side":"ask",
+         "volume":"0.02",
+         "created_at":"2014-12-04T17:32:55+08:00"
+         }
+         */
+        //set id and order_id
+        out.setId(in.get("id").toString());
+        out.setOrder_id(in.get("id").toString());
+        //get and set currency pair
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(in.get("market").toString(), "");
+        out.setPair(pair);
+        //set the type
+        out.setType(in.get("side").toString().equals("bid") ? Constant.BUY : Constant.SELL);
+        //get and set the price
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //get and set the amount
+        Amount amount = new Amount(Double.parseDouble(in.get("volume").toString()), pair.getOrderCurrency());
+        out.setAmount(amount);
+        //set the Date
+        out.setDate(parseDate(in.get("created_at").toString()));
+        //set the exchange name
+        out.setExchangeName(exchange.getName());
+
+        return out;
+
     }
 
     private class PeatioService implements ServiceInterface {

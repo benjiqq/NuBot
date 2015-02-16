@@ -37,21 +37,22 @@ public class Constant {
     public static final String POLONIEX = "poloniex";
     public static final String CCEX = "ccex";
     public static final String ALLCOIN = "allcoin";
+    public static final String EXCOIN = "excoin";
+    public static final String BITCOINCOID = "bitcoincoid";
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";
     //Order types
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
     //Currencies
-    public static final Currency USD = new Currency("$", true, "USD", "US Dollar");
-    public static final Currency CNY = new Currency("C", true, "CNY", "CNY");
-    public static final Currency EUR = new Currency("€", true, "EUR", "Euro");
-    public static final Currency BTC = new Currency("B", false, "BTC", "Bitcoin");
-    public static final Currency NBT = new Currency("N", false, "NBT", "Nubits");
-    public static final Currency PPC = new Currency("P", false, "PPC", "Peercoin");
-    public static final Currency LTC = new Currency("L", false, "LTC", "Litecoin");
-    public static final Currency BITUSD = new Currency("busd", false, "BITUSD", "Bitshare X BitUSD");
-    public static final Currency BTSX = new Currency("bx", false, "BTSX", "Bitshares X");
+    public static final Currency USD = Currency.createCurrency("USD");
+    public static final Currency CNY = Currency.createCurrency("CNY");
+    public static final Currency EUR = Currency.createCurrency("EUR");
+    public static final Currency BTC = Currency.createCurrency("BTC");
+    public static final Currency NBT = Currency.createCurrency("NBT");
+    public static final Currency NSR = Currency.createCurrency("NSR");
+    public static final Currency PPC = Currency.createCurrency("PPC");
+    public static final Currency LTC = Currency.createCurrency("LTC");
     //!! When adding one here, also add it down
     public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
     public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
@@ -64,52 +65,9 @@ public class Constant {
     public static final CurrencyPair PPC_BTC = new CurrencyPair(PPC, BTC);
     public static final CurrencyPair PPC_LTC = new CurrencyPair(PPC, LTC);
     public static final CurrencyPair BTC_CNY = new CurrencyPair(BTC, CNY);
-    public static final CurrencyPair BTSX_USD = new CurrencyPair(BTSX, USD);
-    public static final CurrencyPair BTSX_BTC = new CurrencyPair(BTSX, BTC);
-    public static final CurrencyPair BITUSD_BTC = new CurrencyPair(BITUSD, BTC);
-    public static final CurrencyPair BTC_BITUSD = new CurrencyPair(BTC, BITUSD);
     public static final CurrencyPair EUR_USD = new CurrencyPair(EUR, USD);
     public static final CurrencyPair CNY_USD = new CurrencyPair(CNY, USD);
     //Direction of price
     public static final String UP = "up";
     public static final String DOWN = "down";
-
-    public static Currency getCurrencyFromCode(String codeString) {
-        Currency toRet = null;
-        codeString = codeString.toUpperCase();
-        switch (codeString) {
-            case "USD":
-                toRet = USD;
-                break;
-            case "EUR":
-                toRet = EUR;
-                break;
-            case "LTC":
-                toRet = LTC;
-                break;
-            case "CNY":
-                toRet = CNY;
-                break;
-            case "BTC":
-                toRet = BTC;
-                break;
-            case "PPC":
-                toRet = PPC;
-                break;
-            case "NBT":
-                toRet = NBT;
-                break;
-            case "BITUSD":
-                toRet = BITUSD;
-                break;
-            case "BTSX":
-                toRet = BTSX;
-                break;
-            default:
-                LOG.severe("Currency " + codeString + " not available");
-                break;
-        }
-
-        return toRet;
-    }
 }

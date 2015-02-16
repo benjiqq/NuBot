@@ -41,6 +41,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
+import java.util.Random;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -171,10 +173,16 @@ public class Utils {
      *
      * @return
      */
-    public static String getTimestamp() {
+    public static String getTimestampString() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    public static long getTimestampLong() {
+        Date timeStamp = new Date();
+        return timeStamp.getTime();
+
     }
 
     public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
@@ -302,5 +310,54 @@ public class Utils {
     public static void exitWithMessage(String msg) {
         LOG.severe(msg);
         System.exit(0);
+    }
+
+    /**
+     * Returns a pseudo-random number between min and max, inclusive. The
+     * difference between min and max can be at most
+     * <code>Integer.MAX_VALUE - 1</code>.
+     *
+     * @param min Minimum value
+     * @param max Maximum value. Must be greater than min.
+     * @return Integer between min and max, inclusive.
+     * @see java.util.Random#nextInt(int)
+     */
+    public static int randInt(int min, int max) {
+
+        // NOTE: Usually this should be a field rather than a method
+        // variable so that it is not re-seeded every call.
+        Random rand = new Random();
+
+        // nextInt is normally exclusive of the top value,
+        // so add 1 to make it inclusive
+        int randomNum = rand.nextInt((max - min) + 1) + min;
+
+        return randomNum;
+    }
+
+    /**
+     * For use with the multi-custodian option. The walls are removed and
+     * re-added every three minutes. The bot needs to wait for the next 3 minute
+     * window before placing walls
+     *
+     * @return delay
+     */
+    public static int getSecondsToNextwindow(int windowWidthSeconds) {
+        Date remoteDate = new NTPClient().getTime();
+        Calendar remoteCalendar = new GregorianCalendar();
+        remoteCalendar.setTime(remoteDate);
+        int remoteTimeInSeconds = remoteCalendar.get(Calendar.SECOND);
+        int remoteTimeInMinutes = remoteCalendar.get(Calendar.MINUTE);
+        int minutesTillWindow = windowWidthSeconds - (remoteTimeInMinutes % windowWidthSeconds);
+        int delay = ((60 * minutesTillWindow) - remoteTimeInSeconds);
+        return delay;
+    }
+
+    public static String calcDate(long millisecs) {
+        String timezone = "UTC";
+        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd yyyy HH:mm:ss.SSS");
+        date_format.setTimeZone(TimeZone.getTimeZone("timezone"));
+        Date resultdate = new Date(millisecs);
+        return date_format.format(resultdate) + " " + timezone;
     }
 }

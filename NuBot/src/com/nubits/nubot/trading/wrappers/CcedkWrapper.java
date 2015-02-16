@@ -61,7 +61,6 @@ import org.json.simple.parser.ParseException;
 
 public class CcedkWrapper implements TradeInterface {
 
-
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -130,6 +129,7 @@ public class CcedkWrapper implements TradeInterface {
         }
         if (offset != -1000000000) {
             numericalNonce = (int) (System.currentTimeMillis() / 1000L) + offset;
+
             validNonce = Objects.toString(numericalNonce);
             //LOG.warning("validNonce = " + validNonce);
         } else {
@@ -290,7 +290,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -463,7 +463,7 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
 
-        LOG.warning("CCEDK uses global TX fee, currency pair not supported. \n"
+        LOG.warning("CCEDK uses global TX fee, currency pair not supported."
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -504,7 +504,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        //Since there is no API entry point for that, this call will iterate over actie
+        //Since there is no API entry point for that, this call will iterate over active
         ApiResponse toReturn = new ApiResponse();
         boolean ok = true;
 
@@ -513,20 +513,21 @@ public class CcedkWrapper implements TradeInterface {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
-                //TODO check that the order belongs to 'pair'
-                ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
-                if (deleteOrderResponse.isPositive()) {
-                    boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
+                if (pair.equals(tempOrder.getPair())) {
+                    ApiResponse deleteOrderResponse = cancelOrder(tempOrder.getId(), null);
+                    if (deleteOrderResponse.isPositive()) {
+                        boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
-                    if (deleted) {
-                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        if (deleted) {
+                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        } else {
+                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            ok = false;
+                        }
+
                     } else {
-                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
-                        ok = false;
+                        LOG.severe(deleteOrderResponse.getError().toString());
                     }
-
-                } else {
-                    LOG.severe(deleteOrderResponse.getError().toString());
                 }
                 try {
                     Thread.sleep(500);
@@ -583,12 +584,12 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private Order parseOrder(JSONObject orderObject) {
@@ -607,7 +608,9 @@ public class CcedkWrapper implements TradeInterface {
         CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
         order.setPair(cp);
 
+
         order.setType(orderObject.get("type").toString());
+
         order.setAmount(new Amount(Double.parseDouble((String) orderObject.get("volume")), cp.getOrderCurrency()));
         order.setPrice(new Amount(Double.parseDouble((String) orderObject.get("price")), cp.getPaymentCurrency()));
 
@@ -625,6 +628,9 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     private Trade parseTrade(JSONObject orderObject) {
+        //hotfix for Ben request
+        //FileSystem.writeToFile(orderObject.toJSONString(), "raw-trades.json", true);
+
         Trade trade = new Trade();
 
         /*
@@ -668,7 +674,7 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
@@ -703,6 +709,7 @@ public class CcedkWrapper implements TradeInterface {
         startDateArg = startDateArg.substring(0, 10);
 
         query_args.put("date_from", startDateArg);
+        query_args.put("items_per_page", "10000");
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {

@@ -138,16 +138,22 @@ public class Trade {
         DecimalFormat df = new DecimalFormat("0");
         df.setMaximumFractionDigits(8);
 
-        return "\"Trade_" + id + "\":{\n"
-                + "\"id\":\"" + id + "\",\n"
-                + "\"order_id\":\"" + order_id + "\",\n"
-                + "\"exchange\":\"" + exchangeName + "\",\n"
-                + "\"pair\":\"" + pair.toString() + "\",\n"
-                + "\"type\":\"" + type.toUpperCase() + "\",\n"
-                + "\"price\":" + price.getQuantity() + ",\n"
-                + "\"amount\":" + amount.getQuantity() + ",\n"
-                + "\"fee\":" + df.format(fee.getQuantity()) + ",\n"
-                + "\"timestamp\":" + date.getTime() + "\n"
+        String feeString = "N.A.";
+        if (fee != null) {
+            feeString = df.format(this.fee.getQuantity());
+        }
+
+
+        return "\"Trade_" + this.id + "\":{\n"
+                + "\"id\":\"" + this.id + "\",\n"
+                + "\"order_id\":\"" + this.order_id + "\",\n"
+                + "\"exchange\":\"" + this.exchangeName + "\",\n"
+                + "\"pair\":\"" + this.pair.toString() + "\",\n"
+                + "\"type\":\"" + this.type.toUpperCase() + "\",\n"
+                + "\"price\":" + this.price.getQuantity() + ",\n"
+                + "\"amount\":" + this.amount.getQuantity() + ",\n"
+                + "\"fee\":" + feeString + ",\n"
+                + "\"timestamp\":" + this.date.getTime() + "\n"
                 + "}";
     }
 }

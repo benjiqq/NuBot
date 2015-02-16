@@ -19,10 +19,11 @@ package com.nubits.nubot.global;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.models.OptionsJSON;
+import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import java.util.Properties;
+import java.util.UUID;
 
 /**
  *
@@ -31,6 +32,7 @@ import java.util.Properties;
 public class Global {
 
     public static Properties settings;
+    public static String sessionId = UUID.randomUUID().toString().substring(0, 6);
     public static boolean running = false;
     public static Exchange exchange;
     public static boolean startupComplete = false;
@@ -44,4 +46,5 @@ public class Global {
     public static OptionsJSON options;
     public static double conversion = 1; //Change this? update SendLiquidityinfoTask
     public static FrozenBalancesManager frozenBalances;
+    public static boolean swappedPair; //true if paymen currency is NBT
 }

@@ -42,7 +42,7 @@ public class TradeUtils {
 
     private static final Logger LOG = Logger.getLogger(TradeUtils.class.getName());
 
-    public static boolean tryCancelAllOrders(CurrencyPair pair) { //TODO the name of the method does not reflect its content
+    public static boolean tryCancelAllOrders(CurrencyPair pair) {
         boolean toRet = false;
         //get all orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -52,7 +52,7 @@ public class TradeUtils {
             if (orderList.size() == 0) {
                 toRet = true;
             } else {
-                LOG.warning("There are still : " + orderList.size() + " active orders");
+                LOG.info("There are still : " + orderList.size() + " active orders");
                 //Retry to cancel them to fix issue #14
                 ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
                 if (deleteOrdersResponse.isPositive()) {
@@ -61,13 +61,17 @@ public class TradeUtils {
                     if (deleted) {
                         LOG.info("Order clear request succesfully");
                     } else {
+                        toRet = false;
                         LOG.info("Could not submit request to clear orders");
                     }
                 } else {
+                    toRet = false;
                     LOG.severe(deleteOrdersResponse.getError().toString());
                 }
             }
         } else {
+            toRet = false;
+
             LOG.severe(activeOrdersResponse.getError().toString());
         }
 
@@ -209,7 +213,7 @@ public class TradeUtils {
         return result;
     }
     //The two methods below have been amalgamated into the CCDEK wrapper
-    //TODO - remove these methods once testing has taken place
+    //TODO - get rid of these ccedk =methods once testing has taken place
     public static int offset = 0;
 
     public static String getCCDKEvalidNonce() {

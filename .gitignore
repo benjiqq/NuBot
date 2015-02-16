@@ -7,7 +7,6 @@ releases/
 
 #Directories to ignore
 
-/NuBot/res/options/test/
 /NuBot/res/options/private/
 /NuBot/nbproject/private/
 /NuBot/build/
@@ -19,6 +18,9 @@ releases/
 #Specific files to ignore
 ssl_readme.txt
 readme.html
+changelog.html
+setup.html
+feeds.html
 
 #launch configurations
 /NuBot/nbproject/configs/*.properties

@@ -32,9 +32,9 @@ public class Order {
     private Date executedDate; //the time at which this trade was filled.
     private String type; // string value containing either Constant.BUY or Constant.SELL
     private CurrencyPair pair; //Object containing currency pair
-    private Amount amount;    //Object containing the number of units for this trade (without fees).
-    private Amount price; //Object containing the price for each units traded.
-    private Amount amountPlusFee; //Object representing the total costs/proceeds of this trade.
+    private Amount amount;    //Object containing the number of units for this trade (without fees). Expressed in pair.OrderCurrency
+    private Amount price; //Object containing the price for each units traded. Expressed in pair.PaymentCurrency
+    private Amount amountPlusFee; //Object representing the total costs/proceeds of this trade. Expressed in pair.OrderCurrency
     private boolean completed; // true if the order is filled completely
 
     //Constructor
@@ -211,6 +211,6 @@ public class Order {
 
     public String getDigest() {
         //i.e 12312 : { buy : 3242 NBT @ 0.003342 BTC }
-        return id + " : { " + type + " " + Utils.round(amount.getQuantity(), 2) + "@" + Utils.round(price.getQuantity(), 8) + "} ";
+        return id + " : { " + type + " " + Utils.round(amount.getQuantity(), 6) + "@" + Utils.round(price.getQuantity(), 8) + "} ";
     }
 }

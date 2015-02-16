@@ -1,6 +1,22 @@
 package com.nubits.nubot.trading.wrappers;
+/*
+ * Copyright (C) 2014 desrever < woolly_sammoth at nubits.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -11,10 +27,6 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -23,6 +35,10 @@ import java.text.*;
 import java.util.*;
 import java.util.logging.Logger;
 import javax.net.ssl.HttpsURLConnection;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  * Created by woolly_sammoth on 21/10/14.
@@ -45,6 +61,7 @@ public class AllCoinWrapper implements TradeInterface {
     private final String API_BUY_COIN = "buy_coin";
     private final String API_OPEN_ORDERS = "myorders";
     private final String API_CANCEL_ORDERS = "cancel_order";
+    private final String API_TRADES = "mytrades";
     //Tokens
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_ERR = "error_info";
@@ -56,7 +73,9 @@ public class AllCoinWrapper implements TradeInterface {
     //Errors
     ErrorManager errors = new ErrorManager();
 
-    public AllCoinWrapper() { setupErrors(); }
+    public AllCoinWrapper() {
+        setupErrors();
+    }
 
     public AllCoinWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
@@ -68,7 +87,7 @@ public class AllCoinWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery (String url, String method, TreeMap <String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
         if (queryResult == null) {
@@ -120,7 +139,6 @@ public class AllCoinWrapper implements TradeInterface {
     public ApiError getErrorByCode(int code) {
         return null;
     }
-
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
@@ -211,8 +229,7 @@ public class AllCoinWrapper implements TradeInterface {
                     Amount total = new Amount(0, currency);
                     apiResponse.setResponseObject(total);
                 }
-            }
-            else { //we have returned data
+            } else { //we have returned data
                 String s;
                 if (currency == null) { //get all balances
                     JSONObject holdBal = (JSONObject) dataJson.get(TOKEN_BAL_HOLD);
@@ -266,17 +283,17 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -292,10 +309,9 @@ public class AllCoinWrapper implements TradeInterface {
         return queryResult;
     }
 
-
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -310,7 +326,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -338,8 +354,7 @@ public class AllCoinWrapper implements TradeInterface {
             if (dataJson == null) {
                 ApiError apiError = errors.nullReturnError;
                 apiResponse.setError(apiError);
-            }
-            else {
+            } else {
                 for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
                     Order order = parseOrder(data.next());
                     if (pair != null && !order.getPair().equals(pair)) {
@@ -365,27 +380,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     public Order parseOrder(JSONObject data) {
         Order order = new Order();
-        /*
-        {
-        "code": 1,
-        "data": [
-            {
-            "order_id": "1410027",
-            "user_id": "100000",
-            "type": "DOGE",
-            "exchange": "BTC",
-            "ctime": "2014-06-15 14:42:36",
-            "price": "0.00000060",
-            "num": "1000.00000000",
-            "total": "0.00060000",
-            "rest_num": "1000.00000000", // the remaining DOGE of the order
-            "rest_total": "0.00060000", //the remaining BTC of the order
-            "fee": "0.00000090", // about fees, please visit here https://www.allcoin.com/pub/fee
-            "order_type": "sell"
-            },
-            ...
-        }
-        */
+
         //set the order id
         // A String containing a unique identifier for this order
         order.setId(data.get(TOKEN_ORDER_ID).toString());
@@ -403,7 +398,7 @@ public class AllCoinWrapper implements TradeInterface {
         Amount thisPrice = new Amount(Double.parseDouble(data.get("price").toString()), thisPair.getPaymentCurrency());
         order.setPrice(thisPrice);
         //set the insertedDate
-        SimpleDateFormat sdf  = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
         Date date = null;
         try {
             date = sdf.parse(data.get("ctime").toString());
@@ -435,17 +430,31 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+
+        ApiResponse activeOrders = getActiveOrders();
+        if (activeOrders.isPositive()) {
+            ArrayList<Order> orders = (ArrayList) activeOrders.getResponseObject();
+            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(orderID)) {
+                    apiResponse.setResponseObject(thisOrder);
+                }
+            }
+        } else {
+            apiResponse = activeOrders;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
         /* Params
-            access_key	String	Yes	Access key
-            created	Timestamp	Yes	UTC Timestamp
-            methodcancel_order	Yes	Function name
-            order_id	Integer	Yes	Order Id
-            sign
+         access_key	String	Yes	Access key
+         created	Timestamp	Yes	UTC Timestamp
+         methodcancel_order	Yes	Function name
+         order_id	Integer	Yes	Order Id
+         sign
          */
         ApiResponse apiResponse = new ApiResponse();
         boolean isGet = false;
@@ -492,7 +501,7 @@ public class AllCoinWrapper implements TradeInterface {
         //if (Global.options != null) {
         //    return new ApiResponse(true, Global.options.getTxFee(), null);
         //} else {
-            return new ApiResponse(true, defaultFee, null);
+        return new ApiResponse(true, defaultFee, null);
         //}
     }
 
@@ -505,12 +514,102 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    public ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_AUTH_URL;
+        String method = API_TRADES;
+        boolean isGet = false;
+        ArrayList<Trade> tradeList = new ArrayList<Trade>();
+        TreeMap<String, String> query_args = new TreeMap<>();
+        query_args.put("page", "1");
+        query_args.put("page_size", "20");
+
+        ApiResponse response = getQuery(url, method, query_args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray trades = (JSONArray) httpAnswerJson.get("data");
+            if (trades != null) {
+                //LOG.info(trades.toJSONString());
+                for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                    Trade thisTrade = parseTrade(trade.next());
+                    if (!thisTrade.getPair().equals(pair)) {
+                        continue;
+                    }
+                    if (thisTrade.getDate().getTime() < startTime) {
+                        continue;
+                    }
+                    tradeList.add(thisTrade);
+                }
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+    }
+
+    public Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+        /*
+         {
+         "trade_id": "100000",
+         "type": "HIC",
+         "exchange": "BTC",
+         "ctime": "2014-06-01 09:03:42",
+         "price": "0.00001849",
+         "num": "11.12000000",
+         "total": "0.00020561",
+         "fee": "0.016680",
+         "order_id": "139978",
+         "trade_type": "buy"
+         }
+         */
+        //get and set the pair
+        String cur = in.get("type").toString();
+        String com = in.get("exchange").toString();
+        String cPair = cur + "_" + com;
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(cPair, "_");
+        out.setPair(pair);
+        //set the id
+        out.setId(in.get("trade_id").toString());
+        out.setOrder_id(in.get("trade_id").toString());
+        //set type
+        out.setType(in.get("trade_type").toString().equals("buy") ? Constant.BUY : Constant.SELL);
+        //set price
+        Amount price = new Amount(Double.parseDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //set amount
+        Amount amount = new Amount(Double.parseDouble(in.get("num").toString()), pair.getOrderCurrency());
+        //set the Date
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd kk:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("ctime").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.severe(pe.toString());
+        }
+        if (date != null) {
+            long ctime = date.getTime();
+            Date insertDate = new Date(ctime);
+            out.setDate(insertDate);
+        }
+        //set the exchange name
+        out.setExchangeName(exchange.getName());
+        //set the fee
+        Amount fee = new Amount(Double.parseDouble(in.get("fee").toString()), pair.getPaymentCurrency());
+        out.setFee(fee);
+
+
+        return out;
     }
 
     @Override
@@ -523,7 +622,7 @@ public class AllCoinWrapper implements TradeInterface {
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
-               Order thisOrder = order.next();
+                Order thisOrder = order.next();
                 if (thisOrder.getId().equals(id)) {
                     apiResponse.setResponseObject(true);
                 }
@@ -677,9 +776,9 @@ public class AllCoinWrapper implements TradeInterface {
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + url + " (method = " + method + " )" +
-                        "\nData : \" + post_data" +
-                        "\nHTTP Response : " + Objects.toString(response));
+                LOG.severe("Query to : " + url + " (method = " + method + " )"
+                        + "\nData : \" + post_data"
+                        + "\nHTTP Response : " + Objects.toString(response));
             }
 
             try {
@@ -692,16 +791,18 @@ public class AllCoinWrapper implements TradeInterface {
             }
 
             /*
-            if (httpError) {
-                JSONParser parser = new JSONParser();
-                try {
-                    JSONObject obj = (JSONObject) (parser.parse(answer));
-                    answer = (String) obj.get(TOKEN_ERR);
-                } catch (ParseException pe) {
-                    LOG.severe(pe.toString());
-                }
-            }
-            */
+
+             if (httpError) {
+             JSONParser parser = new JSONParser();
+             try {
+             JSONObject obj = (JSONObject) (parser.parse(answer));
+             answer = (String) obj.get(TOKEN_ERR);
+             } catch (ParseException pe) {
+             LOG.severe(pe.toString());
+             }
+             }
+             */
+
 
             connection.disconnect();
             connection = null;
@@ -716,14 +817,13 @@ public class AllCoinWrapper implements TradeInterface {
                 byte[] array = md.digest(hash_data.getBytes());
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < array.length; ++i) {
-                    sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1,3));
+                    sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
                 }
                 return sb.toString();
             } catch (java.security.NoSuchAlgorithmException e) {
+                LOG.severe(e.toString());
             }
             return null;
         }
-
     }
-
 }

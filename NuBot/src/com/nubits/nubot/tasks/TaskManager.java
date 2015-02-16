@@ -20,6 +20,9 @@ package com.nubits.nubot.tasks;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
+import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
+import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -52,9 +55,9 @@ public class TaskManager {
         this.running = false;
         taskList = new ArrayList<BotTask>();
         //assign default values just for testing without Global.options loaded
-        int sendLiquidityInterval = 181,
-                executeStrategyInterval = 41;
-        long checkPriceInterval = 61;
+        int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds")),
+                executeStrategyInterval = 41,
+                checkPriceInterval = 61;
 
         boolean verbose = false;
 
@@ -63,10 +66,6 @@ public class TaskManager {
             sendLiquidityInterval = Global.options.getSendLiquidityInteval();
             executeStrategyInterval = Global.options.getExecuteStrategyInterval();
             verbose = Global.options.isVerbose();
-            if (Global.options.getSecondaryPegOptions() != null) {
-                //If global option have been loaded
-                checkPriceInterval = Global.options.getSecondaryPegOptions().getRefreshTime();
-            }
         }
 
 
@@ -75,7 +74,7 @@ public class TaskManager {
         taskList.add(checkConnectionTask);
 
         sendLiquidityTask = new BotTask(
-                new SendLiquidityinfoTask(verbose), sendLiquidityInterval, "sendLiquidity"); //true for verbosity
+                new SubmitLiquidityinfoTask(verbose), sendLiquidityInterval, "sendLiquidity"); //true for verbosity
         taskList.add(sendLiquidityTask);
 
         checkNudTask = new BotTask(

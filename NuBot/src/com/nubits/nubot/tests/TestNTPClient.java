@@ -22,6 +22,7 @@ package com.nubits.nubot.tests;
  * @author desrever <desrever at nubits.com>
  */
 import com.nubits.nubot.NTP.NTPClient;
+import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
 
 public class TestNTPClient {
@@ -31,6 +32,7 @@ public class TestNTPClient {
     public static void main(String[] args) {
         NTPClient client = new NTPClient();
 
+        LOG.info("Seconds untile next window : " + Utils.getSecondsToNextwindow(3));
 
         //Try multiple servers
         LOG.info("Date (multiple servers) : " + client.getTime());

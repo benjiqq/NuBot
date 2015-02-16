@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tasks;
+package com.nubits.nubot.tasks.strategy;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -31,7 +31,6 @@ import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
@@ -47,79 +46,134 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private boolean ordersAndBalancesOk;
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false;
+    private final int RESET_AFTER_CYCLES = 50;
+    private final int MAX_RANDOM_WAIT_SECONDS = 5;
+    private final int SHORT_WAIT_SECONDS = 5;
+    private int cycles = 0;
 
     @Override
     public void run() {
         LOG.fine("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
 
-        if (!isFirstTime) {
-            recount(); //Count number of active sells and buys
-            if (mightNeedInit) {
+        cycles++;
+        if (cycles != RESET_AFTER_CYCLES) {
+            if (!isFirstTime) {
+                recount(); //Count number of active sells and buys
+                if (mightNeedInit) {
 
-                // if there are 2 active orders, do nothing
-                // if there are 0 orders, place initial walls
-                // if there are a number of orders different than 2, cancel all and place initial walls
+                    // if there are 2 active orders, do nothing
+                    // if there are 0 orders, place initial walls
+                    // if there are a number of orders different than 2, cancel all and place initial walls
 
-                if (!(ordersAndBalancesOk)) {
-                    //They are either 0 or need to be cancelled
-                    if (totalActiveOrders != 0) {
-                        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                        if (deleteOrdersResponse.isPositive()) {
-                            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-                            if (deleted) {
-                                LOG.warning("Clear all orders request succesfully");
-                                //Wait until there are no active orders
-                                boolean timedOut = false;
-                                long timeout = Global.options.getEmergencyTimeout() * 1000;
-                                long wait = 6 * 1000;
-                                long count = 0L;
-                                do {
-                                    try {
-                                        Thread.sleep(wait);
-                                        count += wait;
-                                        timedOut = count > timeout;
+                    if (!(ordersAndBalancesOk)) {
+                        //They are either 0 or need to be cancelled
+                        if (totalActiveOrders != 0) {
+                            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                            if (deleteOrdersResponse.isPositive()) {
+                                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+                                if (deleted) {
+                                    LOG.warning("Clear all orders request succesfully");
+                                    //Wait until there are no active orders
+                                    boolean timedOut = false;
+                                    long timeout = Global.options.getEmergencyTimeout() * 1000;
+                                    long wait = 6 * 1000;
+                                    long count = 0L;
+                                    do {
+                                        try {
+                                            Thread.sleep(wait);
+                                            count += wait;
+                                            timedOut = count > timeout;
 
-                                    } catch (InterruptedException ex) {
-                                        LOG.severe(ex.toString());
+                                        } catch (InterruptedException ex) {
+                                            LOG.severe(ex.toString());
+                                        }
+                                    } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
+
+                                    if (timedOut) {
+                                        String message = "There was a problem cancelling all existing orders";
+                                        LOG.severe(message);
+                                        HipChatNotifications.sendMessage(message, Color.YELLOW);
+                                        MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
+                                        //Continue anyway, maybe there is some balance to put up on order.
                                     }
-                                } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
-
-                                if (timedOut) {
-                                    String message = "There was a problem cancelling all existing orders";
+                                    //Update the balance
+                                    placeInitialWalls();
+                                } else {
+                                    String message = "Could not submit request to clear orders";
                                     LOG.severe(message);
-                                    HipChatNotifications.sendMessage(message, Color.YELLOW);
-                                    MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
-                                    //Continue anyway, maybe there is some balance to put up on order.
+                                    System.exit(0);
                                 }
-                                //Update the balance
-                                placeInitialWalls();
+
                             } else {
+                                LOG.severe(deleteOrdersResponse.getError().toString());
                                 String message = "Could not submit request to clear orders";
                                 LOG.severe(message);
                                 System.exit(0);
                             }
-
                         } else {
-                            LOG.severe(deleteOrdersResponse.getError().toString());
-                            String message = "Could not submit request to clear orders";
-                            LOG.severe(message);
-                            System.exit(0);
+                            placeInitialWalls();
                         }
                     } else {
-                        placeInitialWalls();
+                        LOG.warning("No need to init new orders since current orders seems correct");
                     }
-                } else {
-                    LOG.warning("No need to init new orders since current orders seems correct");
+                    mightNeedInit = false;
+                    recount();
                 }
-                mightNeedInit = false;
-                recount();
-            }
 
-            //Make sure there are 2 orders per side
-            if (!ordersAndBalancesOk) {
-                LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-                mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
+                //Make sure there are 2 orders per side
+                if (!ordersAndBalancesOk) {
+                    LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+                    mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
+                } else {
+                    ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+                    if (balancesResponse.isPositive()) {
+                        Balance balance = (Balance) balancesResponse.getResponseObject();
+                        Amount balanceNBT = balance.getNBTAvailable();
+
+                        Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+                        LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
+                                + balanceFIAT.getQuantity() + " USD");
+
+                        //Execute sellSide strategy
+                        sellSide(balanceNBT);
+
+                        //Execute buy Side strategy
+                        if (Global.isDualSide && proceedsInBalance) {
+                            buySide();
+                        }
+
+                    } else {
+                        //Cannot get balance
+                        LOG.severe(balancesResponse.getError().toString());
+                    }
+                }
             } else {
+                LOG.info("Initializing strategy");
+                recount();
+                isFirstTime = false;
+
+                boolean reinitiateSuccess = reInitiateOrders(true);
+                if (!reinitiateSuccess) {
+                    LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
+                    isFirstTime = true;
+                } else {
+                    LOG.info("Initial walls placed");
+                }
+            }
+        } else {
+            //Execute this block every RESET_AFTER_CYCLES cycles to ensure faireness with competing custodians
+
+            //Reset cycle number
+            cycles = 0;
+
+            //add a random number of cycles to avoid unlikely situation of synced custodians
+            cycles += Utils.randInt(0, 5);
+
+            //Cancel sell side orders
+            boolean cancelSells = TradeUtils.takeDownOrders(Constant.SELL, Global.options.getPair());
+
+            if (cancelSells) {
+                //Update balances
                 ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
                 if (balancesResponse.isPositive()) {
                     Balance balance = (Balance) balancesResponse.getResponseObject();
@@ -130,29 +184,37 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             + balanceFIAT.getQuantity() + " USD");
 
                     //Execute sellSide strategy
-                    sellSide(balanceNBT);
-
-                    //Execute buy Side strategy
-                    if (Global.isDualSide && proceedsInBalance) {
-                        buySide();
+                    //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+                    //This will favour competition in markets with multiple custodians
+                    try {
+                        Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+                    } catch (InterruptedException ex) {
+                        LOG.severe(ex.toString());
                     }
 
-                } else {
+                    sellSide(balanceNBT);
+                }
+                {
                     //Cannot get balance
                     LOG.severe(balancesResponse.getError().toString());
                 }
             }
-        } else {
-            LOG.info("Initializing strategy");
-            recount();
-            isFirstTime = false;
 
-            boolean reinitiateSuccess = reInitiateOrders(true);
-            if (!reinitiateSuccess) {
-                LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
-                isFirstTime = true;
+            //Execute buy Side strategy
+            if (Global.isDualSide) {
+                //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+                //This will favour competition in markets with multiple custodians
+                try {
+                    Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+                } catch (InterruptedException ex) {
+                    LOG.severe(ex.toString());
+                }
+
+                buySide();
             }
+
         }
+
     }
 
     private void placeInitialWalls() {
@@ -195,6 +257,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     if (balancesResponse.isPositive()) {
                         Balance balance = (Balance) balancesResponse.getResponseObject();
                         balanceNBT = balance.getNBTAvailable();
+
                         Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
                         LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
@@ -210,10 +273,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             //Prepare the sell order
                             double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
 
+                            if (Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
+                            {
+                                if (balanceNBT.getQuantity() > Global.options.getMaxSellVolume()) {
+                                    //put the cap
+                                    balanceNBT.setQuantity(Global.options.getMaxSellVolume());
+                                }
+                            }
+
                             double amountToSell = balanceNBT.getQuantity();
                             if (Global.executeOrders) {
                                 //execute the order
-                                String orderString = "sell " + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
+                                String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                                         + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
                                 LOG.warning("Strategy : Submit order : " + orderString);
 
@@ -421,7 +492,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             placeInitialWalls();
         }
         try {
-            Thread.sleep(4000); //Give the time to new orders to be placed before counting again
+            Thread.sleep(SHORT_WAIT_SECONDS); //Give the time to new orders to be placed before counting again
         } catch (InterruptedException ex) {
             LOG.severe(ex.toString());
         }
@@ -464,38 +535,54 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                     LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
-                    /*
-                    if (type.equals(Constant.SELL) && Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
-                    {
-                        if (balance.getQuantity() > Global.options.getMaxSellVolume()) {
-                            //put the cap
-                            balance.setQuantity(Global.options.getMaxSellVolume());
-                        }
-                    }
-
-                    if (type.equals(Constant.BUY) && Global.options.getMaxBuyVolume() > 0) {
-                        if (balance.getQuantity() > Global.options.getMaxBuyVolume()) {
-                            //put the cap
-                            balance.setQuantity(Global.options.getMaxBuyVolume());
-
-                        }
-                    }
-                    */
-
-
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
+
+
+                    //check the calculated amount against the set maximum sell amount set in the options.json file
+                    if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                        amount1 = amount1 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount1;
+                    }
+
+                    if (type.equals(Constant.BUY) && !Global.swappedPair) {
+                        amount1 = Utils.round(amount1 / price, 8);
+                        //check the calculated amount against the max buy amount option, if any.
+                        if (Global.options.getMaxBuyVolume() > 0) {
+                            amount1 = amount1 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount1;
+                        }
+
+                    }
+
+
                     double amount2 = balance.getQuantity() - amount1;
 
-                    if (type.equals(Constant.BUY)) {
-                        amount1 = Utils.round(amount1 / price, 8);
+                    if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                        amount2 = amount2 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount2;
+                    }
+
+                    if ((type.equals(Constant.BUY) && !Global.swappedPair)
+                            || (type.equals(Constant.SELL) && Global.swappedPair)) {
+                        //hotfix
+                        amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+
                         amount2 = Utils.round(amount2 / price, 8);
+
+                        //check the calculated amount against the max buy amount option, if any.
+                        if (Global.options.getMaxBuyVolume() > 0) {
+                            amount2 = amount2 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount2;
+                        }
+
+                    }
+
+                    if (type.equals(Constant.BUY)) {
+                        amount2 = Utils.round(amount2 / price, 8);
+
                     }
 
                     //Prepare the orders
 
-                    String orderString1 = type + " " + amount1 + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    String orderString1 = type + " " + Utils.round(amount1, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-                    String orderString2 = type + " " + amount2 + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    String orderString2 = type + " " + Utils.round(amount2, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
                     if (Global.options.isExecuteOrders()) {

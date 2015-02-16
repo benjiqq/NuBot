@@ -17,6 +17,11 @@
  */
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.utils.FileSystem;
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.logging.Logger;
+
 /**
  *
  * @author desrever <desrever at nubits.com>
@@ -24,12 +29,13 @@ package com.nubits.nubot.models;
 public class Currency {
 
 //Class Variables
-    private String symbol; // i.e. $
+    private static final Logger LOG = Logger.getLogger(Currency.class.getName());
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
-
+    private final static String PATH_TO_CURRENCIES = "res/currencies.csv";
 //Constructor
+
     /**
      *
      * @param symbol
@@ -37,27 +43,33 @@ public class Currency {
      * @param code
      * @param extendedName
      */
-    public Currency(String symbol, boolean fiat, String code, String extendedName) {
-        this.symbol = symbol;
+    public static Currency createCurrency(String code) {
+        Currency toRet = null;
+        ArrayList<String[]> currencyList = FileSystem.parseCsvFromFile(PATH_TO_CURRENCIES);
+        boolean found = false;
+        for (int j = 1; j < currencyList.size(); j++) {
+            String[] tempLine = currencyList.get(j);
+
+            if (tempLine[0].equalsIgnoreCase(code)) {
+                return new Currency(Boolean.parseBoolean(tempLine[2]), tempLine[0], tempLine[1]);
+            }
+        }
+
+        if (!found) {
+            LOG.warning("Didn't find a currency with code " + code + " in lookup table " + PATH_TO_CURRENCIES
+                    + "\nUpdate the currency file to avoid malfunctionings.");
+
+            return new Currency(false, code, "");
+
+        }
+
+        return toRet;
+    }
+
+    private Currency(boolean fiat, String code, String extendedName) {
         this.fiat = fiat;
         this.code = code;
         this.extendedName = extendedName;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getSymbol() {
-        return symbol;
-    }
-
-    /**
-     *
-     * @param symbol
-     */
-    public void setSymbol(String symbol) {
-        this.symbol = symbol;
     }
 
     /**
@@ -110,6 +122,21 @@ public class Currency {
 
     @Override
     public String toString() {
-        return "Currency{" + "symbol=" + symbol + ", fiat=" + fiat + ", code=" + code + ", extendedName=" + extendedName + '}';
+        return "Currency{fiat=" + fiat + ", code=" + code + ", extendedName=" + extendedName + '}';
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final Currency other = (Currency) obj;
+        if (!Objects.equals(this.code, other.code)) {
+            return false;
+        }
+        return true;
     }
 }

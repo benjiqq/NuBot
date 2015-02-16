@@ -18,6 +18,7 @@
 package com.nubits.nubot.models;
 
 import com.nubits.nubot.utils.Utils;
+import java.text.DecimalFormat;
 
 /**
  *
@@ -54,7 +55,7 @@ public class Amount {
      * @param quantity
      */
     public void setQuantity(double quantity) {
-        this.quantity = this.quantity = Utils.round(quantity, 8);
+        this.quantity = Utils.round(quantity, 8);
     }
 
     /**
@@ -75,7 +76,9 @@ public class Amount {
 
     @Override
     public String toString() {
-        return "" + quantity + " " + currency.getCode() + "\n";
+        DecimalFormat df = new DecimalFormat("#");
+        df.setMaximumFractionDigits(8);
+        return "" + df.format(quantity) + " " + currency.getCode() + "\n";
     }
 
     /**
