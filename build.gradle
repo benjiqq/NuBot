@@ -27,7 +27,7 @@ apply plugin: 'java'
 apply plugin: 'application'
 apply plugin: 'eclipse'
 
-sourceCompatibility = 1.7 // java version
+sourceCompatibility = 1.8 // java version
 
 
 repositories {
@@ -222,7 +222,13 @@ task NuBotJar(type: Jar) {
 
 
 task runCollector(type:JavaExec) {
-   description 'run the collector service on a server'
-   main = "com.nubits.nuservice.CollectService"
-   classpath = sourceSets.main.runtimeClasspath
+    description 'run the collector service on a server'
+    main = "com.nubits.nuservice.CollectService"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task runUI(type:JavaExec) {
+    description 'run the WebUI'
+    main = "com.nubits.nubot.webui.UiServer"
+    classpath = sourceSets.main.runtimeClasspath
 }

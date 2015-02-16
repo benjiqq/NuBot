@@ -7,7 +7,7 @@ import java.util.Map;
 
 import spark.ModelAndView;
  
-public class WebUI {
+public class UiServer {
     
  
     public static void main(String[] args) {

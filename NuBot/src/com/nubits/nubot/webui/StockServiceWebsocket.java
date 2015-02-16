@@ -37,7 +37,7 @@ public class StockServiceWebsocket {
         switch (message) {
             case "start":
                 send("Stock service started!");
-                executor.scheduleAtFixedRate(() -> 
+                executor.scheduleAtFixedRate(() ->
                     send(StockServiceRandom.getStockInfo()), 0, 500, TimeUnit.MILLISECONDS);
                 break;
             case "stop":
