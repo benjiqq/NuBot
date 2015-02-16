@@ -116,7 +116,7 @@ Parameters :
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  if set to false will disable hipchat notifications | boolean |
-| mail-notifications    | true |  if set to false will disable email notifications | boolean |
+| mail-notifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
 | mail-recipient | / |  the email to which emergency email are sent  |  String  |
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
 | keep-proceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
