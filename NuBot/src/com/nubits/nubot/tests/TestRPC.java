@@ -75,7 +75,7 @@ public class TestRPC {
         }
         //test.testGetInfo();
         //test.testIsConnected();
-        test.testSendLiquidityInfo(buy, sell);
+        test.testSendLiquidityInfo(buy, sell, 1);
         //test.testGetLiquidityInfo();
         //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
         //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
@@ -84,11 +84,9 @@ public class TestRPC {
 
     }
 
-    private void testSendLiquidityInfo(double amountBuy, double amountSell) {
-
-
+    private void testSendLiquidityInfo(double amountBuy, double amountSell, int tier) {
         if (Global.rpcClient.isConnected()) {
-            JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar, amountBuy, amountSell);
+            JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar, amountBuy, amountSell, tier);
             if (null == responseObject) {
                 LOG.severe("Something went wrong while sending liquidityinfo");
             } else {

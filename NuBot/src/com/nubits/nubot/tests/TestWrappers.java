@@ -63,6 +63,7 @@ public class TestWrappers {
 
         //Methods strictly necessary for NuBot to run-------------
         //-------------
+
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
         //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
