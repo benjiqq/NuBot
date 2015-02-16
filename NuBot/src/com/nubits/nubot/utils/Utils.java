@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Random;
+import java.util.TimeZone;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -172,10 +173,16 @@ public class Utils {
      *
      * @return
      */
-    public static String getTimestamp() {
+    public static String getTimestampString() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    public static long getTimestampLong() {
+        Date timeStamp = new Date();
+        return timeStamp.getTime();
+
     }
 
     public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
@@ -283,7 +290,7 @@ public class Utils {
                 }
             }
         }
-        
+
     }
 
     public static long getOneDayInMillis() {
@@ -351,5 +358,14 @@ public class Utils {
             throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
         }
         return (int) l;
+    }
+
+    public static String calcDate(long millisecs) {
+        String timezone = "UTC";
+        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd yyyy HH:mm:ss.SSS");
+        date_format.setTimeZone(TimeZone.getTimeZone("timezone"));
+        Date resultdate = new Date(millisecs);
+        return date_format.format(resultdate) + " " + timezone;
+
     }
 }

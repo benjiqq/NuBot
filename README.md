@@ -2,7 +2,6 @@
 
 #####Official automated trading bot for NuBits custodians
 
-
 *Disclaimer : this documentation is currently under-development and is therefore subject to sudden changes*
 
 #What is NuBot?
@@ -13,6 +12,9 @@ As explained in the [white paper](https://nubits.com/about/white-paper), a custo
 
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
+#Changelog
+See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
+
 
 #How does it work?
 
@@ -22,6 +24,9 @@ Within the Nu system there are two types of custodians: **sell side** and **dual
 In the case of *sell side custodians*, the liquidity they provide is secondary to another goal such as funding core development, marketing NBT or distributing Peercoin dividends. They want to spend the proceeds of their NBT, so under no circumstance will they provide buy side liquidity.
 NuBot permits a user to indicate they are either a sell side or dual side custodian. This effect the trading bots behavior is detailed in the use cases below.
 
+#Using NuBot
+
+See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/SETUP.md?at=master)
 
 ##Dual-side strategy
 
@@ -65,224 +70,7 @@ Alternative strategies  :
 * *Secondary Peg Strategy* : a strategy to let custodian trade of pairs different from NBT/USD .
 * *KTms Strategy* : dual side Strategy with x% of proceeds from sales kept in balance. Link to [KTm's custodial proposal](http://discuss.nubits.com/t/proposal-to-operate-a-nubits-grant-to-provide-early-stage-dual-side-liquidity-and-shareholder-dividends/120/25) .
 
-#Using NuBot
-##Disclaimer . Use NuBot at your own risk
-
-*PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL. ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS. NONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF NUBOT*
-
-By using NuBot you declare to have accepted the afore-mentioned risks.
-
-##Assumption for a correct functioning
-
-* The computer that runs NuBot must be connected to the internet
-* The custodian must provide the bot with access to market exchanges where NuBits are traded
-* The custodian must avoid manual interaction with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds.
-* The custodian must avoid opening multiple instances of the Nu client in control of the custodian address at the same time.
-* To communicate *liquidityinfo*, the custodian should possess an unlocked NuBit client which controls the custodial grant address.
-* Before running the bot on a market where another instance of NuBot is operating, make sure to reach an agreement with the other operator on the price-feed to be used.
-* For NBT_EUR pair, only one instance per market is currently allowed.
-
-###1) Prepare the NuBits client client
-
-To function correctly, NuBot needs to communicate with the NuBits client of the custodian.
-The bot needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have real-time information about active orders in the network across custodians, and react to it.
-It does so by interacting via the *NuBits client of the custodian*.
-
-*NOTE: Is it also possible to test NuBot without being a custodian and setting the `"submit-liquidity":false` in the option file. In this case you can ignore this section.*
-
-The bot communicates with the Nu client via RCP over HTTP.
-If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client. In order to do that, open your *nu.conf* and add make sure you have it properly configured.
-
-
-```
-server=1
-rpcuser=<choose-a-username>
-rpcpassword=<choose-a-password>
-port=9090
-rpcport=9091
-rpcallowip=<ip_of_machine_running_the_bot>
-```
-
-*NOTE: if using NuBot and NuBits on the same machine, the last parameter can be omitted*
-
-Launch Nu client and, if the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Unlocking the wallet *for minting only* is not enough.
-Also, make sure that the NuBit client controls a public address which received a custodial grant.
-
-The two Nu wallets are locked/unlocked separately. To unlock the NuBits wallets, first make sure the client is displaying the NuBits units, then open the console and type:
-```
-walletpassphrase <your passphrase> 9999999999
-```
-The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg!
-
-
-###2) Configure the NuBot
-
-**Download latest stable builds from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).**
-
-The bot reads options from one or multiple *.json* file.
-
-Here is a list of essential options :
-
-| Parameter        | Description          |  Admitted values  |
-| ------------- |:-------------:| -----:|
-| exchangename     | Name of the exchange where the bots operates | "bter" ; "ccedk" ; "btce" ; "peatio" ; "poloniex" ;  "ccex" ;  |
-| apikey      |  Custodian's public key to access the exchange . *this param is optional for ccex*     |  String |
-| apisecret |  Custodian's secret key to access the exchange    | String |
-| dualside |  If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.     | true,false |
-| nubitaddress | The public address where the custodial grant has been received    |   valid custodian NBT addresses (String) |
-| nudport | The RPC port of the Nu daemon |   1024...65535 |
-| rpcpass |  The RPC password of the Nu daemon    |  String |
-| rpcuser |  The RPC username  of the Nu daemon    |    String |
-| pair |  The currency pair where the bot operates     |   valid currency pair for the specified exchange eg. "nbt_usd" |
-| mail-recipient | the email at which emergency email has to be sent  |  String  |
-
-With the builds of the bot a sample *options.json* is attached and its will resemble the snippet below :
-
-```json
-{"options":
-    {
-    "exchangename":"xxx",
-    "apikey": "xxx",
-    "apisecret": "xxx",
-    "dualside": false,
-    "nubitaddress": "xxx",
-    "nudport": 9091,
-    "rpcpass": "xxx",
-    "rpcuser": "xxx",
-    "pair":"xxx_xxx",
-    "mail-recipient":"xxx"
- }
-}
-
-```
-
-Is it also possible to split the options in several files, to keep some information private or for multiple instances.
-
-In the example below we see how the options presented above can be broken down :
-
-*part1.json*
-```json
-{"options":
-    {
-    "exchangename":"xxx",
-    "apikey": "xxx",
-    "apisecret": "xxx"
- }
-}
-```
-
-*part2.json*
-
-```json
-{"options":
-    {
-    "dualside": false,
-    "nubitaddress": "xxx",
-    "nudport": 9091,
-    "rpcpass": "xxx",
-    "rpcuser": "xxx",
-    "pair":"xxx_xxx",
-    "mail-recipient":"xxx"
- }
-}
-```
-
-Check the [Under the hood](#markdown-header-under-the-hood) section of this document for additional configuration parameters available.
-
-Its good practice separating configuration parameters in different files : market, price-tracking, rpc, and settings  is a possible good grouping of optional parameters.
-
-
-###3) Run NuBot
-
-
-Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
-
-```
-java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]
-```
-
-The bot will start and output messages on the console and write in the */logs* folder.
-
-To terminate the bot, exit the process with "Ctrl+C"
-
-*Requirements*
-NuBot comes as a cross platform executable jar file to run from command line.
-It only requires a recent Java Runtime Environment to be installed.
-Download Java JRE:1.7 [from oracle](http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html)
-
-
-
 #Under the hood
-##Additional configuration parameters
-
-
-###Secondary Peg Parameters
-When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.
-The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.
-The price feed will track the live rate between the *secondary peg* currency and USD.
-
-It is sufficient to add a JSON object in the standard options file structured in the following example (for a nbt/usd pair) :
-
-```json
-"secondary-peg-options":
-        {
-            "main-feed":"bter",
-            "backup-feeds": {
-                "backup1" : { "name" : "bitcoinaverage"},
-                "backup2" : { "name" : "coinbase"},
-                "backup3" : { "name" : "blockchain"}
-                },
-            "wallshift-threshold": 0.1,
-         }
-```
-
-####Parameters explanation :
-
-| Parameter        | Description          |  Admitted values  |
-| ------------- |:-------------:| -----:|
-| main-feed     | the name of the main price feed that has priority over the others | **see following table |
-| backup-feeds       |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
-| wallshift-threshold |  how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
-
-####Available price feed names (can be used as value for *main-feed* and *backup-feeds*)
-
-| Feed name        | Currencies available for tracking   |  Feed |
-| ------------- |:-------------:| -------------:|
-| blockchain    | BTC  |  https://blockchain.info |
-| bitcoinaverage    | BTC  |  https://api.bitcoinaverage.com |
-| coinbase    | BTC  |  https://coinbase.com |
-| btce  | BTC, PPC, ...  |  https://btc-e.com |
-| bter    | BTC  |  http://data.bter.com |
-| ccedk    | BTC |  https://www.ccedk.com |
-| coinmarketcap_no    | PPC |  http://coinmarketcap.northpole.ro |
-| coinmarketcap_ne    | PPC |  http://coinmarketcap-nexuist.rhcloud.com |
-| bitstampeurusd    | EUR  |  https://bitstamp.com |
-| google-unofficial    | EUR,CNY, ...  |  http://rate-exchange.appspot.com |
-| yahoo    | EUR,CNY, ...  |  https://yahooapis.com |
-| openexchangerates    | EUR,CNY, ...  |  https://openexchangerates.org |
-| exchangeratelab    | EUR,CNY, ...  |  https://exchangeratelab.com |
-
-
-###Additional parameters
-
-NuBot can be further configured by adding additional parameters to its config file. Below a table with an explanation of each parameter and its default value.
-
-
-| Parameter      |  Default value  |  Description  |   Admitted values  |
-| ------------- |:-------------:| -------------:|
-| nudip    | "127.0.0.1"  |   | The IP address of the machine that hosts the Nu Client |
-| multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
-| verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
-| hipchat    | true |  f set to false will disable hipchat notifications | boolean |
-| mail-notifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
-| submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
-| executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
-| emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapses, emergency prodecure starts |  int (minutes) |
-| txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
-| keep-proceedings    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceedings from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD|
-| max-sell-order-volume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT  |
-| max-buy-order-volume | 0 | maximum volume to put on buy walls.  |  double , expressed in the peg currency  |
 
 ##Adding support for an exchange
 *coming soon*
@@ -295,13 +83,6 @@ NuBot can be further configured by adding additional parameters to its config fi
 ###Dual-side logic
 
 ![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
-
-##Implementation details
-*coming soon*
-##HipChat notifications
-*coming soon*
-##Email notifications
-*coming soon*
 
 ##Adding SSL certificates for an exchange
 In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.
@@ -340,22 +121,12 @@ We are committed to keep the *java keystore* always updated with most recent cer
 To get the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/f82fc9c98ff044afa4af0eaef95199a563cc6250/NuBot/res/ssl/nubot_keystore.jks?at=master) and place it in the *res/ssl* folder of NuBot.
 
 
-##Logging on HTML and csv
-
-The bot produces different output log files, all stored in a special folder created for each session under *logs/*.
-The bot produces a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*.
-*fine* are never logged to file (only to console).
-*info* are logged to file if we set`"verbose"=true`.
-*warning* are used for logging trading-related messages.
-*severe* are used for errors.
-
-Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders.
-
-#Changelogs
-See [changelog.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
+#Price Feeds
+See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
 
 #Contribute
-see CONTRIBUTE.md
+See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CONTRIBUTE.md?at=master)
+
 
 #License
 NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)

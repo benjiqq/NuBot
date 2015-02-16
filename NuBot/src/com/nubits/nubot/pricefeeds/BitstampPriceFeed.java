@@ -35,8 +35,8 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = Logger.getLogger(BitstampPriceFeed.class.getName());
 
     public BitstampPriceFeed() {
-        name = "bitstampeurusd";
-        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
+        name = "bitstamp";
+        refreshMinTime = 58 * 1000; //8 hours
     }
 
     @Override
@@ -44,7 +44,7 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = "https://www.bitstamp.net/api/eur_usd/";
+            String url = "https://www.bitstamp.net/api/ticker/";
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url, true);
@@ -55,11 +55,10 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double buy = Double.valueOf((String) httpAnswerJson.get("buy"));
-                double sell = Double.valueOf((String) httpAnswerJson.get("sell"));
+                double last = Double.valueOf((String) httpAnswerJson.get("last"));
 
                 //Make the average between buy and sell
-                double last = Utils.round((buy + sell) / 2, 8);
+                last = Utils.round(last, 8);
 
 
                 lastRequest = System.currentTimeMillis();

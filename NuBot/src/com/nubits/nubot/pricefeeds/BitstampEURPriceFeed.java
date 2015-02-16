@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,35 +17,34 @@
  */
 package com.nubits.nubot.pricefeeds;
 
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- * @author desrever <desrever at nubits.com>
- */
-public class CcedkPriceFeed extends AbstractPriceFeed {
+public class BitstampEURPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(CcedkPriceFeed.class.getName());
+    private static final Logger LOG = Logger.getLogger(BitstampEURPriceFeed.class.getName());
 
-    public CcedkPriceFeed() {
-        name = "ccedk";
-        refreshMinTime = 50 * 1000; //one minutee
+    public BitstampEURPriceFeed() {
+        name = "bitstampeurusd";
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = TradeUtils.getCCEDKTickerUrl(pair);
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = "https://www.bitstamp.net/api/eur_usd/";
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url, true);
@@ -55,12 +54,13 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
             }
             JSONParser parser = new JSONParser();
             try {
-                //{"errors":false,"response":{"entity":{"pair_id":"2","min":"510","max":"510","avg":"510","vol":"0.0130249"}}}
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("response");
-                JSONObject entityObject = (JSONObject) tickerObject.get("entity");
+                double buy = Double.valueOf((String) httpAnswerJson.get("buy"));
+                double sell = Double.valueOf((String) httpAnswerJson.get("sell"));
 
-                double last = Double.valueOf((String) entityObject.get("avg"));
+                //Make the average between buy and sell
+                double last = Utils.round((buy + sell) / 2, 8);
+
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
@@ -75,6 +75,5 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-
     }
 }

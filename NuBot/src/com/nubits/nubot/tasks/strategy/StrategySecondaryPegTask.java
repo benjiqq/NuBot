@@ -92,6 +92,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
                 isFirstTime = true;
             }
+            getSendLiquidityTask().setFirstOrdersPlaced(true);
         }
     }
 
@@ -121,8 +122,12 @@ public class StrategySecondaryPegTask extends TimerTask {
                 currencyTracked = Global.options.getPair().getPaymentCurrency().getCode().toUpperCase();
             }
 
-            String message = "Shift needed on " + Global.exchange.getName() + ": " + currencyTracked + " "
-                    + "price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
+            String message = "Shift needed on " + Global.exchange.getName() + "\nReason : ";
+            if (!Global.options.isMultipleCustodians()) {
+                message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
+            } else {
+                message += Integer.parseInt(Global.settings.getProperty("reset_every_minutes")) + " minutes elapsed since last shift";
+            }
             HipChatNotifications.sendMessage(message, Color.PURPLE);
             LOG.warning(message);
 
