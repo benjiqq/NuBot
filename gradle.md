@@ -33,7 +33,6 @@ Gradle can be used inside most IDE's.
 * Netbeans
 http://plugins.netbeans.org/plugin/44510/gradle-support
 
-
 ## Dependencies
 
 dependencies online, except the jars in lib
@@ -49,6 +48,18 @@ gradle tasks => show the tasks available
 gradle NuBotJar => package the jar
 
 gradle test => run Unit tests. HTML Testout under build/reports/tests/index.html
+
+## Adding gradle dependencies
+
+go to => http://search.maven.org
+ 
+search for the appropriate project.
+
+Click on latest version.
+
+On the left, click on gradle/grails
+
+Copy the compile 'xyz' line
 
 ## dist layout
 
