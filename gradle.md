@@ -2,9 +2,9 @@
 
 ## Install
 
-install gradle, version at least 2.0, see http://gradle.org
+Install gradle, version at least 2.0, see http://gradle.org
 
-to install gradle on linux:
+To install gradle on linux:
  sudo add-apt-repository ppa:cwchien/gradle
  sudo apt-get update
  sudo apt-get install -y gradle
@@ -20,6 +20,18 @@ Other tasks
 compileReadme - compile the HTML readme
 NuBotJar - create the jar in .../dist-packaged
 runCollector - run the collector service on a server
+
+
+## IDE
+
+Gradle can be used inside most IDE's.
+
+* Eclipse
+
+* IntelliJ
+
+* Netbeans
+http://plugins.netbeans.org/plugin/44510/gradle-support
 
 
 ## Dependencies
