@@ -21,18 +21,17 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
-import java.io.File;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.logging.Logger;
 
+import com.nubits.nubot.utils.FileSystem;
+import junit.framework.TestCase;
 import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import com.nubits.nubot.utils.FileSystem;
-import com.nubits.nubot.utils.TestClasspathOut;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.logging.Logger;
 
-public class TestReadCsv {
+public class TestReadCsv  extends TestCase {
 
     private static final Logger LOG = Logger.getLogger(TestReadCsv.class
             .getName());

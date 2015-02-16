@@ -25,9 +25,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.logging.Logger;
 
+import junit.framework.TestCase;
 import org.junit.Test;
 
-public class TestDateFormat {
+public class TestDateFormat  extends TestCase {
 
     private static final Logger LOG = Logger.getLogger(TestDateFormat.class
             .getName());
