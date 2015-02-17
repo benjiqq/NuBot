@@ -1,3 +1,5 @@
+dist-packaged
+
 #A folder containing utilities that do not need to be pushed
 /gitignore/
 
@@ -59,9 +61,15 @@ hs_err_pid*
 .gradle
 
 #Eclipse
+.classpath
+.project
+.settings
 NuBot/.classpath
 NuBot/.gitignore
 NuBot/.project
 NuBot/.settings
 
+#IJ
+.idea
+*.iml
 Test*.xml
