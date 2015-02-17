@@ -60,8 +60,11 @@ public class ComkortWrapper implements TradeInterface {
     private String checkConnectionUrl;
     //API Paths
     private final String API_BASE_URL = "https://api.comkort.com/v1/private";
+    private final String API_BASE_URL_PUBLIC = "GET https://api.comkort.com/v1/public";
     private final String API_USER = "user";
     private final String API_BALANCE = "balance";
+    private final String API_MARKET = "market";
+    private final String API_SUMMARY = "summary";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -162,7 +165,14 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        return null;
+        //market/summary?market_alias={param}
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL_PUBLIC + "/" + API_MARKET + "/" + API_SUMMARY;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = true;
+        
+        
+        return apiResponse;
     }
 
     @Override
@@ -221,6 +231,11 @@ public class ComkortWrapper implements TradeInterface {
     }
 
     @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        return null;
+    }
+
+    @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
         return null;
     }
@@ -240,7 +255,11 @@ public class ComkortWrapper implements TradeInterface {
         ComkortService query = new ComkortService(url, args, keys);
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            if (isGet) {
+                queryResult = query.executeQuery(true, isGet);
+            } else {
+                queryResult = query.executeQuery(false, isGet);
+            }
         } else {
             LOG.severe("The bot will not execute the query, there is no connection to Comkort");
             queryResult = TOKEN_BAD_RETURN;
