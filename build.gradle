@@ -89,12 +89,18 @@ sourceSets {
         java {
             srcDir 'NuBot/src'
         }
+        resources {
+        	srcDir 'NuBot/res'
+    	}
     }
 
     test {
         java {
         srcDir 'NuBot/src/com/nubits/nubot/tests'
         }
+        resources {
+        	srcDir 'NuBot/res'
+    	}        
     }
 }
 
@@ -196,7 +202,7 @@ task init << {
     	into "${storedir}/res/logs_assets"
     }
     
-    delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+    //delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
         
 	//not needed    
 	//<delete file="${store.dir}/NuBot_temp.jar"/>

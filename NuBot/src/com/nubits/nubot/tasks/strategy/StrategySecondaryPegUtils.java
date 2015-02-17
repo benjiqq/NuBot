@@ -168,12 +168,21 @@ public class StrategySecondaryPegUtils {
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                 if (txFeeNTBPEGResponse.isPositive()) {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                    LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                    LOG.fine("Updated Transaction fee = " + txFeePEGNTB + "%");
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
+                    //check the calculated amount against the set maximum sell amount set in the options.json file
+                    if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                        amount1 = amount1 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount1;
+                    }
 
                     if (type.equals(Constant.BUY) && !Global.swappedPair) {
                         amount1 = Utils.round(amount1 / price, 8);
+                        //check the calculated amount against the max buy amount option, if any.
+                        if (Global.options.getMaxBuyVolume() > 0) {
+                            amount1 = amount1 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount1;
+                        }
+
                     }
                     //Prepare the orders
 
@@ -189,6 +198,9 @@ public class StrategySecondaryPegUtils {
                         if (type.equals(Constant.SELL)) {
                             typeStr = Constant.BUY;
                             amount1 = Utils.round(amount1 / Global.conversion, 8);
+                            if (Global.options.getMaxSellVolume() > 0) {
+                                amount1 = amount1 > Global.options.getMaxSellVolume() ? Global.options.getMaxSellVolume() : amount1;
+                            }
                         } else {
                             typeStr = Constant.SELL;
                         }
@@ -231,20 +243,35 @@ public class StrategySecondaryPegUtils {
                         //read balance again
                         ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
                         if (balancesResponse2.isPositive()) {
-                            if (type.equals(Constant.SELL)) {
-                                balance = (Amount) balancesResponse2.getResponseObject();
-                            } else {
-                                //Here its time to compute the balance to put apart, if any
-                                balance = (Amount) balancesResponse2.getResponseObject();
+
+                            balance = (Amount) balancesResponse2.getResponseObject();
+
+
+                            if (type.equals(Constant.BUY)) {
                                 balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                             }
+
+
                             double amount2 = balance.getQuantity();
+
+                            //check the calculated amount against the set maximum sell amount set in the options.json file
+
+                            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                                amount2 = amount2 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount2;
+                            }
 
                             if ((type.equals(Constant.BUY) && !Global.swappedPair)
                                     || (type.equals(Constant.SELL) && Global.swappedPair)) {
                                 //hotfix
                                 amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+
                                 amount2 = Utils.round(amount2 / price, 8);
+
+                                //check the calculated amount against the max buy amount option, if any.
+                                if (Global.options.getMaxBuyVolume() > 0) {
+                                    amount2 = amount2 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount2;
+                                }
+
                             }
 
                             String orderString2;
@@ -351,7 +378,10 @@ public class StrategySecondaryPegUtils {
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
 
-                if (balancePEG > oneNBT && Global.options.getPair().getPaymentCurrency().isFiat() && !strategy.isFirstTime()) { //Only for EUR...CNY etc
+                if (balancePEG > oneNBT
+                        && Global.options.getPair().getPaymentCurrency().isFiat()
+                        && !strategy.isFirstTime()
+                        && Global.options.getMaxBuyVolume() != 0) { //Only for EUR...CNY etc
                     LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
                             + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                     strategy.setProceedsInBalance(true);

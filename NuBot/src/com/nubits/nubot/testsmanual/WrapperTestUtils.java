@@ -1,4 +1,4 @@
-package com.nubits.nubot.tests;
+package com.nubits.nubot.testsmanual;
 
 /**
  *
