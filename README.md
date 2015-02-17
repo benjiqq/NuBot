@@ -26,8 +26,7 @@ NuBot permits a user to indicate they are either a sell side or dual side custod
 
 #Using NuBot
 
-See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/SETUP.md?at=master)
-
+See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/d69252c90538a92acb0f40a0367f0a10a207719e/SETUP.md?at=master)
 ##Dual-side strategy
 
 First, someone who wishes to fulfill this role must seek shareholder approval via the custodial grant mechanism.
