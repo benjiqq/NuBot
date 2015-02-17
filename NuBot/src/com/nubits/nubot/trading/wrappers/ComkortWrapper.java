@@ -171,6 +171,15 @@ public class ComkortWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = true;
         
+        args.put("market_alias", pair.toString());
+        
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            apiResponse.setResponseObject(httpAnswerJson);
+        } else {
+            apiResponse = response;
+        }
         
         return apiResponse;
     }
@@ -252,17 +261,16 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
-        ComkortService query = new ComkortService(url, args, keys);
-        String queryResult;
-        if (exchange.getLiveData().isConnected()) {
-            if (isGet) {
-                queryResult = query.executeQuery(true, isGet);
-            } else {
-                queryResult = query.executeQuery(false, isGet);
-            }
-        } else {
+        if (!exchange.getLiveData().isConnected()) {
             LOG.severe("The bot will not execute the query, there is no connection to Comkort");
-            queryResult = TOKEN_BAD_RETURN;
+            return TOKEN_BAD_RETURN;
+        }
+        String queryResult;
+        ComkortService query = new ComkortService(url, args, keys);
+        if (isGet) {
+            queryResult = query.executeQuery(true, isGet);
+        } else {
+            queryResult = query.executeQuery(false, isGet);
         }
         return queryResult;
     }
@@ -284,17 +292,18 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public void setKeys(ApiKeys keys) {
-
+        this.keys = keys;
     }
 
     @Override
     public void setExchange(Exchange exchange) {
-
+        this.exchange = exchange;
     }
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-
+        
+        
     }
 
     private class ComkortService implements ServiceInterface {
@@ -324,16 +333,17 @@ public class ComkortWrapper implements TradeInterface {
             String output;
             int response = 200;
             String answer = null;
-
+            post_data = TradeUtils.buildQueryString(args, ENCODING);
+            
             try {
-                queryUrl = new URL(url);
+                if (isGet) {
+                    queryUrl = new URL(url + "?" + post_data);
+                } else {
+                    queryUrl = new URL(url);
+                }
             } catch (MalformedURLException mal) {
                 LOG.severe(mal.toString());
                 return null;
-            }
-
-            if (needAuth) {
-                post_data = TradeUtils.buildQueryString(args, ENCODING);
             }
 
             try {
