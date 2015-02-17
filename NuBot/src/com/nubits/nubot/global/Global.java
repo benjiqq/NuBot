@@ -23,7 +23,6 @@ import com.nubits.nubot.options.OptionsJSON;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import java.util.Properties;
-import java.util.UUID;
 
 /**
  *
@@ -32,7 +31,7 @@ import java.util.UUID;
 public class Global {
 
     public static Properties settings;
-    public static String sessionId = UUID.randomUUID().toString().substring(0, 6);
+    public static String sessionId;
     public static boolean running = false;
     public static Exchange exchange;
     public static boolean startupComplete = false;

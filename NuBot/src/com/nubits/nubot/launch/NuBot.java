@@ -102,10 +102,13 @@ public class NuBot {
         }
         Utils.printSeparator();
 
+        //Generate Bot Session unique id
+        Global.sessionId = Utils.generateSessionID();
+        LOG.info("Session ID = " + Global.sessionId);
 
         //Setting up log folder for this session :
 
-        String folderName = "NuBot_" + System.currentTimeMillis() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
+        String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
         logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         //Create log dir
@@ -375,11 +378,11 @@ public class NuBot {
             System.exit(0);
         }
 
-        
+
         notifyOnline();
     }
-    
-    private static void notifyOnline(){
+
+    private static void notifyOnline() {
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";

@@ -118,11 +118,16 @@ public class MailNotifications {
             throws AddressException, MessagingException {
         title = "[NuBot] " + title;
         Date now = new Date();
+        String sessionId = "";
+        if (Global.sessionId != null) {
+            sessionId = Global.sessionId;
+        }
         String footer = "\n --- \n Message generated at " + now;
         if (Global.options != null) {
             footer += "from bot with custodial address "
-                    + Global.options.getNubitsAddress() + " on "
-                    + Global.options.getExchangeName();
+                    + Global.options.getNubitsAddress() + " , "
+                    + "session id = " + sessionId + " "
+                    + "on " + Global.options.getExchangeName();
         }
         message = message + footer;
         MailNotifications.Send(recipientEmail, "", title, message);

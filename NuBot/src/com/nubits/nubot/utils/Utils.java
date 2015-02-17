@@ -43,6 +43,7 @@ import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -367,5 +368,21 @@ public class Utils {
         Date resultdate = new Date(millisecs);
         return date_format.format(resultdate) + " " + timezone;
 
+    }
+
+    public static String generateSessionID() {
+        String sep = "|";
+        //Generate a random alfanumeric id of 6 chars
+        String uid = UUID.randomUUID().toString().substring(0, 6);
+        //Get nubot version
+        String version = Utils.getVersion();
+        //Get timestamp
+        String timest = "" + getTimestampLong();
+        //conatenate
+        return version + sep + timest + sep + uid;
+    }
+
+    public static String getVersion() {
+        return Global.settings.getProperty("version");
     }
 }
