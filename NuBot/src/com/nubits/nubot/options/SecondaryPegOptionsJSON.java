@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -163,7 +163,7 @@ public class SecondaryPegOptionsJSON {
      *
      * @param spread
      */
-    public void setPriceOffset(double spread) {
+    public void setSpread(double spread) {
         this.spread = spread;
     }
 

@@ -1,3 +1,5 @@
+dist-packaged
+
 #A folder containing utilities that do not need to be pushed
 /gitignore/
 
@@ -18,6 +20,9 @@ releases/
 #Specific files to ignore
 ssl_readme.txt
 readme.html
+changelog.html
+setup.html
+feeds.html
 
 #launch configurations
 /NuBot/nbproject/configs/*.properties
@@ -43,8 +48,28 @@ Passwords.java
 
 # Package Files #
 *.jar
+!EasyJccKit.jar
 *.war
 *.ear
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/build/
+/bin/
+
+#Gradle
+.gradle
+
+#Eclipse
+.classpath
+.project
+.settings
+NuBot/.classpath
+NuBot/.gitignore
+NuBot/.project
+NuBot/.settings
+
+#IJ
+.idea
+*.iml
+Test*.xml

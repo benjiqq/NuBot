@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tests;
+package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
@@ -45,15 +45,15 @@ import java.util.logging.Logger;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class TestWrappers {
+public class TestWrapperPeatio {
 
-    private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestWrapperPeatio.class.getName());
     /**
      * Configure tests
      */
-    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
-    private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.COMKORT;
+    private static final String TEST_OPTIONS_PATH = "TestPeatio.json";
+    //private static final String TEST_OPTIONS_PATH = "options.json";
+    public static final String testExchange = Constant.INTERNAL_EXCHANGE_PEATIO;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;
 

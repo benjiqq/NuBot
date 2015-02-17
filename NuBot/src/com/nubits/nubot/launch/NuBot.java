@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -102,10 +102,13 @@ public class NuBot {
         }
         Utils.printSeparator();
 
+        //Generate Bot Session unique id
+        Global.sessionId = Utils.generateSessionID();
+        LOG.info("Session ID = " + Global.sessionId);
 
         //Setting up log folder for this session :
 
-        String folderName = "NuBot_" + System.currentTimeMillis() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
+        String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
         logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         //Create log dir
@@ -188,9 +191,10 @@ public class NuBot {
         if (txFeeResponse.isPositive()) {
             double txfee = (Double) txFeeResponse.getResponseObject();
             if (txfee == 0) {
-                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1%");
-                Global.options.getSecondaryPegOptions().setPriceOffset(0.1);
-
+                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
+                if (Global.options.getSecondaryPegOptions().getSpread() < 0.1) {
+                    Global.options.getSecondaryPegOptions().setSpread(0.1);
+                }
             }
         }
 
@@ -228,7 +232,9 @@ public class NuBot {
 
 
         String orders_outputPath = logsFolder + "orders_history.csv";
-        ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFile(orders_outputPath);
+        String balances_outputPath = logsFolder + "balance_history.json";
+
+        ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFiles(orders_outputPath, balances_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
 
 
@@ -347,9 +353,11 @@ public class NuBot {
                 } else {
                     interval = 60 * reset_every;
                     //Force the a spread to avoid collisions
-                    double forcedSpread = 0.5;
-                    LOG.info("Forcing a " + forcedSpread + "% spread to protect from collisions");
-                    Global.options.getSecondaryPegOptions().setPriceOffset(forcedSpread);
+                    double forcedSpread = 0.9;
+                    LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
+                    if (Global.options.getSecondaryPegOptions().getSpread() < forcedSpread) {
+                        Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
+                    }
                 }
 
                 Global.taskManager.getPriceTriggerTask().setInterval(interval);
@@ -371,13 +379,16 @@ public class NuBot {
         }
 
 
+        notifyOnline();
+    }
 
-
+    private static void notifyOnline() {
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";
         }
-        HipChatNotifications.sendMessage("A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")", Message.Color.GREEN);
+        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")";
+        HipChatNotifications.sendMessage(msg, Message.Color.GREEN);
     }
 
     private boolean readParams(String[] args) {
@@ -419,13 +430,23 @@ public class NuBot {
 
                     //reset liquidity info
                     if (Global.rpcClient.isConnected() && Global.options.isSendRPC()) {
-                        JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0);
+                        //tier 1
                         LOG.info("Resetting Liquidity Info before quit");
-                        if (null == responseObject) {
+
+                        JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0, 1);
+                        if (null == responseObject1) {
                             LOG.severe("Something went wrong while sending liquidityinfo");
                         } else {
-                            LOG.fine(responseObject.toJSONString());
+                            LOG.fine(responseObject1.toJSONString());
+                        }
+
+                        JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                                0, 0, 2);
+                        if (null == responseObject2) {
+                            LOG.severe("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.fine(responseObject2.toJSONString());
                         }
                     }
 

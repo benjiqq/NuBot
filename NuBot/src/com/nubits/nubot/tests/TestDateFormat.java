@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,26 +21,32 @@ package com.nubits.nubot.tests;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.utils.Utils;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.Logger;
 
-public class TestNTPClient {
+import junit.framework.TestCase;
+import org.junit.Test;
 
-    private static final Logger LOG = Logger.getLogger(TestNTPClient.class.getName());
+public class TestDateFormat  extends TestCase {
 
-    public static void main(String[] args) {
-        NTPClient client = new NTPClient();
+    private static final Logger LOG = Logger.getLogger(TestDateFormat.class
+            .getName());
 
-        LOG.info("Seconds untile next window : " + Utils.getSecondsToNextwindow(3));
+    @Test
+    public void testDate() {
 
-        //Try multiple servers
-        LOG.info("Date (multiple servers) : " + client.getTime());
+        String date = "2014-12-22T17:55:25.107Z";
+        String pattern = "yyyy-MM-dd'T'HH:mm:ss";
 
-        //Try single server
-        LOG.info("Date (single server) : " + client.getTime("time.nist.gov"));
+        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
+        try {
+            Date d = sdf.parse(date);
+            //assert(d.equals("Mon Dec 22 17:55:25 CET 2014"));
+        } catch (java.text.ParseException pe1) {
+            LOG.severe(pe1.toString());
+        }
 
-        System.exit(0);
 
     }
 }

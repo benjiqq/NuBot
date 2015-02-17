@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -791,6 +791,11 @@ public class BterWrapper implements TradeInterface {
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
         LOG.warning("BTER only expose access to trades from 24 hours");
         return getLastTrades(pair);
+    }
+
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("BterWrapper.getOrderBook() not implemented yet.");
     }
 
     private class BterService implements ServiceInterface {

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -55,7 +55,7 @@ public class TaskManager {
         this.running = false;
         taskList = new ArrayList<BotTask>();
         //assign default values just for testing without Global.options loaded
-        int sendLiquidityInterval = 181,
+        int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds")),
                 executeStrategyInterval = 41,
                 checkPriceInterval = 61;
 
@@ -121,7 +121,8 @@ public class TaskManager {
                     if (Global.options != null) {
                         additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toString("_");
                     }
-                    HipChatNotifications.sendMessage("Bot shut-down ( " + additionalInfo + " )", Color.RED);
+                    //dpn't send mail here for now
+                    HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
                     sentNotification = true;
                 }
             }

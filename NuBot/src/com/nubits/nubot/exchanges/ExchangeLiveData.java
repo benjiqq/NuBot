@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014 Nu Development Team
+/*
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -30,22 +30,22 @@ public class ExchangeLiveData {
     private ExchangeStatus status;
     private boolean validKeys;
     private String urlConnectionCheck; //URL used to check connection
-//1 NBT price
+    //1 NBT price
     private double bid;
     private double ask;
     private double last;
     private boolean connected;
-//assets
+    //assets
     private Balance balance;
-//fee
+    //fee
     private double fee;
-//Orders
+    //Orders
     private ArrayList<Order> ordersList = new ArrayList<>();
-//Liquidity info
+    //Liquidity info
     private double NBTonsell;
     private double NBTonbuy;
 
-//Constructor
+    //Constructor
     public ExchangeLiveData() {
     }
 
@@ -60,7 +60,7 @@ public class ExchangeLiveData {
 
     }
 
-//Methods
+    //Methods
     public ExchangeStatus getStatus() {
         return status;
     }

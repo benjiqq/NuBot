@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tests;
+package com.nubits.nubot.testsmanual;
 
 /**
  *
@@ -123,8 +123,8 @@ public class TestSync extends TimerTask {
         //Send hipchat notification
         message("Run");
 
-        HipChatNotifications.sendMessage(getIdString() + " test price reading : 1BTC =" + readPrice()
-                + "$ ", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
+        HipChatNotifications.sendMessageCritical(getIdString() + " test price reading : 1BTC =" + readPrice()
+                + "$ ");
 
         //Add a random sleep after the notification to see if the keep sync
 

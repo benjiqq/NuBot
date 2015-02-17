@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -463,7 +463,7 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
 
-        LOG.warning("CCEDK uses global TX fee, currency pair not supported. \n"
+        LOG.warning("CCEDK uses global TX fee, currency pair not supported."
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -734,6 +734,11 @@ public class CcedkWrapper implements TradeInterface {
         }
 
         return apiResponse;
+    }
+
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("CcedkWrapper.getOrderBook() not implemented yet.");
     }
 
     private class CcedkService implements ServiceInterface {

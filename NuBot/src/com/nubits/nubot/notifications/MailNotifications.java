@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -37,18 +37,66 @@ import javax.mail.internet.MimeMessage;
  */
 public class MailNotifications {
 
-    private static final Logger LOG = Logger.getLogger(MailNotifications.class.getName());
+    public static final String MAIL_LEVEL_NONE = "NONE";
+    public static final String MAIL_LEVEL_ALL = "ALL";
+    public static final String MAIL_LEVEL_SEVERE = "SEVERE";
+    private static final Logger LOG = Logger.getLogger(MailNotifications.class
+            .getName());
 
+    /**
+     * send to recipient if level is set to all
+     *
+     * @param address
+     * @param title
+     * @param message
+     */
     public static void send(String address, String title, String message) {
-        if (Global.options == null || Global.options.isSendMails()) {
-            try {
-                MailNotifications.Send(address, title, message);
-            } catch (AddressException ex) {
-                LOG.severe(ex.toString());
-            } catch (MessagingException ex) {
-                LOG.severe(ex.toString());
-            }
+        boolean any = true; //Default to severe
+
+        if (Global.options != null) {
+            any = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL);
         }
+        if (any) {
+            sendImpl(address, title, message);
+        }
+    }
+
+    /**
+     * send to recipient only if level is severe
+     *
+     * @param address
+     * @param title
+     * @param message
+     */
+    public static void sendCritical(String address, String title, String message) {
+        boolean isCritical = true;
+
+        if (Global.options != null) {
+            isCritical = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL)
+                    || Global.options.sendMailsLevel().equals(MAIL_LEVEL_SEVERE);
+        }
+        if (isCritical) {
+            sendImpl(address, title, message);
+        }
+    }
+
+    /**
+     * send mail
+     *
+     * @param address
+     * @param title
+     * @param message
+     */
+    private static void sendImpl(String address, String title, String message) {
+
+        try {
+            MailNotifications.Send(address, title, message);
+        } catch (AddressException ex) {
+            LOG.severe(ex.toString());
+        } catch (MessagingException ex) {
+            LOG.severe(ex.toString());
+        }
+
     }
 
     private MailNotifications() {
@@ -66,12 +114,20 @@ public class MailNotifications {
      * @throws MessagingException if the connection is dead or not in the
      * connected state or if the message is not a MimeMessage
      */
-    private static void Send(String recipientEmail, String title, String message) throws AddressException, MessagingException {
+    private static void Send(String recipientEmail, String title, String message)
+            throws AddressException, MessagingException {
         title = "[NuBot] " + title;
         Date now = new Date();
+        String sessionId = "";
+        if (Global.sessionId != null) {
+            sessionId = Global.sessionId;
+        }
         String footer = "\n --- \n Message generated at " + now;
         if (Global.options != null) {
-            footer += "from bot with custodial address " + Global.options.getNubitsAddress() + " on " + Global.options.getExchangeName();
+            footer += "from bot with custodial address "
+                    + Global.options.getNubitsAddress() + " , "
+                    + "session id = " + sessionId + " "
+                    + "on " + Global.options.getExchangeName();
         }
         message = message + footer;
         MailNotifications.Send(recipientEmail, "", title, message);
@@ -90,7 +146,9 @@ public class MailNotifications {
      * @throws MessagingException if the connection is dead or not in the
      * connected state or if the message is not a MimeMessage
      */
-    private static void Send(String recipientEmail, String ccEmail, String title, String message) throws AddressException, MessagingException {
+    private static void Send(String recipientEmail, String ccEmail,
+            String title, String message) throws AddressException,
+            MessagingException {
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
 
@@ -104,12 +162,15 @@ public class MailNotifications {
         props.setProperty("mail.smtps.auth", "false");
 
         /*
-         If set to false, the QUIT command is sent and the connection is immediately closed. If set
-         to true (the default), causes the transport to wait for the response to the QUIT command.
-
-         ref :   http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp/package-summary.html
-         http://forum.java.sun.com/thread.jspa?threadID=5205249
-         smtpsend.java - demo program from javamail
+         * If set to false, the QUIT command is sent and the connection is
+         * immediately closed. If set to true (the default), causes the
+         * transport to wait for the response to the QUIT command.
+         *
+         * ref :
+         * http://java.sun.com/products/javamail/javadocs/com/sun/mail/smtp
+         * /package-summary.html
+         * http://forum.java.sun.com/thread.jspa?threadID=5205249 smtpsend.java
+         * - demo program from javamail
          */
         props.put("mail.smtps.quitwait", "false");
 
@@ -120,10 +181,12 @@ public class MailNotifications {
 
         // -- Set the FROM and TO fields --
         msg.setFrom(new InternetAddress(Passwords.SMTP_USERNAME + ""));
-        msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipientEmail, false));
+        msg.setRecipients(Message.RecipientType.TO,
+                InternetAddress.parse(recipientEmail, false));
 
         if (ccEmail.length() > 0) {
-            msg.setRecipients(Message.RecipientType.CC, InternetAddress.parse(ccEmail, false));
+            msg.setRecipients(Message.RecipientType.CC,
+                    InternetAddress.parse(ccEmail, false));
         }
 
         msg.setSubject(title);
@@ -132,7 +195,8 @@ public class MailNotifications {
 
         SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
 
-        t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME, Passwords.SMTP_PASSWORD);
+        t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME,
+                Passwords.SMTP_PASSWORD);
         t.sendMessage(msg, msg.getAllRecipients());
         t.close();
     }

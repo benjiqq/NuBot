@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -84,7 +84,6 @@ public class BtceWrapper implements TradeInterface {
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
-
 
     public BtceWrapper() {
         setupErrors();
@@ -592,12 +591,12 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
     public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -660,7 +659,7 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
 
     }
 
@@ -671,7 +670,12 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        throw new UnsupportedOperationException("Not supported yet."); 
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("BtceWrapper.getOrderBook() not implemented yet.");
     }
 
 
@@ -773,18 +777,18 @@ public class BtceWrapper implements TradeInterface {
                     answer += output;
                 }
                 /*
-                if (httpError) {
-                    JSONParser parser = new JSONParser();
-                    try {
-                        JSONObject obj2 = (JSONObject) (parser.parse(answer));
-                        answer = (String) obj2.get(TOKEN_ERR);
+                 if (httpError) {
+                 JSONParser parser = new JSONParser();
+                 try {
+                 JSONObject obj2 = (JSONObject) (parser.parse(answer));
+                 answer = (String) obj2.get(TOKEN_ERR);
 
-                    } catch (ParseException ex) {
-                        LOG.severe(ex.toString());
+                 } catch (ParseException ex) {
+                 LOG.severe(ex.toString());
 
-                    }
-                }
-                */
+                 }
+                 }
+                 */
             } //Capture Exceptions
             catch (IllegalStateException ex) {
                 LOG.severe(ex.toString());

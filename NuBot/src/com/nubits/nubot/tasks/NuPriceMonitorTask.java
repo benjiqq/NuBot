@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,7 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.launch.NuPriceMonitor;
+import com.nubits.nubot.launch.toolkit.NuPriceMonitor;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -110,8 +110,9 @@ public class NuPriceMonitorTask extends TimerTask {
 
 
 
-                            MailNotifications.send(Global.options.getMailRecipient(), title, message);
-                            HipChatNotifications.sendMessage(title + message, Color.RED);
+                            MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
+                            HipChatNotifications.sendMessageCritical(title + message);
+                            
                             LOG.severe(title + message);
                         }
                     }

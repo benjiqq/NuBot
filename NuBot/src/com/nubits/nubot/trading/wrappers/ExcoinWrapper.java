@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -175,7 +175,7 @@ public class ExcoinWrapper implements TradeInterface {
                 }
                 Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
 
-                balance = Balance.getSwapedBalance(balance); //Swap here for BTC_NBT
+                balance = Balance.getSwappedBalance(balance); //Swap here for BTC_NBT
                 apiResponse.setResponseObject(balance);
             } else { //get specific balance
                 Amount total = new Amount(0, currency);
@@ -675,6 +675,11 @@ public class ExcoinWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
+    }
+
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("ExcoinWrapper.getOrderBook() not implemented yet.");
     }
 
     private class ExcoinService implements ServiceInterface {

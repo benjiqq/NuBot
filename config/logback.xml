@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+	<appender name="STDOUT" level="all"
+		class="ch.qos.logback.core.ConsoleAppender">
+
+		<encoder>
+			<pattern>%d{HH:mm:ss} %logger{36} - %msg%n</pattern>
+		</encoder>
+		
+		<!-- <filter class="ch.qos.logback.classic.filter.LevelFilter"> <level>INFO</level> 
+			<onMatch>ACCEPT</onMatch> <onMismatch>DENY</onMismatch> </filter> -->
+	</appender>
+
+
+	<appender name="FILE" class="ch.qos.logback.core.FileAppender">
+		<file>logs/NuBot.log</file>
+
+		<encoder>
+			<pattern>%date %level - %msg%n
+			</pattern>
+			<!-- [%thread] %logger{10} [%file:%line] -->
+		</encoder>
+	</appender>
+
+	<root>
+		<appender-ref ref="FILE" />
+		<appender-ref ref="STDOUT" />
+	</root>
+
+</configuration>

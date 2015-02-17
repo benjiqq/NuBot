@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,7 +18,9 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
@@ -55,7 +57,7 @@ public class OptionsJSON {
     private int nudPort;
     //Optional settings with a default value  ----------------------------
     private String nudIp;
-    private boolean sendMails;
+    private String sendMails;
     private boolean submitLiquidity;
     private boolean executeOrders;
     private boolean verbose;
@@ -95,14 +97,14 @@ public class OptionsJSON {
      * @param sendMails
      * @param mailRecipient
      * @param emergencyTimeout
-     * @param keepProceedings
+     * @param keepProceeds
      * @param secondaryPegOptions
      */
     public OptionsJSON(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
             String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
             double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
             int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-            boolean sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
+            String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -382,7 +384,7 @@ public class OptionsJSON {
 
     /**
      *
-     * @param checkBalanceInterval
+     * @param executeStrategyInterval
      */
     public void getExecuteStrategyInterval(int executeStrategyInterval) {
         this.executeStrategyInterval = executeStrategyInterval;
@@ -398,7 +400,7 @@ public class OptionsJSON {
 
     /**
      *
-     * @param checkOrdersInteval
+     * @param sendLiquidityInterval
      */
     public void setSendLiquidityInteval(int sendLiquidityInterval) {
         this.sendLiquidityInterval = sendLiquidityInterval;
@@ -424,7 +426,7 @@ public class OptionsJSON {
      *
      * @return
      */
-    public boolean isSendMails() {
+    public String sendMailsLevel() {
         return sendMails;
     }
 
@@ -432,7 +434,7 @@ public class OptionsJSON {
      *
      * @param sendMails
      */
-    public void setSendMails(boolean sendMails) {
+    public void setSendMailsLevel(String sendMails) {
         this.sendMails = sendMails;
     }
 
@@ -464,8 +466,8 @@ public class OptionsJSON {
      *
      * @param secondaryPegOptions
      */
-    public void setCryptoPegOptions(SecondaryPegOptionsJSON cryptoPegOptions) {
-        this.secondaryPegOptions = cryptoPegOptions;
+    public void setCryptoPegOptions(SecondaryPegOptionsJSON secondaryPegOptions) {
+        this.secondaryPegOptions = secondaryPegOptions;
     }
 
     public boolean isMultipleCustodians() {
@@ -494,7 +496,7 @@ public class OptionsJSON {
 
     /**
      *
-     * @param path
+     * @param paths
      * @return
      */
     public static OptionsJSON parseOptions(String[] paths) {
@@ -576,7 +578,7 @@ public class OptionsJSON {
             //Then parse optional settings. If not use the default value declared here
 
             String nudIp = "127.0.0.1";
-            boolean sendMails = true;
+            String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
             boolean submitLiquidity = true;
             boolean executeOrders = true;
             boolean verbose = false;
@@ -584,7 +586,7 @@ public class OptionsJSON {
 
             boolean multipleCustodians = false;
             int executeStrategyInterval = 41;
-            int sendLiquidityInterval = 181;
+            int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
 
             double txFee = 0.2;
             double priceIncrement = 0.0003;
@@ -671,8 +673,20 @@ public class OptionsJSON {
             }
 
             if (optionsJSON.containsKey("mail-notifications")) {
-                sendMails = (boolean) optionsJSON.get("mail-notifications");
+                sendMails = (String) optionsJSON.get("mail-notifications");
+                if (sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
+                        || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
+                        || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
+                    sendMails = sendMails.toUpperCase(); //Convert to upper case 
+                } else {
+                    LOG.severe("Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
+                            + MailNotifications.MAIL_LEVEL_ALL + " , "
+                            + MailNotifications.MAIL_LEVEL_SEVERE + " or "
+                            + MailNotifications.MAIL_LEVEL_NONE);
+                    System.exit(0);
+                }
             }
+
 
 
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)

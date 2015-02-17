@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -204,8 +204,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
             String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
                     + " price. Please restart the bot and get in touch with Nu Dev team";
-            MailNotifications.send(Global.options.getMailRecipient(), title, message);
-            HipChatNotifications.sendMessage(title + message, Color.RED);
+            MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
+            HipChatNotifications.sendMessageCritical(title + message);
             LOG.severe(title + message);
         }
     }
@@ -456,7 +456,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             this.pegPriceDirection = Constant.DOWN;
         }
 
-        LOG.info(" Sell Price " + sellPricePEG_new + "\n"
+        LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
 
 
@@ -494,9 +494,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("feed", tempPrice.getSource());
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
+        LOG.warning(row);
+
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
-        LOG.warning(row);
         FileSystem.writeToFile(row, outputPath, true);
 
         //Also update a json version of the output file
@@ -527,9 +528,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         FileSystem.writeToFile(wall_shift_file.toJSONString(), jsonFile, false);
 
 
-        if (Global.options.isSendMails()) {
+        if (!Global.options.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_NONE)) {
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
-
 
             String messageNow = row;
             emailHistory += messageNow;

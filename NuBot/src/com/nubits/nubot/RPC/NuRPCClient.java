@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -58,7 +58,6 @@ public class NuRPCClient {
     private boolean connected;
     private boolean verbose;
     private boolean useIdentifier;
-    private String identifier;
     private String custodianPublicAddress;
     private String exchangeName;
     private CurrencyPair pair;
@@ -74,13 +73,11 @@ public class NuRPCClient {
         this.custodianPublicAddress = custodianPublicAddress;
         this.pair = pair;
         this.exchangeName = exchangeName;
-        if (useIdentifier) {
-            identifier = generateIdentifier();
-        }
+
     }
 
     //Public Methods
-    public JSONObject submitLiquidityInfo(String currencyChar, double buyamount, double sellamount) {
+    public JSONObject submitLiquidityInfo(String currencyChar, double buyamount, double sellamount, int tier) {
 
         /*
          * String[] params = { USDchar,buyamount,sellamount,custodianPublicAddress, identifier* };
@@ -90,7 +87,7 @@ public class NuRPCClient {
 
         List params;
         if (useIdentifier) {
-            params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress, identifier);
+            params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress, generateIdentifier(tier));
         } else {
             params = Arrays.asList(currencyChar, buyamount, sellamount, custodianPublicAddress);
         }
@@ -318,7 +315,15 @@ public class NuRPCClient {
         return responseJsonObj;
     }
 
-    private String generateIdentifier() {
-        return custodianPublicAddress + "_" + exchangeName + "_" + pair.toString().toUpperCase();
+    private String generateIdentifier(int tier) {
+        //tier:pair:exchange:sessionid
+        //Example : 2_BTCNBT_ccedk_0.1.5|1424193501841|788606
+
+        String separator = ":";
+
+        return tier + separator
+                + pair.toString().toUpperCase() + separator
+                + exchangeName + separator
+                + Global.sessionId;
     }
 }

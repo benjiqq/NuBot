@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,34 +15,28 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tests;
+package com.nubits.nubot.testsmanual;
 
 /**
  *
  * @author desrever <desrever at nubits.com>
  */
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.notifications.MailNotifications;
 import java.util.logging.Logger;
 
-public class TestQuick {
+public class TestNotifications {
 
-    private static final Logger LOG = Logger.getLogger(TestQuick.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestNotifications.class.getName());
 
     public static void main(String[] a) {
-        String date = "2014-12-22T17:55:25.107Z";
-        String pattern = "yyyy-MM-dd'T'HH:mm:ss";
-
-        SimpleDateFormat sdf = new SimpleDateFormat(pattern);
-        try {
-            Date d = sdf.parse(date);
-        } catch (java.text.ParseException pe1) {
-            LOG.severe(pe1.toString());
-        }
-
-        System.out.println("done");
 
 
+        MailNotifications.send("desrever.nu@gmail.com", "Test Title", "Test Message");
+        MailNotifications.sendCritical("desrever.nu@gmail.com", "Test Critial Title", "Test critical message");
+        //USE RED FOR CRITICAL, ANYTHING ELSE FOR STANDARD
+        HipChatNotifications.sendMessageCritical("Critical notification test");
+        HipChatNotifications.sendMessage("Standard notification test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.GREEN);
 
     }
 }

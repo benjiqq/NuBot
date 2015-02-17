@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -42,6 +42,8 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Random;
+import java.util.TimeZone;
+import java.util.UUID;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -172,10 +174,16 @@ public class Utils {
      *
      * @return
      */
-    public static String getTimestamp() {
+    public static String getTimestampString() {
         DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    public static long getTimestampLong() {
+        Date timeStamp = new Date();
+        return timeStamp.getTime();
+
     }
 
     public static String getHTML(String url, boolean removeNonLatinChars) throws IOException {
@@ -257,7 +265,7 @@ public class Utils {
         return toRet;
     }
 
-    public static Properties loadProperties(String filename) {
+    public static void loadProperties(String filename) {
         Global.settings = new Properties();
         InputStream input = null;
 
@@ -283,7 +291,7 @@ public class Utils {
                 }
             }
         }
-        return null;
+
     }
 
     public static long getOneDayInMillis() {
@@ -344,5 +352,37 @@ public class Utils {
         int minutesTillWindow = windowWidthSeconds - (remoteTimeInMinutes % windowWidthSeconds);
         int delay = ((60 * minutesTillWindow) - remoteTimeInSeconds);
         return delay;
+    }
+
+    public static int safeLongToInt(long l) {
+        if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException(l + " cannot be cast to int without changing its value.");
+        }
+        return (int) l;
+    }
+
+    public static String calcDate(long millisecs) {
+        String timezone = "UTC";
+        SimpleDateFormat date_format = new SimpleDateFormat("MMM dd yyyy HH:mm:ss.SSS");
+        date_format.setTimeZone(TimeZone.getTimeZone("timezone"));
+        Date resultdate = new Date(millisecs);
+        return date_format.format(resultdate) + " " + timezone;
+
+    }
+
+    public static String generateSessionID() {
+        String sep = "|";
+        //Generate a random alfanumeric id of 6 chars
+        String uid = UUID.randomUUID().toString().substring(0, 6);
+        //Get nubot version
+        String version = Utils.getVersion();
+        //Get timestamp
+        String timest = "" + getTimestampLong();
+        //conatenate
+        return version + sep + timest + sep + uid;
+    }
+
+    public static String getVersion() {
+        return Global.settings.getProperty("version");
     }
 }

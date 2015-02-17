@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,24 +15,32 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tests;
+package com.nubits.nubot.testsmanual;
 
 /**
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.NTP.NTPClient;
+import com.nubits.nubot.utils.Utils;
 import java.util.logging.Logger;
 
-public class TestNotifications {
+public class TestNTPClient {
 
-    private static final Logger LOG = Logger.getLogger(TestNotifications.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestNTPClient.class.getName());
 
-    public static void main(String[] a) {
-        //MailNotifications.send("pennybreaker@outlook.com", "Test Title", "Test Message");
-        //USE RED FOR CRITICAL, ANYTHING ELSE FOR STANDARD
-        HipChatNotifications.sendMessage("Critical notification test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.RED);
-        HipChatNotifications.sendMessage("Standard notification test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.GREEN);
+    public static void main(String[] args) {
+        NTPClient client = new NTPClient();
+
+        LOG.info("Seconds untile next window : " + Utils.getSecondsToNextwindow(3));
+
+        //Try multiple servers
+        LOG.info("Date (multiple servers) : " + client.getTime());
+
+        //Try single server
+        LOG.info("Date (single server) : " + client.getTime("time.nist.gov"));
+
+        System.exit(0);
 
     }
 }

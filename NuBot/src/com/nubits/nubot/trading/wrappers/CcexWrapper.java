@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -764,6 +764,11 @@ public class CcexWrapper implements TradeInterface {
             toRet = new Date();
         }
         return toRet;
+    }
+
+    @Override
+    public ApiResponse getOrderBook(CurrencyPair pair) {
+        throw new UnsupportedOperationException("CcexWrapper.getOrderBook() not implemented yet.");
     }
 
     private class CcexService implements ServiceInterface {

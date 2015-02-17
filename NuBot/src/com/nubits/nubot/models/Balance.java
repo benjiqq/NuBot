@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -21,7 +21,7 @@ import com.nubits.nubot.global.Constant;
 
 /**
  *
- * @author desrever < desrever@NBTTotal.com >
+ * @author desrever < desrever@nubits.com >
  */
 public class Balance {
 
@@ -168,7 +168,7 @@ public class Balance {
         return "Balance{" + "PEGTotal=" + PEGTotal + ", PEGonOrder=" + PEGonOrder + ", PEGAvailable=" + PEGAvailable + ", NBTTotal=" + NBTTotal + ", NBTonOrder=" + NBTonOrder + ", NBTAvailable=" + NBTAvailable + '}';
     }
 
-    public static Balance getSwapedBalance(Balance original) {
+    public static Balance getSwappedBalance(Balance original) {
         return new Balance(original.NBTAvailable, original.getPEGAvailableBalance(), original.getNBTonOrder(), original.getPEGBalanceonOrder());
     }
 }

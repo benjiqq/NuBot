@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -186,6 +186,15 @@ public interface TradeInterface {
      * case of error.
      */
     public ApiResponse isOrderActive(String id);
+
+    /**
+     * Get the the order book associated with a trading pair
+     *
+     * @param id The order id
+     * @return an ApiResponse object with an OrderBook object, ApiError in case
+     * of error.
+     */
+    public ApiResponse getOrderBook(CurrencyPair pair);
 
     /**
      * Delete all active orders. Async
