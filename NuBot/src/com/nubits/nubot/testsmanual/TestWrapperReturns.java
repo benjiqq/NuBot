@@ -1,4 +1,4 @@
-package com.nubits.nubot.tests;
+package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
