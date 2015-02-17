@@ -18,6 +18,8 @@
 package com.nubits.nubot.models;
 
 import com.nubits.nubot.utils.FileSystem;
+import org.apache.commons.io.FileUtils;
+
 import java.util.ArrayList;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -33,7 +35,7 @@ public class Currency {
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
-    private final static String PATH_TO_CURRENCIES = "res/currencies.csv";
+    private final static String PATH_TO_CURRENCIES = FileUtils.getFile("NuBot", "res", "currencies.csv").toPath().toString();
 //Constructor
 
     /**
