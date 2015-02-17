@@ -57,12 +57,12 @@ public class NuPriceMonitor {
         //Load settings
         Utils.loadProperties("settings.properties");
 
-        String folderName = "NuPriceMonitor_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+        String folderName = "NuPriceMonitor_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
         try {
-            NuLogger.setup(false,logsFolder);
+            NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
@@ -229,9 +229,11 @@ public class NuPriceMonitor {
     }
 
     private void init() {
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
-
+        try {
+            Utils.installTrustAllManager();
+        } catch (Exception ex) {
+            LOG.severe(ex.toString());
+        }
         Global.taskManager = new TaskManager();
 
     }

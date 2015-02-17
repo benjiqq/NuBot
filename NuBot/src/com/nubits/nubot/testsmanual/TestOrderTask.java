@@ -62,9 +62,11 @@ public class TestOrderTask {
         }
         LOG.setLevel(Level.FINE);
 
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
-
+        try {
+            Utils.installTrustAllManager();
+        } catch (Exception ex) {
+            LOG.severe(ex.toString());
+        }
 
         Global.options = new OptionsJSON(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,

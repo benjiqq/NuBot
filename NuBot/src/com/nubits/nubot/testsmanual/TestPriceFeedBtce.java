@@ -68,9 +68,11 @@ public class TestPriceFeedBtce {
         feed = new BitcoinaveragePriceFeed(); //REPLACE HERE
 
         LOG.info("Set up SSL certificates");
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
-
+        try {
+            Utils.installTrustAllManager();
+        } catch (Exception ex) {
+            LOG.severe(ex.toString());
+        }
     }
 
     private void executeSingle() {
