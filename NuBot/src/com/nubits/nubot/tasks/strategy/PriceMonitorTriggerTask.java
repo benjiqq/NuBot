@@ -398,12 +398,12 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         LOG.fine("Executing tryMoveWalls");
 
-        boolean needToMoveWalls = true;
+        boolean needToShift = true;
         if (!Global.options.isMultipleCustodians()) {
-            needToMoveWalls(lastPrice);         //check if price moved more than x% from when the wall was setup
+            needToShift = needToMoveWalls(lastPrice);         //check if price moved more than x% from when the wall was setup
         }
 
-        if (needToMoveWalls && !isWallsBeingShifted()) { //prevent a wall shift trigger if the strategy is already shifting walls.
+        if (needToShift && !isWallsBeingShifted()) { //prevent a wall shift trigger if the strategy is already shifting walls.
             LOG.info("Walls needs to be shifted");
             //Compute price for walls
             currentWallPEGPrice = lastPrice;
@@ -412,7 +412,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         } else {
             LOG.fine("No need to move walls");
             currentTime = System.currentTimeMillis();
-            if (isWallsBeingShifted() && needToMoveWalls) {
+            if (isWallsBeingShifted() && needToShift) {
                 LOG.warning("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
             }
         }
