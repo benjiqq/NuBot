@@ -23,7 +23,7 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
@@ -66,7 +66,7 @@ public class TestOrderTask {
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
 
 
-        Global.options = new OptionsJSON(true, nudip, "", "", "", "",
+        Global.options = new NuBotOptions(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
                 60, 30, false, "", "", -1, 0, false, true, 0, 0, null);
 

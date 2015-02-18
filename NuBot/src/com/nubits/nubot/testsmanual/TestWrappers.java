@@ -21,7 +21,7 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
@@ -50,7 +50,7 @@ public class TestWrappers {
         init();
         String[] inputs = new String[1];
         inputs[0] = TEST_OPTIONS_PATH;
-        Global.options = OptionsJSON.parseOptions(inputs);
+        Global.options = ParseOptions.parseOptions(inputs);
 
         WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
 
