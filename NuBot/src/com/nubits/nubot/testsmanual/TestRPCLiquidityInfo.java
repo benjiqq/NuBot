@@ -35,9 +35,9 @@ import org.json.simple.JSONObject;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class TestRPC {
+public class TestRPCLiquidityInfo {
 
-    private static final Logger LOG = Logger.getLogger(TestRPC.class.getName());
+    private static final Logger LOG = Logger.getLogger(TestRPCLiquidityInfo.class.getName());
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
     private static boolean verbose = false;
@@ -63,7 +63,7 @@ public class TestRPC {
 
         Utils.loadProperties("settings.properties");
 
-        TestRPC test = new TestRPC();
+        TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
         test.setup(Constant.INTERNAL_EXCHANGE_PEATIO, custodian, Constant.NBT_BTC, user, pass);
         test.testCheckNudTask();
@@ -71,7 +71,7 @@ public class TestRPC {
             Thread.sleep(2000);
 
         } catch (InterruptedException ex) {
-            Logger.getLogger(TestRPC.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(TestRPCLiquidityInfo.class.getName()).log(Level.SEVERE, null, ex);
         }
         //test.testGetInfo();
         //test.testIsConnected();
@@ -131,8 +131,7 @@ public class TestRPC {
             LOG.severe(ex.toString());
         }
 
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+        Utils.installKeystore(true);
 
         Global.publicAddress = custodianAddress;
 

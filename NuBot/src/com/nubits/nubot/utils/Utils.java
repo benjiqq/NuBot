@@ -35,6 +35,7 @@ import java.net.URLConnection;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -43,12 +44,19 @@ import java.util.GregorianCalendar;
 import java.util.Properties;
 import java.util.Random;
 import java.util.TimeZone;
+import java.util.UUID;
 import java.util.logging.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -367,5 +375,67 @@ public class Utils {
         Date resultdate = new Date(millisecs);
         return date_format.format(resultdate) + " " + timezone;
 
+    }
+
+    public static String generateSessionID() {
+        String sep = "|";
+        //Generate a random alfanumeric id of 6 chars
+        String uid = UUID.randomUUID().toString().substring(0, 6);
+        //Get nubot version
+        String version = Utils.getVersion();
+        //Get timestamp
+        String timest = "" + getTimestampLong();
+        //conatenate
+        return version + sep + timest + sep + uid;
+    }
+
+    public static String getVersion() {
+        return Global.settings.getProperty("version");
+    }
+
+    private static void installTrustAllManager() throws Exception {
+        // Install a trust manager that does not validate certificate chains for https calls
+
+        // Create a trust manager that does not validate certificate chains
+        TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
+            }
+        };
+
+        // Install the all-trusting trust manager
+        SSLContext sc = SSLContext.getInstance("SSL");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+        // Create all-trusting host name verifier
+        HostnameVerifier allHostsValid = new HostnameVerifier() {
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        };
+        // Install the all-trusting host verifier
+        HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+    }
+
+    public static void installKeystore(boolean trustAll) {
+        if (trustAll) {
+            try {
+                Utils.installTrustAllManager();
+            } catch (Exception ex) {
+                LOG.severe(ex.toString());
+            }
+
+        } else {
+            System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
+            System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+        }
     }
 }

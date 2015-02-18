@@ -23,7 +23,7 @@ package com.nubits.nubot.launch.toolkit;
  */
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -57,12 +57,12 @@ public class NuPriceMonitor {
         //Load settings
         Utils.loadProperties("settings.properties");
 
-        String folderName = "NuPriceMonitor_"+System.currentTimeMillis()+"/";
-        String logsFolder = Global.settings.getProperty("log_path")+folderName;
+        String folderName = "NuPriceMonitor_" + System.currentTimeMillis() + "/";
+        String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
         try {
-            NuLogger.setup(false,logsFolder);
+            NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
@@ -144,7 +144,7 @@ public class NuPriceMonitor {
 
     private boolean readOptions() {
         boolean ok = false;
-        OptionsJSON options = null;
+        NuBotOptions options = null;
         JSONParser parser = new JSONParser();
         String optionsString = FileSystem.readFromFile(optionsPath);
         try {
@@ -229,9 +229,7 @@ public class NuPriceMonitor {
     }
 
     private void init() {
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
-
+        Utils.installKeystore(true);
         Global.taskManager = new TaskManager();
 
     }

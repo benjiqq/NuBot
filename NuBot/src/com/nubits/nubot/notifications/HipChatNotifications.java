@@ -51,17 +51,22 @@ public class HipChatNotifications {
 
     private static void sendMessageImpl(String message, Color color,
             boolean critical) {
-        
+
         String publicAddress = "";
 
         if (Global.options != null) {
             publicAddress = Global.options.getNubitsAddress();
             boolean send = Global.options.isSendHipchat();
-            if (!send)
+            if (!send) {
                 return;
+            }
+        }
+        String sessionId = "";
+        if (Global.sessionId != null) {
+            sessionId = Global.sessionId;
         }
 
-        String toSend = message + " (" + publicAddress + ")";
+        String toSend = message + " ( " + sessionId + " - " + publicAddress + ")";
 
         try {
             if (critical) {

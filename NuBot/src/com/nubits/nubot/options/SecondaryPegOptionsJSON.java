@@ -63,7 +63,7 @@ public class SecondaryPegOptionsJSON {
      * @return
      */
     public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON, CurrencyPair pair) {
-        OptionsJSON options = null;
+        NuBotOptions options = null;
         try {
             //First try to parse compulsory parameters
 

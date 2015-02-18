@@ -27,7 +27,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
@@ -95,17 +95,20 @@ public class NuBot {
 
 
         //Load Options
-        Global.options = OptionsJSON.parseOptions(args);
+        Global.options = ParseOptions.parseOptions(args);
         if (Global.options == null) {
             LOG.severe("Error while loading options");
             System.exit(0);
         }
         Utils.printSeparator();
 
+        //Generate Bot Session unique id
+        Global.sessionId = Utils.generateSessionID();
+        LOG.info("Session ID = " + Global.sessionId);
 
         //Setting up log folder for this session :
 
-        String folderName = "NuBot_" + System.currentTimeMillis() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
+        String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
         logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         //Create log dir
@@ -120,10 +123,12 @@ public class NuBot {
         LOG.info("Init logging system");
 
         LOG.info("Set up SSL certificates");
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+        boolean trustAllCertificates = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            trustAllCertificates = true;
+        }
+        Utils.installKeystore(trustAllCertificates);
         Utils.printSeparator();
-
 
         String inputFiles = "";
         for (int i = 0; i < args.length; i++) {
@@ -375,11 +380,11 @@ public class NuBot {
             System.exit(0);
         }
 
-        
+
         notifyOnline();
     }
-    
-    private static void notifyOnline(){
+
+    private static void notifyOnline() {
         String mode = "sell-side";
         if (Global.options.isDualSide()) {
             mode = "dual-side";
