@@ -423,6 +423,19 @@ public class Utils {
         };
         // Install the all-trusting host verifier
         HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+    }
 
+    public static void installKeystore(boolean trustAll) {
+        if (trustAll) {
+            try {
+                Utils.installTrustAllManager();
+            } catch (Exception ex) {
+                LOG.severe(ex.toString());
+            }
+
+        } else {
+            System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
+            System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+        }
     }
 }

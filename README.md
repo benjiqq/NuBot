@@ -83,6 +83,43 @@ Alternative strategies  :
 
 ![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
 
+##Adding SSL certificates for an exchange
+In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.
+NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](../master/NuBot/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
+
+Using the keytool we can create the keystore
+```
+keytool -genkey -alias signFiles -keystore nubot_keystore.jks
+```
+You will be prompted to enter passwords for the key and keystore.
+
+To add a certificate we first need to get the SSL certificate (usually .cer) from the Exchange.
+An easy way is navigate with the browser to the API entry-point, click on the lock icon, and drag the certificate locally.
+After that the certificate can be added to the bot using keytool:
+
+```
+keytool -importcert -file certificate.cer -keystore nubot_keystore.jks -alias "certificate alias"
+```
+
+In the Java code we need to tell to the JVM which keystore to use (usually on startup)
+
+```java
+System.setProperty("javax.net.ssl.trustStore",KEYSTORE_FILE_PATH);
+System.setProperty("javax.net.ssl.trustStorePassword",KEYSTORE_PASSWORD);
+```
+
+To list all the certificates in a keystore
+
+```
+keytool -list -v -keystore Nubot_keystore.jks
+```
+
+##Download the latest version of the keystore
+
+We are committed to keep the *java keystore* always updated with most recent certificates available.
+To get the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/f82fc9c98ff044afa4af0eaef95199a563cc6250/NuBot/res/ssl/nubot_keystore.jks?at=master) and place it in the *res/ssl* folder of NuBot.
+
+
 #Price Feeds
 See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
 
