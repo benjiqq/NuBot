@@ -62,9 +62,7 @@ public class TestOrderTask {
         }
         LOG.setLevel(Level.FINE);
 
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
-
+        Utils.installKeystore(true);
 
         Global.options = new NuBotOptions(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,

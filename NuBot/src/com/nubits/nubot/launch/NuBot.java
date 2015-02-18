@@ -123,10 +123,12 @@ public class NuBot {
         LOG.info("Init logging system");
 
         LOG.info("Set up SSL certificates");
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+        boolean trustAllCertificates = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            trustAllCertificates = true;
+        }
+        Utils.installKeystore(trustAllCertificates);
         Utils.printSeparator();
-
 
         String inputFiles = "";
         for (int i = 0; i < args.length; i++) {

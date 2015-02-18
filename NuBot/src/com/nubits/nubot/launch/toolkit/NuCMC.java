@@ -168,8 +168,8 @@ public class NuCMC {
     }
 
     private void init() {
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+
+        Utils.installKeystore(true);
 
         Global.taskManager = new TaskManager();
 
