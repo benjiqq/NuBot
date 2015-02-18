@@ -21,7 +21,8 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
@@ -61,7 +62,7 @@ public class TestWrappers {
         inputs[1] = TEST_OPTIONS_PATH_2;
         inputs[2] = TEST_OPTIONS_PATH_3;
         inputs[3] = TEST_OPTIONS_PATH_4;
-        Global.options = OptionsJSON.parseOptions(inputs);
+        Global.options = ParseOptions.parseOptions(inputs);
 
         WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
 
@@ -76,7 +77,7 @@ public class TestWrappers {
         //-------------
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
@@ -134,8 +135,10 @@ public class TestWrappers {
         } catch (IOException ex) {
             LOG.severe(ex.toString());
         }
-
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+        try {
+            Utils.installKeystore(true);
+        } catch (Exception ex) {
+            LOG.severe(ex.toString());
+        }
     }
 }
