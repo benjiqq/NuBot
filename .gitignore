@@ -16,6 +16,7 @@ releases/
 /NuBot/dist-packaged/
 /NuBot/res/frozen
 /NuBot/logs/
+/logs/
 
 #Specific files to ignore
 ssl_readme.txt
