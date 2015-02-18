@@ -21,16 +21,8 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.AllCoinWrapper;
-import com.nubits.nubot.trading.wrappers.BitSparkWrapper;
-import com.nubits.nubot.trading.wrappers.BitcoinCoIDWrapper;
-import com.nubits.nubot.trading.wrappers.BtceWrapper;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.CcexWrapper;
-import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
-import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.trading.wrappers.PoloniexWrapper;
+import com.nubits.nubot.trading.wrappers.*;
+
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
@@ -394,6 +386,13 @@ public class WrapperTestUtils {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(Constant.COMKORT)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.COMKORT_SECRET, Passwords.COMKORT_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new ComkortWrapper(keys, Global.exchange));
         } else {
             LOG.severe("Exchange " + exchangeName + " not supported");
             System.exit(0);
