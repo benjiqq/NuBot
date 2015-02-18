@@ -19,7 +19,7 @@ package com.nubits.nubot.global;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import java.util.Properties;
@@ -42,7 +42,7 @@ public class Global {
     public static boolean isDualSide;
     public static String publicAddress;
     public static NuRPCClient rpcClient;
-    public static OptionsJSON options;
+    public static NuBotOptions options;
     public static double conversion = 1; //Change this? update SendLiquidityinfoTask
     public static FrozenBalancesManager frozenBalances;
     public static boolean swappedPair; //true if paymen currency is NBT

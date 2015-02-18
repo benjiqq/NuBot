@@ -26,7 +26,7 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
@@ -97,7 +97,7 @@ public class NuCMC {
 
     private boolean readOptions() {
         boolean ok = false;
-        OptionsJSON options = null;
+        NuBotOptions options = null;
         JSONParser parser = new JSONParser();
         String optionsString = FileSystem.readFromFile(optionsPath);
         try {
@@ -168,8 +168,8 @@ public class NuCMC {
     }
 
     private void init() {
-        System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-        System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+
+        Utils.installKeystore(true);
 
         Global.taskManager = new TaskManager();
 

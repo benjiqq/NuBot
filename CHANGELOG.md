@@ -1,3 +1,8 @@
+## v0.1.5b (2015-02-18)
+#### Bug fixes:
+  - Bitcoin.co.id buy order amounts
+  - Wallshift was not considering threshold
+
 ## v0.1.5 (2015-01-29)
 
 #### New Features:
