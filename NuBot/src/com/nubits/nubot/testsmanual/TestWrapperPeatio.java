@@ -29,7 +29,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.Trade;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -63,7 +63,7 @@ public class TestWrapperPeatio {
         init();
         String[] inputs = new String[1];
         inputs[0] = TEST_OPTIONS_PATH;
-        Global.options = OptionsJSON.parseOptions(inputs);
+        Global.options = ParseOptions.parseOptions(inputs);
 
         configExchange(testExchange); //Replace to test a different API implementation
 

@@ -6,7 +6,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
@@ -38,7 +38,7 @@ public class TestWrapperReturns {
         init();
         String[] inputs = new String[1];
         inputs[0] = TEST_OPTIONS_PATH;
-        Global.options = OptionsJSON.parseOptions(inputs);
+        Global.options = ParseOptions.parseOptions(inputs);
         testExchanges = populateExchanges();
 
         //configExchange(Constant.BTER);

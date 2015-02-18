@@ -27,7 +27,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
@@ -59,7 +59,7 @@ public class TestLiquidityDistribution {
         TestLiquidityDistribution test = new TestLiquidityDistribution();
         String[] inputs = new String[1];
         inputs[0] = TEST_OPTIONS_PATH;
-        Global.options = OptionsJSON.parseOptions(inputs);
+        Global.options = ParseOptions.parseOptions(inputs);
         test.init(Constant.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
         test.exec();

@@ -23,7 +23,7 @@ package com.nubits.nubot.launch.toolkit;
  */
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -144,7 +144,7 @@ public class NuPriceMonitor {
 
     private boolean readOptions() {
         boolean ok = false;
-        OptionsJSON options = null;
+        NuBotOptions options = null;
         JSONParser parser = new JSONParser();
         String optionsString = FileSystem.readFromFile(optionsPath);
         try {

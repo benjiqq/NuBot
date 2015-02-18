@@ -27,7 +27,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
@@ -95,7 +95,7 @@ public class NuBot {
 
 
         //Load Options
-        Global.options = OptionsJSON.parseOptions(args);
+        Global.options = ParseOptions.parseOptions(args);
         if (Global.options == null) {
             LOG.severe("Error while loading options");
             System.exit(0);
