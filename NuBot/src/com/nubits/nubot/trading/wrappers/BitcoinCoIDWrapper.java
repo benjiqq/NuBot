@@ -232,7 +232,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             args.put(pair.getPaymentCurrency().getCode().toLowerCase(), nf.format(amount * price));
             args.put(pair.getOrderCurrency().getCode().toLowerCase(), nf.format(amount));
         } else {
-            args.put(pair.getPaymentCurrency().getCode().toLowerCase(), nf.format(amount));
+            args.put(pair.getPaymentCurrency().getCode().toLowerCase(), nf.format(amount * price));
         }
 
         ApiResponse response = getQuery(url, method, args, isGet);
