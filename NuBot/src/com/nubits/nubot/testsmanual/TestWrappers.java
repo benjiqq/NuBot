@@ -27,6 +27,7 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import org.apache.commons.io.FileUtils;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -40,8 +41,11 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    public static final String SETTINGS = FileUtils.getFile("src", "settings.properties").toPath().toString();
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    public static final String SETTINGS = FileUtils.getFile("settings.properties").getPath();
+    private static final String TEST_OPTIONS_PATH_1 = FileUtils.getFile("NuBot", "res", "options", "private", "market.json").getAbsolutePath();
+    private static final String TEST_OPTIONS_PATH_2 = FileUtils.getFile("NuBot", "res", "options", "private", "liquidityinfo.json").getAbsolutePath();
+    private static final String TEST_OPTIONS_PATH_3 = FileUtils.getFile("NuBot", "res", "options", "private", "misc.json").getAbsolutePath();
+    private static final String TEST_OPTIONS_PATH_4 = FileUtils.getFile("NuBot", "res", "options", "private", "price-tracking.json").getAbsolutePath();
     //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = Constant.COMKORT;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
@@ -52,8 +56,11 @@ public class TestWrappers {
         //Load settings
         Utils.loadProperties(SETTINGS);
         init();
-        String[] inputs = new String[1];
-        inputs[0] = TEST_OPTIONS_PATH;
+        String[] inputs = new String[4];
+        inputs[0] = TEST_OPTIONS_PATH_1;
+        inputs[1] = TEST_OPTIONS_PATH_2;
+        inputs[2] = TEST_OPTIONS_PATH_3;
+        inputs[3] = TEST_OPTIONS_PATH_4;
         Global.options = OptionsJSON.parseOptions(inputs);
 
         WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
@@ -89,7 +96,7 @@ public class TestWrappers {
         //WrapperTestUtils.testGetTxFee();
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
 
-        WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
 
 
         //Create multiple orders for testing
@@ -108,7 +115,7 @@ public class TestWrappers {
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
-        //WrapperTestUtils.testGetLastPrice(testPair);
+        WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
         //WrapperTestUtils.testGetLastTrades(testPair);
 
