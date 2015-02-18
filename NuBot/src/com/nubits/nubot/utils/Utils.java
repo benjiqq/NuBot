@@ -393,7 +393,7 @@ public class Utils {
         return Global.settings.getProperty("version");
     }
 
-    public static void installTrustAllManager() throws Exception {
+    private static void installTrustAllManager() throws Exception {
         // Install a trust manager that does not validate certificate chains for https calls
 
         // Create a trust manager that does not validate certificate chains

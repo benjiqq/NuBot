@@ -168,11 +168,8 @@ public class NuCMC {
     }
 
     private void init() {
-        try {
-            Utils.installTrustAllManager();
-        } catch (Exception ex) {
-            LOG.severe(ex.toString());
-        }
+
+        Utils.installKeystore(true);
 
         Global.taskManager = new TaskManager();
 

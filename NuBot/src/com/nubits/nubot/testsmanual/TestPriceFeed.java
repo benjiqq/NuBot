@@ -67,11 +67,7 @@ public class TestPriceFeed {
         LOG.setLevel(Level.INFO);
 
         LOG.info("Set up SSL certificates");
-        try {
-            Utils.installTrustAllManager();
-        } catch (Exception ex) {
-            LOG.severe(ex.toString());
-        }
+        Utils.installKeystore(true);
     }
 
     private void executeSingle(AbstractPriceFeed feed, CurrencyPair pair) {

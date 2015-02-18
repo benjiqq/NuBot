@@ -124,7 +124,7 @@ public class TestWrappers {
             LOG.severe(ex.toString());
         }
         try {
-            Utils.installTrustAllManager();
+            Utils.installKeystore(true);
         } catch (Exception ex) {
             LOG.severe(ex.toString());
         }

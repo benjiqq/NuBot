@@ -123,13 +123,12 @@ public class NuBot {
         LOG.info("Init logging system");
 
         LOG.info("Set up SSL certificates");
-        try {
-            Utils.installTrustAllManager();
-        } catch (Exception ex) {
-            LOG.severe(ex.toString());
+        boolean trustAllCertificates = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            trustAllCertificates = true;
         }
+        Utils.installKeystore(trustAllCertificates);
         Utils.printSeparator();
-
 
         String inputFiles = "";
         for (int i = 0; i < args.length; i++) {

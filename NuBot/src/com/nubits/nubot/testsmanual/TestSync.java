@@ -114,7 +114,7 @@ public class TestSync extends TimerTask {
 
         LOG.info("Set up SSL certificates");
         try {
-            Utils.installTrustAllManager();
+            Utils.installKeystore(true);
         } catch (Exception ex) {
             LOG.severe(ex.toString());
         }

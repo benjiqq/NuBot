@@ -62,11 +62,7 @@ public class TestOrderTask {
         }
         LOG.setLevel(Level.FINE);
 
-        try {
-            Utils.installTrustAllManager();
-        } catch (Exception ex) {
-            LOG.severe(ex.toString());
-        }
+        Utils.installKeystore(true);
 
         Global.options = new OptionsJSON(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
