@@ -75,6 +75,8 @@ public class PeatioWrapper implements TradeInterface {
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
+    boolean isFirstNonce = true;
+    long timeDiffMs = 0;
 
     public PeatioWrapper() {
         setupErrors();
@@ -125,6 +127,7 @@ public class PeatioWrapper implements TradeInterface {
 
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
+        //LOG.warning("\n\n" + queryResult + "\n\n");
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -156,6 +159,9 @@ public class PeatioWrapper implements TradeInterface {
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
                 LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                apiResponse.setError(errors.parseError);
+            } catch (ClassCastException ex) {
+                LOG.severe("httpResponse: " + queryResult + " \n" + ex.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
@@ -626,11 +632,20 @@ public class PeatioWrapper implements TradeInterface {
     private long getNonceInternal(String requester) {
         apiBusy = true;
         long currentTime = System.currentTimeMillis();
+        if (isFirstNonce) {
+            apiBusy = false;
+            //The newer version of peatio require the nonce to be in the 30 seconds range of remote time
+            isFirstNonce = false;
+            timeDiffMs = getTimeDiff(currentTime);
+        }
+
+
         if (Global.options != null) {
             if (Global.options.isVerbose()) {
                 LOG.info(currentTime + " Now apiBusy! req : " + requester);
             }
         }
+
         long timeElapsedSinceLastCall = currentTime - lastSentTonce;
         if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
             try {
@@ -647,7 +662,7 @@ public class PeatioWrapper implements TradeInterface {
             }
         }
 
-        lastSentTonce = currentTime;
+        lastSentTonce = currentTime += timeDiffMs;
         if (Global.options != null) {
             if (Global.options.isVerbose()) {
                 LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
@@ -699,7 +714,7 @@ public class PeatioWrapper implements TradeInterface {
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
-            LOG.info("A maximum of 1000 trades can be returned from the BitSpark API");
+            LOG.info("A maximum of 1000 trades can be returned from the Peatio API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext();) {
                 Trade thisTrade = parseTrade(trade.next());
@@ -756,6 +771,31 @@ public class PeatioWrapper implements TradeInterface {
         throw new UnsupportedOperationException("PeatioWrapper.getOrderBook() not implemented yet.");
     }
 
+    private long getTimeDiff(long localtime) {
+        long diff = 0;
+        //Make an API call, parse the response and compute the diff (localtime vs remotetime)
+
+        ApiResponse balanceResponse = this.getAvailableBalance(Constant.NBT);
+        if (!balanceResponse.isPositive()) {
+            String errString = balanceResponse.getError().getDescription();
+            //Sample response to parse
+            //"The tonce 1424274776909 is invalid, current timestamp is 1424274905000."
+            String startStr = "timestamp is ";
+            String stopStr = ".";
+            long remoteTime = localtime; //default
+            try {
+                int startIndex = errString.indexOf(startStr) + startStr.length();
+                int stopIndex = errString.lastIndexOf(stopStr);
+                remoteTime = Long.parseLong(errString.substring(startIndex, stopIndex));
+            } catch (Exception ex) {
+                LOG.fine("Local timestamp and Peatio timestamp are equal");
+            }
+            diff = remoteTime - localtime;
+            //LOG.warning("\n\n\n diff=" + diff + "  \n\n");
+        }
+        return diff;
+    }
+
     private class PeatioService implements ServiceInterface {
 
         protected String base;
@@ -782,7 +822,6 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-
 
             args.put("access_key", keys.getApiKey());
 
