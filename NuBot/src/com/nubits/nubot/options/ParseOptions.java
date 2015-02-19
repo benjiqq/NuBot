@@ -209,20 +209,7 @@ public class ParseOptions {
             }
         }
 
-
-        //TODO: ?
-            /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
-             if (optionsJSON.containsKey("check-balance-interval")) {
-             long checkBalanceIntervallong = (long) optionsJSON.get("check-balance-interval");
-             checkBalanceInterval = (int) checkBalanceIntervallong;
-             }
-
-             if (optionsJSON.containsKey("check-orders-interval")) {
-             long checkOrdersIntevallong = (long) optionsJSON.get("check-orders-interval");
-             checkOrdersInteval = (int) checkOrdersIntevallong;
-             }
-             */
-
+        
         if (optionsJSON.containsKey("emergency-timeout")) {
             long emergencyTimeoutLong = (long) optionsJSON.get("emergency-timeout");
             emergencyTimeout = (int) emergencyTimeoutLong;
