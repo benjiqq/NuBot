@@ -381,10 +381,16 @@ public class NuBot {
         HipChatNotifications.sendMessage(msg, Message.Color.GREEN);
     }
 
+    /**
+     * check if arguments to NuBot are valid
+     * supported are arguments larger then 0
+     * @param args
+     * @return
+     */
     private boolean isValidArgs(String[] args) {
-        boolean ok = args.length < 1;
+        boolean valid = args.length > 0;
 
-        return ok;
+        return valid;
     }
 
     private static void createShutDownHook() {
