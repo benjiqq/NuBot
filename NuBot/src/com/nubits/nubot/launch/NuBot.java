@@ -27,6 +27,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
@@ -95,11 +96,13 @@ public class NuBot {
 
 
         //Load Options
-        Global.options = ParseOptions.parseOptions(args);
-        if (Global.options == null) {
-            LOG.severe("Error while loading options");
+        try {
+            Global.options = ParseOptions.parseOptions(args);
+        } catch(NuBotConfigException ex){
+            Utils.exitWithMessage("NuBot wrongly configured");
             System.exit(0);
         }
+
         Utils.printSeparator();
 
         //Generate Bot Session unique id
