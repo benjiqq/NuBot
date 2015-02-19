@@ -18,11 +18,11 @@ public class ParseOptions {
     private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
 
     /**
-     *
+     * Parse Options from an array of paths
      * @param paths
      * @return
      */
-    public static NuBotOptions parseOptions(String[] paths) {
+    public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigError {
         NuBotOptions options = null;
         ArrayList<String> filePaths = new ArrayList();
         filePaths.addAll(Arrays.asList(paths));
@@ -87,8 +87,7 @@ public class ParseOptions {
                     pegOptionsJSON = new org.json.JSONObject(setMap);
                     cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
                 } else {
-                    LOG.severe("secondary-peg-options are required in the options");
-                    System.exit(0);
+                    throw new NuBotConfigError("secondary-peg-options are required in the options");
                 }
 
                 /*
@@ -154,21 +153,21 @@ public class ParseOptions {
                 if (optionsJSON.containsKey("nubitaddress")) {
                     nubitAddress = (String) optionsJSON.get("nubitaddress");
                 } else {
-                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                    throw new NuBotConfigError("When submit-liquidity is set to true "
                             + "you need to declare a value for \"nubitaddress\" ");
                 }
 
                 if (optionsJSON.containsKey("rpcpass")) {
                     rpcPass = (String) optionsJSON.get("rpcpass");
                 } else {
-                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                    throw new NuBotConfigError("When submit-liquidity is set to true "
                             + "you need to declare a value for \"rpcpass\" ");
                 }
 
                 if (optionsJSON.containsKey("rpcuser")) {
                     rpcUser = (String) optionsJSON.get("rpcuser");
                 } else {
-                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                    throw new NuBotConfigError("When submit-liquidity is set to true "
                             + "you need to declare a value for \"rpcuser\" ");
                 }
 
@@ -176,7 +175,7 @@ public class ParseOptions {
                     long nudPortlong = (long) optionsJSON.get("nudport");
                     nudPort = (int) nudPortlong;
                 } else {
-                    Utils.exitWithMessage("When submit-liquidity is set to true "
+                    throw new NuBotConfigError("When submit-liquidity is set to true "
                             + "you need to declare a value for \"nudport\" ");
                 }
 
@@ -211,7 +210,7 @@ public class ParseOptions {
             }
 
 
-
+            //TODO: ?
             /*Ignore this parameter to prevent one custodian to execute faster than others (walls collapsing)
              if (optionsJSON.containsKey("check-balance-interval")) {
              long checkBalanceIntervallong = (long) optionsJSON.get("check-balance-interval");
@@ -246,6 +245,10 @@ public class ParseOptions {
         } catch (NumberFormatException e) {
             LOG.severe("Error while parsing the options file : " + e);
         }
+
+        if (options == null)
+            throw new NuBotConfigError("error parsing configuration files");
+
         return options;
     }
 }
