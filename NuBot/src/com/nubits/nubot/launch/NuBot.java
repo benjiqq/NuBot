@@ -103,10 +103,6 @@ public class NuBot {
             System.exit(0);
         }
 
-        if (Global.options == null) {
-            LOG.severe("Error while loading options");
-            System.exit(0);
-        }
         Utils.printSeparator();
 
         //Generate Bot Session unique id
