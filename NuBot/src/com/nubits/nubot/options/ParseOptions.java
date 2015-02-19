@@ -34,12 +34,30 @@ public class ParseOptions {
     /**
      *  parseOptions from JSON
      *
-     * @param paths
+     * @param optionsJSON
      * @return
      */
     public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
 
         NuBotOptions options = null;
+
+        //default values for optional settings
+
+        String nudIp = NuBotOptionsDefault.nudIp;
+        String sendMails = NuBotOptionsDefault.sendMails;
+        boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
+        boolean executeOrders = NuBotOptionsDefault.executeOrders;
+        boolean verbose = NuBotOptionsDefault.verbose;
+        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
+        int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
+        int sendLiquidityInterval = NuBotOptionsDefault.sendLiquidityInterval;
+        double txFee = NuBotOptionsDefault.txFee;
+        double priceIncrement = NuBotOptionsDefault.priceIncrement;
+        double keepProceeds = NuBotOptionsDefault.keepProceeds;
+        double maxSellVolume = NuBotOptionsDefault.maxSellVolume;
+        double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
+        int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
 
 
         //First try to parse compulsory parameters
@@ -99,35 +117,8 @@ public class ParseOptions {
                 throw new NuBotConfigException("secondary-peg-options are required in the options");
             }
 
-                /*
-                 org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
-                 org.json.JSONObject optionsJSON2 = (org.json.JSONObject) jsonString.get("options");
-                 pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("secondary-peg-options");
-                 cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);*/
         }
 
-        //Then parse optional settings. If not use the default value declared here
-
-        String nudIp = "127.0.0.1";
-        String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
-        boolean submitLiquidity = true;
-        boolean executeOrders = true;
-        boolean verbose = false;
-        boolean sendHipchat = true;
-
-        boolean multipleCustodians = false;
-        int executeStrategyInterval = 41;
-        int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
-
-        double txFee = 0.2;
-        double priceIncrement = 0.0003;
-        double keepProceeds = 0;
-
-        double maxSellVolume = 0;
-        double maxBuyVolume = 0;
-
-
-        int emergencyTimeout = 60;
 
         if (optionsJSON.containsKey("nudip")) {
             nudIp = (String) optionsJSON.get("nudip");
