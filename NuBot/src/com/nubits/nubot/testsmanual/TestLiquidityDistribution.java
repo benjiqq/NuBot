@@ -27,7 +27,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
-import com.nubits.nubot.options.NuBotConfigError;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
@@ -62,7 +62,7 @@ public class TestLiquidityDistribution {
         inputs[0] = TEST_OPTIONS_PATH;
         try {
             Global.options = ParseOptions.parseOptions(inputs);
-        } catch(NuBotConfigError ex){
+        } catch(NuBotConfigException ex){
             Utils.exitWithMessage("NuBot wrongly configured");
             System.exit(0);
         }

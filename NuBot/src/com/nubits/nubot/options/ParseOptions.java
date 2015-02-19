@@ -22,7 +22,7 @@ public class ParseOptions {
      * @param paths
      * @return
      */
-    public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigError {
+    public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigException {
         NuBotOptions options = null;
         ArrayList<String> filePaths = new ArrayList();
         filePaths.addAll(Arrays.asList(paths));
@@ -87,7 +87,7 @@ public class ParseOptions {
                     pegOptionsJSON = new org.json.JSONObject(setMap);
                     cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
                 } else {
-                    throw new NuBotConfigError("secondary-peg-options are required in the options");
+                    throw new NuBotConfigException("secondary-peg-options are required in the options");
                 }
 
                 /*
@@ -153,21 +153,21 @@ public class ParseOptions {
                 if (optionsJSON.containsKey("nubitaddress")) {
                     nubitAddress = (String) optionsJSON.get("nubitaddress");
                 } else {
-                    throw new NuBotConfigError("When submit-liquidity is set to true "
+                    throw new NuBotConfigException("When submit-liquidity is set to true "
                             + "you need to declare a value for \"nubitaddress\" ");
                 }
 
                 if (optionsJSON.containsKey("rpcpass")) {
                     rpcPass = (String) optionsJSON.get("rpcpass");
                 } else {
-                    throw new NuBotConfigError("When submit-liquidity is set to true "
+                    throw new NuBotConfigException("When submit-liquidity is set to true "
                             + "you need to declare a value for \"rpcpass\" ");
                 }
 
                 if (optionsJSON.containsKey("rpcuser")) {
                     rpcUser = (String) optionsJSON.get("rpcuser");
                 } else {
-                    throw new NuBotConfigError("When submit-liquidity is set to true "
+                    throw new NuBotConfigException("When submit-liquidity is set to true "
                             + "you need to declare a value for \"rpcuser\" ");
                 }
 
@@ -175,7 +175,7 @@ public class ParseOptions {
                     long nudPortlong = (long) optionsJSON.get("nudport");
                     nudPort = (int) nudPortlong;
                 } else {
-                    throw new NuBotConfigError("When submit-liquidity is set to true "
+                    throw new NuBotConfigException("When submit-liquidity is set to true "
                             + "you need to declare a value for \"nudport\" ");
                 }
 
@@ -247,7 +247,7 @@ public class ParseOptions {
         }
 
         if (options == null)
-            throw new NuBotConfigError("error parsing configuration files");
+            throw new NuBotConfigException("error parsing configuration files");
 
         return options;
     }
