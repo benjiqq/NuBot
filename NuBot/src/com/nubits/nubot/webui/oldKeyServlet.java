@@ -69,13 +69,13 @@ public class oldKeyServlet extends HttpServlet {
     JSONObject configJson() {
         JSONObject json = new JSONObject();
         Map m = new HashMap();
-        m = OptionsJSON.getOptionsFromSingleFile(exchangeFile);
-        Iterator<String> it = m.keySet().iterator();
-        while (it.hasNext()) {
-            String k = it.next();
-            Object o = m.get(k);
-            json.put(k, "" + o);
-        }
+        //m = OptionsJSON.getOptionsFromSingleFile(exchangeFile);
+//        Iterator<String> it = m.keySet().iterator();
+//        while (it.hasNext()) {
+//            String k = it.next();
+//            Object o = m.get(k);
+//            json.put(k, "" + o);
+//        }
         return json;
     }
 

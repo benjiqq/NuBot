@@ -12,7 +12,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import com.nubits.nubot.options.OptionsJSON;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.keys.ApiKeys;
 
 public class JsonRead {
@@ -101,7 +101,8 @@ public class JsonRead {
     
     public static void main(final String[] args) {
         Map setMap = new HashMap(); 
-        setMap = OptionsJSON.getOptionsFromSingleFile(exchangeFile);
+        setMap = ParseOptions.
+        .getOptionsFromSingleFile(exchangeFile);
         printMap(setMap);
 
     }

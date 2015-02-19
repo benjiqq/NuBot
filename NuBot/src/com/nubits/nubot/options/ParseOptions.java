@@ -17,6 +17,8 @@ public class ParseOptions {
 
     private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
 
+
+
     /**
      * Parse Options from an array of paths
      *
