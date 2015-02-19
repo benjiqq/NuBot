@@ -74,7 +74,7 @@ public class NuBot {
         NuBot app = new NuBot();
 
         Utils.printSeparator();
-        if (app.readParams(args)) {
+        if (app.isValidArgs(args)) {
             createShutDownHook();
             if (!Global.running) {
                 app.execute(args);
@@ -82,6 +82,7 @@ public class NuBot {
                 LOG.severe("NuBot is already running. Make sure to terminate other instances.");
             }
         } else {
+            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
             System.exit(0);
         }
     }
@@ -380,13 +381,9 @@ public class NuBot {
         HipChatNotifications.sendMessage(msg, Message.Color.GREEN);
     }
 
-    private boolean readParams(String[] args) {
-        boolean ok = false;
-        if (args.length < 1) {
-            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
-            System.exit(0);
-        }
-        ok = true;
+    private boolean isValidArgs(String[] args) {
+        boolean ok = args.length < 1;
+
         return ok;
     }
 
