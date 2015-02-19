@@ -26,7 +26,6 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
@@ -41,6 +40,7 @@ import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.io.IOException;
 import java.util.logging.Logger;
 import org.json.simple.JSONObject;
@@ -390,7 +390,7 @@ public class NuBot {
             mode = "dual-side";
         }
         String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")";
-        HipChatNotifications.sendMessage(msg, Message.Color.GREEN);
+        HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
     private boolean readParams(String[] args) {

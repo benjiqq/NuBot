@@ -23,6 +23,7 @@ package com.nubits.nubot.testsmanual;
  */
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.util.logging.Logger;
 
 public class TestNotifications {
@@ -36,7 +37,7 @@ public class TestNotifications {
         MailNotifications.sendCritical("desrever.nu@gmail.com", "Test Critial Title", "Test critical message");
         //USE RED FOR CRITICAL, ANYTHING ELSE FOR STANDARD
         HipChatNotifications.sendMessageCritical("Critical notification test");
-        HipChatNotifications.sendMessage("Standard notification test", com.nubits.nubot.notifications.jhipchat.messages.Message.Color.GREEN);
+        HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN);
 
     }
 }
