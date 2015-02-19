@@ -47,8 +47,6 @@ Passwords.java
 .mtj.tmp/
 
 # Package Files #
-*.jar
-!EasyJccKit.jar
 *.war
 *.ear
 
