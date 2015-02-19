@@ -43,7 +43,6 @@ dependencies {
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
-    compile 'commons-logging:commons-logging:1.2'
     compile 'commons-net:commons-net:3.3' //note: 3.3., instead of 1.2.0
     compile 'com.alibaba:fastjson:1.1.36'
     compile 'com.google.code.gson:gson:2.2.3'
@@ -57,25 +56,30 @@ dependencies {
     compile 'org.codeartisans:org.json:20131017'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
 
+    compile 'io.evanwong.oss:hipchat-java:0.2.0'
+
     //dependencies with develop branch
     compile 'org.zeromq:jeromq:0.3.4'
     compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'commons-logging:commons-logging:1.2'
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
 
-	//webUI deps
+    compile 'javax.websocket:javax.websocket-api:1.1'
+    compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
+    compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
+
+
+    //webUI deps
     compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
-	compile 'com.github.spullara.mustache.java:compiler:0.9.0'
-    compile "javax.servlet:servlet-api:2.5"        
+    compile "javax.servlet:servlet-api:2.5"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
     compile 'org.eclipse.jetty.websocket:websocket-server:9.3.0.M1'
     compile 'com.sparkjava:spark-core:2.1'
-    
-    
-    //compile 'javax.websocket:javax.websocket-api:1.1'
-    //compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
-    //compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
-    
+    compile 'com.sparkjava:spark-template-mustache:1.0.0'
+    //compile 'com.github.spullara.mustache.java:compiler:0.9.0'
+
+
     compile files('NuBot/lib/EasyJccKit.jar')
         
     //dependencies for testing
@@ -167,6 +171,11 @@ task init << {
     copy {
     	from "NuBot/res/ssl/nubot_keystore.jks" 
     	into "$storedir/res/ssl/"
+    }
+
+    copy {
+        from "NuBot/res/ssl/updateKeystore.sh"
+        into "$storedir/res/ssl/"
     }
 
     copy {

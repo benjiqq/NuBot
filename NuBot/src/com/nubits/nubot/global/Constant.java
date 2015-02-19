@@ -40,7 +40,8 @@ public class Constant {
     public static final String EXCOIN = "excoin";
     public static final String BITCOINCOID = "bitcoincoid";
     //API base url for peatio instances
-    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/"; //"http://178.62.186.229/";    //Order types
+    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
+    //public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";  //Casa di nu
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
     //Currencies

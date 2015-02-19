@@ -114,10 +114,18 @@ To list all the certificates in a keystore
 keytool -list -v -keystore Nubot_keystore.jks
 ```
 
-##Download the latest version of the keystore
+##Updating the latest version of the keystore
 
-We are committed to keep the *java keystore* always updated with most recent certificates available.
-To get the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/f82fc9c98ff044afa4af0eaef95199a563cc6250/NuBot/res/ssl/nubot_keystore.jks?at=master) and place it in the *res/ssl* folder of NuBot.
+Exchanges tend to upgrade their SSL certificates multiple times per year, and you need to maintain the keystore up-to-date for security reasons. We are committed to keep the *java keystore* always updated with most recent certificates available in the develop branch of this repository. 
+
+For unix systems with, you can use the downloading script provided with the bot, and located under `res/ssl` (wget required) :  
+
+```
+cd res/ssl
+ ./updateKeystore.sh
+```
+
+Alternatively you can manually download the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/cfa0c7699ccd96300c1b1f77d416b9a6f1fa6e8d/NuBot/res/ssl/nubot_keystore.jks?at=develop) and place it in the *res/ssl* folder of NuBot.
 
 
 #Price Feeds
