@@ -493,7 +493,7 @@ public class NuBotOptions {
     /*
      * Concatenate a list of of files into a JSONObject
      */
-    public static JSONObject parseFiles(ArrayList<String> filePaths) {
+    public static JSONObject parseFiles(ArrayList<String> filePaths) throws NuBotConfigException {
         JSONObject optionsObject = new JSONObject();
         Map setMap = new HashMap();
 
@@ -511,8 +511,7 @@ public class NuBotOptions {
                 }
 
             } catch (ParseException ex) {
-                LOG.severe("Parse exception \n" + ex.toString());
-                System.exit(0);
+                throw new NuBotConfigException("Parse exception \n" + ex.toString());
             }
         }
 

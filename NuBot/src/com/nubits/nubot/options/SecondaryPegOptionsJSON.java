@@ -62,7 +62,7 @@ public class SecondaryPegOptionsJSON {
      * @param optionsJSON
      * @return
      */
-    public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON, CurrencyPair pair) {
+    public static SecondaryPegOptionsJSON create(org.json.JSONObject optionsJSON, CurrencyPair pair) throws NuBotConfigException {
         NuBotOptions options = null;
         try {
             //First try to parse compulsory parameters
@@ -77,16 +77,14 @@ public class SecondaryPegOptionsJSON {
 
             String names[] = org.json.JSONObject.getNames(dataJson);
             if (names.length < 2) {
-                LOG.severe("The bot requires at least two backup data feeds to run");
-                System.exit(0);
+                throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
             }
             for (int i = 0; i < names.length; i++) {
                 try {
                     org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                     backupFeedNames.add((String) tempJson.get("name"));
                 } catch (JSONException ex) {
-                    LOG.severe(ex.toString());
-                    System.exit(0);
+                    throw new NuBotConfigException(ex.toString());
                 }
             }
 
@@ -130,9 +128,9 @@ public class SecondaryPegOptionsJSON {
             return new SecondaryPegOptionsJSON(wallchangeThreshold, spread, distanceThreshold, mainFeed, backupFeedNames);
         } catch (JSONException ex) {
             LOG.severe(ex.toString());
-            System.exit(0);
+            throw new NuBotConfigException("" + ex);
         }
-        return null; //never reached
+
     }
 
     /**
