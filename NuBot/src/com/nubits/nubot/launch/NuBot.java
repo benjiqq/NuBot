@@ -133,18 +133,6 @@ public class NuBot {
         Utils.installKeystore(trustAllCertificates);
         Utils.printSeparator();
 
-        String inputFiles = "";
-        for (int i = 0; i < args.length; i++) {
-            if (i != args.length - 1) {
-                inputFiles += args[i] + " ,";
-            } else {
-                inputFiles += args[i];
-            }
-        }
-        LOG.info("Load options from " + args.length + " files : " + inputFiles);
-        Utils.printSeparator();
-
-
         LOG.info("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         Utils.printSeparator();
