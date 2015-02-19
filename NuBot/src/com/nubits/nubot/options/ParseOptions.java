@@ -28,7 +28,7 @@ public class ParseOptions {
         filePaths.addAll(Arrays.asList(paths));
         JSONObject inputJSON = NuBotOptions.parseFiles(filePaths);
         JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
-        parseOptions(optionsJSON);
+        return parseOptionsFromJson(optionsJSON);
     }
 
     /**
@@ -37,7 +37,7 @@ public class ParseOptions {
      * @param paths
      * @return
      */
-    public static NuBotOptions parseOptions(JSONObject optionsJSON) throws NuBotConfigException {
+    public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
 
         NuBotOptions options = null;
 
