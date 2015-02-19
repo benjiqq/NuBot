@@ -155,6 +155,11 @@ task init << {
     }
 
     copy {
+        from "NuBot/res/ssl/updateKeystore.sh"
+        into "$storedir/res/ssl/"
+    }
+
+    copy {
     	from "NuBot/res/logs_assets" 
     	into "${storedir}/res/logs_assets/"
     }
