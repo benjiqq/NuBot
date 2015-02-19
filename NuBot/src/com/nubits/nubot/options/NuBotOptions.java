@@ -490,37 +490,6 @@ public class NuBotOptions {
         this.maxBuyVolume = maxBuyVolume;
     }
 
-    /*
-     * Concatenate a list of of files into a JSONObject
-     */
-    public static JSONObject parseFiles(ArrayList<String> filePaths) {
-        JSONObject optionsObject = new JSONObject();
-        Map setMap = new HashMap();
-
-        for (int i = 0; i < filePaths.size(); i++) {
-            try {
-                JSONParser parser = new JSONParser();
-
-                JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filePaths.get(i))));
-                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
-
-                Set tempSet = tempOptions.entrySet();
-                for (Object o : tempSet) {
-                    Map.Entry entry = (Map.Entry) o;
-                    setMap.put(entry.getKey(), entry.getValue());
-                }
-
-            } catch (ParseException ex) {
-                LOG.severe("Parse exception \n" + ex.toString());
-                System.exit(0);
-            }
-        }
-
-        JSONObject content = new JSONObject(setMap);
-        optionsObject.put("options", content);
-        return optionsObject;
-    }
-
     /**
      *
      * @return
