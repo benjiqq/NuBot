@@ -32,7 +32,6 @@ public class HipChatNotifications {
 
     private static final Logger LOG = Logger
             .getLogger(HipChatNotifications.class.getName());
-    private static HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_KEY);
 
     public static void sendMessage(String message, MessageColor color) {
         sendMessageImpl(message, color, false);
@@ -63,10 +62,12 @@ public class HipChatNotifications {
 
         try {
             if (critical) {
+                HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_CRITICAL_ROOM_TOKEN);
                 SendRoomNotificationRequestBuilder builder = hipchat.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_CRITICAL_ROOM_ID, toSend);
                 builder.setColor(MessageColor.RED).setNotify(true).build().execute();
 
             } else {
+                HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_TOKEN);
                 SendRoomNotificationRequestBuilder builder = hipchat.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, toSend);
                 builder.setColor(color).setNotify(false).build().execute();
 
