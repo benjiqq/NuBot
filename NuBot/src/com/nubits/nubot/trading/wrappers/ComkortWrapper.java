@@ -18,9 +18,12 @@
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
+import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -41,9 +44,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -60,11 +61,15 @@ public class ComkortWrapper implements TradeInterface {
     private String checkConnectionUrl;
     //API Paths
     private final String API_BASE_URL = "https://api.comkort.com/v1/private";
-    private final String API_BASE_URL_PUBLIC = "GET https://api.comkort.com/v1/public";
+    private final String API_BASE_URL_PUBLIC = "https://api.comkort.com/v1/public";
     private final String API_USER = "user";
     private final String API_BALANCE = "balance";
     private final String API_MARKET = "market";
     private final String API_SUMMARY = "summary";
+    private final String API_ORDER = "order";
+    private final String API_SELL = "sell";
+    private final String API_BUY = "buy";
+    private final String API_LIST = "list";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -132,6 +137,7 @@ public class ComkortWrapper implements TradeInterface {
 
     private ApiResponse getAvailableBalancesImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
+        //https://api.comkort.com/v1/private/user/balance
         String url = API_BASE_URL + "/" + API_USER + "/" + API_BALANCE;
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
@@ -171,12 +177,28 @@ public class ComkortWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = true;
         
-        args.put("market_alias", pair.toString());
+        args.put("market_alias", pair.toString("_"));
         
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            apiResponse.setResponseObject(httpAnswerJson);
+            
+            Ticker ticker = new Ticker();
+            double last = -1;
+            double ask = -1;
+            double bid = -1;
+            
+            JSONObject markets = (JSONObject) httpAnswerJson.get("markets");
+            JSONObject market = (JSONObject) markets.get(pair.getOrderCurrency().getCode().toUpperCase() + "/" + pair.getPaymentCurrency().getCode().toUpperCase());
+            last = Utils.getDouble(market.get("last_price"));
+            ask = Utils.getDouble(market.get("low"));
+            bid = Utils.getDouble(market.get("high"));
+            
+            ticker.setAsk(ask);
+            ticker.setBid(bid);
+            ticker.setLast(last);
+            
+            apiResponse.setResponseObject(ticker);
         } else {
             apiResponse = response;
         }
@@ -186,12 +208,39 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        return null;
+        return enterOrder(Constant.SELL, pair, amount, rate);
     }
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        return null;
+        return enterOrder(Constant.BUY, pair, amount, rate);
+    }
+    
+    private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_ORDER + "/";
+        if (type.equals(Constant.BUY)) {
+            url += API_BUY;
+        } else {
+            url += API_SELL;
+        }
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+
+        args.put("market_alias", pair.toString("_"));
+        args.put("amount", Objects.toString(amount));
+        args.put("price", Objects.toString(rate));
+
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()){
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            String order_id = httpAnswerJson.get("order_id").toString();
+            apiResponse.setResponseObject(order_id);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -201,7 +250,44 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_ORDER + "/" + API_LIST;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        args.put("market_alias", pair.toString("_"));
+        
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
+            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+                orderList.add(parseOrder(order.next()));
+            }
+            apiResponse.setResponseObject(orderList);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+    }
+    
+    private Order parseOrder(JSONObject in) {
+        Order out = new Order();
+        /*
+        {
+            "id": "12996",
+            "type": "sell",
+            "amount": "1.00000000",
+            "start_amount": "1.00000000",
+            "fee": "0.00200000",
+            "price": "1.00000000"
+        }
+         */
+        
+        
+        return out;        
     }
 
     @Override
@@ -268,9 +354,9 @@ public class ComkortWrapper implements TradeInterface {
         String queryResult;
         ComkortService query = new ComkortService(url, args, keys);
         if (isGet) {
-            queryResult = query.executeQuery(true, isGet);
-        } else {
             queryResult = query.executeQuery(false, isGet);
+        } else {
+            queryResult = query.executeQuery(true, isGet);
         }
         return queryResult;
     }
@@ -397,7 +483,15 @@ public class ComkortWrapper implements TradeInterface {
                 LOG.severe("Query to : " + url
                         + "\nData : " + post_data
                         + "\nHTTP Response : " + Objects.toString(response));
-                return "{'error': 'httpError', 'response': Objects.toString(response)}";
+                String error = "";
+                try {
+                    while ((output = br.readLine()) != null) {
+                        error += output;
+                    }
+                } catch (IOException io) {
+                    LOG.severe(io.toString());
+                }
+                return "{'error': 'httpError', 'response': " + error + "}";
             }
 
             try {
