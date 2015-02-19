@@ -143,7 +143,7 @@ public class NuBot {
         Global.exchange = new Exchange(Global.options.getExchangeName());
         Utils.printSeparator();
 
-        LOG.info("Create e ExchangeLiveData object to accomodate liveData from the exchange");
+        LOG.info("Create e ExchangeLiveData object to accommodate liveData from the exchange");
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
         Utils.printSeparator();
@@ -154,13 +154,12 @@ public class NuBot {
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
         if (Global.options.getExchangeName().equals(Constant.CCEX)) {
-            ((CcexWrapper) (ti)).initBaseUrl();;
+            ((CcexWrapper) (ti)).initBaseUrl();
         }
 
 
         if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
             Global.swappedPair = true;
-
         } else {
             Global.swappedPair = false;
         }
@@ -223,7 +222,6 @@ public class NuBot {
 
         //Set the fileoutput for active orders
 
-
         String orders_outputPath = logsFolder + "orders_history.csv";
         String balances_outputPath = logsFolder + "balance_history.json";
 
@@ -232,7 +230,8 @@ public class NuBot {
 
 
         //Start task to check orders
-        Global.taskManager.getSendLiquidityTask().start(39);
+        int start_delay = 40;
+        Global.taskManager.getSendLiquidityTask().start(start_delay);
 
         Utils.printSeparator();
 
@@ -246,7 +245,6 @@ public class NuBot {
                 System.exit(0);
             }
         }
-
 
         Utils.printSeparator();
         LOG.fine("Checking bot working mode");
@@ -326,10 +324,6 @@ public class NuBot {
                 String outputPath = logsFolder + "wall_shifts.csv";
                 ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
                 FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
-
-
-
-
 
                 //read the delay to sync with remote clock
                 //issue 136 - multi custodians on a pair.
