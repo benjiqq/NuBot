@@ -19,18 +19,27 @@ public class ParseOptions {
 
     /**
      * Parse Options from an array of paths
+     * @param paths
+     * @return
+     * @throws NuBotConfigException
+     */
+    public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigException {
+        ArrayList<String> filePaths = new ArrayList();
+        filePaths.addAll(Arrays.asList(paths));
+        JSONObject inputJSON = NuBotOptions.parseFiles(filePaths);
+        JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
+        parseOptions(optionsJSON);
+    }
+
+    /**
+     *  parseOptions from JSON
      *
      * @param paths
      * @return
      */
-    public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigException {
+    public static NuBotOptions parseOptions(JSONObject optionsJSON) throws NuBotConfigException {
+
         NuBotOptions options = null;
-        ArrayList<String> filePaths = new ArrayList();
-        filePaths.addAll(Arrays.asList(paths));
-
-
-        JSONObject inputJSON = NuBotOptions.parseFiles(filePaths);
-        JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
 
 
         //First try to parse compulsory parameters
