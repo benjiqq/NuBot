@@ -1,27 +1,28 @@
 package com.nubits.nubot.webui;
 
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
+import org.eclipse.jetty.io.RuntimeIOException;
+import spark.ModelAndView;
+import spark.TemplateEngine;
+
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jetty.io.RuntimeIOException;
-
-import spark.ModelAndView;
-import spark.TemplateEngine;
-
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
-
 /**
- * Defaults to the 'templates' directory under the resource path.
+ * Render bootstrap based HTML with Mustache
+ * Top: html head
+ * Footer: footer
  *
- * @author Sam Pullara https://github.com/spullara
  */
 public class LayoutTemplateEngine extends TemplateEngine {
 
     private MustacheFactory mustacheFactory;
+    //TODO: global
+    private static String htmlFolder = "./html/tmpl/";
 
     /**
      * Constructs a mustache template engine
@@ -33,8 +34,7 @@ public class LayoutTemplateEngine extends TemplateEngine {
     /**
      * Constructs a mustache template engine
      *
-     * @param resourceRoot
-     *            the resource root
+     * @param resourceRoot the resource root
      */
     public LayoutTemplateEngine(String resourceRoot) {
         mustacheFactory = new DefaultMustacheFactory(resourceRoot);
@@ -43,8 +43,7 @@ public class LayoutTemplateEngine extends TemplateEngine {
     /**
      * Constructs a mustache template engine
      *
-     * @param mustacheFactory
-     *            the mustache factory
+     * @param mustacheFactory the mustache factory
      */
     public LayoutTemplateEngine(MustacheFactory mustacheFactory) {
         this.mustacheFactory = mustacheFactory;
@@ -52,15 +51,20 @@ public class LayoutTemplateEngine extends TemplateEngine {
 
     public String renderTop() {
         Map map = new HashMap();
-        map.put("Title", "Yo");
-        ModelAndView mv = new ModelAndView(map, "./html/tmpl/top.mustache");
+
+        //map.put("host", "localhost");
+        //TODO: spark issue. using default of 4567
+        int serverPort = 4567;
+        //setPort(serverPort); // Spark will run on this port
+        //map.put("port", "" + serverPort);
+
+        ModelAndView mv = new ModelAndView(map,  htmlFolder + "top.mustache");
         return renderTemplateFile(mv);
     }
 
     public String renderFooter() {
         Map map = new HashMap();
-        map.put("Title", "Yo");
-        ModelAndView mv = new ModelAndView(map, "./html/tmpl/footer.mustache");
+        ModelAndView mv = new ModelAndView(map, htmlFolder + "footer.mustache");
         return renderTemplateFile(mv);
     }
 
@@ -87,7 +91,7 @@ public class LayoutTemplateEngine extends TemplateEngine {
         } catch (IOException e) {
             throw new RuntimeIOException(e);
         }
-        
+
         String body = stringWriter.toString();
         String head = renderTop();
         String footer = renderFooter();

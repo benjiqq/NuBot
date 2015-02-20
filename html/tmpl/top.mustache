@@ -40,11 +40,16 @@
 
 
       <script>
+
+              var host = "localhost";
+              var port = 4567;
+              var url = "http://" + host + ":" + port;
+
             function loadVals() {
 
                 $.ajax({
                   dataType: "json",
-                  url: "http://localhost:8080/keys",
+                  url: url + "/keys",
                 })
                   .done(function( data ) {
                     //var pp = $("#key").attr("placeholder");
@@ -75,15 +80,18 @@
 
                 //make HTTP post to server
 
-                /*$.post( "http://localhost:8080/keys", { apikey: "zzzzz" } )
 
-                  .done(function( data ) {
+                $.post( url + "/keys", { apikey: "zzzzz" } )
 
+                .done(function( data ) {
                     elmnt.css( 'border-color', '#993333' );
-                }*/
-
+                });
 
             }
+
+
+
+
 
 
         </script>
@@ -101,3 +109,8 @@
 
 
     </head>
+
+
+
+<body onLoad="loadVals()">
+

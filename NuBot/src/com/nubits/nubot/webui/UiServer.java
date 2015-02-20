@@ -1,11 +1,12 @@
 package com.nubits.nubot.webui;
 
-import static spark.Spark.get;
+import spark.ModelAndView;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import spark.ModelAndView;
+import static spark.Spark.setPort;
+import static spark.Spark.get;
  
 public class UiServer {
 
@@ -27,9 +28,12 @@ public class UiServer {
     public static void main(String[] args) {
         
 
-        Map map = new HashMap();
-        map.put("name", "Yo");
+        //Map map = new HashMap();
 
+        Map map = new HashMap();
+        map.put("name", "Sam");
+
+        get("/hello", (rq, rs) -> new ModelAndView(map, htmlFolder + "hello.mustache"), new MustacheTemplateEngine());
 
         get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
 
@@ -38,7 +42,7 @@ public class UiServer {
 
         Msg keyMsg = new Msg("key");
 
-        get("/hello", "application/json", (request, response) -> {
+        get("/keys", "application/json", (request, response) -> {
             return keyMsg;
         }, new JsonTransformer());
 
