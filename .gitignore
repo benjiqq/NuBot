@@ -71,3 +71,5 @@ NuBot/.settings
 .idea
 *.iml
 Test*.xml
+
+testconfig/

@@ -1,14 +1,15 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import org.json.simple.JSONObject;
-
 import java.util.*;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -24,16 +25,64 @@ public class ParseOptions {
      *
      * @param paths
      * @return
+     * @throws NuBotConfigException
      */
     public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigException {
-        NuBotOptions options = null;
         ArrayList<String> filePaths = new ArrayList();
         filePaths.addAll(Arrays.asList(paths));
-
-
-        JSONObject inputJSON = NuBotOptions.parseFiles(filePaths);
+        JSONObject inputJSON = parseFiles(filePaths);
         JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
+        return parseOptionsFromJson(optionsJSON);
+    }
 
+    /**
+     * parse Options from one file
+     *
+     * @param filepath
+     * @return
+     * @throws NuBotConfigException
+     */
+    public static NuBotOptions parseOptionsSingle(String filepath) throws NuBotConfigException {
+
+        try {
+            JSONObject inputJSON = parseSingleFileToJson(filepath);
+            JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
+            return parseOptionsFromJson(optionsJSON);
+
+        } catch (ParseException ex) {
+            throw new NuBotConfigException("Configuration error from single file");
+        }
+
+    }
+
+    /**
+     * parseOptions from JSON
+     *
+     * @param optionsJSON
+     * @return
+     */
+    public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
+
+        NuBotOptions options = null;
+
+        //default values for optional settings
+
+        String nudIp = NuBotOptionsDefault.nudIp;
+        String sendMails = NuBotOptionsDefault.sendMails;
+        boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
+        boolean executeOrders = NuBotOptionsDefault.executeOrders;
+        boolean verbose = NuBotOptionsDefault.verbose;
+        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
+        int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
+        int sendLiquidityInterval = NuBotOptionsDefault.sendLiquidityInterval;
+        double txFee = NuBotOptionsDefault.txFee;
+        double priceIncrement = NuBotOptionsDefault.priceIncrement;
+        double keepProceeds = NuBotOptionsDefault.keepProceeds;
+        double maxSellVolume = NuBotOptionsDefault.maxSellVolume;
+        double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
+        int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
+        boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
 
         //First try to parse compulsory parameters
         String exchangeName = (String) optionsJSON.get("exchangename");
@@ -47,7 +96,6 @@ public class ParseOptions {
             } else {
                 apiKey = (String) optionsJSON.get("apikey");
             }
-
         }
 
         String apiSecret = (String) optionsJSON.get("apisecret");
@@ -76,7 +124,6 @@ public class ParseOptions {
 
                 Map setMap = new HashMap();
 
-
                 //convert from simple JSON to org.json.JSONObject
                 JSONObject oldObject = (JSONObject) optionsJSON.get("secondary-peg-options");
 
@@ -92,35 +139,7 @@ public class ParseOptions {
                 throw new NuBotConfigException("secondary-peg-options are required in the options");
             }
 
-                /*
-                 org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
-                 org.json.JSONObject optionsJSON2 = (org.json.JSONObject) jsonString.get("options");
-                 pegOptionsJSON = (org.json.JSONObject) optionsJSON2.get("secondary-peg-options");
-                 cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);*/
         }
-
-        //Then parse optional settings. If not use the default value declared here
-
-        String nudIp = "127.0.0.1";
-        String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
-        boolean submitLiquidity = true;
-        boolean executeOrders = true;
-        boolean verbose = false;
-        boolean sendHipchat = true;
-
-        boolean multipleCustodians = false;
-        int executeStrategyInterval = 41;
-        int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
-
-        double txFee = 0.2;
-        double priceIncrement = 0.0003;
-        double keepProceeds = 0;
-
-        double maxSellVolume = 0;
-        double maxBuyVolume = 0;
-
-
-        int emergencyTimeout = 60;
 
         if (optionsJSON.containsKey("nudip")) {
             nudIp = (String) optionsJSON.get("nudip");
@@ -203,15 +222,16 @@ public class ParseOptions {
                     || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
                 sendMails = sendMails.toUpperCase(); //Convert to upper case
             } else {
-                LOG.severe("Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
+                String error = "Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
                         + MailNotifications.MAIL_LEVEL_SEVERE + " or "
-                        + MailNotifications.MAIL_LEVEL_NONE);
-                System.exit(0);
+                        + MailNotifications.MAIL_LEVEL_NONE;
+                LOG.severe(error);
+                throw new NuBotConfigException(error);
             }
         }
 
-        
+
         if (optionsJSON.containsKey("emergency-timeout")) {
             long emergencyTimeoutLong = (long) optionsJSON.get("emergency-timeout");
             emergencyTimeout = (int) emergencyTimeoutLong;
@@ -224,17 +244,72 @@ public class ParseOptions {
         if (optionsJSON.containsKey("multiple-custodians")) {
             multipleCustodians = (boolean) optionsJSON.get("multiple-custodians");
         }
+
+        if (optionsJSON.containsKey("distribute-liquidity")) {
+            distributeLiquidity = (boolean) optionsJSON.get("distribute-liquidity");
+        }
+
         //Create a new Instance
         options = new NuBotOptions(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                 rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                 executeOrders, verbose, pair, executeStrategyInterval,
                 sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
-                emergencyTimeout, keepProceeds, aggregate, multipleCustodians, maxSellVolume, maxBuyVolume, cpo);
+                emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
+                maxSellVolume, maxBuyVolume, distributeLiquidity, cpo);
 
 
-        if (options == null)
+        if (options == null) {
             throw new NuBotConfigException("error parsing configuration files");
+        }
 
         return options;
+    }
+
+    /**
+     * parse file to json
+     *
+     * @param filepath
+     * @return
+     * @throws ParseException
+     */
+    public static JSONObject parseSingleFileToJson(String filepath) throws ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filepath)));
+        return fileJSON;
+    }
+
+    /**
+     * Concatenate a list of of files into a JSONObject
+     *
+     * @param filePaths
+     * @return
+     * @throws NuBotConfigException
+     */
+    public static JSONObject parseFiles(ArrayList<String> filePaths) throws NuBotConfigException {
+        JSONObject optionsObject = new JSONObject();
+        Map setMap = new HashMap();
+
+        for (int i = 0; i < filePaths.size(); i++) {
+            try {
+
+                String filepath = filePaths.get(i);
+
+                JSONObject fileJSON = parseSingleFileToJson(filepath);
+                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
+
+                Set tempSet = tempOptions.entrySet();
+                for (Object o : tempSet) {
+                    Map.Entry entry = (Map.Entry) o;
+                    setMap.put(entry.getKey(), entry.getValue());
+                }
+
+            } catch (ParseException ex) {
+                throw new NuBotConfigException("Parse exception \n" + ex.toString());
+            }
+        }
+
+        JSONObject content = new JSONObject(setMap);
+        optionsObject.put("options", content);
+        return optionsObject;
     }
 }

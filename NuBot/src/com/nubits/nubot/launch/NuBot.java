@@ -27,9 +27,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.options.SecondaryPegOptionsJSON;
+import com.nubits.nubot.options.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -63,8 +61,8 @@ public class NuBot {
      * Initialises the NuBot. Check if NuBot has valid parameters and quit if it
      * doesn't Check if NuBot is already running and Log if that is so
      *
-     * @author desrever <desrever at nubits.com>
      * @param args a list of valid arguments
+     * @author desrever <desrever at nubits.com>
      */
     public static void main(String args[]) {
         mainThread = Thread.currentThread();
@@ -72,7 +70,7 @@ public class NuBot {
         NuBot app = new NuBot();
 
         Utils.printSeparator();
-        if (app.readParams(args)) {
+        if (app.isValidArgs(args)) {
             createShutDownHook();
             if (!Global.running) {
                 app.execute(args);
@@ -80,12 +78,12 @@ public class NuBot {
                 LOG.severe("NuBot is already running. Make sure to terminate other instances.");
             }
         } else {
+            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
             System.exit(0);
         }
     }
 
     /**
-     *
      * @author desrever <desrever at nubits.com>
      */
     private void execute(String args[]) {
@@ -94,12 +92,17 @@ public class NuBot {
         //Load settings
         Utils.loadProperties("settings.properties");
 
-
-        //Load Options
+        //Load Options and test for critical configuration errors
         try {
             Global.options = ParseOptions.parseOptions(args);
-        } catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
             Utils.exitWithMessage("NuBot wrongly configured");
+            System.exit(0);
+        }
+
+        //test if configuration is supported
+        if (!Utils.isSupported(Global.options.getPair())) {
+            LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
             System.exit(0);
         }
 
@@ -133,18 +136,6 @@ public class NuBot {
         Utils.installKeystore(trustAllCertificates);
         Utils.printSeparator();
 
-        String inputFiles = "";
-        for (int i = 0; i < args.length; i++) {
-            if (i != args.length - 1) {
-                inputFiles += args[i] + " ,";
-            } else {
-                inputFiles += args[i];
-            }
-        }
-        LOG.info("Load options from " + args.length + " files : " + inputFiles);
-        Utils.printSeparator();
-
-
         LOG.info("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         Utils.printSeparator();
@@ -155,7 +146,7 @@ public class NuBot {
         Global.exchange = new Exchange(Global.options.getExchangeName());
         Utils.printSeparator();
 
-        LOG.info("Create e ExchangeLiveData object to accomodate liveData from the exchange");
+        LOG.info("Create e ExchangeLiveData object to accommodate liveData from the exchange");
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
         Utils.printSeparator();
@@ -166,13 +157,12 @@ public class NuBot {
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
         if (Global.options.getExchangeName().equals(Constant.CCEX)) {
-            ((CcexWrapper) (ti)).initBaseUrl();;
+            ((CcexWrapper) (ti)).initBaseUrl();
         }
 
 
         if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
             Global.swappedPair = true;
-
         } else {
             Global.swappedPair = false;
         }
@@ -235,7 +225,6 @@ public class NuBot {
 
         //Set the fileoutput for active orders
 
-
         String orders_outputPath = logsFolder + "orders_history.csv";
         String balances_outputPath = logsFolder + "balance_history.json";
 
@@ -244,7 +233,8 @@ public class NuBot {
 
 
         //Start task to check orders
-        Global.taskManager.getSendLiquidityTask().start(39);
+        int start_delay = 40;
+        Global.taskManager.getSendLiquidityTask().start(start_delay);
 
         Utils.printSeparator();
 
@@ -258,7 +248,6 @@ public class NuBot {
                 System.exit(0);
             }
         }
-
 
         Utils.printSeparator();
         LOG.fine("Checking bot working mode");
@@ -287,100 +276,93 @@ public class NuBot {
 
         //Switch strategy for different trading pair
 
-        if (Utils.isSupported(Global.options.getPair())) {
-            if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
-                Global.taskManager.getStrategyFiatTask().start(7);
-            } else {
 
-                SecondaryPegOptionsJSON cpo = Global.options.getSecondaryPegOptions();
-                if (cpo == null) {
-                    LOG.severe("To run in secondary peg mode, you need to specify the crypto-peg-options");
-                    System.exit(0);
-                }
-
-                //Peg to a USD price via crypto pair
-                Currency toTrackCurrency;
-
-                if (Global.swappedPair) { //NBT as paymentCurrency
-                    toTrackCurrency = Global.options.getPair().getOrderCurrency();
-                } else {
-                    toTrackCurrency = Global.options.getPair().getPaymentCurrency();
-                }
-
-                CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
-
-
-                // set trading strategy to the price monitor task
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
-                        .setStrategy(((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())));
-
-                // set price monitor task to the strategy
-                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                        .setPriceMonitorTask(((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())));
-
-                // set liquidityinfo task to the strategy
-
-                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                        .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
-
-                PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
-                //Then set the pfm
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
-
-                //Set the priceDistance threshold
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(cpo.getDistanceThreshold());
-
-                //Set the wallet shift threshold
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeThreshold());
-
-                //Set the outputpath for wallshifts
-
-                String outputPath = logsFolder + "wall_shifts.csv";
-                ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
-                FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
-
-
-
-
-
-                //read the delay to sync with remote clock
-                //issue 136 - multi custodians on a pair.
-                //walls are removed and re-added every three minutes.
-                //Bot needs to wait for next 3 min window before placing walls
-                //set the interval from settings
-
-                int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes")); //read from propeprties file
-                int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
-
-                int interval = 1;
-                if (!Global.options.isMultipleCustodians()) {
-                    interval = refresh_time_seconds;
-                } else {
-                    interval = 60 * reset_every;
-                    //Force the a spread to avoid collisions
-                    double forcedSpread = 0.9;
-                    LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
-                    if (Global.options.getSecondaryPegOptions().getSpread() < forcedSpread) {
-                        Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
-                    }
-                }
-
-                Global.taskManager.getPriceTriggerTask().setInterval(interval);
-
-                int delaySeconds = 0;
-
-                if (Global.options.isMultipleCustodians()) {
-                    delaySeconds = Utils.getSecondsToNextwindow(reset_every);
-                    LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
-                } else {
-                    LOG.warning("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
-                }
-                //then start the thread
-                Global.taskManager.getPriceTriggerTask().start(delaySeconds);
-            }
+        if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
+            Global.taskManager.getStrategyFiatTask().start(7);
         } else {
-            LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
-            System.exit(0);
+
+            SecondaryPegOptionsJSON cpo = Global.options.getSecondaryPegOptions();
+            if (cpo == null) {
+                LOG.severe("To run in secondary peg mode, you need to specify the crypto-peg-options");
+                System.exit(0);
+            }
+
+            //Peg to a USD price via crypto pair
+            Currency toTrackCurrency;
+
+            if (Global.swappedPair) { //NBT as paymentCurrency
+                toTrackCurrency = Global.options.getPair().getOrderCurrency();
+            } else {
+                toTrackCurrency = Global.options.getPair().getPaymentCurrency();
+            }
+
+            CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
+
+
+            // set trading strategy to the price monitor task
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
+                    .setStrategy(((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())));
+
+            // set price monitor task to the strategy
+            ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
+                    .setPriceMonitorTask(((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())));
+
+            // set liquidityinfo task to the strategy
+
+            ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
+                    .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
+
+            PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
+            //Then set the pfm
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
+
+            //Set the priceDistance threshold
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(cpo.getDistanceThreshold());
+
+            //Set the wallet shift threshold
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeThreshold());
+
+            //Set the outputpath for wallshifts
+
+            String outputPath = logsFolder + "wall_shifts.csv";
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
+            FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
+
+            //read the delay to sync with remote clock
+            //issue 136 - multi custodians on a pair.
+            //walls are removed and re-added every three minutes.
+            //Bot needs to wait for next 3 min window before placing walls
+            //set the interval from settings
+
+            //TODO set in NuBotoptions, or subclass
+            int reset_every = NuBotOptionsDefault.reset_every;
+            int refresh_time_seconds = NuBotOptionsDefault.refresh_time_seconds;
+
+            int interval = 1;
+            if (!Global.options.isMultipleCustodians()) {
+                interval = refresh_time_seconds;
+            } else {
+                interval = 60 * reset_every;
+                //Force the a spread to avoid collisions
+                double forcedSpread = 0.9;
+                LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
+                if (Global.options.getSecondaryPegOptions().getSpread() < forcedSpread) {
+                    Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
+                }
+            }
+
+            Global.taskManager.getPriceTriggerTask().setInterval(interval);
+
+            int delaySeconds = 0;
+
+            if (Global.options.isMultipleCustodians()) {
+                delaySeconds = Utils.getSecondsToNextwindow(reset_every);
+                LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
+            } else {
+                LOG.warning("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
+            }
+            //then start the thread
+            Global.taskManager.getPriceTriggerTask().start(delaySeconds);
         }
 
 
@@ -396,14 +378,17 @@ public class NuBot {
         HipChatNotifications.sendMessage(msg, Message.Color.GREEN);
     }
 
-    private boolean readParams(String[] args) {
-        boolean ok = false;
-        if (args.length < 1) {
-            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
-            System.exit(0);
-        }
-        ok = true;
-        return ok;
+    /**
+     * check if arguments to NuBot are valid supported are arguments larger then
+     * 0
+     *
+     * @param args
+     * @return
+     */
+    private boolean isValidArgs(String[] args) {
+        boolean valid = args.length > 0;
+
+        return valid;
     }
 
     private static void createShutDownHook() {
