@@ -85,6 +85,8 @@ sourceSets {
         }
         resources {
         	srcDir 'NuBot/res'
+            //include '**/*.example'
+            //exclude '**/*.DS_Store'
     	}
     }
 
