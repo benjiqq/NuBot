@@ -19,7 +19,7 @@ package com.nubits.nubot.tests;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 
 import com.nubits.nubot.global.Global;
@@ -30,9 +30,20 @@ import org.junit.Test;
 public class TestSettings extends TestCase {
 
 
+    private static String testconfigFile = "test.json";
+    private static String testconfig = "testconfig/" + testconfigFile;
+
+    @Override
+    public void setUp() {
+        Utils.loadProperties("settings.properties");
+    }
+
     @Test
     public void testRead() {
-        //Utils.loadProperties("settings.properties");
-        //assertTrue(Global.settings.containsKey("version"));
+        Utils.loadProperties("settings.properties");
+        //Global.settings.getProperty("submit_liquidity_seconds"));
+        assertTrue(Global.settings.containsKey("version"));
     }
+
+
 }
