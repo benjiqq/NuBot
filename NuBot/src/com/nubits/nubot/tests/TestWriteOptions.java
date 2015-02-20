@@ -11,8 +11,11 @@ import java.io.File;
 
 public class TestWriteOptions extends TestCase {
 
+
     private static String testOutconfigFile = "testout.json";
     private static String testconfig = "testconfig/" + testOutconfigFile;
+    private static String testconfigFile = "test.json";
+    private static String testinconfig = "testconfig/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -41,6 +44,13 @@ public class TestWriteOptions extends TestCase {
         SaveOptions.saveOptions(opt, testconfig);
         File f = new File(testconfig);
         assertTrue(f.exists());
+    }
+
+    @Test
+    public void testBackup() {
+        NuBotOptions opt = new NuBotOptions();
+        boolean success = SaveOptions.backupOptions(testinconfig);
+        assertTrue(success);
     }
 
 
