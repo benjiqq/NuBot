@@ -101,8 +101,8 @@ public class JsonRead {
     
     public static void main(final String[] args) {
         Map setMap = new HashMap(); 
-        setMap = ParseOptions.
-        .getOptionsFromSingleFile(exchangeFile);
+        //setMap = ParseOptions.
+        //.getOptionsFromSingleFile(exchangeFile);
         printMap(setMap);
 
     }

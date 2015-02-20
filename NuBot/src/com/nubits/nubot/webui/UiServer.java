@@ -20,6 +20,9 @@ public class UiServer {
         
         Map map = new HashMap();
         map.put("name", "Yo");
+
+        String htmlFolder = ""
+
         get("/", (rq, rs) -> new ModelAndView(map, "./html/tmpl/config.mustache"), new LayoutTemplateEngine());
 
         get("/log", (rq, rs) -> new ModelAndView(map, "./html/tmpl/log.mustache"), new LayoutTemplateEngine());

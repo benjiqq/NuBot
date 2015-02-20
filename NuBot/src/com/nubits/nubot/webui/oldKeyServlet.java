@@ -1,23 +1,18 @@
 package com.nubits.nubot.webui;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Writer;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
+import com.nubits.nubot.utils.FileSystem;
+import org.json.JSONObject;
+import org.json.simple.JSONStreamAware;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.json.JSONObject;
-import org.json.simple.JSONStreamAware;
-
-import com.nubits.nubot.options.OptionsJSON;
-import com.nubits.nubot.utils.FileSystem;
+import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.HashMap;
+import java.util.Map;
 
 @SuppressWarnings("serial")
 /**
