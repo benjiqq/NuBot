@@ -34,7 +34,6 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
-import static com.nubits.nubot.utils.LiquidityPlot.*;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
@@ -62,11 +61,9 @@ public class TestLiquidityDistribution {
         inputs[0] = TEST_OPTIONS_PATH;
         try {
             Global.options = ParseOptions.parseOptions(inputs);
-        } catch(NuBotConfigException ex){
-            Utils.exitWithMessage("NuBot wrongly configured");
-            System.exit(0);
+        } catch (NuBotConfigException ex) {
+            LOG.severe(ex.toString());
         }
-
         test.init(Constant.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
         test.exec();
@@ -156,7 +153,7 @@ public class TestLiquidityDistribution {
         ArrayList<OrderToPlace> buyOrders = ldm.getOrdersToPlace(Constant.BUY, balancePEG, pegPrice, pair, txFee);
 
         printOrderBooks(sellOrders, buyOrders);
-        drawOrderBooks(sellOrders, buyOrders);
+        Utils.drawOrderBooks(sellOrders, buyOrders, pegPrice);
 
         if (execOrders) {
             placeOrders(sellOrders, buyOrders);
@@ -201,33 +198,6 @@ public class TestLiquidityDistribution {
 
         toReturn += "----- ";
         return toReturn;
-    }
-
-    private void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders) {
-        double[] xSell = new double[sellOrders.size()];
-        double[] ySell = new double[sellOrders.size()];
-        double[] xBuy = new double[buyOrders.size()];
-        double[] yBuy = new double[buyOrders.size()];
-
-
-        for (int i = 0; i < sellOrders.size(); i++) {
-            OrderToPlace tempOrder = sellOrders.get(i);
-            xSell[i] = tempOrder.getPrice() * pegPrice * 100;
-            ySell[i] = tempOrder.getSize();
-
-        }
-
-        for (int i = 0; i < buyOrders.size(); i++) {
-            OrderToPlace tempOrder = buyOrders.get(i);
-            xBuy[i] = tempOrder.getPrice() * pegPrice * 100;
-            yBuy[i] = tempOrder.getSize();
-
-        }
-
-        plot(xSell, ySell); // create a plot using xaxis and yvalues
-        addPlot(xBuy, yBuy); // create a second plot on top of first
-
-
     }
 
     private void placeOrders(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders) {
