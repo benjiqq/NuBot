@@ -25,7 +25,7 @@ version = '0.15' //current project version
 
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'eclipse'
+apply plugin: 'idea'
 
 sourceCompatibility = 1.8 // java version
 
