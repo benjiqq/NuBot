@@ -26,6 +26,8 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SecondaryPegOptionsJSON;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
@@ -41,9 +43,10 @@ import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.json.simple.JSONObject;
+
 import java.io.IOException;
 import java.util.logging.Logger;
-import org.json.simple.JSONObject;
 
 /**
  * Provides the main class of NuBot. Instantiate this class to start the NuBot
