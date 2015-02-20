@@ -21,19 +21,18 @@ package com.nubits.nubot.tasks.strategy;
  *
  * @author desrever <desrever at nubits.com>
  */
+
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.Order;
-import com.nubits.nubot.models.OrderToPlace;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
+import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
