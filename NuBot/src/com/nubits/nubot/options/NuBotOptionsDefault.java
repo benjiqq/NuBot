@@ -10,11 +10,8 @@ public class NuBotOptionsDefault {
 
     //TODO
     public static int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
-    public static int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes")); //read from propeprties file
-    public static int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
-    //reset_every_minutes=3
-    //refresh_time_seconds=61
-    //submit_liquidity_seconds=130
+    public static int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes"));
+    public static int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds"));
 
     public static String nudIp = "127.0.0.1";
     public static String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
