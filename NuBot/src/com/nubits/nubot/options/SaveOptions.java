@@ -16,6 +16,7 @@ public class SaveOptions {
 
     /**
      * save options to file
+     *
      * @param opt
      * @param filepath
      * @return
@@ -32,6 +33,7 @@ public class SaveOptions {
 
     /**
      * backup an options file. write it to .bak and increase counter
+     *
      * @param filepath
      * @return
      */
@@ -41,11 +43,11 @@ public class SaveOptions {
             boolean wrote = false;
             int i = 0;
             while (!wrote) {
-                String fp = f.getParent() + f.getName() + "_" + i + ".bak";
+                String fp = f.getParent() + File.separator + f.getName() + "_" + i + ".bak";
                 File dest = new File(fp);
                 if (!dest.exists()) {
                     try {
-                        FileUtils.copyFileToDirectory(f, dest);
+                        FileUtils.copyFile(f, dest);
                     } catch (IOException e) {
                         e.printStackTrace();
                     } finally {
