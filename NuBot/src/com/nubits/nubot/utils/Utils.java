@@ -22,6 +22,9 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.launch.NuBot;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.OrderToPlace;
+import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
+import static com.nubits.nubot.utils.LiquidityPlot.plot;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -38,6 +41,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -437,5 +441,31 @@ public class Utils {
             System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
             System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
         }
+    }
+
+    public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
+        double[] xSell = new double[sellOrders.size()];
+        double[] ySell = new double[sellOrders.size()];
+        double[] xBuy = new double[buyOrders.size()];
+        double[] yBuy = new double[buyOrders.size()];
+
+
+        for (int i = 0; i < sellOrders.size(); i++) {
+            OrderToPlace tempOrder = sellOrders.get(i);
+            xSell[i] = tempOrder.getPrice() * pegPrice * 100;
+            ySell[i] = tempOrder.getSize();
+
+        }
+
+        for (int i = 0; i < buyOrders.size(); i++) {
+            OrderToPlace tempOrder = buyOrders.get(i);
+            xBuy[i] = tempOrder.getPrice() * pegPrice * 100;
+            yBuy[i] = tempOrder.getSize();
+
+        }
+
+        plot(xSell, ySell); // create a plot using xaxis and yvalues
+        addPlot(xBuy, yBuy); // create a second plot on top of first
+
     }
 }
