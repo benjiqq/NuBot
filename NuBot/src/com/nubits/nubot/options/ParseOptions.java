@@ -5,14 +5,17 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
+ * ParseOptions from one or several JSON files
  */
 public class ParseOptions {
 
@@ -36,7 +39,7 @@ public class ParseOptions {
     }
 
     /**
-     * parse Options from one file
+     * parse single JSON file to NuBoptions
      *
      * @param filepath
      * @return
@@ -44,9 +47,13 @@ public class ParseOptions {
      */
     public static NuBotOptions parseOptionsSingle(String filepath) throws NuBotConfigException {
 
+        File f = new File(filepath);
+        if (!f.exists())
+            throw new NuBotConfigException("file does not exist");
+
         try {
-            JSONObject inputJSON = parseSingleFileToJson(filepath);
-            JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
+            JSONObject inputJSON = parseSingleJsonFile(filepath);
+            JSONObject optionsJSON = getOptionsKey(inputJSON);
             return parseOptionsFromJson(optionsJSON);
 
         } catch (ParseException ex) {
@@ -56,7 +63,7 @@ public class ParseOptions {
     }
 
     /**
-     * parseOptions from JSON
+     * parseOptions from JSON into NuBotOptions
      *
      * @param optionsJSON
      * @return
@@ -266,16 +273,27 @@ public class ParseOptions {
     }
 
     /**
-     * parse file to json
+     * parse single json file
      *
      * @param filepath
      * @return
      * @throws ParseException
      */
-    public static JSONObject parseSingleFileToJson(String filepath) throws ParseException {
+    public static JSONObject parseSingleJsonFile(String filepath) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filepath)));
         return fileJSON;
+    }
+
+    /**
+     * get options value in dictionary
+     *
+     * @param fileJSON
+     * @return
+     */
+    public static JSONObject getOptionsKey(JSONObject fileJSON) {
+        JSONObject tempOptions = (JSONObject) fileJSON.get("options");
+        return tempOptions;
     }
 
     /**
@@ -294,8 +312,8 @@ public class ParseOptions {
 
                 String filepath = filePaths.get(i);
 
-                JSONObject fileJSON = parseSingleFileToJson(filepath);
-                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
+                JSONObject fileJSON = parseSingleJsonFile(filepath);
+                JSONObject tempOptions = getOptionsKey(fileJSON);
 
                 Set tempSet = tempOptions.entrySet();
                 for (Object o : tempSet) {

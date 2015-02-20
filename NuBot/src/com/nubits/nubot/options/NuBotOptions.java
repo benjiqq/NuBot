@@ -63,6 +63,13 @@ public class NuBotOptions {
     private SecondaryPegOptionsJSON cpo;
 
     /**
+     * empty constructor. assumes safe creation of valid options
+     */
+    public NuBotOptions(){
+
+    }
+
+    /**
      *
      * @param dualSide
      * @param apiKey

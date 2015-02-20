@@ -4,6 +4,7 @@ package com.nubits.nubot.tests;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -15,31 +16,43 @@ import java.nio.file.Paths;
 
 public class TestOptions extends TestCase {
 
-    private static String testconfig = "testconfig/test.config";
+    private static String testconfigFile = "test.json";
+    private static String testconfig = "testconfig/" + testconfigFile;
+
+    @Override
+    public void setUp(){
+        Utils.loadProperties("settings.properties");
+    }
 
     @Test
-    public void testLoadconfig() {
-        // Utils.loadProperties("settings.properties");
+    public void testConfigExists() {
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
         final String wdir = System.getProperty("user.dir");
-        // System.out.println("working dir : " + wdir);
-        // System.out.println("Current relative path is: " + s);
-        // String p = System.getProperty("java.class.path");
-        // System.out.println(p);
+        System.out.println("wdir: " + wdir);
 
         File f = new File(testconfig);
-        assertTrue(f.getAbsolutePath().contains("test.config"));
+        System.out.println(">>> " + f.getAbsolutePath() + " exists : " + f.exists());
         assertTrue(f.exists());
+    }
 
+    @Test
+    public void testLoadconfig() {
+        try {
+            JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
+            System.out.println(inputJSON);
+            assertTrue(inputJSON.keySet().size() > 0);
+        } catch (ParseException e) {
+            // e.printStackTrace();
+        }
     }
 
     @Test
     public void testJson() {
         try {
-            JSONObject inputJSON = ParseOptions.parseSingleFileToJson(testconfig);
+            JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
 
-            assertTrue(inputJSON.containsKey("exchangename"));
+            assertTrue(inputJSON.containsKey("options"));
         } catch (ParseException e) {
             // e.printStackTrace();
         }
@@ -70,10 +83,11 @@ public class TestOptions extends TestCase {
             // System.out.println(System.getProperty("));
             // Global.options =
             JSONObject j = ParseOptions
-                    .parseSingleFileToJson("testconfig/test.config");
+                    .parseSingleJsonFile(testconfig);
+            JSONObject o = ParseOptions.getOptionsKey(j);
 
-            assertTrue((boolean) j.get("verbose") == false);
-            assertTrue(((int) new Long((Long) j.get("emergency-timeout"))
+            assertTrue((boolean) o.get("verbose") == false);
+            assertTrue(((int) new Long((Long) o.get("emergency-timeout"))
                     .intValue()) == 60);
 
         } catch (ParseException e) {
@@ -85,14 +99,15 @@ public class TestOptions extends TestCase {
     public void testLoadConfig() {
         try {
             NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle("testconfig/test.config");
+                    .parseOptionsSingle(testconfig);
+
             assertTrue(nuo != null);
 
-            assertTrue(nuo.getExchangeName().equals("example"));
+            assertTrue(nuo.getExchangeName().equals("peatio"));
 
-            assertTrue(nuo.getPair() != null);
+            //assertTrue(nuo.getPair() != null);
 
-            assertTrue(nuo.getSecondaryPegOptions() != null);
+            //assertTrue(nuo.getSecondaryPegOptions() != null);
             //.getSpread())
 
         } catch (NuBotConfigException e) {
