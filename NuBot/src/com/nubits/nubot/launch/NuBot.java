@@ -27,9 +27,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.options.SecondaryPegOptionsJSON;
+import com.nubits.nubot.options.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -338,8 +336,9 @@ public class NuBot {
             //Bot needs to wait for next 3 min window before placing walls
             //set the interval from settings
 
-            int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes")); //read from propeprties file
-            int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
+            //TODO set in NuBotoptions, or subclass
+            int reset_every = NuBotOptionsDefault.reset_every;
+            int refresh_time_seconds = NuBotOptionsDefault.refresh_time_seconds;
 
             int interval = 1;
             if (!Global.options.isMultipleCustodians()) {
