@@ -1,4 +1,4 @@
-package com.nubits.nubot.webui;
+package com.nubits.nubot.webui.service;
 
 import java.text.MessageFormat;
 import java.time.LocalTime;

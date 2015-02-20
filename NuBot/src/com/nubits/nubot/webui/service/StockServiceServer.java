@@ -1,4 +1,4 @@
-package com.nubits.nubot.webui;
+package com.nubits.nubot.webui.service;
 
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.servlet.ServletContextHandler;

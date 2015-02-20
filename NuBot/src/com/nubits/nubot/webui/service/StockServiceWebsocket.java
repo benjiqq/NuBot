@@ -1,4 +1,4 @@
-package com.nubits.nubot.webui;
+package com.nubits.nubot.webui.service;
 
 import java.io.IOException;
 import java.util.concurrent.Executors;

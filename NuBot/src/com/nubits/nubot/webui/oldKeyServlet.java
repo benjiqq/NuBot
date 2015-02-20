@@ -14,10 +14,9 @@ import java.io.Writer;
 import java.util.HashMap;
 import java.util.Map;
 
-@SuppressWarnings("serial")
 /**
  * get config and set config
- * TODO: for exchange
+ * TODO: incorporate with Options packages and probably delete this
  */
 public class oldKeyServlet extends HttpServlet {
 

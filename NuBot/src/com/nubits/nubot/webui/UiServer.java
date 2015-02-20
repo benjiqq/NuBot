@@ -1,11 +1,11 @@
 package com.nubits.nubot.webui;
 
+import com.nubits.nubot.webui.service.StockServiceServer;
 import spark.ModelAndView;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static spark.Spark.setPort;
 import static spark.Spark.get;
  
 public class UiServer {
