@@ -33,8 +33,9 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadconfig() {
         try {
-            JSONObject inputJSON = ParseOptions.parseSingleFileToJson(testconfig);
-            assertTrue(!inputJSON.isEmpty());
+            JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
+            System.out.println(inputJSON);
+            assertTrue(inputJSON.keySet().size() > 0);
         } catch (ParseException e) {
             // e.printStackTrace();
         }
@@ -43,7 +44,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testJson() {
         try {
-            JSONObject inputJSON = ParseOptions.parseSingleFileToJson(testconfig);
+            JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
 
             assertTrue(inputJSON.containsKey("options"));
         } catch (ParseException e) {
@@ -76,10 +77,11 @@ public class TestOptions extends TestCase {
             // System.out.println(System.getProperty("));
             // Global.options =
             JSONObject j = ParseOptions
-                    .parseSingleFileToJson(testconfig);
+                    .parseSingleJsonFile(testconfig);
+            JSONObject o = ParseOptions.getOptionsKey(j);
 
-            assertTrue((boolean) j.get("verbose") == false);
-            assertTrue(((int) new Long((Long) j.get("emergency-timeout"))
+            assertTrue((boolean) o.get("verbose") == false);
+            assertTrue(((int) new Long((Long) o.get("emergency-timeout"))
                     .intValue()) == 60);
 
         } catch (ParseException e) {
@@ -92,13 +94,14 @@ public class TestOptions extends TestCase {
         try {
             NuBotOptions nuo = ParseOptions
                     .parseOptionsSingle(testconfig);
+
             assertTrue(nuo != null);
 
-            assertTrue(nuo.getExchangeName().equals("example"));
+            assertTrue(nuo.getExchangeName().equals("peatio"));
 
-            assertTrue(nuo.getPair() != null);
+            //assertTrue(nuo.getPair() != null);
 
-            assertTrue(nuo.getSecondaryPegOptions() != null);
+            //assertTrue(nuo.getSecondaryPegOptions() != null);
             //.getSpread())
 
         } catch (NuBotConfigException e) {

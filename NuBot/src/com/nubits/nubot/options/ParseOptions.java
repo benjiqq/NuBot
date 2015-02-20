@@ -6,6 +6,7 @@ import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 
+import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -36,7 +37,7 @@ public class ParseOptions {
     }
 
     /**
-     * parse Options from one file
+     * parse single JSON file to NuBoptions
      *
      * @param filepath
      * @return
@@ -44,8 +45,12 @@ public class ParseOptions {
      */
     public static NuBotOptions parseOptionsSingle(String filepath) throws NuBotConfigException {
 
+        File f = new File(filepath);
+        if (!f.exists())
+            throw new NuBotConfigException("file does not exist");
+
         try {
-            JSONObject inputJSON = parseSingleFileToJson(filepath);
+            JSONObject inputJSON = parseSingleJsonFile(filepath);
             JSONObject optionsJSON = getOptionsKey(inputJSON);
             return parseOptionsFromJson(optionsJSON);
 
@@ -56,7 +61,7 @@ public class ParseOptions {
     }
 
     /**
-     * parseOptions from JSON
+     * parseOptions from JSON into NuBotOptions
      *
      * @param optionsJSON
      * @return
@@ -266,13 +271,13 @@ public class ParseOptions {
     }
 
     /**
-     * parse file to json
+     * parse single json file
      *
      * @param filepath
      * @return
      * @throws ParseException
      */
-    public static JSONObject parseSingleFileToJson(String filepath) throws ParseException {
+    public static JSONObject parseSingleJsonFile(String filepath) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filepath)));
         return fileJSON;
@@ -305,7 +310,7 @@ public class ParseOptions {
 
                 String filepath = filePaths.get(i);
 
-                JSONObject fileJSON = parseSingleFileToJson(filepath);
+                JSONObject fileJSON = parseSingleJsonFile(filepath);
                 JSONObject tempOptions = getOptionsKey(fileJSON);
 
                 Set tempSet = tempOptions.entrySet();
