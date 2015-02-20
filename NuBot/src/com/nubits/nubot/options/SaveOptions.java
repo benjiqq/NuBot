@@ -12,5 +12,7 @@ public class SaveOptions {
         Gson gson = builder.create();
         String jsonOpt = gson.toJson(opt);
         FileSystem.writeToFile(jsonOpt, filepath, false);
+        //TODO: success?
+        return true;
     }
 }

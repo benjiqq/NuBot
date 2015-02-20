@@ -38,8 +38,8 @@ public class TestWriteOptions extends TestCase {
     public void testSave() {
         NuBotOptions opt = new NuBotOptions();
 
-        SaveOptions.saveOptions(opt,testOutconfigFile);
-        File f = new File(testOutconfigFile);
+        SaveOptions.saveOptions(opt, testconfig);
+        File f = new File(testconfig);
         assertTrue(f.exists());
     }
 
