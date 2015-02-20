@@ -18,16 +18,7 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.utils.FileSystem;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -97,10 +88,10 @@ public class NuBotOptions {
      * @param secondaryPegOptions
      */
     public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
-                        String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
-                        double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-                        int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
+            String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
+            double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
+            int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
+            String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -488,36 +479,6 @@ public class NuBotOptions {
 
     public void setMaxBuyVolume(double maxBuyVolume) {
         this.maxBuyVolume = maxBuyVolume;
-    }
-
-    /*
-     * Concatenate a list of of files into a JSONObject
-     */
-    public static JSONObject parseFiles(ArrayList<String> filePaths) throws NuBotConfigException {
-        JSONObject optionsObject = new JSONObject();
-        Map setMap = new HashMap();
-
-        for (int i = 0; i < filePaths.size(); i++) {
-            try {
-                JSONParser parser = new JSONParser();
-
-                JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filePaths.get(i))));
-                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
-
-                Set tempSet = tempOptions.entrySet();
-                for (Object o : tempSet) {
-                    Map.Entry entry = (Map.Entry) o;
-                    setMap.put(entry.getKey(), entry.getValue());
-                }
-
-            } catch (ParseException ex) {
-                throw new NuBotConfigException("Parse exception \n" + ex.toString());
-            }
-        }
-
-        JSONObject content = new JSONObject(setMap);
-        optionsObject.put("options", content);
-        return optionsObject;
     }
 
     /**
