@@ -19,8 +19,8 @@ package com.nubits.nubot.tasks.strategy;
 
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
@@ -56,7 +56,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                         boolean reset = mightNeedInit && !(ordersAndBalancesOK);
                         if (reset) {
                             String message = "Order reset needed on " + Global.exchange.getName();
-                            HipChatNotifications.sendMessage(message, Color.PURPLE);
+                            HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
                             LOG.warning(message);
                             boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
                             if (reinitiateSuccess) {
@@ -128,7 +128,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             } else {
                 message += Integer.parseInt(Global.settings.getProperty("reset_every_minutes")) + " minutes elapsed since last shift";
             }
-            HipChatNotifications.sendMessage(message, Color.PURPLE);
+            HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
             LOG.warning(message);
 
             shiftSuccess = strategyUtils.shiftWalls();

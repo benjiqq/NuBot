@@ -27,7 +27,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -111,7 +111,7 @@ public class FrozenBalancesManager {
 
                     HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
                             + percentageToSetApart * 100 + "% of  sale proceedings)"
-                            + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), Message.Color.PURPLE);
+                            + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), MessageColor.PURPLE);
                 }
             } else {
                 LOG.info("Nothing to freeze. The funds initially set apart (" + initialFunds.toString() + ") "
