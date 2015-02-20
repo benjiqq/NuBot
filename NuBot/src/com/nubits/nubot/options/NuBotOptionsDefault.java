@@ -8,6 +8,9 @@ import com.nubits.nubot.notifications.MailNotifications;
  */
 public class NuBotOptionsDefault {
 
+    //TODO
+    public static int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
+
     public static String nudIp = "127.0.0.1";
     public static String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
     public static boolean submitLiquidity = true;
@@ -17,7 +20,6 @@ public class NuBotOptionsDefault {
 
     public static boolean multipleCustodians = false;
     public static int executeStrategyInterval = 41;
-    public static int sendLiquidityInterval = 130; //=submit_liquidity_seconds
 
     public static double txFee = 0.2;
     public static double priceIncrement = 0.0003;
