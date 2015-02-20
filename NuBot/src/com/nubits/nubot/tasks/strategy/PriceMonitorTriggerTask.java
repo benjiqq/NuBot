@@ -23,10 +23,10 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
@@ -288,7 +288,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         String logMessage;
         String notification;
         String subject;
-        Color notificationColor;
+        MessageColor notificationColor;
         double sleepTime = 0;
 
         //we need to check the reason that the refresh took a whole period.
@@ -300,7 +300,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             logMessage = "There has been a connection issue for " + Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) + " seconds\n"
                     + "Consider restarting the bot if the connection issue persists";
             notification = "";
-            notificationColor = Color.YELLOW;
+            notificationColor = MessageColor.YELLOW;
             subject = Global.exchange.getName() + " Bot is suffering a connection issue";
 
         } else { //otherwise something bad has happened so we shutdown.
@@ -314,7 +314,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + Objects.toString(PRICE_PERCENTAGE) + "% of the moving average figure of " + Objects.toString(getMovingAverage())
                     + ".\nNuBot will remove the current orders and replace them in "
                     + sleepTime + "seconds.";
-            notificationColor = Color.PURPLE;
+            notificationColor = MessageColor.PURPLE;
             subject = Global.exchange.getName() + " Moving Average issue. Bot will replace orders in "
                     + sleepTime + "seconds.";
         }

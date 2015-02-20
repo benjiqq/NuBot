@@ -26,10 +26,9 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message;
-import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.util.ArrayList;
 import java.util.TimerTask;
 import java.util.logging.Logger;
@@ -92,7 +91,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                                     if (timedOut) {
                                         String message = "There was a problem cancelling all existing orders";
                                         LOG.severe(message);
-                                        HipChatNotifications.sendMessage(message, Color.YELLOW);
+                                        HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
                                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
                                         //Continue anyway, maybe there is some balance to put up on order.
                                     }
@@ -290,7 +289,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                                 ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
                                 if (sellResponse.isPositive()) {
-                                    HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, Color.YELLOW);
+                                    HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, MessageColor.YELLOW);
                                     String sellResponseString = (String) sellResponse.getResponseObject();
                                     LOG.warning("Strategy : Sell Response = " + sellResponseString);
                                 } else {
@@ -315,7 +314,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 } else {
                     String errMessagedeletingOrder = "could not delete order " + idToDelete;
                     LOG.severe(errMessagedeletingOrder);
-                    HipChatNotifications.sendMessage(errMessagedeletingOrder, Color.YELLOW);
+                    HipChatNotifications.sendMessage(errMessagedeletingOrder, MessageColor.YELLOW);
                     MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
                 }
             } else {
@@ -466,7 +465,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     if (timedOut) {
                         String message = "There was a problem cancelling all existing orders";
                         LOG.severe(message);
-                        HipChatNotifications.sendMessage(message, Color.YELLOW);
+                        HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
                         //Continue anyway, maybe there is some balance to put up on order.
                     }
@@ -596,7 +595,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         }
 
                         if (order1Response.isPositive()) {
-                            HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, Message.Color.YELLOW);
+                            HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, MessageColor.YELLOW);
                             String response1String = (String) order1Response.getResponseObject();
                             LOG.warning("Strategy - " + type + " Response1 = " + response1String);
                         } else {
@@ -615,7 +614,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
                         if (order2Response.isPositive()) {
-                            HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, Message.Color.YELLOW);
+                            HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
                             String response2String = (String) order2Response.getResponseObject();
                             LOG.warning("Strategy : " + type + " Response2 = " + response2String);
                         } else {
