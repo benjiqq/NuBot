@@ -231,7 +231,7 @@ java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [pat
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-nohup java -jar NuBot.jar market.json misc.json liquidity-info.jon price-tracking.json  &
+nohup java -jar NuBot.jar market.json misc.json liquidity-info.json price-tracking.json  &
 ```
 
 The bot will start and write output in the */logs* folder. 
