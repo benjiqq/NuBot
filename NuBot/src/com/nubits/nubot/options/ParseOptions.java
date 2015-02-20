@@ -5,14 +5,16 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+
 import java.util.*;
 import java.util.logging.Logger;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
+ * ParseOptions from one or several JSON files
  */
 public class ParseOptions {
 
@@ -44,7 +46,7 @@ public class ParseOptions {
 
         try {
             JSONObject inputJSON = parseSingleFileToJson(filepath);
-            JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
+            JSONObject optionsJSON = getOptionsKey(inputJSON);
             return parseOptionsFromJson(optionsJSON);
 
         } catch (ParseException ex) {
@@ -277,6 +279,17 @@ public class ParseOptions {
     }
 
     /**
+     * get options value in dictionary
+     *
+     * @param fileJSON
+     * @return
+     */
+    public static JSONObject getOptionsKey(JSONObject fileJSON) {
+        JSONObject tempOptions = (JSONObject) fileJSON.get("options");
+        return tempOptions;
+    }
+
+    /**
      * Concatenate a list of of files into a JSONObject
      *
      * @param filePaths
@@ -293,7 +306,7 @@ public class ParseOptions {
                 String filepath = filePaths.get(i);
 
                 JSONObject fileJSON = parseSingleFileToJson(filepath);
-                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
+                JSONObject tempOptions = getOptionsKey(fileJSON);
 
                 Set tempSet = tempOptions.entrySet();
                 for (Object o : tempSet) {

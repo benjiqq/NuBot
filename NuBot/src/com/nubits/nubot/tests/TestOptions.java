@@ -15,23 +15,29 @@ import java.nio.file.Paths;
 
 public class TestOptions extends TestCase {
 
-    private static String testconfig = "testconfig/test.config";
+    private static String testconfigFile = "test.json";
+    private static String testconfig = "testconfig/" + testconfigFile;
 
     @Test
-    public void testLoadconfig() {
-        // Utils.loadProperties("settings.properties");
+    public void testConfigExists() {
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
         final String wdir = System.getProperty("user.dir");
-        // System.out.println("working dir : " + wdir);
-        // System.out.println("Current relative path is: " + s);
-        // String p = System.getProperty("java.class.path");
-        // System.out.println(p);
+        System.out.println("wdir: " + wdir);
 
         File f = new File(testconfig);
-        assertTrue(f.getAbsolutePath().contains("test.config"));
+        System.out.println(">>> " + f.getAbsolutePath() + " exists : " + f.exists());
         assertTrue(f.exists());
+    }
 
+    @Test
+    public void testLoadconfig() {
+        try {
+            JSONObject inputJSON = ParseOptions.parseSingleFileToJson(testconfig);
+            assertTrue(!inputJSON.isEmpty());
+        } catch (ParseException e) {
+            // e.printStackTrace();
+        }
     }
 
     @Test
@@ -39,7 +45,7 @@ public class TestOptions extends TestCase {
         try {
             JSONObject inputJSON = ParseOptions.parseSingleFileToJson(testconfig);
 
-            assertTrue(inputJSON.containsKey("exchangename"));
+            assertTrue(inputJSON.containsKey("options"));
         } catch (ParseException e) {
             // e.printStackTrace();
         }
@@ -70,7 +76,7 @@ public class TestOptions extends TestCase {
             // System.out.println(System.getProperty("));
             // Global.options =
             JSONObject j = ParseOptions
-                    .parseSingleFileToJson("testconfig/test.config");
+                    .parseSingleFileToJson(testconfig);
 
             assertTrue((boolean) j.get("verbose") == false);
             assertTrue(((int) new Long((Long) j.get("emergency-timeout"))
@@ -85,7 +91,7 @@ public class TestOptions extends TestCase {
     public void testLoadConfig() {
         try {
             NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle("testconfig/test.config");
+                    .parseOptionsSingle(testconfig);
             assertTrue(nuo != null);
 
             assertTrue(nuo.getExchangeName().equals("example"));
