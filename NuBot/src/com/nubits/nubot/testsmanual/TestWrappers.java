@@ -90,9 +90,9 @@ public class TestWrappers {
         //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
         //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
-        //WrapperTestUtils.testCancelOrder("2063803", testPair);
+        WrapperTestUtils.testCancelOrder("2983623", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
-        //WrapperTestUtils.testGetOrderDetail("1139");
+        //WrapperTestUtils.testGetOrderDetail("2983623");
         //WrapperTestUtils.testIsOrderActive("1139");
         //WrapperTestUtils.testGetTxFee();
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);

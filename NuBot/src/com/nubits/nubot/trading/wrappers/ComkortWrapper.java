@@ -70,6 +70,8 @@ public class ComkortWrapper implements TradeInterface {
     private final String API_SELL = "sell";
     private final String API_BUY = "buy";
     private final String API_LIST = "list";
+    private final String API_LIST_ALL = "list_all";
+    private final String API_CANCEL = "cancel";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -245,7 +247,31 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_ORDER + "/" + API_LIST_ALL;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject orders = (JSONObject) httpAnswerJson.get("orders");
+            Set<String> keys = orders.keySet();
+            for (Iterator<String> key = keys.iterator(); key.hasNext();) {
+                String thisKey = key.next();
+                CurrencyPair thisPair = CurrencyPair.getCurrencyPairFromString(thisKey, "_");
+                JSONArray pairOrders = (JSONArray) orders.get(thisKey);
+                for (Iterator<JSONObject> order = pairOrders.iterator(); order.hasNext();) {
+                    orderList.add(parseOrder(order.next(), thisPair));
+                }
+            }
+            apiResponse.setResponseObject(orderList);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -263,7 +289,7 @@ public class ComkortWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
             for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
-                orderList.add(parseOrder(order.next()));
+                orderList.add(parseOrder(order.next(), pair));
             }
             apiResponse.setResponseObject(orderList);
         } else {
@@ -273,41 +299,75 @@ public class ComkortWrapper implements TradeInterface {
         return apiResponse;
     }
     
-    private Order parseOrder(JSONObject in) {
+    private Order parseOrder(JSONObject in, CurrencyPair pair) {
         Order out = new Order();
-        /*
-        {
-            "id": "12996",
-            "type": "sell",
-            "amount": "1.00000000",
-            "start_amount": "1.00000000",
-            "fee": "0.00200000",
-            "price": "1.00000000"
+
+        out.setId(in.get("id").toString());
+        out.setType(in.get("type") == "sell" ? Constant.SELL : Constant.BUY);
+        Amount amount = new Amount(Utils.getDouble(in.get("amount").toString()), pair.getOrderCurrency());
+        out.setAmount(amount);
+        Amount price = new Amount(Utils.getDouble(in.get("price").toString()), pair.getPaymentCurrency());
+        out.setPrice(price);
+        out.setPair(pair);
+        if (in.containsKey("added")) {
+            LOG.severe(in.get("added").toString());
+            long timeStamp = (long) Utils.getDouble(in.get("added").toString());
+            LOG.severe(Objects.toString(timeStamp));
+            Date insertDate = new Date(timeStamp * 1000);
+            out.setInsertedDate(insertDate);
         }
-         */
-        
-        
+
         return out;        
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        
+        ApiResponse activeOrders = getActiveOrders();
+        if (activeOrders.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrders.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(orderID)) {
+                    apiResponse.setResponseObject(thisOrder);
+                }
+            }
+        } else {
+            apiResponse = activeOrders;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_ORDER + "/" + API_CANCEL;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+        
+        args.put("order_id", orderID);
+        
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            boolean success = (boolean) httpAnswerJson.get("success");
+            apiResponse.setResponseObject(success);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        double defaultFee = Global.options == null ? 0.2 : Global.options.getTxFee();
+        return new ApiResponse(true, defaultFee, null);
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        return getTxFee();
     }
 
     @Override
