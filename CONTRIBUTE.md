@@ -10,7 +10,11 @@ NuBot development process follows the git-flow model. For more information see h
 
 Features are developed in new branches assigned to a Bitbucket issue, i.e. branch feature/123 is development with regards to issue 123.
 
+Critical changes shall be submitted via Online Pull Requests. This allows for code comments and discussion. The merge is done by person other than the person who submitted the PR, usually the last to approve.
+
 ## Dependencies
+
+Make sure Java 8 is installed (java -version). See: http://docs.oracle.com/javase/8/docs/technotes/guides/install/install_overview.html
 
 Dependencies are located in the lib folder (gradle in the future).
 
