@@ -51,7 +51,13 @@ public class TestWriteOptions extends TestCase {
         NuBotOptions opt = new NuBotOptions();
         boolean success = SaveOptions.backupOptions(testinconfig);
         assertTrue(success);
-        File newbak = new File("testconfig/testconfig.bak");
+        File newbak = new File("testconfig/test.json_1.bak");
+        assertTrue(newbak.exists());
+
+        //backup again. increases counter
+        success = SaveOptions.backupOptions(testinconfig);
+        assertTrue(success);
+        newbak = new File("testconfig/test.json_2.bak");
         assertTrue(newbak.exists());
     }
 
