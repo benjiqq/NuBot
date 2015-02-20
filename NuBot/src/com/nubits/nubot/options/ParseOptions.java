@@ -80,7 +80,7 @@ public class ParseOptions {
         double maxSellVolume = NuBotOptionsDefault.maxSellVolume;
         double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
-
+        boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
 
         //First try to parse compulsory parameters
         String exchangeName = (String) optionsJSON.get("exchangename");
@@ -242,12 +242,18 @@ public class ParseOptions {
         if (optionsJSON.containsKey("multiple-custodians")) {
             multipleCustodians = (boolean) optionsJSON.get("multiple-custodians");
         }
+
+        if (optionsJSON.containsKey("distribute-liquidity")) {
+            distributeLiquidity = (boolean) optionsJSON.get("distribute-liquidity");
+        }
+
         //Create a new Instance
         options = new NuBotOptions(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                 rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                 executeOrders, verbose, pair, executeStrategyInterval,
                 sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
-                emergencyTimeout, keepProceeds, aggregate, multipleCustodians, maxSellVolume, maxBuyVolume, cpo);
+                emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
+                maxSellVolume, maxBuyVolume, distributeLiquidity, cpo);
 
 
         if (options == null) {
