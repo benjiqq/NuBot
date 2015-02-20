@@ -4,7 +4,7 @@
 
 The git repository for NuBot is located at https://bitbucket.org/JordanLeePeershares/nubottrading
 
-To be able to provide pull requests an account with Bitbucket is needed.
+Pull requests are welcome. To be able to submit pull requests an account with Bitbucket is needed.
 
 NuBot development process follows the git-flow model. For more information see http://nvie.com/posts/a-successful-git-branching-model/
 
@@ -12,7 +12,7 @@ Features are developed in new branches assigned to a Bitbucket issue, i.e. branc
 
 ## Dependencies
 
-Dependecies are located in the lib folder (gradle in the future).
+Dependencies are located in the lib folder (gradle in the future).
 
 Grip is used to compile markdown into HTML, see https://github.com/joeyespo/grip
 
@@ -55,8 +55,8 @@ TODO: more info here.
 
 ## Trello
 
-currently not in use. Management takes place over the forum or Hipchat or Bitbucket.
+currently not in use. Coordination takes place over the forum or Hipchat or Bitbucket.
 
-## AssitantBot
+## AssistantBot
 
 see https://bitbucket.org/mj2p/assistantbot
