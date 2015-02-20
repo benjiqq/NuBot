@@ -2,6 +2,7 @@ package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.launch.NuBot;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.Utils;
@@ -210,11 +211,12 @@ public class ParseOptions {
                     || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
                 sendMails = sendMails.toUpperCase(); //Convert to upper case
             } else {
-                LOG.severe("Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
+                String error = "Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
                         + MailNotifications.MAIL_LEVEL_SEVERE + " or "
-                        + MailNotifications.MAIL_LEVEL_NONE);
-                System.exit(0);
+                        + MailNotifications.MAIL_LEVEL_NONE;
+                LOG.severe(error);
+                throw new NuBotConfigException(error);
             }
         }
 
