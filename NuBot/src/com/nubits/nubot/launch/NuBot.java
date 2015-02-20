@@ -122,6 +122,9 @@ public class NuBot {
 
         LOG.info("Init logging system");
 
+        //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+
         LOG.info("Set up SSL certificates");
         boolean trustAllCertificates = false;
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
