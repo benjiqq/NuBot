@@ -6,7 +6,7 @@ import spark.ModelAndView;
 import java.util.HashMap;
 import java.util.Map;
 
-import static spark.Spark.get;
+import static spark.Spark.*;
  
 public class UiServer {
 
@@ -26,14 +26,8 @@ public class UiServer {
      * @param args
      */
     public static void main(String[] args) {
-        
-
-        //Map map = new HashMap();
 
         Map map = new HashMap();
-        map.put("name", "Sam");
-
-        get("/hello", (rq, rs) -> new ModelAndView(map, htmlFolder + "hello.mustache"), new MustacheTemplateEngine());
 
         get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
 
@@ -45,6 +39,10 @@ public class UiServer {
         get("/keys", "application/json", (request, response) -> {
             return keyMsg;
         }, new JsonTransformer());
+
+        post("/keys", "application/json", (request, response) -> {
+            return "try put: " + request.body();
+        });
 
     }
 }

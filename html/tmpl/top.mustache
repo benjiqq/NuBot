@@ -72,19 +72,21 @@
             }
 
 
-            function save(el) {
+            function savekey(el) {
+                //get user data
 
+                var el = $('#apikey');
                 alert(el);
 
-                //var x = el.attr('placeholder');
+                var inputkey = el.attr('placeholder');
 
                 //make HTTP post to server
 
-
-                $.post( url + "/keys", { apikey: "zzzzz" } )
+                $.post( url + "/keys", { apikey: inputkey } )
 
                 .done(function( data ) {
-                    elmnt.css( 'border-color', '#993333' );
+                   // el.css( 'border-color', '#993333' );
+                   alert(data);
                 });
 
             }
