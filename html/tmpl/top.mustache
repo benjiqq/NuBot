@@ -43,7 +43,7 @@
 
               var host = "localhost";
               var port = 4567;
-              var url = "http://" + host + ":" + port;
+              
 
             function loadVals() {
 
@@ -86,17 +86,50 @@
 
                 //make HTTP post to server
 
-                /*$.post( url + "/keys", { apikey: inputkey } )
+                /*$.post( 
+                  url + "/keys", 
+                  JSON.stringify({ "apikey": "test"}) //inputkey } )
+                )  
 
                 .done(function( data ) {
+
                    el.css( 'border-color', '#993333' );
                    alert(data);
                 });*/
+                
+                var url = "http://" + host + ":" + port + "/keys";
 
-                $.post( url + "/key", { apikey: "test" } )
-                .done(function( data ) {
-                  alert("got back " + data);
+                $.ajax(url, {
+
+                    data : JSON.stringify({ "apikey": "test" }),
+                    contentType : 'application/json',
+                    type : 'POST',
+
+                    success: function(data){
+                      alert("ok " + data);
+                    },
+
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("some error " + textStatus);
+                    }
+               });     
+                /*
+                $.ajax({
+                  url: url + "/keys", 
+                  type: "POST",                
+                  dataType: 'json',
+
+                  data: JSON.stringify({ "apikey": "test" } ),
+                  //data: { "apikey": "test" },
+
+                  success: function(data){
+                      alert("ok " + data);
+                  },
+                  error: function(XMLHttpRequest, textStatus, errorThrown) {
+                    alert("some error " + textStatus);
+                  }
                 });
+                */
 
             }
 

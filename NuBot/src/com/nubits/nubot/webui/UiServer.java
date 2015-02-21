@@ -11,6 +11,7 @@ import java.util.Map;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
+import static spark.Spark.after;
 
 public class UiServer {
 
@@ -41,35 +42,9 @@ public class UiServer {
 
         get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
-        Msg keyMsg = new Msg("key");
 
-        get("/keys", "application/json", (request, response) -> {
-            return keyMsg;
-        }, new JsonTransformer());
+        new KeyController();
 
-        post("/keys", "application/json", (request, response) -> {
-            String resp = request.body();
-
-            //Map<String, String> rmap = request.params();
-            //Iterator<String> it = rmap.keySet().iterator();
-            //while (it.hasNext()) {
-            //    String c = it.next();
-            //    resp += c;
-            //
-            // }
-            String apikey = request.queryParams("apikey");
-
-
-            //SaveOptions.backupOptions(testconfig);
-            //NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
-            //opt.setApiKey(apikey);
-            //SaveOptions.saveOptions(opt,testconfig);
-
-            //TODO: return success
-
-
-            return "try put: " + apikey;
-        });
 
     }
 }
