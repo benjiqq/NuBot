@@ -3,6 +3,7 @@ package com.nubits.nubot.webui;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
+import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.webui.service.StockServiceServer;
 import spark.ModelAndView;
 
@@ -18,8 +19,6 @@ public class UiServer {
     //TODO path
     private static String htmlFolder = "./html/tmpl/";
 
-    private static String testconfigFile = "test.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
 
     public static void startService() {
         try {
@@ -35,6 +34,10 @@ public class UiServer {
      * @param args
      */
     public static void main(String[] args) {
+
+        //TODO: only load if in testmode and this is not set elsewhere
+        //should better read: load global settings
+        Utils.loadProperties("settings.properties");
 
         Map map = new HashMap();
 
