@@ -37,37 +37,7 @@ repositories {
         dirs 'NuBot/lib/nubot-dependancies'
     }
 }
-
 dependencies {
-
-//jars
-//    CopyLibs
-//    commons-codec-1.7.jar
-//    commons-io-2.4.jar
-//    commons-net-3.3.jar
-//    fastjson-1.1.36.jar
-//    gson-2.2.3.jar
-//    hipchat-java-0.2.0.jar
-//    httpclient-4.3.4.jar
-//    httpcore-4.3.2.jar
-//    jackson-annotations-2.4.2.jar
-//    jackson-core-2.4.2.jar
-//    jackson-databind-2.4.2.jar
-//    java-mail-1.4.4.jar
-//    jeromq-0.3.4.jar
-//    json-simple-1.1.1.jar
-//    jsoup-1.7.3.jar
-//    junit-4.12.jar
-//    logback-classic-1.1.2.jar
-//    logback-core-1.1.2.jar
-//    mailapi-1.4.4.jar
-//    nblibraries.properties
-//    org.json-20120521.jar
-//    slf4j-api-1.7.10.jar
-//    commons-logging-1.2.jar
-//    smtp-1.4.4.jar
-//    testng-6.8.21.jar
-
 
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
@@ -84,15 +54,10 @@ dependencies {
     compile 'commons-logging:commons-logging:1.2'
     compile 'com.sun.mail:smtp:1.5.2'
 
-    //not used? compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
-    //not used? compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
-
     //new
-    //compile 'commons-collections:commons-collections:3.2'
     compile 'io.evanwong.oss:hipchat-java:0.2.0'
     compile 'org.zeromq:jeromq:0.3.4'
     compile 'org.slf4j:slf4j-api:1.7.7'
-    compile 'commons-logging:commons-logging:1.2'
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
 
@@ -110,6 +75,10 @@ dependencies {
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 
+    //not used?
+    // compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
+    // compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
+
     //currently not in use
     //compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     //compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
@@ -118,6 +87,7 @@ dependencies {
     //compile 'javax.websocket:javax.websocket-api:1.1'
 
 }
+
 
 sourceSets {
     main {
