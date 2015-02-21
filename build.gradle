@@ -40,6 +40,35 @@ repositories {
 
 dependencies {
 
+//jars
+//    CopyLibs
+//    commons-codec-1.7.jar
+//    commons-io-2.4.jar
+//    commons-net-3.3.jar
+//    fastjson-1.1.36.jar
+//    gson-2.2.3.jar
+//    hipchat-java-0.2.0.jar
+//    httpclient-4.3.4.jar
+//    httpcore-4.3.2.jar
+//    jackson-annotations-2.4.2.jar
+//    jackson-core-2.4.2.jar
+//    jackson-databind-2.4.2.jar
+//    java-mail-1.4.4.jar
+//    jeromq-0.3.4.jar
+//    json-simple-1.1.1.jar
+//    jsoup-1.7.3.jar
+//    junit-4.12.jar
+//    logback-classic-1.1.2.jar
+//    logback-core-1.1.2.jar
+//    mailapi-1.4.4.jar
+//    nblibraries.properties
+//    org.json-20120521.jar
+//    slf4j-api-1.7.10.jar
+//    commons-logging-1.2.jar
+//    smtp-1.4.4.jar
+//    testng-6.8.21.jar
+
+
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-net:commons-net:3.3' //note: 3.3., instead of 1.2.0
@@ -47,15 +76,19 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
+    compile 'com.sun.mail:mailapi:1.5.2'
     compile 'javax.mail:mail:1.4.4' //replaces mail.jar
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
-    compile 'commons-collections:commons-collections:3.2'
     compile 'org.codeartisans:org.json:20131017'
-    compile 'com.sparkjava:spark-template-mustache:1.0.0'
+    compile 'commons-logging:commons-logging:1.2'
+    compile 'com.sun.mail:smtp:1.5.2'
+
+    //not used? compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
+    //not used? compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
 
     //new
+    //compile 'commons-collections:commons-collections:3.2'
     compile 'io.evanwong.oss:hipchat-java:0.2.0'
     compile 'org.zeromq:jeromq:0.3.4'
     compile 'org.slf4j:slf4j-api:1.7.7'
