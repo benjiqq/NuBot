@@ -16,10 +16,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
- /*
- * NuBot gradle build
- * see gradle.md for details on usage
- */
+/*
+* NuBot gradle build
+* see gradle.md for details on usage
+*/
 
 version = '0.15' //current project version
 
@@ -31,16 +31,15 @@ sourceCompatibility = 1.8 // java version
 
 
 repositories {
-  maven { url "http://mvnrepository.com/artifact" }
-  mavenCentral()
-  flatDir {
-       dirs 'NuBot/lib/nubot-dependancies'
-   }
+    maven { url "http://mvnrepository.com/artifact" }
+    mavenCentral()
+    flatDir {
+        dirs 'NuBot/lib/nubot-dependancies'
+    }
 }
 
 dependencies {
 
-    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-net:commons-net:3.3' //note: 3.3., instead of 1.2.0
@@ -48,7 +47,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-    compile 'org.codehaus.jackson:jackson-mapper-asl:1.9.13'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
     compile 'javax.mail:mail:1.4.4' //replaces mail.jar
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
@@ -56,35 +55,34 @@ dependencies {
     compile 'org.codeartisans:org.json:20131017'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
 
+    //new
     compile 'io.evanwong.oss:hipchat-java:0.2.0'
-
-    //dependencies with develop branch
     compile 'org.zeromq:jeromq:0.3.4'
     compile 'org.slf4j:slf4j-api:1.7.7'
     compile 'commons-logging:commons-logging:1.2'
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
 
-    compile 'javax.websocket:javax.websocket-api:1.1'
-    compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
-    compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
-
-
-    //webUI deps
-    compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    //webUI
     compile "javax.servlet:servlet-api:2.5"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
-    compile 'org.eclipse.jetty.websocket:websocket-server:9.3.0.M1'
     compile 'com.sparkjava:spark-core:2.1'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
-    //compile 'com.github.spullara.mustache.java:compiler:0.9.0'
+    compile 'com.github.spullara.mustache.java:compiler:0.9.0'
 
+    //static. no maven available
+    compile files('NuBot/lib/EasyJccKit.jar') // lib: EasyJccKit.jar
 
-    compile files('NuBot/lib/EasyJccKit.jar')
-        
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
     testCompile group: 'junit', name: 'junit', version: '4.+'
+
+    //currently not in use
+    //compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
+    //compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
+    //compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
+    //compile 'org.eclipse.jetty.websocket:websocket-server:9.3.0.M1'
+    //compile 'javax.websocket:javax.websocket-api:1.1'
 
 }
 
@@ -94,28 +92,28 @@ sourceSets {
             srcDir 'NuBot/src'
         }
         resources {
-        	srcDir 'NuBot/res'
+            srcDir 'NuBot/res'
             //include '**/*.example'
             //exclude '**/*.DS_Store'
-    	}
+        }
     }
 
     test {
         java {
-        srcDir 'NuBot/src/com/nubits/nubot/tests'
+            srcDir 'NuBot/src/com/nubits/nubot/tests'
         }
         resources {
-        	srcDir 'NuBot/res'
-    	}        
+            srcDir 'NuBot/res'
+        }
     }
 }
 
 compileJava {
-  //enable compilation in a separate daemon process
-  options.fork = true
+    //enable compilation in a separate daemon process
+    options.fork = true
 
-  //enable incremental compilation
-  options.incremental = true
+    //enable incremental compilation
+    options.incremental = true
 }
 
 
@@ -136,43 +134,43 @@ def mainclass = "com.nubits.nubot.launch.NuBot"
 
 
 task compileReadme(type: Exec) {
-  description 'compile the HTML readme'
-  executable "sh"
-  args "-c", "/bin/bash compileReadme.sh"
+    description 'compile the HTML readme'
+    executable "sh"
+    args "-c", "/bin/bash compileReadme.sh"
 }
 
 task init << {
     description 'init for build'
-	dependsOn << compileReadme
-	println "init build"
-	
-	if( !storedir.exists() ) {
-    	println("creating storedir")
+    dependsOn << compileReadme
+    println "init build"
 
-    	if(storedir.mkdirs()) {
-	    	println("succeeded in creating " + storedir)
-	    }
-    } else  {
-    	println("folder " + storedir + " exists. delete it")
-    	delete storedir
-    	if(storedir.mkdirs()) {
-	    	println("succeeded in creating " + storedir)
-	    }
-    }    
-    
-    copy {
-    	from "LICENSE.md"
-    	into storedir
+    if (!storedir.exists()) {
+        println("creating storedir")
+
+        if (storedir.mkdirs()) {
+            println("succeeded in creating " + storedir)
+        }
+    } else {
+        println("folder " + storedir + " exists. delete it")
+        delete storedir
+        if (storedir.mkdirs()) {
+            println("succeeded in creating " + storedir)
+        }
     }
-    
+
     copy {
-    	from "CHANGELOG.md"
-    	into storedir
+        from "LICENSE.md"
+        into storedir
     }
-    
+
     copy {
-    	from "NuBot/res/ssl/nubot_keystore.jks" 
-    	into "$storedir/res/ssl/"
+        from "CHANGELOG.md"
+        into storedir
+    }
+
+    copy {
+        from "NuBot/res/ssl/nubot_keystore.jks"
+        into "$storedir/res/ssl/"
     }
 
     copy {
@@ -181,70 +179,70 @@ task init << {
     }
 
     copy {
-    	from "NuBot/res/logs_assets" 
-    	into "${storedir}/res/logs_assets/"
-    }
-    
-	copy {
-    	from "NuBot/res/currencies.csv" 
-    	into "${storedir}/res/"
+        from "NuBot/res/logs_assets"
+        into "${storedir}/res/logs_assets/"
     }
 
-	copy {
-    	from "NuBot/src" 
-    	into "${storedir}/res/sources/src"
+    copy {
+        from "NuBot/res/currencies.csv"
+        into "${storedir}/res/"
     }
 
-	copy {
-    	from "readme.html" 
-    	into "${storedir}/readme.html"
+    copy {
+        from "NuBot/src"
+        into "${storedir}/res/sources/src"
     }
-        
-	if( !logdir.exists() ) {
-    	println("creating logdir")
 
-    	if(logdir.mkdirs()) {
-	    	println("succeeded in creating " + logdir)
-	    }
-    }         
-   
-	copy {
-    	from "NuBot/res/logs_assets"
-    	into "${storedir}/res/logs_assets"
+    copy {
+        from "readme.html"
+        into "${storedir}/readme.html"
     }
-    
+
+    if (!logdir.exists()) {
+        println("creating logdir")
+
+        if (logdir.mkdirs()) {
+            println("succeeded in creating " + logdir)
+        }
+    }
+
+    copy {
+        from "NuBot/res/logs_assets"
+        into "${storedir}/res/logs_assets"
+    }
+
     //delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
-        
-	//not needed    
-	//<delete file="${store.dir}/NuBot_temp.jar"/>
-	
+
+    //not needed
+    //<delete file="${store.dir}/NuBot_temp.jar"/>
+
 }
 
 
 task NuBotJar(type: Jar) {
     description 'create the jar in ' + project.file(storedir)
-	dependsOn << init
+    dependsOn << init
     archiveName = "Nu.jar"
     destinationDir project.file(storedir)
-    from (configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }){
-    		exclude 'META-INF/MANIFEST.MF'
-			exclude 'META-INF/*.SF'
-			exclude 'META-INF/*.DSA'
-			exclude 'META-INF/*.RSA'
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
     }
     with jar
-    manifest.attributes("Main-Class":mainclass)
+    manifest.attributes("Main-Class": mainclass)
     //println 'jar created: ' + archivePath
 }
 
 
-task runCollector(type:JavaExec) {
+task runCollector(type: JavaExec) {
     description 'run the collector service on a server'
     main = "com.nubits.nuservice.CollectService"
     classpath = sourceSets.main.runtimeClasspath
 }
 
-task runUI(type:JavaExec) {
+task runUI(type: JavaExec) {
     description 'run the WebUI'
     main = "com.nubits.nubot.webui.UiServer"
     classpath = sourceSets.main.runtimeClasspath
