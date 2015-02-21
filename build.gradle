@@ -136,11 +136,13 @@ def mainclass = "com.nubits.nubot.launch.NuBot"
 
 
 
+
 task compileReadme(type: Exec) {
     description 'compile the HTML readme'
     executable "sh"
     args "-c", "/bin/bash compileReadme.sh"
 }
+
 
 task init << {
     description 'init for build'
@@ -162,6 +164,11 @@ task init << {
     }
 
     copy {
+        from "NuBot/src/settings.properties"
+        into "NuBot/res/"
+    }
+
+    /*copy {
         from "LICENSE.md"
         into storedir
     }
@@ -212,7 +219,7 @@ task init << {
     copy {
         from "NuBot/res/logs_assets"
         into "${storedir}/res/logs_assets"
-    }
+    }*/
 
     //delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
 
@@ -225,7 +232,7 @@ task init << {
 task NuBotJar(type: Jar) {
     description 'create the jar in ' + project.file(storedir)
     dependsOn << init
-    archiveName = "Nu.jar"
+    archiveName = jarname
     destinationDir project.file(storedir)
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
@@ -236,6 +243,23 @@ task NuBotJar(type: Jar) {
     with jar
     manifest.attributes("Main-Class": mainclass)
     //println 'jar created: ' + archivePath
+}
+
+task copyDist(type: Copy) {
+    from "Nubot/res"
+    into "${storedir}/res"
+    //exclude '**/*.xml'
+
+}
+task NuBotMakeDistribution(){//dependsOn: NuBotJar) {
+    description 'make nubot distribution package'
+    println 'delete "${storedir}"'
+    delete "${storedir}"
+    tasks.NuBotJar.execute()
+    println 'copy for distribution'
+    tasks.copyDist.execute()
+    println "finish distribution"
+
 }
 
 
