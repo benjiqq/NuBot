@@ -144,7 +144,7 @@ task compileReadme(type: Exec) {
 }
 
 
-task initDist() {
+task initDist << {
     description 'init for build'
     println "init distribution"
 
@@ -192,7 +192,6 @@ task NuBotMakeDistribution(dependsOn: compileReadme) << {
     println 'start making distribution'
     tasks.initDist.execute()
 
-
     //println 'delete ${distdir}'
     //delete "${distdir}"
     tasks.NuBotJar.execute()
@@ -202,20 +201,12 @@ task NuBotMakeDistribution(dependsOn: compileReadme) << {
 
     println "finish distribution"
 
-    if (includeTestConfig){
+    if (includeTestConfig) {
         copy {
             from "testconfig/test.json"
             into "${distdir}"
         }
     }
-
-
-
-    //delete compile output
-    //delete "readme.html"
-    //delete "setup.html"
-    //delete "feeds.html"
-    //delete "changelog.html"
 }
 
 
@@ -236,13 +227,13 @@ task copyDist << {
     println 'copy dist'
     FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
 
-    html_files.each {File file ->
+    html_files.each { File file ->
         println file.name
         copy {
             from file.name
             into "${distdir}/"
         }
-        delete (file)
+        delete(file)
     }
 
     if (!logdir.exists()) {
