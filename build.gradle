@@ -37,6 +37,7 @@ repositories {
         dirs 'NuBot/lib/nubot-dependancies'
     }
 }
+
 dependencies {
 
     compile 'commons-codec:commons-codec:1.7'
@@ -145,7 +146,7 @@ task compileReadme(type: Exec) {
 
 task initDist() {
     description 'init for build'
-    println "init build"
+    println "init distribution"
 
     if (!distdir.exists()) {
         println("creating distdir")
@@ -184,21 +185,64 @@ task NuBotJar(type: Jar) {
     //println 'jar created: ' + archivePath
 }
 
-task copyDist(type: Copy) {
 
-    copy {
-        from "readme.html"
-        into "${distdir}"
+task NuBotMakeDistribution(dependsOn: compileReadme) << {
+    description 'make NuBot distribution folder'
+
+    println 'start making distribution'
+    tasks.initDist.execute()
+
+
+    //println 'delete ${distdir}'
+    //delete "${distdir}"
+    tasks.NuBotJar.execute()
+    println 'copy for distribution'
+    tasks.copyDist.execute()
+
+
+    println "finish distribution"
+
+    if (includeTestConfig){
+        copy {
+            from "testconfig/test.json"
+            into "${distdir}"
+        }
     }
 
-    copy {
-        from "setup.html"
-        into "${distdir}"
-    }
 
-    copy {
-        from "feeds.html"
-        into "${distdir}"
+
+    //delete compile output
+    //delete "readme.html"
+    //delete "setup.html"
+    //delete "feeds.html"
+    //delete "changelog.html"
+}
+
+
+task runCollector(type: JavaExec) {
+    description 'run the collector service on a server'
+    main = "com.nubits.nuservice.CollectService"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task runUI(type: JavaExec) {
+    description 'run the WebUI'
+    main = "com.nubits.nubot.webui.UiServer"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+
+task copyDist << {
+    println 'copy dist'
+    FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
+
+    html_files.each {File file ->
+        println file.name
+        copy {
+            from file.name
+            into "${distdir}/"
+        }
+        delete (file)
     }
 
     if (!logdir.exists()) {
@@ -214,90 +258,28 @@ task copyDist(type: Copy) {
         into "${distdir}/sample-config"
     }
 
-    //exclude '**/*.xml'
-
-    /*copy {
-        from "LICENSE.md"
-        into "${distdir}"
-    }
-
-    copy {
-        from "CHANGELOG.md"
-        into "${distdir}"
-    }*/
-
-    /*
-    copy {
-        from "NuBot/res/"
-        into "${distdir}/res"
-        exclude "listCertificates.sh"
-    }
-
     copy {
         from "NuBot/src"
-        into "${distdir}/res/sources/src"
+        into "${distdir}/res/sources"
     }
-    */
 
-    /*copy {
-        from "readme.html"
-        into "${distdir}/readme.html"
-    }*/
-
-    /*
     copy {
         from "NuBot/res/logs_assets"
         into "${distdir}/res/logs_assets"
     }
-    */
 
-
-    /*if (!logdir.exists()) {
-        println("creating logdir")
-
-        if (logdir.mkdirs()) {
-            println("succeeded in creating " + logdir)
-        }
-    }*/
-
-
-
-    //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
-
-}
-
-task NuBotMakeDistribution() {
-    description 'make nubot distribution package'
-    println 'start making distribution'
-    tasks.initDist.execute()
-    println 'compile readme'
-    //tasks.compileReadme.execute()
-    //println 'delete ${distdir}'
-    //delete "${distdir}"
-    tasks.NuBotJar.execute()
-    println 'copy for distribution'
-    tasks.copyDist.execute()
-
-
-    println "finish distribution"
-
-    if (includeTestConfig){
-        copy {
-            from "testconfig"
-            into "${distdir}/testconfig"
-        }
+    copy {
+        from "NuBot/res/currencies.csv"
+        into "${distdir}/res"
     }
-}
+
+    copy {
+        from "NuBot/res/ssl"
+        into "${distdir}/res/ssl"
+        exclude 'listCertificates.sh'
+    }
 
 
-task runCollector(type: JavaExec) {
-    description 'run the collector service on a server'
-    main = "com.nubits.nuservice.CollectService"
-    classpath = sourceSets.main.runtimeClasspath
-}
+    delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
 
-task runUI(type: JavaExec) {
-    description 'run the WebUI'
-    main = "com.nubits.nubot.webui.UiServer"
-    classpath = sourceSets.main.runtimeClasspath
 }
