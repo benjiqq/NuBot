@@ -128,13 +128,12 @@ test {
 }
 
 //definitions
-def storedir = new File("dist-packaged")
+def distdir = new File("dist-packaged")
 def logdir = new File("logs")
 def jarname = "NuBot.jar"
-def storejar = new File(storedir, jarname)
 def mainclass = "com.nubits.nubot.launch.NuBot"
 
-
+def includeTestConfig = true
 
 
 task compileReadme(type: Exec) {
@@ -144,22 +143,21 @@ task compileReadme(type: Exec) {
 }
 
 
-task init << {
+task initDist() {
     description 'init for build'
-    dependsOn << compileReadme
     println "init build"
 
-    if (!storedir.exists()) {
-        println("creating storedir")
+    if (!distdir.exists()) {
+        println("creating distdir")
 
-        if (storedir.mkdirs()) {
-            println("succeeded in creating " + storedir)
+        if (distdir.mkdirs()) {
+            println("succeeded in creating " + distdir)
         }
     } else {
-        println("folder " + storedir + " exists. delete it")
-        delete storedir
-        if (storedir.mkdirs()) {
-            println("succeeded in creating " + storedir)
+        println("folder " + distdir + " exists. delete it")
+        delete distdir
+        if (distdir.mkdirs()) {
+            println("succeeded in creating " + distdir)
         }
     }
 
@@ -168,72 +166,13 @@ task init << {
         into "NuBot/res/"
     }
 
-    /*copy {
-        from "LICENSE.md"
-        into storedir
-    }
-
-    copy {
-        from "CHANGELOG.md"
-        into storedir
-    }
-
-    copy {
-        from "NuBot/res/ssl/nubot_keystore.jks"
-        into "$storedir/res/ssl/"
-    }
-
-    copy {
-        from "NuBot/res/ssl/updateKeystore.sh"
-        into "$storedir/res/ssl/"
-    }
-
-    copy {
-        from "NuBot/res/logs_assets"
-        into "${storedir}/res/logs_assets/"
-    }
-
-    copy {
-        from "NuBot/res/currencies.csv"
-        into "${storedir}/res/"
-    }
-
-    copy {
-        from "NuBot/src"
-        into "${storedir}/res/sources/src"
-    }
-
-    copy {
-        from "readme.html"
-        into "${storedir}/readme.html"
-    }
-
-    if (!logdir.exists()) {
-        println("creating logdir")
-
-        if (logdir.mkdirs()) {
-            println("succeeded in creating " + logdir)
-        }
-    }
-
-    copy {
-        from "NuBot/res/logs_assets"
-        into "${storedir}/res/logs_assets"
-    }*/
-
-    //delete "${store.dir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
-
-    //not needed
-    //<delete file="${store.dir}/NuBot_temp.jar"/>
-
 }
 
 
 task NuBotJar(type: Jar) {
-    description 'create the jar in ' + project.file(storedir)
-    dependsOn << init
+    description 'create the jar in ' + project.file(distdir)
     archiveName = jarname
-    destinationDir project.file(storedir)
+    destinationDir project.file(distdir)
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -246,20 +185,108 @@ task NuBotJar(type: Jar) {
 }
 
 task copyDist(type: Copy) {
-    from "Nubot/res"
-    into "${storedir}/res"
+
+    copy {
+        from "readme.html"
+        into "${distdir}"
+    }
+
+    copy {
+        from "setup.html"
+        into "${distdir}"
+    }
+
+    copy {
+        from "feeds.html"
+        into "${distdir}"
+    }
+
+    if (!logdir.exists()) {
+        println("creating logdir")
+
+        if (logdir.mkdirs()) {
+            println("succeeded in creating " + logdir)
+        }
+    }
+
+    copy {
+        from "Nubot/res/options/sample-config"
+        into "${distdir}/sample-config"
+    }
+
     //exclude '**/*.xml'
 
+    /*copy {
+        from "LICENSE.md"
+        into "${distdir}"
+    }
+
+    copy {
+        from "CHANGELOG.md"
+        into "${distdir}"
+    }*/
+
+    /*
+    copy {
+        from "NuBot/res/"
+        into "${distdir}/res"
+        exclude "listCertificates.sh"
+    }
+
+    copy {
+        from "NuBot/src"
+        into "${distdir}/res/sources/src"
+    }
+    */
+
+    /*copy {
+        from "readme.html"
+        into "${distdir}/readme.html"
+    }*/
+
+    /*
+    copy {
+        from "NuBot/res/logs_assets"
+        into "${distdir}/res/logs_assets"
+    }
+    */
+
+
+    /*if (!logdir.exists()) {
+        println("creating logdir")
+
+        if (logdir.mkdirs()) {
+            println("succeeded in creating " + logdir)
+        }
+    }*/
+
+
+
+    //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+
 }
-task NuBotMakeDistribution(){//dependsOn: NuBotJar) {
+
+task NuBotMakeDistribution() {
     description 'make nubot distribution package'
-    println 'delete "${storedir}"'
-    delete "${storedir}"
+    println 'start making distribution'
+    tasks.initDist.execute()
+    println 'compile readme'
+    //tasks.compileReadme.execute()
+    //println 'delete ${distdir}'
+    //delete "${distdir}"
     tasks.NuBotJar.execute()
     println 'copy for distribution'
     tasks.copyDist.execute()
+
+
     println "finish distribution"
 
+    if (includeTestConfig){
+        copy {
+            from "testconfig"
+            into "${distdir}/testconfig"
+        }
+    }
 }
 
 
