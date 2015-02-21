@@ -41,7 +41,6 @@ public class UiServer {
 
         get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
-
         Msg keyMsg = new Msg("key");
 
         get("/keys", "application/json", (request, response) -> {

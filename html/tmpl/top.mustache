@@ -47,7 +47,8 @@
 
             function loadVals() {
 
-                $.ajax({
+                /*$.ajax({
+                  type: "POST",
                   dataType: "json",
                   url: url + "/keys",
                 })
@@ -55,6 +56,12 @@
                     //var pp = $("#key").attr("placeholder");
 
                     $("#apikey").attr("placeholder", data["apikey"]);
+
+
+                  });*/
+
+            }
+
 
                     /*
                     $("#apisecret").attr("placeholder", data["apisecret"]);
@@ -66,11 +73,6 @@
                     $("#pair").attr("placeholder", data["pair"]);
                     $("#mail-recipient").attr("placeholder", data["mail-recipient"]);
                     */
-
-                  });
-
-            }
-
 
             function savekey(el) {
                 //get user data
@@ -84,11 +86,16 @@
 
                 //make HTTP post to server
 
-                $.post( url + "/keys", { apikey: inputkey } )
+                /*$.post( url + "/keys", { apikey: inputkey } )
 
                 .done(function( data ) {
                    el.css( 'border-color', '#993333' );
                    alert(data);
+                });*/
+
+                $.post( url + "/key", { apikey: "test" } )
+                .done(function( data ) {
+                  alert("got back " + data);
                 });
 
             }
