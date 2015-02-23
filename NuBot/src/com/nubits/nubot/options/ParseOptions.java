@@ -18,6 +18,8 @@ import java.util.logging.Logger;
  */
 public class ParseOptions {
 
+    private static String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
+
     private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
 
 
@@ -99,7 +101,6 @@ public class ParseOptions {
 
         NuBotOptions options = null;
 
-        String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
         for (int i = 0; i < comp.length; i++) {
             if (!containsIgnoreCase(optionsJSON, comp[i]))
@@ -193,12 +194,12 @@ public class ParseOptions {
             txFee = Utils.getDouble(getIgnoreCase(optionsJSON, "txfee"));
         }
 
-        if (containsIgnoreCase(optionsJSON, "submit-liquidity")) {
-            submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submit-liquidity");
+        if (containsIgnoreCase(optionsJSON, "submitliquidity")) {
+            submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
         }
 
         if (containsIgnoreCase(optionsJSON, "max-sell-order-volume")) {
-            maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON,"max-sell-order-volume"));
+            maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "max-sell-order-volume"));
         }
 
         if (containsIgnoreCase(optionsJSON, "max-buy-order-volume")) {
@@ -223,7 +224,7 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(optionsJSON, "keep-proceeds")) {
-            keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON,"keep-proceeds")));
+            keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, "keep-proceeds")));
         }
 
         if (containsIgnoreCase(optionsJSON, "multiple-custodians")) {

@@ -18,12 +18,12 @@ public class OptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("exchangename", opt.getExchangeName());
         root.addProperty("apikey", opt.getApiKey());
         root.addProperty("apisecret", opt.getApiSecret());
-        root.addProperty("dualside", opt.getApiSecret());
+        root.addProperty("dualside", opt.isDualSide());
 
         root.addProperty("submitliquidity", opt.isSendRPC());
 
 
-        root.addProperty("pair", opt.getPair().toString());
+        root.addProperty("pair", opt.getPair().toString("_"));
 
         return root;
     }

@@ -41,7 +41,8 @@ public class ConfigController {
             SaveOptions.backupOptions(testconfig);
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
             opt.setApiKey(newapikey);
-            SaveOptions.saveOptions(opt, testconfig);
+            //SaveOptions.saveOptions(opt, testconfig);
+            SaveOptions.saveOptionsPretty(opt, "testconfig/new.json");
 
             //TODO: return success(?)
 
