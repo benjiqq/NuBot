@@ -70,6 +70,13 @@ public class ParseOptions {
 
         NuBotOptions options = null;
 
+        String[] comp = {"exchangename", "apisecret", "mail-recipient", "dualside"};
+
+        for (int i = 0; i < comp.length; i++) {
+            if (!optionsJSON.containsKey(comp[i]))
+                throw new NuBotConfigException("necessary key: " + comp[i]);
+        }
+
         //default values for optional settings
         //TODO: check mandatory keys
         String[] comp = {"exchangename", "apisecret", "mail-recipient", "dualside"};
@@ -78,6 +85,7 @@ public class ParseOptions {
             if (optionsJSON.containsKey(comp[i]))
                 throw new NuBotConfigException("necessary key " + comp[i]);
         }
+
 
         String nudIp = NuBotOptionsDefault.nudIp;
         String sendMails = NuBotOptionsDefault.sendMails;
