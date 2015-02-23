@@ -20,7 +20,7 @@ public class TestOptions extends TestCase {
     private static String testconfig = "testconfig/" + testconfigFile;
 
     @Override
-    public void setUp(){
+    public void setUp() {
         Utils.loadProperties("settings.properties");
     }
 
@@ -113,6 +113,34 @@ public class TestOptions extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void testLoadComplete() {
+
+        String testconfigFile = "test.json";
+        String testconfig = "testconfig/" + testconfigFile;
+        boolean catched = false;
+
+        try {
+            JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
+            assertTrue(inputJSON.containsKey("options"));
+            JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
+            assertTrue(optionsJSON.containsKey("exchangename"));
+        } catch (Exception e) {
+
+        }
+
+
+        try {
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+        } catch (NuBotConfigException e) {
+            System.out.println("could not parse config");
+            System.out.println(e);
+            catched = true;
+        }
+
+        assertTrue(!catched);
     }
 
     // @Test
