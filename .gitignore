@@ -72,4 +72,4 @@ NuBot/.settings
 *.iml
 Test*.xml
 
-testconfig/
+#testconfig/
