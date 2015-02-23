@@ -70,7 +70,8 @@ dependencies {
     compile 'com.github.spullara.mustache.java:compiler:0.9.0'
 
     //static. no maven available
-    compile files('NuBot/lib/EasyJccKit.jar') // lib: EasyJccKit.jar
+    compile files('NuBot/lib/EasyJccKit.jar')
+    compile files('NuBot/lib/JavaBitcoindRpcClient-0.9.1.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
