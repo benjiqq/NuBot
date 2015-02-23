@@ -1,6 +1,8 @@
 package com.nubits.nubot.webui;
 
-
+/**
+ * TODO: refactor this class related to NuBotOptions
+ */
 public class Msg {
 
     private String apikey;

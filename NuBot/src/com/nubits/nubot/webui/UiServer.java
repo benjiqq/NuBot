@@ -3,7 +3,6 @@ package com.nubits.nubot.webui;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.options.SaveOptions;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.webui.service.StockServiceServer;
 import spark.ModelAndView;
@@ -63,7 +62,7 @@ public class UiServer {
         get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
 
-        new KeyController();
+        new ConfigController();
 
 
     }

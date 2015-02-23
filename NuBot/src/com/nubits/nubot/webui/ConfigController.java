@@ -10,12 +10,15 @@ import org.json.simple.parser.JSONParser;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
-public class KeyController {
+/**
+ * controller for changing Configurations
+ */
+public class ConfigController {
 
     private static String testconfigFile = "test.json";
     private static String testconfig = "testconfig/" + testconfigFile;
 
-    public KeyController() {
+    public ConfigController() {
 
         Msg keyMsg = new Msg("key");
 
@@ -25,16 +28,8 @@ public class KeyController {
 
         post("/keys", "application/json", (request, response) -> {
 
-
             //not working. put is in request body
             //request.queryParams("apikey");
-            //Map<String, String> rmap = request.params();
-            //Iterator<String> it = rmap.keySet().iterator();
-            //while (it.hasNext()) {
-            //    String c = it.next();
-            //    resp += c;
-            //
-            // }
 
             String json_body = request.body();
 
@@ -46,19 +41,15 @@ public class KeyController {
             SaveOptions.backupOptions(testconfig);
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
             opt.setApiKey(newapikey);
-            SaveOptions.saveOptions(opt,testconfig);
+            SaveOptions.saveOptions(opt, testconfig);
 
-            //TODO: return success
+            //TODO: return success(?)
 
             System.out.println("got post key " + newapikey);
 
-            //response.type("application/json");
-            //response.body("try put: " + apikey);
+
             return "try put new " + newapikey;
         });
 
-        /*after((req, res) -> {
-
-        });*/
     }
 }
