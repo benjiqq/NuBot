@@ -15,7 +15,7 @@ public class NuBotOptionsDefault {
 
     public static String nudIp = "127.0.0.1";
     public static String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
-    public static boolean submitLiquidity = true;
+    public static boolean submitLiquidity = false;
     public static boolean executeOrders = true;
     public static boolean verbose = false;
     public static boolean sendHipchat = true;

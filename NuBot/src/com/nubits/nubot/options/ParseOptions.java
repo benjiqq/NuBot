@@ -187,7 +187,7 @@ public class ParseOptions {
         //---- optional settings ----
 
         if (optionsJSON.containsKey("nudip")) {
-            nudIp = (String) optionsJSON.get("nudip");
+            nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
         }
 
         if (containsIgnoreCase(optionsJSON, "priceincrement")) {
