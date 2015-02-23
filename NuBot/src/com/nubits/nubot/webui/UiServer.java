@@ -1,5 +1,6 @@
 package com.nubits.nubot.webui;
 
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
@@ -28,16 +29,32 @@ public class UiServer {
         }
     }
 
+    private static String testconfigFile = "test.json";
+    private static String testconfig = "testconfig/" + testconfigFile;
+
     /**
-     * start the UI
+     * start the UI server
      *
      * @param args
      */
+    public static void startUIserver(){
+
+    }
+
+
     public static void main(String[] args) {
 
         //TODO: only load if in testmode and this is not set elsewhere
         //should better read: load global settings
         Utils.loadProperties("settings.properties");
+
+        try{
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+        }catch(NuBotConfigException e){
+            System.out.println("could not parse config");
+            System.out.println(e);
+            System.exit(0);
+        }
 
         Map map = new HashMap();
 
