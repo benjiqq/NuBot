@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
@@ -13,7 +12,6 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.io.File;
-import java.text.ParseException;
 
 public class TestWriteOptions extends TestCase {
 
@@ -35,7 +33,7 @@ public class TestWriteOptions extends TestCase {
 
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        String jsonOpt =gson.toJson(opt);
+        String jsonOpt = gson.toJson(opt);
         //System.out.println(jsonOpt);
         assertTrue(jsonOpt.startsWith("{"));
         assertTrue(jsonOpt.endsWith("}"));
@@ -72,7 +70,7 @@ public class TestWriteOptions extends TestCase {
      * create a class and then write it to file
      */
     @Test
-    public void testCreateObject(){
+    public void testCreateObject() {
         NuBotOptions opt = new NuBotOptions();
         opt.setApiKey("test");
         opt.setExchangeName("testexchange");
@@ -80,14 +78,14 @@ public class TestWriteOptions extends TestCase {
         Currency usd = Currency.createCurrency("USD");
         opt.setPair(new CurrencyPair(c, usd));
         String testout = "testconfig/test_out.json";
-        SaveOptions.saveOptionsPretty(opt,testout);
+        SaveOptions.saveOptionsPretty(opt, testout);
         File newout = new File(testout);
         assertTrue(newout.exists());
 
-        try{
+        try {
             JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testout);
             assertTrue(inputJSON.containsKey("exchangename"));
-        }catch (Exception e){
+        } catch (Exception e) {
             assertTrue(false);
         }
 
