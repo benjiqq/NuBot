@@ -27,7 +27,7 @@ public class UiServer {
     }
 
     private static String testconfigFile = "test.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
+    private static String testconfigpath = "testconfig/" + testconfigFile;
 
     /**
      * start the UI server
@@ -40,7 +40,8 @@ public class UiServer {
         Utils.loadProperties("settings.properties");
 
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
+            new ConfigController(opt, testconfigpath);
         } catch (NuBotConfigException e) {
             System.out.println("could not parse config");
             System.out.println(e);
@@ -54,7 +55,7 @@ public class UiServer {
         get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
 
-        new ConfigController();
+
 
     }
 

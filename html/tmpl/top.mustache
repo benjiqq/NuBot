@@ -77,13 +77,10 @@
                 //get user data
 
                 var el = $('#apikey');
-                alert(el);
 
                 var inputkey = el.attr('value');
 
                 //make HTTP post to server
-
-
 
                 $.ajax(url, {
 
@@ -92,11 +89,11 @@
                     type : 'POST',
 
                     success: function(data){
-                      alert("ok " + data);
+                      console.log("ok " + data);
                     },
 
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert("some error " + textStatus);
+                        alert("error posting to server " + textStatus);
                     }
                });
 

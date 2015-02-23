@@ -1,6 +1,8 @@
 package com.nubits.nubot.webui;
 
 
+import com.nubits.nubot.launch.NuBot;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
@@ -15,12 +17,14 @@ import static spark.Spark.post;
  */
 public class ConfigController {
 
-    private static String testconfigFile = "test.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
 
-    public ConfigController() {
+    private String testconfigfile;
+    private NuBotOptions opt;
 
-        Msg keyMsg = new Msg("key");
+    public ConfigController(NuBotOptions opt, String testconfigfile) {
+        this.testconfigfile= testconfigfile;
+
+        Msg keyMsg = new Msg(opt.getApiKey());
 
         get("/keys", "application/json", (request, response) -> {
             return keyMsg;
@@ -38,8 +42,8 @@ public class ConfigController {
 
             String newapikey = "" + postJson.get("apikey");
 
-            SaveOptions.backupOptions(testconfig);
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            SaveOptions.backupOptions(this.testconfigfile);
+            //NuBotOptions opt = ParseOptions.parseOptionsSingle(thils.testconfigfile);
             opt.setApiKey(newapikey);
             //SaveOptions.saveOptions(opt, testconfig);
             SaveOptions.saveOptionsPretty(opt, "testconfig/new.json");
