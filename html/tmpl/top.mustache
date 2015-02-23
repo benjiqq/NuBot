@@ -53,7 +53,12 @@
 
                     $("#apikey").attr("placeholder", data["apikey"]);
                     $("#apisecret").attr("placeholder", data["apisecret"]);
-
+                    $('#dualside').attr('checked',data["dualside"]);
+                    $('#multiplecustodians').attr('checked',data["multiplecustodians"]);
+                    $('#submitliquidity').attr('checked',data["submitliquidity"]);
+                    $('#executeorders').attr('checked',data["executeorders"]);
+                    $('#verbose').attr('checked',data["verbose"]);
+                    $('#hipchat').attr('checked',data["hipchat"]);
                  });
 
             }
