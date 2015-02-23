@@ -4,7 +4,7 @@
     "apisecret":"abc",
     "pair":"NBT_USD",
     "dualside": true,
-    "multiple-custodians":false,
+    "multiplecustodians":false,
     "submitliquidity":false,
     "executeorders":false,
     "verbose":false,
