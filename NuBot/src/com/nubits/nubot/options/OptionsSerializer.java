@@ -11,6 +11,13 @@ import java.util.Set;
 
 public class OptionsSerializer implements JsonSerializer<NuBotOptions> {
 
+
+    //TODO: pretty pring
+    //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+    //JsonParser jp = new JsonParser();
+    //JsonElement je = jp.parse(uglyJSONString);
+    //String prettyJsonString = gson.toJson(je);
+
     @Override
     public JsonElement serialize(NuBotOptions opt, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject root = new JsonObject();
@@ -34,6 +41,8 @@ public class OptionsSerializer implements JsonSerializer<NuBotOptions> {
         //Map setMap = new HashMap();
         //setMap.put("dualside", opt.isDualSide());
 
+
+
         //Gson gson=new Gson();
 
         //Map<String,String> map=new HashMap<String,String>();
@@ -46,7 +55,17 @@ public class OptionsSerializer implements JsonSerializer<NuBotOptions> {
 
         //newopt.add("dualside",opt.is)
 
-        //root.addProperty("options", gson.toJson(map));
+        root.addProperty("exchangename", opt.getExchangeName());
+        root.addProperty("apikey", opt.getApiKey());
+        root.addProperty("apisecret", opt.getApiSecret());
+        root.addProperty("dualside", opt.getApiSecret());
+
+        root.addProperty("submitliquidity", opt.isSendRPC());
+
+
+
+
+        root.addProperty("pair", opt.getPair().toString());
 
         return root;
     }

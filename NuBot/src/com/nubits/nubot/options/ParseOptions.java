@@ -99,10 +99,10 @@ public class ParseOptions {
 
         NuBotOptions options = null;
 
-        String[] comp = {"exchangename", "apisecret", "mail-recipient", "dualside", "pair"};
+        String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
         for (int i = 0; i < comp.length; i++) {
-            if (!optionsJSON.containsKey(comp[i]))
+            if (!containsIgnoreCase(optionsJSON, comp[i]))
                 throw new NuBotConfigException("necessary key: " + comp[i]);
         }
 
@@ -125,15 +125,15 @@ public class ParseOptions {
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
 
         //First try to parse compulsory parameters
-        String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangname");
+        String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
         boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
         String apiKey = "";
 
         if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
-            if (!optionsJSON.containsKey("apiKey")) {
-                Utils.exitWithMessage("The apikey parameter is compulsory.");
+            if (!containsIgnoreCase(optionsJSON, "apiKey")) {
+                throw new NuBotConfigException("The apikey parameter is compulsory.");
             } else {
                 apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
             }
@@ -141,9 +141,9 @@ public class ParseOptions {
 
         String apiSecret = (String) getIgnoreCase(optionsJSON, "apisecret");
 
-        String mailRecipient = (String) optionsJSON.get("mail-recipient");
+        String mailRecipient = (String) getIgnoreCase(optionsJSON, "mailrecipient");
 
-        String pairStr = (String) optionsJSON.get("pair");
+        String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
         CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
 
         boolean aggregate = true; //true only for USD

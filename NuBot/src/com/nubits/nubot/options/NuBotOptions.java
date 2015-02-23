@@ -150,7 +150,7 @@ public class NuBotOptions {
     }
 
     /**
-     *
+     * TODO: rename
      * @return
      */
     public boolean isSendRPC() {
@@ -158,7 +158,7 @@ public class NuBotOptions {
     }
 
     /**
-     *
+     * TODO: rename
      * @param sendRPC
      */
     public void setSendRPC(boolean sendRPC) {
