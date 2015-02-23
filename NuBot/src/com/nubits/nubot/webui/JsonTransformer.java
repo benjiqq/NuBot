@@ -6,6 +6,9 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.OptionsSerializer;
 import spark.ResponseTransformer;
 
+/**
+ * Render NuBotOptions to json
+ */
 public class JsonTransformer implements ResponseTransformer {
 
     private Gson gson = new Gson();

@@ -52,9 +52,10 @@ public class LayoutTemplateEngine extends TemplateEngine {
     public String renderTop() {
         Map map = new HashMap();
 
-        //map.put("host", "localhost");
-        //TODO: spark issue. using default of 4567
+        //using default of 4567
         int serverPort = 4567;
+
+        //TODO: spark issue: can't set port.
         //setPort(serverPort); // Spark will run on this port
         //map.put("port", "" + serverPort);
 
