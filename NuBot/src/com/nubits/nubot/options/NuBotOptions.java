@@ -30,21 +30,38 @@ public class NuBotOptions {
 
     //Compulsory settings ----------------------------
 
+    /**
+     * Custodian's public key to access the exchange
+     */
     private String apiKey;
+
+    /**
+     * Custodian's secret key to access the exchange
+     */
     private String apiSecret;
 
     /**
      * the email to which emergency email are sent
      */
     private String mailRecipient;
+
+    /**
+     * Name of the exchange where the bots operates
+     */
     private String exchangeName;
 
     /**
      * If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.
      */
     private boolean dualSide;
+
+    /**
+     * valid currency pair for the specified eg. "nbt_usd"
+     */
     private CurrencyPair pair;
+
     private SecondaryPegOptionsJSON secondaryPegOptions;
+
     //Conditional settings with a default value
 
     /**
@@ -112,6 +129,9 @@ public class NuBotOptions {
 
     private int sendLiquidityInterval; //disabled
 
+    /**
+     * If transaction fee not available from the exchange via api, this value will be used
+     */
     private double txFee;
 
     /**
