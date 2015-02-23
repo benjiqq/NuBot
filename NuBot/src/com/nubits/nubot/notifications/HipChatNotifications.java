@@ -23,33 +23,25 @@ package com.nubits.nubot.notifications;
  */
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
-import com.nubits.nubot.notifications.jhipchat.HipChat;
-import com.nubits.nubot.notifications.jhipchat.Room;
-import com.nubits.nubot.notifications.jhipchat.UserId;
-import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
+import io.evanwong.oss.hipchat.v2.HipChatClient;
+import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import io.evanwong.oss.hipchat.v2.rooms.SendRoomNotificationRequestBuilder;
 import java.util.logging.Logger;
 
 public class HipChatNotifications {
 
     private static final Logger LOG = Logger
             .getLogger(HipChatNotifications.class.getName());
-    private static String BOT_NAME = "Custodian Bot";
-    private static HipChat hipchat = new HipChat(Passwords.HIPCHAT_KEY);
-    private static UserId hipchatUser = UserId.create("idbot", BOT_NAME);
-    private static Room notificationRoom = Room.create(
-            Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, hipchat);
-    private static Room criticalNotificationRoom = Room.create(
-            Passwords.HIPCHAT_CRITICAL_ROOM_ID, hipchat);
 
-    public static void sendMessage(String message, Color color) {
+    public static void sendMessage(String message, MessageColor color) {
         sendMessageImpl(message, color, false);
     }
 
     public static void sendMessageCritical(String message) {
-        sendMessageImpl(message, Color.RED, true);
+        sendMessageImpl(message, MessageColor.RED, true);
     }
 
-    private static void sendMessageImpl(String message, Color color,
+    private static void sendMessageImpl(String message, MessageColor color,
             boolean critical) {
 
         String publicAddress = "";
@@ -70,11 +62,15 @@ public class HipChatNotifications {
 
         try {
             if (critical) {
-                criticalNotificationRoom.sendMessage(toSend, hipchatUser,
-                        critical, color);
+                HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_CRITICAL_ROOM_TOKEN);
+                SendRoomNotificationRequestBuilder builder = hipchat.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_CRITICAL_ROOM_ID, toSend);
+                builder.setColor(MessageColor.RED).setNotify(true).build().execute();
+
             } else {
-                notificationRoom.sendMessage(toSend, hipchatUser, critical,
-                        color);
+                HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_TOKEN);
+                SendRoomNotificationRequestBuilder builder = hipchat.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, toSend);
+                builder.setColor(color).setNotify(false).build().execute();
+
             }
 
         } catch (Exception e) {

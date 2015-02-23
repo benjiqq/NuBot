@@ -41,6 +41,7 @@
 
         <!-- Copy SSL keystore -->
         <copy file="res/ssl/nubot_keystore.jks" tofile="${store.dir}/res/ssl/nubot_keystore.jks"/>
+        <copy file="res/ssl/updateKeystore.sh" tofile="${store.dir}/res/ssl/updateKeystore.sh"/>
 
         <!-- Copy currencies.csv -->
         <copy file="res/currencies.csv" tofile="${store.dir}/res/currencies.csv"/>

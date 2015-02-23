@@ -25,8 +25,14 @@ Detailed tutorial below :
 NuBot can run on a computer, on a raspberry pi, or a remote VPS, as long as it has a permanent connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java Runtime Environment to be installed.
 NuBot comes as a cross platform executable jar file to run from command line. 
 
-Type `java -version` in your terminal to make sure you have JRE >= 1.7 installed on your machine, otherwise download Java JRE:1.7 [from oracle's download page](http://www.oracle.com/technetwork/java/javase/downloads/java-se-jre-7-download-432155.html)
+Type `java -version` in your terminal to make sure you have JRE >= 1.8 installed on your machine, otherwise download Java JRE:1.8[from oracle's download page](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
 
+Or install via apt-get 
+```
+$ sudo add-apt-repository ppa:webupd8team/java
+$ sudo apt-get update
+$ sudo apt-get install oracle-java8-installer
+```
 In the future we will make available a docker container pre-prepared. 
 
 ###1) Prepare the NuBits client 
@@ -231,7 +237,7 @@ java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [pat
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-nohup java -jar NuBot.jar market.json misc.json liquidity-info.jon price-tracking.json  &
+nohup java -jar NuBot.jar market.json misc.json liquidity-info.json price-tracking.json  &
 ```
 
 The bot will start and write output in the */logs* folder. 

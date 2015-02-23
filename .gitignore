@@ -48,8 +48,6 @@ Passwords.java
 .mtj.tmp/
 
 # Package Files #
-*.jar
-!EasyJccKit.jar
 *.war
 *.ear
 
@@ -74,3 +72,5 @@ NuBot/.settings
 .idea
 *.iml
 Test*.xml
+
+testconfig/

@@ -22,7 +22,6 @@ import com.nubits.nubot.launch.toolkit.NuPriceMonitor;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -112,7 +111,7 @@ public class NuPriceMonitorTask extends TimerTask {
 
                             MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
                             HipChatNotifications.sendMessageCritical(title + message);
-                            
+
                             LOG.severe(title + message);
                         }
                     }

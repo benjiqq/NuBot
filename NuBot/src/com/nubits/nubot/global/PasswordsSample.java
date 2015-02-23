@@ -59,9 +59,10 @@ public class PasswordsSample {
     public static final String SMTP_USERNAME = "xxx"; //used to send mail notifications
     public static final String SMTP_PASSWORD = "xxx";
     public static final String SMTP_HOST = "xxx";
-    public static final String HIPCHAT_KEY = "xxx"; //not admin
     public static final String HIPCHAT_NOTIFICATIONS_ROOM_ID = "xxx";
+    public static final String HIPCHAT_NOTIFICATIONS_ROOM_TOKEN = "xxx";
     public static final String HIPCHAT_CRITICAL_ROOM_ID = "xxx"; //use for critical notifications
+    public static final String HIPCHAT_CRITICAL_ROOM_TOKEN = "xxx"; //use for critical notifications
     public static final String OPEN_EXCHANGE_RATES_APP_ID = "xxx";
     public static final String EXCHANGE_RATE_LAB = "xxx";
 }

@@ -6,6 +6,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -13,6 +14,7 @@ import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -38,7 +40,11 @@ public class TestWrapperReturns {
         init();
         String[] inputs = new String[1];
         inputs[0] = TEST_OPTIONS_PATH;
-        Global.options = ParseOptions.parseOptions(inputs);
+        try {
+            Global.options = ParseOptions.parseOptions(inputs);
+        } catch (NuBotConfigException ex) {
+            Logger.getLogger(TestWrapperReturns.class.getName()).log(Level.SEVERE, null, ex);
+        }
         testExchanges = populateExchanges();
 
         //configExchange(Constant.BTER);

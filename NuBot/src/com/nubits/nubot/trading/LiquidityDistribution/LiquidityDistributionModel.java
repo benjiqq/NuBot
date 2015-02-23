@@ -39,12 +39,50 @@ public class LiquidityDistributionModel {
         this.buyParams = buyParams;
     }
 
+    public LiquidityDistributionModel(ModelParameters params, String type) {
+        if (type.equals(Constant.SELL)) {
+            this.sellParams = params;
+        } else {
+            this.buyParams = params;
+        }
+    }
+
+    public static ModelParameters getStandardParams(String type, double wallHeight) {
+
+        double wallDensity = 0.020;
+        double wallWidth = 0.15;
+
+
+        double offset;
+        LiquidityCurve curve;
+
+        if (type.equals(Constant.SELL)) {
+            offset = 0.005;
+            curve = new LiquidityCurveLin(LiquidityCurve.STEEPNESS_MID); //Linear
+
+        } else {
+            offset = 0.002;
+            curve = new LiquidityCurveExp(LiquidityCurve.STEEPNESS_LOW); //Exponential
+        }
+
+        return new ModelParameters(offset, wallHeight, wallWidth, wallDensity, curve);
+
+    }
+
     public ArrayList<OrderToPlace> getOrdersToPlace(String type, Amount fundsAvailable, double pegPrice, CurrencyPair pair, double txFee) {
         if (type.equals(Constant.SELL)) {
             return getOrdersToPlaceImpl(this.sellParams, fundsAvailable, Constant.SELL, pegPrice, pair, txFee);
         } else {
             return getOrdersToPlaceImpl(this.buyParams, fundsAvailable, Constant.BUY, pegPrice, pair, txFee);
         }
+    }
+
+    public ArrayList<OrderToPlace> getSellOrdersToPlace(Amount fundsAvailable, double pegPrice, CurrencyPair pair, double txFee) {
+        return getOrdersToPlaceImpl(this.sellParams, fundsAvailable, Constant.SELL, pegPrice, pair, txFee);
+    }
+
+    public ArrayList<OrderToPlace> getBuyOrdersToPlace(Amount fundsAvailable, double pegPrice, CurrencyPair pair, double txFee) {
+        return getOrdersToPlaceImpl(this.buyParams, fundsAvailable, Constant.BUY, pegPrice, pair, txFee);
     }
 
     private ArrayList<OrderToPlace> getOrdersToPlaceImpl(ModelParameters params, Amount funds, String wallType, double pegPrice, CurrencyPair pair, double txFee) {

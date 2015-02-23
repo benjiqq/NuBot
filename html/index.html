@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+            body {
+                font-family: Helvetica;
+            }
+
+
+            body {
+  min-height: 2000px;
+  padding-top: 70px;
+}
+
+/*
+table.table.table-bordered tr td{ width:50% }
+*/
+
+.row {
+  margin-bottom: 20px;
+}
+.row .row {
+  margin-top: -20px;
+  margin-bottom: 0;
+}
+[class*="col-"] {
+  padding-top: 2px;
+  padding-bottom: 2px;
+  border: 0px solid #ddd;
+  border: 0px solid rgba(86,61,124,.2);
+}
+
+hr {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+
+
+        </style>
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+        <script>
+            function loadVals() {
+
+                $.ajax({
+                  dataType: "json",
+                  url: "http://localhost:8080/keys",
+                })
+                  .done(function( data ) {
+                    //var pp = $("#key").attr("placeholder");
+
+                    $("#apikey").attr("placeholder", data["apikey"]);
+                    $("#apisecret").attr("placeholder", data["apisecret"]);
+                    $("#dualside").attr("placeholder", data["dualside"]);
+                    $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
+                    $("#nudport").attr("placeholder", data["nudport"]);
+                    $("#rpcpass").attr("placeholder", data["rpcpass"]);
+                    $("#rpcuser").attr("placeholder", data["rpcuser"]);
+                    $("#pair").attr("placeholder", data["pair"]);
+                    $("#mail-recipient").attr("placeholder", data["mail-recipient"]);
+
+                  });
+
+            }
+
+
+            function save(elmnt) {
+
+                var x = elmnt.attr('placeholder');
+
+                //make HTTP post to server
+
+                /*$.post( "http://localhost:8080/keys", { apikey: "zzzzz" } )
+
+                  .done(function( data ) {
+
+                    elmnt.css( 'border-color', '#993333' );
+                }*/
+
+
+            }
+
+
+        </script>
+
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+
+
+    </head>
+
+
+    <body onLoad="loadVals()">
+
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">NuBot</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Exchange Config</a></li>
+            <li><a href="#about">About</a></li>
+
+          </ul>
+
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+    <div class="container">
+
+
+<div class="row">
+  <div class="col-xs-12 col-md-8">
+
+    <h3>CCEDK</h3>
+
+
+
+
+
+<table class="table table-bordered" width="500">
+<tr>
+    <td class="col-md-2">API key</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+
+      <input id="apikey" size="100" type="text" class="form-control" placeholder="API Key">
+<!--
+      <span class="input-group-btn">
+         <button class="btn btn-default" type="button" onclick="showModal()">Change</button>
+
+      </span>
+-->
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="save()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td>API secret</td>
+<td>
+
+    <div class="input-group">
+
+        <input id="apisecret" size="100" type="text" class="form-control" placeholder="API Secret">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary"  onclick="save($('#apisecret'))">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+<tr>
+    <td>dualside</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="dualside" type="text" class="form-control" placeholder="dualside">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+
+<tr>
+    <td>nubitaddress</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="nubitaddress" type="text" class="form-control" placeholder="nubitaddress">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+<tr>
+    <td>nudport</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="nudport" type="text" class="form-control" placeholder="nudport">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+<tr>
+    <td>rpcpass</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="rpcpass" type="text" class="form-control" placeholder="rpcpass">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+<tr>
+    <td>rpcuser</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="rpcuser" type="text" class="form-control" placeholder="rpcuser">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+<tr>
+    <td>pair</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="pair" type="text" class="form-control" placeholder="pair">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+<tr>
+    <td>mail-recipient</td>
+<td>
+
+    <div class="input-group">
+
+        <input size="100" id="mail-recipient" type="text" class="form-control" placeholder="mail-recipient">
+
+    </td>
+<td>
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
+  Change
+</button>
+    </div><!-- /input-group -->
+
+</td></tr>
+
+</table>
+
+    </div>
+
+
+  <div class="col-xs-6 col-md-4"></div>
+    <!-- spacer -->
+    </div>
+
+
+    </div> <!-- /container -->
+
+</div>
+
+      </div>
+
+    </div> <!-- /container -->
+
+
+
+
+
+
+    </body>
+</html>

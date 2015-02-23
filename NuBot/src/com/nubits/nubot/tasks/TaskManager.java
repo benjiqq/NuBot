@@ -19,7 +19,6 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.notifications.jhipchat.messages.Message.Color;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;

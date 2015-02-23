@@ -18,16 +18,7 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.utils.FileSystem;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  *
@@ -68,7 +59,15 @@ public class NuBotOptions {
     private double keepProceeds;
     private double maxSellVolume;
     private double maxBuyVolume;
+    private boolean distributeLiquidity;
     private SecondaryPegOptionsJSON cpo;
+
+    /**
+     * empty constructor. assumes safe creation of valid options
+     */
+    public NuBotOptions(){
+
+    }
 
     /**
      *
@@ -97,10 +96,12 @@ public class NuBotOptions {
      * @param secondaryPegOptions
      */
     public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
-                        String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
-                        double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-                        int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate, boolean multipleCustodians, double maxSellVolume, double maxBuyVolume, SecondaryPegOptionsJSON secondaryPegOptions) {
+            String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
+            double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
+            int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
+            String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
+            boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
+            boolean distributeLiquidity, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -128,6 +129,8 @@ public class NuBotOptions {
         this.multipleCustodians = multipleCustodians;
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
+        this.distributeLiquidity = distributeLiquidity;
+
     }
 
     /**
@@ -490,37 +493,6 @@ public class NuBotOptions {
         this.maxBuyVolume = maxBuyVolume;
     }
 
-    /*
-     * Concatenate a list of of files into a JSONObject
-     */
-    public static JSONObject parseFiles(ArrayList<String> filePaths) {
-        JSONObject optionsObject = new JSONObject();
-        Map setMap = new HashMap();
-
-        for (int i = 0; i < filePaths.size(); i++) {
-            try {
-                JSONParser parser = new JSONParser();
-
-                JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filePaths.get(i))));
-                JSONObject tempOptions = (JSONObject) fileJSON.get("options");
-
-                Set tempSet = tempOptions.entrySet();
-                for (Object o : tempSet) {
-                    Map.Entry entry = (Map.Entry) o;
-                    setMap.put(entry.getKey(), entry.getValue());
-                }
-
-            } catch (ParseException ex) {
-                LOG.severe("Parse exception \n" + ex.toString());
-                System.exit(0);
-            }
-        }
-
-        JSONObject content = new JSONObject(setMap);
-        optionsObject.put("options", content);
-        return optionsObject;
-    }
-
     /**
      *
      * @return
@@ -561,13 +533,21 @@ public class NuBotOptions {
         this.aggregate = aggregate;
     }
 
+    public boolean isDistributeLiquidity() {
+        return distributeLiquidity;
+    }
+
+    public void setDistributeLiquidity(boolean distributeLiquidity) {
+        this.distributeLiquidity = distributeLiquidity;
+    }
+
     @Override
     public String toString() {
         String cryptoOptions = "";
         if (secondaryPegOptions != null) {
             cryptoOptions = secondaryPegOptions.toString();
         }
-        return "NuBotOptions{" + "dualSide=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , cryptoPegOptions=" + cryptoOptions + '}';
+        return "NuBotOptions{" + "dualSide=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apiKey=" + apiKey + ", apiSecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangeName=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity + " , cryptoPegOptions=" + cryptoOptions + '}';
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
@@ -580,6 +560,6 @@ public class NuBotOptions {
         if (secondaryPegOptions != null) {
             cryptoOptions = secondaryPegOptions.toHtmlString();
         }
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + " <br><br>" + cryptoOptions + '}';
+        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangeName=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity + " <br><br>" + cryptoOptions + '}';
     }
 }
