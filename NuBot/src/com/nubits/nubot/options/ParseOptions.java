@@ -51,8 +51,8 @@ public class ParseOptions {
 
         try {
             JSONObject inputJSON = parseSingleJsonFile(filepath);
-            JSONObject optionsJSON = getOptionsKey(inputJSON);
-            return parseOptionsFromJson(optionsJSON);
+            //JSONObject optionsJSON = getOptionsKey(inputJSON);
+            return parseOptionsFromJson(inputJSON);
 
         } catch (ParseException ex) {
             throw new NuBotConfigException("Configuration error from single file");
@@ -70,7 +70,7 @@ public class ParseOptions {
 
         NuBotOptions options = null;
 
-        String[] comp = {"exchangename", "apisecret", "mail-recipient", "dualside"};
+        String[] comp = {"exchangename", "apisecret", "mail-recipient", "dualside", "pair"};
 
         for (int i = 0; i < comp.length; i++) {
             if (!optionsJSON.containsKey(comp[i]))
