@@ -11,8 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static spark.Spark.get;
-import static spark.Spark.post;
-import static spark.Spark.after;
 
 public class UiServer {
 
@@ -34,22 +32,16 @@ public class UiServer {
     /**
      * start the UI server
      *
-     * @param args
      */
-    public static void startUIserver(){
-
-    }
-
-
-    public static void main(String[] args) {
+    public static void startUIserver() {
 
         //TODO: only load if in testmode and this is not set elsewhere
         //should better read: load global settings
         Utils.loadProperties("settings.properties");
 
-        try{
+        try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             System.out.println("could not parse config");
             System.out.println(e);
             System.exit(0);
@@ -64,6 +56,10 @@ public class UiServer {
 
         new ConfigController();
 
+    }
 
+
+    public static void main(String[] args) {
+        startUIserver();
     }
 }

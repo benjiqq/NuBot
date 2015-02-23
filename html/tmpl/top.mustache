@@ -43,22 +43,21 @@
 
               var host = "localhost";
               var port = 4567;
-              
+              var url = "http://" + host + ":" + port + "/keys";
 
             function loadVals() {
 
-                /*$.ajax({
-                  type: "POST",
+                $.ajax({
+                  type: "GET",
                   dataType: "json",
-                  url: url + "/keys",
+                  url: url,
                 })
-                  .done(function( data ) {
+                .done(function( data ) {
                     //var pp = $("#key").attr("placeholder");
 
                     $("#apikey").attr("placeholder", data["apikey"]);
 
-
-                  });*/
+                 });
 
             }
 
@@ -80,24 +79,11 @@
                 var el = $('#apikey');
                 alert(el);
 
-                var inputkey = el.attr('value'); //el.attr('placeholder');
-
-                //$('#input_id').attr('value',$('#input_id').val());
+                var inputkey = el.attr('value');
 
                 //make HTTP post to server
 
-                /*$.post( 
-                  url + "/keys", 
-                  JSON.stringify({ "apikey": "test"}) //inputkey } )
-                )  
 
-                .done(function( data ) {
-
-                   el.css( 'border-color', '#993333' );
-                   alert(data);
-                });*/
-                
-                var url = "http://" + host + ":" + port + "/keys";
 
                 $.ajax(url, {
 
@@ -112,29 +98,10 @@
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                     alert("some error " + textStatus);
                     }
-               });     
-                /*
-                $.ajax({
-                  url: url + "/keys", 
-                  type: "POST",                
-                  dataType: 'json',
+               });
 
-                  data: JSON.stringify({ "apikey": "test" } ),
-                  //data: { "apikey": "test" },
-
-                  success: function(data){
-                      alert("ok " + data);
-                  },
-                  error: function(XMLHttpRequest, textStatus, errorThrown) {
-                    alert("some error " + textStatus);
-                  }
-                });
-                */
 
             }
-
-
-
 
 
 

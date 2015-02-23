@@ -9,25 +9,32 @@ import javafx.scene.Scene;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.paint.Color;
 import javafx.scene.web.WebEngine;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 
-
+/**
+ * the webkit wrapper
+ * TODO: on exit, stop server
+ */
 public class WebkitUI extends Application {
     private Scene scene;
 
-    private String startPage = "http://www.nubits.com";
+    //private String startPage = "http://www.nubits.com";
+    private String startPage = "http://localhost:4567";
+    private String title = "NuBot";
+    private int width = 1200;
+    private int height = 800;
 
     @Override
     public void start(Stage stage) {
         // create the scene
-        stage.setTitle("Web View");
+        stage.setTitle(title);
         Browser browser = new Browser();
-        scene = new Scene(browser, 750, 500, Color.web("#666970"));
+        scene = new Scene(browser, width, height);
+        //, Color.web("#666970"));
         stage.setScene(scene);
-        scene.getStylesheets().add("webviewsample/BrowserToolbar.css");
+        //scene.getStylesheets().add("webviewsample/BrowserToolbar.css");
 
         browser.loadSite(startPage);
 
@@ -37,14 +44,18 @@ public class WebkitUI extends Application {
     }
 
     public static void main(String[] args) {
+
+
         System.out.println("launch app");
-        for (String a : args){
+        UiServer.startUIserver();
+
+
+        for (String a : args) {
             System.out.println(a);
         }
         launch();
     }
 }
-
 
 
 class Browser extends Region {
@@ -56,7 +67,7 @@ class Browser extends Region {
 
         System.out.println("create browser");
         //apply the styles
-        getStyleClass().add("browser");
+        // getStyleClass().add("browser");
 
         //add the web view to the scene
         getChildren().add(browser);
