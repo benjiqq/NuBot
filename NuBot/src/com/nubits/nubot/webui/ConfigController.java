@@ -19,12 +19,13 @@ public class ConfigController {
     private NuBotOptions opt;
 
     public ConfigController(NuBotOptions opt, String testconfigfile) {
+        this.opt = opt;
         this.testconfigfile = testconfigfile;
 
-        Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
+        //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
         get("/keys", "application/json", (request, response) -> {
-            return keyMsg;
+            return opt;
         }, new JsonTransformer());
 
         post("/keys", "application/json", (request, response) -> {
@@ -65,25 +66,25 @@ public class ConfigController {
 
             if (postJson.containsKey("submitliquidity")) {
                 boolean newv = (boolean) postJson.get("submitliquidity");
-                opt.setDualSide(newv);
+                opt.setSendRPC(newv);
                 variableset = "submitliquidity";
             }
 
             if (postJson.containsKey("executeorders")) {
                 boolean newv = (boolean) postJson.get("executeorders");
-                opt.setDualSide(newv);
+                opt.setExecuteOrders(newv);
                 variableset = "executeorders";
             }
 
             if (postJson.containsKey("verbose")) {
                 boolean newv = (boolean) postJson.get("verbose");
-                opt.setDualSide(newv);
+                opt.setVerbose(newv);
                 variableset = "verbose";
             }
 
             if (postJson.containsKey("hipchat")) {
                 boolean newv = (boolean) postJson.get("hipchat");
-                opt.setDualSide(newv);
+                opt.setSendHipchat(newv);
                 variableset = "hipchat";
             }
 
