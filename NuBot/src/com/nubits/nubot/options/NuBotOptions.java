@@ -18,59 +18,139 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.models.CurrencyPair;
+
 import java.util.logging.Logger;
 
 /**
- *
  * @author desrever <desrever at nubits.com>
- *
- *
  */
 public class NuBotOptions {
 
     private static final Logger LOG = Logger.getLogger(NuBotOptions.class.getName());
+
     //Compulsory settings ----------------------------
+
     private String apiKey;
     private String apiSecret;
+
+    /**
+     * the email to which emergency email are sent
+     */
     private String mailRecipient;
     private String exchangeName;
+
+    /**
+     * If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.
+     */
     private boolean dualSide;
     private CurrencyPair pair;
     private SecondaryPegOptionsJSON secondaryPegOptions;
     //Conditional settings with a default value
+
+    /**
+     * The RPC username of the Nu daemon
+     */
     private String rpcUser;
+
+    /**
+     * The RPC password of the Nu daemon
+     */
     private String rpcPass;
+
+    /**
+     * The public address where the custodial grant has been received
+     */
     private String nubitAddress;
+
+    /**
+     * The RPC port of the Nu daemon
+     */
     private int nudPort;
+
     //Optional settings with a default value  ----------------------------
+
+    /**
+     * The IP address of the machine that hosts the Nu Client
+     */
     private String nudIp;
+
+    /**
+     * if set to false will disable email notifications
+     * TODO: rename mailnotifications
+     */
     private String sendMails;
+
+    /**
+     * if set to false, the bot will not try to submit liquidity info.
+     * If set to false, it will also allow the custodian to omit the declaration of nubitaddress , nudport , rpcuser and rpcpass
+     */
     private boolean submitLiquidity;
+
+    /**
+     * if set to false the bot will print a warning instead of executing orders
+     */
     private boolean executeOrders;
+
+    /**
+     * if set to true, will print on screen additional debug messages
+     */
     private boolean verbose;
+
+    /**
+     * if set to false will disable hipchat notifications
+     */
     private boolean sendHipchat;
+
     private boolean aggregate;
+
+    /**
+     * if set to true, will sync with remote NPT and reset orders often
+     */
     private boolean multipleCustodians;
+
     private int executeStrategyInterval; //disabled
+
     private int sendLiquidityInterval; //disabled
+
     private double txFee;
+
+    /**
+     * if working in sell-side mode, this value (considered USD) will be added to the sell price
+     */
     private double priceIncrement;
+
+    /**
+     * max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts
+     */
     private int emergencyTimeout;
+
+    /**
+     * Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy .
+     */
     private double keepProceeds;
+
+    /**
+     * maximum volume to put on sell walls.
+     */
     private double maxSellVolume;
+
+    /**
+     * maximum volume to put on buy walls.
+     */
     private double maxBuyVolume;
+
     private boolean distributeLiquidity;
+
     private SecondaryPegOptionsJSON cpo;
 
     /**
      * empty constructor. assumes safe creation of valid options
      */
-    public NuBotOptions(){
+    public NuBotOptions() {
 
     }
 
     /**
-     *
      * @param dualSide
      * @param apiKey
      * @param apiSecret
@@ -96,12 +176,12 @@ public class NuBotOptions {
      * @param secondaryPegOptions
      */
     public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
-            String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
-            double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-            int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
-            String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
-            boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-            boolean distributeLiquidity, SecondaryPegOptionsJSON secondaryPegOptions) {
+                        String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
+                        double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
+                        int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
+                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
+                        boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
+                        boolean distributeLiquidity, SecondaryPegOptionsJSON secondaryPegOptions) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -134,7 +214,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public boolean isDualSide() {
@@ -142,7 +221,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param dualSide
      */
     public void setDualSide(boolean dualSide) {
@@ -150,7 +228,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public boolean isSendRPC() {
@@ -158,7 +235,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param sendRPC
      */
     public void setSendRPC(boolean sendRPC) {
@@ -166,7 +242,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public boolean isExecuteOrders() {
@@ -174,7 +249,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param executeOrders
      */
     public void setExecuteOrders(boolean executeOrders) {
@@ -182,7 +256,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public boolean isVerbose() {
@@ -190,7 +263,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param verbose
      */
     public void setVerbose(boolean verbose) {
@@ -198,7 +270,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getApiKey() {
@@ -206,7 +277,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param apiKey
      */
     public void setApiKey(String apiKey) {
@@ -214,7 +284,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getApiSecret() {
@@ -222,7 +291,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param apiSecret
      */
     public void setApiSecret(String apiSecret) {
@@ -230,7 +298,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getNubitsAddress() {
@@ -238,7 +305,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param nubitAddress
      */
     public void setNubitsAddress(String nubitAddress) {
@@ -246,7 +312,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getRpcUser() {
@@ -254,7 +319,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param rpcUser
      */
     public void setRpcUser(String rpcUser) {
@@ -262,7 +326,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getRpcPass() {
@@ -270,7 +333,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param rpcPass
      */
     public void setRpcPass(String rpcPass) {
@@ -278,7 +340,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getNudIp() {
@@ -286,7 +347,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param nudIp
      */
     public void setNudIp(String nudIp) {
@@ -294,7 +354,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public int getNudPort() {
@@ -302,7 +361,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param nudPort
      */
     public void setNudPort(int nudPort) {
@@ -310,7 +368,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public double getPriceIncrement() {
@@ -318,7 +375,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param priceIncrement
      */
     public void setPriceIncrement(double priceIncrement) {
@@ -326,7 +382,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public double getTxFee() {
@@ -334,7 +389,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param txFee
      */
     public void setTxFee(double txFee) {
@@ -342,7 +396,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getExchangeName() {
@@ -350,7 +403,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param exchangeName
      */
     public void setExchangeName(String exchangeName) {
@@ -358,7 +410,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public CurrencyPair getPair() {
@@ -366,7 +417,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param pair
      */
     public void setPair(CurrencyPair pair) {
@@ -374,7 +424,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public int getExecuteStrategyInterval() {
@@ -382,7 +431,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param executeStrategyInterval
      */
     public void getExecuteStrategyInterval(int executeStrategyInterval) {
@@ -390,7 +438,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public int getSendLiquidityInteval() {
@@ -398,7 +445,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param sendLiquidityInterval
      */
     public void setSendLiquidityInteval(int sendLiquidityInterval) {
@@ -406,7 +452,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public boolean isSendHipchat() {
@@ -414,7 +459,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param sendHipchat
      */
     public void setSendHipchat(boolean sendHipchat) {
@@ -422,7 +466,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String sendMailsLevel() {
@@ -430,7 +473,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param sendMails
      */
     public void setSendMailsLevel(String sendMails) {
@@ -438,7 +480,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public String getMailRecipient() {
@@ -446,7 +487,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param mailRecipient
      */
     public void setMailRecipient(String mailRecipient) {
@@ -454,7 +494,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public SecondaryPegOptionsJSON getSecondaryPegOptions() {
@@ -462,7 +501,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param secondaryPegOptions
      */
     public void setCryptoPegOptions(SecondaryPegOptionsJSON secondaryPegOptions) {
@@ -494,7 +532,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @return
      */
     public int getEmergencyTimeout() {
@@ -502,7 +539,6 @@ public class NuBotOptions {
     }
 
     /**
-     *
      * @param emergencyTimeoutMinutes
      */
     public void setEmergencyTimeoutMinutes(int emergencyTimeoutMinutes) {
@@ -551,8 +587,8 @@ public class NuBotOptions {
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
+
     /**
-     *
      * @return
      */
     public String toStringNoKeys() {
