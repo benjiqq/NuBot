@@ -88,6 +88,18 @@ public class ConfigController {
                 variableset = "hipchat";
             }
 
+            if (postJson.containsKey("nubitaddress")) {
+                String newv = "" + postJson.get("nubitaddress");
+                opt.setNubitAddress(newv);
+                variableset = "nubitaddress";
+            }
+
+
+            if (postJson.containsKey("nudport")) {
+                int newv = (Integer)postJson.get("nudport");
+                opt.setNudPort(newv);
+                variableset = "nudport";
+            }
 
 
             SaveOptions.backupOptions(this.testconfigfile);

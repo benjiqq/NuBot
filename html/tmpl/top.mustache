@@ -59,6 +59,15 @@
                     $('#executeorders').attr('checked',data["executeorders"]);
                     $('#verbose').attr('checked',data["verbose"]);
                     $('#hipchat').attr('checked',data["hipchat"]);
+
+                    $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
+                    $("#nudport").attr("placeholder", data["nudport"]);
+                    $("#rpcpass").attr("placeholder", data["rpcpass"]);
+                    $("#rpcuser").attr("placeholder", data["rpcuser"]);
+                    $("#pair").attr("placeholder", data["pair"]);
+
+
+
                  });
 
             }
@@ -86,23 +95,20 @@
 
             function savesecret() {
                 //put data to server
-                //TODO which element?
                 var el = $('#apisecret');
-
                 var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "apisecret": inputval });
 
-                //make HTTP post to server
-                $.ajax(url, {
-                    data : JSON.stringify({ "apisecret": inputval }),
-                    contentType : 'application/json',
-                    type : 'POST',
-                    success: function(data){
-                      console.log("ok " + data);
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        alert("error posting to server " + textStatus);
-                    }
-               });
+                makePost(jsondata);
+            }
+
+            function save_nubitaddress() {
+                //put data to server
+                var el = $('#nubitaddress');
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "nubitaddress": inputval });
+
+                makePost(jsondata);
             }
 
 
@@ -157,16 +163,6 @@
                     }
                });
             }
-
-/*
-
-$("#nubitaddress").attr("placeholder", data["nubitaddress"]);
-$("#nudport").attr("placeholder", data["nudport"]);
-$("#rpcpass").attr("placeholder", data["rpcpass"]);
-$("#rpcuser").attr("placeholder", data["rpcuser"]);
-$("#pair").attr("placeholder", data["pair"]);
-$("#mail-recipient").attr("placeholder", data["mail-recipient"]);
-*/
 
 
         </script>
