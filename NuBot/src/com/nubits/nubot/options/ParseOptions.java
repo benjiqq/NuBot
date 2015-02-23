@@ -76,7 +76,7 @@ public class ParseOptions {
 
         for (int i = 0; i < comp.length; i++) {
             if (!optionsJSON.containsKey(comp[i]))
-                throw new NuBotConfigException("necessary key " + comp[i]);
+                throw new NuBotConfigException("necessary key: " + comp[i]);
         }
 
         //default values for optional settings
