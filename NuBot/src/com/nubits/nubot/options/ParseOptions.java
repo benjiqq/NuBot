@@ -101,13 +101,14 @@ public class ParseOptions {
 
         NuBotOptions options = null;
 
-
         for (int i = 0; i < comp.length; i++) {
             if (!containsIgnoreCase(optionsJSON, comp[i]))
                 throw new NuBotConfigException("necessary key: " + comp[i]);
         }
 
+
         //default values for optional settings
+
         String nudIp = NuBotOptionsDefault.nudIp;
         String sendMails = NuBotOptionsDefault.sendMails;
         boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
@@ -180,10 +181,13 @@ public class ParseOptions {
 
         }
 
-        //optional settings
-
         if (containsIgnoreCase(optionsJSON, "nudip")) {
             nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
+        }
+        //---- optional settings ----
+
+        if (optionsJSON.containsKey("nudip")) {
+            nudIp = (String) optionsJSON.get("nudip");
         }
 
         if (containsIgnoreCase(optionsJSON, "priceincrement")) {
