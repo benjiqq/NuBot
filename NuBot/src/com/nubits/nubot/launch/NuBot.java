@@ -33,6 +33,7 @@ import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -281,6 +282,9 @@ public class NuBot {
 
         if (Utils.isSupported(Global.options.getPair())) {
             if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
+                // set liquidityinfo task to the strategy
+                ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
+                        .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
                 Global.taskManager.getStrategyFiatTask().start(7);
             } else {
 
