@@ -33,9 +33,9 @@ sourceCompatibility = 1.8 // java version
 repositories {
     maven { url "http://mvnrepository.com/artifact" }
     mavenCentral()
-    flatDir {
-        dirs 'NuBot/lib/nubot-dependancies'
-    }
+    /*flatDir {
+        dirs 'NuBot/lib'
+    }*/
 }
 
 dependencies {
@@ -133,6 +133,7 @@ def distdir = new File("dist-packaged")
 def logdir = new File("logs")
 def jarname = "NuBot.jar"
 def mainclass = "com.nubits.nubot.launch.NuBot"
+def uiclass = "com.nubits.nubot.webui.UiServer"
 
 def includeTestConfig = true
 
@@ -181,7 +182,10 @@ task NuBotJar(type: Jar) {
         exclude 'META-INF/*.RSA'
     }
     with jar
+
     manifest.attributes("Main-Class": mainclass)
+    //manifest.attributes("Main-Class": uiclass)
+
     //println 'jar created: ' + archivePath
 }
 
@@ -192,8 +196,8 @@ task NuBotMakeDistribution(dependsOn: compileReadme) << {
     println 'start making distribution'
     tasks.initDist.execute()
 
-    //println 'delete ${distdir}'
-    //delete "${distdir}"
+    println 'delete ${distdir}'
+    delete "${distdir}"
     tasks.NuBotJar.execute()
     println 'copy for distribution'
     tasks.copyDist.execute()
