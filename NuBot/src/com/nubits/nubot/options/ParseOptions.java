@@ -58,6 +58,8 @@ public class ParseOptions {
 
         } catch (ParseException ex) {
             throw new NuBotConfigException("Configuration error from single file");
+        } catch (Exception e){
+            throw new NuBotConfigException("Configuration error from single file");
         }
 
     }
