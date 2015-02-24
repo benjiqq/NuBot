@@ -26,6 +26,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -44,6 +45,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
     private boolean isFirstTime = true;
+    private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean proceedsInBalance = false;
     private final int RESET_AFTER_CYCLES = 50;
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
@@ -158,6 +160,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 } else {
                     LOG.info("Initial walls placed");
                 }
+                getSendLiquidityTask().setFirstOrdersPlaced(true);
             }
         } else {
             //Execute this block every RESET_AFTER_CYCLES cycles to ensure faireness with competing custodians
@@ -636,5 +639,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
 
         return success;
+    }
+
+    public SubmitLiquidityinfoTask getSendLiquidityTask() {
+        return sendLiquidityTask;
+    }
+
+    public void setSendLiquidityTask(SubmitLiquidityinfoTask sendLiquidityTask) {
+        this.sendLiquidityTask = sendLiquidityTask;
     }
 }
