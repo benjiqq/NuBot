@@ -24,11 +24,11 @@ public class ConfigController {
 
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
-        get("/keys", "application/json", (request, response) -> {
+        get("/config", "application/json", (request, response) -> {
             return opt;
         }, new JsonTransformer());
 
-        post("/keys", "application/json", (request, response) -> {
+        post("/config", "application/json", (request, response) -> {
 
             //not working. put is in request body
             //request.queryParams("apikey");
@@ -102,11 +102,12 @@ public class ConfigController {
             }
 
 
-            SaveOptions.backupOptions(this.testconfigfile);
             //NuBotOptions opt = ParseOptions.parseOptionsSingle(thils.testconfigfile);
 
             //SaveOptions.saveOptions(opt, testconfig);
-            SaveOptions.saveOptionsPretty(opt, "testconfig/new.json");
+            SaveOptions.backupOptions(this.testconfigfile);
+            String saveTo = "test.json"; //"testconfig/new.json"
+            SaveOptions.saveOptionsPretty(opt, saveTo);
 
             //TODO: as json
             boolean success = true;

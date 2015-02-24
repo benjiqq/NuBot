@@ -49,15 +49,17 @@ public class ParseOptions {
 
         File f = new File(filepath);
         if (!f.exists())
-            throw new NuBotConfigException("file does not exist");
+            throw new NuBotConfigException("file " + f.getAbsolutePath() + " does not exist");
 
         try {
             JSONObject inputJSON = parseSingleJsonFile(filepath);
-            //JSONObject optionsJSON = getOptionsKey(inputJSON);
+            JSONObject optionsJSON = getOptionsKey(inputJSON);
             return parseOptionsFromJson(inputJSON);
 
         } catch (ParseException ex) {
-            throw new NuBotConfigException("Configuration error from single file");
+            throw new NuBotConfigException("Parse Exception. Configuration error from single file");
+        } catch (Exception e){
+            throw new NuBotConfigException("Configuration error from single file " + e);
         }
 
     }

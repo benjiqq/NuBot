@@ -97,11 +97,21 @@ public class NuBot {
         Utils.loadProperties("settings.properties");
 
         //Load Options and test for critical configuration errors
-        try {
-            Global.options = ParseOptions.parseOptions(args);
-        } catch (NuBotConfigException ex) {
-            Utils.exitWithMessage("NuBot wrongly configured");
-            System.exit(0);
+        if (args.length > 1) {
+            //more than one file path given
+            try {
+                Global.options = ParseOptions.parseOptions(args);
+            } catch (NuBotConfigException ex) {
+                Utils.exitWithMessage("NuBot wrongly configured");
+                System.exit(0);
+            }
+        } else {
+            try {
+                Global.options = ParseOptions.parseOptionsSingle(args[0]);
+            } catch (NuBotConfigException ex) {
+                Utils.exitWithMessage("NuBot wrongly configured");
+                System.exit(0);
+            }
         }
 
         //test if configuration is supported

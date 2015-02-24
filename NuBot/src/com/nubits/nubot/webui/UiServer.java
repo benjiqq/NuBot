@@ -4,7 +4,6 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.webui.service.StockServiceServer;
 import spark.ModelAndView;
 
 import java.util.HashMap;
@@ -17,34 +16,29 @@ public class UiServer {
     //TODO path
     private static String htmlFolder = "./html/tmpl/";
 
-
-    public static void startService() {
-        try {
-            new StockServiceServer().run();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     private static String testconfigFile = "test.json";
     private static String testconfigpath = "testconfig/" + testconfigFile;
 
     /**
      * start the UI server
-     *
      */
-    public static void startUIserver() {
+    public static void startUIserver(String[] args) {
 
         //TODO: only load if in testmode and this is not set elsewhere
         //should better read: load global settings
         Utils.loadProperties("settings.properties");
-
-        try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
-            new ConfigController(opt, testconfigpath);
-        } catch (NuBotConfigException e) {
-            System.out.println("could not parse config");
-            System.out.println(e);
+        if (args.length == 1) {
+            try {
+                String configFilePath = args[0]; //testconfigpath
+                NuBotOptions opt = ParseOptions.parseOptionsSingle(configFilePath);
+                new ConfigController(opt, testconfigpath);
+            } catch (NuBotConfigException e) {
+                System.out.println("could not parse config");
+                System.out.println(e);
+                System.exit(0);
+            }
+        } else if ((args.length > 1)|| (args.length ==0)){
+            System.out.println("single file config only");
             System.exit(0);
         }
 
@@ -55,12 +49,11 @@ public class UiServer {
         get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
 
-
-
     }
 
 
     public static void main(String[] args) {
-        startUIserver();
+
+        startUIserver(args);
     }
 }
