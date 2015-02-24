@@ -44,6 +44,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
 
@@ -59,6 +60,7 @@ public class ComkortWrapper implements TradeInterface {
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
     private String checkConnectionUrl;
+    private int lastNonce = 0;
     //API Paths
     private final String API_BASE_URL = "https://api.comkort.com/v1/private";
     private final String API_BASE_URL_PUBLIC = "https://api.comkort.com/v1/public";
@@ -72,6 +74,7 @@ public class ComkortWrapper implements TradeInterface {
     private final String API_LIST = "list";
     private final String API_LIST_ALL = "list_all";
     private final String API_CANCEL = "cancel";
+    private final String API_TRADES = "trades";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -256,7 +259,13 @@ public class ComkortWrapper implements TradeInterface {
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            JSONObject orders = (JSONObject) httpAnswerJson.get("orders");
+            JSONObject orders;
+            try {
+                orders = (JSONObject) httpAnswerJson.get("orders");
+            } catch (ClassCastException cce) {
+                apiResponse.setResponseObject(orderList);
+                return apiResponse;
+            }
             Set<String> keys = orders.keySet();
             for (Iterator<String> key = keys.iterator(); key.hasNext();) {
                 String thisKey = key.next();
@@ -310,9 +319,7 @@ public class ComkortWrapper implements TradeInterface {
         out.setPrice(price);
         out.setPair(pair);
         if (in.containsKey("added")) {
-            LOG.severe(in.get("added").toString());
             long timeStamp = (long) Utils.getDouble(in.get("added").toString());
-            LOG.severe(Objects.toString(timeStamp));
             Date insertDate = new Date(timeStamp * 1000);
             out.setInsertedDate(insertDate);
         }
@@ -372,17 +379,93 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
+    }
+    
+    private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        //https://api.comkort.com/v1/private/user/trades
+        String url = API_BASE_URL + "/" + API_USER + "/" + API_TRADES;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+        ArrayList<Trade> tradeList = new ArrayList<>();
+
+        args.put("market_alias", pair.toString("_"));
+
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray trades = (JSONArray) httpAnswerJson.get("trades");
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                Trade thisTrade = parseTrade(trade.next());
+                if ( thisTrade.getDate().getTime() < (startTime * 1000L)) {
+                    continue;
+                }
+                tradeList.add(thisTrade);
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;        
+    }
+
+    private Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+        
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(in.get("market_alias").toString(), "_");
+        out.setPair(pair);
+        Amount amount = new Amount(Utils.getDouble(in.get("amount")), pair.getOrderCurrency());
+        out.setAmount(amount);
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("timestamp").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.severe(pe.toString());
+        }
+        if (date != null) {
+            long timeStamp = date.getTime();
+            Date insertDate = new Date(timeStamp);
+            out.setDate(insertDate);
+        }
+        out.setExchangeName(Global.exchange.getName());
+        out.setId(in.get("id").toString());
+        if (in.get("buy_order_id").equals(false)) {
+            out.setOrder_id(in.get("sell_order_id").toString());
+            out.setType(Constant.SELL);
+        } else {
+            out.setOrder_id(in.get("buy_order_id").toString());
+            out.setType(Constant.BUY);
+        }
+        Amount price = new Amount(Utils.getDouble(in.get("price")), pair.getPaymentCurrency());
+        out.setPrice(price);
+        
+        return out;
     }
 
     @Override
     public ApiResponse isOrderActive(String id) {
-        return null;
+        ApiResponse apiRespone = new ApiResponse();
+        ApiResponse activeOrders = getActiveOrders();
+        if (activeOrders.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList) activeOrders.getResponseObject();
+            apiRespone.setResponseObject(false);
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(id)) {
+                    apiRespone.setResponseObject(true);
+                }
+            }
+        } else {
+            apiRespone = activeOrders;
+        }
+        return apiRespone;
     }
 
     @Override
@@ -392,7 +475,22 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        ApiResponse openOrders = getActiveOrders();
+        if (openOrders.isPositive()) {
+            apiResponse.setResponseObject(true);
+            ArrayList<Order> orderList = (ArrayList) openOrders.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                ApiResponse cancel = cancelOrder(thisOrder.getId(), thisOrder.getPair());
+                if (cancel.getResponseObject().equals(false)) {
+                    apiResponse.setResponseObject(false);
+                }
+            }
+        } else { 
+            apiResponse = openOrders;
+        }
+        return apiResponse;
     }
 
     @Override
@@ -500,7 +598,12 @@ public class ComkortWrapper implements TradeInterface {
                 if (needAuth) {
                     connection.setRequestProperty("apikey", keys.getApiKey());
                     connection.setRequestProperty("sign", signRequest(keys.getPrivateKey(), post_data));
-                    connection.setRequestProperty("nonce", Objects.toString(System.currentTimeMillis() / 1000L));
+                    int nonce = Integer.parseInt(Objects.toString(System.currentTimeMillis() / 1000L));
+                    if (nonce <= lastNonce) {
+                        nonce += 1;
+                    }
+                    lastNonce = nonce;
+                    connection.setRequestProperty("nonce", Objects.toString(nonce));
                 }
 
                 connection.setDoOutput(true);
