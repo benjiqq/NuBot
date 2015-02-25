@@ -34,6 +34,7 @@ import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -43,10 +44,9 @@ import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
-import org.json.simple.JSONObject;
-
 import java.io.IOException;
 import java.util.logging.Logger;
+import org.json.simple.JSONObject;
 
 /**
  * Provides the main class of NuBot. Instantiate this class to start the NuBot
@@ -295,6 +295,10 @@ public class NuBot {
 
 
         if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
+            // set liquidityinfo task to the strategy
+            ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
+                    .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
+
             Global.taskManager.getStrategyFiatTask().start(7);
         } else {
 
