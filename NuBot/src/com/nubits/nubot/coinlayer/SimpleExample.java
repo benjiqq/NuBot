@@ -1,78 +1,53 @@
 package com.nubits.nubot.coinlayer;
 
+import io.metaexchange.bitcoinrpc.BitcoinAPI;
+import io.metaexchange.bitcoinrpc.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Date;
-import java.util.Map;
-import java.util.Properties;
+import java.math.BigDecimal;
 
-import com.googlecode.jsonrpc4j.JsonRpcHttpClient;
-import io.metaexchange.bitcoinrpc.BitcoinRPC;
-import io.metaexchange.bitcoinrpc.ClientStatic;
 
 public class SimpleExample {
 
     private static final Logger logger = LoggerFactory.getLogger(SimpleExample.class);
 
+    private static BitcoinAPI fullclient;
+
+    private static String rpcfile = "conf/rpc.properties";
+
+
     public static void main(String[] args) {
 
-        JsonRpcHttpClient clientrpc = null;
-
-        logger.debug("[MAIN] Current Date : {}", getCurrentDate());
-        System.out.println(getCurrentDate());
-
-        String username, password, host, port;
-
-        Properties properties = new Properties();
+        BitcoinAPI client = null;
         try {
-            properties.load(new FileInputStream(
-                    "config/rpc.properties"));
-            username = properties.getProperty("username");
-            password = properties.getProperty("password");
-            host = properties.getProperty("host");
-            port = properties.getProperty("port");
-
-            System.out.println("using config " + username + " " + password + " " + host + " " + port);
-
-            clientrpc = ClientStatic.createRpc(username, password, host, port);
-            System.out.println("client " + clientrpc);
-
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
+            client = new BitcoinAPI(rpcfile);
+        } catch (Exception e) {
             System.exit(0);
         }
 
-
-        try {
-            BitcoinRPC client = ClientStatic.clientCreate(clientrpc);
-
-            String bcount = "" + client.getblockcount();
-            System.out.println("block count: " + bcount);
-
-            String balance = "" + client.getbalance();
-            System.out.println("balance: " + balance);
-
-            String newaddr = client.getnewaddress("test");
-            System.out.println("newaddr: " + newaddr);
-
-            Map<String,String> valid = client.validateaddress(newaddr);
-            boolean isvalid = new Boolean(valid.get("isvalid")).booleanValue();
-            System.out.println(isvalid);
-
-
-        } catch (Exception e) {
-            try {
-                logger.info("server not available " + e);
-                Thread.sleep(1000);
-            } catch (InterruptedException e1) {
-            }
+        boolean islive = client.isLive();
+        if (!islive) {
+            System.out.println("blockchain is not live");
+            System.exit(0);
         }
+
+        Block block = client.getLastBlock();
+        System.out.println("block " + block);
+
+        System.out.println(block.getMerkleroot());
+
+        BigDecimal balance = client.getBalance();
+        System.out.println("balance: " + balance);
+
+        //String newaddr = client.getnewaddress("test");
+        //System.out.println("newaddr: " + newaddr);
+
+        //Map<String, String> valid = client.validateaddress(newaddr);
+        //boolean isvalid = new Boolean(valid.get("isvalid")).booleanValue();
+        //System.out.println(isvalid);
+
+
     }
 
-    private static Date getCurrentDate() {
-        return new Date();
-    }
 }

@@ -71,7 +71,7 @@ dependencies {
 
     //static. no maven available
     compile files('NuBot/lib/EasyJccKit.jar')
-    compile files('NuBot/lib/rpcstub-1.0.jar')
+    compile files('NuBot/lib/bitcoinapi-0.1.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
