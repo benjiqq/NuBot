@@ -60,6 +60,9 @@ public class NuBotOptions {
      */
     private CurrencyPair pair;
 
+    /**
+     * options for PEG other than NBT/USD
+     */
     private SecondaryPegOptionsJSON secondaryPegOptions;
 
     //Conditional settings with a default value
@@ -118,16 +121,15 @@ public class NuBotOptions {
      */
     private boolean sendHipchat;
 
+    /**
+     * TODO: describe this
+     */
     private boolean aggregate;
 
     /**
      * if set to true, will sync with remote NPT and reset orders often
      */
     private boolean multipleCustodians;
-
-    private int executeStrategyInterval; //disabled
-
-    private int sendLiquidityInterval; //disabled
 
     /**
      * If transaction fee not available from the exchange via api, this value will be used
@@ -159,7 +161,21 @@ public class NuBotOptions {
      */
     private double maxBuyVolume;
 
+    /**
+     * TODO
+     */
     private boolean distributeLiquidity;
+
+    /**
+     * TODO
+     */
+    private int executeStrategyInterval; //disabled
+
+    /**
+     * TODO
+     */
+    private int sendLiquidityInterval; //disabled
+
 
     private SecondaryPegOptionsJSON cpo;
 
@@ -257,7 +273,7 @@ public class NuBotOptions {
     /**
      * @param sendRPC
      */
-    public void setSendRPC(boolean sendRPC) {
+    public void setSubmitLiquidity(boolean sendRPC) {
         this.submitLiquidity = sendRPC;
     }
 
