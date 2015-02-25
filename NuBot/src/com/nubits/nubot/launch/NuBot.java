@@ -214,7 +214,7 @@ public class NuBot {
         Global.taskManager = new TaskManager();
         Utils.printSeparator();
 
-        if (Global.options.isSendRPC()) {
+        if (Global.options.isSubmitliquidity()) {
             LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
             Global.publicAddress = Global.options.getNubitsAddress();
             Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
@@ -255,7 +255,7 @@ public class NuBot {
 
         Utils.printSeparator();
 
-        if (Global.options.isSendRPC()) {
+        if (Global.options.isSubmitliquidity()) {
             Utils.printSeparator();
             LOG.info("Check connection with nud");
             if (Global.rpcClient.isConnected()) {
@@ -436,7 +436,7 @@ public class NuBot {
                     }
 
                     //reset liquidity info
-                    if (Global.rpcClient.isConnected() && Global.options.isSendRPC()) {
+                    if (Global.rpcClient.isConnected() && Global.options.isSubmitliquidity()) {
                         //tier 1
                         LOG.info("Resetting Liquidity Info before quit");
 

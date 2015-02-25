@@ -250,7 +250,7 @@ public class NuBotOptions {
     /**
      * @return
      */
-    public boolean isSendRPC() {
+    public boolean isSubmitliquidity() {
         return submitLiquidity;
     }
 
