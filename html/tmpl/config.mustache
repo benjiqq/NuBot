@@ -36,21 +36,219 @@
 
 
 <table class="table table-bordered" width="500">
+
+
 <tr>
     <td class="col-md-2">API key</td>
 
 <td class="col-md-8">
     <div class="input-group">
-
       <input id="apikey" size="100" type="text" class="form-control" placeholder="API Key">
-<!--
-      <span class="input-group-btn">
-         <button class="btn btn-default" type="button" onclick="showModal()">Change</button>
-
-      </span>
--->
     </td><td>
 <button type="button" class="btn btn-primary" onclick="savekey()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">API secret</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="apisecret" size="100" type="text" class="form-control" placeholder="API Secret">
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="savesecret()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+
+<tr>
+    <td class="col-md-2">Dual side</td>
+
+<td class="col-md-8">
+  <span class="input-group-addon">
+        <input id="dualside" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td><td>
+
+<button type="button" class="btn btn-primary" onclick="savedual()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+
+<tr>
+    <td class="col-md-2">multiplecustodians</td>
+
+<td class="col-md-8">
+  <span class="input-group-addon">
+        <input id="multiplecustodians" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td><td>
+
+<button type="button" class="btn btn-primary" onclick="save_multiplecustodians()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">submitliquidity</td>
+
+<td class="col-md-8">
+  <span class="input-group-addon">
+        <input id="submitliquidity" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td><td>
+
+<button type="button" class="btn btn-primary" onclick="save_submitliquidity()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+
+<tr>
+    <td class="col-md-2">executeorders</td>
+
+<td class="col-md-8">
+  <span class="input-group-addon">
+        <input id="executeorders" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td><td>
+
+<button type="button" class="btn btn-primary" onclick="save_executeorders()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+
+
+<tr>
+    <td class="col-md-2">verbose</td>
+
+<td class="col-md-8">
+  <span class="input-group-addon">
+        <input id="verbose" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td><td>
+
+<button type="button" class="btn btn-primary" onclick="save_verbose()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">hipchat</td>
+
+<td class="col-md-8">
+  <span class="input-group-addon">
+        <input id="hipchat" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td><td>
+
+<button type="button" class="btn btn-primary" onclick="save_hipchat()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">nubitaddress</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="nubitaddress" size="100" type="text" class="form-control" placeholder="nubitaddress">
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="save_nubitaddress()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">nudport</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="nudport" size="100" type="text" class="form-control" placeholder="nudport">
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="save_nudport()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">rpcpass</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="rpcpass" size="100" type="text" class="form-control" placeholder="rpcpass">
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="save_rpcpass()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">rpcuser</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="rpcuser" size="100" type="text" class="form-control" placeholder="rpcuser">
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="save_rpcuser()">
+  Change
+</button>
+
+    </div><!-- /input-group -->
+</td></tr>
+
+
+<tr>
+    <td class="col-md-2">pair</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="pair" size="100" type="text" class="form-control" placeholder="pair">
+    </td><td>
+<button type="button" class="btn btn-primary" onclick="save_pair()">
   Change
 </button>
 
@@ -61,6 +259,8 @@
 </table>
 
     </div>
+
+
 
 
   <div class="col-xs-6 col-md-4"></div>

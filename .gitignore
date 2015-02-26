@@ -71,5 +71,7 @@ NuBot/.settings
 .idea
 *.iml
 Test*.xml
+*.ipr
+*.iws
 
-testconfig/
+#testconfig/

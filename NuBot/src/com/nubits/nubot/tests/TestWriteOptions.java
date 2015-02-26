@@ -2,9 +2,13 @@ package com.nubits.nubot.tests;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
 import junit.framework.TestCase;
+import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.io.File;
@@ -29,7 +33,7 @@ public class TestWriteOptions extends TestCase {
 
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        String jsonOpt =gson.toJson(opt);
+        String jsonOpt = gson.toJson(opt);
         //System.out.println(jsonOpt);
         assertTrue(jsonOpt.startsWith("{"));
         assertTrue(jsonOpt.endsWith("}"));
@@ -59,6 +63,44 @@ public class TestWriteOptions extends TestCase {
         assertTrue(success);
         newbak = new File("testconfig/test.json_2.bak");
         assertTrue(newbak.exists());
+    }
+
+
+    /**
+     * create a class and then write it to file
+     */
+    @Test
+    public void testCreateObject() {
+        NuBotOptions opt = new NuBotOptions();
+        opt.setApiKey("test");
+        opt.setExchangeName("testexchange");
+        Currency c = Currency.createCurrency("NBT");
+        Currency usd = Currency.createCurrency("USD");
+        opt.setPair(new CurrencyPair(c, usd));
+        String testout = "testconfig/test_out.json";
+        SaveOptions.saveOptionsPretty(opt, testout);
+        File newout = new File(testout);
+        assertTrue(newout.exists());
+
+        try {
+            JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testout);
+            assertTrue(inputJSON.containsKey("exchangename"));
+        } catch (Exception e) {
+            assertTrue(false);
+        }
+
+        //assertTrue(inputJSON.containsKey("options"));
+        //JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
+
+    }
+
+    @Test
+    public void testLoadChangeSave() {
+        NuBotOptions opt = new NuBotOptions();
+
+        SaveOptions.saveOptions(opt, "testconfig/" + "test1.json");
+        File f = new File(testconfig);
+        assertTrue(f.exists());
     }
 
 

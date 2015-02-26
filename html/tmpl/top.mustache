@@ -5,12 +5,8 @@
 
             body {
                 font-family: Helvetica;
-            }
-
-
-            body {
-              min-height: 2000px;
-              padding-top: 70px;
+                min-height: 2000px;
+                padding-top: 70px;
             }
 
           .row {
@@ -43,59 +39,130 @@
 
               var host = "localhost";
               var port = 4567;
-              var url = "http://" + host + ":" + port;
+              var url = "http://" + host + ":" + port + "/keys";
 
             function loadVals() {
 
                 $.ajax({
+                  type: "GET",
                   dataType: "json",
-                  url: url + "/keys",
+                  url: url,
                 })
-                  .done(function( data ) {
+                .done(function( data ) {
                     //var pp = $("#key").attr("placeholder");
 
                     $("#apikey").attr("placeholder", data["apikey"]);
-
-                    /*
                     $("#apisecret").attr("placeholder", data["apisecret"]);
-                    $("#dualside").attr("placeholder", data["dualside"]);
+                    $('#dualside').attr('checked',data["dualside"]);
+                    $('#multiplecustodians').attr('checked',data["multiplecustodians"]);
+                    $('#submitliquidity').attr('checked',data["submitliquidity"]);
+                    $('#executeorders').attr('checked',data["executeorders"]);
+                    $('#verbose').attr('checked',data["verbose"]);
+                    $('#hipchat').attr('checked',data["hipchat"]);
+
                     $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
                     $("#nudport").attr("placeholder", data["nudport"]);
                     $("#rpcpass").attr("placeholder", data["rpcpass"]);
                     $("#rpcuser").attr("placeholder", data["rpcuser"]);
                     $("#pair").attr("placeholder", data["pair"]);
-                    $("#mail-recipient").attr("placeholder", data["mail-recipient"]);
-                    */
 
-                  });
+
+
+                 });
 
             }
 
-
-            function savekey(el) {
-                //get user data
-
+            function savekey() {
+                //put data to server
+                //TODO which element?
                 var el = $('#apikey');
-                alert(el);
 
-                var inputkey = el.attr('value'); //el.attr('placeholder');
-
-                //$('#input_id').attr('value',$('#input_id').val());
+                var inputkey = el.attr('value');
 
                 //make HTTP post to server
+                $.ajax(url, {
+                    data : JSON.stringify({ "apikey": inputkey }),
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                      console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus);
+                    }
+               });
+            }
 
-                $.post( url + "/keys", { apikey: inputkey } )
+            function savesecret() {
+                //put data to server
+                var el = $('#apisecret');
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "apisecret": inputval });
 
-                .done(function( data ) {
-                   el.css( 'border-color', '#993333' );
-                   alert(data);
-                });
+                makePost(jsondata);
+            }
 
+            function save_nubitaddress() {
+                //put data to server
+                var el = $('#nubitaddress');
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "nubitaddress": inputval });
+
+                makePost(jsondata);
             }
 
 
+            function savedual() {
+                var ischecked = $('#dualside').prop('checked');
+                var jsondata = JSON.stringify({ "dualside": ischecked });
+                makePost(jsondata);
+            }
+
+            function save_multiplecustodians(){
+                var ischecked = $('#multiplecustodians').prop('checked');
+                var jsondata = JSON.stringify({ "multiplecustodians": ischecked });
+                makePost(jsondata);
+            }
+
+            function save_submitliquidity(){
+                var ischecked = $('#submitliquidity').prop('checked');
+                var jsondata = JSON.stringify({ "submitliquidity": ischecked });
+                makePost(jsondata);
+            }
+
+            function save_executeorders(){
+                var ischecked = $('#executeorders').prop('checked');
+                var jsondata = JSON.stringify({ "executeorders": ischecked });
+                makePost(jsondata);
+            }
+
+            function save_verbose(){
+                var ischecked = $('#verbose').prop('checked');
+                var jsondata = JSON.stringify({ "verbose": ischecked });
+                makePost(jsondata);
+            }
+
+            function save_hipchat(){
+                var ischecked = $('#hipchat').prop('checked');
+                var jsondata = JSON.stringify({ "hipchat": ischecked });
+                makePost(jsondata);
+            }
 
 
+            function makePost(jsondata){
+                //make HTTP post to server
+                $.ajax(url, {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                      console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus);
+                    }
+               });
+            }
 
 
         </script>
@@ -109,7 +176,6 @@
 
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
-
 
 
     </head>

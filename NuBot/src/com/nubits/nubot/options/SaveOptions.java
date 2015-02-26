@@ -3,6 +3,8 @@ package com.nubits.nubot.options;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FileSystem;
 import org.apache.commons.io.FileUtils;
 
@@ -14,6 +16,16 @@ import java.io.IOException;
  */
 public class SaveOptions {
 
+
+    public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
+        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+        gson.registerTypeAdapter(NuBotOptions.class, new OptionsSerializer());
+        Gson parser = gson.create();
+        String js = parser.toJson(opt);
+        FileSystem.writeToFile(js, filepath, false);
+        System.out.println(js);
+        return true;
+    }
     /**
      * save options to file
      *
