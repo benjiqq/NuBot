@@ -176,8 +176,17 @@ public class NuBotOptions {
      */
     private int sendLiquidityInterval; //disabled
 
+    // ------- secondary peg ----------
 
-    private SecondaryPegOptionsJSON cpo;
+    private boolean secondarypeg;
+
+    //private SecondaryPegOptionsJSON cpo;
+
+    private double wallchangeThreshold;
+
+    private double spread;
+
+    private double distanceThreshold;
 
     /**
      * empty constructor. assumes safe creation of valid options
@@ -216,7 +225,8 @@ public class NuBotOptions {
                         int executeStrategyInterval, boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity, SecondaryPegOptionsJSON secondaryPegOptions) {
+                        boolean distributeLiquidity, boolean secondarypeg,
+                        double wallchangeThreshold, double spread, double distanceThreshold) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -238,12 +248,16 @@ public class NuBotOptions {
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
-        this.secondaryPegOptions = secondaryPegOptions;
         this.aggregate = aggregate;
         this.multipleCustodians = multipleCustodians;
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
+
+        this.secondarypeg = secondarypeg;
+        this.wallchangeThreshold = wallchangeThreshold;
+        this.spread = spread;
+        this.distanceThreshold = distanceThreshold;
 
     }
 

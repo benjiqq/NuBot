@@ -108,6 +108,12 @@ public class ParseOptions {
         }
 
 
+        boolean secondarypeg = false;
+
+        double wallchangeThreshold = -1;
+        double spread = -1;
+        double distanceThreshold = -1;
+
         //default values for optional settings
 
         String nudIp = NuBotOptionsDefault.nudIp;
@@ -160,21 +166,12 @@ public class ParseOptions {
         SecondaryPegOptionsJSON cpo = null;
         if (requireCryptoOptions) {
 
-            if (optionsJSON.containsKey("secondary-peg-options")) {
+            if (optionsJSON.containsKey("secondarypegoptions")) {
+                secondarypeg = (boolean)getIgnoreCase(optionsJSON,"secondarypegoptions");
+                wallchangeThreshold = (double)getIgnoreCase(optionsJSON,"wallchangeThreshold");
+                spread = (double)getIgnoreCase(optionsJSON,"spread");
+                distanceThreshold= (double)getIgnoreCase(optionsJSON,"distanceThreshold");
 
-                Map setMap = new HashMap();
-
-                //convert from simple JSON to org.json.JSONObject
-                JSONObject oldObject = (JSONObject) getIgnoreCase(optionsJSON, "secondary-peg-options");
-
-                Set tempSet = oldObject.entrySet();
-                for (Object o : tempSet) {
-                    Map.Entry entry = (Map.Entry) o;
-                    setMap.put(entry.getKey(), entry.getValue());
-                }
-
-                pegOptionsJSON = new org.json.JSONObject(setMap);
-                cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
             } else {
                 throw new NuBotConfigException("secondary-peg-options are required in the options");
             }
@@ -299,7 +296,7 @@ public class ParseOptions {
                 executeOrders, verbose, pair, executeStrategyInterval,
                 sendHipchat, sendMails, mailRecipient,
                 emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
-                maxSellVolume, maxBuyVolume, distributeLiquidity, cpo);
+                maxSellVolume, maxBuyVolume, distributeLiquidity, secondarypeg, wallchangeThreshold, spread, distanceThreshold);
 
 
         if (options == null) {
