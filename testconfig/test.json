@@ -5,14 +5,14 @@
   "dualside": true,
   "submitliquidity": false,
   "executeorders": false,
+  "pair": "nbt_usd",
   "verbose": false,
   "hipchat": true,
   "mailnotifications": "ALL",
   "mailrecipient": "xxx@xxx.xxx",
-  "emergency-timeout": 60,
+  "emergencytimeout": 60,
   "keepproceeds": 0.0,
   "maxsellvolume": 0.0,
   "maxbuyvolume": 0.0,
-  "priceincrement": 0.1,
-  "pair": "nbt_usd"
+  "priceincrement": 0.1
 }

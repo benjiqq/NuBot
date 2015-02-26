@@ -224,6 +224,13 @@ task runUI(type: JavaExec) {
     description 'run the WebUI'
     main = "com.nubits.nubot.webui.UiServer"
     classpath = sourceSets.main.runtimeClasspath
+
+    //store the output instead of printing to the console:
+    /*standardOutput = new ByteArrayOutputStream()
+    //obtain the output:
+    ext.output = {
+        return standardOutput.toString()
+    }*/
 }
 
 
