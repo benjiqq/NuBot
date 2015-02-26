@@ -92,7 +92,6 @@ public class ParseOptions {
         boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
         boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
         int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
-        int sendLiquidityInterval = NuBotOptionsDefault.sendLiquidityInterval;
         double txFee = NuBotOptionsDefault.txFee;
         double priceIncrement = NuBotOptionsDefault.priceIncrement;
         double keepProceeds = NuBotOptionsDefault.keepProceeds;
@@ -272,7 +271,7 @@ public class ParseOptions {
         options = new NuBotOptions(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                 rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                 executeOrders, verbose, pair, executeStrategyInterval,
-                sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
+                sendHipchat, sendMails, mailRecipient,
                 emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
                 maxSellVolume, maxBuyVolume, distributeLiquidity, cpo);
 

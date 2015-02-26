@@ -66,7 +66,7 @@ public class TestOrderTask {
 
         Global.options = new NuBotOptions(true, nudip, "", "", "", "",
                 nudip, nudport, nudport, nudport, true, "", true, true, null,
-                60, 30, false, "", "", -1, 0, false, true, 0, 0, false, null);
+                30, false, "", "", -1, 0, false, true, 0, 0, false, null);
 
 
         //Check local filesystem for API keys

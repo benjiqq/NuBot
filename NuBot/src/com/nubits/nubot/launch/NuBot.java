@@ -26,10 +26,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptionsDefault;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.options.SecondaryPegOptionsJSON;
+import com.nubits.nubot.options.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -355,15 +352,17 @@ public class NuBot {
             //Bot needs to wait for next 3 min window before placing walls
             //set the interval from settings
 
-            //TODO set in NuBotoptions, or subclass
-            int reset_every = NuBotOptionsDefault.reset_every;
-            int refresh_time_seconds = NuBotOptionsDefault.refresh_time_seconds;
+            int reset_every = NuBotAdminSettings.reset_every_minutes;
 
             int interval = 1;
-            if (!Global.options.isMultipleCustodians()) {
-                interval = refresh_time_seconds;
-            } else {
+            if (Global.options.isMultipleCustodians()) {
                 interval = 60 * reset_every;
+            } else {
+                interval = NuBotAdminSettings.refresh_time_seconds;
+            }
+            Global.taskManager.getPriceTriggerTask().setInterval(interval);
+
+            if (Global.options.isMultipleCustodians()){
                 //Force the a spread to avoid collisions
                 double forcedSpread = 0.9;
                 LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
@@ -372,7 +371,6 @@ public class NuBot {
                 }
             }
 
-            Global.taskManager.getPriceTriggerTask().setInterval(interval);
 
             int delaySeconds = 0;
 

@@ -9,9 +9,9 @@ import com.nubits.nubot.notifications.MailNotifications;
 public class NuBotOptionsDefault {
 
     //TODO consistent names
-    public static int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
-    public static int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes"));
-    public static int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds"));
+    //public static int sendLiquidityInterval = Global.settings.getProperty("submit_liquidity_seconds"));
+    //public static int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes"));
+    //public static int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds"));
 
     public static String nudIp = "127.0.0.1";
     public static String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;

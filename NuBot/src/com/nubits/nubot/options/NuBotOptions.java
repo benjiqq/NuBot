@@ -203,7 +203,6 @@ public class NuBotOptions {
      * @param verbose
      * @param pair
      * @param executeStrategyInterval
-     * @param sendLiquidityInterval
      * @param sendHipchat
      * @param sendMails
      * @param mailRecipient
@@ -214,7 +213,7 @@ public class NuBotOptions {
     public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
                         double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-                        int executeStrategyInterval, int sendLiquidityInterval, boolean sendHipchat,
+                        int executeStrategyInterval, boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity, SecondaryPegOptionsJSON secondaryPegOptions) {
@@ -233,7 +232,6 @@ public class NuBotOptions {
         this.verbose = verbose;
         this.executeOrders = executeOrders;
         this.pair = pair;
-        this.sendLiquidityInterval = sendLiquidityInterval;
         this.executeStrategyInterval = executeStrategyInterval;
         this.sendHipchat = sendHipchat;
         this.sendMails = sendMails;
