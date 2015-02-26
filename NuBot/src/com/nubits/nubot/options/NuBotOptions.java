@@ -262,7 +262,6 @@ public class NuBotOptions {
     }
 
     /**
-     * TODO: rename
      * @return
      */
     public boolean isSubmitliquidity() {
@@ -270,7 +269,6 @@ public class NuBotOptions {
     }
 
     /**
-     * TODO: rename
      * @param submitLiquidity
      */
     public void setSubmitLiquidity(boolean submitLiquidity) {

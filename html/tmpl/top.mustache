@@ -97,11 +97,9 @@
             }
 
             function save_nubitaddress() {
-                //put data to server
                 var el = $('#nubitaddress');
                 var inputval = el.attr('value');
                 var jsondata = JSON.stringify({ "nubitaddress": inputval });
-
                 makePost(jsondata);
             }
 
@@ -139,6 +137,20 @@
             function save_hipchat(){
                 var ischecked = $('#hipchat').prop('checked');
                 var jsondata = JSON.stringify({ "hipchat": ischecked });
+                makePost(jsondata);
+            }
+
+            function save_maxbuyvolume(){
+                var el = $('#maxbuyvolume');
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "maxbuyvolume": inputval });
+                makePost(jsondata);
+            }
+
+            function save_maxsellvolume(){
+                var el = $('#maxsellvolume');
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "maxsellvolume": inputval });
                 makePost(jsondata);
             }
 

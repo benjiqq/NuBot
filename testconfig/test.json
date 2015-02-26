@@ -7,12 +7,12 @@
   "executeorders": false,
   "verbose": false,
   "hipchat": true,
-  "mail-notifications": "ALL",
+  "mailnotifications": "ALL",
   "mailrecipient": "xxx@xxx.xxx",
   "emergency-timeout": 60,
-  "keep-proceeds": 0.0,
-  "max-sell-order-volume": 0.0,
-  "max-buy-order-volume": 0.0,
+  "keepproceeds": 0.0,
+  "maxsellvolume": 0.0,
+  "maxbuyvolume": 0.0,
   "priceincrement": 0.1,
   "pair": "nbt_usd"
 }

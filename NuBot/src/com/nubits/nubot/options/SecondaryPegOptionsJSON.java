@@ -41,7 +41,6 @@ public class SecondaryPegOptionsJSON {
 
     /**
      *
-     * @param refreshTime
      * @param wallchangeThreshold
      * @param spread
      * @param distanceThreshold
