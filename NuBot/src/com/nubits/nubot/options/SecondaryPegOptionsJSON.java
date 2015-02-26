@@ -125,6 +125,7 @@ public class SecondaryPegOptionsJSON {
              */
 
             return new SecondaryPegOptionsJSON(wallchangeThreshold, spread, distanceThreshold, mainFeed, backupFeedNames);
+
         } catch (JSONException ex) {
             LOG.severe(ex.toString());
             throw new NuBotConfigException("" + ex);
@@ -178,22 +179,6 @@ public class SecondaryPegOptionsJSON {
      */
     public void setDistanceThreshold(double distanceThreshold) {
         this.distanceThreshold = distanceThreshold;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public String getMainFeed() {
-        return mainFeed;
-    }
-
-    /**
-     *
-     * @param mainFeed
-     */
-    public void setMainFeed(String mainFeed) {
-        this.mainFeed = mainFeed;
     }
 
     /**

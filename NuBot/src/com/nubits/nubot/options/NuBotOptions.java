@@ -19,6 +19,7 @@ package com.nubits.nubot.options;
 
 import com.nubits.nubot.models.CurrencyPair;
 
+import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
@@ -33,160 +34,163 @@ public class NuBotOptions {
     /**
      * Custodian's public key to access the exchange
      */
-    private String apiKey;
+    public String apiKey;
 
     /**
      * Custodian's secret key to access the exchange
      */
-    private String apiSecret;
+    public String apiSecret;
 
     /**
      * the email to which emergency email are sent
      */
-    private String mailRecipient;
+    public String mailRecipient;
 
     /**
      * Name of the exchange where the bots operates
      */
-    private String exchangeName;
+    public String exchangeName;
 
     /**
      * If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.
      */
-    private boolean dualSide;
+    public boolean dualSide;
 
     /**
      * valid currency pair for the specified eg. "nbt_usd"
      */
-    private CurrencyPair pair;
+    public CurrencyPair pair;
 
     /**
      * options for PEG other than NBT/USD
      */
-    private SecondaryPegOptionsJSON secondaryPegOptions;
+    public SecondaryPegOptionsJSON secondaryPegOptions;
 
     //Conditional settings with a default value
 
     /**
      * The RPC username of the Nu daemon
      */
-    private String rpcUser;
+    public String rpcUser;
 
     /**
      * The RPC password of the Nu daemon
      */
-    private String rpcPass;
+    public String rpcPass;
 
     /**
      * The public address where the custodial grant has been received
      */
-    private String nubitAddress;
+    public String nubitAddress;
 
     /**
      * The RPC port of the Nu daemon
      */
-    private int nudPort;
+    public int nudPort;
 
     //Optional settings with a default value  ----------------------------
 
     /**
      * The IP address of the machine that hosts the Nu Client
      */
-    private String nudIp;
+    public String nudIp;
 
     /**
      * if set to false will disable email notifications
      * TODO: rename mailnotifications
      */
-    private String sendMails;
+    public String sendMails;
 
     /**
      * if set to false, the bot will not try to submit liquidity info.
      * If set to false, it will also allow the custodian to omit the declaration of nubitaddress , nudport , rpcuser and rpcpass
      */
-    private boolean submitLiquidity;
+    public boolean submitLiquidity;
 
     /**
      * if set to false the bot will print a warning instead of executing orders
      */
-    private boolean executeOrders;
+    public boolean executeOrders;
 
     /**
      * if set to true, will print on screen additional debug messages
      */
-    private boolean verbose;
+    public boolean verbose;
 
     /**
      * if set to false will disable hipchat notifications
      */
-    private boolean sendHipchat;
+    public boolean sendHipchat;
 
     /**
      * TODO: describe this
      */
-    private boolean aggregate;
+    public boolean aggregate;
 
     /**
      * if set to true, will sync with remote NPT and reset orders often
      */
-    private boolean multipleCustodians;
+    public boolean multipleCustodians;
 
     /**
      * If transaction fee not available from the exchange via api, this value will be used
      */
-    private double txFee;
+    public double txFee;
 
     /**
      * if working in sell-side mode, this value (considered USD) will be added to the sell price
      */
-    private double priceIncrement;
+    public double priceIncrement;
 
     /**
      * max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts
      */
-    private int emergencyTimeout;
+    public int emergencyTimeout;
 
     /**
      * Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy .
      */
-    private double keepProceeds;
+    public double keepProceeds;
 
     /**
      * maximum volume to put on sell walls.
      */
-    private double maxSellVolume;
+    public double maxSellVolume;
 
     /**
      * maximum volume to put on buy walls.
      */
-    private double maxBuyVolume;
+    public double maxBuyVolume;
 
     /**
      * TODO
      */
-    private boolean distributeLiquidity;
+    public boolean distributeLiquidity;
 
     /**
      * TODO
      */
-    private int executeStrategyInterval; //disabled
+    public int executeStrategyInterval; //disabled
 
     /**
      * TODO
      */
-    private int sendLiquidityInterval; //disabled
+    public int sendLiquidityInterval; //disabled
 
     // ------- secondary peg ----------
 
-    private boolean secondarypeg;
+    public boolean secondarypeg;
 
-    //private SecondaryPegOptionsJSON cpo;
+    //public SecondaryPegOptionsJSON cpo;
 
-    private double wallchangeThreshold;
+    public double wallchangeThreshold;
 
-    private double spread;
+    public double spread;
 
-    private double distanceThreshold;
+    public double distanceThreshold;
+
+    public String mainFeed;
+    public ArrayList<String> backupFeedNames;
 
     /**
      * empty constructor. assumes safe creation of valid options
@@ -646,6 +650,29 @@ public class NuBotOptions {
     public void setDistributeLiquidity(boolean distributeLiquidity) {
         this.distributeLiquidity = distributeLiquidity;
     }
+
+    public double getDistanceThreshold(){
+        return this.distanceThreshold;
+    }
+
+    public double getSpread(){
+        return this.spread;
+    }
+
+    public double getWallchangeThreshold(){
+        return this.wallchangeThreshold;
+    }
+
+
+    public String getMainFeed() {
+        return mainFeed;
+    }
+
+    public void setMainFeed(String mainFeed) {
+        this.mainFeed = mainFeed;
+    }
+
+
 
     @Override
     public String toString() {

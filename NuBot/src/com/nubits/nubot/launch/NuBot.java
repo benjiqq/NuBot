@@ -369,13 +369,8 @@ public class NuBot {
 
             int delay = 7;
             Global.taskManager.getStrategyFiatTask().start(delay);
-        } else {
 
-            SecondaryPegOptionsJSON cpo = Global.options.getSecondaryPegOptions();
-            if (cpo == null) {
-                LOG.severe("To run in secondary peg mode, you need to specify the crypto-peg-options");
-                System.exit(0);
-            }
+        } else {
 
             //Peg to a USD price via crypto pair
             Currency toTrackCurrency;
@@ -401,15 +396,15 @@ public class NuBot {
             ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
                     .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
 
-            PriceFeedManager pfm = new PriceFeedManager(cpo.getMainFeed(), cpo.getBackupFeedNames(), toTrackCurrencyPair);
+            PriceFeedManager pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
             //Then set the pfm
             ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
 
             //Set the priceDistance threshold
-            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(cpo.getDistanceThreshold());
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(opt.getDistanceThreshold());
 
             //Set the wallet shift threshold
-            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(cpo.getWallchangeThreshold());
+            ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(opt.getWallchangeThreshold());
 
             //Set the outputpath for wallshifts
 
