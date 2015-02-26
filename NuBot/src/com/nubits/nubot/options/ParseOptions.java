@@ -199,12 +199,12 @@ public class ParseOptions {
             submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
         }
 
-        if (containsIgnoreCase(optionsJSON, "max-sell-order-volume")) {
-            maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "max-sell-order-volume"));
+        if (containsIgnoreCase(optionsJSON, "maxsellordervolume")) {
+            maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxsellordervolume"));
         }
 
-        if (containsIgnoreCase(optionsJSON, "max-buy-order-volume")) {
-            maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "max-buy-order-volume"));
+        if (containsIgnoreCase(optionsJSON, "maxbuyordervolume")) {
+            maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxbuyordervolume"));
         }
 
         if (containsIgnoreCase(optionsJSON, "executeorders")) {
@@ -219,21 +219,21 @@ public class ParseOptions {
             sendHipchat = (boolean) getIgnoreCase(optionsJSON, "hipchat");
         }
 
-        if (containsIgnoreCase(optionsJSON, "emergency-timeout")) {
-            long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, "emergency-timeout");
+        if (containsIgnoreCase(optionsJSON, "emergencytimeout")) {
+            long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, "emergencytimeout");
             emergencyTimeout = (int) emergencyTimeoutLong;
         }
 
-        if (containsIgnoreCase(optionsJSON, "keep-proceeds")) {
-            keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, "keep-proceeds")));
+        if (containsIgnoreCase(optionsJSON, "keepproceeds")) {
+            keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, "keepproceeds")));
         }
 
-        if (containsIgnoreCase(optionsJSON, "multiple-custodians")) {
-            multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiple-custodians");
+        if (containsIgnoreCase(optionsJSON, "multiplecustodians")) {
+            multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiplecustodians");
         }
 
-        if (containsIgnoreCase(optionsJSON, "distribute-liquidity")) {
-            distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distribute-liquidity");
+        if (containsIgnoreCase(optionsJSON, "distributeliquidity")) {
+            distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distributeliquidity");
         }
 
         //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
@@ -273,8 +273,8 @@ public class ParseOptions {
 
         }
 
-        if (containsIgnoreCase(optionsJSON, "mail-notifications")) {
-            sendMails = (String) getIgnoreCase(optionsJSON, "mail-notifications");
+        if (containsIgnoreCase(optionsJSON, "mailnotifications")) {
+            sendMails = (String) getIgnoreCase(optionsJSON, "mailnotifications");
             if (sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
                     || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
                     || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
