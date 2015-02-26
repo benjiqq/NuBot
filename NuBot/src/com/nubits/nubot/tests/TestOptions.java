@@ -86,7 +86,7 @@ public class TestOptions extends TestCase {
                     .parseSingleJsonFile(testconfig);
 
             assertTrue((boolean) j.get("verbose") == false);
-            assertTrue(((int) new Long((Long) j.get("emergency-timeout"))
+            assertTrue(((int) new Long((Long) j.get("emergencytimeout"))
                     .intValue()) == 60);
 
         } catch (ParseException e) {

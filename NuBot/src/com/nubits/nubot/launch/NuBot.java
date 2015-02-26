@@ -71,7 +71,6 @@ public class NuBot {
 
         mainThread = Thread.currentThread();
 
-
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
             NuBotOptions opt = parseOptionsArgs(args);
@@ -475,6 +474,9 @@ public class NuBot {
         return valid;
     }
 
+    /**
+     * shutdown mechanics
+     */
     private static void createShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override

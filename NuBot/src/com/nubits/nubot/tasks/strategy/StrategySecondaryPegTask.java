@@ -125,7 +125,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
             String message = "Shift needed on " + Global.exchange.getName() + "\nReason : ";
             if (!Global.options.isMultipleCustodians()) {
-                message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + " %";
+                message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getWallchangeThreshold() + " %";
             } else {
                 message += NuBotAdminSettings.reset_every_minutes + " minutes elapsed since last shift";
             }

@@ -569,14 +569,14 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Add(remove) the offset % from prices
 
             //compute half of the spread
-            double halfSpread = Utils.round(Global.options.getSecondaryPegOptions().getSpread() / 2, 6);
+            double halfSpread = Utils.round(Global.options.getSpread() / 2, 6);
 
             double offset = Utils.round(halfSpread / 100, 6);
 
             sellPriceUSD = sellPriceUSD + offset;
             buyPriceUSD = buyPriceUSD - offset;
 
-            String message = "Computing USD prices with spread " + Global.options.getSecondaryPegOptions().getSpread() + "%  : sell @ " + sellPriceUSD;
+            String message = "Computing USD prices with spread " + Global.options.getSpread() + "%  : sell @ " + sellPriceUSD;
             if (Global.isDualSide) {
                 message += " buy @ " + buyPriceUSD;
             }
@@ -619,7 +619,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Send email notification
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
             String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
-                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + "%.";
+                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
         } else {
             LOG.severe("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
