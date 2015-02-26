@@ -24,6 +24,7 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
@@ -64,9 +65,7 @@ public class TestOrderTask {
 
         Utils.installKeystore(true);
 
-        Global.options = new NuBotOptions(true, nudip, "", "", "", "",
-                nudip, nudport, nudport, nudport, true, "", true, true, null,
-                30, false, "", "", -1, 0, false, true, 0, 0, false, null);
+        Global.options = NuBotOptionsDefault.defaultFactory();
 
 
         //Check local filesystem for API keys

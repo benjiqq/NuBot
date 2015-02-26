@@ -195,29 +195,9 @@ public class NuBotOptions {
 
     }
 
+
     /**
-     * @param dualSide
-     * @param apiKey
-     * @param apiSecret
-     * @param nubitAddress
-     * @param rpcUser
-     * @param rpcPass
-     * @param nudIp
-     * @param nudPort
-     * @param priceIncrement
-     * @param txFee
-     * @param sendRPC
-     * @param exchangeName
-     * @param executeOrders
-     * @param verbose
-     * @param pair
-     * @param executeStrategyInterval
-     * @param sendHipchat
-     * @param sendMails
-     * @param mailRecipient
-     * @param emergencyTimeout
-     * @param keepProceeds
-     * @param secondaryPegOptions
+     * standard constructor with all options
      */
     public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
@@ -260,6 +240,48 @@ public class NuBotOptions {
         this.distanceThreshold = distanceThreshold;
 
     }
+
+    /**
+     * standard constructor with all options
+     */
+    public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
+                        String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
+                        double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
+                        int executeStrategyInterval, boolean sendHipchat,
+                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
+                        boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
+                        boolean distributeLiquidity, boolean secondarypeg) {
+        this.dualSide = dualSide;
+        this.apiKey = apiKey;
+        this.apiSecret = apiSecret;
+        this.nubitAddress = nubitAddress;
+        this.rpcUser = rpcUser;
+        this.rpcPass = rpcPass;
+        this.nudIp = nudIp;
+        this.nudPort = nudPort;
+        this.priceIncrement = priceIncrement;
+        this.txFee = txFee;
+        this.submitLiquidity = sendRPC;
+        this.exchangeName = exchangeName;
+        this.verbose = verbose;
+        this.executeOrders = executeOrders;
+        this.pair = pair;
+        this.executeStrategyInterval = executeStrategyInterval;
+        this.sendHipchat = sendHipchat;
+        this.sendMails = sendMails;
+        this.mailRecipient = mailRecipient;
+        this.emergencyTimeout = emergencyTimeout;
+        this.keepProceeds = keepProceeds;
+        this.aggregate = aggregate;
+        this.multipleCustodians = multipleCustodians;
+        this.maxSellVolume = maxSellVolume;
+        this.maxBuyVolume = maxBuyVolume;
+        this.distributeLiquidity = distributeLiquidity;
+
+        this.secondarypeg = secondarypeg;
+
+    }
+
 
     /**
      * @return
