@@ -22,6 +22,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
+import com.nubits.nubot.global.NuBotConnectionException;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
@@ -70,20 +71,26 @@ public class NuBot {
 
         mainThread = Thread.currentThread();
 
-        NuBot app = new NuBot();
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
             NuBotOptions opt = parseOptionsArgs(args);
 
+            //test if configuration is supported
+            if (!Utils.isSupported(opt.getPair())) {
+                exitWithNotice("This bot doesn't work yet with trading pair " + opt.getPair().toString());
+            }
+
             Utils.printSeparator();
 
             createShutDownHook();
 
+            // Check if NuBot is already running
             if (!Global.running) {
+                NuBot app = new NuBot();
                 app.execute(opt);
             } else {
-                // Check if NuBot is already running. notify user
+                //otherwise notify user and exit
                 exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
             }
 
@@ -123,8 +130,8 @@ public class NuBot {
                 opt = ParseOptions.parseOptions(args);
             } catch (NuBotConfigException ex) {
                 throw new NuBotConfigException("NuBot wrongly configured");
-
             }
+
         } else {
             try {
                 opt = ParseOptions.parseOptionsSingle(args[0]);
@@ -138,31 +145,7 @@ public class NuBot {
         return opt;
     }
 
-    /**
-     * execute the NuBot based on a configuration
-     */
-    private void execute(NuBotOptions opt) {
-
-        Global.options = opt;
-
-        Global.running = true;
-
-        //Load settings
-        Utils.loadProperties("settings.properties");
-
-
-        //test if configuration is supported
-        if (!Utils.isSupported(Global.options.getPair())) {
-            LOG.severe("This bot doesn't work yet with trading pair " + Global.options.getPair().toString());
-            System.exit(0);
-        }
-
-        Utils.printSeparator();
-
-        //Generate Bot Session unique id
-        Global.sessionId = Utils.generateSessionID();
-        LOG.info("Session ID = " + Global.sessionId);
-
+    private void setupLog(){
         //Setting up log folder for this session :
 
         String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
@@ -181,7 +164,9 @@ public class NuBot {
 
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+    }
 
+    private void setupSSL(){
         LOG.info("Set up SSL certificates");
         boolean trustAllCertificates = false;
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
@@ -189,11 +174,30 @@ public class NuBot {
         }
         Utils.installKeystore(trustAllCertificates);
         Utils.printSeparator();
+    }
 
+    /**
+     * all setups
+     */
+    private void setupConfigBot(){
+
+        Utils.printSeparator();
+
+        //Generate Bot Session unique id
+        Global.sessionId = Utils.generateSessionID();
+        LOG.info("Session ID = " + Global.sessionId);
+
+        setupLog();
+
+        setupSSL();
+
+        setupExchange();
+    }
+
+    private void setupExchange(){
         LOG.info("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         Utils.printSeparator();
-
 
         LOG.info("Creating an Exchange object");
 
@@ -241,31 +245,63 @@ public class NuBot {
             double txfee = (Double) txFeeResponse.getResponseObject();
             if (txfee == 0) {
                 LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
-                if (Global.options.getSecondaryPegOptions().getSpread() < 0.1) {
-                    Global.options.getSecondaryPegOptions().setSpread(0.1);
+                double maxOffset = 0.1;
+                if (Global.options.getSecondaryPegOptions().getSpread() < maxOffset) {
+                    Global.options.getSecondaryPegOptions().setSpread(maxOffset);
                 }
             }
         }
+    }
+
+    private  void setupNuTask(){
+        LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
+        Global.publicAddress = Global.options.getNubitsAddress();
+        Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
+                Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
+                Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
+
+        Utils.printSeparator();
+        LOG.info("Starting task : Check connection with Nud");
+        Global.taskManager.getCheckNudTask().start();
+    }
+
+    private void checkNuConn() throws NuBotConnectionException {
+        Utils.printSeparator();
+        LOG.info("Check connection with nud");
+        if (Global.rpcClient.isConnected()) {
+            LOG.info("RPC connection OK!");
+        } else {
+            //TODO: recover?
+            throw new NuBotConnectionException("problem with nu connectivity");
+        }
+    }
+
+    /**
+     * execute the NuBot based on a configuration
+     */
+    private void execute(NuBotOptions opt) {
+
+        Global.options = opt;
+
+        Global.running = true;
+
+        //Load settings
+        Utils.loadProperties("settings.properties");
+
+        setupConfigBot();
 
         LOG.info("Create a TaskManager ");
         Global.taskManager = new TaskManager();
         Utils.printSeparator();
 
         if (Global.options.isSubmitliquidity()) {
-            LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
-            Global.publicAddress = Global.options.getNubitsAddress();
-            Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
-                    Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
-                    Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
-
-            Utils.printSeparator();
-            LOG.info("Starting task : Check connection with Nud");
-            Global.taskManager.getCheckNudTask().start();
+            setupNuTask();
         }
 
         Utils.printSeparator();
         LOG.info("Starting task : Check connection with exchange");
-        Global.taskManager.getCheckConnectionTask().start(1);
+        int conn_delay = 1;
+        Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
 
         Utils.printSeparator();
@@ -275,7 +311,6 @@ public class NuBot {
         } catch (InterruptedException ex) {
             LOG.severe(ex.toString());
         }
-
 
         //Set the fileoutput for active orders
 
@@ -293,13 +328,10 @@ public class NuBot {
         Utils.printSeparator();
 
         if (Global.options.isSubmitliquidity()) {
-            Utils.printSeparator();
-            LOG.info("Check connection with nud");
-            if (Global.rpcClient.isConnected()) {
-                LOG.info("RPC connection OK!");
-            } else {
-                LOG.severe("Problem while connecting with nud");
-                System.exit(0);
+            try{
+                checkNuConn();
+            }catch(NuBotConnectionException e){
+                exitWithNotice("" + e);
             }
         }
 
@@ -330,13 +362,13 @@ public class NuBot {
 
         //Switch strategy for different trading pair
 
-
-        if (!Utils.requiresSecondaryPegStrategy(Global.options.getPair())) {
+        if (!PegOptions.requiresSecondaryPegStrategy(Global.options.getPair())) {
             // set liquidityinfo task to the strategy
             ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
                     .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
 
-            Global.taskManager.getStrategyFiatTask().start(7);
+            int delay = 7;
+            Global.taskManager.getStrategyFiatTask().start(delay);
         } else {
 
             SecondaryPegOptionsJSON cpo = Global.options.getSecondaryPegOptions();
@@ -355,7 +387,6 @@ public class NuBot {
             }
 
             CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
-
 
             // set trading strategy to the price monitor task
             ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
@@ -410,7 +441,6 @@ public class NuBot {
                     Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
                 }
             }
-
 
             int delaySeconds = 0;
 

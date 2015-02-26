@@ -161,7 +161,7 @@ public class ParseOptions {
 
 
         //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
-        boolean requireCryptoOptions = Utils.requiresSecondaryPegStrategy(pair);
+        boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         org.json.JSONObject pegOptionsJSON;
         SecondaryPegOptionsJSON cpo = null;
         if (requireCryptoOptions) {
