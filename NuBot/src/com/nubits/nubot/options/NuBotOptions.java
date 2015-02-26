@@ -651,16 +651,8 @@ public class NuBotOptions {
         this.distributeLiquidity = distributeLiquidity;
     }
 
-    public double getDistanceThreshold(){
-        return this.distanceThreshold;
-    }
-
-    public double getSpread(){
+    public double getSpread() {
         return this.spread;
-    }
-
-    public double getWallchangeThreshold(){
-        return this.wallchangeThreshold;
     }
 
 
@@ -668,10 +660,45 @@ public class NuBotOptions {
         return mainFeed;
     }
 
+
     public void setMainFeed(String mainFeed) {
         this.mainFeed = mainFeed;
     }
 
+
+    public void setWallchangeThreshold(double wallchangeThreshold) {
+        this.wallchangeThreshold = wallchangeThreshold;
+    }
+
+    public double getWallchangeThreshold(){
+        return this.wallchangeThreshold;
+    }
+
+    public void setSpread(double spread) {
+        this.spread = spread;
+    }
+
+    public ArrayList<String> getBackupFeedNames() {
+        return backupFeedNames;
+    }
+
+    public void setBackupFeedNames(ArrayList<String> backupFeedNames) {
+        this.backupFeedNames = backupFeedNames;
+    }
+
+    /**
+     * @return
+     */
+    public double getDistanceThreshold() {
+        return distanceThreshold;
+    }
+
+    /**
+     * @param distanceThreshold
+     */
+    public void setDistanceThreshold(double distanceThreshold) {
+        this.distanceThreshold = distanceThreshold;
+    }
 
 
     @Override

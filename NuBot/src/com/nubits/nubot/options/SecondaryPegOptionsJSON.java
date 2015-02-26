@@ -133,66 +133,11 @@ public class SecondaryPegOptionsJSON {
 
     }
 
-    /**
-     *
-     * @return
-     */
-    public double getWallchangeThreshold() {
-        return wallchangeThreshold;
-    }
 
-    /**
-     *
-     * @param wallchangeThreshold
-     */
-    public void setWallchangeThreshold(double wallchangeThreshold) {
-        this.wallchangeThreshold = wallchangeThreshold;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public double getSpread() {
-        return spread;
-    }
-
-    /**
-     *
-     * @param spread
-     */
-    public void setSpread(double spread) {
-        this.spread = spread;
-    }
-
-    /**
-     *
-     * @return
-     */
-    public double getDistanceThreshold() {
-        return distanceThreshold;
-    }
-
-    /**
-     *
-     * @param distanceThreshold
-     */
-    public void setDistanceThreshold(double distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
-    }
-
-    /**
-     *
-     * @return
-     */
     public ArrayList<String> getBackupFeedNames() {
         return backupFeedNames;
     }
 
-    /**
-     *
-     * @param backupFeedNames
-     */
     public void setBackupFeedNames(ArrayList<String> backupFeedNames) {
         this.backupFeedNames = backupFeedNames;
     }

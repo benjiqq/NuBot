@@ -246,8 +246,8 @@ public class NuBot {
             if (txfee == 0) {
                 LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
                 double maxOffset = 0.1;
-                if (Global.options.getSecondaryPegOptions().getSpread() < maxOffset) {
-                    Global.options.getSecondaryPegOptions().setSpread(maxOffset);
+                if (Global.options.getSpread() < maxOffset) {
+                    Global.options.setSpread(maxOffset);
                 }
             }
         }
@@ -432,8 +432,8 @@ public class NuBot {
                 //Force the a spread to avoid collisions
                 double forcedSpread = 0.9;
                 LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
-                if (Global.options.getSecondaryPegOptions().getSpread() < forcedSpread) {
-                    Global.options.getSecondaryPegOptions().setSpread(forcedSpread);
+                if (Global.options.getSpread() < forcedSpread) {
+                    Global.options.setSpread(forcedSpread);
                 }
             }
 
