@@ -39,7 +39,7 @@
 
               var host = "localhost";
               var port = 4567;
-              var url = "http://" + host + ":" + port + "/keys";
+              var url = "http://" + host + ":" + port + "/config";
 
             function loadVals() {
 
@@ -49,8 +49,8 @@
                   url: url,
                 })
                 .done(function( data ) {
-                    //var pp = $("#key").attr("placeholder");
 
+                    $("#exchangename").attr("placeholder", data["exchangename"]);
                     $("#apikey").attr("placeholder", data["apikey"]);
                     $("#apisecret").attr("placeholder", data["apisecret"]);
                     $('#dualside').attr('checked',data["dualside"]);
@@ -72,33 +72,27 @@
 
             }
 
+            //save variable
+            //not generic (copy & paste needed)
+
+            function saveexchangename() {
+                var el = $('#exchangename');
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "exchangename": inputval });
+                makePost(jsondata);
+            }
+
             function savekey() {
-                //put data to server
-                //TODO which element?
                 var el = $('#apikey');
-
-                var inputkey = el.attr('value');
-
-                //make HTTP post to server
-                $.ajax(url, {
-                    data : JSON.stringify({ "apikey": inputkey }),
-                    contentType : 'application/json',
-                    type : 'POST',
-                    success: function(data){
-                      console.log("ok " + data);
-                    },
-                    error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        alert("error posting to server " + textStatus);
-                    }
-               });
+                var inputval = el.attr('value');
+                var jsondata = JSON.stringify({ "apikey": inputval });
+                makePost(jsondata);
             }
 
             function savesecret() {
-                //put data to server
                 var el = $('#apisecret');
                 var inputval = el.attr('value');
                 var jsondata = JSON.stringify({ "apisecret": inputval });
-
                 makePost(jsondata);
             }
 

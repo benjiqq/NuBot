@@ -6,6 +6,8 @@ import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+import java.io.File;
+
 import static spark.Spark.get;
 import static spark.Spark.post;
 
@@ -15,11 +17,13 @@ import static spark.Spark.post;
 public class ConfigController {
 
 
+    private String configDir;
     private String testconfigfile;
     private NuBotOptions opt;
 
-    public ConfigController(NuBotOptions opt, String testconfigfile) {
+    public ConfigController(NuBotOptions opt, String configDir, String testconfigfile) {
         this.opt = opt;
+        this.configDir = configDir;
         this.testconfigfile = testconfigfile;
 
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
@@ -40,64 +44,70 @@ public class ConfigController {
             //System.out.println(">>>> " + postJson);
             String variableset = "none";
 
+            if (postJson.containsKey("exchangename")) {
+                String newvalue = "" + postJson.get("exchangename");
+                this.opt.setExchangeName(newvalue);
+                variableset = "exchangename";
+            }
+
             if (postJson.containsKey("apikey")) {
                 String newapikey = "" + postJson.get("apikey");
-                opt.setApiKey(newapikey);
+                this.opt.setApiKey(newapikey);
                 variableset = "apikey";
             }
 
             if (postJson.containsKey("apisecret")) {
                 String newsecret = "" + postJson.get("apisecret");
-                opt.setApiSecret(newsecret);
+                this.opt.setApiSecret(newsecret);
                 variableset = "apisecret";
             }
 
             if (postJson.containsKey("dualside")) {
                 boolean newv = (boolean) postJson.get("dualside");
-                opt.setDualSide(newv);
+                this.opt.setDualSide(newv);
                 variableset = "dualside";
             }
 
             if (postJson.containsKey("multiplecustodians")) {
                 boolean newv = (boolean) postJson.get("multiplecustodians");
-                opt.setDualSide(newv);
+                this.opt.setDualSide(newv);
                 variableset = "multiplecustodians";
             }
 
             if (postJson.containsKey("submitliquidity")) {
                 boolean newv = (boolean) postJson.get("submitliquidity");
-                opt.setSendRPC(newv);
+                this.opt.setSubmitLiquidity(newv);
                 variableset = "submitliquidity";
             }
 
             if (postJson.containsKey("executeorders")) {
                 boolean newv = (boolean) postJson.get("executeorders");
-                opt.setExecuteOrders(newv);
+                this.opt.setExecuteOrders(newv);
                 variableset = "executeorders";
             }
 
             if (postJson.containsKey("verbose")) {
                 boolean newv = (boolean) postJson.get("verbose");
-                opt.setVerbose(newv);
+                this.opt.setVerbose(newv);
                 variableset = "verbose";
             }
 
             if (postJson.containsKey("hipchat")) {
                 boolean newv = (boolean) postJson.get("hipchat");
-                opt.setSendHipchat(newv);
+                this.opt.setSendHipchat(newv);
                 variableset = "hipchat";
             }
 
             if (postJson.containsKey("nubitaddress")) {
                 String newv = "" + postJson.get("nubitaddress");
-                opt.setNubitAddress(newv);
+                this.opt.setNubitAddress(newv);
                 variableset = "nubitaddress";
             }
 
 
             if (postJson.containsKey("nudport")) {
-                int newv = (Integer)postJson.get("nudport");
-                opt.setNudPort(newv);
+                int newv = (Integer) postJson.get("nudport");
+                this.opt.setNudPort(newv);
                 variableset = "nudport";
             }
 
@@ -105,9 +115,12 @@ public class ConfigController {
             //NuBotOptions opt = ParseOptions.parseOptionsSingle(thils.testconfigfile);
 
             //SaveOptions.saveOptions(opt, testconfig);
-            SaveOptions.backupOptions(this.testconfigfile);
-            String saveTo = "test.json"; //"testconfig/new.json"
-            SaveOptions.saveOptionsPretty(opt, saveTo);
+            SaveOptions.backupOptions(this.configDir + File.separator + this.testconfigfile);
+
+            String saveTo = this.configDir + File.separator + this.testconfigfile;
+            String js = SaveOptions.jsonPretty(this.opt);
+            System.out.println("new opt: " + js);
+            SaveOptions.saveOptionsPretty(this.opt, saveTo);
 
             //TODO: as json
             boolean success = true;

@@ -17,13 +17,19 @@ import java.io.IOException;
 public class SaveOptions {
 
 
-    public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
+    public static String jsonPretty(NuBotOptions opt){
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
         gson.registerTypeAdapter(NuBotOptions.class, new OptionsSerializer());
         Gson parser = gson.create();
         String js = parser.toJson(opt);
+        return js;
+    }
+
+    public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
+        String js = jsonPretty(opt);
+        System.out.println("saving js to " + filepath);
+        System.out.println("js " + js);
         FileSystem.writeToFile(js, filepath, false);
-        System.out.println(js);
         return true;
     }
     /**

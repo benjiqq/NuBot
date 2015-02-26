@@ -47,7 +47,8 @@ public class WebkitUI extends Application {
 
 
         System.out.println("launch app");
-        UiServer.startUIserver(args);
+
+        //UiServer.startUIserver(args);
 
         launch();
     }

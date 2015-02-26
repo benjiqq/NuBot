@@ -5,6 +5,8 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import spark.ModelAndView;
+import spark.SparkBase;
+import spark.webserver.SparkServer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -17,30 +19,19 @@ public class UiServer {
     private static String htmlFolder = "./html/tmpl/";
 
     private static String testconfigFile = "test.json";
+    private static String configdir = "testconfig";
     private static String testconfigpath = "testconfig/" + testconfigFile;
 
     /**
      * start the UI server
      */
-    public static void startUIserver(String[] args) {
+    public static void startUIserver(NuBotOptions opt) {
 
         //TODO: only load if in testmode and this is not set elsewhere
         //should better read: load global settings
         Utils.loadProperties("settings.properties");
-        if (args.length == 1) {
-            try {
-                String configFilePath = args[0]; //testconfigpath
-                NuBotOptions opt = ParseOptions.parseOptionsSingle(configFilePath);
-                new ConfigController(opt, testconfigpath);
-            } catch (NuBotConfigException e) {
-                System.out.println("could not parse config");
-                System.out.println(e);
-                System.exit(0);
-            }
-        } else if ((args.length > 1)|| (args.length ==0)){
-            System.out.println("single file config only");
-            System.exit(0);
-        }
+
+        new ConfigController(opt, configdir, testconfigFile);
 
         Map map = new HashMap();
 
@@ -54,6 +45,32 @@ public class UiServer {
 
     public static void main(String[] args) {
 
-        startUIserver(args);
+        try{
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
+            startUIserver(opt);
+        }catch(Exception e){
+
+        }
+
+
+
+        /*if (args.length == 1) {
+            try {
+                String configFilePath = args[0]; //testconfigpath
+                NuBotOptions opt = ParseOptions.parseOptionsSingle(configFilePath);
+
+                startUIserver(opt);
+
+            } catch (NuBotConfigException e) {
+                System.out.println("could not parse config");
+                System.out.println(e);
+                System.exit(0);
+            }
+        } else if ((args.length > 1)|| (args.length ==0)){
+            System.out.println("single file config only");
+            System.exit(0);
+        }*/
+
+
     }
 }

@@ -271,10 +271,10 @@ public class NuBotOptions {
 
     /**
      * TODO: rename
-     * @param sendRPC
+     * @param submitLiquidity
      */
-    public void setSubmitLiquidity(boolean sendRPC) {
-        this.submitLiquidity = sendRPC;
+    public void setSubmitLiquidity(boolean submitLiquidity) {
+        this.submitLiquidity = submitLiquidity;
     }
 
     /**

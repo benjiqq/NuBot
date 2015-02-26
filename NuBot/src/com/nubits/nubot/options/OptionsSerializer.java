@@ -19,7 +19,8 @@ public class OptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("apikey", opt.getApiKey());
         root.addProperty("apisecret", opt.getApiSecret());
         root.addProperty("dualside", opt.isDualSide());
-        root.addProperty("submitliquidity", opt.isSendRPC());
+        root.addProperty("submitliquidity", opt.isSubmitliquidity());
+        root.addProperty("multiplecustodians", opt.isMultipleCustodians());
         root.addProperty("executeorders", opt.isExecuteOrders());
         root.addProperty("verbose", opt.isVerbose());
         root.addProperty("hipchat", opt.isSendHipchat());
