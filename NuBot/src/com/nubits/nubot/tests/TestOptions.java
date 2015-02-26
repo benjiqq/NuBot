@@ -52,7 +52,7 @@ public class TestOptions extends TestCase {
         try {
             JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
 
-            assertTrue(inputJSON.containsKey("options"));
+            assertTrue(inputJSON.containsKey("exchangename"));
         } catch (ParseException e) {
             // e.printStackTrace();
         }
@@ -84,10 +84,9 @@ public class TestOptions extends TestCase {
             // Global.options =
             JSONObject j = ParseOptions
                     .parseSingleJsonFile(testconfig);
-            JSONObject o = ParseOptions.getOptionsKey(j);
 
-            assertTrue((boolean) o.get("verbose") == false);
-            assertTrue(((int) new Long((Long) o.get("emergency-timeout"))
+            assertTrue((boolean) j.get("verbose") == false);
+            assertTrue(((int) new Long((Long) j.get("emergency-timeout"))
                     .intValue()) == 60);
 
         } catch (ParseException e) {
@@ -124,14 +123,21 @@ public class TestOptions extends TestCase {
 
         try {
             JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
-            assertTrue(inputJSON.containsKey("options"));
-            JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
-            assertTrue(optionsJSON.containsKey("exchangename"));
+            //assertTrue(inputJSON.containsKey("options"));
+            //JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
+            assertTrue(inputJSON.containsKey("exchangename"));
         } catch (Exception e) {
 
         }
+        assertTrue(!catched);
+    }
 
+    @Test
+    public void testLoadOptions(){
 
+        String testconfigFile = "test.json";
+        String testconfig = "testconfig/" + testconfigFile;
+        boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
         } catch (NuBotConfigException e) {

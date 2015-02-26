@@ -53,8 +53,8 @@ public class ParseOptions {
 
         try {
             JSONObject inputJSON = parseSingleJsonFile(filepath);
-            JSONObject optionsJSON = getOptionsKey(inputJSON);
-            return parseOptionsFromJson(optionsJSON);
+            //JSONObject optionsJSON = getOptionsKey(inputJSON);
+            return parseOptionsFromJson(inputJSON);
 
         } catch (ParseException ex) {
             throw new NuBotConfigException("Configuration error from single file");
