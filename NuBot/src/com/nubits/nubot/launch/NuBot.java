@@ -41,8 +41,10 @@ import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+
 import java.io.IOException;
 import java.util.logging.Logger;
+
 import org.json.simple.JSONObject;
 
 /**
@@ -59,57 +61,95 @@ public class NuBot {
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
     /**
-     * Initialises the NuBot. Check if NuBot has valid parameters and quit if it
-     * doesn't Check if NuBot is already running and Log if that is so
+     * Start the NuBot. start if config is valid and other instance is running
      *
      * @param args a list of valid arguments
      * @author desrever <desrever at nubits.com>
      */
     public static void main(String args[]) {
+
         mainThread = Thread.currentThread();
 
         NuBot app = new NuBot();
 
-        Utils.printSeparator();
-        if (app.isValidArgs(args)) {
+        try {
+            //Check if NuBot has valid parameters and quit if it doesn't
+            NuBotOptions opt = parseOptionsArgs(args);
+
+            Utils.printSeparator();
+
             createShutDownHook();
+
             if (!Global.running) {
-                app.execute(args);
+                app.execute(opt);
             } else {
-                LOG.severe("NuBot is already running. Make sure to terminate other instances.");
+                // Check if NuBot is already running. notify user
+                exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
             }
-        } else {
-            LOG.severe("wrong argument number : run nubot with \n" + USAGE_STRING);
-            System.exit(0);
+
+        } catch (NuBotConfigException e) {
+            exitWithNotice("" + e);
         }
+
     }
 
     /**
-     * @author desrever <desrever at nubits.com>
+     * exit application and notify user
+     *
+     * @param msg
      */
-    private void execute(String args[]) {
+    private static void exitWithNotice(String msg) {
+        LOG.severe(msg);
+        System.exit(0);
+    }
+
+    /**
+     * parse the command line arguments
+     * @param args
+     * @return
+     * @throws NuBotConfigException
+     */
+    private static NuBotOptions parseOptionsArgs(String args[]) throws NuBotConfigException {
+
+        if (!isValidArgs(args)) {
+            throw new NuBotConfigException("wrong argument number : run nubot with \n" + USAGE_STRING);
+        }
+
+        NuBotOptions opt = null;
+        //Load Options and test for critical configuration errors
+        if (args.length > 1) {
+            //more than one file path given
+            try {
+                opt = ParseOptions.parseOptions(args);
+            } catch (NuBotConfigException ex) {
+                throw new NuBotConfigException("NuBot wrongly configured");
+
+            }
+        } else {
+            try {
+                opt = ParseOptions.parseOptionsSingle(args[0]);
+            } catch (NuBotConfigException ex) {
+                throw new NuBotConfigException("NuBot wrongly configured");
+            }
+        }
+        if (opt == null)
+            throw new NuBotConfigException("");
+
+        return opt;
+    }
+
+    /**
+     * execute the NuBot based on a configuration
+     */
+    private void execute(NuBotOptions opt) {
+
+        Global.options = opt;
+
         Global.running = true;
 
         //Load settings
         Utils.loadProperties("settings.properties");
 
-        //Load Options and test for critical configuration errors
-        if (args.length > 1) {
-            //more than one file path given
-            try {
-                Global.options = ParseOptions.parseOptions(args);
-            } catch (NuBotConfigException ex) {
-                Utils.exitWithMessage("NuBot wrongly configured");
-                System.exit(0);
-            }
-        } else {
-            try {
-                Global.options = ParseOptions.parseOptionsSingle(args[0]);
-            } catch (NuBotConfigException ex) {
-                Utils.exitWithMessage("NuBot wrongly configured");
-                System.exit(0);
-            }
-        }
 
         //test if configuration is supported
         if (!Utils.isSupported(Global.options.getPair())) {
@@ -362,7 +402,7 @@ public class NuBot {
             }
             Global.taskManager.getPriceTriggerTask().setInterval(interval);
 
-            if (Global.options.isMultipleCustodians()){
+            if (Global.options.isMultipleCustodians()) {
                 //Force the a spread to avoid collisions
                 double forcedSpread = 0.9;
                 LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
@@ -404,7 +444,7 @@ public class NuBot {
      * @param args
      * @return
      */
-    private boolean isValidArgs(String[] args) {
+    private static boolean isValidArgs(String[] args) {
         boolean valid = args.length > 0;
 
         return valid;
