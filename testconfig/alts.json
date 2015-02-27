@@ -1,7 +1,7 @@
 {
   "exchangename":"altstrade",
-  "apikey": "xxx",
-  "apisecret": "xxx",
+  "apikey": "745a3fb20c61e4407998b11a3ec5acde",
+  "apisecret": "8616ff6a1c5932ce2ae34155e9650e8a",
   "txfee": 0.2,
   "pair":"nbt_btc",
   "submitliquidity":false,
