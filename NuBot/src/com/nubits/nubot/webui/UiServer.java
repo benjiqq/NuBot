@@ -1,22 +1,21 @@
 package com.nubits.nubot.webui;
 
-import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import spark.ModelAndView;
-import spark.SparkBase;
-import spark.webserver.SparkServer;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import static spark.Spark.get;
 
 public class UiServer {
 
-    private static final Logger LOG = Logger.getLogger(UiServer.class.getName());
+    final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
     //TODO path
     private static String htmlFolder = "./html/tmpl/";
@@ -34,13 +33,15 @@ public class UiServer {
         Utils.loadProperties("settings.properties");
 
         //binds GET and POST
-        new ConfigController("/config",opt, configdir, testconfigFile);
+        new ConfigController("/config", opt, configdir, testconfigFile);
 
         Map map = new HashMap();
 
-        get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
+        get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "operation.mustache"), new LayoutTemplateEngine());
 
-        get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
+        get("/configui", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
+
+        //get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
 
     }
@@ -50,12 +51,12 @@ public class UiServer {
 
         LOG.info("starting UI server");
 
-        try{
+        try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
             LOG.info("using options " + opt);
             startUIserver(opt);
-        }catch(Exception ex){
-            LOG.severe("error configuring " + ex);
+        } catch (Exception ex) {
+            LOG.error("error configuring " + ex);
         }
 
 
