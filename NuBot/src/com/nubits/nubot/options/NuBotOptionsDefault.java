@@ -25,6 +25,10 @@ public class NuBotOptionsDefault {
     public static int emergencyTimeout = 60;
     public static boolean distributeLiquidity = false;
 
+    //double wallchangeThreshold = 0.5;
+    //double spread = 0;
+    //double distanceThreshold = 10;
+
     public static NuBotOptions defaultFactory() {
 
         NuBotOptions opt = new NuBotOptions(true, nudIp, "", "", "", "",

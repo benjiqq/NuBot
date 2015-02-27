@@ -1,12 +1,10 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import org.json.JSONException;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -20,7 +18,7 @@ import java.util.logging.Logger;
  */
 public class ParseOptions {
 
-    private static String[] comp = {"secondarypegoptions","exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
+    private static String[] comp = {"secondarypegoptions", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
     private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
 
@@ -167,9 +165,9 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        boolean speg =containsIgnoreCase(optionsJSON, "secondarypegoptions");
+        boolean speg = containsIgnoreCase(optionsJSON, "secondarypegoptions");
 
-        if (speg ) {
+        if (speg) {
             parseSecondary(options, optionsJSON);
         }
 
@@ -304,16 +302,17 @@ public class ParseOptions {
 
     public static void parseSecondary(NuBotOptions options, JSONObject optionsJSON) throws NuBotConfigException {
 
-        //First try to parse compulsory parameters
+        if (!containsIgnoreCase(optionsJSON, "mainfeed"))
+            throw new NuBotConfigException("mainfeed necessary parameter");
 
         options.mainFeed = (String) optionsJSON.get("mainfeed");
 
-        ArrayList<String> backupFeedNames = new ArrayList<>();
-        org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backupfeeds");
+        //ArrayList<String> backupFeedNames = new ArrayList<>();
+        //org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backupfeeds");
 
         //Iterate on backupFeeds
 
-        String names[] = org.json.JSONObject.getNames(dataJson);
+        /*String names[] = org.json.JSONObject.getNames(dataJson);
         if (names.length < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
         }
@@ -324,7 +323,7 @@ public class ParseOptions {
             } catch (JSONException ex) {
                 throw new NuBotConfigException(ex.toString());
             }
-        }
+        }*/
 
         options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypegoptions");
 
@@ -344,13 +343,33 @@ public class ParseOptions {
         else
             options.distanceThreshold = (double) getIgnoreCase(optionsJSON, "distanceThreshold");
 
-        //double wallchangeThreshold = 0.5;
-        //double spread = 0;
-        //double distanceThreshold = 10;
-
         if (options.spread != 0) {
             throw new NuBotConfigException("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
+
+
+        options.mainFeed = (String) optionsJSON.get("main-feed");
+
+
+    }
+
+    public static void parseBackupfeeds() {
+                //            ArrayList<String> backupFeedNames = new ArrayList<>();
+        //            org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backup-feeds");
+        //
+        //            //Iterate on backupFeeds
+        //
+        //            String names[] = org.json.JSONObject.getNames(dataJson);
+        //            if (names.length < 2) {
+        //                throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
+        //            }
+        //            for (int i = 0; i < names.length; i++) {
+        //                try {
+        //                    org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
+        //                    backupFeedNames.add((String) tempJson.get("name"));
+        //
+        // }
+        //            }
     }
 
 
