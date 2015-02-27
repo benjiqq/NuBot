@@ -35,7 +35,7 @@ public class Currency {
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
-    private final static String PATH_TO_CURRENCIES = FileUtils.getFile("NuBot", "res", "currencies.csv").toPath().toString();;
+    private final static String PATH_TO_CURRENCIES = FileUtils.getFile("NuBot", "res", "currencies.csv").toPath().toString();
 //Constructor
 
     /**

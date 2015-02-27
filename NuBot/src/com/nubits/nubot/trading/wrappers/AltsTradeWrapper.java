@@ -198,7 +198,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
     @Override
     public String getUrlConnectionCheck() {
-        return null;
+        return API_BASE_URL;
     }
 
     @Override
