@@ -21,7 +21,7 @@
   "hipchat":false,
   "mailnotifications":"none",
   "mailrecipient":"xxx@xxx.xxx",
-  "emergency-timeout":60,
+  "emergencytimeout":60,
   "keepproceeds":0,
   "maxsellordervolume" : 0,
   "maxbuyordervolume" : 0,
