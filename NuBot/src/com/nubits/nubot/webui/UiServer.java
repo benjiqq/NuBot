@@ -43,6 +43,8 @@ public class UiServer {
 
         get("/configui", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
 
+        get("/feeds", (rq, rs) -> new ModelAndView(map, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine());
+
         //get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
 
