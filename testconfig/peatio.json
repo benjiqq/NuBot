@@ -1,0 +1,19 @@
+{
+  "exchangename": "peatio",
+  "apikey": "09Uu4r2xRE4lGA7g4sBxR0L4bd3lnC5a3PMmkEec",
+  "apisecret": "Q6ruhmxKQ0c0vWlTJxxsS4KqPbVR051cfRGbKnce",
+  "dualside": true,
+  "submitliquidity": false,
+  "multiplecustodians": false,
+  "executeorders": false,
+  "verbose": false,
+  "hipchat": true,
+  "mail-notifications": "ALL",
+  "mailrecipient": "xxx@xxx.xxx",
+  "emergency-timeout": 60,
+  "keep-proceeds": 0.0,
+  "max-sell-order-volume": 0.0,
+  "max-buy-order-volume": 0.0,
+  "priceincrement": 0.1,
+  "pair": "nbt_usd"
+}
