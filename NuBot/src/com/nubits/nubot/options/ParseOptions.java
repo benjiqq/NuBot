@@ -96,6 +96,7 @@ public class ParseOptions {
 
     /**
      * parseOptions from JSON into NuBotOptions
+     * makes sure the parses object is valid
      *
      * @param optionsJSON
      * @return
@@ -171,7 +172,6 @@ public class ParseOptions {
             if (optionsJSON.containsKey("secondarypegoptions")) {
 
                 parseSecondary(options, optionsJSON);
-
 
             } else {
                 throw new NuBotConfigException("secondary-peg-options are required in the options");
