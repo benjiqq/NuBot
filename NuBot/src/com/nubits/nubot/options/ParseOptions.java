@@ -348,7 +348,7 @@ public class ParseOptions {
         }
 
 
-        String mainFeed = (String) optionsJSON.get("main-feed");
+        options.mainFeed = (String) optionsJSON.get("main-feed");
 
 
     }
