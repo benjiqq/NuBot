@@ -292,6 +292,11 @@ public class ParseOptions {
                 emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
                 maxSellVolume, maxBuyVolume, distributeLiquidity, secondarypeg, wallchangeThreshold, spread, distanceThreshold);
 
+        //test if configuration is supported
+        if (!isSupportedPair(options.getPair())) {
+            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        }
+
 
         if (options == null) {
             throw new NuBotConfigException("error parsing configuration files");
@@ -354,7 +359,7 @@ public class ParseOptions {
     }
 
     public static void parseBackupfeeds() {
-                //            ArrayList<String> backupFeedNames = new ArrayList<>();
+        //            ArrayList<String> backupFeedNames = new ArrayList<>();
         //            org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backup-feeds");
         //
         //            //Iterate on backupFeeds
@@ -431,5 +436,25 @@ public class ParseOptions {
         JSONObject content = new JSONObject(setMap);
         optionsObject.put("options", content);
         return optionsObject;
+    }
+
+
+    /**
+     * check if pair is supported
+     *
+     * @param pair
+     * @return
+     */
+    public static boolean isSupportedPair(CurrencyPair pair) {
+        if (pair.equals(Constant.NBT_USD)
+                || pair.equals(Constant.NBT_BTC)
+                || pair.equals(Constant.BTC_NBT)
+                || pair.equals(Constant.NBT_EUR)
+                || pair.equals(Constant.NBT_CNY)
+                || pair.equals(Constant.NBT_PPC)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
