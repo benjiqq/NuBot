@@ -29,7 +29,7 @@
 <div class="row">
   <div class="col-xs-12 col-md-6">
 
-    <h3>Config
+    <h3>Exchange Config
     <button type="button" class="btn btn-primary" onclick="saveexchangename()">
     Save all
     </button>
@@ -45,10 +45,10 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="exchangename" size="100" type="text" class="form-control" placeholder="exchangename">
-    </td><td>
+    </td>
 
-    </div><!-- /input-group -->
-</td></tr>
+
+</tr>
 
 
 <tr>
@@ -57,10 +57,10 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="apikey" size="100" type="text" class="form-control" placeholder="API Key">
-    </td><td>
+    </td>
 
-    </div><!-- /input-group -->
-</td></tr>
+
+</tr>
 
 
 <tr>
@@ -69,10 +69,10 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="apisecret" size="100" type="text" class="form-control" placeholder="API Secret">
-    </td><td>
+    </td>
 
-    </div><!-- /input-group -->
-</td></tr>
+
+</tr>
 
 
 <tr>
@@ -81,100 +81,11 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="pair" size="100" type="text" class="form-control" placeholder="pair">
-    </td><td>
-
-    </div><!-- /input-group -->
-</td></tr>
+    </td>
 
 
-<tr>
-    <td class="col-md-2">Dual side</td>
+</tr>
 
-<td class="col-md-8">
-  <span class="input-group-addon">
-        <input id="dualside" type="checkbox" aria-label="dualside">
-  </span>
-
-  </td><td>
-
-    </div><!-- /input-group -->
-</td></tr>
-
-
-
-<tr>
-    <td class="col-md-2">multiplecustodians</td>
-
-<td class="col-md-8">
-  <span class="input-group-addon">
-        <input id="multiplecustodians" type="checkbox" aria-label="dualside">
-  </span>
-
-  </td><td>
-
-
-    </div><!-- /input-group -->
-</td></tr>
-
-
-<tr>
-    <td class="col-md-2">submitliquidity</td>
-
-<td class="col-md-8">
-  <span class="input-group-addon">
-        <input id="submitliquidity" type="checkbox" aria-label="dualside">
-  </span>
-
-  </td><td>
-
-
-    </div><!-- /input-group -->
-</td></tr>
-
-
-
-<tr>
-    <td class="col-md-2">executeorders</td>
-
-<td class="col-md-8">
-  <span class="input-group-addon">
-        <input id="executeorders" type="checkbox" aria-label="dualside">
-  </span>
-
-  </td><td>
-
-    </div><!-- /input-group -->
-</td></tr>
-
-
-
-
-<tr>
-    <td class="col-md-2">verbose</td>
-
-<td class="col-md-8">
-  <span class="input-group-addon">
-        <input id="verbose" type="checkbox" aria-label="dualside">
-  </span>
-
-  </td><td>
-
-    </div><!-- /input-group -->
-</td></tr>
-
-
-<tr>
-    <td class="col-md-2">hipchat</td>
-
-<td class="col-md-8">
-  <span class="input-group-addon">
-        <input id="hipchat" type="checkbox" aria-label="dualside">
-  </span>
-
-  </td><td>
-
-    </div><!-- /input-group -->
-</td></tr>
 
 
 
@@ -185,10 +96,9 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="maxbuyvolume" size="100" type="text" class="form-control" placeholder="maxbuyvolume">
-    </td><td>
+    </td>
 
-    </div><!-- /input-group -->
-</td></tr>
+</tr>
 
 
 <tr>
@@ -197,19 +107,94 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="pair" size="100" type="text" class="form-control" placeholder="maxsellvolume">
-    </td><td>
+    </div>
 
-    </div><!-- /input-group -->
-</td></tr>
+    </td>
+
+
+</tr>
 
 
 </table>
 
+
+<div class="col-xs-12 col-md-8">
+
+<table class="table table-bordered">
+
+<tr>
+    <td>Dual side</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="dualside" type="checkbox" aria-label="dualside">
+  </span>
+</td>
+
+
+<td>multiplecustodians</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="multiplecustodians" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+</tr>
+
+
+
+<tr>
+    <td>submitliquidity</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="submitliquidity" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+    <td>executeorders</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="executeorders" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+
+
+</tr>
+
+<tr>
+    <td>verbose</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="verbose" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+    <td>hipchat</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="hipchat" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+</tr>
+
+
+</table>
+</div>
+
+
     </div>
-
-
-
-
 
 
 
@@ -218,7 +203,7 @@
 
       <div class="col-xs-12 col-md-6">
 
-    <h3>Config</h3>
+    <h3>RPC Config</h3>
 
 
 
@@ -230,10 +215,11 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="nubitaddress" size="100" type="text" class="form-control" placeholder="nubitaddress">
-    </td><td>
+    </div>
+</td>
 
-    </div><!-- /input-group -->
-</td></tr>
+
+</tr>
 
 
 <tr>
@@ -242,11 +228,9 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="nudport" size="100" type="text" class="form-control" placeholder="nudport">
-    </td><td>
+    </td>
 
-    </div><!-- /input-group -->
-</td></tr>
-
+</tr>
 
 
 <tr>
@@ -255,23 +239,26 @@
 <td class="col-md-8">
     <div class="input-group">
       <input id="rpcuser" size="100" type="text" class="form-control" placeholder="rpcuser">
-    </td><td>
+    </div>
+    </td>
 
-    </div><!-- /input-group -->
-</td></tr>
+
+</tr>
 
 
 <tr>
-    <td class="col-md-2">rpcpass</td>
+
+<td class="col-md-2">rpcpass</td>
 
 <td class="col-md-8">
+
     <div class="input-group">
       <input id="rpcpass" size="100" type="text" class="form-control" placeholder="rpcpass">
-    </td><td>
+    </div>
 
-    </div><!-- /input-group -->
-</td></tr>
+</td>
 
+</tr>
 
 
 
