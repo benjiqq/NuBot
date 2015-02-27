@@ -50,6 +50,10 @@ public class MainLaunch {
     }
 
 
+    /**
+     * execute a NuBot based on valid options. Also make sure only one NuBot is running
+     * @param opt
+     */
     public static void executeBot(NuBotOptions opt) {
 
         mainThread = Thread.currentThread();
@@ -68,6 +72,7 @@ public class MainLaunch {
 
     /**
      * shutdown mechanics
+     * TODO: some of the logic can be handled by NuBot in an async way
      */
     private static void createShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {

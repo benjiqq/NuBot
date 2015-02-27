@@ -39,9 +39,26 @@
 
               var host = "localhost";
               var port = 4567;
-              var url = "http://" + host + ":" + port + "/config";
 
-            function loadVals() {
+
+            function loadlog() {
+
+                var url = "http://" + host + ":" + port + "/logdump";
+
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+                })
+                .done(function( data ) {
+                  $('#logarea').text(data);
+                }
+
+            }
+
+            function loadconfig() {
+
+                var url = "http://" + host + ":" + port + "/config";
 
                 $.ajax({
                   type: "GET",
@@ -123,6 +140,4 @@
     </head>
 
 
-
-<body onLoad="loadVals()">
 

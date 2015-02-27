@@ -35,6 +35,8 @@ public class UiServer {
         //binds GET and POST
         new ConfigController("/config", opt, configdir, testconfigFile);
 
+        new LogController("/logdump");
+
         Map map = new HashMap();
 
         get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "operation.mustache"), new LayoutTemplateEngine());
