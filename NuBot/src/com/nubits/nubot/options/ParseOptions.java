@@ -402,9 +402,9 @@ public class ParseOptions {
                 String filepath = filePaths.get(i);
 
                 JSONObject fileJSON = parseSingleJsonFile(filepath);
-                JSONObject tempOptions = getOptionsKey(fileJSON);
+                //JSONObject tempOptions = getOptionsKey(fileJSON);
 
-                Set tempSet = tempOptions.entrySet();
+                Set tempSet = fileJSON.entrySet();
                 for (Object o : tempSet) {
                     Map.Entry entry = (Map.Entry) o;
                     setMap.put(entry.getKey(), entry.getValue());
