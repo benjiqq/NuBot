@@ -10,10 +10,13 @@ import spark.webserver.SparkServer;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import static spark.Spark.get;
 
 public class UiServer {
+
+    private static final Logger LOG = Logger.getLogger(UiServer.class.getName());
 
     //TODO path
     private static String htmlFolder = "./html/tmpl/";
@@ -45,11 +48,14 @@ public class UiServer {
 
     public static void main(String[] args) {
 
+        LOG.info("starting UI server");
+
         try{
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
+            LOG.info("using options " + opt);
             startUIserver(opt);
-        }catch(Exception e){
-
+        }catch(Exception ex){
+            LOG.severe("error configuring " + ex);
         }
 
 

@@ -138,8 +138,6 @@ public class ParseOptions {
 
         boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
-        String apiKey = "";
-
         if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
             if (!containsIgnoreCase(optionsJSON, "apiKey")) {
                 throw new NuBotConfigException("The apikey parameter is compulsory.");
@@ -147,6 +145,8 @@ public class ParseOptions {
                 options.apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
             }
         }
+
+        String apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
 
         String apiSecret = (String) getIgnoreCase(optionsJSON, "apisecret");
 

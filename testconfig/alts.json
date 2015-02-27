@@ -26,5 +26,9 @@
   "secondarypegoptions": true,
   "maxsellordervolume" : 0,
   "maxbuyordervolume" : 0,
-  "priceincrement": 0.1
+  "priceincrement": 0.1,
+  "secondarypegoptions": false,
+  "spread":0.0,
+  "distanceThreshold":0.0,
+  "wallchangeThreshold": 0.1,
 }
