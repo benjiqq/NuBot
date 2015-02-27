@@ -25,12 +25,12 @@ public class OptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("verbose", opt.isVerbose());
         root.addProperty("hipchat", opt.isSendHipchat());
 
-        root.addProperty("mail-notifications", opt.sendMailsLevel());
+        root.addProperty("mailnotifications", opt.sendMailsLevel());
         root.addProperty("mailrecipient", opt.getMailRecipient());
-        root.addProperty("emergency-timeout", opt.getEmergencyTimeout());
-        root.addProperty("keep-proceeds", opt.getKeepProceeds());
-        root.addProperty("max-sell-order-volume", opt.getMaxSellVolume());
-        root.addProperty("max-buy-order-volume", opt.getMaxBuyVolume());
+        root.addProperty("emergencytimeout", opt.getEmergencyTimeout());
+        root.addProperty("keepproceeds", opt.getKeepProceeds());
+        root.addProperty("maxsellordervolume", opt.getMaxSellVolume());
+        root.addProperty("maxbuyordervolume", opt.getMaxBuyVolume());
         root.addProperty("priceincrement", opt.getPriceIncrement());
 
         root.addProperty("pair", opt.getPair().toString("_"));
