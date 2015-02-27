@@ -21,18 +21,18 @@ public class ConfigController {
     private String testconfigfile;
     private NuBotOptions opt;
 
-    public ConfigController(NuBotOptions opt, String configDir, String testconfigfile) {
+    public ConfigController(String endpoint, NuBotOptions opt, String configDir, String testconfigfile) {
         this.opt = opt;
         this.configDir = configDir;
         this.testconfigfile = testconfigfile;
 
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
-        get("/config", "application/json", (request, response) -> {
+        get(endpoint, "application/json", (request, response) -> {
             return opt;
         }, new JsonTransformer());
 
-        post("/config", "application/json", (request, response) -> {
+        post(endpoint, "application/json", (request, response) -> {
 
             //not working. put is in request body
             //request.queryParams("apikey");

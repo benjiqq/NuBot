@@ -31,10 +31,10 @@ public class UiServer {
     public static void startUIserver(NuBotOptions opt) {
 
         //TODO: only load if in testmode and this is not set elsewhere
-        //should better read: load global settings
         Utils.loadProperties("settings.properties");
 
-        new ConfigController(opt, configdir, testconfigFile);
+        //binds GET and POST
+        new ConfigController("/config",opt, configdir, testconfigFile);
 
         Map map = new HashMap();
 
