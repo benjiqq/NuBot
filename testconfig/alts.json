@@ -4,6 +4,7 @@
   "apisecret": "xxx",
   "txfee": 0.2,
   "pair":"nbt_btc",
+  "secondarypegioptions": false,
   "submitliquidity":false,
   "nubitaddress": "xxx",
   "nudip": "127.0.0.1",

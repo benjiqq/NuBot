@@ -4,14 +4,13 @@ import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class TestConfigTest extends TestCase {
+public class TestConfigAlts extends TestCase {
 
     private static String testconfigFile = "alts.json";
     private static String testconfig = "testconfig/" + testconfigFile;
@@ -32,26 +31,6 @@ public class TestConfigTest extends TestCase {
     }
 
     @Test
-    public void testLoadConfig() {
-        try {
-            NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle(testconfig);
-
-            assertTrue(nuo != null);
-
-            assertTrue(nuo.getExchangeName().equals("peatio"));
-
-            //assertTrue(nuo.getPair() != null);
-
-            //assertTrue(nuo.getSecondaryPegOptions() != null);
-            //.getSpread())
-
-        } catch (NuBotConfigException e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void testLoadComplete() {
 
         String testconfigFile = "test.json";
@@ -60,8 +39,6 @@ public class TestConfigTest extends TestCase {
 
         try {
             JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
-            //assertTrue(inputJSON.containsKey("options"));
-            //JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
             assertTrue(inputJSON.containsKey("exchangename"));
         } catch (Exception e) {
 
@@ -69,7 +46,21 @@ public class TestConfigTest extends TestCase {
         assertTrue(!catched);
     }
 
+    @Test
+    public void testLoadConfig() {
+        try {
+            NuBotOptions nuo = ParseOptions
+                    .parseOptionsSingle(testconfig);
 
+            assertTrue(nuo != null);
+            String exc = nuo.getExchangeName();
+            System.out.println(">>> exc" + exc);
+            assertTrue(exc.equals("altstrade"));
+
+        } catch (NuBotConfigException e) {
+            e.printStackTrace();
+        }
+    }
 
 
 }
