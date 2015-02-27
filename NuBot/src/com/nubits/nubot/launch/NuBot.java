@@ -55,6 +55,8 @@ import org.json.simple.JSONObject;
  */
 public class NuBot {
 
+    private boolean liveTrading;
+
     private String logsFolder;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
@@ -202,6 +204,16 @@ public class NuBot {
      */
     public void execute(NuBotOptions opt) {
 
+        //DANGER ZONE : This variable set to true will cause orders to execute
+        if (opt.isExecuteOrders()){
+            liveTrading = true;
+            //inform user about real trading (he should be informed by now)
+        } else{
+
+            liveTrading = false;
+            //inform user we're in demo mode
+        }
+
         Global.options = opt;
 
         Global.running = true;
@@ -267,11 +279,6 @@ public class NuBot {
         }
 
         Utils.printSeparator();
-
-
-        //DANGER ZONE : This variable set to true will cause orders to execute
-        Global.executeOrders = Global.options.isExecuteOrders();
-
 
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 

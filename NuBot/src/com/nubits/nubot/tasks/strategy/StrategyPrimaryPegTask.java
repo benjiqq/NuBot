@@ -244,6 +244,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     }
 
+    private void orderLog(String orderString){
+        LOG.warning("Strategy : Submit order : " + orderString);
+    }
+
     private void sellSide(Amount balanceNBT) {
         //----------------------NTB (Sells)----------------------------
         //Check if NBT balance > 1
@@ -284,11 +288,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             }
 
                             double amountToSell = balanceNBT.getQuantity();
-                            if (Global.executeOrders) {
+                            if (Global.options.isExecuteOrders()) {
                                 //execute the order
                                 String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
                                         + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
-                                LOG.warning("Strategy : Submit order : " + orderString);
+                                orderLog(orderString);
 
                                 ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
                                 if (sellResponse.isPositive()) {
