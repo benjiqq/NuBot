@@ -5,6 +5,7 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 
@@ -40,7 +41,12 @@ public class ConfigController {
             String json_body = request.body();
 
             JSONParser parser = new JSONParser();
-            JSONObject postJson = (JSONObject) (parser.parse(json_body));
+            JSONObject postJson = null;
+            try {
+                postJson = (JSONObject) (parser.parse(json_body));
+            } catch (ParseException e) {
+
+            }
             //System.out.println(">>>> " + postJson);
             String variableset = "none";
 

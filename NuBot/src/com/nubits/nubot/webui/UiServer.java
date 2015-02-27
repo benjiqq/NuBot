@@ -49,6 +49,10 @@ public class UiServer {
 
     public static void main(String[] args) {
 
+        LOG.debug("test debug");
+        LOG.warn("test warn ");
+        LOG.error("test error");
+
         LOG.info("starting UI server");
 
         try {
