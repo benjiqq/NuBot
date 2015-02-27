@@ -20,7 +20,7 @@ import java.util.logging.Logger;
  */
 public class ParseOptions {
 
-    private static String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
+    private static String[] comp = {"secondarypegoptions","exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
     private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
 
@@ -96,6 +96,7 @@ public class ParseOptions {
 
     /**
      * parseOptions from JSON into NuBotOptions
+     * makes sure the parses object is valid
      *
      * @param optionsJSON
      * @return
@@ -163,20 +164,13 @@ public class ParseOptions {
 
 
         //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
-        boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
-        org.json.JSONObject pegOptionsJSON;
+        //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
+        //org.json.JSONObject pegOptionsJSON;
 
-        if (requireCryptoOptions) {
+        boolean speg =containsIgnoreCase(optionsJSON, "secondarypegoptions");
 
-            if (optionsJSON.containsKey("secondarypegoptions")) {
-
-                parseSecondary(options, optionsJSON);
-
-
-            } else {
-                throw new NuBotConfigException("secondary-peg-options are required in the options");
-            }
-
+        if (speg ) {
+            parseSecondary(options, optionsJSON);
         }
 
 
@@ -402,9 +396,9 @@ public class ParseOptions {
                 String filepath = filePaths.get(i);
 
                 JSONObject fileJSON = parseSingleJsonFile(filepath);
-                JSONObject tempOptions = getOptionsKey(fileJSON);
+                //JSONObject tempOptions = getOptionsKey(fileJSON);
 
-                Set tempSet = tempOptions.entrySet();
+                Set tempSet = fileJSON.entrySet();
                 for (Object o : tempSet) {
                     Map.Entry entry = (Map.Entry) o;
                     setMap.put(entry.getKey(), entry.getValue());

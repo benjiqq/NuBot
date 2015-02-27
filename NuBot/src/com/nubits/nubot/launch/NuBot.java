@@ -71,31 +71,33 @@ public class NuBot {
 
         mainThread = Thread.currentThread();
 
+        NuBotOptions opt = null;
+
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            NuBotOptions opt = parseOptionsArgs(args);
-
-            //test if configuration is supported
-            if (!Utils.isSupported(opt.getPair())) {
-                exitWithNotice("This bot doesn't work yet with trading pair " + opt.getPair().toString());
-            }
-
-            Utils.printSeparator();
-
-            createShutDownHook();
-
-            // Check if NuBot is already running
-            if (!Global.running) {
-                NuBot app = new NuBot();
-                app.execute(opt);
-            } else {
-                //otherwise notify user and exit
-                exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
-            }
-
+            opt = parseOptionsArgs(args);
         } catch (NuBotConfigException e) {
             exitWithNotice("" + e);
         }
+
+        //test if configuration is supported
+        if (!Utils.isSupported(opt.getPair())) {
+            exitWithNotice("This bot doesn't work yet with trading pair " + opt.getPair().toString());
+        }
+
+        Utils.printSeparator();
+
+        createShutDownHook();
+
+        // Check if NuBot is already running
+        if (!Global.running) {
+            NuBot app = new NuBot();
+            app.execute(opt);
+        } else {
+            //otherwise notify user and exit
+            exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
+        }
+
 
     }
 
@@ -111,6 +113,7 @@ public class NuBot {
 
     /**
      * parse the command line arguments
+     *
      * @param args
      * @return
      * @throws NuBotConfigException
@@ -144,7 +147,7 @@ public class NuBot {
         return opt;
     }
 
-    private void setupLog(){
+    private void setupLog() {
         //Setting up log folder for this session :
 
         String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
@@ -165,7 +168,7 @@ public class NuBot {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     }
 
-    private void setupSSL(){
+    private void setupSSL() {
         LOG.info("Set up SSL certificates");
         boolean trustAllCertificates = false;
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
@@ -178,7 +181,7 @@ public class NuBot {
     /**
      * all setups
      */
-    private void setupConfigBot(){
+    private void setupConfigBot() {
 
         Utils.printSeparator();
 
@@ -193,7 +196,7 @@ public class NuBot {
         setupExchange();
     }
 
-    private void setupExchange(){
+    private void setupExchange() {
         LOG.info("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         Utils.printSeparator();
@@ -252,7 +255,7 @@ public class NuBot {
         }
     }
 
-    private  void setupNuTask(){
+    private void setupNuTask() {
         LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
         Global.publicAddress = Global.options.getNubitsAddress();
         Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
@@ -327,9 +330,9 @@ public class NuBot {
         Utils.printSeparator();
 
         if (Global.options.isSubmitliquidity()) {
-            try{
+            try {
                 checkNuConn();
-            }catch(NuBotConnectionException e){
+            } catch (NuBotConnectionException e) {
                 exitWithNotice("" + e);
             }
         }
