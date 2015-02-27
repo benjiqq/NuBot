@@ -69,10 +69,26 @@
                     $("#rpcuser").attr("placeholder", data["rpcuser"]);
                     $("#pair").attr("placeholder", data["pair"]);
 
-
-
                  });
 
+            }
+
+            function postall(){
+                var exchangename = $('#exchangename').attr('value');
+                var apikey = $('#apikey').attr('value');
+                var apisecret = $('#apisecret').attr('value');
+                var maxbuyvolume = $('#maxbuyvolume').attr('value');
+                var maxsellvolume = $('#maxsellvolume').attr('value');
+
+                var jsondata = JSON.stringify({
+                    "exchangename": exchangename,
+                    "apikey": apikey,
+                    "apisecret": apisecret,
+                    "maxbuyvolume": maxbuyvolume,
+                    "maxsellvolume": maxsellvolume
+                });
+
+                makePost(jsondata);
             }
 
             //save variable
