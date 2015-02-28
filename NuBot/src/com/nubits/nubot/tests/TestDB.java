@@ -46,6 +46,11 @@ public class TestDB extends TestCase {
             String s = new String(b);
             assertTrue(s.equals("12345678"));
 
+            NuDB.writeTo("abcdefgh".getBytes());
+            byte[] a = NuDB.readAll();
+            String sa = new String(a);
+            assertTrue(sa.equals("12345678abcdefgh"));
+
             //ff.delete();
             //assertTrue(!ff.exists());
         } catch (Exception e) {

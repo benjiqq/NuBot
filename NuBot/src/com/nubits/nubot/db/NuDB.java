@@ -5,7 +5,11 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * A low level DB
+ * A very simple low level DB.
+ * Used for storing prices or other time-series data. Instead of using a flat file or SQL
+ * with random access all basic operations can be implemented
+ * storing a record and getting the latest
+ * there is no update method, since time-series are just kept and never deleted
  */
 public class NuDB {
 
@@ -14,6 +18,7 @@ public class NuDB {
 
     /**
      * create a DB file
+     *
      * @param dbPath
      * @throws IOException
      */
@@ -30,6 +35,7 @@ public class NuDB {
 
     /**
      * write an array to the DB
+     *
      * @param byteArray
      * @throws IOException
      */
@@ -37,23 +43,53 @@ public class NuDB {
         dbfile.write(byteArray);
     }
 
-    public static byte[] readNbytes(int n) throws IOException{
+    /**
+     * read the whole DB
+     *
+     * @return
+     * @throws IOException
+     */
+    public static byte[] readAll() throws IOException {
+        long beforepointer = dbfile.getFilePointer();
         dbfile.seek(0);
-        byte[] b= new byte[n];
+        long n = dbfile.length();
+        byte[] allbytes = readNbytes((int) n);
+
+        //reseth pointer
+        pointer = beforepointer;
+        dbfile.seek(beforepointer);
+        return allbytes;
+    }
+
+    /**
+     * read n number of bytes
+     *
+     * @param n
+     * @return
+     * @throws IOException
+     */
+    public static byte[] readNbytes(int n) throws IOException {
+        //set pointer not needed
+        //dbfile.seek(pointer);
+
+        byte[] b = new byte[n];
         for (int i = 0; i < n; i++) {
             byte aByte = dbfile.readByte();
             b[i] = aByte;
         }
-        long p = dbfile.getFilePointer();
-        System.out.println("p: " + p);
+
+        //pointer has moved
         return b;
 
     }
-     /**
+
+    /**
      * close the database
+     *
      * @throws IOException
      */
     public static void closeDB() throws IOException {
         dbfile.close();
     }
+
 }
