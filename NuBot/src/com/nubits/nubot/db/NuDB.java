@@ -25,6 +25,7 @@ public class NuDB {
 
         dbfile = new RandomAccessFile(dbPath, "rw");
         pointer = dbfile.getFilePointer();
+
     }
 
     /**
