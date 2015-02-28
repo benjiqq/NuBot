@@ -21,23 +21,14 @@ import java.util.Map;
 public class LayoutTemplateEngine extends TemplateEngine {
 
     private MustacheFactory mustacheFactory;
-    //TODO: global
-    private static String htmlFolder = "./html/tmpl/";
+    private  String htmlfolder;
 
     /**
      * Constructs a mustache template engine
      */
-    public LayoutTemplateEngine() {
+    public LayoutTemplateEngine(String htmlfolder) {
+        this.htmlfolder = htmlfolder;
         mustacheFactory = new DefaultMustacheFactory("templates");
-    }
-
-    /**
-     * Constructs a mustache template engine
-     *
-     * @param resourceRoot the resource root
-     */
-    public LayoutTemplateEngine(String resourceRoot) {
-        mustacheFactory = new DefaultMustacheFactory(resourceRoot);
     }
 
     /**
@@ -59,13 +50,13 @@ public class LayoutTemplateEngine extends TemplateEngine {
         //setPort(serverPort); // Spark will run on this port
         //map.put("port", "" + serverPort);
 
-        ModelAndView mv = new ModelAndView(map,  htmlFolder + "top.mustache");
+        ModelAndView mv = new ModelAndView(map,  this.htmlfolder + "top.mustache");
         return renderTemplateFile(mv);
     }
 
     public String renderFooter() {
         Map map = new HashMap();
-        ModelAndView mv = new ModelAndView(map, htmlFolder + "footer.mustache");
+        ModelAndView mv = new ModelAndView(map, this.htmlfolder + "footer.mustache");
         return renderTemplateFile(mv);
     }
 

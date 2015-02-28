@@ -1,7 +1,6 @@
 
 
-<body onLoad="loadVals()">
-
+<body onLoad="loadlog()">
 
     <!-- Fixed navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -17,8 +16,9 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul class="nav navbar-nav">
-            <li><a href="/">Exchange Config</a></li>
-            <li class="active"><a href="/log">Log</a></li>
+            <li class="active"><a href="/">Operation</a></li>
+            <li><a href="/configui">Configuration</a></li>
+            <li><a href="/feeds">Feeds</a></li>
 
           </ul>
 
@@ -31,28 +31,34 @@
 
 
 <div class="row">
-  <div class="col-xs-12 col-md-8">
+<h3>NuBot Operation</h3>
 
-    <h3>Logging</h3>
-
-
-    <button onclick="sendToServer('start')">Start</button>
-    <button onclick="sendToServer('stop')">Stop!</button><br/><br/>
-    <textarea id="log" rows="20" cols="90"></textarea>
-
-    </div>
-
-
-  <div class="col-xs-6 col-md-4"></div>
-    <!-- spacer -->
-    </div>
-
-
-    </div> <!-- /container -->
+  <button>Start</button>
+  <button>Stop</button>
 
 </div>
 
-      </div>
+<div class="row">
+<h3>Balance</h3>
 
-    </div> <!-- /container -->
+{{exchange}} : {{balance}}
 
+</div>
+
+<div class="row">
+    <h3>Logs Orders</h3>
+<button>Clear</button>
+<div class="input-group">
+    <textarea id="logarea" class="form-control custom-control"></textarea>
+</div>
+
+</div>
+
+<div class="row">
+    <h3>Logs Detail</h3>
+<button>Clear</button>
+<div class="input-group">
+    <textarea id="logarea" class="form-control custom-control"></textarea>
+</div>
+
+</div>

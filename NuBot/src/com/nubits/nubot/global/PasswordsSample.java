@@ -50,6 +50,8 @@ public class PasswordsSample {
     public static final String EXCOIN_SECRET = "xxx";
     public static final String BITCOINCOID_KEY = "xxx";
     public static final String BITCOINCOID_SECRET = "xxx";
+    public static final String ALTSTRADE_KEY = "xxx";
+    public static final String ALTSTRADE_SECRET = "xxx";
     /*
      * Misc - Necessary for build
      * ! Remember to add to build process in Jenkins !!

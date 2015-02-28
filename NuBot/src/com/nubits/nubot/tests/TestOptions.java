@@ -140,6 +140,9 @@ public class TestOptions extends TestCase {
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+
+            assertTrue(opt.getNubitAddress().equals("xxx"));
+
         } catch (NuBotConfigException e) {
             System.out.println("could not parse config");
             System.out.println(e);
@@ -147,6 +150,8 @@ public class TestOptions extends TestCase {
         }
 
         assertTrue(!catched);
+
+
     }
 
     // @Test

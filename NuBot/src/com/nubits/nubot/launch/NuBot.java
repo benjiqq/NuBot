@@ -49,104 +49,25 @@ import java.util.logging.Logger;
 import org.json.simple.JSONObject;
 
 /**
- * Provides the main class of NuBot. Instantiate this class to start the NuBot
- * program
+ * NuBot. launched from command line or UI
  *
  * @author desrever <desrever at nubits.com>
  */
 public class NuBot {
 
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]";
+    private boolean liveTrading;
+
     private String logsFolder;
-    private static Thread mainThread;
     private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
 
-    /**
-     * Start the NuBot. start if config is valid and other instance is running
-     *
-     * @param args a list of valid arguments
-     * @author desrever <desrever at nubits.com>
-     */
-    public static void main(String args[]) {
 
-        mainThread = Thread.currentThread();
-
-        NuBotOptions opt = null;
-
-        try {
-            //Check if NuBot has valid parameters and quit if it doesn't
-            opt = parseOptionsArgs(args);
-        } catch (NuBotConfigException e) {
-            exitWithNotice("" + e);
-        }
-
-        //test if configuration is supported
-        if (!Utils.isSupported(opt.getPair())) {
-            exitWithNotice("This bot doesn't work yet with trading pair " + opt.getPair().toString());
-        }
-
-        Utils.printSeparator();
-
-        createShutDownHook();
-
-        // Check if NuBot is already running
-        if (!Global.running) {
-            NuBot app = new NuBot();
-            app.execute(opt);
-        } else {
-            //otherwise notify user and exit
-            exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
-        }
-
+    public NuBot() {
 
     }
 
     /**
-     * exit application and notify user
-     *
-     * @param msg
+     * setup logging
      */
-    private static void exitWithNotice(String msg) {
-        LOG.severe(msg);
-        System.exit(0);
-    }
-
-    /**
-     * parse the command line arguments
-     *
-     * @param args
-     * @return
-     * @throws NuBotConfigException
-     */
-    private static NuBotOptions parseOptionsArgs(String args[]) throws NuBotConfigException {
-
-        if (!isValidArgs(args)) {
-            throw new NuBotConfigException("wrong argument number : run nubot with \n" + USAGE_STRING);
-        }
-
-        NuBotOptions opt = null;
-        //Load Options and test for critical configuration errors
-        if (args.length > 1) {
-            //more than one file path given
-            try {
-                opt = ParseOptions.parseOptions(args);
-            } catch (NuBotConfigException ex) {
-                throw new NuBotConfigException("NuBot wrongly configured");
-            }
-
-        } else {
-            try {
-                opt = ParseOptions.parseOptionsSingle(args[0]);
-            } catch (NuBotConfigException ex) {
-                throw new NuBotConfigException("NuBot wrongly configured");
-            }
-        }
-        if (opt == null)
-            throw new NuBotConfigException("");
-
-        return opt;
-    }
-
     private void setupLog() {
         //Setting up log folder for this session :
 
@@ -281,7 +202,17 @@ public class NuBot {
     /**
      * execute the NuBot based on a configuration
      */
-    private void execute(NuBotOptions opt) {
+    public void execute(NuBotOptions opt) {
+
+        //DANGER ZONE : This variable set to true will cause orders to execute
+        if (opt.isExecuteOrders()){
+            liveTrading = true;
+            //inform user about real trading (he should be informed by now)
+        } else{
+
+            liveTrading = false;
+            //inform user we're in demo mode
+        }
 
         Global.options = opt;
 
@@ -348,11 +279,6 @@ public class NuBot {
         }
 
         Utils.printSeparator();
-
-
-        //DANGER ZONE : This variable set to true will cause orders to execute
-        Global.executeOrders = Global.options.isExecuteOrders();
-
 
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
@@ -464,83 +390,14 @@ public class NuBot {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
+
     /**
-     * check if arguments to NuBot are valid supported are arguments larger then
-     * 0
+     * exit application and notify user
      *
-     * @param args
-     * @return
+     * @param msg
      */
-    private static boolean isValidArgs(String[] args) {
-        boolean valid = args.length > 0;
-
-        return valid;
-    }
-
-    /**
-     * shutdown mechanics
-     */
-    private static void createShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                LOG.info("Bot shutting down..");
-
-                if (Global.options != null) {
-                    //Try to cancel all orders, if any
-                    if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
-                        LOG.info("Clearing out active orders ... ");
-
-                        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                        if (deleteOrdersResponse.isPositive()) {
-                            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-
-                            if (deleted) {
-                                LOG.info("Order clear request succesfully");
-                            } else {
-                                LOG.severe("Could not submit request to clear orders");
-                            }
-
-                        } else {
-                            LOG.severe(deleteOrdersResponse.getError().toString());
-                        }
-                    }
-
-                    //reset liquidity info
-                    if (Global.rpcClient.isConnected() && Global.options.isSubmitliquidity()) {
-                        //tier 1
-                        LOG.info("Resetting Liquidity Info before quit");
-
-                        JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0, 1);
-                        if (null == responseObject1) {
-                            LOG.severe("Something went wrong while sending liquidityinfo");
-                        } else {
-                            LOG.fine(responseObject1.toJSONString());
-                        }
-
-                        JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0, 2);
-                        if (null == responseObject2) {
-                            LOG.severe("Something went wrong while sending liquidityinfo");
-                        } else {
-                            LOG.fine(responseObject2.toJSONString());
-                        }
-                    }
-
-                    LOG.info("Exit. ");
-                    NuBot.mainThread.interrupt();
-                    if (Global.taskManager != null) {
-                        if (Global.taskManager.isInitialized()) {
-                            Global.taskManager.stopAll();
-                        }
-                    }
-                }
-
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
+    private static void exitWithNotice(String msg) {
+        LOG.severe(msg);
+        System.exit(0);
     }
 }

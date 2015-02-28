@@ -36,15 +36,10 @@ public class Currency {
     private String code; // i.e USD
     private String extendedName; // the extended name where available
     private final static String PATH_TO_CURRENCIES = FileUtils.getFile("NuBot", "res", "currencies.csv").toPath().toString();
-
 //Constructor
 
     /**
      *
-     * @param symbol
-     * @param fiat
-     * @param code
-     * @param extendedName
      */
     public static Currency createCurrency(String code) {
         Currency toRet = null;
