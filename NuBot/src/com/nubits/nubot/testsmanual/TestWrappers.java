@@ -26,6 +26,8 @@ import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
+import org.apache.commons.io.FileUtils;
+
 import java.io.IOException;
 import java.util.logging.Logger;
 
@@ -39,7 +41,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = Constant.POLONIEX;
     public static final CurrencyPair testPair = Constant.NBT_BTC;

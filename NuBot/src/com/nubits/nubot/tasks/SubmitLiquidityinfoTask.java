@@ -190,7 +190,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
             }
 
-            if (Global.options.isSendRPC()) {
+            if (Global.options.isSubmitliquidity()) {
                 //Call RPC
 
                 double buySide;
@@ -261,7 +261,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             buyside = Utils.round(buyside * Global.conversion, 2);
 
-            if (Global.options.isSendRPC()) {
+            if (Global.options.isSubmitliquidity()) {
                 //Call RPC
                 toReturn = sendLiquidityInfoImpl(buyside, sellside, 2);
             }

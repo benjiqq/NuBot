@@ -38,7 +38,7 @@ public class Global {
     public static Thread connectionThread;
     public static boolean isFirstTime;
     public static TaskManager taskManager;
-    public static boolean executeOrders = false;
+
     public static boolean isDualSide;
     public static String publicAddress;
     public static NuRPCClient rpcClient;

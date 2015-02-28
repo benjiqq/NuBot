@@ -19,6 +19,7 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
@@ -54,7 +55,7 @@ public class TaskManager {
         this.running = false;
         taskList = new ArrayList<BotTask>();
         //assign default values just for testing without Global.options loaded
-        int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds")),
+        int sendLiquidityInterval = NuBotAdminSettings.submit_liquidity_seconds,
                 executeStrategyInterval = 41,
                 checkPriceInterval = 61;
 

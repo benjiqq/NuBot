@@ -230,28 +230,6 @@ public class Utils {
         LOG.fine("\n----------- -----------  -----------\n");
     }
 
-    public static boolean isSupported(CurrencyPair pair) {
-        if (pair.equals(Constant.NBT_USD)
-                || pair.equals(Constant.NBT_BTC)
-                || pair.equals(Constant.BTC_NBT)
-                || pair.equals(Constant.NBT_EUR)
-                || pair.equals(Constant.NBT_CNY)
-                || pair.equals(Constant.NBT_PPC)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public static boolean requiresSecondaryPegStrategy(CurrencyPair pair) {
-        //Return TRUE when it requires a dedicated NBT peg to something that is not USD
-        if (pair.equals(Constant.NBT_USD)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
-
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
     //not needed if using alibaba json parser
     public static double getDouble(Object obj) {

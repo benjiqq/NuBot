@@ -1,5 +1,6 @@
 package com.nubits.nubot.options;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.MailNotifications;
 
@@ -8,14 +9,10 @@ import com.nubits.nubot.notifications.MailNotifications;
  */
 public class NuBotOptionsDefault {
 
-    //TODO consistent names
-    public static int sendLiquidityInterval = Integer.parseInt(Global.settings.getProperty("submit_liquidity_seconds"));
-    public static int reset_every = Integer.parseInt(Global.settings.getProperty("reset_every_minutes"));
-    public static int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds"));
-
     public static String nudIp = "127.0.0.1";
+    public static int nudport = 9091;
     public static String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
-    public static boolean submitLiquidity = true;
+    public static boolean submitLiquidity = false;
     public static boolean executeOrders = true;
     public static boolean verbose = false;
     public static boolean sendHipchat = true;
@@ -28,4 +25,33 @@ public class NuBotOptionsDefault {
     public static double maxBuyVolume = 0;
     public static int emergencyTimeout = 60;
     public static boolean distributeLiquidity = false;
+
+    //double wallchangeThreshold = 0.5;
+    //double spread = 0;
+    //double distanceThreshold = 10;
+
+    public static NuBotOptions defaultFactory() {
+
+        NuBotOptions opt = new NuBotOptions();
+        opt.dualSide = true;
+        opt.apiKey = "";
+        opt.apiSecret = "";
+        opt.rpcUser = "";
+        opt.rpcPass = "";
+        opt.nudIp = "127.0.0.1";
+        opt.priceIncrement = 0.0;
+        opt.txFee = 0.0;
+        opt.submitLiquidity = false;
+        opt.executeOrders = false;
+        opt.executeStrategyInterval = 30;
+        opt.sendHipchat = true;
+        opt.sendMails = "NONE";
+        opt.mailRecipient = "";
+        opt.emergencyTimeout = 30;
+        opt.keepProceeds = 0.0;
+        opt.distributeLiquidity = false;
+        opt.secondarypeg = false;
+        opt.pair = Constant.NBT_USD;
+        return opt;
+    }
 }

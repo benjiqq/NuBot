@@ -1,4 +1,5 @@
 dist-packaged
+config/
 
 #A folder containing utilities that do not need to be pushed
 /gitignore/
@@ -71,5 +72,6 @@ NuBot/.settings
 .idea
 *.iml
 Test*.xml
+*.ipr
+*.iws
 
-testconfig/

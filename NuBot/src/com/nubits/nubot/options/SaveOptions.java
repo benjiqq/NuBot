@@ -14,6 +14,20 @@ import java.io.IOException;
  */
 public class SaveOptions {
 
+
+    public static String jsonPretty(NuBotOptions opt){
+        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        Gson parser = gson.create();
+        String js = parser.toJson(opt);
+        return js;
+    }
+
+    public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
+        String js = jsonPretty(opt);
+        FileSystem.writeToFile(js, filepath, false);
+        return true;
+    }
     /**
      * save options to file
      *
@@ -37,7 +51,7 @@ public class SaveOptions {
      * @param filepath
      * @return
      */
-    public static boolean backupOptions(String filepath) {
+    public static boolean backupOptions(String filepath) throws IOException{
         File f = new File(filepath);
         if (f.exists()) {
             boolean wrote = false;
@@ -49,12 +63,13 @@ public class SaveOptions {
                     try {
                         FileUtils.copyFile(f, dest);
                     } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        return true;
+                        throw new IOException(e);
                     }
                 }
                 i++;
+
+                if (i > 10)
+                    return false;
             }
         }
         return false;

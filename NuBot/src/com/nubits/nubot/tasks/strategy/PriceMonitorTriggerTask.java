@@ -23,6 +23,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -297,7 +298,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             currentTime = System.currentTimeMillis();
 
 
-            logMessage = "There has been a connection issue for " + Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) + " seconds\n"
+            logMessage = "There has been a connection issue for " + NuBotAdminSettings.refresh_time_seconds + " seconds\n"
                     + "Consider restarting the bot if the connection issue persists";
             notification = "";
             notificationColor = MessageColor.YELLOW;
@@ -307,7 +308,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             sleepTime = (Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) * 3);
 
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
-                    + Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) + "seconds.\nThe bot will notify and restart in "
+                    + NuBotAdminSettings.refresh_time_seconds + "seconds.\nThe bot will notify and restart in "
                     + sleepTime + "seconds.";
             notification = "A large price difference was detected at " + Global.exchange.getName()
                     + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
@@ -366,7 +367,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //the potential price is within the % boundary.
             //add it to the MA-Queue to keep the moving average moving
             // Only do this if the standard update interval hasn't passed
-            if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < Integer.parseInt(Global.settings.getProperty("refresh_time_seconds"))) {
+            if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < NuBotAdminSettings.refresh_time_seconds) {
                 updateMovingAverageQueue(current);
             } else {
                 //If we get here, we haven't had a price within % of the average for as long as a standard update period
@@ -568,14 +569,14 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Add(remove) the offset % from prices
 
             //compute half of the spread
-            double halfSpread = Utils.round(Global.options.getSecondaryPegOptions().getSpread() / 2, 6);
+            double halfSpread = Utils.round(Global.options.getSpread() / 2, 6);
 
             double offset = Utils.round(halfSpread / 100, 6);
 
             sellPriceUSD = sellPriceUSD + offset;
             buyPriceUSD = buyPriceUSD - offset;
 
-            String message = "Computing USD prices with spread " + Global.options.getSecondaryPegOptions().getSpread() + "%  : sell @ " + sellPriceUSD;
+            String message = "Computing USD prices with spread " + Global.options.getSpread() + "%  : sell @ " + sellPriceUSD;
             if (Global.isDualSide) {
                 message += " buy @ " + buyPriceUSD;
             }
@@ -618,7 +619,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //Send email notification
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
             String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
-                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getSecondaryPegOptions().getWallchangeThreshold() + "%.";
+                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
         } else {
             LOG.severe("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());

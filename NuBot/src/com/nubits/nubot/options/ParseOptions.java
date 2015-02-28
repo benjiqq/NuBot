@@ -1,26 +1,27 @@
 package com.nubits.nubot.options;
 
+import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.util.*;
 import java.util.logging.Logger;
-
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  * ParseOptions from one or several JSON files
  */
 public class ParseOptions {
 
-    private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
+    private static String[] comp = {"secondarypegoptions", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
+    private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
 
 
     /**
@@ -49,36 +50,86 @@ public class ParseOptions {
 
         File f = new File(filepath);
         if (!f.exists())
-            throw new NuBotConfigException("file does not exist");
+            throw new NuBotConfigException("file " + f.getAbsolutePath() + " does not exist");
 
         try {
             JSONObject inputJSON = parseSingleJsonFile(filepath);
-            JSONObject optionsJSON = getOptionsKey(inputJSON);
-            return parseOptionsFromJson(optionsJSON);
+            return parseOptionsFromJson(inputJSON);
 
         } catch (ParseException ex) {
-            throw new NuBotConfigException("Configuration error from single file");
+            throw new NuBotConfigException("Parse Exception. Configuration error from single file");
+        } catch (Exception e) {
+            throw new NuBotConfigException("Configuration error from single file " + e);
         }
 
     }
 
+    public static Object getIgnoreCase(JSONObject jobj, String key) {
+
+        Iterator<String> iter = jobj.keySet().iterator();
+        while (iter.hasNext()) {
+            String key1 = iter.next();
+            if (key1.equalsIgnoreCase(key)) {
+                return jobj.get(key1);
+            }
+        }
+
+        return null;
+
+    }
+
+    public static boolean containsIgnoreCase(JSONObject jobj, String key) {
+
+        Iterator<String> iter = jobj.keySet().iterator();
+        boolean contains = false;
+        while (iter.hasNext()) {
+            String key1 = iter.next();
+            if (key1.equalsIgnoreCase(key))
+                return true;
+        }
+
+        return contains;
+
+    }
+
+    /**
+     * the rules for valid configurations
+     * @param optionsJSON
+     * @return
+     * @throws NuBotConfigException
+     */
+    public static boolean isValidJSON(JSONObject optionsJSON) throws NuBotConfigException {
+
+        for (int i = 0; i < comp.length; i++) {
+            if (!containsIgnoreCase(optionsJSON, comp[i]))
+                throw new NuBotConfigException("necessary key: " + comp[i]);
+        }
+
+        return true;
+    }
+
     /**
      * parseOptions from JSON into NuBotOptions
+     * makes sure the parses object is valid
      *
      * @param optionsJSON
      * @return
      */
     public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
 
-        NuBotOptions options = null;
+        NuBotOptions options = new NuBotOptions();
 
-        String[] comp = {"exchangename", "apisecret", "mail-recipient", "dualside", "pair"};
-
-        for (int i = 0; i < comp.length; i++) {
-            if (!optionsJSON.containsKey(comp[i]))
-                throw new NuBotConfigException("necessary key: " + comp[i]);
+        try{
+            isValidJSON(optionsJSON);
+        }catch(NuBotConfigException e){
+            throw e;
         }
 
+        boolean secondarypeg = false;
+
+        double wallchangeThreshold = -1;
+        double spread = -1;
+        double distanceThreshold = -1;
 
         //default values for optional settings
 
@@ -90,7 +141,6 @@ public class ParseOptions {
         boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
         boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
         int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
-        int sendLiquidityInterval = NuBotOptionsDefault.sendLiquidityInterval;
         double txFee = NuBotOptionsDefault.txFee;
         double priceIncrement = NuBotOptionsDefault.priceIncrement;
         double keepProceeds = NuBotOptionsDefault.keepProceeds;
@@ -100,24 +150,25 @@ public class ParseOptions {
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
 
         //First try to parse compulsory parameters
-        String exchangeName = (String) optionsJSON.get("exchangename");
+        String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
-        String apiKey = "";
-
+        boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
         if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
-            if (!optionsJSON.containsKey("apikey")) {
-                Utils.exitWithMessage("The apikey parameter is compulsory.");
+            if (!containsIgnoreCase(optionsJSON, "apiKey")) {
+                throw new NuBotConfigException("The apikey parameter is compulsory.");
             } else {
-                apiKey = (String) optionsJSON.get("apikey");
+                options.apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
             }
         }
 
-        String apiSecret = (String) optionsJSON.get("apisecret");
+        String apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
 
-        String mailRecipient = (String) optionsJSON.get("mail-recipient");
+        String apiSecret = (String) getIgnoreCase(optionsJSON, "apisecret");
 
-        String pairStr = (String) optionsJSON.get("pair");
+        String mailRecipient = (String) getIgnoreCase(optionsJSON, "mailrecipient");
+
+        String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
         CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
 
         boolean aggregate = true; //true only for USD
@@ -126,60 +177,70 @@ public class ParseOptions {
         }
 
 
-        boolean dualside = (boolean) optionsJSON.get("dualside");
-
-
         //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
-        boolean requireCryptoOptions = Utils.requiresSecondaryPegStrategy(pair);
-        org.json.JSONObject pegOptionsJSON;
-        SecondaryPegOptionsJSON cpo = null;
-        if (requireCryptoOptions) {
+        //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
+        //org.json.JSONObject pegOptionsJSON;
 
-            if (optionsJSON.containsKey("secondary-peg-options")) {
+        boolean speg = containsIgnoreCase(optionsJSON, "secondarypegoptions");
 
-                Map setMap = new HashMap();
-
-                //convert from simple JSON to org.json.JSONObject
-                JSONObject oldObject = (JSONObject) optionsJSON.get("secondary-peg-options");
-
-                Set tempSet = oldObject.entrySet();
-                for (Object o : tempSet) {
-                    Map.Entry entry = (Map.Entry) o;
-                    setMap.put(entry.getKey(), entry.getValue());
-                }
-
-                pegOptionsJSON = new org.json.JSONObject(setMap);
-                cpo = SecondaryPegOptionsJSON.create(pegOptionsJSON, pair);
-            } else {
-                throw new NuBotConfigException("secondary-peg-options are required in the options");
-            }
-
+        if (speg) {
+            parseSecondary(options, optionsJSON);
         }
+
 
         //---- optional settings ----
 
         if (optionsJSON.containsKey("nudip")) {
-            nudIp = (String) optionsJSON.get("nudip");
+            nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
         }
 
-        if (optionsJSON.containsKey("priceincrement")) {
-            priceIncrement = Utils.getDouble(optionsJSON.get("priceincrement"));
+        if (containsIgnoreCase(optionsJSON, "priceincrement")) {
+            priceIncrement = Utils.getDouble(getIgnoreCase(optionsJSON, "priceincrement"));
         }
 
-        if (optionsJSON.containsKey("txfee")) {
-            txFee = Utils.getDouble(optionsJSON.get("txfee"));
+        if (containsIgnoreCase(optionsJSON, "txfee")) {
+            txFee = Utils.getDouble(getIgnoreCase(optionsJSON, "txfee"));
         }
 
-        if (optionsJSON.containsKey("submit-liquidity")) {
-            submitLiquidity = (boolean) optionsJSON.get("submit-liquidity");
+        if (containsIgnoreCase(optionsJSON, "submitliquidity")) {
+            submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
         }
 
-        if (optionsJSON.containsKey("max-sell-order-volume")) {
-            maxSellVolume = Utils.getDouble(optionsJSON.get("max-sell-order-volume"));
+        if (containsIgnoreCase(optionsJSON, "maxsellordervolume")) {
+            maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxsellordervolume"));
         }
 
-        if (optionsJSON.containsKey("max-buy-order-volume")) {
-            maxBuyVolume = Utils.getDouble(optionsJSON.get("max-buy-order-volume"));
+        if (containsIgnoreCase(optionsJSON, "maxbuyordervolume")) {
+            maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxbuyordervolume"));
+        }
+
+        if (containsIgnoreCase(optionsJSON, "executeorders")) {
+            executeOrders = (boolean) getIgnoreCase(optionsJSON, "executeorders");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "verbose")) {
+            verbose = (boolean) getIgnoreCase(optionsJSON, "verbose");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "hipchat")) {
+            sendHipchat = (boolean) getIgnoreCase(optionsJSON, "hipchat");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "emergencytimeout")) {
+            long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, "emergencytimeout");
+            emergencyTimeout = (int) emergencyTimeoutLong;
+        }
+
+        if (containsIgnoreCase(optionsJSON, "keepproceeds")) {
+            keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, "keepproceeds")));
+        }
+
+        if (containsIgnoreCase(optionsJSON, "multiplecustodians")) {
+            multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiplecustodians");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "distributeliquidity")) {
+            distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distributeliquidity");
         }
 
         //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
@@ -188,29 +249,29 @@ public class ParseOptions {
         int nudPort = 9091;
 
         if (submitLiquidity) {
-            if (optionsJSON.containsKey("nubitaddress")) {
-                nubitAddress = (String) optionsJSON.get("nubitaddress");
+            if (containsIgnoreCase(optionsJSON, "nubitaddress")) {
+                nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
             } else {
                 throw new NuBotConfigException("When submit-liquidity is set to true "
                         + "you need to declare a value for \"nubitaddress\" ");
             }
 
-            if (optionsJSON.containsKey("rpcpass")) {
-                rpcPass = (String) optionsJSON.get("rpcpass");
+            if (containsIgnoreCase(optionsJSON, "rpcpass")) {
+                rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
             } else {
                 throw new NuBotConfigException("When submit-liquidity is set to true "
                         + "you need to declare a value for \"rpcpass\" ");
             }
 
-            if (optionsJSON.containsKey("rpcuser")) {
-                rpcUser = (String) optionsJSON.get("rpcuser");
+            if (containsIgnoreCase(optionsJSON, "rpcuser")) {
+                rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
             } else {
                 throw new NuBotConfigException("When submit-liquidity is set to true "
                         + "you need to declare a value for \"rpcuser\" ");
             }
 
-            if (optionsJSON.containsKey("nudport")) {
-                long nudPortlong = (long) optionsJSON.get("nudport");
+            if (containsIgnoreCase(optionsJSON, "nudport")) {
+                long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
                 nudPort = (int) nudPortlong;
             } else {
                 throw new NuBotConfigException("When submit-liquidity is set to true "
@@ -219,21 +280,8 @@ public class ParseOptions {
 
         }
 
-
-        if (optionsJSON.containsKey("executeorders")) {
-            executeOrders = (boolean) optionsJSON.get("executeorders");
-        }
-
-        if (optionsJSON.containsKey("verbose")) {
-            verbose = (boolean) optionsJSON.get("verbose");
-        }
-
-        if (optionsJSON.containsKey("hipchat")) {
-            sendHipchat = (boolean) optionsJSON.get("hipchat");
-        }
-
-        if (optionsJSON.containsKey("mail-notifications")) {
-            sendMails = (String) optionsJSON.get("mail-notifications");
+        if (containsIgnoreCase(optionsJSON, "mailnotifications")) {
+            sendMails = (String) getIgnoreCase(optionsJSON, "mailnotifications");
             if (sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
                     || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
                     || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
@@ -249,30 +297,18 @@ public class ParseOptions {
         }
 
 
-        if (optionsJSON.containsKey("emergency-timeout")) {
-            long emergencyTimeoutLong = (long) optionsJSON.get("emergency-timeout");
-            emergencyTimeout = (int) emergencyTimeoutLong;
-        }
-
-        if (optionsJSON.containsKey("keep-proceeds")) {
-            keepProceeds = Utils.getDouble((optionsJSON.get("keep-proceeds")));
-        }
-
-        if (optionsJSON.containsKey("multiple-custodians")) {
-            multipleCustodians = (boolean) optionsJSON.get("multiple-custodians");
-        }
-
-        if (optionsJSON.containsKey("distribute-liquidity")) {
-            distributeLiquidity = (boolean) optionsJSON.get("distribute-liquidity");
-        }
-
         //Create a new Instance
         options = new NuBotOptions(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
                 rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
                 executeOrders, verbose, pair, executeStrategyInterval,
-                sendLiquidityInterval, sendHipchat, sendMails, mailRecipient,
+                sendHipchat, sendMails, mailRecipient,
                 emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
-                maxSellVolume, maxBuyVolume, distributeLiquidity, cpo);
+                maxSellVolume, maxBuyVolume, distributeLiquidity, secondarypeg, wallchangeThreshold, spread, distanceThreshold);
+
+        //test if configuration is supported
+        if (!isSupportedPair(options.getPair())) {
+            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        }
 
 
         if (options == null) {
@@ -282,6 +318,79 @@ public class ParseOptions {
         return options;
     }
 
+    public static void parseSecondary(NuBotOptions options, JSONObject optionsJSON) throws NuBotConfigException {
+
+        if (!containsIgnoreCase(optionsJSON, "mainfeed"))
+            throw new NuBotConfigException("mainfeed necessary parameter");
+
+        options.mainFeed = (String) optionsJSON.get("mainfeed");
+
+        //ArrayList<String> backupFeedNames = new ArrayList<>();
+        //org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backupfeeds");
+
+        //Iterate on backupFeeds
+
+        /*String names[] = org.json.JSONObject.getNames(dataJson);
+        if (names.length < 2) {
+            throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
+        }
+        for (int i = 0; i < names.length; i++) {
+            try {
+                org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
+                options.backupFeedNames.add((String) tempJson.get("name"));
+            } catch (JSONException ex) {
+                throw new NuBotConfigException(ex.toString());
+            }
+        }*/
+
+        options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypegoptions");
+
+        if (!containsIgnoreCase(optionsJSON, "wallchangeThreshold"))
+            throw new NuBotConfigException("wallchangeThreshold needed if secondary peg defined");
+        else
+            options.wallchangeThreshold = (double) getIgnoreCase(optionsJSON, "wallchangeThreshold");
+
+
+        if (!containsIgnoreCase(optionsJSON, "spread"))
+            throw new NuBotConfigException("spread needed if secondary peg defined");
+        else
+            options.spread = (double) getIgnoreCase(optionsJSON, "spread");
+
+        if (!containsIgnoreCase(optionsJSON, "distanceThreshold"))
+            throw new NuBotConfigException("distanceThreshold needed if secondary peg defined");
+        else
+            options.distanceThreshold = (double) getIgnoreCase(optionsJSON, "distanceThreshold");
+
+        if (options.spread != 0) {
+            throw new NuBotConfigException("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
+        }
+
+
+        options.mainFeed = (String) optionsJSON.get("main-feed");
+
+
+    }
+
+    public static void parseBackupfeeds() {
+        //            ArrayList<String> backupFeedNames = new ArrayList<>();
+        //            org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backup-feeds");
+        //
+        //            //Iterate on backupFeeds
+        //
+        //            String names[] = org.json.JSONObject.getNames(dataJson);
+        //            if (names.length < 2) {
+        //                throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
+        //            }
+        //            for (int i = 0; i < names.length; i++) {
+        //                try {
+        //                    org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
+        //                    backupFeedNames.add((String) tempJson.get("name"));
+        //
+        // }
+        //            }
+    }
+
+
     /**
      * parse single json file
      *
@@ -289,6 +398,7 @@ public class ParseOptions {
      * @return
      * @throws ParseException
      */
+
     public static JSONObject parseSingleJsonFile(String filepath) throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filepath)));
@@ -323,9 +433,9 @@ public class ParseOptions {
                 String filepath = filePaths.get(i);
 
                 JSONObject fileJSON = parseSingleJsonFile(filepath);
-                JSONObject tempOptions = getOptionsKey(fileJSON);
+                //JSONObject tempOptions = getOptionsKey(fileJSON);
 
-                Set tempSet = tempOptions.entrySet();
+                Set tempSet = fileJSON.entrySet();
                 for (Object o : tempSet) {
                     Map.Entry entry = (Map.Entry) o;
                     setMap.put(entry.getKey(), entry.getValue());
@@ -339,5 +449,25 @@ public class ParseOptions {
         JSONObject content = new JSONObject(setMap);
         optionsObject.put("options", content);
         return optionsObject;
+    }
+
+
+    /**
+     * check if pair is supported
+     *
+     * @param pair
+     * @return
+     */
+    public static boolean isSupportedPair(CurrencyPair pair) {
+        if (pair.equals(Constant.NBT_USD)
+                || pair.equals(Constant.NBT_BTC)
+                || pair.equals(Constant.BTC_NBT)
+                || pair.equals(Constant.NBT_EUR)
+                || pair.equals(Constant.NBT_CNY)
+                || pair.equals(Constant.NBT_PPC)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
