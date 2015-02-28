@@ -34,11 +34,7 @@ public class ConfigController {
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
         get(endpoint, "application/json", (request, response) -> {
-            String resp = "" + this.opt;
-            System.out.println("response " + resp);
-            LOG.warn(resp);
-            System.out.println(this.opt.getNubitAddress());
-            return resp;
+            return opt;
         }, new JsonTransformer());
 
         post(endpoint, "application/json", (request, response) -> {
