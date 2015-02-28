@@ -1,5 +1,6 @@
 package com.nubits.nubot.options;
 
+import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -91,6 +92,21 @@ public class ParseOptions {
 
     }
 
+    /**
+     * the rules for valid configurations
+     * @param optionsJSON
+     * @return
+     * @throws NuBotConfigException
+     */
+    public static boolean isValidJSON(JSONObject optionsJSON) throws NuBotConfigException {
+
+        for (int i = 0; i < comp.length; i++) {
+            if (!containsIgnoreCase(optionsJSON, comp[i]))
+                throw new NuBotConfigException("necessary key: " + comp[i]);
+        }
+
+        return true;
+    }
 
     /**
      * parseOptions from JSON into NuBotOptions
@@ -103,11 +119,11 @@ public class ParseOptions {
 
         NuBotOptions options = new NuBotOptions();
 
-        for (int i = 0; i < comp.length; i++) {
-            if (!containsIgnoreCase(optionsJSON, comp[i]))
-                throw new NuBotConfigException("necessary key: " + comp[i]);
+        try{
+            isValidJSON(optionsJSON);
+        }catch(NuBotConfigException e){
+            throw e;
         }
-
 
         boolean secondarypeg = false;
 

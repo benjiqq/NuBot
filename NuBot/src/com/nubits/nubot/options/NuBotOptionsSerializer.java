@@ -10,6 +10,7 @@ import java.lang.reflect.Type;
 
 
 public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
+
     @Override
     public JsonElement serialize(NuBotOptions opt, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject root = new JsonObject();
@@ -32,9 +33,8 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
         root.addProperty("priceincrement", opt.priceIncrement);
 
-        root.addProperty("pair", opt.pair.toString("_"));
-
-        root.addProperty("pair", opt.getPair().toString("_"));
+        System.out.println(opt.pair.toString());
+        //root.addProperty("pair", opt.pair.toString("_"));
 
         return root;
     }
