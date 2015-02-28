@@ -176,13 +176,13 @@ public class NuBotOptions {
 
     public boolean secondarypeg;
 
-    //public SecondaryPegOptionsJSON cpo;
-
     public double wallchangeThreshold;
 
     public double spread;
 
     public double distanceThreshold;
+
+    // feeds
 
     public String mainFeed;
     public ArrayList<String> backupFeedNames;

@@ -72,16 +72,18 @@
                 })
                 .done(function( data ) {
 
+                    //string values
+
                     $("#exchangename").attr("placeholder", data["exchangename"]);
                     $("#apikey").attr("placeholder", data["apikey"]);
                     $("#apisecret").attr("placeholder", data["apisecret"]);
                     $("#maxbuyvolume").attr("placeholder", data["maxbuyordervolume"]);
                     $("#maxsellvolume").attr("placeholder", data["maxsellordervolume"]);
+                    $("#pair").attr("placeholder", data["pair"]);
                     $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
                     $("#nudport").attr("placeholder", data["nudport"]);
                     $("#rpcpass").attr("placeholder", data["rpcpass"]);
                     $("#rpcuser").attr("placeholder", data["rpcuser"]);
-                    $("#pair").attr("placeholder", data["pair"]);
 
                     //booleans
 
@@ -91,25 +93,39 @@
                     $('#executeorders').attr('checked',data["executeorders"]);
                     $('#verbose').attr('checked',data["verbose"]);
                     $('#hipchat').attr('checked',data["hipchat"]);
+                    $('#secondarypeg').attr('checked',data["secondarypeg"]);
 
                  });
 
             }
 
             function postall(){
-                var exchangename = $('#exchangename').attr('value');
-                var apikey = $('#apikey').attr('value');
-                var apisecret = $('#apisecret').attr('value');
-                var maxbuyordervolume = $('#maxbuyordervolume').attr('value');
-                var maxsellordervolume = $('#maxsellordervolume').attr('value');
+                var posturl = "http://" + host + ":" + port + "/config";
 
+                //get all vars and post them. smarter would be to figure out which ones changed
 
+                //string values
+
+                var exchangename = $('#exchangename').attr('placeholder');
+                var apikey = $('#apikey').attr('placeholder');
+                var apisecret = $('#apisecret').attr('placeholder');
+                var maxbuyordervolume = $('#maxbuyordervolume').attr('placeholder');
+                var maxsellordervolume = $('#maxsellordervolume').attr('placeholder');
+                var pair = $("#pair").attr("placeholder");
+                var nubitaddress = $("#nubitaddress").attr("placeholder");
+                var nudport = $("#nudport").attr("placeholder");
+                var rpcpass = $("#rpcpass").attr("placeholder");
+                var rpcuser = $("#rpcuser").attr("placeholder");
+
+                //booleans
                 var submitliquidity = $('#submitliquidity').prop('checked');
                 var dualside = $('#dualside').prop('checked');
                 var multiplecustodians = $('#multiplecustodians').prop('checked');
                 var executeorders = $('#executeorders').prop('checked');
                 var verbose = $('#verbose').prop('checked');
                 var hipchat = $('#hipchat').prop('checked');
+                var secondarypeg = $('#secondarypeg').prop('checked');
+
 
                 var jsondata = JSON.stringify({
                     "exchangename": exchangename,
@@ -122,13 +138,16 @@
                     "multiplecustodians": multiplecustodians,
                     "executeorders": executeorders,
                     "verbose": verbose,
-                    "hipchat": hipchat
+                    "hipchat": hipchat,
+                    "secondarypeg": secondarypeg
+
                 });
 
-                makePost(jsondata);
+
+                makePost(posturl, jsondata);
             }
 
-            function makePost(jsondata){
+            function makePost(url, jsondata){
                 //make HTTP post to server
                 $.ajax(url, {
                     data : jsondata,
