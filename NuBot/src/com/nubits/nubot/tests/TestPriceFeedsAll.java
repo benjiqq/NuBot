@@ -1,3 +1,4 @@
+import com.nubits.nubot.db.NuDB;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -8,6 +9,7 @@ import com.nubits.nubot.pricefeeds.CoinbasePriceFeed;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -18,9 +20,20 @@ import java.util.List;
 public class TestPriceFeedsAll extends TestCase {
 
     List<Double> alllast;
+    private String dbfile = "testprices.db";
 
     public void setUp(){
 
+        File ff = new File(dbfile);
+        if (ff.exists()) {
+            ff.delete();
+        }
+
+        try {
+            NuDB.createDB(dbfile);
+        } catch (Exception e) {
+            assertTrue(false);
+        }
     }
 
     @Test
