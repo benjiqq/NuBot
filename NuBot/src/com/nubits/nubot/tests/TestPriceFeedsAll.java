@@ -10,77 +10,38 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
+/**
+ * test feed in aggregated
+ */
 public class TestPriceFeedsAll extends TestCase {
 
-    double lastbtce, lastbf, lastbci, lastcb;
-    ArrayList<Double> alllast;
+    List<Double> alllast;
+
+    public void setUp(){
+
+    }
 
     @Test
-    public void testBtce() {
-
-        CurrencyPair testPair = Constant.BTC_USD;
-
-        BtcePriceFeed btce = new BtcePriceFeed();
-        LastPrice lastprice = btce.getLastPrice(testPair);
-        lastbtce = lastprice.getPrice().getQuantity();
-        assertNotNull(lastprice);
-        assertTrue(lastbtce > 0);
+    public void testZAvg() {
 
         alllast.add(lastbtce);
-
-    }
-
-    @Test
-    public void testBitfinex() {
-
-        CurrencyPair testPair = Constant.BTC_USD;
-
-        BitfinexPriceFeed bf = new BitfinexPriceFeed();
-        LastPrice lastprice = bf.getLastPrice(testPair);
-        lastbf = lastprice.getPrice().getQuantity();
-        assertNotNull(lastprice);
-        assertTrue(lastbf > 0);
-
-        alllast.add(lastbf);
-    }
-
-    @Test
-    public void testBCI() {
-
-        CurrencyPair testPair = Constant.BTC_USD;
-
-        BlockchainPriceFeed bci = new BlockchainPriceFeed();
-        LastPrice lastprice = bci.getLastPrice(testPair);
-        lastbci = lastprice.getPrice().getQuantity();
-        assertNotNull(lastprice);
-        assertTrue(lastbci > 0);
-
         alllast.add(lastbci);
-    }
-
-    @Test
-    public void testCoinbase() {
-
-        CurrencyPair testPair = Constant.BTC_USD;
-
-        CoinbasePriceFeed cb = new CoinbasePriceFeed();
-        LastPrice lastprice = cb.getLastPrice(testPair);
-        lastcb = lastprice.getPrice().getQuantity();
-        assertNotNull(lastprice);
-        assertTrue(lastcb > 0);
-
+        alllast.add(lastbf);
         alllast.add(lastcb);
-    }
 
-    @Test
-    public void testAvg() {
+        assertTrue(alllast.size()==4);
+
         double sumlast = 0.0;
         double min = 0.0;
         double max = 9999999.9;
         int n = 0;
+
+        System.out.println("n: " + n);
         for (Iterator<Double> it = alllast.iterator(); it.hasNext();) {
             double p = it.next();
+            System.out.println("p: " + p);
             sumlast += p;
 
             if (p > max)
@@ -92,6 +53,7 @@ public class TestPriceFeedsAll extends TestCase {
             n++;
         }
 
+        System.out.println("sum: " + sumlast);
 
         assertTrue(sumlast > 0.0);
         //sum should be bigger than min * number of prices (n)
