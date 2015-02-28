@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.IOException;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -123,7 +124,13 @@ public class ConfigController {
 
             NuBotOptions newopt = parsePost(postJson);
 
-            SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
+            LOG.info("parsed: new opt: " + newopt);
+
+            try {
+                SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
+            } catch(IOException e){
+                LOG.info("error with backup " + e);
+            }
 
             this.opt = newopt;
 
@@ -131,10 +138,15 @@ public class ConfigController {
             String js = SaveOptions.jsonPretty(this.opt);
             LOG.info("new opt: " + js);
 
-            SaveOptions.saveOptionsPretty(this.opt, saveTo);
+            try {
+                SaveOptions.saveOptionsPretty(this.opt, saveTo);
+            }catch(Exception e){
+                LOG.info("error saving " + e);
+            }
 
             //TODO: return as json for Frontend
             boolean success = true;
+            LOG.info("success " + success);
             return "success: " + success;
         });
 
