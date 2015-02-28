@@ -17,15 +17,20 @@
  */
 package com.nubits.nubot.options;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSerializationContext;
+import com.google.gson.JsonSerializer;
 import com.nubits.nubot.models.CurrencyPair;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.logging.Logger;
 
 /**
  * @author desrever <desrever at nubits.com>
  */
-public class NuBotOptions {
+public class NuBotOptions implements JsonSerializer<NuBotOptions> {
 
     private static final Logger LOG = Logger.getLogger(NuBotOptions.class.getName());
 
@@ -651,7 +656,7 @@ public class NuBotOptions {
         this.wallchangeThreshold = wallchangeThreshold;
     }
 
-    public double getWallchangeThreshold(){
+    public double getWallchangeThreshold() {
         return this.wallchangeThreshold;
     }
 
@@ -681,10 +686,36 @@ public class NuBotOptions {
         this.distanceThreshold = distanceThreshold;
     }
 
+    @Override
+    public JsonElement serialize(NuBotOptions opt, Type typeOfSrc, JsonSerializationContext context) {
+        JsonObject root = new JsonObject();
+
+        root.addProperty("exchangename", opt.exchangeName);
+        root.addProperty("apikey", opt.apiKey);
+        root.addProperty("apisecret", opt.apiSecret);
+        root.addProperty("dualside", opt.dualSide);
+        root.addProperty("submitliquidity", opt.submitLiquidity);
+        root.addProperty("multiplecustodians", opt.multipleCustodians);
+        root.addProperty("executeorders", opt.executeOrders);
+        root.addProperty("verbose", opt.verbose);
+        root.addProperty("hipchat", opt.sendHipchat);
+
+        root.addProperty("mailnotifications", opt.sendMails);
+        root.addProperty("mailrecipient", opt.mailRecipient);
+        root.addProperty("emergencytimeout", opt.emergencyTimeout);
+        root.addProperty("keepproceeds", opt.keepProceeds);
+        root.addProperty("maxsellordervolume", opt.maxSellVolume);
+        root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
+        root.addProperty("priceincrement", opt.priceIncrement);
+
+        root.addProperty("pair", opt.pair.toString("_"));
+
+        return root;
+    }
 
     @Override
     public String toString() {
-        return "NuBotOptions{" + "dualside=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apikey=" + apiKey + ", apisecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangename=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity  + '}';
+        return "NuBotOptions{" + "dualside=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apikey=" + apiKey + ", apisecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangename=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity + '}';
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
@@ -693,6 +724,6 @@ public class NuBotOptions {
      * @return
      */
     public String toStringNoKeys() {
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangename=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity  + '}';
+        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangename=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity + '}';
     }
 }

@@ -37,16 +37,21 @@ public class UiServer {
 
         new LogController("/logdump");
 
-        Map map = new HashMap();
+        Map emptymap = new HashMap();
 
-        get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
+        get("/", (rq, rs) -> new ModelAndView(emptymap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
+        get("/feeds", (rq, rs) -> new ModelAndView(emptymap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
+
 
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
         get("/configui", (rq, rs) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
 
-        get("/feeds", (rq, rs) -> new ModelAndView(map, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
+
+        Map statusmap = new HashMap();
+
+
 
 
     }

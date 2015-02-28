@@ -9,7 +9,7 @@ import spark.ResponseTransformer;
 /**
  * Render NuBotOptions to json
  */
-public class JsonTransformer implements ResponseTransformer {
+public class JsonTransformerOptions implements ResponseTransformer {
 
     private Gson gson = new Gson();
 

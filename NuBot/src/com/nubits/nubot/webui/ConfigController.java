@@ -99,7 +99,7 @@ public class ConfigController {
 
         get(endpoint, "application/json", (request, response) -> {
             return opt;
-        }, new JsonTransformer());
+        }, new JsonTransformerOptions());
 
         post(endpoint, "application/json", (request, response) -> {
 

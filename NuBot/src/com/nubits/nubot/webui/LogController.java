@@ -1,11 +1,7 @@
 package com.nubits.nubot.webui;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Scanner;
 
 import static spark.Spark.get;
 
@@ -26,7 +22,7 @@ public class LogController {
 
             return "log";
 
-        }, new JsonTransformer());
+        }, new JsonTransformerOptions());
 
 
     }
