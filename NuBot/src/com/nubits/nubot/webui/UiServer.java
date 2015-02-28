@@ -18,7 +18,7 @@ public class UiServer {
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
     //TODO path
-    private static String htmlFolder = "./html/tmpl/";
+    private static String htmlFolder = "./html/templates/";
 
     private static String configFile = "config.json";
     private static String configdir = "config";
