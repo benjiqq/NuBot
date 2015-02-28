@@ -39,14 +39,14 @@ public class UiServer {
 
         Map map = new HashMap();
 
-        get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "operation.mustache"), new LayoutTemplateEngine());
+        get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
 
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
-        get("/configui", (rq, rs) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
+        get("/configui", (rq, rs) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
 
-        get("/feeds", (rq, rs) -> new ModelAndView(map, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine());
+        get("/feeds", (rq, rs) -> new ModelAndView(map, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
 
 
     }

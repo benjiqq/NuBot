@@ -6,6 +6,8 @@ import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 
@@ -22,6 +24,8 @@ public class ConfigController {
     private String configfile;
     private NuBotOptions opt;
 
+    final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
+
     public ConfigController(String endpoint, NuBotOptions opt, String configDir, String configfile) {
         this.opt = opt;
         this.configDir = configDir;
@@ -30,7 +34,11 @@ public class ConfigController {
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
         get(endpoint, "application/json", (request, response) -> {
-            return opt;
+            String resp = "" + this.opt;
+            System.out.println("response " + resp);
+            LOG.warn(resp);
+            System.out.println(this.opt.getNubitAddress());
+            return resp;
         }, new JsonTransformer());
 
         post(endpoint, "application/json", (request, response) -> {
@@ -47,73 +55,76 @@ public class ConfigController {
             } catch (ParseException e) {
 
             }
+
+            NuBotOptions newopt = new NuBotOptions();
+
             //System.out.println(">>>> " + postJson);
             String variableset = "none";
 
             if (postJson.containsKey("exchangename")) {
                 String newvalue = "" + postJson.get("exchangename");
-                this.opt.setExchangeName(newvalue);
+                newopt.setExchangeName(newvalue);
                 variableset = "exchangename";
             }
 
             if (postJson.containsKey("apikey")) {
                 String newapikey = "" + postJson.get("apikey");
-                this.opt.setApiKey(newapikey);
+                newopt.setApiKey(newapikey);
                 variableset = "apikey";
             }
 
             if (postJson.containsKey("apisecret")) {
                 String newsecret = "" + postJson.get("apisecret");
-                this.opt.setApiSecret(newsecret);
+                newopt.setApiSecret(newsecret);
                 variableset = "apisecret";
             }
 
             if (postJson.containsKey("dualside")) {
                 boolean newv = (boolean) postJson.get("dualside");
-                this.opt.setDualSide(newv);
+                newopt.setDualSide(newv);
                 variableset = "dualside";
             }
 
             if (postJson.containsKey("multiplecustodians")) {
                 boolean newv = (boolean) postJson.get("multiplecustodians");
-                this.opt.setDualSide(newv);
+                newopt.setDualSide(newv);
                 variableset = "multiplecustodians";
             }
 
             if (postJson.containsKey("submitliquidity")) {
                 boolean newv = (boolean) postJson.get("submitliquidity");
-                this.opt.setSubmitLiquidity(newv);
+                newopt.setSubmitLiquidity(newv);
                 variableset = "submitliquidity";
             }
 
             if (postJson.containsKey("executeorders")) {
                 boolean newv = (boolean) postJson.get("executeorders");
-                this.opt.setExecuteOrders(newv);
+                newopt.setExecuteOrders(newv);
                 variableset = "executeorders";
             }
 
             if (postJson.containsKey("verbose")) {
                 boolean newv = (boolean) postJson.get("verbose");
-                this.opt.setVerbose(newv);
+                newopt.setVerbose(newv);
                 variableset = "verbose";
             }
 
             if (postJson.containsKey("hipchat")) {
                 boolean newv = (boolean) postJson.get("hipchat");
-                this.opt.setSendHipchat(newv);
+                newopt.setSendHipchat(newv);
                 variableset = "hipchat";
             }
 
             if (postJson.containsKey("nubitaddress")) {
                 String newv = "" + postJson.get("nubitaddress");
-                this.opt.setNubitAddress(newv);
+                newopt.setNubitAddress(newv);
                 variableset = "nubitaddress";
             }
 
 
             if (postJson.containsKey("nudport")) {
                 int newv = (Integer) postJson.get("nudport");
-                this.opt.setNudPort(newv);
+                newopt.setNudPort(newv);
                 variableset = "nudport";
             }
 
@@ -123,6 +134,12 @@ public class ConfigController {
             String saveTo = this.configDir + File.separator + this.configfile;
             String js = SaveOptions.jsonPretty(this.opt);
             System.out.println("new opt: " + js);
+
+            //TODO: test validity of posted options
+            boolean valid = true;
+
+            this.opt = newopt;
+
             SaveOptions.saveOptionsPretty(this.opt, saveTo);
 
             //TODO: return as json for Frontend

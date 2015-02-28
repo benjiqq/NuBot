@@ -80,10 +80,18 @@
                     $("#maxbuyvolume").attr("placeholder", data["maxbuyordervolume"]);
                     $("#maxsellvolume").attr("placeholder", data["maxsellordervolume"]);
                     $("#pair").attr("placeholder", data["pair"]);
-                    $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
-                    $("#nudport").attr("placeholder", data["nudport"]);
-                    $("#rpcpass").attr("placeholder", data["rpcpass"]);
-                    $("#rpcuser").attr("placeholder", data["rpcuser"]);
+
+                    if (data["submitliquidity"]){
+                      $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
+                      $("#nudport").attr("placeholder", data["nudport"]);
+                      $("#rpcpass").attr("placeholder", data["rpcpass"]);
+                      $("#rpcuser").attr("placeholder", data["rpcuser"]);
+                    } else {
+                      $("#nubitaddress").attr("placeholder", "-");
+                      $("#nudport").attr("placeholder", "-");
+                      $("#rpcpass").attr("placeholder", "-");
+                      $("#rpcuser").attr("placeholder", "-");
+                    }
 
                     //booleans
 
