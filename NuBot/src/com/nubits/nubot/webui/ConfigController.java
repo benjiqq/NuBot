@@ -26,6 +26,70 @@ public class ConfigController {
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
 
+    //TODO: handle in parseOptions
+    private NuBotOptions parsePost(JSONObject postJson){
+
+        String variableset = "none";
+        NuBotOptions newopt = new NuBotOptions();
+
+        if (postJson.containsKey("exchangename")) {
+            String newvalue = "" + postJson.get("exchangename");
+            newopt.setExchangeName(newvalue);
+        }
+
+        if (postJson.containsKey("apikey")) {
+            String newapikey = "" + postJson.get("apikey");
+            newopt.setApiKey(newapikey);
+        }
+
+        if (postJson.containsKey("apisecret")) {
+            String newsecret = "" + postJson.get("apisecret");
+            newopt.setApiSecret(newsecret);
+        }
+
+        if (postJson.containsKey("dualside")) {
+            boolean newv = (boolean) postJson.get("dualside");
+            newopt.setDualSide(newv);
+        }
+
+        if (postJson.containsKey("multiplecustodians")) {
+            boolean newv = (boolean) postJson.get("multiplecustodians");
+            newopt.setDualSide(newv);
+        }
+
+        if (postJson.containsKey("submitliquidity")) {
+            boolean newv = (boolean) postJson.get("submitliquidity");
+            newopt.setSubmitLiquidity(newv);
+        }
+
+        if (postJson.containsKey("executeorders")) {
+            boolean newv = (boolean) postJson.get("executeorders");
+            newopt.setExecuteOrders(newv);
+        }
+
+        if (postJson.containsKey("verbose")) {
+            boolean newv = (boolean) postJson.get("verbose");
+            newopt.setVerbose(newv);
+        }
+
+        if (postJson.containsKey("hipchat")) {
+            boolean newv = (boolean) postJson.get("hipchat");
+            newopt.setSendHipchat(newv);
+        }
+
+        if (postJson.containsKey("nubitaddress")) {
+            String newv = "" + postJson.get("nubitaddress");
+            newopt.setNubitAddress(newv);
+        }
+
+        if (postJson.containsKey("nudport")) {
+            int newv = (Integer) postJson.get("nudport");
+            newopt.setNudPort(newv);
+        }
+
+        return newopt;
+    }
+
     public ConfigController(String endpoint, NuBotOptions opt, String configDir, String configfile) {
         this.opt = opt;
         this.configDir = configDir;
@@ -52,95 +116,26 @@ public class ConfigController {
 
             }
 
-            NuBotOptions newopt = new NuBotOptions();
-
-            //System.out.println(">>>> " + postJson);
-            String variableset = "none";
-
-            if (postJson.containsKey("exchangename")) {
-                String newvalue = "" + postJson.get("exchangename");
-                newopt.setExchangeName(newvalue);
-                variableset = "exchangename";
-            }
-
-            if (postJson.containsKey("apikey")) {
-                String newapikey = "" + postJson.get("apikey");
-                newopt.setApiKey(newapikey);
-                variableset = "apikey";
-            }
-
-            if (postJson.containsKey("apisecret")) {
-                String newsecret = "" + postJson.get("apisecret");
-                newopt.setApiSecret(newsecret);
-                variableset = "apisecret";
-            }
-
-            if (postJson.containsKey("dualside")) {
-                boolean newv = (boolean) postJson.get("dualside");
-                newopt.setDualSide(newv);
-                variableset = "dualside";
-            }
-
-            if (postJson.containsKey("multiplecustodians")) {
-                boolean newv = (boolean) postJson.get("multiplecustodians");
-                newopt.setDualSide(newv);
-                variableset = "multiplecustodians";
-            }
-
-            if (postJson.containsKey("submitliquidity")) {
-                boolean newv = (boolean) postJson.get("submitliquidity");
-                newopt.setSubmitLiquidity(newv);
-                variableset = "submitliquidity";
-            }
-
-            if (postJson.containsKey("executeorders")) {
-                boolean newv = (boolean) postJson.get("executeorders");
-                newopt.setExecuteOrders(newv);
-                variableset = "executeorders";
-            }
-
-            if (postJson.containsKey("verbose")) {
-                boolean newv = (boolean) postJson.get("verbose");
-                newopt.setVerbose(newv);
-                variableset = "verbose";
-            }
-
-            if (postJson.containsKey("hipchat")) {
-                boolean newv = (boolean) postJson.get("hipchat");
-                newopt.setSendHipchat(newv);
-                variableset = "hipchat";
-            }
-
-            if (postJson.containsKey("nubitaddress")) {
-                String newv = "" + postJson.get("nubitaddress");
-                newopt.setNubitAddress(newv);
-                variableset = "nubitaddress";
-            }
-
-
-            if (postJson.containsKey("nudport")) {
-                int newv = (Integer) postJson.get("nudport");
-                newopt.setNudPort(newv);
-                variableset = "nudport";
-            }
-
-
-            SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
-
-            String saveTo = this.configDir + File.separator + this.configfile;
-            String js = SaveOptions.jsonPretty(this.opt);
-            System.out.println("new opt: " + js);
+            LOG.info("trying post " + postJson);
 
             //TODO: test validity of posted options
             boolean valid = true;
 
+            NuBotOptions newopt = parsePost(postJson);
+
+            SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
+
             this.opt = newopt;
+
+            String saveTo = this.configDir + File.separator + this.configfile;
+            String js = SaveOptions.jsonPretty(this.opt);
+            LOG.info("new opt: " + js);
 
             SaveOptions.saveOptionsPretty(this.opt, saveTo);
 
             //TODO: return as json for Frontend
             boolean success = true;
-            return "success: " + success + " variableset" + variableset;
+            return "success: " + success;
         });
 
     }
