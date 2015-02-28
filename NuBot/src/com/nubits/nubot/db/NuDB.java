@@ -37,7 +37,19 @@ public class NuDB {
         dbfile.write(byteArray);
     }
 
-    /**
+    public static byte[] readNbytes(int n) throws IOException{
+        dbfile.seek(0);
+        byte[] b= new byte[n];
+        for (int i = 0; i < n; i++) {
+            byte aByte = dbfile.readByte();
+            b[i] = aByte;
+        }
+        long p = dbfile.getFilePointer();
+        System.out.println("p: " + p);
+        return b;
+
+    }
+     /**
      * close the database
      * @throws IOException
      */

@@ -7,17 +7,52 @@ import java.io.File;
 public class TestDB extends TestCase {
 
     @Test
-    public void testTestup(){
+    public void testCreate() {
 
-        try{
-            String f = "test.db";
-            File ff = new File(f);
-            assertTrue(!ff.exists());
-            NuDB.createDB(f);
-            assertTrue(ff.exists());
+        String f = "test.db";
+        File ff = new File(f);
+
+        if (!ff.exists()) {
+            try {
+
+                NuDB.createDB(f);
+                assertTrue(ff.exists());
+                ff.delete();
+            } catch (Exception e) {
+                assertTrue(false);
+            }
+        }
+    }
+
+    @Test
+    public void testWrite() {
+
+        String f = "test.db";
+        File ff = new File(f);
+        if (ff.exists()) {
             ff.delete();
-        }catch(Exception e){
+        }
+
+        try {
+            NuDB.createDB(f);
+        } catch (Exception e) {
             assertTrue(false);
         }
+
+        try {
+
+            NuDB.writeTo("12345678".getBytes());
+            byte[] b = NuDB.readNbytes(8);
+            String s = new String(b);
+            assertTrue(s.equals("12345678"));
+
+            //ff.delete();
+            //assertTrue(!ff.exists());
+        } catch (Exception e) {
+            System.out.println(e);
+            assertTrue(false);
+        }
+
+
     }
 }
