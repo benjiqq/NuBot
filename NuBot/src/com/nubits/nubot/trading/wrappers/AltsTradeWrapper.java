@@ -2,16 +2,24 @@ package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Global;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.utils.Utils;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import org.apache.http.Header;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.message.BasicNameValuePair;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -19,16 +27,17 @@ import org.json.simple.parser.ParseException;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
+import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -102,25 +111,46 @@ public class AltsTradeWrapper implements TradeInterface {
     
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
-        ApiResponse apiResponse = new ApiResponse();
-        String url = API_BASE_URL + "/" + API_BALANCE;
-        HashMap<String, String> args = new HashMap<>();
-        boolean isGet = false;
-        
-        ApiResponse response = getQuery(url, args, isGet);
-        if (response.isPositive()) {
-            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            LOG.severe(httpAnswerJson.toJSONString());
-        } else {
-            apiResponse = response;
-        }
-        
-        return apiResponse;
+        return getBalancesImpl(pair, null);
     }
 
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
-        return null;
+        return getBalancesImpl(null, currency);
+    }
+    
+    private ApiResponse getBalancesImpl(CurrencyPair pair, Currency currency) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_BALANCE;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
+            for (Iterator<JSONObject> wallet = httpAnswerJson.iterator(); wallet.hasNext();) {
+                JSONObject thisWallet = wallet.next();
+                if (currency != null) { //get just one currency balance
+                    if (thisWallet.get("code").equals(currency.getCode().toUpperCase())) {
+                        Amount balance = new Amount(Utils.getDouble(thisWallet.get("balance")), currency);
+                        apiResponse.setResponseObject(balance);
+                    }
+                } else { // get the full pair balances
+                    if (thisWallet.get("code").equals(pair.getOrderCurrency().getCode().toUpperCase())) {
+                        
+                    }
+                    if (thisWallet.get("code").equals(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        
+                    }
+                }
+                
+            }
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+        
     }
 
     @Override
@@ -270,96 +300,119 @@ public class AltsTradeWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-            HttpsURLConnection connection = null;
-            URL queryUrl = null;
-            String post_data = "";
-            boolean httpError = false;
-            String output;
-            int response = 200;
             String answer = null;
-
-            if (needAuth) {
-                args.put("nonce", Objects.toString(System.currentTimeMillis()));
-                post_data = TradeUtils.buildQueryString(args, ENCODING);
-            }
+            String signature = "";
+            String post_data = "";
             
+            args.put("nonce", Objects.toString(System.currentTimeMillis()));
+
+            List< NameValuePair> urlParameters = new ArrayList< NameValuePair>();
+
+            for (Iterator< Map.Entry< String, String>> argumentIterator = args.entrySet().iterator(); argumentIterator.hasNext();) {
+
+                Map.Entry< String, String> argument = argumentIterator.next();
+
+                urlParameters.add(new BasicNameValuePair(argument.getKey().toString(), argument.getValue().toString()));
+
+                if (post_data.length() > 0) {
+                    post_data += "&";
+                }
+
+                post_data += argument.getKey() + "=" + argument.getValue();
+
+            }
+
+            signature = signRequest(keys.getPrivateKey(), post_data);
+
+            // add header
+            Header[] headers = new Header[3];
+            headers[ 0] = new BasicHeader("Rest-Key", keys.getApiKey());
+            headers[ 1] = new BasicHeader("Rest-Sign", signature);
+            headers[ 2] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
+
+            URL queryUrl;
             try {
-                if (isGet) {
-                    queryUrl = new URL(url + "&" + post_data);
+                queryUrl = new URL(url);
+            } catch (MalformedURLException ex) {
+                LOG.severe(ex.toString());
+                return null;
+            }
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpPost post = null;
+            HttpGet get = null;
+            HttpResponse response = null;
+
+
+            try {
+                if (!isGet) {
+                    post = new HttpPost(url);
+                    post.setEntity(new UrlEncodedFormEntity(urlParameters));
+                    post.setHeaders(headers);
+                    response = client.execute(post);
                 } else {
-                    queryUrl = new URL(url);
-                }    
-            } catch (MalformedURLException mal) {
-                LOG.severe(mal.toString());
-                return null;
-            }
-
-            
-
-            try {
-                connection = (HttpsURLConnection) queryUrl.openConnection();
-                connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
-
-                if (needAuth) {
-                    connection.setRequestProperty("Rest-Key", keys.getApiKey());
-                    connection.setRequestProperty("Rest-Sign", signRequest(keys.getPrivateKey(), post_data));
+                    get = new HttpGet(url);
+                    get.setHeaders(headers);
+                    response = client.execute(get);
                 }
-
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-
-                if (isGet) {
-                    connection.setRequestMethod("GET");
+            } catch (NoRouteToHostException e) {
+                if (!isGet) {
+                    post.abort();
                 } else {
-                    connection.setRequestMethod("POST");
-                    DataOutputStream os = new DataOutputStream(connection.getOutputStream());
-                    os.writeBytes(post_data);
-                    os.flush();
-                    os.close();
+                    get.abort();
                 }
-            } catch (ProtocolException pe) {
-                LOG.severe(pe.toString());
+                LOG.severe(e.toString());
                 return null;
-            } catch (IOException io) {
-                LOG.severe((io.toString()));
-                return null;
-            }
-
-
-            BufferedReader br = null;
-            try {
-                if (connection.getResponseCode() >= 400) {
-                    httpError = true;
-                    response = connection.getResponseCode();
-                    br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+            } catch (SocketException e) {
+                if (!isGet) {
+                    post.abort();
                 } else {
-                    answer = "";
-                    br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    get.abort();
                 }
-            } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.severe(e.toString());
+                return null;
+            } catch (Exception e) {
+                if (!isGet) {
+                    post.abort();
+                } else {
+                    get.abort();
+                }
+                LOG.severe(e.toString());
                 return null;
             }
+            BufferedReader rd;
 
-            if (httpError) {
-                LOG.severe("Query to : " + url
-                        + "Data : " + post_data
-                        + "\nHTTP Response : " + Objects.toString(response));
-            }
 
             try {
-                while ((output = br.readLine()) != null) {
-                    answer += output;
+                rd = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+
+
+                StringBuffer buffer = new StringBuffer();
+                String line = "";
+                while ((line = rd.readLine()) != null) {
+                    buffer.append(line);
                 }
-            } catch (IOException io) {
-                LOG.severe(io.toString());
+
+                answer = buffer.toString();
+            } catch (IOException ex) {
+
+                LOG.severe(ex.toString());
+                return null;
+            } catch (IllegalStateException ex) {
+
+                LOG.severe(ex.toString());
                 return null;
             }
+            if (Global.options
+                    != null && Global.options.isVerbose()) {
 
-            connection.disconnect();
-            connection = null;
+                LOG.fine("\nSending request to URL : " + url + " ; get = " + isGet);
+                if (post != null) {
+                    System.out.println("Post parameters : " + post.getEntity());
+                }
+                LOG.fine("Response Code : " + response.getStatusLine().getStatusCode());
+                LOG.fine("Response :" + response);
 
+            }
             return answer;
             
         }
