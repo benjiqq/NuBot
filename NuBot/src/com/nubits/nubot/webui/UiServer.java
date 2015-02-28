@@ -20,9 +20,9 @@ public class UiServer {
     //TODO path
     private static String htmlFolder = "./html/tmpl/";
 
-    private static String testconfigFile = "test.json";
-    private static String configdir = "testconfig";
-    private static String testconfigpath = "testconfig/" + testconfigFile;
+    private static String configFile = "config.json";
+    private static String configdir = "config";
+    private static String configpath =configdir + "/" +  configFile;
 
     /**
      * start the UI server
@@ -33,7 +33,7 @@ public class UiServer {
         Utils.loadProperties("settings.properties");
 
         //binds GET and POST
-        new ConfigController("/config", opt, configdir, testconfigFile);
+        new ConfigController("/config", opt, configdir, configFile);
 
         new LogController("/logdump");
 
@@ -41,11 +41,12 @@ public class UiServer {
 
         get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "operation.mustache"), new LayoutTemplateEngine());
 
-        get("/configui", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
+        Map configmap = new HashMap();
+        configmap.put("configfile", configFile);
+
+        get("/configui", (rq, rs) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
 
         get("/feeds", (rq, rs) -> new ModelAndView(map, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine());
-
-        //get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
 
 
     }
@@ -60,7 +61,7 @@ public class UiServer {
         LOG.info("starting UI server");
 
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
             LOG.info("using options " + opt);
             startUIserver(opt);
         } catch (Exception ex) {

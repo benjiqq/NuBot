@@ -19,13 +19,13 @@ public class ConfigController {
 
 
     private String configDir;
-    private String testconfigfile;
+    private String configfile;
     private NuBotOptions opt;
 
-    public ConfigController(String endpoint, NuBotOptions opt, String configDir, String testconfigfile) {
+    public ConfigController(String endpoint, NuBotOptions opt, String configDir, String configfile) {
         this.opt = opt;
         this.configDir = configDir;
-        this.testconfigfile = testconfigfile;
+        this.configfile = configfile;
 
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
@@ -118,17 +118,14 @@ public class ConfigController {
             }
 
 
-            //NuBotOptions opt = ParseOptions.parseOptionsSingle(thils.testconfigfile);
+            SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
 
-            //SaveOptions.saveOptions(opt, testconfig);
-            SaveOptions.backupOptions(this.configDir + File.separator + this.testconfigfile);
-
-            String saveTo = this.configDir + File.separator + this.testconfigfile;
+            String saveTo = this.configDir + File.separator + this.configfile;
             String js = SaveOptions.jsonPretty(this.opt);
             System.out.println("new opt: " + js);
             SaveOptions.saveOptionsPretty(this.opt, saveTo);
 
-            //TODO: as json
+            //TODO: return as json for Frontend
             boolean success = true;
             return "success: " + success + " variableset" + variableset;
         });
