@@ -5,11 +5,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 
 /**
- * A very simple low level DB.
+ * A very simple low level DB based on RandomAccess
  * Used for storing prices or other time-series data. Instead of using a flat file or SQL
  * with random access all basic operations can be implemented
  * storing a record and getting the latest
  * there is no update method, since time-series are just kept and never deleted
+ * read operation is either by reading from the current pointer or reading all
+ *
  */
 public class NuDB {
 
@@ -55,7 +57,7 @@ public class NuDB {
         long n = dbfile.length();
         byte[] allbytes = readNbytes((int) n);
 
-        //reseth pointer
+        //reset pointer
         pointer = beforepointer;
         dbfile.seek(beforepointer);
         return allbytes;
@@ -78,7 +80,7 @@ public class NuDB {
             b[i] = aByte;
         }
 
-        //pointer has moved
+        //pointer has moved automatically
         return b;
 
     }
