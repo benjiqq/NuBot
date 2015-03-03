@@ -18,7 +18,7 @@
 package com.nubits.nubot.tasks.strategy;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
@@ -140,7 +140,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         sellSide(balanceNBT);
 
                         //Execute buy Side strategy
-                        if (Global.isDualSide && proceedsInBalance) {
+                        if (Global.options.isDualSide() && proceedsInBalance) {
                             buySide();
                         }
 
@@ -204,7 +204,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
 
             //Execute buy Side strategy
-            if (Global.isDualSide) {
+            if (Global.options.isDualSide()) {
                 //Introuce an aleatory sleep time to desync bots at the time of placing orders.
                 //This will favour competition in markets with multiple custodians
                 try {

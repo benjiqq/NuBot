@@ -22,7 +22,7 @@ package com.nubits.nubot.tests;
  *
  */
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;

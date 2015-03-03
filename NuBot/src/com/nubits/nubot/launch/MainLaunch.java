@@ -1,6 +1,7 @@
 package com.nubits.nubot.launch;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBot;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;

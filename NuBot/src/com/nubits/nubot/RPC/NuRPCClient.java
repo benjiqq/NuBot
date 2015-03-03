@@ -18,13 +18,13 @@
 package com.nubits.nubot.RPC;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.logging.Level;
+
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;

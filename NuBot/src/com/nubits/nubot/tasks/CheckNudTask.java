@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import java.util.TimerTask;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;

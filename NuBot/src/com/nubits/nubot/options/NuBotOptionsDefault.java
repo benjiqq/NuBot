@@ -1,7 +1,6 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.MailNotifications;
 
 /**

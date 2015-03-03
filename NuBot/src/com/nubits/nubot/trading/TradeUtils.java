@@ -22,7 +22,7 @@ package com.nubits.nubot.trading;
  * @author desrever <desrever at nubits.com>
  */
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -152,7 +152,7 @@ public class TradeUtils {
     }
 
     public static double getSellPrice(double txFee) {
-        if (Global.isDualSide) {
+        if (Global.options.isDualSide()) {
             return 1 + (0.01 * txFee);
         } else {
             return 1 + (0.01 * txFee) + Global.options.getPriceIncrement();

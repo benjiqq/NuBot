@@ -132,7 +132,7 @@ test {
 def distdir = new File("dist-packaged")
 def logdir = new File("logs")
 def jarname = "NuBot.jar"
-def mainclass = "com.nubits.nubot.launch.NuBot"
+def mainclass = "com.nubits.nubot.bot.NuBot"
 def uiclass = "com.nubits.nubot.webui.UiServer"
 
 def includeTestConfig = true

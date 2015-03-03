@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.launch.toolkit.NuPriceMonitor;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;

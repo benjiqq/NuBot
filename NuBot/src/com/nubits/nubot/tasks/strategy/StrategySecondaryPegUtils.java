@@ -23,7 +23,7 @@ package com.nubits.nubot.tasks.strategy;
  */
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -548,8 +548,8 @@ public class StrategySecondaryPegUtils {
             }
         }
 
-        if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL))
-                || Global.isDualSide) {
+        if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.SELL))
+                || Global.options.isDualSide()) {
             LOG.info("Immediately try to cancel all orders");
 
             //immediately try to : cancel all active orders
@@ -597,8 +597,8 @@ public class StrategySecondaryPegUtils {
                     }
 
                     if (success) { //Only move the second type of order if sure that the first have been taken down
-                        if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.BUY))
-                                || Global.isDualSide) {
+                        if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.BUY))
+                                || Global.options.isDualSide()) {
                             if (waitAndShiftOrderType.equals(Constant.BUY)
                                     && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
                             {
@@ -625,8 +625,8 @@ public class StrategySecondaryPegUtils {
                             }
                         }
                     } else { //success false with the first part of the shift
-                        if ((!Global.isDualSide && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
-                                || Global.isDualSide) { //dualside
+                        if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
+                                || Global.options.isDualSide()) { //dualside
                             LOG.error("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
                         }
                     }

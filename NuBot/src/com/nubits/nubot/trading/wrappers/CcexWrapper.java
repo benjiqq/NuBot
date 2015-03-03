@@ -23,7 +23,7 @@ package com.nubits.nubot.trading.wrappers;
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -51,7 +51,7 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.TreeMap;
-import java.util.logging.Level;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.http.Header;

@@ -1,7 +1,5 @@
 package com.nubits.nubot.db;
 
-import com.nubits.nubot.launch.NuBot;
-
 /**
  * local store for prices
  */

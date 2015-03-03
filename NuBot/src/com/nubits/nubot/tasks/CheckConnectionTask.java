@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;

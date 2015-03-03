@@ -18,10 +18,8 @@
 package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
-import com.nubits.nubot.launch.NuBot;
-import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBot;
 import com.nubits.nubot.models.OrderToPlace;
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
 import static com.nubits.nubot.utils.LiquidityPlot.plot;

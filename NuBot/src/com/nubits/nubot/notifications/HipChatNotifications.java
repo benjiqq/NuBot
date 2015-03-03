@@ -21,7 +21,7 @@ package com.nubits.nubot.notifications;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import io.evanwong.oss.hipchat.v2.HipChatClient;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;

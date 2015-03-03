@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.tasks.strategy;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
@@ -77,7 +77,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                     } else {
                         if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
                             //Execute buy Side strategy
-                            if (Global.isDualSide && proceedsInBalance && !needWallShift) {
+                            if (Global.options.isDualSide() && proceedsInBalance && !needWallShift) {
                                 strategyUtils.aggregateAndKeepProceeds();
                             }
                         }

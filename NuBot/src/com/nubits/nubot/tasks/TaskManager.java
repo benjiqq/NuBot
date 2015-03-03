@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;

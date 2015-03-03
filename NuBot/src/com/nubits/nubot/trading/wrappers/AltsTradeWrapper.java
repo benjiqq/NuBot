@@ -1,7 +1,7 @@
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;

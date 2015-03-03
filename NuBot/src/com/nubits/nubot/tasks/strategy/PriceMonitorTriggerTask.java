@@ -18,7 +18,7 @@
 package com.nubits.nubot.tasks.strategy;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
@@ -578,7 +578,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             buyPriceUSD = buyPriceUSD - offset;
 
             String message = "Computing USD prices with spread " + Global.options.getSpread() + "%  : sell @ " + sellPriceUSD;
-            if (Global.isDualSide) {
+            if (Global.options.isDualSide()) {
                 message += " buy @ " + buyPriceUSD;
             }
             LOG.info(message);
@@ -601,7 +601,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
                     + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
 
-            if (Global.isDualSide) {
+            if (Global.options.isDualSide()) {
                 message2 += "; buy @ " + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode();
             }
             LOG.info(message2);
