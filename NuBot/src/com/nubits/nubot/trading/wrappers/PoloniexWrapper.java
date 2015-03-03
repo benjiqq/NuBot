@@ -21,6 +21,7 @@ package com.nubits.nubot.trading.wrappers;
  *
  * @author desrever <desrever at nubits.com>
  */
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
@@ -39,6 +40,7 @@ import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -57,11 +59,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -179,6 +184,7 @@ public class PoloniexWrapper implements TradeInterface {
                 if (httpAnswerJson.containsKey(lookingFor)) {
                     JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                     double balanceD = Utils.getDouble(balanceJSON.get("available"));
+                    LOG.info("balanceD: " + balanceD);
                     apiResponse.setResponseObject(new Amount(balanceD, currency));
                 } else {
                     String errorMessage = "Cannot find a balance for currency " + lookingFor;
@@ -483,12 +489,12 @@ public class PoloniexWrapper implements TradeInterface {
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
         PoloniexService query = new PoloniexService(base, method, keys, args);
         String queryResult;
-        if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
-        } else {
+        //if (exchange.getLiveData().isConnected()) {
+        queryResult = query.executeQuery(true, isGet);
+        /*} else {
             LOG.error("The bot will not execute the query, there is no connection to Poloniex");
             queryResult = TOKEN_BAD_RETURN;
-        }
+        }*/
         return queryResult;
     }
 
@@ -649,6 +655,24 @@ public class PoloniexWrapper implements TradeInterface {
             String post_data = "";
             boolean httpError = false;
             HttpsURLConnection connection = null;
+            URL queryUrl = null;
+
+            try {
+                // build URL
+
+                if (needAuth) {
+                    queryUrl = new URL(base);
+                } else {
+                    queryUrl = new URL(url);
+                }
+                LOG.info("Query " + queryUrl);
+                connection = (HttpsURLConnection) queryUrl.openConnection();
+                connection.setRequestMethod("POST");
+                LOG.info("connection " + connection);
+            }catch(IOException e){
+                LOG.error("can't connect to " + queryUrl);
+            }
+
 
             try {
                 // add nonce and build arg list
@@ -663,18 +687,7 @@ public class PoloniexWrapper implements TradeInterface {
 
                     signature = signRequest(keys.getPrivateKey(), toHash);
                 }
-                // build URL
 
-                URL queryUrl;
-                if (needAuth) {
-                    queryUrl = new URL(base);
-                } else {
-                    queryUrl = new URL(url);
-                }
-
-
-                connection = (HttpsURLConnection) queryUrl.openConnection();
-                connection.setRequestMethod("POST");
 
                 // create and setup a HTTP connection
 
@@ -742,7 +755,6 @@ public class PoloniexWrapper implements TradeInterface {
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();
-                connection = null;
             }
             return answer;
         }

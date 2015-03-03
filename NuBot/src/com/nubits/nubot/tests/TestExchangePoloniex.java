@@ -9,6 +9,8 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -16,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class TestExchangePoloniex extends TestCase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestExchangePeatio.class
+    private static final Logger LOG = LoggerFactory.getLogger(TestExchangePoloniex.class
             .getName());
 
     private static String testconfigFile = "poloniex.json";
@@ -54,6 +56,7 @@ public class TestExchangePoloniex extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
+        Utils.loadProperties("settings.properties");
 
         Global.options = opt;
         Exchange exc = new Exchange(Global.options.getExchangeName());
@@ -62,11 +65,20 @@ public class TestExchangePoloniex extends TestCase {
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
+        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
+
+        Global.exchange = new Exchange(Global.options.getExchangeName());
+
+
+
         CurrencyPair testPair = Constant.NBT_BTC;
 
         WrapperTestUtils.configExchange(opt.getExchangeName());
 
         TradeInterface ti = ExchangeFacade.getInterface(Global.exchange);
+        ti.setKeys(keys);
+        ti.setExchange(Global.exchange);
+
         assertTrue(ti!=null);
         Global.exchange.setTrade(ti);
         Currency btc = CurrencyList.BTC;
@@ -74,13 +86,21 @@ public class TestExchangePoloniex extends TestCase {
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
 
         if (balancesResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            Object o = balancesResponse.getResponseObject();
+            LOG.info("response " + o);
+            try{
+                Amount a = (Amount) o;
+                assertTrue(a.getQuantity()>=0);
+            }catch(Exception e){
+                assertTrue(false);
+            }
+            //Balance balance = (Balance) o;
 
-            LOG.info(balance.toString());
+            //LOG.info(balance.toString());
 
-            assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
-            assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);
+            //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
+            //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);
 
         } else {
             assertTrue(false);
