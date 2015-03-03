@@ -1,10 +1,9 @@
 package com.nubits.nubot.options;
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
@@ -160,7 +159,7 @@ public class ParseOptions {
 
         boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
-        if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
+        if (!exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
             if (!containsIgnoreCase(optionsJSON, "apiKey")) {
                 throw new NuBotConfigException("The apikey parameter is compulsory.");
             } else {
@@ -379,17 +378,17 @@ public class ParseOptions {
 
     public static boolean exchangeSupported(String exchangename) {
         List<String> supportedExchanges = new ArrayList<String>();
-        supportedExchanges.add(Constant.BTCE);
-        supportedExchanges.add(Constant.INTERNAL_EXCHANGE_PEATIO);
-        supportedExchanges.add(Constant.BTER);
-        supportedExchanges.add(Constant.CCEDK);
-        supportedExchanges.add(Constant.POLONIEX);
-        supportedExchanges.add(Constant.CCEX);
-        supportedExchanges.add(Constant.ALLCOIN);
-        supportedExchanges.add(Constant.BITSPARK_PEATIO);
-        supportedExchanges.add(Constant.EXCOIN);
-        supportedExchanges.add(Constant.BITCOINCOID);
-        supportedExchanges.add(Constant.ALTSTRADE);
+        supportedExchanges.add(ExchangeFacade.BTCE);
+        supportedExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
+        supportedExchanges.add(ExchangeFacade.BTER);
+        supportedExchanges.add(ExchangeFacade.CCEDK);
+        supportedExchanges.add(ExchangeFacade.POLONIEX);
+        supportedExchanges.add(ExchangeFacade.CCEX);
+        supportedExchanges.add(ExchangeFacade.ALLCOIN);
+        supportedExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
+        supportedExchanges.add(ExchangeFacade.EXCOIN);
+        supportedExchanges.add(ExchangeFacade.BITCOINCOID);
+        supportedExchanges.add(ExchangeFacade.ALTSTRADE);
 
         return supportedExchanges.contains(exchangename);
     }

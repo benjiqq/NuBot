@@ -20,6 +20,8 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
@@ -62,7 +64,7 @@ public class TestRPCLiquidityInfo {
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
-        test.setup(Constant.INTERNAL_EXCHANGE_PEATIO, custodian, Constant.NBT_BTC, user, pass);
+        test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, Constant.NBT_BTC, user, pass);
         test.testCheckNudTask();
         try {
             Thread.sleep(2000);
@@ -160,7 +162,7 @@ public class TestRPCLiquidityInfo {
             if (response == -1) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.info("Total " + type + " liquidity : " + response + " " + Constant.NBT.getCode());
+                LOG.info("Total " + type + " liquidity : " + response + " " + CurrencyList.NBT.getCode());
             }
         } else {
             LOG.error("Nu Client offline. ");

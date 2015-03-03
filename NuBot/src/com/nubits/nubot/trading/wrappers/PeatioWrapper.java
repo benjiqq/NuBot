@@ -23,6 +23,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
@@ -776,7 +777,7 @@ public class PeatioWrapper implements TradeInterface {
         long diff = 0;
         //Make an API call, parse the response and compute the diff (localtime vs remotetime)
 
-        ApiResponse balanceResponse = this.getAvailableBalance(Constant.NBT);
+        ApiResponse balanceResponse = this.getAvailableBalance(CurrencyList.NBT);
         if (!balanceResponse.isPositive()) {
             String errString = balanceResponse.getError().getDescription();
             //Sample response to parse

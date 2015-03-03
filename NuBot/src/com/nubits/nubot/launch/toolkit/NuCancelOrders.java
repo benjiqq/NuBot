@@ -19,8 +19,8 @@ package com.nubits.nubot.launch.toolkit;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
@@ -96,8 +96,8 @@ public class NuCancelOrders {
 
         //Switch the ip of exchange
         String apibase = "";
-        if (exchangename.equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
-            apibase = Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE;
+        if (exchangename.equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
+            apibase = ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE;
         } else {
             LOG.error("Exchange name not accepted : " + exchangename);
             System.exit(0);

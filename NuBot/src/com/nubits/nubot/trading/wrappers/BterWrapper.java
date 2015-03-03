@@ -20,6 +20,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -734,7 +735,7 @@ public class BterWrapper implements TradeInterface {
          "time_unix":"1402512551"
          */
 
-        trade.setExchangeName(Constant.BTER);
+        trade.setExchangeName(ExchangeFacade.BTER);
 
         trade.setId((String) orderObject.get("id"));
         trade.setOrder_id((String) orderObject.get("orderid"));

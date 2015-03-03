@@ -22,6 +22,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.tasks.TaskManager;
@@ -72,7 +73,7 @@ public class TestOrderTask {
         //Create a new Exchange
 
 
-        exchange = new Exchange(Constant.INTERNAL_EXCHANGE_PEATIO);
+        exchange = new Exchange(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
 
         //Create e ExchangeLiveData object to accomodate liveData from the exchange
         ExchangeLiveData liveData = new ExchangeLiveData();
@@ -81,7 +82,7 @@ public class TestOrderTask {
 
         //Create a new TradeInterface object using the BtceWrapper implementation
         //Assign the TradeInterface to the btceExchange
-        exchange.setTrade(new PeatioWrapper(keys, exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
+        exchange.setTrade(new PeatioWrapper(keys, exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
         exchange.getLiveData().setUrlConnectionCheck(exchange.getTrade().getUrlConnectionCheck());
 
         //Create a TaskManager and

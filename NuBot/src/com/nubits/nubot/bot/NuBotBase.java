@@ -3,7 +3,8 @@ package com.nubits.nubot.bot;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -79,7 +80,7 @@ public abstract class NuBotBase {
     protected void setupSSL() {
         LOG.info("Set up SSL certificates");
         boolean trustAllCertificates = false;
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             trustAllCertificates = true;
         }
         Utils.installKeystore(trustAllCertificates);
@@ -104,11 +105,11 @@ public abstract class NuBotBase {
         ti.setExchange(Global.exchange);
 
         //TODO! handle on exchange level, not bot level
-        if (Global.options.getExchangeName().equals(Constant.CCEX)) {
+        if (Global.options.getExchangeName().equals(ExchangeFacade.CCEX)) {
             ((CcexWrapper) (ti)).initBaseUrl();
         }
 
-        if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
+        if (Global.options.getPair().getPaymentCurrency().equals(CurrencyList.NBT)) {
             Global.swappedPair = true;
         } else {
             Global.swappedPair = false;
@@ -118,8 +119,8 @@ public abstract class NuBotBase {
 
         String apibase = "";
         //TODO! handle on exchange level, not bot level
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
-            ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
+            ti.setApiBaseUrl(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE);
         }
 
         //TODO exchange and tradeinterface are circular referenced

@@ -23,6 +23,8 @@ package com.nubits.nubot.testsmanual;
  */
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -62,7 +64,7 @@ public class TestLiquidityDistribution {
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
-        test.init(Constant.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
+        test.init(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
         test.exec();
 
@@ -91,8 +93,8 @@ public class TestLiquidityDistribution {
         LOG.info("Configuring test");
 
         //Custodian balance simulation
-        balanceNBT = new Amount(27100.0, Constant.NBT);
-        balancePEG = new Amount(100, Constant.BTC);
+        balanceNBT = new Amount(27100.0, CurrencyList.NBT);
+        balancePEG = new Amount(100, CurrencyList.BTC);
         if (execOrders) {
             configureBalances(pair);
         }
@@ -209,7 +211,7 @@ public class TestLiquidityDistribution {
 
     private boolean configureBalances(CurrencyPair pair) {
         boolean success = true;
-        ApiResponse balanceNBTResponse = Global.exchange.getTrade().getAvailableBalance(Constant.NBT);
+        ApiResponse balanceNBTResponse = Global.exchange.getTrade().getAvailableBalance(CurrencyList.NBT);
         if (balanceNBTResponse.isPositive()) {
             Amount balance = (Amount) balanceNBTResponse.getResponseObject();
             LOG.info("NBT Balance : " + balance.toString());

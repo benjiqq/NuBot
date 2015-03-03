@@ -19,6 +19,7 @@ package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.trading.wrappers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +38,6 @@ public class Exchange {
     private ExchangeLiveData exchangeLiveData; //contains the data shown in the UI
     private ApiKeys keys;
     private TradeInterface trade;
-    //Constructor
-    private static HashMap<String, TradeInterface> supportedExchanges = new HashMap<>();
 
     public Exchange(String name) {
         this.name = name;
@@ -78,7 +77,8 @@ public class Exchange {
     }
 
     public TradeInterface getTradeInterface() {
-        return supportedExchanges.get(this.name);
+        return this.trade;
     }
+
 
 }

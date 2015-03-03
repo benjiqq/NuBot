@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.pricefeeds;
 
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class PriceFeedManager {
     public final static String BITFINEX = "bitfinex"; // BTC
     public final static String BTER = "bter"; //BTC and PPC
     public final static String CCEDK = "ccedk"; //BTC and PPC
-    public final static String BTCE = Constant.BTCE;
+    public final static String BTCE = ExchangeFacade.BTCE;
     public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
     public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
     public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR

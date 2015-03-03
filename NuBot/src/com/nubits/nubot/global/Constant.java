@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.global;
 
-import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
@@ -28,50 +28,25 @@ import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 public class Constant {
 
     private static final Logger LOG = LoggerFactory.getLogger(Constant.class.getName());
-    //Exchanges
-    public static final String BTCE = "btce";
-    public static final String CCEDK = "ccedk";
-    public static final String BTER = "bter";
-    public static final String INTERNAL_EXCHANGE_PEATIO = "peatio";
-    public static final String BITSPARK_PEATIO = "bitspark";
-    public static final String POLONIEX = "poloniex";
-    public static final String CCEX = "ccex";
-    public static final String ALLCOIN = "allcoin";
-    public static final String EXCOIN = "excoin";
-    public static final String BITCOINCOID = "bitcoincoid";
-    public static final String ALTSTRADE = "altstrade";
-    //API base url for peatio instances
-    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
     //public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";  //Casa di nu
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
-    //Currencies
-    public static final Currency USD = Currency.createCurrency("USD");
-    public static final Currency CNY = Currency.createCurrency("CNY");
-    public static final Currency EUR = Currency.createCurrency("EUR");
-    public static final Currency PHP = Currency.createCurrency("PHP");
-    public static final Currency HKD = Currency.createCurrency("HKD");
-    public static final Currency BTC = Currency.createCurrency("BTC");
-    public static final Currency NBT = Currency.createCurrency("NBT");
-    public static final Currency NSR = Currency.createCurrency("NSR");
-    public static final Currency PPC = Currency.createCurrency("PPC");
-    public static final Currency LTC = Currency.createCurrency("LTC");
     //Pairs
-    public static final CurrencyPair NBT_USD = new CurrencyPair(NBT, USD);
-    public static final CurrencyPair NBT_BTC = new CurrencyPair(NBT, BTC);
-    public static final CurrencyPair BTC_NBT = new CurrencyPair(BTC, NBT);
-    public static final CurrencyPair NBT_PPC = new CurrencyPair(NBT, PPC);
-    public static final CurrencyPair NBT_EUR = new CurrencyPair(NBT, EUR);
-    public static final CurrencyPair NBT_CNY = new CurrencyPair(NBT, CNY);
-    public static final CurrencyPair BTC_USD = new CurrencyPair(BTC, USD);
-    public static final CurrencyPair PPC_USD = new CurrencyPair(PPC, USD);
-    public static final CurrencyPair PPC_BTC = new CurrencyPair(PPC, BTC);
-    public static final CurrencyPair PPC_LTC = new CurrencyPair(PPC, LTC);
-    public static final CurrencyPair BTC_CNY = new CurrencyPair(BTC, CNY);
-    public static final CurrencyPair EUR_USD = new CurrencyPair(EUR, USD);
-    public static final CurrencyPair CNY_USD = new CurrencyPair(CNY, USD);
-    public static final CurrencyPair PHP_USD = new CurrencyPair(PHP, USD);
-    public static final CurrencyPair HKD_USD = new CurrencyPair(HKD, USD);
+    public static final CurrencyPair NBT_USD = new CurrencyPair(CurrencyList.NBT, CurrencyList.USD);
+    public static final CurrencyPair NBT_BTC = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
+    public static final CurrencyPair BTC_NBT = new CurrencyPair(CurrencyList.BTC, CurrencyList.NBT);
+    public static final CurrencyPair NBT_PPC = new CurrencyPair(CurrencyList.NBT, CurrencyList.PPC);
+    public static final CurrencyPair NBT_EUR = new CurrencyPair(CurrencyList.NBT, CurrencyList.EUR);
+    public static final CurrencyPair NBT_CNY = new CurrencyPair(CurrencyList.NBT, CurrencyList.CNY);
+    public static final CurrencyPair BTC_USD = new CurrencyPair(CurrencyList.BTC, CurrencyList.USD);
+    public static final CurrencyPair PPC_USD = new CurrencyPair(CurrencyList.PPC, CurrencyList.USD);
+    public static final CurrencyPair PPC_BTC = new CurrencyPair(CurrencyList.PPC, CurrencyList.BTC);
+    public static final CurrencyPair PPC_LTC = new CurrencyPair(CurrencyList.PPC, CurrencyList.LTC);
+    public static final CurrencyPair BTC_CNY = new CurrencyPair(CurrencyList.BTC, CurrencyList.CNY);
+    public static final CurrencyPair EUR_USD = new CurrencyPair(CurrencyList.EUR, CurrencyList.USD);
+    public static final CurrencyPair CNY_USD = new CurrencyPair(CurrencyList.CNY, CurrencyList.USD);
+    public static final CurrencyPair PHP_USD = new CurrencyPair(CurrencyList.PHP, CurrencyList.USD);
+    public static final CurrencyPair HKD_USD = new CurrencyPair(CurrencyList.HKD, CurrencyList.USD);
     //Direction of price
     public static final String UP = "up";
     public static final String DOWN = "down";

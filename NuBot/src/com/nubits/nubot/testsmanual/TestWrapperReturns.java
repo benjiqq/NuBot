@@ -2,6 +2,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -60,7 +61,7 @@ public class TestWrapperReturns {
     }
 
     private static void runTests() {
-        if (Global.exchange.getName().equals(Constant.EXCOIN)) {
+        if (Global.exchange.getName().equals(ExchangeFacade.EXCOIN)) {
             testPair = Constant.BTC_NBT;
         } else {
             testPair = Constant.NBT_BTC;
@@ -225,14 +226,14 @@ public class TestWrapperReturns {
     private static ArrayList<String> populateExchanges() {
         ArrayList<String> testExchanges = new ArrayList<>();
         //testExchanges.add(Constant.BTCE);
-        testExchanges.add(Constant.INTERNAL_EXCHANGE_PEATIO);
-        testExchanges.add(Constant.BTER);
-        testExchanges.add(Constant.CCEDK);
-        testExchanges.add(Constant.POLONIEX);
-        testExchanges.add(Constant.ALLCOIN);
-        testExchanges.add(Constant.BITSPARK_PEATIO);
-        testExchanges.add(Constant.EXCOIN);
-        testExchanges.add(Constant.BITCOINCOID);
+        testExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
+        testExchanges.add(ExchangeFacade.BTER);
+        testExchanges.add(ExchangeFacade.CCEDK);
+        testExchanges.add(ExchangeFacade.POLONIEX);
+        testExchanges.add(ExchangeFacade.ALLCOIN);
+        testExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
+        testExchanges.add(ExchangeFacade.EXCOIN);
+        testExchanges.add(ExchangeFacade.BITCOINCOID);
 
         return testExchanges;
     }

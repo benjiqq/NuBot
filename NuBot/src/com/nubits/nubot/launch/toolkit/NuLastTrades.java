@@ -21,6 +21,8 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Trade;
@@ -82,23 +84,23 @@ public class NuLastTrades {
         Global.exchange.setLiveData(liveData);
 
 
-        if (exchangename.equals(Constant.BTCE)) {
+        if (exchangename.equals(ExchangeFacade.BTCE)) {
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangename.equals(Constant.CCEDK)) {
+        } else if (exchangename.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
+        } else if (exchangename.equals(ExchangeFacade.CCEDK)) {
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.BTER)) {
+        } else if (exchangename.equals(ExchangeFacade.BTER)) {
             Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.ALLCOIN)) {
+        } else if (exchangename.equals(ExchangeFacade.ALLCOIN)) {
             Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.BITSPARK_PEATIO)) {
+        } else if (exchangename.equals(ExchangeFacade.BITSPARK_PEATIO)) {
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.POLONIEX)) {
+        } else if (exchangename.equals(ExchangeFacade.POLONIEX)) {
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.CCEX)) {
+        } else if (exchangename.equals(ExchangeFacade.CCEX)) {
             Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.EXCOIN)) {
+        } else if (exchangename.equals(ExchangeFacade.EXCOIN)) {
             Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
         } else {
             LOG.error("Exchange " + exchangename + " not supported");
@@ -149,7 +151,7 @@ public class NuLastTrades {
         //FileSystem.writeToFile(HEADER, output, false); //uncomment for csv outputs
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, dateFrom);
 
-        if (pair.getPaymentCurrency().equals(Constant.NBT)) {
+        if (pair.getPaymentCurrency().equals(CurrencyList.NBT)) {
             Global.swappedPair = true;
         } else {
             Global.swappedPair = false;

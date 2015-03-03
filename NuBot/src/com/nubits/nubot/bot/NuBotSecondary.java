@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.bot;
 
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.*;
@@ -59,7 +59,7 @@ public class NuBotSecondary extends NuBotBase {
             toTrackCurrency = Global.options.getPair().getPaymentCurrency();
         }
 
-        CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
+        CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, CurrencyList.USD);
 
         //TODO! strategy tasks be in bots package
 

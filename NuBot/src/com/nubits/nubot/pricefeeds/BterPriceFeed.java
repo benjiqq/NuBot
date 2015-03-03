@@ -23,7 +23,7 @@ package com.nubits.nubot.pricefeeds;
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -49,7 +49,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
             try {
-                Exchange exch = new Exchange(Constant.BTER);
+                Exchange exch = new Exchange(ExchangeFacade.BTER);
                 ExchangeLiveData liveData = new ExchangeLiveData();
                 exch.setLiveData(liveData);
                 ApiKeys keys = new ApiKeys("a", "b");

@@ -24,6 +24,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -738,7 +739,7 @@ public class CcexWrapper implements TradeInterface {
         Trade trade = new Trade();
         trade.setOrder_id((String) tradeObj.get("id"));
 
-        trade.setExchangeName(Constant.CCEX);
+        trade.setExchangeName(ExchangeFacade.CCEX);
         trade.setPair(pair);
 
         trade.setType(((String) tradeObj.get("type")).toUpperCase());

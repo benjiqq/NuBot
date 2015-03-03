@@ -24,6 +24,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -647,7 +648,7 @@ public class CcedkWrapper implements TradeInterface {
          */
         trade.setId((String) orderObject.get("trade_id"));
 
-        trade.setExchangeName(Constant.CCEDK);
+        trade.setExchangeName(ExchangeFacade.CCEDK);
         int currencyPairID = Integer.parseInt((String) orderObject.get("pair_id"));
         CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
         trade.setPair(cp);

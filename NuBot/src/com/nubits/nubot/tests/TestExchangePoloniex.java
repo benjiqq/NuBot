@@ -1,12 +1,14 @@
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
-import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
+import com.nubits.nubot.trading.TradeInterface;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -42,7 +44,7 @@ public class TestExchangePoloniex extends TestCase {
     }
 
     @Test
-    public void testPing() {
+    public void testGetBalance() {
 
         NuBotOptions opt = null;
         try {
@@ -54,13 +56,22 @@ public class TestExchangePoloniex extends TestCase {
         }
 
         Global.options = opt;
+        Exchange exc = new Exchange(Global.options.getExchangeName());
+        assertTrue(exc != null);
+        Global.exchange =exc;
+        ExchangeLiveData liveData = new ExchangeLiveData();
+        Global.exchange.setLiveData(liveData);
 
         CurrencyPair testPair = Constant.NBT_BTC;
 
         WrapperTestUtils.configExchange(opt.getExchangeName());
 
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(testPair);
-
+        TradeInterface ti = ExchangeFacade.getInterface(Global.exchange);
+        assertTrue(ti!=null);
+        Global.exchange.setTrade(ti);
+        Currency btc = CurrencyList.BTC;
+        assertTrue(btc != null);
+        ApiResponse balancesResponse = ti.getAvailableBalance(btc);
 
         if (balancesResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getBalance() ");

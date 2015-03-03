@@ -19,6 +19,8 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -40,9 +42,9 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.POLONIEX;
+    public static final String testExchange = ExchangeFacade.POLONIEX;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
-    public static final Currency testCurrency = Constant.NBT;
+    public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
         //Load settings

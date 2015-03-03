@@ -19,6 +19,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
@@ -37,7 +38,7 @@ public class TestFroozenAmounts {
 
         CurrencyPair pair = Constant.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();
-        String exchangeName = Constant.BTER;
+        String exchangeName = ExchangeFacade.BTER;
 
         FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair, Global.settings.getProperty("frozen_folder"));
 

@@ -23,6 +23,7 @@ package com.nubits.nubot.trading;
  */
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -296,9 +297,9 @@ public class TradeUtils {
          * 15, NBT
 
          */
-        final String BTC = Constant.BTC.getCode();
-        String USD = Constant.USD.getCode();
-        String PPC = Constant.PPC.getCode();
+        final String BTC = CurrencyList.BTC.getCode();
+        String USD = CurrencyList.USD.getCode();
+        String PPC = CurrencyList.PPC.getCode();
 
         int toRet = -1;
 
@@ -380,7 +381,7 @@ public class TradeUtils {
          * 46, NBT USD
          * 49, NBT EUR
          */
-        CurrencyPair toRet = new CurrencyPair(Constant.BTC, Constant.BTC);
+        CurrencyPair toRet = new CurrencyPair(CurrencyList.BTC, CurrencyList.BTC);
 
         switch (id) {
             case 2:

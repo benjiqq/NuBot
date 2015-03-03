@@ -6,8 +6,8 @@ package com.nubits.nubot.testsmanual;
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
@@ -316,7 +316,7 @@ public class WrapperTestUtils {
 
         Global.options.setExchangeName(exchangeName);
 
-        if (exchangeName.equals(Constant.BTCE)) {
+        if (exchangeName.equals(ExchangeFacade.BTCE)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BTCE_SECRET, Passwords.BTCE_KEY);
             //Create a new TradeInterface object using the custom implementation
@@ -324,70 +324,70 @@ public class WrapperTestUtils {
 
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
 
-        } else if (exchangeName.equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+        } else if (exchangeName.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.INTERNAL_PEATIO_SECRET, Passwords.INTERNAL_PEATIO_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangeName.equals(Constant.CCEDK)) {
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
+        } else if (exchangeName.equals(ExchangeFacade.CCEDK)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEDK_SECRET, Passwords.CCEDK_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.BTER)) {
+        } else if (exchangeName.equals(ExchangeFacade.BTER)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BTER_SECRET, Passwords.BTER_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.POLONIEX)) {
+        } else if (exchangeName.equals(ExchangeFacade.POLONIEX)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.POLONIEX_SECRET, Passwords.POLONIEX_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.CCEX)) {
+        } else if (exchangeName.equals(ExchangeFacade.CCEX)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEX_SECRET, "");
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.ALLCOIN)) {
+        } else if (exchangeName.equals(ExchangeFacade.ALLCOIN)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.ALLCOIN_SECRET, Passwords.ALLCOIN_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.BITSPARK_PEATIO)) {
+        } else if (exchangeName.equals(ExchangeFacade.BITSPARK_PEATIO)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BITSPARK_SECRET, Passwords.BITSPARK_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.EXCOIN)) {
+        } else if (exchangeName.equals(ExchangeFacade.EXCOIN)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.EXCOIN_SECRET, Passwords.EXCOIN_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.BITCOINCOID)) {
+        } else if (exchangeName.equals(ExchangeFacade.BITCOINCOID)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BITCOINCOID_SECRET, Passwords.BITCOINCOID_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.ALTSTRADE)) {
+        } else if (exchangeName.equals(ExchangeFacade.ALTSTRADE)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.ALTSTRADE_SECRET, Passwords.ALTSTRADE_KEY);
 
