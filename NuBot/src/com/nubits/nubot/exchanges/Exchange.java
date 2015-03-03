@@ -18,21 +18,24 @@
 package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
- *
  * @author desrever < desrever@nubits.com >
  */
 public class Exchange {
 
-//Class Variables
+    //Class Variables
     //Persisted
     private static final Logger LOG = LoggerFactory.getLogger(Exchange.class.getName());
     private String name; //Name of the exchange
@@ -43,42 +46,10 @@ public class Exchange {
     //Constructor
     private static HashMap<String, TradeInterface> supportedExchanges = new HashMap<>();
 
-    public static boolean isSupported(String name) {
-
-        supportedExchanges.put(Constant.BTCE, new BtceWrapper());
-        supportedExchanges.put(Constant.INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
-        supportedExchanges.put(Constant.BTER, new BterWrapper());
-        supportedExchanges.put(Constant.CCEDK, new CcedkWrapper());
-        supportedExchanges.put(Constant.POLONIEX, new PoloniexWrapper());
-        supportedExchanges.put(Constant.CCEX, new CcexWrapper());
-        supportedExchanges.put(Constant.ALLCOIN, new AllCoinWrapper());
-        supportedExchanges.put(Constant.BITSPARK_PEATIO, new BitSparkWrapper());
-        supportedExchanges.put(Constant.EXCOIN, new ExcoinWrapper());
-        supportedExchanges.put(Constant.BITCOINCOID, new BitcoinCoIDWrapper());
-        supportedExchanges.put(Constant.ALTSTRADE, new AltsTradeWrapper());
-
-        Iterator it = supportedExchanges.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-            if (name.equalsIgnoreCase((String) pairs.getKey())) {
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public Exchange(String name) {
-        if (isSupported(name)) {
-            this.name = name;
-            this.exchangeLiveData = new ExchangeLiveData();
-        } else {
-            LOG.error("Nubot doesn't support exchange named : " + name);
-            listSupportedExchanges();
-            System.exit(0);
-
-        }
-
+        this.name = name;
+        this.exchangeLiveData = new ExchangeLiveData();
     }
 
     public String getName() {
@@ -133,17 +104,15 @@ public class Exchange {
         LOG.info(infoString);
     }
 
-    public static TradeInterface getTradeInterface(String name) {
-        TradeInterface ti = null;
+    public TradeInterface getTradeInterface() {
+        return supportedExchanges.get(this.name);
+    }
 
+    /*public static TradeInterface getTradeInterface(String name) throws NuBotConfigException {
         if (supportedExchanges.containsKey(name)) {
             return supportedExchanges.get(name);
         } else {
-            LOG.error("Cannot find the trading interface for " + name);
-            System.exit(0);
+            throw new NuBotConfigException("Cannot find the trading interface for " + name);
         }
-
-        return ti;
-
-    }
+    }*/
 }

@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
@@ -152,6 +153,10 @@ public class ParseOptions {
 
         //First try to parse compulsory parameters
         String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
+
+        boolean supported = exchangeSupported(exchangeName);
+        if (!supported)
+            throw new NuBotConfigException("exchange not supported");
 
         boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
@@ -370,6 +375,23 @@ public class ParseOptions {
         options.mainFeed = (String) optionsJSON.get("main-feed");
 
 
+    }
+
+    public static boolean exchangeSupported(String exchangename) {
+        List<String> supportedExchanges = new ArrayList<String>();
+        supportedExchanges.add(Constant.BTCE);
+        supportedExchanges.add(Constant.INTERNAL_EXCHANGE_PEATIO);
+        supportedExchanges.add(Constant.BTER);
+        supportedExchanges.add(Constant.CCEDK);
+        supportedExchanges.add(Constant.POLONIEX);
+        supportedExchanges.add(Constant.CCEX);
+        supportedExchanges.add(Constant.ALLCOIN);
+        supportedExchanges.add(Constant.BITSPARK_PEATIO);
+        supportedExchanges.add(Constant.EXCOIN);
+        supportedExchanges.add(Constant.BITCOINCOID);
+        supportedExchanges.add(Constant.ALTSTRADE);
+
+        return supportedExchanges.contains(exchangename);
     }
 
     public static void parseBackupfeeds() {

@@ -113,7 +113,7 @@ public class NuBot {
         Global.exchange.setLiveData(liveData);
 
         LOG.info("Create a new TradeInterface object");
-        TradeInterface ti = Exchange.getTradeInterface(Global.options.getExchangeName());
+        TradeInterface ti = Global.exchange.getTradeInterface();
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
         if (Global.options.getExchangeName().equals(Constant.CCEX)) {
