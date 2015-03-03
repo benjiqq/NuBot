@@ -16,7 +16,7 @@
 
 
 	<appender name="infoFILE" class="ch.qos.logback.core.FileAppender">
-		<file>llogs/NuBot.log</file>
+		<file>logs/NuBot.log</file>
 
 		<encoder>
 			<pattern>%date %level - %msg%n
@@ -33,7 +33,7 @@
 	</appender>
 
 	<appender name="debugFILE" class="ch.qos.logback.core.FileAppender">
-		<file>llogs/NuBot_debug.log</file>
+		<file>logs/NuBot_debug.log</file>
 
 		<encoder>
 			<pattern>%date %level - %msg%n
@@ -50,7 +50,7 @@
 	</appender>
 
 	<appender name="warnFILE" class="ch.qos.logback.core.FileAppender">
-		<file>llogs/NuBot_main.log</file>
+		<file>logs/NuBot_main.log</file>
 
 		<encoder>
 			<pattern>%date %level - %msg%n
