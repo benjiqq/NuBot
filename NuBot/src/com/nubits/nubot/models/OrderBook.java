@@ -21,9 +21,10 @@ package com.nubits.nubot.models;
  *
  * @author desrever <desrever at nubits.com>
  */
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class OrderBook {
 
-    private static final Logger LOG = Logger.getLogger(OrderBook.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(OrderBook.class.getName());
 }

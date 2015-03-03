@@ -28,14 +28,15 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class TestAggregateOptions {
 
-    private static final Logger LOG = Logger.getLogger(TestAggregateOptions.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestAggregateOptions.class.getName());
     private ArrayList<String> fileNames = new ArrayList();
     private ArrayList<String> fileContent = new ArrayList();
 
@@ -70,7 +71,7 @@ public class TestAggregateOptions {
                 }
 
             } catch (ParseException ex) {
-                LOG.severe("Parse exception \n" + ex.toString());
+                LOG.error("Parse exception \n" + ex.toString());
                 System.exit(0);
             }
         }

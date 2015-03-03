@@ -34,14 +34,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class TradeUtils {
 
-    private static final Logger LOG = Logger.getLogger(TradeUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TradeUtils.class.getName());
 
     public static boolean tryCancelAllOrders(CurrencyPair pair) {
         boolean toRet = false;
@@ -67,13 +68,13 @@ public class TradeUtils {
                     }
                 } else {
                     toRet = false;
-                    LOG.severe(deleteOrdersResponse.getError().toString());
+                    LOG.error(deleteOrdersResponse.getError().toString());
                 }
             }
         } else {
             toRet = false;
 
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
 
         return toRet;
@@ -96,7 +97,7 @@ public class TradeUtils {
                 }
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             return false;
         }
         return completed;
@@ -109,13 +110,13 @@ public class TradeUtils {
             boolean delRequested = (boolean) deleteOrderResponse.getResponseObject();
 
             if (delRequested) {
-                LOG.warning("Order " + orderID + " delete request submitted");
+                LOG.warn("Order " + orderID + " delete request submitted");
             } else {
-                LOG.severe("Could not submit request to delete order" + orderID);
+                LOG.error("Could not submit request to delete order" + orderID);
             }
 
         } else {
-            LOG.severe(deleteOrderResponse.getError().toString());
+            LOG.error(deleteOrderResponse.getError().toString());
         }
 
 
@@ -133,13 +134,13 @@ public class TradeUtils {
                 ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderID);
                 if (orderDetailResponse.isPositive()) {
                     deleted = !((boolean) orderDetailResponse.getResponseObject());
-                    LOG.fine("Does order " + orderID + "  still exist?" + !deleted);
+                    LOG.info("Does order " + orderID + "  still exist?" + !deleted);
                 } else {
-                    LOG.severe(orderDetailResponse.getError().toString());
+                    LOG.error(orderDetailResponse.getError().toString());
                     return false;
                 }
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return false;
             }
         } while (!deleted && !timedout);
@@ -192,7 +193,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
         return result;
@@ -208,7 +209,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
         return result;
@@ -278,7 +279,7 @@ public class TradeUtils {
 
             return to;
         } catch (ParseException ex) {
-            LOG.severe(htmlString + " " + ex.toString());
+            LOG.error(htmlString + " " + ex.toString());
             return "1234567891";
         }
     }
@@ -321,7 +322,7 @@ public class TradeUtils {
                 toRet = 4;
                 break;
             default:
-                LOG.severe("Currency " + currencyCode + "not available");
+                LOG.error("Currency " + currencyCode + "not available");
                 break;
         }
         return toRet;
@@ -360,7 +361,7 @@ public class TradeUtils {
         } else if (pair.equals(Constant.NBT_EUR)) {
             return 49;
         } else {
-            LOG.severe("Pair " + pair.toString() + " not available");
+            LOG.error("Pair " + pair.toString() + " not available");
         }
 
         return toRet;
@@ -407,7 +408,7 @@ public class TradeUtils {
                 toRet = Constant.NBT_EUR;
                 break;
             default:
-                LOG.severe("Pair with id = " + id + " not available");
+                LOG.error("Pair with id = " + id + " not available");
 
         }
         return toRet;
@@ -443,14 +444,14 @@ public class TradeUtils {
             try {
                 Thread.sleep(300); //sleep to avoid getting banned
             } catch (InterruptedException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.error(ex.getMessage());
             }
 
         }
         if (success) {
             LOG.info(orders.size() + " orders placed succesfully");
         } else {
-            LOG.warning(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
+            LOG.warn(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
                     + "\nDetails : \n" + failureString);
         }
 

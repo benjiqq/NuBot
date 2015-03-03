@@ -24,11 +24,12 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class WrapperTestUtils {
 
-    private static final Logger LOG = Logger.getLogger(WrapperTestUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(WrapperTestUtils.class.getName());
 
     public static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
@@ -40,7 +41,7 @@ public class WrapperTestUtils {
             LOG.info(balance.toString());
 
         } else {
-            LOG.severe(balancesResponse.getError().toString());
+            LOG.error(balancesResponse.getError().toString());
         }
     }
 
@@ -53,7 +54,7 @@ public class WrapperTestUtils {
 
             LOG.info(balance.toString());
         } else {
-            LOG.severe(balanceResponse.getError().toString());
+            LOG.error(balanceResponse.getError().toString());
         }
     }
 
@@ -71,7 +72,7 @@ public class WrapperTestUtils {
                     + ticker.getBid() + " " + pair.getPaymentCurrency().getCode());
 
         } else {
-            LOG.severe(lastPriceResponse.getError().toString());
+            LOG.error(lastPriceResponse.getError().toString());
         }
 
     }
@@ -84,14 +85,14 @@ public class WrapperTestUtils {
         if (sellResponse.isPositive()) {
 
             LOG.info("\nPositive response  from TradeInterface.sell(...) ");
-            LOG.warning("Strategy : Submit order : "
+            LOG.warn("Strategy : Submit order : "
                     + "sell" + amountSell + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceSell + " " + pair.getPaymentCurrency().getCode());
 
             String sellResponseString = (String) sellResponse.getResponseObject();
             LOG.info("Response = " + sellResponseString);
         } else {
-            LOG.severe(sellResponse.getError().toString());
+            LOG.error(sellResponse.getError().toString());
         }
     }
 
@@ -108,7 +109,7 @@ public class WrapperTestUtils {
             LOG.info("Response = " + buyResponseString);
 
         } else {
-            LOG.severe(buyResponse.getError().toString());
+            LOG.error(buyResponse.getError().toString());
         }
     }
 
@@ -126,7 +127,7 @@ public class WrapperTestUtils {
             }
 
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -143,7 +144,7 @@ public class WrapperTestUtils {
                 LOG.info(tempOrder.toString());
             }
         } else {
-            LOG.severe(activeOrdersUSDNTBResponse.getError().toString());
+            LOG.error(activeOrdersUSDNTBResponse.getError().toString());
         }
     }
 
@@ -172,7 +173,7 @@ public class WrapperTestUtils {
             }
 
         } else {
-            LOG.severe(deleteOrderResponse.getError().toString());
+            LOG.error(deleteOrderResponse.getError().toString());
         }
     }
 
@@ -184,7 +185,7 @@ public class WrapperTestUtils {
             double txFee = (Double) txFeeResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFee + "%");
         } else {
-            LOG.severe(txFeeResponse.getError().toString());
+            LOG.error(txFeeResponse.getError().toString());
         }
     }
 
@@ -196,7 +197,7 @@ public class WrapperTestUtils {
             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFeeUSDNTB + "%");
         } else {
-            LOG.severe(txFeeNTBUSDResponse.getError().toString());
+            LOG.error(txFeeNTBUSDResponse.getError().toString());
         }
     }
 
@@ -208,7 +209,7 @@ public class WrapperTestUtils {
             boolean exist = (boolean) orderDetailResponse.getResponseObject();
             LOG.info("Order " + orderId + "  active? " + exist);
         } else {
-            LOG.severe(orderDetailResponse.getError().toString());
+            LOG.error(orderDetailResponse.getError().toString());
         }
     }
 
@@ -224,7 +225,7 @@ public class WrapperTestUtils {
             }
 
         } else {
-            LOG.severe(deleteOrdersResponse.getError().toString());
+            LOG.error(deleteOrdersResponse.getError().toString());
         }
     }
 
@@ -240,7 +241,7 @@ public class WrapperTestUtils {
                 LOG.info(tempTrade.toString());
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -256,7 +257,7 @@ public class WrapperTestUtils {
                 LOG.info(tempTrade.toString());
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -279,7 +280,7 @@ public class WrapperTestUtils {
             try {
                 Thread.sleep(400);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
 
@@ -288,7 +289,7 @@ public class WrapperTestUtils {
             try {
                 Thread.sleep(400);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
 
@@ -297,7 +298,7 @@ public class WrapperTestUtils {
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         //try to clear orders
@@ -394,7 +395,7 @@ public class WrapperTestUtils {
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new AltsTradeWrapper(keys, Global.exchange));
         } else {
-            LOG.severe("Exchange " + exchangeName + " not supported");
+            LOG.error("Exchange " + exchangeName + " not supported");
             System.exit(0);
         }
 
@@ -410,7 +411,7 @@ public class WrapperTestUtils {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         /* Setup (end) ------------------------------------------------------------------------------------------------------ */

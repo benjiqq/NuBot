@@ -19,7 +19,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -34,7 +35,7 @@ import org.json.simple.parser.ParseException;
  */
 public class BitcoinCoIDWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(BitcoinCoIDWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BitcoinCoIDWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -95,7 +96,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
                 ApiError apiError = errors.apiReturnError;
                 apiError.setDescription(errorMessage);
-                //LOG.severe("AllCoin API returned an error : " + errorMessage);
+                //LOG.error("AllCoin API returned an error : " + errorMessage);
                 apiResponse.setError(apiError);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -106,11 +107,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -188,7 +189,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         try {
             httpAnswerJson = (JSONObject) parser.parse(queryResult);
         } catch (ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
             ApiError error = errors.apiReturnError;
             error.setDescription("Error parsing ticker response");
             apiResponse.setError(error);
@@ -496,7 +497,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to BitcoinCoId");
+            LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -509,7 +510,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to BitcoinCoId");
+            LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -578,7 +579,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException mal) {
-                LOG.severe(mal.toString());
+                LOG.error(mal.toString());
                 return null;
             }
 
@@ -611,10 +612,10 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                     os.close();
                 }
             } catch (ProtocolException pe) {
-                LOG.severe(pe.toString());
+                LOG.error(pe.toString());
                 return null;
             } catch (IOException io) {
-                LOG.severe((io.toString()));
+                LOG.error((io.toString()));
                 return null;
             }
 
@@ -630,12 +631,12 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                     br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + url + " (method = " + method + " )"
+                LOG.error("Query to : " + url + " (method = " + method + " )"
                         + "\nData : \" + post_data"
                         + "\nHTTP Response : " + Objects.toString(response));
             }
@@ -645,7 +646,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                     answer += output;
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
@@ -669,11 +670,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 mac.init(key);
                 sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
             } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
+                LOG.error("Unsupported encoding exception: " + uee.toString());
             } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
+                LOG.error("No such algorithm exception: " + nsae.toString());
             } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
+                LOG.error("Invalid key exception: " + ike.toString());
             }
             return sign;
         }

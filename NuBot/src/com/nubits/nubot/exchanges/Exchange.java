@@ -24,7 +24,7 @@ import com.nubits.nubot.trading.wrappers.*;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  *
@@ -34,7 +34,7 @@ public class Exchange {
 
 //Class Variables
     //Persisted
-    private static final Logger LOG = Logger.getLogger(Exchange.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Exchange.class.getName());
     private String name; //Name of the exchange
     //Not persisted
     private ExchangeLiveData exchangeLiveData; //contains the data shown in the UI
@@ -73,7 +73,7 @@ public class Exchange {
             this.name = name;
             this.exchangeLiveData = new ExchangeLiveData();
         } else {
-            LOG.severe("Nubot doesn't support exchange named : " + name);
+            LOG.error("Nubot doesn't support exchange named : " + name);
             listSupportedExchanges();
             System.exit(0);
 
@@ -139,7 +139,7 @@ public class Exchange {
         if (supportedExchanges.containsKey(name)) {
             return supportedExchanges.get(name);
         } else {
-            LOG.severe("Cannot find the trading interface for " + name);
+            LOG.error("Cannot find the trading interface for " + name);
             System.exit(0);
         }
 

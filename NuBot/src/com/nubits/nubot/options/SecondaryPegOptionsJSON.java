@@ -23,7 +23,8 @@
 // */
 //import com.nubits.nubot.models.CurrencyPair;
 //import java.util.ArrayList;
-//import java.util.logging.Logger;
+//import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 //import org.json.JSONException;
 //
 ///**
@@ -32,7 +33,7 @@
 // */
 //public class SecondaryPegOptionsJSON {
 //
-//    private static final Logger LOG = Logger.getLogger(SecondaryPegOptionsJSON.class.getName());
+//    private static final Logger LOG = LoggerFactory.getLogger(SecondaryPegOptionsJSON.class.getName());
 //    //Compulsory settings ----------------------------
 //    private String mainFeed;
 //    private ArrayList<String> backupFeedNames;
@@ -107,7 +108,7 @@
 //            if (optionsJSON.has("spread")) {
 //                spread = new Double((optionsJSON.get("spread")).toString());
 //                if (spread != 0) {
-//                    LOG.warning("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
+//                    LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
 //                }
 //
 //            }
@@ -127,7 +128,7 @@
 //            return new SecondaryPegOptionsJSON(wallchangeThreshold, spread, distanceThreshold, mainFeed, backupFeedNames);
 //
 //        } catch (JSONException ex) {
-//            LOG.severe(ex.toString());
+//            LOG.error(ex.toString());
 //            throw new NuBotConfigException("" + ex);
 //        }
 //

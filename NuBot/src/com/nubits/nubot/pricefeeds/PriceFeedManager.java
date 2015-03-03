@@ -22,7 +22,8 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -30,7 +31,7 @@ import java.util.logging.Logger;
  */
 public class PriceFeedManager {
 
-    private static final Logger LOG = Logger.getLogger(PriceFeedManager.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PriceFeedManager.class.getName());
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
     public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
@@ -98,11 +99,11 @@ public class PriceFeedManager {
                         isMainFeedValid = true;
                     }
                 } else {
-                    LOG.warning("Error while updating " + pair.getOrderCurrency().getCode() + ""
+                    LOG.warn("Error while updating " + pair.getOrderCurrency().getCode() + ""
                             + " price from " + tempFeed.name);
                 }
             } else {
-                LOG.warning("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
+                LOG.warn("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
                         + " price from " + tempFeed.name);
             }
         }
@@ -118,12 +119,12 @@ public class PriceFeedManager {
             AbstractPriceFeed tempFeed = feedList.get(i);
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (!lastPrice.isError()) {
-                LOG.fine("Got last price of 1" + pair.getOrderCurrency().getCode() + ""
+                LOG.info("Got last price of 1" + pair.getOrderCurrency().getCode() + ""
                         + " from " + tempFeed.name + " : " + lastPrice.getPrice().getQuantity() + " " + lastPrice.getPrice().getCurrency().getCode());
                 return lastPrice;
             } else {
                 //handle error
-                LOG.severe("Problem while updating the price on " + tempFeed.name);
+                LOG.error("Problem while updating the price on " + tempFeed.name);
             }
         }
 
@@ -136,7 +137,7 @@ public class PriceFeedManager {
         if (FEED_NAMES_MAP.containsKey(feedname)) {
             return FEED_NAMES_MAP.get(feedname);
         } else {
-            LOG.severe("Error wile adding price seed with name unrecognized : " + feedname);
+            LOG.error("Error wile adding price seed with name unrecognized : " + feedname);
             System.exit(0);
         }
         return null;//never reached

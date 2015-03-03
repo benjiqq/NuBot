@@ -49,7 +49,8 @@ import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -84,7 +85,7 @@ public class CcedkWrapper implements TradeInterface {
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "errors";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
-    private static final Logger LOG = Logger.getLogger(CcedkWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(CcedkWrapper.class.getName());
     private static final String INVALID_NONCE_ERROR = "Invalid Nonce value detected";
     private static final int ROUND_CUTOFF = 99;
     private static int INVALID_NONCE_COUNT = 1;
@@ -122,18 +123,18 @@ public class CcedkWrapper implements TradeInterface {
                 upperEdge = Integer.parseInt(nonceError.substring(indexStart, indexStart + 10));
                 offset = upperEdge - (int) (System.currentTimeMillis() / 1000L);
             } catch (ParseException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
             }
         }
         if (offset != -1000000000) {
             numericalNonce = (int) (System.currentTimeMillis() / 1000L) + offset;
 
             validNonce = Objects.toString(numericalNonce);
-            //LOG.warning("validNonce = " + validNonce);
+            //LOG.warn("validNonce = " + validNonce);
         } else {
-            LOG.severe("Error calculating nonce");
+            LOG.error("Error calculating nonce");
             validNonce = "1234567891";
         }
         return validNonce;
@@ -182,7 +183,7 @@ public class CcedkWrapper implements TradeInterface {
                 JSONObject errorMessage = (JSONObject) httpAnswerJson.get(TOKEN_ERR);
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage.toJSONString());
-                LOG.severe("Ccedk API returned an error: " + errorMessage);
+                LOG.error("Ccedk API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -193,11 +194,11 @@ public class CcedkWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -435,7 +436,7 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 boolean valid = (boolean) dataJson.get("entity");
                 String message = "The order " + orderID + " does not exist";
-                LOG.severe(message);
+                LOG.error(message);
                 apiResponse.setResponseObject(false);
                 return apiResponse;
             } catch (ClassCastException e) {
@@ -463,7 +464,7 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
 
-        LOG.warning("CCEDK uses global TX fee, currency pair not supported."
+        LOG.warn("CCEDK uses global TX fee, currency pair not supported."
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -519,26 +520,26 @@ public class CcedkWrapper implements TradeInterface {
                         boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
                         if (deleted) {
-                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                            LOG.warn("Order " + tempOrder.getId() + " deleted succesfully");
                         } else {
-                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            LOG.warn("Could not delete order " + tempOrder.getId() + "");
                             ok = false;
                         }
 
                     } else {
-                        LOG.severe(deleteOrderResponse.getError().toString());
+                        LOG.error(deleteOrderResponse.getError().toString());
                     }
                 }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
+                    LOG.error(ex.toString());
                 }
 
             }
             toReturn.setResponseObject(ok);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             toReturn.setError(activeOrdersResponse.getError());
             return toReturn;
         }
@@ -563,7 +564,7 @@ public class CcedkWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, false);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to ccdek");
+            LOG.error("The bot will not execute the query, there is no connection to ccdek");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -576,7 +577,7 @@ public class CcedkWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, false);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to ccdek");
+            LOG.error("The bot will not execute the query, there is no connection to ccdek");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -845,15 +846,15 @@ public class CcedkWrapper implements TradeInterface {
                 String output;
 
                 if (httpError) {
-                    LOG.severe("Http error - Post Data: " + post_data);
+                    LOG.error("Http error - Post Data: " + post_data);
                 }
-                LOG.fine("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.fine(output);
+                    LOG.info(output);
                     answer += output;
                 }
 
-                //LOG.severe("answer = " + answer);
+                //LOG.error("answer = " + answer);
                 if (answer.contains("\"nonce\":\"incorrect range")) {
                     //executeQuery(needAuth, isGet);
                     return INVALID_NONCE_ERROR + " " + answer;
@@ -866,21 +867,21 @@ public class CcedkWrapper implements TradeInterface {
                         answer = (String) obj2.get(TOKEN_ERR);
 
                     } catch (ParseException ex) {
-                        LOG.severe(ex.toString());
+                        LOG.error(ex.toString());
 
                     }
                 }
             } //Capture Exceptions
             catch (IllegalStateException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
 
                 answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } finally {
                 //close the connection, set all objects to null
@@ -902,7 +903,7 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
             } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
+                LOG.error("Unsupported encoding exception: " + uee.toString());
                 return null;
             }
 
@@ -910,7 +911,7 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 mac = Mac.getInstance(SIGN_HASH_FUNCTION);
             } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
+                LOG.error("No such algorithm exception: " + nsae.toString());
                 return null;
             }
 
@@ -918,14 +919,14 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 mac.init(key);
             } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
+                LOG.error("Invalid key exception: " + ike.toString());
                 return null;
             }
             try {
                 signature = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
             return signature;
         }

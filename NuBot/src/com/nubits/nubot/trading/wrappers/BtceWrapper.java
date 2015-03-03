@@ -48,7 +48,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -65,7 +66,7 @@ import org.json.simple.parser.ParseException;
  */
 public class BtceWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(BtceWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BtceWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -128,7 +129,7 @@ public class BtceWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
-                //LOG.severe("Btce returned an error: " + errorMessage);
+                //LOG.error("Btce returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -139,11 +140,11 @@ public class BtceWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -328,7 +329,7 @@ public class BtceWrapper implements TradeInterface {
             try {
                 content = Utils.getHTML(API_GET_FEE, true);
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
             if (!content.equals("ERROR")) {
                 int startIndex = content.lastIndexOf(strDelimiterStart) + strDelimiterStart.length();
@@ -346,7 +347,7 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.fine("Btc-e uses global TX fee, currency pair not supprted. \n"
+        LOG.info("Btc-e uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -399,7 +400,7 @@ public class BtceWrapper implements TradeInterface {
      //error
      String error = (String) httpAnswerJson.get("error");
      apiResponse.setError(new ApiError(ERRROR_API, error));
-     LOG.severe("Btce returned an error: " + error);
+     LOG.error("Btce returned an error: " + error);
      return apiResponse;
      } else {
      //correct
@@ -423,7 +424,7 @@ public class BtceWrapper implements TradeInterface {
      permissions.setValid_keys(true);
      }
      } catch (ParseException ex) {
-     LOG.severe(ex.toString());
+     LOG.error(ex.toString());
      apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing api permissions for btce"));
      }
      apiResponse.setResponseObject(permissions);
@@ -500,7 +501,7 @@ public class BtceWrapper implements TradeInterface {
                 }
                 apiResponse.setResponseObject(orderList);
             } catch (JSONException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 apiResponse.setError(errors.parseError);
                 return apiResponse;
             }
@@ -556,7 +557,7 @@ public class BtceWrapper implements TradeInterface {
                 existResponse.setResponseObject(false);
             } else {
                 existResponse.setError(err);
-                LOG.severe(existResponse.getError().toString());
+                LOG.error(existResponse.getError().toString());
             }
         }
 
@@ -570,7 +571,7 @@ public class BtceWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(false, false);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to btce");
+            LOG.error("The bot will not execute the query, there is no connection to btce");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -583,7 +584,7 @@ public class BtceWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, false);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to btce");
+            LOG.error("The bot will not execute the query, there is no connection to btce");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -616,25 +617,25 @@ public class BtceWrapper implements TradeInterface {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
                     if (deleted) {
-                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        LOG.warn("Order " + tempOrder.getId() + " deleted succesfully");
                     } else {
-                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        LOG.warn("Could not delete order " + tempOrder.getId() + "");
                         ok = false;
                     }
 
                 } else {
-                    LOG.severe(deleteOrderResponse.getError().toString());
+                    LOG.error(deleteOrderResponse.getError().toString());
                 }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
+                    LOG.error(ex.toString());
                 }
 
             }
             toReturn.setResponseObject(ok);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             toReturn.setError(activeOrdersResponse.getError());
             return toReturn;
         }
@@ -769,11 +770,11 @@ public class BtceWrapper implements TradeInterface {
                 String output;
 
                 if (httpError) {
-                    LOG.severe("Post Data: " + post_data);
+                    LOG.error("Post Data: " + post_data);
                 }
-                LOG.fine("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.fine(output);
+                    LOG.info(output);
                     answer += output;
                 }
                 /*
@@ -784,22 +785,22 @@ public class BtceWrapper implements TradeInterface {
                  answer = (String) obj2.get(TOKEN_ERR);
 
                  } catch (ParseException ex) {
-                 LOG.severe(ex.toString());
+                 LOG.error(ex.toString());
 
                  }
                  }
                  */
             } //Capture Exceptions
             catch (IllegalStateException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
 
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } finally {
                 //close the connection, set all objects to null
@@ -820,7 +821,7 @@ public class BtceWrapper implements TradeInterface {
             try {
                 key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
             } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
+                LOG.error("Unsupported encoding exception: " + uee.toString());
                 return null;
             }
 
@@ -828,7 +829,7 @@ public class BtceWrapper implements TradeInterface {
             try {
                 mac = Mac.getInstance(SIGN_HASH_FUNCTION);
             } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
+                LOG.error("No such algorithm exception: " + nsae.toString());
                 return null;
             }
 
@@ -836,14 +837,14 @@ public class BtceWrapper implements TradeInterface {
             try {
                 mac.init(key);
             } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
+                LOG.error("Invalid key exception: " + ike.toString());
                 return null;
             }
             try {
                 signature = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
             return signature;
         }

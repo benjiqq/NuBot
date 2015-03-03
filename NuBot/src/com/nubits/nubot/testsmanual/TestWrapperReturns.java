@@ -15,14 +15,15 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Created by woolly_sammoth on 24/01/15.
  */
 public class TestWrapperReturns {
 
-    private static final Logger LOG = Logger.getLogger(TestWrapperReturns.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestWrapperReturns.class.getName());
     /**
      * Configure tests
      */
@@ -43,7 +44,7 @@ public class TestWrapperReturns {
         try {
             Global.options = ParseOptions.parseOptions(inputs);
         } catch (NuBotConfigException ex) {
-            Logger.getLogger(TestWrapperReturns.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("" +  ex);
         }
         testExchanges = populateExchanges();
 
@@ -127,7 +128,7 @@ public class TestWrapperReturns {
     private static void clearOrders(CurrencyPair pair) {
         ApiResponse response = Global.exchange.getTrade().clearOrders(pair);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
         } else {
             print("Error: " + response.getError().toString());
         }
@@ -148,7 +149,7 @@ public class TestWrapperReturns {
     private static boolean cancelOrder(String order_id, CurrencyPair pair) {
         ApiResponse response = Global.exchange.getTrade().cancelOrder(order_id, pair);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
             return (boolean) response.getResponseObject();
         } else {
             print("Error: " + response.getError().toString());
@@ -159,7 +160,7 @@ public class TestWrapperReturns {
     private static Order getOrderDetail(String order_id) {
         ApiResponse response = Global.exchange.getTrade().getOrderDetail(order_id);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
             return (Order) response.getResponseObject();
         } else {
             print("Error: " + response.getError().toString());
@@ -182,7 +183,7 @@ public class TestWrapperReturns {
         //get the available balances for pair
         ApiResponse response = Global.exchange.getTrade().getAvailableBalances(pair);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
         } else {
             print("Error: " + response.getError().toString());
         }
@@ -192,7 +193,7 @@ public class TestWrapperReturns {
         //test that sell requests are processed correctly
         ApiResponse response = Global.exchange.getTrade().sell(pair, amount, price);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
             return response.getResponseObject().toString();
         } else {
             print("Error: " + response.getError().toString());
@@ -204,7 +205,7 @@ public class TestWrapperReturns {
         //test that sell requests are processed correctly
         ApiResponse response = Global.exchange.getTrade().buy(pair, amount, price);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
             return response.getResponseObject().toString();
         } else {
             print("Error: " + response.getError().toString());
@@ -220,7 +221,7 @@ public class TestWrapperReturns {
         try {
             NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));

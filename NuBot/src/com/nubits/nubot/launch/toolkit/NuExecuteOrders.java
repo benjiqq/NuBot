@@ -34,7 +34,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  *
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
  */
 public class NuExecuteOrders {
 
-    private static final Logger LOG = Logger.getLogger(NuExecuteOrders.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuExecuteOrders.class.getName());
     private String api;
     private String secret;
     private String pathToOrders;
@@ -66,18 +66,18 @@ public class NuExecuteOrders {
         try {
             NuLogger.setup(true, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
 
         NuExecuteOrders app = new NuExecuteOrders();
         if (app.readParams(args)) {
             createShutDownHook();
-            LOG.fine("Launching NuOrderExecutor ");
+            LOG.info("Launching NuOrderExecutor ");
             app.orderList = app.readOrdersFromFile();
             app.prepareForExecution();
             app.executeOrders();
-            LOG.fine("Done");
+            LOG.info("Done");
             System.exit(0);
 
         } else {
@@ -92,10 +92,10 @@ public class NuExecuteOrders {
             ApiResponse respose = orderList.get(i).execute();
             if (respose.isPositive()) {
                 String resposeString = (String) respose.getResponseObject();
-                LOG.warning("Orders submitted . Response = " + resposeString);
+                LOG.warn("Orders submitted . Response = " + resposeString);
                 Utils.printSeparator();
             } else {
-                LOG.severe(respose.getError().toString());
+                LOG.error(respose.getError().toString());
             }
         }
     }
@@ -117,7 +117,7 @@ public class NuExecuteOrders {
         if (exchangename.equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             apibase = Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE;
         } else {
-            LOG.severe("Exchange name not accepted : " + exchangename);
+            LOG.error("Exchange name not accepted : " + exchangename);
             System.exit(0);
         }
 
@@ -136,11 +136,11 @@ public class NuExecuteOrders {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.fine("Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
     }
@@ -149,7 +149,7 @@ public class NuExecuteOrders {
         boolean ok = false;
 
         if (args.length != 4) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+            LOG.error("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
 
@@ -175,7 +175,7 @@ public class NuExecuteOrders {
                 String[] order = line.split(cvsSplitBy);
                 CsvLine csvline = new CsvLine(order[0], Double.valueOf(order[1]), Double.valueOf(order[2]), Long.valueOf(order[3]));
                 list.add(csvline);
-                LOG.fine("Order " + list.size() + " loaded from file : " + csvline.toString());
+                LOG.info("Order " + list.size() + " loaded from file : " + csvline.toString());
             }
 
         } catch (FileNotFoundException e) {
@@ -200,7 +200,7 @@ public class NuExecuteOrders {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                LOG.fine("Exiting...");
+                LOG.info("Exiting...");
                 NuExecuteOrders.mainThread.interrupt();
                 Global.taskManager.stopAll();
 
@@ -228,11 +228,11 @@ public class NuExecuteOrders {
             try {
                 Thread.sleep(this.delay);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
 
 
-            LOG.warning("\nExecuting " + this.toString());
+            LOG.warn("\nExecuting " + this.toString());
 
 
             switch (this.type) {

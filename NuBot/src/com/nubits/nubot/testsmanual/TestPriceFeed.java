@@ -29,7 +29,8 @@ import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
 public class TestPriceFeed {
     //refer to FEEDS.md for the list of price feeds
 
-    private static final Logger LOG = Logger.getLogger(TestPriceFeed.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeed.class.getName());
 
     public static void main(String a[]) {
         TestPriceFeed test = new TestPriceFeed();
@@ -62,9 +63,8 @@ public class TestPriceFeed {
         try {
             NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
-        LOG.setLevel(Level.INFO);
 
         LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);
@@ -77,7 +77,7 @@ public class TestPriceFeed {
             LOG.info(lastPrice.toString());
         } else {
             //handle error
-            LOG.severe("There was a problem while updating the price");
+            LOG.error("There was a problem while updating the price");
         }
     }
 

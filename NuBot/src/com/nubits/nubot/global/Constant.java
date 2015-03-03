@@ -19,7 +19,7 @@ package com.nubits.nubot.global;
 
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  *
@@ -27,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class Constant {
 
-    private static final Logger LOG = Logger.getLogger(Constant.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Constant.class.getName());
     //Exchanges
     public static final String BTCE = "btce";
     public static final String CCEDK = "ccedk";

@@ -52,7 +52,8 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.TreeMap;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -71,7 +72,7 @@ public class CcexWrapper implements TradeInterface {
     private ApiKeys keys;
     private Exchange exchange;
     private String checkConnectionUrl = "https://c-cex.com/";
-    private static final Logger LOG = Logger.getLogger(CcexWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(CcexWrapper.class.getName());
     //Entry point(s)
     private final String API_BASE = "https://c-cex.com/t/r.html?";
     private String baseUrl;
@@ -214,13 +215,13 @@ public class CcexWrapper implements TradeInterface {
 
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {
-                    LOG.warning("Cannot find a balance for currency with code "
+                    LOG.warn("Cannot find a balance for currency with code "
                             + "" + NBTcode + " or " + PEGcode + " in your balance. "
                             + "NuBot assumes that balance is 0");
                 }
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -291,7 +292,7 @@ public class CcexWrapper implements TradeInterface {
             if (ret.contains("not enough funds") || ret.contains(" ")) {
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(ret);
-                LOG.severe("CCex API returned an error: " + ret);
+                LOG.error("CCex API returned an error: " + ret);
                 apiResponse.setError(apiErr);
                 return apiResponse;
             } else {
@@ -301,7 +302,7 @@ public class CcexWrapper implements TradeInterface {
             }
 
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -383,7 +384,7 @@ public class CcexWrapper implements TradeInterface {
 
 
         } catch (JSONException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -467,7 +468,7 @@ public class CcexWrapper implements TradeInterface {
                 apiResponse.setResponseObject(true);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -488,7 +489,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.fine("CCex uses global TX fee, currency pair not supprted. \n"
+        LOG.info("CCex uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -571,7 +572,7 @@ public class CcexWrapper implements TradeInterface {
             }
             apiResponse.setResponseObject(tradeList);
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -616,25 +617,25 @@ public class CcexWrapper implements TradeInterface {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
                     if (deleted) {
-                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        LOG.warn("Order " + tempOrder.getId() + " deleted succesfully");
                     } else {
-                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        LOG.warn("Could not delete order " + tempOrder.getId() + "");
                         ok = false;
                     }
 
                 } else {
-                    LOG.severe(deleteOrderResponse.getError().toString());
+                    LOG.error(deleteOrderResponse.getError().toString());
                 }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
+                    LOG.error(ex.toString());
                 }
 
             }
             toReturn.setResponseObject(ok);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             toReturn.setError(activeOrdersResponse.getError());
             return toReturn;
         }
@@ -659,7 +660,7 @@ public class CcexWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to CCex");
+            LOG.error("The bot will not execute the query, there is no connection to CCex");
             queryResult = TOKEN_BAD_RETURN;
         }
 
@@ -726,7 +727,7 @@ public class CcexWrapper implements TradeInterface {
             order.setInsertedDate(new Date()); //Not provided
 
         } catch (JSONException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         return order;
 
@@ -760,7 +761,7 @@ public class CcexWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (java.text.ParseException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
             toRet = new Date();
         }
         return toRet;
@@ -793,7 +794,7 @@ public class CcexWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
 
             HttpClient client = HttpClientBuilder.create().build();
@@ -808,7 +809,7 @@ public class CcexWrapper implements TradeInterface {
                 response = client.execute(get);
 
             } catch (Exception e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             }
             BufferedReader rd;
@@ -823,21 +824,21 @@ public class CcexWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.error("" +  ex);
                 return null;
             } catch (IllegalStateException ex) {
-                Logger.getLogger(BterWrapper.class.getName()).log(Level.SEVERE, null, ex);
+                LOG.error("" +  ex);
                 return null;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.fine("\nSending request to URL : " + url + " ; get = " + isGet);
+                LOG.info("\nSending request to URL : " + url + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
-                LOG.fine("Response Code : " + response.getStatusLine().getStatusCode());
-                LOG.fine("Response :" + response);
+                LOG.info("Response Code : " + response.getStatusLine().getStatusCode());
+                LOG.info("Response :" + response);
 
             }
             return answer;

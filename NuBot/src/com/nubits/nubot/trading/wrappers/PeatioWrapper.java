@@ -35,7 +35,8 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.json.simple.JSONArray;
@@ -51,7 +52,7 @@ import org.jsoup.nodes.Document;
  */
 public class PeatioWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(PeatioWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PeatioWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -106,7 +107,7 @@ public class PeatioWrapper implements TradeInterface {
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
             }
         }
         return toReturn;
@@ -123,11 +124,11 @@ public class PeatioWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
 
-        //LOG.warning("\nurl: " + url + "\nmethod: " + method + "\nquery_args: " + query_args.toString() + "\nisGet: " + isGet);
+        //LOG.warn("\nurl: " + url + "\nmethod: " + method + "\nquery_args: " + query_args.toString() + "\nisGet: " + isGet);
 
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, isGet);
-        //LOG.warning("\n\n" + queryResult + "\n\n");
+        //LOG.warn("\n\n" + queryResult + "\n\n");
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -158,14 +159,14 @@ public class PeatioWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             } catch (ClassCastException ex) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + ex.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + ex.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -298,7 +299,7 @@ public class PeatioWrapper implements TradeInterface {
 
             apiResponse.setResponseObject(ticker);
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -483,7 +484,7 @@ public class PeatioWrapper implements TradeInterface {
                 existResponse.setResponseObject(exists);
             } else {
                 existResponse.setError(err);
-                LOG.severe(existResponse.getError().toString());
+                LOG.error(existResponse.getError().toString());
             }
         }
 
@@ -533,7 +534,7 @@ public class PeatioWrapper implements TradeInterface {
             queryResult = query.executeQuery(true, isGet);
 
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to Peatio");
+            LOG.error("The bot will not execute the query, there is no connection to Peatio");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -600,7 +601,7 @@ public class PeatioWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (java.text.ParseException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
             toRet = new Date();
         }
         return toRet;
@@ -658,7 +659,7 @@ public class PeatioWrapper implements TradeInterface {
                     }
                 }
             } catch (InterruptedException e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
             }
         }
 
@@ -788,10 +789,10 @@ public class PeatioWrapper implements TradeInterface {
                 int stopIndex = errString.lastIndexOf(stopStr);
                 remoteTime = Long.parseLong(errString.substring(startIndex, stopIndex));
             } catch (Exception ex) {
-                LOG.fine("Local timestamp and Peatio timestamp are equal");
+                LOG.info("Local timestamp and Peatio timestamp are equal");
             }
             diff = remoteTime - localtime;
-            //LOG.warning("\n\n\n diff=" + diff + "  \n\n");
+            //LOG.warn("\n\n\n diff=" + diff + "  \n\n");
         }
         return diff;
     }
@@ -834,7 +835,7 @@ public class PeatioWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.fine("Calling " + canonical_uri + " with params:" + args);
+            LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
@@ -852,10 +853,10 @@ public class PeatioWrapper implements TradeInterface {
 
                 return response;
             } catch (Exception e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             } finally {
-                LOG.fine("result:{}" + response);
+                LOG.info("result:{}" + response);
             }
         }
 

@@ -29,14 +29,15 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * Created by sammoth on 27/02/15.
  */
 public class AltsTradeWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ExcoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -89,11 +90,11 @@ public class AltsTradeWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -110,7 +111,7 @@ public class AltsTradeWrapper implements TradeInterface {
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            LOG.severe(httpAnswerJson.toJSONString());
+            LOG.error(httpAnswerJson.toJSONString());
         } else {
             apiResponse = response;
         }
@@ -206,7 +207,7 @@ public class AltsTradeWrapper implements TradeInterface {
     @Override
     public String query(String url, HashMap<String, String> args, boolean isGet) {
         if (!exchange.getLiveData().isConnected()) {
-            LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
+            LOG.error("The bot will not execute the query, there is no connection to Alts.Trade");
             return TOKEN_BAD_RETURN;
         }
         String queryResult;
@@ -290,7 +291,7 @@ public class AltsTradeWrapper implements TradeInterface {
                     queryUrl = new URL(url);
                 }    
             } catch (MalformedURLException mal) {
-                LOG.severe(mal.toString());
+                LOG.error(mal.toString());
                 return null;
             }
 
@@ -319,10 +320,10 @@ public class AltsTradeWrapper implements TradeInterface {
                     os.close();
                 }
             } catch (ProtocolException pe) {
-                LOG.severe(pe.toString());
+                LOG.error(pe.toString());
                 return null;
             } catch (IOException io) {
-                LOG.severe((io.toString()));
+                LOG.error((io.toString()));
                 return null;
             }
 
@@ -338,12 +339,12 @@ public class AltsTradeWrapper implements TradeInterface {
                     br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + url
+                LOG.error("Query to : " + url
                         + "Data : " + post_data
                         + "\nHTTP Response : " + Objects.toString(response));
             }
@@ -353,7 +354,7 @@ public class AltsTradeWrapper implements TradeInterface {
                     answer += output;
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
@@ -379,11 +380,11 @@ public class AltsTradeWrapper implements TradeInterface {
                 mac.init(key);
                 sign = Base64.encode(mac.doFinal(hash_data.getBytes(ENCODING)));
             } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
+                LOG.error("Unsupported encoding exception: " + uee.toString());
             } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
+                LOG.error("No such algorithm exception: " + nsae.toString());
             } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
+                LOG.error("Invalid key exception: " + ike.toString());
             }
             return sign;
         }

@@ -35,7 +35,8 @@ import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import org.json.simple.JSONArray;
@@ -53,7 +54,7 @@ public class BitSparkWrapper implements TradeInterface {
 
     //It seems that BitSpark also have a reversed pairing for NBT_BTC.
     //to correctly return a pair balance the pair needs to be NBT_BTC instead of BTC_NBT
-    private static final Logger LOG = Logger.getLogger(BitSparkWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BitSparkWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -107,7 +108,7 @@ public class BitSparkWrapper implements TradeInterface {
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
             }
         }
         return toReturn;
@@ -155,11 +156,11 @@ public class BitSparkWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -291,7 +292,7 @@ public class BitSparkWrapper implements TradeInterface {
 
             apiResponse.setResponseObject(ticker);
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -476,7 +477,7 @@ public class BitSparkWrapper implements TradeInterface {
                 existResponse.setResponseObject(exists);
             } else {
                 existResponse.setError(err);
-                LOG.severe(existResponse.getError().toString());
+                LOG.error(existResponse.getError().toString());
             }
         }
 
@@ -526,7 +527,7 @@ public class BitSparkWrapper implements TradeInterface {
             queryResult = query.executeQuery(true, isGet);
 
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to BitSpark");
+            LOG.error("The bot will not execute the query, there is no connection to BitSpark");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -593,7 +594,7 @@ public class BitSparkWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (java.text.ParseException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
             toRet = new Date();
         }
         return toRet;
@@ -642,7 +643,7 @@ public class BitSparkWrapper implements TradeInterface {
                     }
                 }
             } catch (InterruptedException e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
             }
         }
 
@@ -811,10 +812,10 @@ public class BitSparkWrapper implements TradeInterface {
 
                 return response;
             } catch (Exception e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             } finally {
-                LOG.fine("result:{}" + response);
+                LOG.info("result:{}" + response);
             }
         }
 

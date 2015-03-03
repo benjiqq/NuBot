@@ -33,7 +33,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.text.*;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -45,7 +46,7 @@ import org.json.simple.parser.ParseException;
  */
 public class AllCoinWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(AllCoinWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(AllCoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -113,7 +114,7 @@ public class AllCoinWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get(TOKEN_ERR);
                 ApiError apiError = errors.apiReturnError;
                 apiError.setDescription(errorMessage);
-                //LOG.severe("AllCoin API returned an error : " + errorMessage);
+                //LOG.error("AllCoin API returned an error : " + errorMessage);
                 apiResponse.setError(apiError);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -124,11 +125,11 @@ public class AllCoinWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -303,7 +304,7 @@ public class AllCoinWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to AllCoin");
+            LOG.error("The bot will not execute the query, there is no connection to AllCoin");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -403,7 +404,7 @@ public class AllCoinWrapper implements TradeInterface {
         try {
             date = sdf.parse(data.get("ctime").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
         }
         if (date != null) {
             long ctime = date.getTime();
@@ -507,7 +508,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warning("AllCoin uses global TX fee, currency pair not supported. \n"
+        LOG.warn("AllCoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -595,7 +596,7 @@ public class AllCoinWrapper implements TradeInterface {
         try {
             date = sdf.parse(in.get("ctime").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
         }
         if (date != null) {
             long ctime = date.getTime();
@@ -649,26 +650,26 @@ public class AllCoinWrapper implements TradeInterface {
                         boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
                         if (deleted) {
-                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                            LOG.warn("Order " + tempOrder.getId() + " deleted succesfully");
                         } else {
-                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            LOG.warn("Could not delete order " + tempOrder.getId() + "");
                             ok = false;
                         }
 
                     } else {
-                        LOG.severe(deleteOrderResponse.getError().toString());
+                        LOG.error(deleteOrderResponse.getError().toString());
                     }
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
-                        LOG.severe(ex.toString());
+                        LOG.error(ex.toString());
                     }
                 }
 
             }
             toReturn.setResponseObject(ok);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             toReturn.setError(activeOrdersResponse.getError());
             return toReturn;
         }
@@ -715,7 +716,7 @@ public class AllCoinWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException mal) {
-                LOG.severe(mal.toString());
+                LOG.error(mal.toString());
                 return null;
             }
 
@@ -734,7 +735,7 @@ public class AllCoinWrapper implements TradeInterface {
                 try {
                     queryUrl = new URL(queryUrl + "?" + post_data);
                 } catch (MalformedURLException mal) {
-                    LOG.severe(mal.toString());
+                    LOG.error(mal.toString());
                     return null;
                 }
             }
@@ -757,10 +758,10 @@ public class AllCoinWrapper implements TradeInterface {
                     os.close();
                 }
             } catch (ProtocolException pe) {
-                LOG.severe(pe.toString());
+                LOG.error(pe.toString());
                 return null;
             } catch (IOException io) {
-                LOG.severe((io.toString()));
+                LOG.error((io.toString()));
                 return null;
             }
 
@@ -776,12 +777,12 @@ public class AllCoinWrapper implements TradeInterface {
                     br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + url + " (method = " + method + " )"
+                LOG.error("Query to : " + url + " (method = " + method + " )"
                         + "\nData : \" + post_data"
                         + "\nHTTP Response : " + Objects.toString(response));
             }
@@ -791,7 +792,7 @@ public class AllCoinWrapper implements TradeInterface {
                     answer += output;
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
@@ -803,7 +804,7 @@ public class AllCoinWrapper implements TradeInterface {
              JSONObject obj = (JSONObject) (parser.parse(answer));
              answer = (String) obj.get(TOKEN_ERR);
              } catch (ParseException pe) {
-             LOG.severe(pe.toString());
+             LOG.error(pe.toString());
              }
              }
              */
@@ -826,7 +827,7 @@ public class AllCoinWrapper implements TradeInterface {
                 }
                 return sb.toString();
             } catch (java.security.NoSuchAlgorithmException e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
             }
             return null;
         }

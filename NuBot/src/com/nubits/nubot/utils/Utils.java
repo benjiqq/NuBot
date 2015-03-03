@@ -49,7 +49,8 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
@@ -69,7 +70,7 @@ import org.apache.commons.io.FileUtils;
  */
 public class Utils {
 
-    private static final Logger LOG = Logger.getLogger(Utils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
     /**
      *
@@ -101,7 +102,7 @@ public class Utils {
 
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         return encodedString;
@@ -129,7 +130,7 @@ public class Utils {
             clearString = new String(aes.doFinal(ciphertextBytes));
 
         } catch (IOException | NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | BadPaddingException | IllegalBlockSizeException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
             return "-1";
         }
         return clearString;
@@ -227,7 +228,7 @@ public class Utils {
     }
 
     public static void printSeparator() {
-        LOG.fine("\n----------- -----------  -----------\n");
+        LOG.info("\n----------- -----------  -----------\n");
     }
 
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
@@ -246,7 +247,7 @@ public class Utils {
                 try {
                     toRet = Double.parseDouble((String) obj);
                 } catch (ClassCastException ex) {
-                    LOG.severe("cannot parse object : " + obj.toString());
+                    LOG.error("cannot parse object : " + obj.toString());
                     return -1;
                 }
             }
@@ -263,20 +264,20 @@ public class Utils {
             input = NuBot.class.getClassLoader().getResourceAsStream(filename);
 
             if (input == null) {
-                LOG.severe("Sorry, unable to find " + filename);
+                LOG.error("Sorry, unable to find " + filename);
                 System.exit(0);
             }
 
             //load a properties file from class path, inside static method
             Global.settings.load(input);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         } finally {
             if (input != null) {
                 try {
                     input.close();
                 } catch (IOException e) {
-                    LOG.severe(e.toString());
+                    LOG.error(e.toString());
                 }
             }
         }
@@ -298,7 +299,7 @@ public class Utils {
     }
 
     public static void exitWithMessage(String msg) {
-        LOG.severe(msg);
+        LOG.error(msg);
         System.exit(0);
     }
 
@@ -412,7 +413,7 @@ public class Utils {
             try {
                 Utils.installTrustAllManager();
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
 
         } else {

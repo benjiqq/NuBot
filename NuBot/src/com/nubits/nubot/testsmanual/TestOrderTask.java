@@ -32,7 +32,8 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  */
 public class TestOrderTask {
 
-    private static final Logger LOG = Logger.getLogger(TestOrderTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestOrderTask.class.getName());
     private static Exchange exchange;
     private static String nudip = "127.0.0.1";
     private static int nudport = 9091;
@@ -59,9 +60,8 @@ public class TestOrderTask {
         try {
             NuLogger.setup(true, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
-        LOG.setLevel(Level.FINE);
 
         Utils.installKeystore(true);
 
@@ -69,7 +69,7 @@ public class TestOrderTask {
 
 
         //Check local filesystem for API keys
-        LOG.fine("Checking existance of API keys on local filesystem");
+        LOG.info("Checking existance of API keys on local filesystem");
 
         ApiKeys keys;
 
@@ -102,7 +102,7 @@ public class TestOrderTask {
 
         Global.publicAddress = Passwords.CUSTODIAN_PUBLIC_ADDRESS;
 
-        LOG.fine("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
+        LOG.info("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
         Global.rpcClient = new NuRPCClient(nudip, nudport, Passwords.NUD_RPC_USER,
                 Passwords.NUD_RPC_PASS, true, true, Global.publicAddress, Constant.NBT_PPC, "testid");
 
@@ -114,15 +114,15 @@ public class TestOrderTask {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
 
-        LOG.fine("Check connection with nud");
+        LOG.info("Check connection with nud");
         if (Global.rpcClient.isConnected()) {
-            LOG.fine("OK!");
+            LOG.info("OK!");
         } else {
-            LOG.severe("Problem while connecting with nud");
+            LOG.error("Problem while connecting with nud");
             System.exit(0);
         }
 

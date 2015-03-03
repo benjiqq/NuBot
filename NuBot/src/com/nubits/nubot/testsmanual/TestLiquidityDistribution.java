@@ -35,15 +35,13 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestLiquidityDistribution {
 
-    private static final Logger LOG = Logger.getLogger(TestLiquidityDistribution.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestLiquidityDistribution.class.getName());
     private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     private LiquidityDistributionModel ldm;
     private ModelParameters sellParams;
@@ -62,7 +60,7 @@ public class TestLiquidityDistribution {
         try {
             Global.options = ParseOptions.parseOptions(inputs);
         } catch (NuBotConfigException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         test.init(Constant.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
@@ -75,12 +73,7 @@ public class TestLiquidityDistribution {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
-        LOG.setLevel(Level.INFO);
+
 
         execOrders = false;
         if (!exchangeName.equals("")) {
@@ -222,7 +215,7 @@ public class TestLiquidityDistribution {
             LOG.info("NBT Balance : " + balance.toString());
             balanceNBT = balance;
         } else {
-            LOG.severe(balanceNBTResponse.getError().toString());
+            LOG.error(balanceNBTResponse.getError().toString());
             success = false;
         }
 
@@ -232,7 +225,7 @@ public class TestLiquidityDistribution {
             LOG.info(pair.getPaymentCurrency().getCode() + " Balance : " + balance.toString());
             balancePEG = balance;
         } else {
-            LOG.severe(balancePEGResponse.getError().toString());
+            LOG.error(balancePEGResponse.getError().toString());
             success = false;
         }
 

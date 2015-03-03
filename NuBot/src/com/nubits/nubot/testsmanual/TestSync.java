@@ -40,11 +40,12 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestSync extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(TestSync.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestSync.class.getName());
     private static final int TASK_INTERVAL = 61;
     private static final int TASK_MAX_EXECUTION_INTERVAL = 50;
     private static String id;
@@ -108,15 +109,14 @@ public class TestSync extends TimerTask {
         try {
             NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
-        LOG.setLevel(Level.INFO);
 
         LOG.info("Set up SSL certificates");
         try {
             Utils.installKeystore(true);
         } catch (Exception ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
     }
 
@@ -134,7 +134,7 @@ public class TestSync extends TimerTask {
         try {
             Thread.sleep(rand * 1000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.error(ex.getMessage());
         }
 
     }

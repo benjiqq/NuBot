@@ -10,11 +10,12 @@ import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestExchangePeatio extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(TestExchangePeatio.class
+    private static final Logger LOG = LoggerFactory.getLogger(TestExchangePeatio.class
             .getName());
 
     private static String testconfigFile = "peatio.json";

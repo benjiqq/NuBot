@@ -23,11 +23,12 @@ package com.nubits.nubot.testsmanual;
  */
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.utils.Utils;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestNTPClient {
 
-    private static final Logger LOG = Logger.getLogger(TestNTPClient.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestNTPClient.class.getName());
 
     public static void main(String[] args) {
         NTPClient client = new NTPClient();

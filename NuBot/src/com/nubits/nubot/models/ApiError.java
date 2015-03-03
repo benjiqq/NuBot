@@ -17,7 +17,8 @@
  */
 package com.nubits.nubot.models;
 
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -25,7 +26,7 @@ import java.util.logging.Logger;
  */
 public class ApiError {
 
-    private static final Logger LOG = Logger.getLogger(ApiError.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ApiError.class.getName());
     private int code;
     private String description;
 

@@ -36,7 +36,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -45,7 +46,7 @@ import org.json.simple.parser.ParseException;
 
 public class FrozenBalancesManager {
 
-    private static final Logger LOG = Logger.getLogger(FrozenBalancesManager.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FrozenBalancesManager.class.getName());
     private String pathToFrozenBalancesFiles;
     private FrozenAmount frozenAmount;
     private ArrayList<HistoryRow> history;
@@ -84,12 +85,12 @@ public class FrozenBalancesManager {
                     double updatedQuantity = amount.getQuantity() - frozen.getAmount().getQuantity();
                     return new Amount(updatedQuantity, currentPegCurrency);
                 } else {
-                    LOG.severe("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
+                    LOG.error("Cannot compare the frozen currency (" + frozenCurrency.getCode() + ") with the peg currency  (" + currentPegCurrency + "). "
                             + "Returning original balance without freezing value");
                     return amount;
                 }
             } else {
-                LOG.severe("The funds to freeze are greater than the amount found in balance. Please stop the bot and analyze the frozen balance log.");
+                LOG.error("The funds to freeze are greater than the amount found in balance. Please stop the bot and analyze the frozen balance log.");
                 return amount;
             }
         }
@@ -133,7 +134,7 @@ public class FrozenBalancesManager {
                 }
                 setBalanceAlreadyThere(toFreezeCurrency);
             } else {
-                LOG.severe("Cannot get the updated balance");
+                LOG.error("Cannot get the updated balance");
             }
         }
 
@@ -155,7 +156,7 @@ public class FrozenBalancesManager {
                 if (balance.getQuantity() > getAmountAlreadyThere().getQuantity()) {
                     setAmountAlreadyThere(balance);
                 } else {
-                    LOG.fine("Did not update the balanceAlreadyThere, since its would be smaller(" + balance.toString() + ") than the former value(" + getAmountAlreadyThere().toString() + ") .");
+                    LOG.info("Did not update the balanceAlreadyThere, since its would be smaller(" + balance.toString() + ") than the former value(" + getAmountAlreadyThere().toString() + ") .");
                 }
             } else {
                 success = false;
@@ -166,7 +167,7 @@ public class FrozenBalancesManager {
                     + Global.frozenBalances.getAmountAlreadyThere().getQuantity()
                     + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency());
         } else {
-            LOG.severe("An error occurred while trying to set the balance already there (not proceeds)");
+            LOG.error("An error occurred while trying to set the balance already there (not proceeds)");
         }
     }
 
@@ -232,7 +233,7 @@ public class FrozenBalancesManager {
             }
 
         } catch (ParseException | NumberFormatException | java.text.ParseException e) {
-            LOG.severe("Error while parsing the frozen balances file (" + pathToFrozenBalancesFiles + ")\n"
+            LOG.error("Error while parsing the frozen balances file (" + pathToFrozenBalancesFiles + ")\n"
                     + e.toString());
         }
     }
@@ -276,7 +277,7 @@ public class FrozenBalancesManager {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
             LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
     }

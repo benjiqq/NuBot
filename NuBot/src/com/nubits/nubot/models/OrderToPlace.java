@@ -21,12 +21,13 @@ package com.nubits.nubot.models;
  *
  * @author desrever <desrever at nubits.com>
  */
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 //TODO rename (requires refactoring of current Order class)
 public class OrderToPlace {
 
-    private static final Logger LOG = Logger.getLogger(OrderToPlace.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(OrderToPlace.class.getName());
     private String type; // string value containing either Constant.BUY or Constant.SELL
     private CurrencyPair pair; //Object containing currency pair
     private double size;    //Object containing the number of units for this trade (without fees). Expressed in pair.OrderCurrency

@@ -19,7 +19,8 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.global.Global;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -27,11 +28,11 @@ import java.util.logging.Logger;
  */
 public class CheckNudTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(CheckNudTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(CheckNudTask.class.getName());
 
     @Override
     public void run() {
-        LOG.fine("Executing task : CheckNudTask ");
+        LOG.info("Executing task : CheckNudTask ");
         Global.rpcClient.checkConnection();
         if (Global.rpcClient.isVerbose()) {
             String connectedString = "offline";

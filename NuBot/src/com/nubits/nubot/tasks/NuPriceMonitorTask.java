@@ -28,7 +28,8 @@ import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -38,7 +39,7 @@ import java.util.logging.Logger;
  */
 public class NuPriceMonitorTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(NuPriceMonitorTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitorTask.class.getName());
     private PriceFeedManager pfm = null;
     private double distanceTreshold;
     private LastPrice lastPrice;
@@ -55,7 +56,7 @@ public class NuPriceMonitorTask extends TimerTask {
     public void run() {
         LOG.info("Executing task : CheckLastPriceTask ");
         if (pfm == null) {
-            LOG.severe("CheckLastPrice task needs a PriceFeedManager to work. Please assign it before running it");
+            LOG.error("CheckLastPrice task needs a PriceFeedManager to work. Please assign it before running it");
 
         } else {
             ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
@@ -112,7 +113,7 @@ public class NuPriceMonitorTask extends TimerTask {
                             MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
                             HipChatNotifications.sendMessageCritical(title + message);
 
-                            LOG.severe(title + message);
+                            LOG.error(title + message);
                         }
                     }
                 }
@@ -214,7 +215,7 @@ public class NuPriceMonitorTask extends TimerTask {
         } else {
             //check if price moved more than x% from when the wall was setup
             if (needToMoveWalls(lastPrice)) {
-                LOG.severe("We should move the walls now!");
+                LOG.error("We should move the walls now!");
                 //Compute price for walls
 
                 currentWallPEGPrice = lastPrice;

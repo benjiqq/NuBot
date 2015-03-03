@@ -29,7 +29,8 @@ import com.nubits.nubot.utils.logging.NuLogger;
 import org.apache.commons.io.FileUtils;
 
 import java.io.IOException;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -37,7 +38,7 @@ import java.util.logging.Logger;
  */
 public class TestWrappers {
 
-    private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
     /**
      * Configure tests
      */
@@ -56,7 +57,7 @@ public class TestWrappers {
         try {
             Global.options = ParseOptions.parseOptions(inputs);
         } catch (NuBotConfigException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
@@ -128,12 +129,12 @@ public class TestWrappers {
         try {
             NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         try {
             Utils.installKeystore(false);
         } catch (Exception ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
     }
 }

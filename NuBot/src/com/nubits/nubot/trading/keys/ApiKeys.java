@@ -18,7 +18,8 @@
 package com.nubits.nubot.trading.keys;
 
 import com.nubits.nubot.utils.Utils;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -26,7 +27,7 @@ import java.util.logging.Logger;
  */
 public class ApiKeys {
 
-    private static final Logger LOG = Logger.getLogger(ApiKeys.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ApiKeys.class.getName());
     public static final String VALID_KEYS = "These keys are valid! Save them to complete the setup";
 //Class Variables
     private String secretKey, apiKey;
@@ -90,7 +91,7 @@ public class ApiKeys {
      break;
      }
      default: {
-     LOG.severe("Exchange " + exchange.getName() + " is not supported");
+     LOG.error("Exchange " + exchange.getName() + " is not supported");
      return "exchange " + exchange.getName() + " not supported";
      }
      }

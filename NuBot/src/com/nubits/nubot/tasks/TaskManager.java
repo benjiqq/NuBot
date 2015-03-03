@@ -24,7 +24,8 @@ import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -32,7 +33,7 @@ import java.util.logging.Logger;
  */
 public class TaskManager {
 
-    private static final Logger LOG = Logger.getLogger(TaskManager.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TaskManager.class.getName());
     private static final String STRATEGY_FIAT = "Strategy Fiat Task";
     private static final String STRATEGY_CRYPTO = "Strategy Crypto Task";
     //Class Variables
@@ -110,7 +111,7 @@ public class TaskManager {
     }
 
     public void stopAll() {
-        LOG.fine("\nStopping all tasks : -- ");
+        LOG.info("\nStopping all tasks : -- ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
@@ -126,7 +127,7 @@ public class TaskManager {
                     sentNotification = true;
                 }
             }
-            LOG.fine("Shutting down " + bt.getName());
+            LOG.info("Shutting down " + bt.getName());
             try {
                 bt.getTimer().cancel();
                 bt.getTimer().purge();
@@ -141,7 +142,7 @@ public class TaskManager {
     public void printTasksStatus() {
         for (int i = 0; i < taskList.size(); i++) {
             BotTask task = taskList.get(i);
-            LOG.fine("Task name : " + task.getName() + ""
+            LOG.info("Task name : " + task.getName() + ""
                     + " running : " + task.isRunning());
         }
     }

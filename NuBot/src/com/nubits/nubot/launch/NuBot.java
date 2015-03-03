@@ -40,13 +40,9 @@ import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
-
-import java.io.IOException;
-import java.util.logging.Logger;
-
-import org.json.simple.JSONObject;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * NuBot. launched from command line or UI
@@ -57,9 +53,8 @@ public class NuBot {
 
     private boolean liveTrading;
 
-    private String logsFolder;
-    private static final Logger LOG = Logger.getLogger(NuBot.class.getName());
-
+    //private String logsFolder;
+    final static Logger LOG = LoggerFactory.getLogger(NuBot.class);
 
     public NuBot() {
 
@@ -71,7 +66,7 @@ public class NuBot {
     private void setupLog() {
         //Setting up log folder for this session :
 
-        String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
+        /*String folderName = "NuBot_" + Utils.getTimestampLong() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
         logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         //Create log dir
@@ -79,11 +74,11 @@ public class NuBot {
         try {
             NuLogger.setup(Global.options.isVerbose(), logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
-        LOG.info("Init logging system");
+        LOG.info("Init logging system");*/
 
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
@@ -167,7 +162,7 @@ public class NuBot {
         if (txFeeResponse.isPositive()) {
             double txfee = (Double) txFeeResponse.getResponseObject();
             if (txfee == 0) {
-                LOG.warning("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
+                LOG.warn("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
                 double maxOffset = 0.1;
                 if (Global.options.getSpread() < maxOffset) {
                     Global.options.setSpread(maxOffset);
@@ -204,6 +199,13 @@ public class NuBot {
      */
     public void execute(NuBotOptions opt) {
 
+        //Load settings
+        Utils.loadProperties("settings.properties");
+
+        LOG.info("NuBot logging");
+        LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
+
+
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()){
             liveTrading = true;
@@ -217,9 +219,6 @@ public class NuBot {
         Global.options = opt;
 
         Global.running = true;
-
-        //Load settings
-        Utils.loadProperties("settings.properties");
 
         setupConfigBot();
 
@@ -242,11 +241,12 @@ public class NuBot {
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         //Set the fileoutput for active orders
-
+        //TODO! handle logging locally
+        String logsFolder = "logs";
         String orders_outputPath = logsFolder + "orders_history.csv";
         String balances_outputPath = logsFolder + "balance_history.json";
 
@@ -269,7 +269,7 @@ public class NuBot {
         }
 
         Utils.printSeparator();
-        LOG.fine("Checking bot working mode");
+        LOG.info("Checking bot working mode");
         Global.isDualSide = Global.options.isDualSide();
 
         if (Global.options.isDualSide()) {
@@ -371,7 +371,7 @@ public class NuBot {
                 delaySeconds = Utils.getSecondsToNextwindow(reset_every);
                 LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
             } else {
-                LOG.warning("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
+                LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
             }
             //then start the thread
             Global.taskManager.getPriceTriggerTask().start(delaySeconds);
@@ -397,7 +397,7 @@ public class NuBot {
      * @param msg
      */
     private static void exitWithNotice(String msg) {
-        LOG.severe(msg);
+        LOG.error(msg);
         System.exit(0);
     }
 }

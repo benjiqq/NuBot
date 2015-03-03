@@ -30,7 +30,8 @@ import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.io.File;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -45,7 +46,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private int count;
     private final int MAX_ATTEMPTS = 5;
-    private static final Logger LOG = Logger.getLogger(PriceMonitorTriggerTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
     private PriceFeedManager pfm = null;
     private StrategySecondaryPegTask strategy = null;
     private double distanceTreshold;
@@ -83,9 +84,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
         // until the moving average is within 10% of the reported price.
         //we don't want that process to take longer than the price refresh interval
         currentTime = System.currentTimeMillis();
-        LOG.fine("Executing task : PriceMonitorTriggerTask ");
+        LOG.info("Executing task : PriceMonitorTriggerTask ");
         if (pfm == null || strategy == null) {
-            LOG.severe("PriceMonitorTriggerTask task needs a PriceFeedManager and a Strategy to work. Please assign it before running it");
+            LOG.error("PriceMonitorTriggerTask task needs a PriceFeedManager and a Strategy to work. Please assign it before running it");
 
         } else {
             count = 1;
@@ -98,13 +99,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (countTrials <= MAX_ATTEMPTS) {
             ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
-            LOG.fine("CheckLastPrice received values from remote feeds. ");
+            LOG.info("CheckLastPrice received values from remote feeds. ");
 
             /*
-             LOG.fine("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
+             LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
              for (int i = 0; i < priceList.size(); i++) {
              LastPrice tempPrice = priceList.get(i);
-             LOG.fine(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+             LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
              + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
              }
              * */
@@ -178,7 +179,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else {
             //Tried more than three times without success
-            LOG.severe("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
+            LOG.error("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
             sendErrorNotification();
             Global.exchange.getTrade().clearOrders(Global.options.getPair());
         }
@@ -195,7 +196,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         try {
             Thread.sleep(count * 60 * 1000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         executeUpdatePrice(count);
     }
@@ -207,7 +208,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + " price. Please restart the bot and get in touch with Nu Dev team";
             MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
             HipChatNotifications.sendMessageCritical(title + message);
-            LOG.severe(title + message);
+            LOG.error(title + message);
         }
     }
 
@@ -322,17 +323,17 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //we want to send Hip Chat and mail notifications,
         // cancel all orders to avoid arbitrage against the bot and
         // exit execution gracefully
-        LOG.severe(logMessage);
-        LOG.severe("Notifying HipChat");
+        LOG.error(logMessage);
+        LOG.error("Notifying HipChat");
         HipChatNotifications.sendMessage(notification, notificationColor);
-        LOG.severe("Sending Email");
+        LOG.error("Sending Email");
         MailNotifications.send(Global.options.getMailRecipient(), subject, notification);
         if (sleepTime > 0) {
-            LOG.severe("Cancelling Orders to avoid Arbitrage against the bot");
+            LOG.error("Cancelling Orders to avoid Arbitrage against the bot");
             Global.exchange.getTrade().clearOrders(Global.options.getPair());
             //clear the moving average so the restart is fresh
             queueMA.clear();
-            LOG.severe("Sleeping for " + sleepTime);
+            LOG.error("Sleeping for " + sleepTime);
             SLEEP_COUNT = 3;
         }
         currentTime = System.currentTimeMillis();
@@ -357,7 +358,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 //The potential price is more than % different to the moving average
                 //add it to the MA-Queue to raise the Moving Average and re-request the currency data
                 //in this way we can react to a large change in price when we are sure it is not an anomaly
-                LOG.warning("Latest price " + Objects.toString(current) + " is " + Objects.toString(percentageDiff) + "% outside of the moving average of " + Objects.toString(MA) + "."
+                LOG.warn("Latest price " + Objects.toString(current) + " is " + Objects.toString(percentageDiff) + "% outside of the moving average of " + Objects.toString(MA) + "."
                         + "\nShifting moving average and re-fetching exchange rate data.");
                 updateMovingAverageQueue(current);
 
@@ -380,7 +381,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //carry on with updating the wall price shift
         this.lastPrice = lp;
 
-        LOG.fine("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
+        LOG.info("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
             initStrategy(lp.getPrice().getQuantity());
@@ -397,7 +398,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private void verifyPegPrices() {
 
-        LOG.fine("Executing tryMoveWalls");
+        LOG.info("Executing tryMoveWalls");
 
         boolean needToShift = true;
         if (!Global.options.isMultipleCustodians()) {
@@ -411,10 +412,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
             computeNewPrices();
 
         } else {
-            LOG.fine("No need to move walls");
+            LOG.info("No need to move walls");
             currentTime = System.currentTimeMillis();
             if (isWallsBeingShifted() && needToShift) {
-                LOG.warning("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
+                LOG.warn("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
             }
         }
     }
@@ -423,7 +424,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double currentWallPEGprice = currentWallPEGPrice.getPrice().getQuantity();
         double distance = Math.abs(last.getPrice().getQuantity() - currentWallPEGprice);
         double percentageDistance = Utils.round((distance * 100) / currentWallPEGprice, 4);
-        LOG.fine("d=" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
+        LOG.info("d=" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
 
         if (percentageDistance < wallchangeThreshold) {
             return false;
@@ -495,7 +496,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("feed", tempPrice.getSource());
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
-        LOG.warning(row);
+        LOG.warn(row);
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
@@ -520,7 +521,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             wall_shift_file = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
             wall_shifts = (JSONArray) wall_shift_file.get("wall_shifts");
         } catch (ParseException pe) {
-            LOG.severe("Unable to parse order_history.json");
+            LOG.error("Unable to parse order_history.json");
         }
         //add the latest orders to the orders array
         wall_shifts.add(wall_shift);
@@ -622,7 +623,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
         } else {
-            LOG.severe("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
+            LOG.error("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
             System.exit(0);
         }
     }

@@ -25,7 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -46,7 +46,7 @@ import org.json.simple.parser.ParseException;
  */
 public class NuRPCClient {
 
-    private static final Logger LOG = Logger.getLogger(NuRPCClient.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuRPCClient.class.getName());
     public static final String USDchar = "B";
     private static final String COMMAND_GET_INFO = "getinfo";
     private static final String COMMAND_LIQUIDITYINFO = "liquidityinfo";
@@ -93,14 +93,14 @@ public class NuRPCClient {
         }
 
 
-        LOG.fine("RPC parameters " + params.toString());
+        LOG.info("RPC parameters " + params.toString());
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
 
             if (json.get("null") == null) {
                 //Correct answer, try to getliquidityinfo
-                LOG.fine("RPC : Liquidity info submitted correctly.");
+                LOG.info("RPC : Liquidity info submitted correctly.");
                 JSONObject jo = new JSONObject();
                 jo.put("submitted", true);
                 return jo;
@@ -152,16 +152,16 @@ public class NuRPCClient {
                 } else if (type.equalsIgnoreCase(Constant.BUY)) {
                     toRet = (double) total.get("buy");
                 } else {
-                    LOG.severe("The type can be either buy or sell");
+                    LOG.error("The type can be either buy or sell");
                 }
                 return toRet;
             } else {
-                LOG.severe(((JSONObject) json.get("error")).toString());
+                LOG.error(((JSONObject) json.get("error")).toString());
                 return 0;
             }
 
         } else {
-            LOG.severe("getliquidityinfo returned null");
+            LOG.error("getliquidityinfo returned null");
             return -1;
         }
     }
@@ -199,7 +199,7 @@ public class NuRPCClient {
         if (responseObject.containsKey("unlocked_until")) {
             long lockedUntil = (long) responseObject.get("unlocked_until");
             if (lockedUntil == 0) {
-                LOG.warning("Nu client is locked and will not be able to submit liquidity info."
+                LOG.warn("Nu client is locked and will not be able to submit liquidity info."
                         + "\nUse walletpassphrase <yourpassphrase> 9999999 to unlock it");
             }
         }
@@ -277,35 +277,35 @@ public class NuRPCClient {
                     new UsernamePasswordCredentials(this.rpcUsername, this.rpcPassword));
             StringEntity myEntity = new StringEntity(json.toJSONString());
             if (this.verbose) {
-                LOG.fine("RPC : " + json.toString());
+                LOG.info("RPC : " + json.toString());
             }
             HttpPost httppost = new HttpPost("http://" + this.ip + ":" + this.port);
             httppost.setEntity(myEntity);
 
             if (this.verbose) {
-                LOG.fine("RPC executing request :" + httppost.getRequestLine());
+                LOG.info("RPC executing request :" + httppost.getRequestLine());
             }
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
 
             if (this.verbose) {
-                LOG.fine("RPC----------------------------------------");
-                LOG.fine("" + response.getStatusLine());
+                LOG.info("RPC----------------------------------------");
+                LOG.info("" + response.getStatusLine());
 
                 if (entity != null) {
-                    LOG.fine("RPC : Response content length: " + entity.getContentLength());
+                    LOG.info("RPC : Response content length: " + entity.getContentLength());
                 }
             }
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
-            LOG.fine("Entity = " + entityString);
+            LOG.info("Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
-            LOG.severe(e.toString());
+            LOG.error(e.toString());
         } catch (IOException e) {
-            LOG.severe(e.toString());
+            LOG.error(e.toString());
         } catch (ParseException ex) {
-            Logger.getLogger(NuRPCClient.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("" + ex);
         } finally {
             // When HttpClient instance is no longer needed,
             // shut down the connection manager to ensure

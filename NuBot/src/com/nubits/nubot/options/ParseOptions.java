@@ -12,7 +12,8 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * ParseOptions from one or several JSON files
@@ -21,7 +22,7 @@ public class ParseOptions {
 
     private static String[] comp = {"secondarypegoptions", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
-    private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
 
 
     /**
@@ -291,7 +292,7 @@ public class ParseOptions {
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
                         + MailNotifications.MAIL_LEVEL_SEVERE + " or "
                         + MailNotifications.MAIL_LEVEL_NONE;
-                LOG.severe(error);
+                LOG.error(error);
                 throw new NuBotConfigException(error);
             }
         }

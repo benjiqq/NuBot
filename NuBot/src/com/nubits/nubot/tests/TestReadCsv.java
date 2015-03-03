@@ -29,11 +29,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestReadCsv  extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(TestReadCsv.class
+    private static final Logger LOG = LoggerFactory.getLogger(TestReadCsv.class
             .getName());
     private static final String TEST_FILE_PATH = "/currencies.csv";
     private static final String TEST_FILE = "currencies.csv";

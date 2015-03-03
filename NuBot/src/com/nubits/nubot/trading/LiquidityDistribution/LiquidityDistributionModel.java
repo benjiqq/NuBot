@@ -27,11 +27,12 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.utils.Utils;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class LiquidityDistributionModel {
 
-    private static final Logger LOG = Logger.getLogger(LiquidityDistributionModel.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(LiquidityDistributionModel.class.getName());
     private ModelParameters sellParams, buyParams;
 
     public LiquidityDistributionModel(ModelParameters sellParams, ModelParameters buyParams) {
@@ -117,7 +118,7 @@ public class LiquidityDistributionModel {
         double wallHeight = params.getWallHeight();
         boolean tailAvailable = true;
         if (wallHeight > totalFundsAvailNBT) {
-            LOG.warning("The current balance equivalent " + totalFundsAvailNBT
+            LOG.warn("The current balance equivalent " + totalFundsAvailNBT
                     + " NBT is not enought to place the full " + wallType + "wall"
                     + " defined in the liquidity model (" + wallHeight + "). "
                     + "\nResizing the size of the order, and not adding the tail");
@@ -141,7 +142,7 @@ public class LiquidityDistributionModel {
                         toReturn.add(new OrderToPlace(wallType, pair, sizes[i], prices[i]));
                         totalFundsAvailNBT -= sizes[i];
                     } else {
-                        LOG.warning("Not enough liquidity to place the full tail as defined in the model. Skipping the rest of the tail"
+                        LOG.warn("Not enough liquidity to place the full tail as defined in the model. Skipping the rest of the tail"
                                 + "\ntotalFundsAvailNBT = " + totalFundsAvailNBT + " ; sizes[i] = " + sizes[i]);
                         break;
                     }

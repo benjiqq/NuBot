@@ -32,11 +32,12 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class NuLastTrades {
 
-    private static final Logger LOG = Logger.getLogger(NuLastTrades.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuLastTrades.class.getName());
     private final String USAGE_STRING = "java -jar NuLastTrades <exchange-name> <apikey> <apisecret> <currency_pair> [<date_from>]";
     private final String HEADER = "id,order_id,pair,type,price,amount,date";
     private String output;
@@ -62,7 +63,7 @@ public class NuLastTrades {
             try {
                 NuLogger.setup(false, logsFolder);
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
 
             LOG.info("Launching NuLastTrades on " + app.exchangename);
@@ -106,7 +107,7 @@ public class NuLastTrades {
         } else if (exchangename.equals(Constant.EXCOIN)) {
             Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
         } else {
-            LOG.severe("Exchange " + exchangename + " not supported");
+            LOG.error("Exchange " + exchangename + " not supported");
             System.exit(0);
         }
 
@@ -119,11 +120,11 @@ public class NuLastTrades {
         Global.taskManager.getCheckConnectionTask().start();
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.fine("Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
     }
@@ -132,7 +133,7 @@ public class NuLastTrades {
         boolean ok = false;
 
         if (args.length != 4 && args.length != 5) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+            LOG.error("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
 
@@ -213,7 +214,7 @@ public class NuLastTrades {
             }
             FileSystem.writeToFile("}", output, true);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
 
         //Report :

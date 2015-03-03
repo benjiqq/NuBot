@@ -30,7 +30,7 @@ import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  *
@@ -38,7 +38,7 @@ import java.util.logging.Logger;
  */
 public class NuCancelOrders {
 
-    private static final Logger LOG = Logger.getLogger(NuCancelOrders.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuCancelOrders.class.getName());
     private String api;
     private String secret;
     private String exchangename;
@@ -59,13 +59,13 @@ public class NuCancelOrders {
             try {
                 NuLogger.setup(false, logsFolder);
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
 
-            LOG.fine("Launching CancellAllOrders ");
+            LOG.info("Launching CancellAllOrders ");
             app.prepareForExecution();
             app.cancelAllOrders(app.pair);
-            LOG.fine("Done");
+            LOG.info("Done");
             System.exit(0);
 
         } else {
@@ -80,13 +80,13 @@ public class NuCancelOrders {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                LOG.fine("Clear request succesfully");
+                LOG.info("Clear request succesfully");
             } else {
-                LOG.fine("Could not submit request to clear orders");
+                LOG.info("Could not submit request to clear orders");
             }
 
         } else {
-            LOG.severe(deleteOrdersResponse.getError().toString());
+            LOG.error(deleteOrdersResponse.getError().toString());
         }
 
         System.exit(0);
@@ -105,7 +105,7 @@ public class NuCancelOrders {
         if (exchangename.equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             apibase = Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE;
         } else {
-            LOG.severe("Exchange name not accepted : " + exchangename);
+            LOG.error("Exchange name not accepted : " + exchangename);
             System.exit(0);
         }
 
@@ -126,11 +126,11 @@ public class NuCancelOrders {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.fine("Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
     }
@@ -139,7 +139,7 @@ public class NuCancelOrders {
         boolean ok = false;
 
         if (args.length != 4) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+            LOG.error("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
 

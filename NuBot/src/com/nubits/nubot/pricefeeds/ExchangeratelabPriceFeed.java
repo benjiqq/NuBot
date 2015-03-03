@@ -27,14 +27,15 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(ExchangeratelabPriceFeed.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ExchangeratelabPriceFeed.class.getName());
 
     public ExchangeratelabPriceFeed() {
         name = "exchangeratelab";
@@ -51,7 +52,7 @@ public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
             try {
                 htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
@@ -80,17 +81,17 @@ public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
                     lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(rate, pair.getPaymentCurrency()));
                     return lastPrice;
                 } else {
-                    LOG.warning("Cannot find currency " + lookingfor + " on feed " + name);
+                    LOG.warn("Cannot find currency " + lookingfor + " on feed " + name);
                     return new LastPrice(true, name, pair.getOrderCurrency(), null);
                 }
 
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
         } else {
-            LOG.fine("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
+            LOG.info("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }

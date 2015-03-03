@@ -25,14 +25,15 @@ import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * @author desrever <desrever at nubits.com>
  */
 public class NuBotOptions {
 
-    private static final Logger LOG = Logger.getLogger(NuBotOptions.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuBotOptions.class.getName());
 
     //Compulsory settings ----------------------------
 

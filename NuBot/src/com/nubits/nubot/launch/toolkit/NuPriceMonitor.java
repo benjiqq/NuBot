@@ -32,13 +32,14 @@ import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
 
 public class NuPriceMonitor {
 
-    private static final Logger LOG = Logger.getLogger(NuPriceMonitor.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitor.class.getName());
     private static final String USAGE_STRING = "java  -jar NuPriceMonitor <path/to/options.json>";
     public static final String HEADER = "timestamp,source,crypto,price,currency,sellprice,sellpricedoubleside,buyprice,otherfeeds\n";
     private static Thread mainThread;
@@ -64,14 +65,14 @@ public class NuPriceMonitor {
         try {
             NuLogger.setup(false, logsFolder);
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         NuPriceMonitor app = new NuPriceMonitor();
         if (app.readParams(args)) {
             createShutDownHook();
             app.init();
-            LOG.fine("Launching NuCheckPrice ");
+            LOG.info("Launching NuCheckPrice ");
             app.exec();
         } else {
             System.exit(0);
@@ -110,8 +111,8 @@ public class NuPriceMonitor {
             sellPriceUSDsellside = sellPriceUSDsellside + ((sellPriceUSDsellside / 100) * priceOffset);
             buyPriceUSD = buyPriceUSD - ((buyPriceUSD / 100) * priceOffset);
 
-            LOG.fine("Computing USD pegs with offset " + priceOffset + "% (sell-side custodian) : sell @ " + sellPriceUSDsellside);
-            LOG.fine("Computing USD pegs with offset " + priceOffset + "% (dual-side custodian) : sell @ " + sellPriceUSDdoubleside + " buy @ " + buyPriceUSD);
+            LOG.info("Computing USD pegs with offset " + priceOffset + "% (sell-side custodian) : sell @ " + sellPriceUSDsellside);
+            LOG.info("Computing USD pegs with offset " + priceOffset + "% (dual-side custodian) : sell @ " + sellPriceUSDdoubleside + " buy @ " + buyPriceUSD);
 
 
             //Set the prices in USD
@@ -134,7 +135,7 @@ public class NuPriceMonitor {
             Global.taskManager.getPriceMonitorTask().start(2);
 
         } else {
-            LOG.severe("Problem while reading options from " + optionsPath);
+            LOG.error("Problem while reading options from " + optionsPath);
             System.exit(0);
         }
 
@@ -165,7 +166,7 @@ public class NuPriceMonitor {
 
             String names[] = org.json.JSONObject.getNames(dataJson);
             if (names.length < 2) {
-                LOG.severe("The bot requires at least two backup data feeds to run");
+                LOG.error("The bot requires at least two backup data feeds to run");
                 System.exit(0);
             }
             for (int i = 0; i < names.length; i++) {
@@ -173,7 +174,7 @@ public class NuPriceMonitor {
                     org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                     backupFeedNames.add((String) tempJson.get("name"));
                 } catch (JSONException ex) {
-                    LOG.severe(ex.toString());
+                    LOG.error(ex.toString());
                     System.exit(0);
                 }
             }
@@ -193,7 +194,7 @@ public class NuPriceMonitor {
 
             ok = true;
         } catch (JSONException | NumberFormatException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         return ok;
     }
@@ -202,7 +203,7 @@ public class NuPriceMonitor {
         boolean ok = false;
 
         if (args.length != 1) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+            LOG.error("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
 
@@ -218,7 +219,7 @@ public class NuPriceMonitor {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                LOG.fine("Exiting...");
+                LOG.info("Exiting...");
                 mainThread.interrupt();
                 Global.taskManager.stopAll();
 

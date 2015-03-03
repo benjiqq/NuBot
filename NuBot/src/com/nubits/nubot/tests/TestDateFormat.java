@@ -23,14 +23,15 @@ package com.nubits.nubot.tests;
  */
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import junit.framework.TestCase;
 import org.junit.Test;
 
 public class TestDateFormat  extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(TestDateFormat.class
+    private static final Logger LOG = LoggerFactory.getLogger(TestDateFormat.class
             .getName());
 
     @Test
@@ -44,7 +45,7 @@ public class TestDateFormat  extends TestCase {
             Date d = sdf.parse(date);
             //assert(d.equals("Mon Dec 22 17:55:25 CET 2014"));
         } catch (java.text.ParseException pe1) {
-            LOG.severe(pe1.toString());
+            LOG.error(pe1.toString());
         }
 
 

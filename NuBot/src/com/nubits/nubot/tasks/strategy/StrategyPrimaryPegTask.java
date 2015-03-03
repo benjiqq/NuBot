@@ -32,7 +32,8 @@ import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.util.ArrayList;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -40,7 +41,7 @@ import java.util.logging.Logger;
  */
 public class StrategyPrimaryPegTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(StrategyPrimaryPegTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(StrategyPrimaryPegTask.class.getName());
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
@@ -54,7 +55,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.fine("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
+        LOG.info("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
 
         cycles++;
         if (cycles != RESET_AFTER_CYCLES) {
@@ -73,7 +74,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             if (deleteOrdersResponse.isPositive()) {
                                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                                 if (deleted) {
-                                    LOG.warning("Clear all orders request succesfully");
+                                    LOG.warn("Clear all orders request succesfully");
                                     //Wait until there are no active orders
                                     boolean timedOut = false;
                                     long timeout = Global.options.getEmergencyTimeout() * 1000;
@@ -86,13 +87,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
                                             timedOut = count > timeout;
 
                                         } catch (InterruptedException ex) {
-                                            LOG.severe(ex.toString());
+                                            LOG.error(ex.toString());
                                         }
                                     } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
 
                                     if (timedOut) {
                                         String message = "There was a problem cancelling all existing orders";
-                                        LOG.severe(message);
+                                        LOG.error(message);
                                         HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
                                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
                                         //Continue anyway, maybe there is some balance to put up on order.
@@ -101,21 +102,21 @@ public class StrategyPrimaryPegTask extends TimerTask {
                                     placeInitialWalls();
                                 } else {
                                     String message = "Could not submit request to clear orders";
-                                    LOG.severe(message);
+                                    LOG.error(message);
                                     System.exit(0);
                                 }
 
                             } else {
-                                LOG.severe(deleteOrdersResponse.getError().toString());
+                                LOG.error(deleteOrdersResponse.getError().toString());
                                 String message = "Could not submit request to clear orders";
-                                LOG.severe(message);
+                                LOG.error(message);
                                 System.exit(0);
                             }
                         } else {
                             placeInitialWalls();
                         }
                     } else {
-                        LOG.warning("No need to init new orders since current orders seems correct");
+                        LOG.warn("No need to init new orders since current orders seems correct");
                     }
                     mightNeedInit = false;
                     recount();
@@ -123,7 +124,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                 //Make sure there are 2 orders per side
                 if (!ordersAndBalancesOk) {
-                    LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+                    LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
                     mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
                 } else {
                     ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
@@ -132,7 +133,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         Amount balanceNBT = balance.getNBTAvailable();
 
                         Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                        LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
+                        LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                                 + balanceFIAT.getQuantity() + " USD");
 
                         //Execute sellSide strategy
@@ -145,7 +146,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                     } else {
                         //Cannot get balance
-                        LOG.severe(balancesResponse.getError().toString());
+                        LOG.error(balancesResponse.getError().toString());
                     }
                 }
             } else {
@@ -155,7 +156,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                 boolean reinitiateSuccess = reInitiateOrders(true);
                 if (!reinitiateSuccess) {
-                    LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
+                    LOG.error("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
                     isFirstTime = true;
                 } else {
                     LOG.info("Initial walls placed");
@@ -182,7 +183,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     Amount balanceNBT = balance.getNBTAvailable();
 
                     Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                    LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
+                    LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                             + balanceFIAT.getQuantity() + " USD");
 
                     //Execute sellSide strategy
@@ -191,14 +192,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     try {
                         Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
                     } catch (InterruptedException ex) {
-                        LOG.severe(ex.toString());
+                        LOG.error(ex.toString());
                     }
 
                     sellSide(balanceNBT);
                 }
                 {
                     //Cannot get balance
-                    LOG.severe(balancesResponse.getError().toString());
+                    LOG.error(balancesResponse.getError().toString());
                 }
             }
 
@@ -209,7 +210,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 try {
                     Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
+                    LOG.error(ex.toString());
                 }
 
                 buySide();
@@ -237,7 +238,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 mightNeedInit = true;
             }
         } else {
-            LOG.severe("An error occurred while attempting to update tx fee.");
+            LOG.error("An error occurred while attempting to update tx fee.");
             mightNeedInit = true;
         }
 
@@ -245,7 +246,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     }
 
     private void orderLog(String orderString){
-        LOG.warning("Strategy : Submit order : " + orderString);
+        LOG.warn("Strategy : Submit order : " + orderString);
     }
 
     private void sellSide(Amount balanceNBT) {
@@ -254,7 +255,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         if (balanceNBT.getQuantity() > 1) {
             String idToDelete = getSmallerWallID(Constant.SELL);
             if (!idToDelete.equals("-1")) {
-                LOG.warning("Sellside : Taking down smaller order to aggregate it with new balance");
+                LOG.warn("Sellside : Taking down smaller order to aggregate it with new balance");
 
                 if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair())) {
 
@@ -266,7 +267,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                         Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
-                        LOG.fine("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
+                        LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                                 + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
 
                         //Update TX fee :
@@ -274,7 +275,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                         if (txFeeNTBUSDResponse.isPositive()) {
                             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
-                            LOG.fine("Updated Trasaction fee = " + txFeeUSDNTB + "%");
+                            LOG.info("Updated Trasaction fee = " + txFeeUSDNTB + "%");
 
                             //Prepare the sell order
                             double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
@@ -298,39 +299,39 @@ public class StrategyPrimaryPegTask extends TimerTask {
                                 if (sellResponse.isPositive()) {
                                     HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, MessageColor.YELLOW);
                                     String sellResponseString = (String) sellResponse.getResponseObject();
-                                    LOG.warning("Strategy : Sell Response = " + sellResponseString);
+                                    LOG.warn("Strategy : Sell Response = " + sellResponseString);
                                 } else {
-                                    LOG.severe(sellResponse.getError().toString());
+                                    LOG.error(sellResponse.getError().toString());
                                 }
                             } else {
                                 //Testing only : print the order without executing it
-                                LOG.warning("Strategy : (Should) Submit order : "
+                                LOG.warn("Strategy : (Should) Submit order : "
                                         + "sell" + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
                                         + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
                             }
                         } else {
                             //Cannot update txfee
-                            LOG.severe(txFeeNTBUSDResponse.getError().toString());
+                            LOG.error(txFeeNTBUSDResponse.getError().toString());
                         }
 
 
                     } else {
                         //Cannot get balance
-                        LOG.severe(balancesResponse.getError().toString());
+                        LOG.error(balancesResponse.getError().toString());
                     }
                 } else {
                     String errMessagedeletingOrder = "could not delete order " + idToDelete;
-                    LOG.severe(errMessagedeletingOrder);
+                    LOG.error(errMessagedeletingOrder);
                     HipChatNotifications.sendMessage(errMessagedeletingOrder, MessageColor.YELLOW);
                     MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
                 }
             } else {
-                LOG.severe("Can't get smaller wall id.");
+                LOG.error("Can't get smaller wall id.");
             }
 
         } else {
             //NBT balance = 0
-            LOG.fine("NBT balance < 1, no orders to execute");
+            LOG.info("NBT balance < 1, no orders to execute");
         }
     }
 
@@ -346,11 +347,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     initOrders(Constant.BUY, TradeUtils.getBuyPrice(txFeeFIATNTB));
                 }
             } else {
-                LOG.severe("An error occurred while attempting to update tx fee.");
+                LOG.error("An error occurred while attempting to update tx fee.");
             }
 
         } else {
-            LOG.severe("An error occurred while attempting to cancel buy orders.");
+            LOG.error("An error occurred while attempting to cancel buy orders.");
         }
 
     }
@@ -376,7 +377,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 }
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             return "-1";
         }
 
@@ -398,7 +399,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
 
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             return -1;
         }
         return toRet;
@@ -423,7 +424,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1);
 
                 if (balanceFIAT > 1 && !isFirstTime) {
-                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
+                    LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
                             + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                     proceedsInBalance = true;
                 } else {
@@ -433,7 +434,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 ordersAndBalancesOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
             }
         } else {
-            LOG.severe(balancesResponse.getError().toString());
+            LOG.error(balancesResponse.getError().toString());
         }
     }
 
@@ -443,7 +444,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
-                    LOG.warning("Clear all orders request succesfully");
+                    LOG.warn("Clear all orders request succesfully");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
                         Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
@@ -465,13 +466,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             timedOut = count > timeout;
 
                         } catch (InterruptedException ex) {
-                            LOG.severe(ex.toString());
+                            LOG.error(ex.toString());
                         }
                     } while (!areAllOrdersCanceled && !timedOut);
 
                     if (timedOut) {
                         String message = "There was a problem cancelling all existing orders";
-                        LOG.severe(message);
+                        LOG.error(message);
                         HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
                         //Continue anyway, maybe there is some balance to put up on order.
@@ -480,14 +481,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     placeInitialWalls();
                 } else {
                     String message = "Could not submit request to clear orders";
-                    LOG.severe(message);
+                    LOG.error(message);
                     return false;
                 }
 
             } else {
-                LOG.severe(deleteOrdersResponse.getError().toString());
+                LOG.error(deleteOrdersResponse.getError().toString());
                 String message = "Could not submit request to clear orders";
-                LOG.severe(message);
+                LOG.error(message);
                 return false;
             }
         } else {
@@ -500,7 +501,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         try {
             Thread.sleep(SHORT_WAIT_SECONDS); //Give the time to new orders to be placed before counting again
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         return true;
     }
@@ -539,7 +540,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                 if (txFeeNTBPEGResponse.isPositive()) {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                    LOG.fine("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                    LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
 
@@ -592,7 +593,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                             + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
 
                     if (Global.options.isExecuteOrders()) {
-                        LOG.warning("Strategy - Submit order : " + orderString1);
+                        LOG.warn("Strategy - Submit order : " + orderString1);
 
                         ApiResponse order1Response;
                         if (type.equals(Constant.SELL)) {
@@ -604,13 +605,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         if (order1Response.isPositive()) {
                             HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, MessageColor.YELLOW);
                             String response1String = (String) order1Response.getResponseObject();
-                            LOG.warning("Strategy - " + type + " Response1 = " + response1String);
+                            LOG.warn("Strategy - " + type + " Response1 = " + response1String);
                         } else {
-                            LOG.severe(order1Response.getError().toString());
+                            LOG.error(order1Response.getError().toString());
                             success = false;
                         }
 
-                        LOG.warning("Strategy - Submit order : " + orderString2);
+                        LOG.warn("Strategy - Submit order : " + orderString2);
 
                         ApiResponse order2Response;
                         if (type.equals(Constant.SELL)) {
@@ -623,22 +624,22 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         if (order2Response.isPositive()) {
                             HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
                             String response2String = (String) order2Response.getResponseObject();
-                            LOG.warning("Strategy : " + type + " Response2 = " + response2String);
+                            LOG.warn("Strategy : " + type + " Response2 = " + response2String);
                         } else {
-                            LOG.severe(order2Response.getError().toString());
+                            LOG.error(order2Response.getError().toString());
                             success = false;
                         }
 
                     } else {
                         //Just print the order without executing it
-                        LOG.warning("Should execute : " + orderString1 + "\n and " + orderString2);
+                        LOG.warn("Should execute : " + orderString1 + "\n and " + orderString2);
                     }
                 }
             } else {
-                LOG.fine(type + " available balance < 1 NBT, no need to execute orders");
+                LOG.info(type + " available balance < 1 NBT, no need to execute orders");
             }
         } else {
-            LOG.severe(balancesResponse.getError().toString());
+            LOG.error(balancesResponse.getError().toString());
             success = false;
         }
 

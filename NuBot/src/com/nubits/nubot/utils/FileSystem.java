@@ -20,7 +20,8 @@ package com.nubits.nubot.utils;
 import com.nubits.nubot.utils.FileSystem;
 import java.io.*;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -28,18 +29,18 @@ import java.util.logging.Logger;
  */
 public class FileSystem {
 
-    private static final Logger LOG = Logger.getLogger(FileSystem.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FileSystem.class.getName());
 
     public static void deleteFile(String path) {
         try {
             File file = new File(path);
             if (file.delete()) {
-                LOG.fine("file " + file.getName() + " deleted!");
+                LOG.info("file " + file.getName() + " deleted!");
             } else {
-                LOG.severe("Delete operation is failed for : " + path);
+                LOG.error("Delete operation is failed for : " + path);
             }
         } catch (Exception e) {
-            LOG.severe(e.toString());
+            LOG.error(e.toString());
         }
     }
 
@@ -74,15 +75,15 @@ public class FileSystem {
                 writer.println(what);
                 writer.close();
             } catch (FileNotFoundException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         } else {
             try (PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(where, true)))) {
                 out.println(what);
             } catch (IOException e) {
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
             }
         }
     }
@@ -104,14 +105,14 @@ public class FileSystem {
             }
 
         } catch (FileNotFoundException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         } catch (IOException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         } finally {
             try {
                 bufferedReader.close();
             } catch (IOException ex) {
-                LOG.severe("File not found " + path + "\n "
+                LOG.error("File not found " + path + "\n "
                         + ex.toString());
             }
         }
@@ -136,15 +137,15 @@ public class FileSystem {
             }
 
         } catch (FileNotFoundException e) {
-            LOG.severe(e.toString());
+            LOG.error(e.toString());
         } catch (IOException e) {
-            LOG.severe(e.toString());
+            LOG.error(e.toString());
         } finally {
             if (br != null) {
                 try {
                     br.close();
                 } catch (IOException e) {
-                    LOG.severe(e.toString());
+                    LOG.error(e.toString());
                 }
             }
         }

@@ -33,7 +33,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -45,7 +46,7 @@ import org.json.simple.parser.ParseException;
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(SubmitLiquidityinfoTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(SubmitLiquidityinfoTask.class.getName());
     private boolean verbose;
     private String outputFile_orders;
     private String jsonFile_orders;
@@ -59,7 +60,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.fine("Executing task : CheckOrdersTask ");
+        LOG.info("Executing task : CheckOrdersTask ");
         checkOrders();
     }
     //Taken the input exchange, updates it and returns it.
@@ -71,11 +72,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 String response2 = reportTier2(); //balance
                 LOG.info(response1 + "\n" + response2);
             } else {
-                LOG.warning("Liquidity is not being sent : orders are not yet initialized");
+                LOG.warn("Liquidity is not being sent : orders are not yet initialized");
 
             }
         } else {
-            LOG.warning("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
         }
     }
 
@@ -86,7 +87,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.fine("Active orders : " + orderList.size());
+            LOG.info("Active orders : " + orderList.size());
 
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
@@ -103,7 +104,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 digest = digest + tempOrder.getDigest();
                 double toAdd = tempOrder.getAmount().getQuantity();
                 if (verbose) {
-                    LOG.fine(tempOrder.toString());
+                    LOG.info(tempOrder.toString());
                 }
 
                 if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
@@ -178,7 +179,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_orders));
                 orders = (JSONArray) orderHistory.get("orders");
             } catch (ParseException pe) {
-                LOG.severe("Unable to parse " + this.jsonFile_orders);
+                LOG.error("Unable to parse " + this.jsonFile_orders);
             }
             //add the latest orders to the orders array
             orders.add(latestOrders);
@@ -208,7 +209,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             }
 
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
         return toReturn;
 
@@ -252,7 +253,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
                 balances = (JSONArray) balanceHistory.get("balances");
             } catch (ParseException pe) {
-                LOG.severe("Unable to parse " + this.jsonFile_balances);
+                LOG.error("Unable to parse " + this.jsonFile_balances);
             }
             //add the latest orders to the orders array
             balances.add(latestBalances);
@@ -268,7 +269,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
 
         } else {
-            LOG.severe(balancesResponse.getError().toString());
+            LOG.error(balancesResponse.getError().toString());
         }
         return toReturn;
     }
@@ -284,11 +285,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             toReturn = "buy : " + buySide + " sell : " + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString();
             if (null == responseObject) {
-                LOG.severe("Something went wrong while sending liquidityinfo");
+                LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.fine(responseObject.toJSONString());
+                LOG.info(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
-                    LOG.fine("RPC Liquidityinfo sent : "
+                    LOG.info("RPC Liquidityinfo sent : "
                             + "\nbuyside : " + buySide
                             + "\nsellside : " + sellSide);
                     if (verbose) {
@@ -299,7 +300,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 }
             }
         } else {
-            LOG.severe("Client offline. ");
+            LOG.error("Client offline. ");
         }
         return toReturn;
     }
