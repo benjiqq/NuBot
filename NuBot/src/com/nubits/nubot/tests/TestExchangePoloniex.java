@@ -49,15 +49,6 @@ public class TestExchangePoloniex extends TestCase {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
 
-            assertTrue(opt != null);
-
-            assertTrue(opt.getExchangeName().equals("peatio"));
-
-            //assertTrue(nuo.getPair() != null);
-
-            //assertTrue(nuo.getSecondaryPegOptions() != null);
-            //.getSpread())
-
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }

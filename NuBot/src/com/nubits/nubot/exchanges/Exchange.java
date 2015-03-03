@@ -17,18 +17,12 @@
  */
 package com.nubits.nubot.exchanges;
 
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * @author desrever < desrever@nubits.com >
@@ -45,7 +39,6 @@ public class Exchange {
     private TradeInterface trade;
     //Constructor
     private static HashMap<String, TradeInterface> supportedExchanges = new HashMap<>();
-
 
     public Exchange(String name) {
         this.name = name;
@@ -84,35 +77,8 @@ public class Exchange {
         this.trade = trade;
     }
 
-    public ExchangeLiveData getExchangeLiveData() {
-        return exchangeLiveData;
-    }
-
-    public void setExchangeLiveData(ExchangeLiveData exchangeLiveData) {
-        this.exchangeLiveData = exchangeLiveData;
-    }
-
-    private static void listSupportedExchanges() {
-        String infoString = "Accepted values for exchange name :";
-
-
-        Iterator it = supportedExchanges.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry pairs = (Map.Entry) it.next();
-            infoString += pairs.getKey() + " ; ";
-        }
-        LOG.info(infoString);
-    }
-
     public TradeInterface getTradeInterface() {
         return supportedExchanges.get(this.name);
     }
 
-    /*public static TradeInterface getTradeInterface(String name) throws NuBotConfigException {
-        if (supportedExchanges.containsKey(name)) {
-            return supportedExchanges.get(name);
-        } else {
-            throw new NuBotConfigException("Cannot find the trading interface for " + name);
-        }
-    }*/
 }

@@ -102,6 +102,7 @@ public abstract class NuBotBase {
         TradeInterface ti = Global.exchange.getTradeInterface();
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
+
         //TODO! handle on exchange level, not bot level
         if (Global.options.getExchangeName().equals(Constant.CCEX)) {
             ((CcexWrapper) (ti)).initBaseUrl();
