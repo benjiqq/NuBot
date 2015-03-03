@@ -1,20 +1,3 @@
-/*
- * Copyright (C) 2014-2015 Nu Development Team
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
 package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
@@ -22,16 +5,10 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.options.*;
-import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
-import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.CcexWrapper;
@@ -39,59 +16,42 @@ import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * NuBot. launched from command line or UI
- *
- * @author desrever <desrever at nubits.com>
+ * Abstract NuBot. implements all primitives without the strategy itself
  */
-public class NuBot {
+public abstract class NuBotBase {
+
+    final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
 
     /**
      * configuration options tied to one instance of NuBot
      */
-    private NuBotOptions opt;
+    protected NuBotOptions opt;
 
-    private boolean liveTrading;
+    protected String mode;
 
-    private String logsFolder = "logs";
+    protected String logsFolder = "logs";
 
-    final static Logger LOG = LoggerFactory.getLogger(NuBot.class);
+    protected boolean liveTrading;
 
-    public NuBot() {
-
-    }
-
-    /**
-     * setup logging
-     */
-    private void setupLog() {
-        //Setting up log folder for this session
-        //done over logback.xml
-
-        //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
-    }
-
-    private void setupSSL() {
-        LOG.info("Set up SSL certificates");
-        boolean trustAllCertificates = false;
-        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
-            trustAllCertificates = true;
-        }
-        Utils.installKeystore(trustAllCertificates);
-    }
+    abstract public void configureStrategy();
 
     /**
      * all setups
      */
-    private void setupAllConfig() {
+    protected void setupAllConfig() {
 
         //Generate Bot Session unique id
         Global.sessionId = Utils.generateSessionID();
         LOG.info("Session ID = " + Global.sessionId);
+
+        mode = "sell-side";
+        if (Global.options.isDualSide()) {
+            mode = "dual-side";
+        }
 
         setupLog();
 
@@ -100,11 +60,32 @@ public class NuBot {
         setupExchange();
     }
 
-    private void setupExchange() {
+    /**
+     * setup logging
+     */
+    protected void setupLog() {
+        //Setting up log folder for this session
+        //done over logback.xml
+
+        //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+    }
+
+    protected void setupSSL() {
+        LOG.info("Set up SSL certificates");
+        boolean trustAllCertificates = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+            trustAllCertificates = true;
+        }
+        Utils.installKeystore(trustAllCertificates);
+    }
+
+
+    protected void setupExchange() {
+        LOG.info("setup Exchange object");
+
         LOG.info("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-
-        LOG.info("Creating an Exchange object");
 
         Global.exchange = new Exchange(Global.options.getExchangeName());
 
@@ -116,10 +97,10 @@ public class NuBot {
         TradeInterface ti = Global.exchange.getTradeInterface();
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
+        //TODO! handle on exchange level, not bot level
         if (Global.options.getExchangeName().equals(Constant.CCEX)) {
             ((CcexWrapper) (ti)).initBaseUrl();
         }
-
 
         if (Global.options.getPair().getPaymentCurrency().equals(Constant.NBT)) {
             Global.swappedPair = true;
@@ -129,13 +110,13 @@ public class NuBot {
 
         LOG.info("Swapped pair mode : " + Global.swappedPair);
 
-
         String apibase = "";
+        //TODO! handle on exchange level, not bot level
         if (Global.options.getExchangeName().equalsIgnoreCase(Constant.INTERNAL_EXCHANGE_PEATIO)) {
             ti.setApiBaseUrl(Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE);
         }
 
-
+        //TODO exchange and tradeinterface are circular referenced
         Global.exchange.setTrade(ti);
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
@@ -156,19 +137,19 @@ public class NuBot {
     /**
      * setup the task for checking Nu RPC
      */
-    private void setupNuRPCTask() {
+    protected void setupNuRPCTask() {
         LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
         Global.publicAddress = Global.options.getNubitsAddress();
         Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
                 Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
                 Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
-        
+
         LOG.info("Starting task : Check connection with Nud");
         Global.taskManager.getCheckNudTask().start();
     }
 
-    private void checkNuConn() throws NuBotConnectionException {
-        
+    protected void checkNuConn() throws NuBotConnectionException {
+
         LOG.info("Check connection with nud");
         if (Global.rpcClient.isConnected()) {
             LOG.info("RPC connection OK!");
@@ -178,114 +159,36 @@ public class NuBot {
         }
     }
 
-    private void configureStrategyPeg(){
-        //Peg to a USD price via crypto pair
-        Currency toTrackCurrency;
-
-        if (Global.swappedPair) { //NBT as paymentCurrency
-            toTrackCurrency = Global.options.getPair().getOrderCurrency();
-        } else {
-            toTrackCurrency = Global.options.getPair().getPaymentCurrency();
-        }
-
-        CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
-
-        //TODO! this needs refactoring
-
-        // set trading strategy to the price monitor task
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
-                .setStrategy(((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())));
-
-        // set price monitor task to the strategy
-        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                .setPriceMonitorTask(((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())));
-
-        // set liquidityinfo task to the strategy
-
-        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
-
-        PriceFeedManager pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
-        //Then set the pfm
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
-
-        //Set the priceDistance threshold
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(opt.getDistanceThreshold());
-
-        //Set the wallet shift threshold
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(opt.getWallchangeThreshold());
-
-        //Set the outputpath for wallshifts
-
-        String outputPath = logsFolder + "wall_shifts.csv";
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
-        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
-
-        //read the delay to sync with remote clock
-        //issue 136 - multi custodians on a pair.
-        //walls are removed and re-added every three minutes.
-        //Bot needs to wait for next 3 min window before placing walls
-        //set the interval from settings
-
-        int reset_every = NuBotAdminSettings.reset_every_minutes;
-
-        int interval = 1;
-        if (Global.options.isMultipleCustodians()) {
-            interval = 60 * reset_every;
-        } else {
-            interval = NuBotAdminSettings.refresh_time_seconds;
-        }
-        Global.taskManager.getPriceTriggerTask().setInterval(interval);
-
-        if (Global.options.isMultipleCustodians()) {
-            //Force the a spread to avoid collisions
-            double forcedSpread = 0.9;
-            LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
-            if (Global.options.getSpread() < forcedSpread) {
-                Global.options.setSpread(forcedSpread);
-            }
-        }
-
-        int delaySeconds = 0;
-
-        if (Global.options.isMultipleCustodians()) {
-            delaySeconds = Utils.getSecondsToNextwindow(reset_every);
-            LOG.info("NuBot will be start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
-        } else {
-            LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
-        }
-        //then start the thread
-        Global.taskManager.getPriceTriggerTask().start(delaySeconds);
-    }
-
     /**
      * execute the NuBot based on a configuration
      */
     public void execute(NuBotOptions opt) {
 
-        //TODO refactor so we can test validity here again
-
         //Load settings
         Utils.loadProperties("settings.properties");
+
+        setupAllConfig();
+
+        //TODO: opt should be passed in constructor, not set in global
+
+        //TODO refactor so we can test validity here again
 
         LOG.info("NuBot logging");
         LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
-
         //DANGER ZONE : This variable set to true will cause orders to execute
-        if (opt.isExecuteOrders()){
+        if (opt.isExecuteOrders()) {
             liveTrading = true;
             //inform user about real trading (he should be informed by now)
-        } else{
+        } else {
             liveTrading = false;
             //inform user we're in demo mode
         }
 
+        //TODO set to this class
         Global.options = opt;
 
         Global.running = true;
-
-        setupAllConfig();
 
         LOG.info("Create a TaskManager ");
         Global.taskManager = new TaskManager();
@@ -294,13 +197,12 @@ public class NuBot {
             setupNuRPCTask();
         }
 
-        
+
         LOG.info("Starting task : Check connection with exchange");
         int conn_delay = 1;
         Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
 
-        
         LOG.info("Waiting  a for the connectionThreads to detect connection");
         try {
             Thread.sleep(3000);
@@ -316,7 +218,6 @@ public class NuBot {
         ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFiles(orders_outputPath, balances_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
 
-
         //Start task to check orders
         int start_delay = 40;
         Global.taskManager.getSendLiquidityTask().start(start_delay);
@@ -329,46 +230,21 @@ public class NuBot {
             }
         }
 
-        
         LOG.info("Checking bot working mode");
-
-        if (Global.options.isDualSide()) {
-            LOG.info("Configuring NuBot for Dual-Side strategy");
-        } else {
-            LOG.info("Configuring NuBot for Sell-Side strategy");
-        }
-
 
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
         LOG.info(Global.options.toStringNoKeys());
 
-
         // Set the frozen balance manager in the global variable
         Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.settings.getProperty("frozen_folder"));
 
-        //Switch strategy for different trading pair
-
-        if (!PegOptions.requiresSecondaryPegStrategy(Global.options.getPair())) {
-            // set liquidityinfo task to the strategy
-            ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
-                    .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
-
-            int delay = 7;
-            Global.taskManager.getStrategyFiatTask().start(delay);
-
-        } else {
-            configureStrategyPeg();
-        }
+        configureStrategy();
 
         notifyOnline();
     }
 
-    private static void notifyOnline() {
-        String mode = "sell-side";
-        if (Global.options.isDualSide()) {
-            mode = "dual-side";
-        }
+    protected void notifyOnline() {
         String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")";
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
@@ -379,8 +255,9 @@ public class NuBot {
      *
      * @param msg
      */
-    private static void exitWithNotice(String msg) {
+    protected static void exitWithNotice(String msg) {
         LOG.error(msg);
         System.exit(0);
     }
+
 }

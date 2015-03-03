@@ -19,7 +19,7 @@ package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBot;
+import com.nubits.nubot.bot.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
 import static com.nubits.nubot.utils.LiquidityPlot.plot;
@@ -259,7 +259,7 @@ public class Utils {
 
         try {
 
-            input = NuBot.class.getClassLoader().getResourceAsStream(filename);
+            input = NuBotSecondary.class.getClassLoader().getResourceAsStream(filename);
 
             if (input == null) {
                 LOG.error("Sorry, unable to find " + filename);

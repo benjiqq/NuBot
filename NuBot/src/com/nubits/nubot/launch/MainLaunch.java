@@ -1,7 +1,7 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBot;
+import com.nubits.nubot.bot.NuBotSecondary;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -65,7 +65,7 @@ public class MainLaunch {
         if (Global.running) {
             exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
         } else {
-            NuBot bot = new NuBot();
+            NuBotSecondary bot = new NuBotSecondary();
             bot.execute(opt);
         }
 
