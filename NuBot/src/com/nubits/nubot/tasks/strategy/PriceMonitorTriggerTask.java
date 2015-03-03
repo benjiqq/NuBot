@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.tasks.strategy;
 
+import com.nubits.nubot.bot.NuBotConnectionException;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
@@ -384,7 +385,11 @@ public class PriceMonitorTriggerTask extends TimerTask {
         LOG.info("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
-            initStrategy(lp.getPrice().getQuantity());
+            try{
+                initStrategy(lp.getPrice().getQuantity());
+            }catch(NuBotConnectionException e){
+
+            }
             currentWallPEGPrice = lp;
             isFirstTimeExecution = false;
         } else {
@@ -547,7 +552,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    private void initStrategy(double peg_price) {
+    private void initStrategy(double peg_price) throws NuBotConnectionException {
         //TODO: should be in bot package
 
         Global.conversion = peg_price; //used then for liquidity info
@@ -620,8 +625,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
             MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
         } else {
-            LOG.error("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
-            System.exit(0);
+            throw new NuBotConnectionException("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
         }
     }
 

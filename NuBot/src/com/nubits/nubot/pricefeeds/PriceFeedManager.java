@@ -22,6 +22,8 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import java.util.ArrayList;
 import java.util.HashMap;
+
+import com.nubits.nubot.options.NuBotConfigException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -52,7 +54,7 @@ public class PriceFeedManager {
     public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY
     //When adding new feed here remember to also add to the hasmap below
 
-    public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
+    public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException{
         initValidFeeds();
         this.pair = pair;
 
@@ -133,14 +135,12 @@ public class PriceFeedManager {
 
     }
 
-    private AbstractPriceFeed createFeed(String feedname) {
+    private AbstractPriceFeed createFeed(String feedname) throws NuBotConfigException {
         if (FEED_NAMES_MAP.containsKey(feedname)) {
             return FEED_NAMES_MAP.get(feedname);
         } else {
-            LOG.error("Error wile adding price seed with name unrecognized : " + feedname);
-            System.exit(0);
+            throw new NuBotConfigException("Error wile adding price seed with name unrecognized : " + feedname);
         }
-        return null;//never reached
 
     }
 

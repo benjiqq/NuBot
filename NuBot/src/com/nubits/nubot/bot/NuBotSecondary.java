@@ -42,7 +42,7 @@ public class NuBotSecondary extends NuBotBase {
     }
 
     @Override
-    public void configureStrategy() {
+    public void configureStrategy() throws NuBotConfigException {
         if (Global.options.isDualSide()) {
             LOG.info("Configuring NuBot for Dual-Side strategy");
         } else {
@@ -76,7 +76,13 @@ public class NuBotSecondary extends NuBotBase {
         ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
                 .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
 
-        PriceFeedManager pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
+        PriceFeedManager pfm = null;
+        try{
+            pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
+        }catch(NuBotConfigException e){
+            exitWithNotice("can't configure price feeds");
+        }
+
         //Then set the pfm
         ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
 

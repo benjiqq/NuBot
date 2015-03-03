@@ -28,6 +28,7 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.Utils;
@@ -137,7 +138,12 @@ public class TestSync extends TimerTask {
         backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
         backupFeedList.add(PriceFeedManager.COINBASE);
 
-        PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        PriceFeedManager pfm = null;
+        try{
+            pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        }catch(NuBotConfigException e){
+
+        }
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 

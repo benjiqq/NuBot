@@ -6,6 +6,7 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -27,7 +28,7 @@ public abstract class NuBotBase {
     /**
      * the strategy setup for specific NuBots to implement
      */
-    abstract public void configureStrategy();
+    abstract public void configureStrategy() throws NuBotConfigException;
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
 
@@ -243,7 +244,11 @@ public abstract class NuBotBase {
         // Set the frozen balance manager in the global variable
         Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.settings.getProperty("frozen_folder"));
 
-        configureStrategy();
+        try{
+            configureStrategy();
+        }catch(NuBotConfigException e){
+            exitWithNotice("can't configure strategy");
+        }
 
         notifyOnline();
     }

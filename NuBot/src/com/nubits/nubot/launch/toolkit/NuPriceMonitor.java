@@ -78,7 +78,12 @@ public class NuPriceMonitor {
         if (readOptions()) {
             init();
 
-            PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedNames, pair);
+            PriceFeedManager pfm = null;
+            try{
+                pfm = new PriceFeedManager(mainFeed, backupFeedNames, pair);
+            }catch(Exception e){
+
+            }
 
             //Then set the pfm
             ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setPriceFeedManager(pfm);

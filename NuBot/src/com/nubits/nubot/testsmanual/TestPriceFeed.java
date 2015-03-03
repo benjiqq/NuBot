@@ -21,6 +21,7 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
@@ -151,7 +152,12 @@ public class TestPriceFeed {
 
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
 
-        PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        PriceFeedManager pfm = null;
+        try{
+            pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        }catch(NuBotConfigException e){
+
+        }
 
         LastPriceResponse lpr = pfm.getLastPrices();
 

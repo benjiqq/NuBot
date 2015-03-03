@@ -2,6 +2,7 @@ package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotSecondary;
+import com.nubits.nubot.bot.NuBotSimple;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -65,8 +66,15 @@ public class MainLaunch {
         if (Global.running) {
             exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
         } else {
-            NuBotSecondary bot = new NuBotSecondary();
-            bot.execute(opt);
+            if (opt.secondarypeg){
+                LOG.info("creating secondary bot");
+                NuBotSecondary bot = new NuBotSecondary();
+                bot.execute(opt);
+            }else{
+                LOG.info("creating simple bot");
+                NuBotSimple bot = new NuBotSimple ();
+                bot.execute(opt);
+            }
         }
 
     }
