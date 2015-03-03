@@ -23,17 +23,13 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
-import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.logging.Level;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -56,12 +52,6 @@ public class TestOrderTask {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
-
-        try {
-            NuLogger.setup(true, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
 
         Utils.installKeystore(true);
 

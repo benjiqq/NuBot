@@ -10,13 +10,11 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * Created by woolly_sammoth on 24/01/15.
@@ -218,11 +216,7 @@ public class TestWrapperReturns {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
+
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));

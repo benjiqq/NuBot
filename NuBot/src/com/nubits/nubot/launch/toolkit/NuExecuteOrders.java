@@ -28,13 +28,14 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  *
@@ -62,12 +63,6 @@ public class NuExecuteOrders {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-
-        try {
-            NuLogger.setup(true, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
 
 
         NuExecuteOrders app = new NuExecuteOrders();

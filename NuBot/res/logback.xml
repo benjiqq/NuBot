@@ -19,7 +19,7 @@
 		<file>logs/NuBot.log</file>
 
 		<encoder>
-			<pattern>%date %level - %msg%n
+			<pattern>%date %logger{36} %level - %msg%n
 			</pattern>
 			<!-- [%thread] %logger{10} [%file:%line] -->
 		</encoder>
@@ -36,7 +36,7 @@
 		<file>logs/NuBot_debug.log</file>
 
 		<encoder>
-			<pattern>%date %level - %msg%n
+			<pattern>%date  %logger{36} %level - %msg%n
 			</pattern>
 			<!-- [%thread] %logger{10} [%file:%line] -->
 		</encoder>
@@ -53,7 +53,7 @@
 		<file>logs/NuBot_main.log</file>
 
 		<encoder>
-			<pattern>%date %level - %msg%n
+			<pattern>%date %logger{36} %level - %msg%n
 			</pattern>
 			<!-- [%thread] %logger{10} [%file:%line] -->
 		</encoder>

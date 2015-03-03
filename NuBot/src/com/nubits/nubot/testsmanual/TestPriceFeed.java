@@ -25,12 +25,10 @@ import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -60,11 +58,6 @@ public class TestPriceFeed {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
 
         LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);

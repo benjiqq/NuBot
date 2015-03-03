@@ -29,7 +29,6 @@ import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
 import java.io.IOException;
 import java.util.ArrayList;
 import org.slf4j.LoggerFactory;
@@ -62,11 +61,6 @@ public class NuPriceMonitor {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
 
         NuPriceMonitor app = new NuPriceMonitor();
         if (app.readParams(args)) {

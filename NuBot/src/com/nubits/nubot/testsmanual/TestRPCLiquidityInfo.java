@@ -23,14 +23,10 @@ import com.nubits.nubot.global.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
-import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.logging.Level;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -124,13 +120,7 @@ public class TestRPCLiquidityInfo {
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        //Create log dir
-        FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(verbose, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
+
 
         Utils.installKeystore(true);
 

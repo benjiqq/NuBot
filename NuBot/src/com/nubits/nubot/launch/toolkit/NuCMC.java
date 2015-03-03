@@ -33,8 +33,6 @@ import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
@@ -60,11 +58,6 @@ public class NuCMC {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
 
         NuCMC app = new NuCMC();
         if (app.readParams(args)) {

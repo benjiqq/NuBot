@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
  *
  * @author desrever <desrever at nubits.com>
  */
+
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
@@ -30,18 +31,10 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.logging.Level;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class TestSync extends TimerTask {
 
@@ -106,11 +99,6 @@ public class TestSync extends TimerTask {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
 
         LOG.info("Set up SSL certificates");
         try {

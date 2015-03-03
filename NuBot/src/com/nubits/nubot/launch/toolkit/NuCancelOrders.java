@@ -28,9 +28,10 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  *
@@ -56,11 +57,6 @@ public class NuCancelOrders {
         //Create log dir
         FileSystem.mkdir(logsFolder);
         if (app.readParams(args)) {
-            try {
-                NuLogger.setup(false, logsFolder);
-            } catch (IOException ex) {
-                LOG.error(ex.toString());
-            }
 
             LOG.info("Launching CancellAllOrders ");
             app.prepareForExecution();

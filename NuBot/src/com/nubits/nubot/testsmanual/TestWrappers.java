@@ -25,12 +25,8 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import org.apache.commons.io.FileUtils;
-
-import java.io.IOException;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -126,11 +122,7 @@ public class TestWrappers {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-        }
+
         try {
             Utils.installKeystore(false);
         } catch (Exception ex) {
