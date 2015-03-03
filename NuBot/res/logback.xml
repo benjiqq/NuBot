@@ -14,9 +14,18 @@
 
 	</appender>
 
+    <appender name="allFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	  <file>logs/all.log</file>
 
-	<appender name="infoFILE" class="ch.qos.logback.core.FileAppender">
-		<file>logs/NuBot.log</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+      <fileNamePattern>logs/all.%i.log.zip</fileNamePattern>
+      <minIndex>1</minIndex>
+      <maxIndex>10</maxIndex>
+    </rollingPolicy>
+
+    <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+      <maxFileSize>1MB</maxFileSize>
+    </triggeringPolicy>
 
 		<encoder>
 			<pattern>%date %logger{36} %level - %msg%n
@@ -24,16 +33,21 @@
 			<!-- [%thread] %logger{10} [%file:%line] -->
 		</encoder>
 
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>INFO</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
+<!--    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator>
+            <expression>
+              if(logger.startsWith("com.nubits.nubot.tests"))
+                return true;
+            </expression>
+        </evaluator>
+        <onMatch>DENY</onMatch>
     </filter>
+-->
 
 	</appender>
 
-	<appender name="debugFILE" class="ch.qos.logback.core.FileAppender">
-		<file>logs/NuBot_debug.log</file>
+	<appender name="debugFILE" level="DEBUG" class="ch.qos.logback.core.FileAppender">
+		<file>logs/debug.log</file>
 
 		<encoder>
 			<pattern>%date  %logger{36} %level - %msg%n
@@ -41,16 +55,13 @@
 			<!-- [%thread] %logger{10} [%file:%line] -->
 		</encoder>
 
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>DEBUG</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-    </filter>
-
+        <!--
+        <logger name="com.nubits.nubot.tests.TestReadCsv" level="INFO" />
+        -->
 	</appender>
 
-	<appender name="warnFILE" class="ch.qos.logback.core.FileAppender">
-		<file>logs/NuBot_main.log</file>
+	<appender name="warnFILE" level="WARN" class="ch.qos.logback.core.FileAppender">
+		<file>logs/warn.log</file>
 
 		<encoder>
 			<pattern>%date %logger{36} %level - %msg%n
@@ -58,24 +69,48 @@
 			<!-- [%thread] %logger{10} [%file:%line] -->
 		</encoder>
 
-    <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>WARN</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-    </filter>
-
 	</appender>
 
+<!--
+	<appender name="testFILE" class="ch.qos.logback.core.FileAppender">
+      <file>test.log</file>
+		<file>logs/NuBot_tests.log</file>
+
+<encoder>
+			<pattern>%date %logger{36} %level - %msg%n
+			</pattern>
+		</encoder>
+
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator>
+            <expression>
+              if(logger.startsWith("com.nubits.nubot.tests"))
+              return true;
+            </expression>
+        </evaluator>
+        <onMatch>ALLOW</onMatch>
+        </filter>
+
+	</appender>
+-->
 
 
-	<root>
-		<appender-ref ref="warnFILE" />
 
-    <appender-ref ref="infoFILE" />
+  <!--  <logger name="com.nubits.nubot.tests.TestReadCsv" level="DEBUG" />
+-->
 
-    <appender-ref ref="debugFILE" />
+	<root level="DEBUG">
 
-		<appender-ref ref="STDOUT" />
+<!--	  <appender-ref ref="warnFILE" />
+      <appender-ref ref="infoFILE" />
+-->
+
+      <appender-ref ref="allFILE" />
+
+	  <appender-ref ref="STDOUT" />
+
+	  <appender-ref ref="testFILE" />
+
 	</root>
 
 </configuration>

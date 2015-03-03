@@ -50,7 +50,7 @@ public class TestReadCsv  extends TestCase {
         // TestClasspathOut.printCpInfo();
 
         final File dic = FileUtils.getFile("NuBot", "res", TEST_FILE);
-        System.out.println(dic.getAbsolutePath());
+        LOG.debug(dic.getAbsolutePath());
         //assert (dic.exists());
 
         // InputStream ins = TestReadCsv.class.getClass().
@@ -75,7 +75,7 @@ public class TestReadCsv  extends TestCase {
             //assert(message.length()>10);
             //assert(message.contains("USD"));
             //assert(message.contains("NBT"));
-            LOG.info(message);
+            LOG.debug(message);
         }
 
     }

@@ -24,6 +24,11 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class NuBotBase {
 
+    /**
+     * the strategy setup for specific NuBots to implement
+     */
+    abstract public void configureStrategy();
+
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
 
     /**
@@ -37,7 +42,6 @@ public abstract class NuBotBase {
 
     protected boolean liveTrading;
 
-    abstract public void configureStrategy();
 
     /**
      * all setups
