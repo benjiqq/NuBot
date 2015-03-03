@@ -21,7 +21,6 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.NuBotConnectionException;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;

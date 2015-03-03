@@ -17,7 +17,7 @@ public class MainLaunch {
 
     private static Thread mainThread;
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]";
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -65,8 +65,8 @@ public class MainLaunch {
         if (Global.running) {
             exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
         } else {
-            NuBot app = new NuBot();
-            app.execute(opt);
+            NuBot bot = new NuBot();
+            bot.execute(opt);
         }
 
     }
@@ -148,7 +148,7 @@ public class MainLaunch {
      * @return
      */
     private static boolean isValidArgs(String[] args) {
-        boolean valid = args.length > 0;
+        boolean valid = args.length == 1;
 
         return valid;
     }
