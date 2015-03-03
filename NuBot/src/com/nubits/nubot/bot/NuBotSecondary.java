@@ -61,7 +61,7 @@ public class NuBotSecondary extends NuBotBase {
 
         CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, Constant.USD);
 
-        //TODO! this needs refactoring
+        //TODO! strategy tasks be in bots package
 
         // set trading strategy to the price monitor task
         ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))

@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * a NuBot implementing dual strategy
+ * simple NuBot
  */
 public class NuBotSimple extends NuBotBase {
 

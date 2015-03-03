@@ -39,7 +39,7 @@ import org.json.simple.parser.ParseException;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  *
  */
 public class PriceMonitorTriggerTask extends TimerTask {
@@ -306,7 +306,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
             subject = Global.exchange.getName() + " Bot is suffering a connection issue";
 
         } else { //otherwise something bad has happened so we shutdown.
-            sleepTime = (Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) * 3);
+            int p = 3;
+            sleepTime = (Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) * p);
 
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
                     + NuBotAdminSettings.refresh_time_seconds + "seconds.\nThe bot will notify and restart in "
@@ -340,7 +341,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     public void updateLastPrice(LastPrice lp) {
-
 
         //We need to fill up the moving average queue so that 30 data points exist.
         if (queueMA.size() < MOVING_AVERAGE_SIZE) {
@@ -390,10 +390,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
         } else {
             verifyPegPrices();
         }
-    }
-
-    public LastPrice getLastPriceFromFeeds() {
-        return this.lastPrice;
     }
 
     private void verifyPegPrices() {
@@ -552,6 +548,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private void initStrategy(double peg_price) {
+        //TODO: should be in bot package
 
         Global.conversion = peg_price; //used then for liquidity info
         //Compute the buy/sell prices in USD
@@ -628,32 +625,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    public double getWallchangeThreshold() {
-        return wallchangeThreshold;
-    }
-
     public void setWallchangeThreshold(double wallchangeThreshold) {
         this.wallchangeThreshold = wallchangeThreshold;
-    }
-
-    public double getSellPriceUSD() {
-        return sellPriceUSD;
-    }
-
-    public void setSellPriceUSD(double sellPriceUSD) {
-        this.sellPriceUSD = sellPriceUSD;
-    }
-
-    public double getBuyPriceUSD() {
-        return buyPriceUSD;
-    }
-
-    public void setBuyPriceUSD(double buyPriceUSD) {
-        this.buyPriceUSD = buyPriceUSD;
-    }
-
-    public String getOutputPath() {
-        return outputPath;
     }
 
     public void setOutputPath(String outputPath) {
@@ -682,16 +655,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         this.wallsBeingShifted = wallsBeingShifted;
     }
 
-    public PriceFeedManager getPfm() {
-        return pfm;
-    }
-
     public void setPriceFeedManager(PriceFeedManager pfm) {
         this.pfm = pfm;
-    }
-
-    public double getDistanceTreshold() {
-        return distanceTreshold;
     }
 
     public void setDistanceTreshold(double distanceTreshold) {

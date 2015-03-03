@@ -48,9 +48,9 @@ public abstract class NuBotBase {
         Global.sessionId = Utils.generateSessionID();
         LOG.info("Session ID = " + Global.sessionId);
 
-        mode = "sell-side";
+        this.mode = "sell-side";
         if (Global.options.isDualSide()) {
-            mode = "dual-side";
+            this.mode = "dual-side";
         }
 
         setupLog();
