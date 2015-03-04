@@ -1,3 +1,5 @@
+package exchanges;
+
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;

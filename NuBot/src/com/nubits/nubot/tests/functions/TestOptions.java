@@ -1,4 +1,4 @@
-package com.nubits.nubot.tests;
+package functions;
 
 
 import com.nubits.nubot.options.NuBotConfigException;
@@ -141,7 +141,7 @@ public class TestOptions extends TestCase {
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
 
-            assertTrue(opt.getNubitAddress().equals("xxx"));
+            assertTrue(opt.isSubmitliquidity()==false);
 
         } catch (NuBotConfigException e) {
             System.out.println("could not parse config");

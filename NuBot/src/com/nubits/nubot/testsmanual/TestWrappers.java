@@ -41,7 +41,7 @@ public class TestWrappers {
      * Configure tests
      */
     private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
-    //private static final String TEST_OPTIONS_PATH = "options.json";
+    //private functions final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = ExchangeFacade.POLONIEX;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;

@@ -266,7 +266,7 @@ public class Utils {
                 System.exit(0);
             }
 
-            //load a properties file from class path, inside static method
+            //load a properties file from class path, inside functions method
             Global.settings.load(input);
         } catch (IOException ex) {
             LOG.error(ex.toString());

@@ -32,7 +32,7 @@ public class ApiKeys {
 //Class Variables
     private String secretKey, apiKey;
 
-//Constructor (private) use the static method loadKeysFromFile instead
+//Constructor (private) use the functions method loadKeysFromFile instead
     public ApiKeys(String secretKey, String apiKey) {
         this.secretKey = secretKey;
         this.apiKey = apiKey;
@@ -82,7 +82,7 @@ public class ApiKeys {
         return toReturn; //Wrong passphrase default
     }
     /*
-     public static String validate(String secret, String api, Exchange exchange) {
+     public functions String validate(String secret, String api, Exchange exchange) {
      TradeInterface trade = null;
      String toReturn = "";
      switch (exchange.getName()) {

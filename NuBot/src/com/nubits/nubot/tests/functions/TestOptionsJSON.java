@@ -1,3 +1,5 @@
+package functions;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nubits.nubot.options.NuBotOptions;

@@ -62,13 +62,14 @@ public class SaveOptions {
                 if (!dest.exists()) {
                     try {
                         FileUtils.copyFile(f, dest);
+                        return true;
                     } catch (IOException e) {
                         throw new IOException(e);
                     }
                 }
                 i++;
 
-                if (i > 10)
+                if (i > 100)
                     return false;
             }
         }
