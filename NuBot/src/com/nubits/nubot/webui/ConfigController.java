@@ -43,9 +43,8 @@ public class ConfigController {
             Gson parser = gson.create();
             String js = parser.toJson(this.opt);
             return js;
-            //return opt;
         });
-        //, new JsonTransformerOptions());
+
 
         post(endpoint, "application/json", (request, response) -> {
 

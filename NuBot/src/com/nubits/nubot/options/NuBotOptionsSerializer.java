@@ -35,9 +35,10 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("priceincrement", opt.priceIncrement);
         root.addProperty("secondarypeg", opt.secondarypeg);
         root.addProperty("nubitaddress", opt.nubitAddress);
+        root.addProperty("nudport", opt.nudPort);
         root.addProperty("nudIp", opt.nudIp);
-        root.addProperty("rpcPass", opt.rpcPass);
-        root.addProperty("rpcUser", opt.rpcUser);
+        root.addProperty("rpcpass", opt.rpcPass);
+        root.addProperty("rpcuser", opt.rpcUser);
         root.addProperty("mainFeed", opt.mainFeed);
         root.addProperty("wallchangeThreshold", opt.wallchangeThreshold);
         //TODO: rename

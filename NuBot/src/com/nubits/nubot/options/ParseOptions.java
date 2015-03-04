@@ -388,85 +388,74 @@ public class ParseOptions {
         String variableset = "none";
         NuBotOptions newopt = new NuBotOptions();
 
-        if (postJson.containsKey("exchangename")) {
-            String newvalue = "" + postJson.get("exchangename");
-            newopt.setExchangeName(newvalue);
+        if (containsIgnoreCase(postJson, "exchangename")) {
+            newopt.exchangeName ="" + getIgnoreCase(postJson,"exchangename");
         }
 
-        if (postJson.containsKey("apikey")) {
-            String newapikey = "" + postJson.get("apikey");
-            newopt.setApiKey(newapikey);
+        if (containsIgnoreCase(postJson, "apikey")) {
+            newopt.apiKey = "" + getIgnoreCase(postJson, "apikey");
         }
 
-        if (postJson.containsKey("apisecret")) {
-            String newsecret = "" + postJson.get("apisecret");
-            newopt.setApiSecret(newsecret);
+        if (containsIgnoreCase(postJson, "apisecret")) {
+            newopt.apiSecret = "" + getIgnoreCase(postJson, "apisecret");
         }
 
-        if (postJson.containsKey("mailRecipient")) {
-            String newvalue = "" + postJson.get("mailRecipient");
-            newopt.setMailRecipient(newvalue);
+        if (containsIgnoreCase(postJson, "mailRecipient")) {
+            newopt.mailRecipient = "" + getIgnoreCase(postJson,"mailRecipient");
         }
 
-        if (postJson.containsKey("dualside")) {
-            boolean newv = (boolean) postJson.get("dualside");
-            newopt.setDualSide(newv);
+        if (containsIgnoreCase(postJson, "dualside")) {
+            newopt.dualSide = (boolean) getIgnoreCase(postJson,"dualside");
         }
 
-        if (postJson.containsKey("multiplecustodians")) {
-            boolean newv = (boolean) postJson.get("multiplecustodians");
-            newopt.setDualSide(newv);
+        if (containsIgnoreCase(postJson, "multiplecustodians")) {
+            newopt.multipleCustodians =(boolean) getIgnoreCase(postJson,"multiplecustodians");
         }
 
-        if (postJson.containsKey("submitliquidity")) {
-            boolean newv = (boolean) postJson.get("submitliquidity");
-            newopt.setSubmitLiquidity(newv);
+        if (containsIgnoreCase(postJson, "submitliquidity")) {
+            newopt.submitLiquidity= (boolean) getIgnoreCase(postJson,"submitliquidity");
         }
 
-        if (postJson.containsKey("secondarypeg")) {
-            boolean newv = (boolean) postJson.get("secondarypeg");
-            newopt.setSecondary(newv);
+        if (containsIgnoreCase(postJson, "secondarypeg")) {
+            newopt.secondarypeg =(boolean) getIgnoreCase(postJson,"secondarypeg");
         }
 
-        if (postJson.containsKey("executeorders")) {
-            boolean newv = (boolean) postJson.get("executeorders");
-            newopt.setExecuteOrders(newv);
+        if (containsIgnoreCase(postJson, "executeorders")) {
+            newopt.executeOrders =(boolean) getIgnoreCase(postJson,"executeorders");
         }
 
-        if (postJson.containsKey("verbose")) {
-            boolean newv = (boolean) postJson.get("verbose");
-            newopt.setVerbose(newv);
+        if (containsIgnoreCase(postJson, "verbose")) {
+            newopt.verbose =(boolean) getIgnoreCase(postJson,"verbose");
         }
 
-        if (postJson.containsKey("hipchat")) {
-            boolean newv = (boolean) postJson.get("hipchat");
-            newopt.setSendHipchat(newv);
+        if (containsIgnoreCase(postJson, "hipchat")) {
+            newopt.sendHipchat =(boolean) getIgnoreCase(postJson,"hipchat");
         }
 
-        if (postJson.containsKey("nubitaddress")) {
-            newopt.nubitAddress = "" + postJson.get("nubitaddress");
+        if (containsIgnoreCase(postJson, "nubitaddress")) {
+            newopt.nubitAddress = "" + getIgnoreCase(postJson,"nubitaddress");
         }
 
-        if (postJson.containsKey("rpcUser")) {
-            newopt.rpcUser = "" + postJson.get("rpcUser");
+        if (containsIgnoreCase(postJson, "rpcUser")) {
+            newopt.rpcUser = "" + getIgnoreCase(postJson,"rpcUser");
         }
 
-        if (postJson.containsKey("rpcPass")) {
-            newopt.rpcPass = "" + postJson.get("rpcPass");
+        if (containsIgnoreCase(postJson,"rpcPass")) {
+            newopt.rpcPass = "" + getIgnoreCase(postJson,"rpcPass");
         }
 
-        if (postJson.containsKey("nudIp")) {
-            newopt.nudIp = "" + postJson.get("nudIp");
+        if (containsIgnoreCase(postJson, "nudIp")) {
+            newopt.nudIp = "" + getIgnoreCase(postJson,"nudIp");
         }
 
-        if (postJson.containsKey("sendMails")) {
-            newopt.sendMails = "" + postJson.get("sendMails");
+        if (containsIgnoreCase(postJson, "sendMails")) {
+            newopt.sendMails = "" + getIgnoreCase(postJson,"sendMails");
         }
 
 
         if (postJson.containsKey("nudport")) {
             try {
-                int newv = (new Integer("" + postJson.get("nudport"))).intValue();
+                int newv = (new Integer("" + getIgnoreCase(postJson,"nudport"))).intValue();
                 newopt.setNudPort(newv);
             } catch (Exception e) {
                 //TODO
@@ -474,7 +463,7 @@ public class ParseOptions {
         }
 
         if (postJson.containsKey("pair")) {
-            String p = "" + postJson.get("pair");
+            String p = "" + getIgnoreCase(postJson,"pair");
             CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
             newopt.setPair(newpair);
         }
