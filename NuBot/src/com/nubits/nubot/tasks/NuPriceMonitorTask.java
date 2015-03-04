@@ -25,17 +25,18 @@ import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.TimerTask;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
- *
  * @author desrever <desrever at nubits.com>
- *
- * USE THIS TASK ONLY WITH NuPriceMonitor bot
+ *         <p>
+ *         USE THIS TASK ONLY WITH NuPriceMonitor bot
  */
 public class NuPriceMonitorTask extends TimerTask {
 
@@ -52,75 +53,77 @@ public class NuPriceMonitorTask extends TimerTask {
     private boolean isFirstEmail = true;
     private String emailHistory = "";
 
+    /*public NuPriceMonitorTask(PriceFeedManager pfm) {
+        this.pfm = pfm;
+    }*/
+
+    private void notifyDeviation(ArrayList<LastPrice> priceList) {
+        String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
+        String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
+        for (int i = 0; i < priceList.size(); i++) {
+            LastPrice tempPrice = priceList.get(i);
+            message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
+        }
+
+
+        MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
+        HipChatNotifications.sendMessageCritical(title + message);
+
+        LOG.error(title + message);
+    }
+
     @Override
     public void run() {
         LOG.info("Executing task : CheckLastPriceTask ");
-        if (pfm == null) {
-            LOG.error("CheckLastPrice task needs a PriceFeedManager to work. Please assign it before running it");
 
-        } else {
-            ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
-            LOG.info("CheckLastPrice received values from remote feeds. ");
+        LOG.info("CheckLastPrice received values from remote feeds. ");
 
-            LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
-            for (int i = 0; i < priceList.size(); i++) {
-                LastPrice tempPrice = priceList.get(i);
-                LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
-            }
+        LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
+        for (int i = 0; i < priceList.size(); i++) {
+            LastPrice tempPrice = priceList.get(i);
+            LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
+        }
 
+        boolean allok = priceList.size() == pfm.getFeedList().size();
+        if (allok) {
+            //All feeds returned a positive value
 
-            if (priceList.size() == pfm.getFeedList().size()) {
-                //All feeds returned a positive value
-
-                //Check if mainPrice is close enough to the others
-                // I am assuming that mainPrice is the first element of the list
-                if (sanityCheck(priceList, 0)) {
-                    //mainPrice is reliable compared to the others
-                    this.updateLastPrice(priceList.get(0));
-                } else {
-                    //mainPrice is not reliable compared to the others
-                    //Check if other backup prices are close enough to each other
-                    boolean foundSomeValiBackUp = false;
-                    LastPrice goodPrice = null;
-                    for (int l = 1; l < priceList.size(); l++) {
-                        if (sanityCheck(priceList, l)) {
-                            goodPrice = priceList.get(l);
-                            foundSomeValiBackUp = true;
-                            break;
-                        }
-                    }
-
-                    if (foundSomeValiBackUp) {
-                        //goodPrice is a valid price backup!
-                        this.updateLastPrice(goodPrice);
-                    } else {
-                        //None of the source are in accord with others.
-
-                        //Try to send a notification
-                        if (Global.options != null) {
-                            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-                            String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-                            for (int i = 0; i < priceList.size(); i++) {
-                                LastPrice tempPrice = priceList.get(i);
-                                message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                                        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
-                            }
-
-
-
-                            MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
-                            HipChatNotifications.sendMessageCritical(title + message);
-
-                            LOG.error(title + message);
-                        }
+            //Check if mainPrice is close enough to the others
+            // I am assuming that mainPrice is the first element of the list
+            if (sanityCheck(priceList, 0)) {
+                //mainPrice is reliable compared to the others
+                this.updateLastPrice(priceList.get(0));
+            } else {
+                //mainPrice is not reliable compared to the others
+                //Check if other backup prices are close enough to each other
+                boolean foundSomeValiBackUp = false;
+                LastPrice goodPrice = null;
+                for (int l = 1; l < priceList.size(); l++) {
+                    if (sanityCheck(priceList, l)) {
+                        goodPrice = priceList.get(l);
+                        foundSomeValiBackUp = true;
+                        break;
                     }
                 }
-            } else {
-            }
 
+                if (foundSomeValiBackUp) {
+                    //goodPrice is a valid price backup!
+                    this.updateLastPrice(goodPrice);
+                } else {
+
+                    //None of the source are in accord with others.
+
+                    //Try to send a notification
+                    notifyDeviation(priceList);
+
+                }
+            }
         }
+
     }
 
     private boolean sanityCheck(ArrayList<LastPrice> priceList, int mainPriceIndex) {
@@ -173,10 +176,6 @@ public class NuPriceMonitorTask extends TimerTask {
         } else {
             return true;
         }
-    }
-
-    public PriceFeedManager getPfm() {
-        return pfm;
     }
 
     public void setPriceFeedManager(PriceFeedManager pfm) {

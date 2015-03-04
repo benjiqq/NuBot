@@ -61,36 +61,41 @@ public class NuBotSecondary extends NuBotBase {
 
         CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, CurrencyList.USD);
 
-        //TODO! strategy tasks be in bots package
+        //TODO strategy tasks be in bots package
+
+        PriceMonitorTriggerTask pmtask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
+        StrategySecondaryPegTask strattask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
 
         // set trading strategy to the price monitor task
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask()))
-                .setStrategy(((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())));
+        pmtask.setStrategy(strattask);
+
+        //TODO circular
 
         // set price monitor task to the strategy
-        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                .setPriceMonitorTask(((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())));
+        strattask.setPriceMonitorTask(pmtask);
+
+        PriceMonitorTriggerTask monitorTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
+        strattask.setPriceMonitorTask(monitorTask);
 
         // set liquidityinfo task to the strategy
-
-        ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask()))
-                .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
+        SubmitLiquidityinfoTask liqtask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
+        strattask.setSendLiquidityTask(liqtask);
 
         PriceFeedManager pfm = null;
-        try{
+        try {
             pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             exitWithNotice("can't configure price feeds");
         }
 
         //Then set the pfm
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setPriceFeedManager(pfm);
+        pmtask.setPriceFeedManager(pfm);
 
         //Set the priceDistance threshold
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setDistanceTreshold(opt.getDistanceThreshold());
+        pmtask.setDistanceTreshold(opt.getDistanceThreshold());
 
         //Set the wallet shift threshold
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setWallchangeThreshold(opt.getWallchangeThreshold());
+        pmtask.setWallchangeThreshold(opt.getWallchangeThreshold());
 
         //Set the outputpath for wallshifts
 
