@@ -1,8 +1,8 @@
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
@@ -11,6 +11,17 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
+import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -19,16 +30,6 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.*;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
-import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  * Created by sammoth on 19/01/15.
@@ -323,22 +324,30 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
-        ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
-        boolean found = false;
-        for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
-            Order thisOrder = order.next();
-            if (thisOrder.getId().equals(orderID)) {
-                found = true;
-                apiResponse.setResponseObject(thisOrder);
-                break;
+        
+        ApiResponse getActiveOrders = getActiveOrders();
+        
+        if (getActiveOrders.isPositive()) {
+            ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
+            boolean found = false;
+            for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(orderID)) {
+                    found = true;
+                    apiResponse.setResponseObject(thisOrder);
+                    break;
+                }
             }
-        }
 
-        if (!found) {
-            ApiError err = errors.apiReturnError;
-            err.setDescription("Order " + orderID + " does not exists");
-            apiResponse.setError(err);
+            if (!found) {
+                ApiError err = errors.apiReturnError;
+                err.setDescription("Order " + orderID + " does not exists");
+                apiResponse.setError(err);
+            }
+        } else {
+            apiResponse = getActiveOrders;
         }
+        
         return apiResponse;
     }
 
