@@ -20,7 +20,7 @@ import org.slf4j.Logger;
  */
 public class ParseOptions {
 
-    private static String[] comp = {"secondarypegoptions", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
+    private static String[] comp = {"secondarypeg", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
     private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
 
@@ -126,7 +126,7 @@ public class ParseOptions {
             throw e;
         }
 
-        boolean secondarypeg = false;
+
 
         double wallchangeThreshold = -1;
         double spread = -1;
@@ -149,6 +149,7 @@ public class ParseOptions {
         double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
+        boolean secondarypeg = NuBotOptionsDefault.secondarypeg;
 
         //First try to parse compulsory parameters
         String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
@@ -187,9 +188,9 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        boolean speg = (boolean)optionsJSON.get("secondarypegoptions");
+        secondarypeg = (boolean)optionsJSON.get("secondarypeg");
 
-        if (speg) {
+        if (secondarypeg) {
             parseSecondary(options, optionsJSON);
         }
 
@@ -349,7 +350,7 @@ public class ParseOptions {
             }
         }*/
 
-        options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypegoptions");
+        options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypeg");
 
         if (!containsIgnoreCase(optionsJSON, "wallchangeThreshold"))
             throw new NuBotConfigException("wallchangeThreshold needed if secondary peg defined");
@@ -418,8 +419,8 @@ public class ParseOptions {
             newopt.setSubmitLiquidity(newv);
         }
 
-        if (postJson.containsKey("secondarypegoptions")) {
-            boolean newv = (boolean) postJson.get("secondarypegoptions");
+        if (postJson.containsKey("secondarypeg")) {
+            boolean newv = (boolean) postJson.get("secondarypeg");
             newopt.setSecondary(newv);
         }
 
