@@ -9,8 +9,27 @@
 			<pattern>%d{HH:mm:ss} %logger{36} - %msg%n</pattern>
 		</encoder>
 
-    <!--filter class="com.nubits.nubot.webui.JettyLogFilter" />
-		-->
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator>
+            <expression>
+              return logger.contains("jetty");
+            </expression>
+        </evaluator>
+        <onMatch>DENY</onMatch>
+        <onMismatch>ALLOW</onMismatch>
+        </filter>
+
+        <!--
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator>
+            <expression>
+              return formattedMessage.contains("ch.qos");
+            </expression>
+        </evaluator>
+        <onMatch>DENY</onMatch>
+        <onMismatch>ALLOW</onMismatch>
+        </filter>
+        -->
 
 	</appender>
 
