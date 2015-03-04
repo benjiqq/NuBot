@@ -9,9 +9,9 @@ import spark.ResponseTransformer;
 /**
  * Render NuBotOptions to json
  */
-public class JsonTransformerOptions implements ResponseTransformer {
+/*public class JsonTransformerOptions implements ResponseTransformer {
 
-    private Gson gson = new Gson();
+
 
     @Override
     public String render(Object model) {
@@ -19,9 +19,7 @@ public class JsonTransformerOptions implements ResponseTransformer {
         gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
         String js = parser.toJson(model);
-
-        //return gson.toJson(model);
         return js;
     }
 
-}
+}*/

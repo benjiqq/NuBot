@@ -12,6 +12,7 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -95,6 +96,7 @@ public class ParseOptions {
 
     /**
      * the rules for valid configurations
+     *
      * @param optionsJSON
      * @return
      * @throws NuBotConfigException
@@ -104,6 +106,22 @@ public class ParseOptions {
         for (int i = 0; i < comp.length; i++) {
             if (!containsIgnoreCase(optionsJSON, comp[i]))
                 throw new NuBotConfigException("necessary key: " + comp[i]);
+        }
+
+        boolean submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
+
+        if (submitLiquidity) {
+
+            String[] sneeded = {"nubitaddress", "rpcpass", "rpcuser", "nudport"};
+
+            for (int i = 0; i < sneeded.length; i++) {
+                String s = sneeded[i];
+                if (!containsIgnoreCase(optionsJSON, s)) {
+                    throw new NuBotConfigException("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"" +
+                            s + "\" ");
+                }
+            }
         }
 
         return true;
@@ -120,12 +138,11 @@ public class ParseOptions {
 
         NuBotOptions options = new NuBotOptions();
 
-        try{
+        try {
             isValidJSON(optionsJSON);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             throw e;
         }
-
 
 
         double wallchangeThreshold = -1;
@@ -150,6 +167,7 @@ public class ParseOptions {
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
         boolean secondarypeg = NuBotOptionsDefault.secondarypeg;
+
 
         //First try to parse compulsory parameters
         String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
@@ -176,7 +194,6 @@ public class ParseOptions {
 
         String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
         CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr);
-        System.out.println(">>>>>>> pair: " + pair);
 
         boolean aggregate = true; //true only for USD
         if (!pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
@@ -188,7 +205,7 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        secondarypeg = (boolean)optionsJSON.get("secondarypeg");
+        secondarypeg = (boolean) optionsJSON.get("secondarypeg");
 
         if (secondarypeg) {
             parseSecondary(options, optionsJSON);
@@ -197,7 +214,7 @@ public class ParseOptions {
 
         //---- optional settings ----
 
-        if (optionsJSON.containsKey("nudip")) {
+        if (containsIgnoreCase(optionsJSON, "nudip")) {
             nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
         }
 
@@ -255,37 +272,24 @@ public class ParseOptions {
         String nubitAddress = "", rpcPass = "", rpcUser = "";
         int nudPort = 9091;
 
-        if (submitLiquidity) {
-            if (containsIgnoreCase(optionsJSON, "nubitaddress")) {
-                nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"nubitaddress\" ");
-            }
 
-            if (containsIgnoreCase(optionsJSON, "rpcpass")) {
-                rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"rpcpass\" ");
-            }
-
-            if (containsIgnoreCase(optionsJSON, "rpcuser")) {
-                rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"rpcuser\" ");
-            }
-
-            if (containsIgnoreCase(optionsJSON, "nudport")) {
-                long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
-                nudPort = (int) nudPortlong;
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"nudport\" ");
-            }
-
+        if (containsIgnoreCase(optionsJSON, "nubitaddress")) {
+            nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
         }
+
+        if (containsIgnoreCase(optionsJSON, "rpcpass")) {
+            rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "rpcuser")) {
+            rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "nudport")) {
+            long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
+            nudPort = (int) nudPortlong;
+        }
+
 
         if (containsIgnoreCase(optionsJSON, "mailnotifications")) {
             sendMails = (String) getIgnoreCase(optionsJSON, "mailnotifications");
@@ -440,38 +444,37 @@ public class ParseOptions {
         }
 
         if (postJson.containsKey("nubitaddress")) {
-            String newv = "" + postJson.get("nubitaddress");
-            newopt.setNubitAddress(newv);
+            newopt.nubitAddress = "" + postJson.get("nubitaddress");
         }
 
         if (postJson.containsKey("rpcUser")) {
-            newopt.rpcUser ="" + postJson.get("rpcUser");
+            newopt.rpcUser = "" + postJson.get("rpcUser");
         }
 
         if (postJson.containsKey("rpcPass")) {
-            newopt.rpcPass ="" + postJson.get("rpcPass");
+            newopt.rpcPass = "" + postJson.get("rpcPass");
         }
 
         if (postJson.containsKey("nudIp")) {
-            newopt.nudIp ="" + postJson.get("nudIp");
+            newopt.nudIp = "" + postJson.get("nudIp");
         }
 
         if (postJson.containsKey("sendMails")) {
-            newopt.sendMails ="" + postJson.get("sendMails");
+            newopt.sendMails = "" + postJson.get("sendMails");
         }
 
 
         if (postJson.containsKey("nudport")) {
-            try{
+            try {
                 int newv = (new Integer("" + postJson.get("nudport"))).intValue();
                 newopt.setNudPort(newv);
-            }catch(Exception e){
+            } catch (Exception e) {
                 //TODO
             }
         }
 
         if (postJson.containsKey("pair")) {
-            String p = "" +  postJson.get("pair");
+            String p = "" + postJson.get("pair");
             CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
             newopt.setPair(newpair);
         }

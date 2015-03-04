@@ -1,7 +1,10 @@
 package com.nubits.nubot.webui;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsSerializer;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
@@ -21,7 +24,6 @@ import static spark.Spark.post;
  */
 public class ConfigController {
 
-
     private String configDir;
     private String configfile;
     private NuBotOptions opt;
@@ -36,8 +38,14 @@ public class ConfigController {
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
         get(endpoint, "application/json", (request, response) -> {
-            return opt;
-        }, new JsonTransformerOptions());
+            GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+            gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+            Gson parser = gson.create();
+            String js = parser.toJson(this.opt);
+            return js;
+            //return opt;
+        });
+        //, new JsonTransformerOptions());
 
         post(endpoint, "application/json", (request, response) -> {
 
