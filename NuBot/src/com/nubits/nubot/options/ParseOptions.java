@@ -187,7 +187,7 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        boolean speg = containsIgnoreCase(optionsJSON, "secondarypegoptions");
+        boolean speg = (boolean)optionsJSON.get("secondarypegoptions");
 
         if (speg) {
             parseSecondary(options, optionsJSON);
@@ -377,6 +377,108 @@ public class ParseOptions {
 
     }
 
+    //TODO: redundant. this handles webUI json parsing
+    public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
+
+        String variableset = "none";
+        NuBotOptions newopt = new NuBotOptions();
+
+        if (postJson.containsKey("exchangename")) {
+            String newvalue = "" + postJson.get("exchangename");
+            newopt.setExchangeName(newvalue);
+        }
+
+        if (postJson.containsKey("apikey")) {
+            String newapikey = "" + postJson.get("apikey");
+            newopt.setApiKey(newapikey);
+        }
+
+        if (postJson.containsKey("apisecret")) {
+            String newsecret = "" + postJson.get("apisecret");
+            newopt.setApiSecret(newsecret);
+        }
+
+        if (postJson.containsKey("mailRecipient")) {
+            String newvalue = "" + postJson.get("mailRecipient");
+            newopt.setMailRecipient(newvalue);
+        }
+
+        if (postJson.containsKey("dualside")) {
+            boolean newv = (boolean) postJson.get("dualside");
+            newopt.setDualSide(newv);
+        }
+
+        if (postJson.containsKey("multiplecustodians")) {
+            boolean newv = (boolean) postJson.get("multiplecustodians");
+            newopt.setDualSide(newv);
+        }
+
+        if (postJson.containsKey("submitliquidity")) {
+            boolean newv = (boolean) postJson.get("submitliquidity");
+            newopt.setSubmitLiquidity(newv);
+        }
+
+        if (postJson.containsKey("secondarypegoptions")) {
+            boolean newv = (boolean) postJson.get("secondarypegoptions");
+            newopt.setSecondary(newv);
+        }
+
+        if (postJson.containsKey("executeorders")) {
+            boolean newv = (boolean) postJson.get("executeorders");
+            newopt.setExecuteOrders(newv);
+        }
+
+        if (postJson.containsKey("verbose")) {
+            boolean newv = (boolean) postJson.get("verbose");
+            newopt.setVerbose(newv);
+        }
+
+        if (postJson.containsKey("hipchat")) {
+            boolean newv = (boolean) postJson.get("hipchat");
+            newopt.setSendHipchat(newv);
+        }
+
+        if (postJson.containsKey("nubitaddress")) {
+            String newv = "" + postJson.get("nubitaddress");
+            newopt.setNubitAddress(newv);
+        }
+
+        if (postJson.containsKey("rpcUser")) {
+            newopt.rpcUser ="" + postJson.get("rpcUser");
+        }
+
+        if (postJson.containsKey("rpcPass")) {
+            newopt.rpcPass ="" + postJson.get("rpcPass");
+        }
+
+        if (postJson.containsKey("nudIp")) {
+            newopt.nudIp ="" + postJson.get("nudIp");
+        }
+
+        if (postJson.containsKey("sendMails")) {
+            newopt.sendMails ="" + postJson.get("sendMails");
+        }
+
+
+        if (postJson.containsKey("nudport")) {
+            try{
+                int newv = (new Integer("" + postJson.get("nudport"))).intValue();
+                newopt.setNudPort(newv);
+            }catch(Exception e){
+                //TODO
+            }
+        }
+
+        if (postJson.containsKey("pair")) {
+            String p = "" +  postJson.get("pair");
+            CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
+            newopt.setPair(newpair);
+        }
+
+
+        return newopt;
+    }
+
     public static boolean exchangeSupported(String exchangename) {
         List<String> supportedExchanges = new ArrayList<String>();
         supportedExchanges.add(ExchangeFacade.BTCE);
@@ -493,4 +595,6 @@ public class ParseOptions {
             return false;
         }
     }
+
+
 }

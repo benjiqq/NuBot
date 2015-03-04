@@ -19,7 +19,6 @@ public class UiServer {
 
     //TODO path
     private static String htmlFolder = "./html/templates/";
-
     private static String configFile = "config.json";
     private static String configdir = "config";
     private static String configpath =configdir + "/" +  configFile;
@@ -50,8 +49,6 @@ public class UiServer {
 
 
         Map statusmap = new HashMap();
-
-
 
 
     }

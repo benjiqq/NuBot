@@ -305,6 +305,20 @@ public class NuBotOptions {
     /**
      * @return
      */
+    public boolean isSecondarypeg() {
+        return this.secondarypeg;
+    }
+
+    /**
+     * @param dualSide
+     */
+    public void setSecondary(boolean secondary) {
+        this.secondarypeg= secondarypeg;
+    }
+
+    /**
+     * @return
+     */
     public boolean isSubmitliquidity() {
         return submitLiquidity;
     }

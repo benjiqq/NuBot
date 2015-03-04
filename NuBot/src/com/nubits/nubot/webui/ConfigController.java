@@ -1,8 +1,8 @@
 package com.nubits.nubot.webui;
 
 
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -27,76 +27,6 @@ public class ConfigController {
     private NuBotOptions opt;
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
-
-    //TODO: handle in parseOptions
-    private NuBotOptions parsePost(JSONObject postJson){
-
-        String variableset = "none";
-        NuBotOptions newopt = new NuBotOptions();
-
-        if (postJson.containsKey("exchangename")) {
-            String newvalue = "" + postJson.get("exchangename");
-            newopt.setExchangeName(newvalue);
-        }
-
-        if (postJson.containsKey("apikey")) {
-            String newapikey = "" + postJson.get("apikey");
-            newopt.setApiKey(newapikey);
-        }
-
-        if (postJson.containsKey("apisecret")) {
-            String newsecret = "" + postJson.get("apisecret");
-            newopt.setApiSecret(newsecret);
-        }
-
-        if (postJson.containsKey("dualside")) {
-            boolean newv = (boolean) postJson.get("dualside");
-            newopt.setDualSide(newv);
-        }
-
-        if (postJson.containsKey("multiplecustodians")) {
-            boolean newv = (boolean) postJson.get("multiplecustodians");
-            newopt.setDualSide(newv);
-        }
-
-        if (postJson.containsKey("submitliquidity")) {
-            boolean newv = (boolean) postJson.get("submitliquidity");
-            newopt.setSubmitLiquidity(newv);
-        }
-
-        if (postJson.containsKey("executeorders")) {
-            boolean newv = (boolean) postJson.get("executeorders");
-            newopt.setExecuteOrders(newv);
-        }
-
-        if (postJson.containsKey("verbose")) {
-            boolean newv = (boolean) postJson.get("verbose");
-            newopt.setVerbose(newv);
-        }
-
-        if (postJson.containsKey("hipchat")) {
-            boolean newv = (boolean) postJson.get("hipchat");
-            newopt.setSendHipchat(newv);
-        }
-
-        if (postJson.containsKey("nubitaddress")) {
-            String newv = "" + postJson.get("nubitaddress");
-            newopt.setNubitAddress(newv);
-        }
-
-        if (postJson.containsKey("nudport")) {
-            int newv = (Integer) postJson.get("nudport");
-            newopt.setNudPort(newv);
-        }
-
-        if (postJson.containsKey("pair")) {
-            String p = "" +  postJson.get("pair");
-            CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
-            newopt.setPair(newpair);
-        }
-
-        return newopt;
-    }
 
     public ConfigController(String endpoint, NuBotOptions opt, String configDir, String configfile) {
         this.opt = opt;
@@ -129,7 +59,12 @@ public class ConfigController {
             //TODO: test validity of posted options
             boolean valid = true;
 
-            NuBotOptions newopt = parsePost(postJson);
+            NuBotOptions newopt = null;
+            try{
+                newopt = ParseOptions.parsePost(postJson);
+            }catch(Exception e){
+                //handle errors
+            }
 
             LOG.info("parsed: new opt: " + newopt);
 
