@@ -9,7 +9,7 @@ import java.util.*;
 import javax.swing.*;
 
 /**
- * You can import this statically "import functions easyjcckit.QuickPlot.*;
+ * You can import this statically "import static easyjcckit.QuickPlot.*;
  */
 public class LiquidityPlot {
 

@@ -26,7 +26,7 @@ public class TestWrapperReturns {
     /**
      * Configure tests
      */
-    //private functions final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     private static final String TEST_OPTIONS_PATH = "options.json";
     public static ArrayList<String> testExchanges = new ArrayList<>();
     public static CurrencyPair testPair = Constant.NBT_BTC;

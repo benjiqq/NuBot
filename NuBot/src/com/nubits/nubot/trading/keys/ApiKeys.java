@@ -32,7 +32,7 @@ public class ApiKeys {
 //Class Variables
     private String secretKey, apiKey;
 
-//Constructor (private) use the functions method loadKeysFromFile instead
+//Constructor (private) use the static method loadKeysFromFile instead
     public ApiKeys(String secretKey, String apiKey) {
         this.secretKey = secretKey;
         this.apiKey = apiKey;

@@ -56,7 +56,7 @@
 		</encoder>
 
         <!--
-        <logger name="com.nubits.nubot.tests.TestReadCsv" level="INFO" />
+        <logger name="functions.TestReadCsv" level="INFO" />
         -->
 	</appender>
 
@@ -96,7 +96,7 @@
 
 
 
-  <!--  <logger name="com.nubits.nubot.tests.TestReadCsv" level="DEBUG" />
+  <!--  <logger name="functions.TestReadCsv" level="DEBUG" />
 -->
 
 	<root level="DEBUG">

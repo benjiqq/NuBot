@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 public class Constant {
 
     private static final Logger LOG = LoggerFactory.getLogger(Constant.class.getName());
-    //public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";  //Casa di nu
+    //public functions final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";  //Casa di nu
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
     //Pairs
