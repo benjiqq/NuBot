@@ -425,7 +425,7 @@ public class BtceWrapper implements TradeInterface {
      permissions.setValid_keys(true);
      }
      } catch (ParseException ex) {
-     LOG.error(ex.toString());
+     LOG.error(ex.toStringSep());
      apiResponse.setError(new ApiError(ERROR_PARSING, "Error while parsing api permissions for btce"));
      }
      apiResponse.setResponseObject(permissions);
@@ -446,7 +446,7 @@ public class BtceWrapper implements TradeInterface {
          * pair, default all pairs
          */
         if (pair != null) {
-            query_args.put("pair", pair.toString("_"));
+            query_args.put("pair", pair.toStringSep());
         }
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
@@ -520,7 +520,7 @@ public class BtceWrapper implements TradeInterface {
         String method = API_TRADE;
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-        query_args.put("pair", pair.toString("_"));
+        query_args.put("pair", pair.toStringSep());
         query_args.put("type", type);
         query_args.put("rate", Double.toString(rate));
         query_args.put("amount", Double.toString(amount));
@@ -786,7 +786,7 @@ public class BtceWrapper implements TradeInterface {
                  answer = (String) obj2.get(TOKEN_ERR);
 
                  } catch (ParseException ex) {
-                 LOG.error(ex.toString());
+                 LOG.error(ex.toStringSep());
 
                  }
                  }

@@ -164,7 +164,7 @@ public class TestPriceFeed {
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
-        LOG.info("\n\n\n ---------------------- Testing " + pair.toString("/"));
+        LOG.info("\n\n\n ---------------------- Testing " + pair.toStringSepSpecial("/"));
         LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);

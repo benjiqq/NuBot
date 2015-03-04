@@ -783,7 +783,7 @@ public class ExcoinWrapper implements TradeInterface {
              JSONObject obj = (JSONObject) (parser.parse(answer));
              answer = (String) obj.get(TOKEN_ERR);
              } catch (ParseException pe) {
-             LOG.error(pe.toString());
+             LOG.error(pe.toStringSep());
              return null;
              }
              }

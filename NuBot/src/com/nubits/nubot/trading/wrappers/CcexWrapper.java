@@ -262,7 +262,7 @@ public class CcexWrapper implements TradeInterface {
         }
 
         String url = baseUrl + "&a=makeorder";
-        url += "&pair=" + (pair.toString("-")).toLowerCase();
+        url += "&pair=" + (pair.toStringSepSpecial("-")).toLowerCase();
         url += "&q=" + amount;
         url += "&t=" + typeCode;
         url += "&r=" + rate;
@@ -325,7 +325,7 @@ public class CcexWrapper implements TradeInterface {
         ArrayList<Order> orderList = new ArrayList<Order>();
         String url = baseUrl + "&a=orderlist&self=1";
         if (pair != null) {
-            url += "&pair=" + (pair.toString("-")).toLowerCase();
+            url += "&pair=" + (pair.toStringSepSpecial("-")).toLowerCase();
         }
 
         String queryResult = query(url, new HashMap<String, String>(), true);
@@ -535,7 +535,7 @@ public class CcexWrapper implements TradeInterface {
         String url = baseUrl + "&a=tradehistory";
         url += "&d1=" + formattedStartDate;
         url += "&d2=" + formattedStopDate;
-        url += "&pair=" + (pair.toString("-")).toLowerCase();
+        url += "&pair=" + (pair.toStringSepSpecial("-")).toLowerCase();
 
         String queryResult = query(url, new HashMap<String, String>(), true);
 

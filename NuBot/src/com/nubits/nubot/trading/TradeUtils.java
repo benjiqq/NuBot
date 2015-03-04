@@ -223,18 +223,18 @@ public class TradeUtils {
         //It tries to send a wrong nonce, get the allowed window, and use it for the actual call
         String wrongNonce = "1234567891";
         String lastdigits;
-        //LOG.info("Offset = " + Objects.toString(offset));
+        //LOG.info("Offset = " + Objects.toStringSep(offset));
         String validNonce;
         if (offset == 0) {
             try {
                 String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, false);
                 //LOG.info(htmlString);
-                //LOG.info(Objects.toString(System.currentTimeMillis() / 1000L));
+                //LOG.info(Objects.toStringSep(System.currentTimeMillis() / 1000L));
                 validNonce = getCCDKEvalidNonce(htmlString);
                 offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
-                //LOG.info("Offset = " + Objects.toString(offset));
+                //LOG.info("Offset = " + Objects.toStringSep(offset));
             } catch (IOException io) {
-                //LOG.info(io.toString());
+                //LOG.info(io.toStringSep());
                 validNonce = "";
             }
         } else {

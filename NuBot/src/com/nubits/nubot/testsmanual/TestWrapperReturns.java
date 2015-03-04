@@ -127,7 +127,7 @@ public class TestWrapperReturns {
     private static void clearOrders(CurrencyPair pair) {
         ApiResponse response = Global.exchange.getTrade().clearOrders(pair);
         if (response.isPositive()) {
-            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
         } else {
             print("Error: " + response.getError().toString());
         }
@@ -148,7 +148,7 @@ public class TestWrapperReturns {
     private static boolean cancelOrder(String order_id, CurrencyPair pair) {
         ApiResponse response = Global.exchange.getTrade().cancelOrder(order_id, pair);
         if (response.isPositive()) {
-            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return (boolean) response.getResponseObject();
         } else {
             print("Error: " + response.getError().toString());
@@ -159,7 +159,7 @@ public class TestWrapperReturns {
     private static Order getOrderDetail(String order_id) {
         ApiResponse response = Global.exchange.getTrade().getOrderDetail(order_id);
         if (response.isPositive()) {
-            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return (Order) response.getResponseObject();
         } else {
             print("Error: " + response.getError().toString());
@@ -182,7 +182,7 @@ public class TestWrapperReturns {
         //get the available balances for pair
         ApiResponse response = Global.exchange.getTrade().getAvailableBalances(pair);
         if (response.isPositive()) {
-            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
         } else {
             print("Error: " + response.getError().toString());
         }
@@ -192,7 +192,7 @@ public class TestWrapperReturns {
         //test that sell requests are processed correctly
         ApiResponse response = Global.exchange.getTrade().sell(pair, amount, price);
         if (response.isPositive()) {
-            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return response.getResponseObject().toString();
         } else {
             print("Error: " + response.getError().toString());
@@ -204,7 +204,7 @@ public class TestWrapperReturns {
         //test that sell requests are processed correctly
         ApiResponse response = Global.exchange.getTrade().buy(pair, amount, price);
         if (response.isPositive()) {
-            //LOG.warn("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return response.getResponseObject().toString();
         } else {
             print("Error: " + response.getError().toString());

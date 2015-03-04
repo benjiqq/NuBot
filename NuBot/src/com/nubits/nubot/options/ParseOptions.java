@@ -344,7 +344,7 @@ public class ParseOptions {
                 org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                 options.backupFeedNames.add((String) tempJson.get("name"));
             } catch (JSONException ex) {
-                throw new NuBotConfigException(ex.toString());
+                throw new NuBotConfigException(ex.toStringSep());
             }
         }*/
 

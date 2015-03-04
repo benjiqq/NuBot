@@ -265,7 +265,7 @@ public class PoloniexWrapper implements TradeInterface {
         pair = CurrencyPair.swap(pair);
         /*Params
          */
-        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("amount", Double.toString(amount));
         query_args.put("rate", Double.toString(rate));
 
@@ -302,7 +302,7 @@ public class PoloniexWrapper implements TradeInterface {
         String pairString = "all";
         if (pair != null) {
             pair = CurrencyPair.swap(pair);
-            pairString = pair.toString("_").toUpperCase();
+            pairString = pair.toStringSep().toUpperCase();
         }
 
         query_args.put("currencyPair", pairString);
@@ -377,7 +377,7 @@ public class PoloniexWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
 
         pair = CurrencyPair.swap(pair);
-        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("orderNumber", orderID);
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
@@ -551,7 +551,7 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         pair = CurrencyPair.swap(pair);
-        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("start", startDateArg);
 
         ApiResponse response = getQuery(url, method, query_args, isGet);

@@ -55,7 +55,7 @@ public class FrozenBalancesManager {
 
     //Call this on bot startup
     public FrozenBalancesManager(String exchangName, CurrencyPair pair, String folder) {
-        String fileName = pair.toString("_") + "-" + exchangName + "-frozen.json";
+        String fileName = pair.toStringSep() + "-" + exchangName + "-frozen.json";
         this.pathToFrozenBalancesFiles = folder + fileName;
         if (Global.swappedPair) {
             toFreezeCurrency = pair.getOrderCurrency();

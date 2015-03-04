@@ -256,7 +256,7 @@ public abstract class NuBotBase {
     }
 
     protected void notifyOnline() {
-        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toString("_") + ")";
+        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toStringSep() + ")";
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 

@@ -354,7 +354,7 @@ public class BterWrapper implements TradeInterface {
         boolean isGet = false;
         String order_id = "";
         HashMap<String, String> query_args = new HashMap<>();
-        query_args.put("pair", pair.toString("_").toLowerCase());
+        query_args.put("pair", pair.toStringSep().toLowerCase());
         query_args.put("type", type);
         query_args.put("rate", Double.toString(rate));
         query_args.put("amount", Double.toString(amount));
@@ -515,7 +515,7 @@ public class BterWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray array = (JSONArray) httpAnswerJson.get("pairs");
 
-            String searchingFor = pair.toString("_").toLowerCase();
+            String searchingFor = pair.toStringSep().toLowerCase();
 
             for (int i = 0; i < array.size(); i++) {
                 JSONObject tempObj = (JSONObject) array.get(i);
@@ -540,7 +540,7 @@ public class BterWrapper implements TradeInterface {
     }
 
     public static String getTickerPath(CurrencyPair pair) {
-        return "ticker/" + pair.toString("_").toLowerCase();
+        return "ticker/" + pair.toStringSep().toLowerCase();
     }
 
     @Override
@@ -763,7 +763,7 @@ public class BterWrapper implements TradeInterface {
         ArrayList<Trade> tradeList = new ArrayList<Trade>();
 
         HashMap<String, String> query_args = new HashMap<>();
-        query_args.put("pair", pair.toString("_").toLowerCase());
+        query_args.put("pair", pair.toStringSep().toLowerCase());
 
         ApiResponse response = getQuery(url, query_args, isGet);
         if (response.isPositive()) {

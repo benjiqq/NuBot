@@ -1,6 +1,7 @@
 package com.nubits.nubot.webui;
 
 
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
@@ -88,6 +89,12 @@ public class ConfigController {
             newopt.setNudPort(newv);
         }
 
+        if (postJson.containsKey("pair")) {
+            String p = "" +  postJson.get("pair");
+            CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
+            newopt.setPair(newpair);
+        }
+
         return newopt;
     }
 
@@ -106,7 +113,7 @@ public class ConfigController {
 
             //not working. put is in request body
             //request.queryParams("apikey");
-
+            LOG.info("config received post" + request);
             String json_body = request.body();
 
             JSONParser parser = new JSONParser();
@@ -117,7 +124,7 @@ public class ConfigController {
 
             }
 
-            LOG.info("trying post " + postJson);
+            LOG.info("the JSON of the post " + postJson);
 
             //TODO: test validity of posted options
             boolean valid = true;

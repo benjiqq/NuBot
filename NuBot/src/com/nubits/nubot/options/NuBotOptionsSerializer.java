@@ -5,6 +5,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
 
@@ -33,8 +34,10 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
         root.addProperty("priceincrement", opt.priceIncrement);
 
-        System.out.println(opt.pair.toString());
-        //root.addProperty("pair", opt.pair.toString("_"));
+        CurrencyPair pair = opt.getPair();
+        String spair = pair.toStringSep();
+        root.addProperty("pair", spair);
+        //root.addProperty("pair", opt.pair.toStringSep("_"));
 
         return root;
     }

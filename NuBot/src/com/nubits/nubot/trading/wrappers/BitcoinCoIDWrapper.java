@@ -174,7 +174,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        String url = API_TICKER_URL + pair.toString("_") + "/" + API_TICKER;
+        String url = API_TICKER_URL + pair.toStringSep() + "/" + API_TICKER;
         HashMap<String, String> query_args = new HashMap<>();
         boolean isGet = true;
 
@@ -224,7 +224,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         boolean isGet = false;
         String order_id = null;
 
-        args.put("pair", pair.toString("_"));
+        args.put("pair", pair.toStringSep());
         args.put("type", type.toLowerCase());
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMinimumFractionDigits(8);
@@ -270,10 +270,10 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         //only handles openOrders with given pair
 
         if (pair != null) {
-            query_args.put("pair", pair.toString("_"));
+            query_args.put("pair", pair.toStringSep());
         } else {
             pair = Global.options.getPair();
-            query_args.put("pair", pair.toString("_"));
+            query_args.put("pair", pair.toStringSep());
         }
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
@@ -350,7 +350,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
 
-        query_args.put("pair", pair.toString("_"));
+        query_args.put("pair", pair.toStringSep());
         query_args.put("order_id", orderID);
         Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
         query_args.put("type", currentOrder.getType().toLowerCase());
@@ -401,7 +401,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         ArrayList<Trade> tradeList = new ArrayList<>();
 
-        query_args.put("pair", pair.toString("_"));
+        query_args.put("pair", pair.toStringSep());
         if (startTime > 0) {
             query_args.put("since", Objects.toString(startTime));
         }

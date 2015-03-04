@@ -86,7 +86,11 @@ public class TestExchangePoloniex extends TestCase {
         Global.exchange.setTrade(ti);
         Currency btc = CurrencyList.BTC;
         assertTrue(btc != null);
+        long start = System.currentTimeMillis();
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
+        long stop = System.currentTimeMillis();
+        long delta = stop - start;
+        System.out.println("delta " + delta);
 
         if (balancesResponse.isPositive()) {
             LOG.info("Positive response  from TradeInterface.getBalance() ");
@@ -100,7 +104,7 @@ public class TestExchangePoloniex extends TestCase {
             }
             //Balance balance = (Balance) o;
 
-            //LOG.info(balance.toString());
+            //LOG.info(balance.toStringSep());
 
             //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
             //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);

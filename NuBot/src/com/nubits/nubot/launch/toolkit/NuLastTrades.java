@@ -169,7 +169,7 @@ public class NuLastTrades {
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
             FileSystem.writeToFile("{\n", output, false);
             //FileSystem.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
-            //FileSystem.writeToFile("\"pair\":\"" + pair.toString("_") + "\",\n", output, true);
+            //FileSystem.writeToFile("\"pair\":\"" + pair.toStringSep("_") + "\",\n", output, true);
             LOG.info("Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);

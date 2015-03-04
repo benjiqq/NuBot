@@ -82,6 +82,6 @@ public class BterPriceFeed extends AbstractPriceFeed {
     }
 
     private String getUrl(CurrencyPair pair) {
-        return "http://data.bter.com/api/1/ticker/" + pair.toString("_");
+        return "http://data.bter.com/api/1/ticker/" + pair.toStringSep();
     }
 }

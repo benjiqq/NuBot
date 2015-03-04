@@ -169,13 +169,13 @@ public class NuRPCClient {
     /*
      public Double getBalance(String account) {
      String[] params = { account };
-     JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GET_BALANCE, Arrays.asList(params));
+     JSONObject json = invokeRPC(UUID.randomUUID().toStringSep(), COMMAND_GET_BALANCE, Arrays.asList(params));
      return (Double)json.get("result");
      }
 
      public String getNewAddress(String account) {
      String[] params = { account };
-     JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GET_NEW_ADDRESS, Arrays.asList(params));
+     JSONObject json = invokeRPC(UUID.randomUUID().toStringSep(), COMMAND_GET_NEW_ADDRESS, Arrays.asList(params));
      return (String)json.get("result");
      }
      */

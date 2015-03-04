@@ -30,6 +30,8 @@ public class CurrencyPair {
     private Currency orderCurrency;
     private Currency paymentCurrency;
 
+    private final String standardsep  = "_";
+
     //Constructor
     /**
      *
@@ -66,12 +68,11 @@ public class CurrencyPair {
     }
 
     //Methods
-    /**
-     *
-     * @param sep
-     * @return
-     */
-    public String toString(String sep) {
+    public String toStringSep() {
+        return orderCurrency.getCode().toLowerCase() + standardsep + paymentCurrency.getCode().toLowerCase();
+    }
+
+    public String toStringSepSpecial(String sep) {
         return orderCurrency.getCode().toLowerCase() + sep + paymentCurrency.getCode().toLowerCase();
     }
 

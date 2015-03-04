@@ -77,6 +77,6 @@ public class BtcePriceFeed extends AbstractPriceFeed {
     }
 
     private String getUrl(CurrencyPair pair) {
-        return "https://btc-e.com/api/2/" + (pair.toString("_")).toLowerCase() + "/ticker/";
+        return "https://btc-e.com/api/2/" + (pair.toStringSep()).toLowerCase() + "/ticker/";
     }
 }

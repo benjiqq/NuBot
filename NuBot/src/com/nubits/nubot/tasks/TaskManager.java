@@ -120,7 +120,7 @@ public class TaskManager {
                 if (!sentNotification) {
                     String additionalInfo = "";
                     if (Global.options != null) {
-                        additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toString("_");
+                        additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
                     }
                     //dpn't send mail here for now
                     HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
