@@ -33,10 +33,7 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("maxsellordervolume", opt.maxSellVolume);
         root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
         root.addProperty("priceincrement", opt.priceIncrement);
-
-        CurrencyPair pair = opt.getPair();
-        String spair = pair.toStringSep();
-        root.addProperty("pair", spair);
+        root.addProperty("pair", opt.pair.toStringSep());
         //root.addProperty("pair", opt.pair.toStringSep("_"));
 
         return root;

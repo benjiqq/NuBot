@@ -174,7 +174,8 @@ public class ParseOptions {
         String mailRecipient = (String) getIgnoreCase(optionsJSON, "mailrecipient");
 
         String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
-        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr);
+        System.out.println(">>>>>>> pair: " + pair);
 
         boolean aggregate = true; //true only for USD
         if (!pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {

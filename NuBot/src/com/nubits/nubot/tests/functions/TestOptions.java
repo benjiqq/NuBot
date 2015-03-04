@@ -3,6 +3,7 @@ package functions;
 
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
@@ -153,6 +154,53 @@ public class TestOptions extends TestCase {
 
 
     }
+
+    @Test
+    public void testLoadOptionsAll(){
+
+        String configFile = "config.json";
+        String configdir = "config";
+        String testconfig =configdir + "/" +  configFile;
+
+        boolean catched = false;
+        NuBotOptions opt = null;
+        try {
+             opt = ParseOptions.parseOptionsSingle(testconfig);
+
+        } catch (NuBotConfigException e) {
+            System.out.println("could not parse config");
+            System.out.println(e);
+            catched = true;
+        }
+
+        assertTrue(!catched);
+
+        /*String nudIp = NuBotOptionsDefault.nudIp;
+        String sendMails = NuBotOptionsDefault.sendMails;
+        boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
+        boolean executeOrders = NuBotOptionsDefault.executeOrders;
+        boolean verbose = NuBotOptionsDefault.verbose;
+        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
+        int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
+        double txFee = NuBotOptionsDefault.txFee;
+        double priceIncrement = NuBotOptionsDefault.priceIncrement;
+        double keepProceeds = NuBotOptionsDefault.keepProceeds;
+        double maxSellVolume = NuBotOptionsDefault.maxSellVolume;
+        double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
+        int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
+        boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;*/
+
+        assertTrue(opt.getPair()!=null);
+        assertTrue(opt.getPair().equals("nbt_btc"));
+
+
+
+    }
+
+
+
+
 
     // @Test
     // public void testDefaultOptions() {

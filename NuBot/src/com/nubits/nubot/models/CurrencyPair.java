@@ -30,7 +30,7 @@ public class CurrencyPair {
     private Currency orderCurrency;
     private Currency paymentCurrency;
 
-    private final String standardsep  = "_";
+    private final static String standardsep  = "_";
 
     //Constructor
     /**
@@ -43,6 +43,11 @@ public class CurrencyPair {
         this.paymentCurrency = paymentCurrency;
     }
 
+    public static CurrencyPair getCurrencyPairFromString(String pairString) {
+        return getCurrencyPairFromString(pairString, standardsep);
+
+    }
+
     /**
      *
      * @param pairString
@@ -52,12 +57,12 @@ public class CurrencyPair {
     public static CurrencyPair getCurrencyPairFromString(String pairString, String sep) {
         String orderCurrencyCode;
         String paymentCurrencyCode;
-        if (!sep.equals("")) {
-            orderCurrencyCode = pairString.substring(0, pairString.indexOf(sep));
-            paymentCurrencyCode = pairString.substring(pairString.indexOf(sep) + 1);
-        } else {
+        if (sep.equals("")) {
             orderCurrencyCode = pairString.substring(0, 3);
             paymentCurrencyCode = pairString.substring(3);
+        } else {
+            orderCurrencyCode = pairString.substring(0, pairString.indexOf(sep));
+            paymentCurrencyCode = pairString.substring(pairString.indexOf(sep) + 1);
         }
 
 
