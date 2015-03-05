@@ -94,7 +94,7 @@ sourceSets {
 
     test {
         java {
-            srcDir 'NuBot/src/com/nubits/nubot/tests/'
+            srcDir 'NuBot/tests'
         }
         resources {
             srcDir 'NuBot/res'
@@ -161,7 +161,7 @@ task initDist << {
 }
 
 
-task NuBotJar(type: Jar) {
+task NuBotJar(type: Jar) << {
     description 'create the jar in ' + project.file(distdir)
     archiveName = jarname
     destinationDir project.file(distdir)
@@ -202,17 +202,10 @@ task NuBotMakeDistribution(dependsOn: compileReadme) << {
         }
     }
 
-
 }
 
 
-task runCollector(type: JavaExec) {
-    description 'run the collector service on a server'
-    main = "com.nubits.nuservice.CollectService"
-    classpath = sourceSets.main.runtimeClasspath
-}
-
-task runUI(type: JavaExec) {
+task runUI(type: JavaExec) << {
     description 'run the WebUI'
     main = "com.nubits.nubot.webui.UiServer"
     classpath = sourceSets.main.runtimeClasspath
@@ -225,13 +218,19 @@ task runUI(type: JavaExec) {
     }*/
 }
 
-task testFunctions(type: Test) {
+task testExchanges(type: Test) << {
   // explicitly include or exclude tests
-  include 'functions/*'
+  include 'NuBot/testexchanges/*'
   //include 'components/**'
   //include 'integration/**'
   //exclude 'components/TestStartStop**'
 }
+
+/*task runCollector(type: JavaExec) << {
+    description 'run the collector service on a server'
+    main = "com.nubits.nuservice.CollectService"
+    classpath = sourceSets.main.runtimeClasspath
+}*/
 
 
 
