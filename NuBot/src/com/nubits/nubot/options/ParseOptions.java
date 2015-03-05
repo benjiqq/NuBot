@@ -145,13 +145,6 @@ public class ParseOptions {
             throw e;
         }
 
-
-        double wallchangeThreshold = -1;
-        double spread = -1;
-        double distanceThreshold = -1;
-
-
-
         //First try to parse compulsory parameters
         String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
