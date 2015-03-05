@@ -175,7 +175,7 @@ task NuBotJar(type: Jar) {
     manifest.attributes("Main-Class": mainclass)
     //manifest.attributes("Main-Class": uiclass)
 
-    //println 'jar created: ' + archivePath
+    println 'generated jar' + jar.archivePath
 }
 
 
@@ -200,6 +200,8 @@ task NuBotMakeDistribution(dependsOn: compileReadme) << {
             into "${distdir}"
         }
     }
+
+
 }
 
 
