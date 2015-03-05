@@ -23,7 +23,7 @@ package com.nubits.nubot.launch.toolkit;
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
@@ -33,15 +33,13 @@ import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
 
 public class NuCMC {
 
-    private static final Logger LOG = Logger.getLogger(NuCMC.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuCMC.class.getName());
     private static final String USAGE_STRING = "java  -jar NuCMC <path/to/options.json>";
     public static final String HEADER = ".. , ..., ...,\n";
     private String optionsPath;
@@ -60,17 +58,12 @@ public class NuCMC {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
 
         NuCMC app = new NuCMC();
         if (app.readParams(args)) {
             createShutDownHook();
 
-            LOG.fine("Launching NuCheckPrice ");
+            LOG.info("Launching NuCheckPrice ");
             app.exec();
         } else {
             System.exit(0);
@@ -87,7 +80,7 @@ public class NuCMC {
 
 
         } else {
-            LOG.severe("Problem while reading options from " + optionsPath);
+            LOG.error("Problem while reading options from " + optionsPath);
             System.exit(0);
         }
 
@@ -131,7 +124,7 @@ public class NuCMC {
 
             ok = true;
         } catch (JSONException | NumberFormatException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
             ok = false;
         }
         return ok;
@@ -141,7 +134,7 @@ public class NuCMC {
         boolean ok = false;
 
         if (args.length != 1) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+            LOG.error("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
 
@@ -157,7 +150,7 @@ public class NuCMC {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                LOG.fine("Exiting...");
+                LOG.info("Exiting...");
                 mainThread.interrupt();
                 Global.taskManager.stopAll();
 
@@ -190,7 +183,7 @@ public class NuCMC {
             }
 
         } else {
-            LOG.severe(deleteOrdersResponse.getError().toString());
+            LOG.error(deleteOrdersResponse.getError().toString());
         }
     }
 }

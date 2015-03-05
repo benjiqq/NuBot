@@ -6,8 +6,8 @@ package com.nubits.nubot.testsmanual;
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
@@ -24,11 +24,12 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class WrapperTestUtils {
 
-    private static final Logger LOG = Logger.getLogger(WrapperTestUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(WrapperTestUtils.class.getName());
 
     public static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
@@ -40,7 +41,7 @@ public class WrapperTestUtils {
             LOG.info(balance.toString());
 
         } else {
-            LOG.severe(balancesResponse.getError().toString());
+            LOG.error(balancesResponse.getError().toString());
         }
     }
 
@@ -53,7 +54,7 @@ public class WrapperTestUtils {
 
             LOG.info(balance.toString());
         } else {
-            LOG.severe(balanceResponse.getError().toString());
+            LOG.error(balanceResponse.getError().toString());
         }
     }
 
@@ -71,7 +72,7 @@ public class WrapperTestUtils {
                     + ticker.getBid() + " " + pair.getPaymentCurrency().getCode());
 
         } else {
-            LOG.severe(lastPriceResponse.getError().toString());
+            LOG.error(lastPriceResponse.getError().toString());
         }
 
     }
@@ -84,14 +85,14 @@ public class WrapperTestUtils {
         if (sellResponse.isPositive()) {
 
             LOG.info("\nPositive response  from TradeInterface.sell(...) ");
-            LOG.warning("Strategy : Submit order : "
+            LOG.warn("Strategy : Submit order : "
                     + "sell" + amountSell + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceSell + " " + pair.getPaymentCurrency().getCode());
 
             String sellResponseString = (String) sellResponse.getResponseObject();
             LOG.info("Response = " + sellResponseString);
         } else {
-            LOG.severe(sellResponse.getError().toString());
+            LOG.error(sellResponse.getError().toString());
         }
     }
 
@@ -108,7 +109,7 @@ public class WrapperTestUtils {
             LOG.info("Response = " + buyResponseString);
 
         } else {
-            LOG.severe(buyResponse.getError().toString());
+            LOG.error(buyResponse.getError().toString());
         }
     }
 
@@ -126,7 +127,7 @@ public class WrapperTestUtils {
             }
 
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -143,7 +144,7 @@ public class WrapperTestUtils {
                 LOG.info(tempOrder.toString());
             }
         } else {
-            LOG.severe(activeOrdersUSDNTBResponse.getError().toString());
+            LOG.error(activeOrdersUSDNTBResponse.getError().toString());
         }
     }
 
@@ -172,7 +173,7 @@ public class WrapperTestUtils {
             }
 
         } else {
-            LOG.severe(deleteOrderResponse.getError().toString());
+            LOG.error(deleteOrderResponse.getError().toString());
         }
     }
 
@@ -184,7 +185,7 @@ public class WrapperTestUtils {
             double txFee = (Double) txFeeResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFee + "%");
         } else {
-            LOG.severe(txFeeResponse.getError().toString());
+            LOG.error(txFeeResponse.getError().toString());
         }
     }
 
@@ -196,7 +197,7 @@ public class WrapperTestUtils {
             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFeeUSDNTB + "%");
         } else {
-            LOG.severe(txFeeNTBUSDResponse.getError().toString());
+            LOG.error(txFeeNTBUSDResponse.getError().toString());
         }
     }
 
@@ -208,7 +209,7 @@ public class WrapperTestUtils {
             boolean exist = (boolean) orderDetailResponse.getResponseObject();
             LOG.info("Order " + orderId + "  active? " + exist);
         } else {
-            LOG.severe(orderDetailResponse.getError().toString());
+            LOG.error(orderDetailResponse.getError().toString());
         }
     }
 
@@ -224,7 +225,7 @@ public class WrapperTestUtils {
             }
 
         } else {
-            LOG.severe(deleteOrdersResponse.getError().toString());
+            LOG.error(deleteOrdersResponse.getError().toString());
         }
     }
 
@@ -240,7 +241,7 @@ public class WrapperTestUtils {
                 LOG.info(tempTrade.toString());
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -256,7 +257,7 @@ public class WrapperTestUtils {
                 LOG.info(tempTrade.toString());
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
@@ -279,7 +280,7 @@ public class WrapperTestUtils {
             try {
                 Thread.sleep(400);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
 
@@ -288,7 +289,7 @@ public class WrapperTestUtils {
             try {
                 Thread.sleep(400);
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
 
@@ -297,7 +298,7 @@ public class WrapperTestUtils {
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         //try to clear orders
@@ -315,7 +316,7 @@ public class WrapperTestUtils {
 
         Global.options.setExchangeName(exchangeName);
 
-        if (exchangeName.equals(Constant.BTCE)) {
+        if (exchangeName.equals(ExchangeFacade.BTCE)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BTCE_SECRET, Passwords.BTCE_KEY);
             //Create a new TradeInterface object using the custom implementation
@@ -323,70 +324,70 @@ public class WrapperTestUtils {
 
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
 
-        } else if (exchangeName.equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
+        } else if (exchangeName.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.INTERNAL_PEATIO_SECRET, Passwords.INTERNAL_PEATIO_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangeName.equals(Constant.CCEDK)) {
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
+        } else if (exchangeName.equals(ExchangeFacade.CCEDK)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEDK_SECRET, Passwords.CCEDK_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.BTER)) {
+        } else if (exchangeName.equals(ExchangeFacade.BTER)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BTER_SECRET, Passwords.BTER_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.POLONIEX)) {
+        } else if (exchangeName.equals(ExchangeFacade.POLONIEX)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.POLONIEX_SECRET, Passwords.POLONIEX_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.CCEX)) {
+        } else if (exchangeName.equals(ExchangeFacade.CCEX)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.CCEX_SECRET, "");
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.ALLCOIN)) {
+        } else if (exchangeName.equals(ExchangeFacade.ALLCOIN)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.ALLCOIN_SECRET, Passwords.ALLCOIN_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.BITSPARK_PEATIO)) {
+        } else if (exchangeName.equals(ExchangeFacade.BITSPARK_PEATIO)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BITSPARK_SECRET, Passwords.BITSPARK_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.EXCOIN)) {
+        } else if (exchangeName.equals(ExchangeFacade.EXCOIN)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.EXCOIN_SECRET, Passwords.EXCOIN_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.BITCOINCOID)) {
+        } else if (exchangeName.equals(ExchangeFacade.BITCOINCOID)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.BITCOINCOID_SECRET, Passwords.BITCOINCOID_KEY);
 
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(Constant.ALTSTRADE)) {
+        } else if (exchangeName.equals(ExchangeFacade.ALTSTRADE)) {
             //Wrap the keys into a new ApiKeys object
             keys = new ApiKeys(Passwords.ALTSTRADE_SECRET, Passwords.ALTSTRADE_KEY);
 
@@ -394,7 +395,7 @@ public class WrapperTestUtils {
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new AltsTradeWrapper(keys, Global.exchange));
         } else {
-            LOG.severe("Exchange " + exchangeName + " not supported");
+            LOG.error("Exchange " + exchangeName + " not supported");
             System.exit(0);
         }
 
@@ -410,7 +411,7 @@ public class WrapperTestUtils {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         /* Setup (end) ------------------------------------------------------------------------------------------------------ */

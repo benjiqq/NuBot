@@ -1,5 +1,7 @@
+package exchanges;
+
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.CurrencyPair;
@@ -10,11 +12,12 @@ import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestExchangePeatio extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(TestExchangePeatio.class
+    private static final Logger LOG = LoggerFactory.getLogger(TestExchangePeatio.class
             .getName());
 
     private static String testconfigFile = "peatio.json";

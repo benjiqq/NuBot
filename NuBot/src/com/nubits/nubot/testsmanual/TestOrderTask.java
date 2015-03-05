@@ -21,18 +21,16 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Passwords;
-import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -40,7 +38,7 @@ import java.util.logging.Logger;
  */
 public class TestOrderTask {
 
-    private static final Logger LOG = Logger.getLogger(TestOrderTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestOrderTask.class.getName());
     private static Exchange exchange;
     private static String nudip = "127.0.0.1";
     private static int nudport = 9091;
@@ -56,20 +54,13 @@ public class TestOrderTask {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
 
-        try {
-            NuLogger.setup(true, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
-        LOG.setLevel(Level.FINE);
-
         Utils.installKeystore(true);
 
         Global.options = NuBotOptionsDefault.defaultFactory();
 
 
         //Check local filesystem for API keys
-        LOG.fine("Checking existance of API keys on local filesystem");
+        LOG.info("Checking existance of API keys on local filesystem");
 
         ApiKeys keys;
 
@@ -82,7 +73,7 @@ public class TestOrderTask {
         //Create a new Exchange
 
 
-        exchange = new Exchange(Constant.INTERNAL_EXCHANGE_PEATIO);
+        exchange = new Exchange(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
 
         //Create e ExchangeLiveData object to accomodate liveData from the exchange
         ExchangeLiveData liveData = new ExchangeLiveData();
@@ -91,7 +82,7 @@ public class TestOrderTask {
 
         //Create a new TradeInterface object using the BtceWrapper implementation
         //Assign the TradeInterface to the btceExchange
-        exchange.setTrade(new PeatioWrapper(keys, exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
+        exchange.setTrade(new PeatioWrapper(keys, exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
         exchange.getLiveData().setUrlConnectionCheck(exchange.getTrade().getUrlConnectionCheck());
 
         //Create a TaskManager and
@@ -102,7 +93,7 @@ public class TestOrderTask {
 
         Global.publicAddress = Passwords.CUSTODIAN_PUBLIC_ADDRESS;
 
-        LOG.fine("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
+        LOG.info("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
         Global.rpcClient = new NuRPCClient(nudip, nudport, Passwords.NUD_RPC_USER,
                 Passwords.NUD_RPC_PASS, true, true, Global.publicAddress, Constant.NBT_PPC, "testid");
 
@@ -114,15 +105,15 @@ public class TestOrderTask {
         try {
             Thread.sleep(2000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
 
-        LOG.fine("Check connection with nud");
+        LOG.info("Check connection with nud");
         if (Global.rpcClient.isConnected()) {
-            LOG.fine("OK!");
+            LOG.info("OK!");
         } else {
-            LOG.severe("Problem while connecting with nud");
+            LOG.error("Problem while connecting with nud");
             System.exit(0);
         }
 

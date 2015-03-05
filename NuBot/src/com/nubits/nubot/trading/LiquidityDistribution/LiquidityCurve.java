@@ -21,11 +21,12 @@ package com.nubits.nubot.trading.LiquidityDistribution;
  *
  * @author desrever <desrever at nubits.com>
  */
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public abstract class LiquidityCurve {
 
-    private static final Logger LOG = Logger.getLogger(LiquidityCurve.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(LiquidityCurve.class.getName());
     public static final String STEEPNESS_LOW = "s_low";
     public static final String STEEPNESS_MID = "s_mid";
     public static final String STEEPNESS_HIGH = "s_high";
@@ -41,7 +42,7 @@ public abstract class LiquidityCurve {
         if (steepness.equals(STEEPNESS_LOW) || steepness.equals(STEEPNESS_MID) || steepness.equals(STEEPNESS_HIGH) || steepness.equals(STEEPNESS_FLAT)) {
             this.steepness = steepness;
         } else {
-            LOG.severe("Value not accepted for steepness : " + steepness);
+            LOG.error("Value not accepted for steepness : " + steepness);
 
         }
     }

@@ -19,17 +19,16 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
-import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.json.simple.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -37,7 +36,7 @@ import org.json.simple.JSONObject;
  */
 public class TestRPCLiquidityInfo {
 
-    private static final Logger LOG = Logger.getLogger(TestRPCLiquidityInfo.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
     private static boolean verbose = false;
@@ -65,13 +64,13 @@ public class TestRPCLiquidityInfo {
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
-        test.setup(Constant.INTERNAL_EXCHANGE_PEATIO, custodian, Constant.NBT_BTC, user, pass);
+        test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, Constant.NBT_BTC, user, pass);
         test.testCheckNudTask();
         try {
             Thread.sleep(2000);
 
         } catch (InterruptedException ex) {
-            Logger.getLogger(TestRPCLiquidityInfo.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("" +  ex);
         }
         //test.testGetInfo();
         //test.testIsConnected();
@@ -88,7 +87,7 @@ public class TestRPCLiquidityInfo {
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar, amountBuy, amountSell, tier);
             if (null == responseObject) {
-                LOG.severe("Something went wrong while sending liquidityinfo");
+                LOG.error("Something went wrong while sending liquidityinfo");
             } else {
                 LOG.info(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
@@ -98,7 +97,7 @@ public class TestRPCLiquidityInfo {
                 }
             }
         } else {
-            LOG.severe("Nu Client offline. ");
+            LOG.error("Nu Client offline. ");
         }
 
     }
@@ -108,7 +107,7 @@ public class TestRPCLiquidityInfo {
             JSONObject responseObject = Global.rpcClient.getInfo();
             LOG.info(responseObject.toJSONString());
         } else {
-            LOG.severe("Nu Client offline. ");
+            LOG.error("Nu Client offline. ");
         }
     }
 
@@ -123,13 +122,7 @@ public class TestRPCLiquidityInfo {
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        //Create log dir
-        FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(verbose, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
+
 
         Utils.installKeystore(true);
 
@@ -154,12 +147,12 @@ public class TestRPCLiquidityInfo {
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar);
             if (null == responseObject) {
-                LOG.severe("Something went wrong while sending liquidityinfo");
+                LOG.error("Something went wrong while sending liquidityinfo");
             } else {
                 LOG.info(responseObject.toJSONString());
             }
         } else {
-            LOG.severe("Nu Client offline. ");
+            LOG.error("Nu Client offline. ");
         }
     }
 
@@ -167,12 +160,12 @@ public class TestRPCLiquidityInfo {
         if (Global.rpcClient.isConnected()) {
             double response = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar, type, address);
             if (response == -1) {
-                LOG.severe("Something went wrong while sending liquidityinfo");
+                LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.info("Total " + type + " liquidity : " + response + " " + Constant.NBT.getCode());
+                LOG.info("Total " + type + " liquidity : " + response + " " + CurrencyList.NBT.getCode());
             }
         } else {
-            LOG.severe("Nu Client offline. ");
+            LOG.error("Nu Client offline. ");
         }
 
     }

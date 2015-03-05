@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.global;
+package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
@@ -25,8 +25,8 @@ import com.nubits.nubot.utils.FrozenBalancesManager;
 import java.util.Properties;
 
 /**
+ * Global object for NuBot
  *
- * @author desrever < desrever@nubits.com >
  */
 public class Global {
 
@@ -34,12 +34,7 @@ public class Global {
     public static String sessionId;
     public static boolean running = false;
     public static Exchange exchange;
-    public static boolean startupComplete = false;
-    public static Thread connectionThread;
-    public static boolean isFirstTime;
     public static TaskManager taskManager;
-
-    public static boolean isDualSide;
     public static String publicAddress;
     public static NuRPCClient rpcClient;
     public static NuBotOptions options;

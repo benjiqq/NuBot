@@ -17,13 +17,14 @@
  */
 package com.nubits.nubot.tasks.strategy;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
  */
 public class StrategySecondaryPegTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(StrategySecondaryPegTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
@@ -48,7 +49,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.fine("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
+        LOG.info("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
         if (!isFirstTime) {
             if (!Global.options.isMultipleCustodians()) {
                 if (!shiftingWalls) {
@@ -58,25 +59,25 @@ public class StrategySecondaryPegTask extends TimerTask {
                         if (reset) {
                             String message = "Order reset needed on " + Global.exchange.getName();
                             HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
-                            LOG.warning(message);
+                            LOG.warn(message);
                             boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
                             if (reinitiateSuccess) {
                                 mightNeedInit = false;
                             }
                         } else {
-                            LOG.fine("No need to init new orders since current orders seems correct");
+                            LOG.info("No need to init new orders since current orders seems correct");
                         }
                         strategyUtils.recount();
                     }
 
                     //Make sure the orders and balances are ok or try to aggregate
                     if (!ordersAndBalancesOK) {
-                        LOG.severe("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+                        LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
                         mightNeedInit = true;
                     } else {
                         if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
                             //Execute buy Side strategy
-                            if (Global.isDualSide && proceedsInBalance && !needWallShift) {
+                            if (Global.options.isDualSide() && proceedsInBalance && !needWallShift) {
                                 strategyUtils.aggregateAndKeepProceeds();
                             }
                         }
@@ -90,7 +91,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             strategyUtils.recount();
             boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
             if (!reinitiateSuccess) {
-                LOG.severe("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
+                LOG.error("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
                 isFirstTime = true;
             }
             getSendLiquidityTask().setFirstOrdersPlaced(true);
@@ -101,7 +102,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (!shiftingWalls) {
             shiftingWalls = true;
 
-            LOG.warning("Strategy received a price change notification.");
+            LOG.warn("Strategy received a price change notification.");
             needWallShift = true;
 
             if (!Global.swappedPair) {
@@ -130,7 +131,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 message += NuBotAdminSettings.reset_every_minutes + " minutes elapsed since last shift";
             }
             HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
-            LOG.warning(message);
+            LOG.warn(message);
 
             shiftSuccess = strategyUtils.shiftWalls();
             if (shiftSuccess) {
@@ -138,11 +139,11 @@ public class StrategySecondaryPegTask extends TimerTask {
                 needWallShift = false;
                 LOG.info("Wall shift successful");
             } else {
-                LOG.severe("Wall shift failed");
+                LOG.error("Wall shift failed");
             }
             shiftingWalls = false;
         } else {
-            LOG.warning("Shift request failed, shift in progress.");
+            LOG.warn("Shift request failed, shift in progress.");
         }
     }
 

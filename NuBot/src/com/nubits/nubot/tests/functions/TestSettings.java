@@ -15,14 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tests;
+package functions;
 
 /**
  *
  *
  */
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;

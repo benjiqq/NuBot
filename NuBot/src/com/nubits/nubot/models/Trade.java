@@ -131,7 +131,7 @@ public class Trade {
 
     /* uncomment for csv output
      public String toCsvString() {
-     return id + "," + order_id + "," + pair.toString("_") + "," + type + "," + price.getQuantity() + "," + amount.getQuantity() + "," + date;
+     return id + "," + order_id + "," + pair.toStringSep("_") + "," + type + "," + price.getQuantity() + "," + amount.getQuantity() + "," + date;
      }
      */
     public String toJSONString() {

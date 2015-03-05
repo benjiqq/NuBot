@@ -18,17 +18,19 @@ package com.nubits.nubot.testsmanual;
  */
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestFroozenAmounts {
 
-    private static final Logger LOG = Logger.getLogger(TestFroozenAmounts.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestFroozenAmounts.class.getName());
 
     public static void main(String[] args) {
         //Load settings that contains the path
@@ -36,7 +38,7 @@ public class TestFroozenAmounts {
 
         CurrencyPair pair = Constant.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();
-        String exchangeName = Constant.BTER;
+        String exchangeName = ExchangeFacade.BTER;
 
         FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair, Global.settings.getProperty("frozen_folder"));
 

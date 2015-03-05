@@ -8,7 +8,7 @@ import static spark.Spark.get;
 
 public class LogController {
 
-    String filePath = "llogs/NuBot_main.log";
+    String filePath = "logs/NuBot_main.log";
 
     public LogController(String endpoint) {
 
@@ -22,7 +22,7 @@ public class LogController {
 
             return "log";
 
-        }, new JsonTransformerOptions());
+        });
 
 
     }

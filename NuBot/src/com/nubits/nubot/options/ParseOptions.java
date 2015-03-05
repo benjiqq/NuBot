@@ -1,7 +1,7 @@
 package com.nubits.nubot.options;
 
-import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
@@ -12,16 +12,18 @@ import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.util.*;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  * ParseOptions from one or several JSON files
  */
 public class ParseOptions {
 
-    private static String[] comp = {"secondarypegoptions", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
+    private static String[] comp = {"secondarypeg", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
-    private static final Logger LOG = Logger.getLogger(ParseOptions.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
 
 
     /**
@@ -94,6 +96,7 @@ public class ParseOptions {
 
     /**
      * the rules for valid configurations
+     *
      * @param optionsJSON
      * @return
      * @throws NuBotConfigException
@@ -103,6 +106,22 @@ public class ParseOptions {
         for (int i = 0; i < comp.length; i++) {
             if (!containsIgnoreCase(optionsJSON, comp[i]))
                 throw new NuBotConfigException("necessary key: " + comp[i]);
+        }
+
+        boolean submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
+
+        if (submitLiquidity) {
+
+            String[] sneeded = {"nubitaddress", "rpcpass", "rpcuser", "nudport"};
+
+            for (int i = 0; i < sneeded.length; i++) {
+                String s = sneeded[i];
+                if (!containsIgnoreCase(optionsJSON, s)) {
+                    throw new NuBotConfigException("When submit-liquidity is set to true "
+                            + "you need to declare a value for \"" +
+                            s + "\" ");
+                }
+            }
         }
 
         return true;
@@ -119,13 +138,12 @@ public class ParseOptions {
 
         NuBotOptions options = new NuBotOptions();
 
-        try{
+        try {
             isValidJSON(optionsJSON);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             throw e;
         }
 
-        boolean secondarypeg = false;
 
         double wallchangeThreshold = -1;
         double spread = -1;
@@ -148,13 +166,19 @@ public class ParseOptions {
         double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
+        boolean secondarypeg = NuBotOptionsDefault.secondarypeg;
+
 
         //First try to parse compulsory parameters
         String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
+        boolean supported = exchangeSupported(exchangeName);
+        if (!supported)
+            throw new NuBotConfigException("exchange not supported");
+
         boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
-        if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
+        if (!exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
             if (!containsIgnoreCase(optionsJSON, "apiKey")) {
                 throw new NuBotConfigException("The apikey parameter is compulsory.");
             } else {
@@ -169,7 +193,7 @@ public class ParseOptions {
         String mailRecipient = (String) getIgnoreCase(optionsJSON, "mailrecipient");
 
         String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
-        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr, "_");
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr);
 
         boolean aggregate = true; //true only for USD
         if (!pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
@@ -181,16 +205,16 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        boolean speg = containsIgnoreCase(optionsJSON, "secondarypegoptions");
+        secondarypeg = (boolean) optionsJSON.get("secondarypeg");
 
-        if (speg) {
+        if (secondarypeg) {
             parseSecondary(options, optionsJSON);
         }
 
 
         //---- optional settings ----
 
-        if (optionsJSON.containsKey("nudip")) {
+        if (containsIgnoreCase(optionsJSON, "nudip")) {
             nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
         }
 
@@ -248,37 +272,24 @@ public class ParseOptions {
         String nubitAddress = "", rpcPass = "", rpcUser = "";
         int nudPort = 9091;
 
-        if (submitLiquidity) {
-            if (containsIgnoreCase(optionsJSON, "nubitaddress")) {
-                nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"nubitaddress\" ");
-            }
 
-            if (containsIgnoreCase(optionsJSON, "rpcpass")) {
-                rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"rpcpass\" ");
-            }
-
-            if (containsIgnoreCase(optionsJSON, "rpcuser")) {
-                rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"rpcuser\" ");
-            }
-
-            if (containsIgnoreCase(optionsJSON, "nudport")) {
-                long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
-                nudPort = (int) nudPortlong;
-            } else {
-                throw new NuBotConfigException("When submit-liquidity is set to true "
-                        + "you need to declare a value for \"nudport\" ");
-            }
-
+        if (containsIgnoreCase(optionsJSON, "nubitaddress")) {
+            nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
         }
+
+        if (containsIgnoreCase(optionsJSON, "rpcpass")) {
+            rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "rpcuser")) {
+            rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
+        }
+
+        if (containsIgnoreCase(optionsJSON, "nudport")) {
+            long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
+            nudPort = (int) nudPortlong;
+        }
+
 
         if (containsIgnoreCase(optionsJSON, "mailnotifications")) {
             sendMails = (String) getIgnoreCase(optionsJSON, "mailnotifications");
@@ -291,7 +302,7 @@ public class ParseOptions {
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
                         + MailNotifications.MAIL_LEVEL_SEVERE + " or "
                         + MailNotifications.MAIL_LEVEL_NONE;
-                LOG.severe(error);
+                LOG.error(error);
                 throw new NuBotConfigException(error);
             }
         }
@@ -339,11 +350,11 @@ public class ParseOptions {
                 org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
                 options.backupFeedNames.add((String) tempJson.get("name"));
             } catch (JSONException ex) {
-                throw new NuBotConfigException(ex.toString());
+                throw new NuBotConfigException(ex.toStringSep());
             }
         }*/
 
-        options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypegoptions");
+        options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypeg");
 
         if (!containsIgnoreCase(optionsJSON, "wallchangeThreshold"))
             throw new NuBotConfigException("wallchangeThreshold needed if secondary peg defined");
@@ -369,6 +380,113 @@ public class ParseOptions {
         options.mainFeed = (String) optionsJSON.get("main-feed");
 
 
+    }
+
+    //TODO: redundant. this handles webUI json parsing
+    public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
+
+        String variableset = "none";
+        NuBotOptions newopt = new NuBotOptions();
+
+        if (containsIgnoreCase(postJson, "exchangename")) {
+            newopt.exchangeName ="" + getIgnoreCase(postJson,"exchangename");
+        }
+
+        if (containsIgnoreCase(postJson, "apikey")) {
+            newopt.apiKey = "" + getIgnoreCase(postJson, "apikey");
+        }
+
+        if (containsIgnoreCase(postJson, "apisecret")) {
+            newopt.apiSecret = "" + getIgnoreCase(postJson, "apisecret");
+        }
+
+        if (containsIgnoreCase(postJson, "mailRecipient")) {
+            newopt.mailRecipient = "" + getIgnoreCase(postJson,"mailRecipient");
+        }
+
+        if (containsIgnoreCase(postJson, "dualside")) {
+            newopt.dualSide = (boolean) getIgnoreCase(postJson,"dualside");
+        }
+
+        if (containsIgnoreCase(postJson, "multiplecustodians")) {
+            newopt.multipleCustodians =(boolean) getIgnoreCase(postJson,"multiplecustodians");
+        }
+
+        if (containsIgnoreCase(postJson, "submitliquidity")) {
+            newopt.submitLiquidity= (boolean) getIgnoreCase(postJson,"submitliquidity");
+        }
+
+        if (containsIgnoreCase(postJson, "secondarypeg")) {
+            newopt.secondarypeg =(boolean) getIgnoreCase(postJson,"secondarypeg");
+        }
+
+        if (containsIgnoreCase(postJson, "executeorders")) {
+            newopt.executeOrders =(boolean) getIgnoreCase(postJson,"executeorders");
+        }
+
+        if (containsIgnoreCase(postJson, "verbose")) {
+            newopt.verbose =(boolean) getIgnoreCase(postJson,"verbose");
+        }
+
+        if (containsIgnoreCase(postJson, "hipchat")) {
+            newopt.sendHipchat =(boolean) getIgnoreCase(postJson,"hipchat");
+        }
+
+        if (containsIgnoreCase(postJson, "nubitaddress")) {
+            newopt.nubitAddress = "" + getIgnoreCase(postJson,"nubitaddress");
+        }
+
+        if (containsIgnoreCase(postJson, "rpcUser")) {
+            newopt.rpcUser = "" + getIgnoreCase(postJson,"rpcUser");
+        }
+
+        if (containsIgnoreCase(postJson,"rpcPass")) {
+            newopt.rpcPass = "" + getIgnoreCase(postJson,"rpcPass");
+        }
+
+        if (containsIgnoreCase(postJson, "nudIp")) {
+            newopt.nudIp = "" + getIgnoreCase(postJson,"nudIp");
+        }
+
+        if (containsIgnoreCase(postJson, "sendMails")) {
+            newopt.sendMails = "" + getIgnoreCase(postJson,"sendMails");
+        }
+
+
+        if (postJson.containsKey("nudport")) {
+            try {
+                int newv = (new Integer("" + getIgnoreCase(postJson,"nudport"))).intValue();
+                newopt.setNudPort(newv);
+            } catch (Exception e) {
+                //TODO
+            }
+        }
+
+        if (postJson.containsKey("pair")) {
+            String p = "" + getIgnoreCase(postJson,"pair");
+            CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
+            newopt.setPair(newpair);
+        }
+
+
+        return newopt;
+    }
+
+    public static boolean exchangeSupported(String exchangename) {
+        List<String> supportedExchanges = new ArrayList<String>();
+        supportedExchanges.add(ExchangeFacade.BTCE);
+        supportedExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
+        supportedExchanges.add(ExchangeFacade.BTER);
+        supportedExchanges.add(ExchangeFacade.CCEDK);
+        supportedExchanges.add(ExchangeFacade.POLONIEX);
+        supportedExchanges.add(ExchangeFacade.CCEX);
+        supportedExchanges.add(ExchangeFacade.ALLCOIN);
+        supportedExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
+        supportedExchanges.add(ExchangeFacade.EXCOIN);
+        supportedExchanges.add(ExchangeFacade.BITCOINCOID);
+        supportedExchanges.add(ExchangeFacade.ALTSTRADE);
+
+        return supportedExchanges.contains(exchangename);
     }
 
     public static void parseBackupfeeds() {
@@ -470,4 +588,6 @@ public class ParseOptions {
             return false;
         }
     }
+
+
 }

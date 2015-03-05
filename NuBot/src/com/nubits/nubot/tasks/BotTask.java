@@ -19,7 +19,8 @@ package com.nubits.nubot.tasks;
 
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -27,7 +28,7 @@ import java.util.logging.Logger;
  */
 public class BotTask {
 
-    private static final Logger LOG = Logger.getLogger(BotTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BotTask.class.getName());
     private Timer timer;
     private boolean running;
     private long interval; //expressed in millseconds
@@ -56,20 +57,20 @@ public class BotTask {
     public void start() {
         timer.scheduleAtFixedRate(task, 0, interval * 1000);
         setRunning(true);
-        LOG.fine("Started BotTask " + this.name);
+        LOG.info("Started BotTask " + this.name);
     }
 
     public void start(int delay) {
         timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);
-        LOG.fine("Started BotTask " + this.name);
+        LOG.info("Started BotTask " + this.name);
 
     }
 
     public void stop() {
         timer.cancel();
         setRunning(false);
-        LOG.fine("Stopped BotTask " + this.name);
+        LOG.info("Stopped BotTask " + this.name);
     }
 
     public boolean isRunning() {

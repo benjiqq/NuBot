@@ -22,11 +22,12 @@ package com.nubits.nubot.trading.LiquidityDistribution;
  * @author desrever <desrever at nubits.com>
  */
 import java.util.Objects;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class ModelParameters {
 
-    private static final Logger LOG = Logger.getLogger(ModelParameters.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ModelParameters.class.getName());
     private double offset; //Distance from 1$ target price, expressed in USD
     private double wallHeight; //amount of base-liquidity available at the best price, expressed in USD
     private double wallWidth; //otal width of the order book, expressed in USD

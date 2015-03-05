@@ -1,7 +1,6 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.MailNotifications;
 
 /**
@@ -24,6 +23,7 @@ public class NuBotOptionsDefault {
     public static double maxSellVolume = 0;
     public static double maxBuyVolume = 0;
     public static int emergencyTimeout = 60;
+    public static boolean secondarypeg = false;
     public static boolean distributeLiquidity = false;
 
     //double wallchangeThreshold = 0.5;

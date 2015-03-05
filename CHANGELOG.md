@@ -156,7 +156,7 @@
   - Reduced the amount of options necessary to launch the bot
 
 #### Bug fixes:
-  - LOG.fine messages now gets print on system output
+  - LOG.info messages now gets print on system output
   - Java .properties file to store general settings instead of static class
 
 

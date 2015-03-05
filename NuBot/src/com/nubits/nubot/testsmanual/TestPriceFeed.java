@@ -18,18 +18,18 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -38,7 +38,7 @@ import java.util.logging.Logger;
 public class TestPriceFeed {
     //refer to FEEDS.md for the list of price feeds
 
-    private static final Logger LOG = Logger.getLogger(TestPriceFeed.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeed.class.getName());
 
     public static void main(String a[]) {
         TestPriceFeed test = new TestPriceFeed();
@@ -59,12 +59,6 @@ public class TestPriceFeed {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
-        LOG.setLevel(Level.INFO);
 
         LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);
@@ -77,7 +71,7 @@ public class TestPriceFeed {
             LOG.info(lastPrice.toString());
         } else {
             //handle error
-            LOG.severe("There was a problem while updating the price");
+            LOG.error("There was a problem while updating the price");
         }
     }
 
@@ -158,14 +152,19 @@ public class TestPriceFeed {
 
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
 
-        PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        PriceFeedManager pfm = null;
+        try{
+            pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        }catch(NuBotConfigException e){
+
+        }
 
         LastPriceResponse lpr = pfm.getLastPrices();
 
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
-        LOG.info("\n\n\n ---------------------- Testing " + pair.toString("/"));
+        LOG.info("\n\n\n ---------------------- Testing " + pair.toStringSepSpecial("/"));
         LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);

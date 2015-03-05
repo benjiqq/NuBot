@@ -22,7 +22,8 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -32,7 +33,7 @@ import org.json.simple.parser.JSONParser;
  */
 public class BtcePriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BtcePriceFeed.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BtcePriceFeed.class.getName());
 
     public BtcePriceFeed() {
         name = "btce";
@@ -50,7 +51,7 @@ public class BtcePriceFeed extends AbstractPriceFeed {
             try {
                 htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
             JSONParser parser = new JSONParser();
@@ -63,19 +64,19 @@ public class BtcePriceFeed extends AbstractPriceFeed {
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
-                LOG.severe(htmlString);
-                LOG.severe(ex.toString());
+                LOG.error(htmlString);
+                LOG.error(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
         } else {
-            LOG.fine("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
+            LOG.info("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
     }
 
     private String getUrl(CurrencyPair pair) {
-        return "https://btc-e.com/api/2/" + (pair.toString("_")).toLowerCase() + "/ticker/";
+        return "https://btc-e.com/api/2/" + (pair.toStringSep()).toLowerCase() + "/ticker/";
     }
 }

@@ -21,17 +21,17 @@ package com.nubits.nubot.notifications;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import io.evanwong.oss.hipchat.v2.HipChatClient;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import io.evanwong.oss.hipchat.v2.rooms.SendRoomNotificationRequestBuilder;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class HipChatNotifications {
 
-    private static final Logger LOG = Logger
-            .getLogger(HipChatNotifications.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(HipChatNotifications.class.getName());
 
     public static void sendMessage(String message, MessageColor color) {
         sendMessageImpl(message, color, false);
@@ -74,7 +74,7 @@ public class HipChatNotifications {
             }
 
         } catch (Exception e) {
-            LOG.severe("Not sending hipchat notification. Network problem");
+            LOG.error("Not sending hipchat notification. Network problem");
         }
 
     }

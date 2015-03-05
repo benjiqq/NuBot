@@ -19,7 +19,7 @@ package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
@@ -35,7 +35,8 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.*;
 import java.util.*;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
@@ -50,7 +51,7 @@ import org.json.simple.parser.ParseException;
  */
 public class ExcoinWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(ExcoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     private Exchange exchange;
@@ -111,7 +112,7 @@ public class ExcoinWrapper implements TradeInterface {
                 String errorMessage = httpAnswerJson.get(TOKEN_ERR).toString();
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
-                LOG.severe("Exco.in API returned an error: " + errorMessage);
+                LOG.error("Exco.in API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
                 //LOG.info("httpAnswerJSON = \n" + httpAnswerJson.toJSONString());
@@ -123,14 +124,14 @@ public class ExcoinWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             } catch (ClassCastException ccex) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + ccex.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + ccex.toString());
                 apiResponse.setError(errors.genericError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
         }
 
@@ -388,7 +389,7 @@ public class ExcoinWrapper implements TradeInterface {
             try {
                 date = sdf.parse(in.get("timestamp").toString());
             } catch (java.text.ParseException pe1) {
-                LOG.severe(pe1.toString());
+                LOG.error(pe1.toString());
             }
         }
         if (date != null) {
@@ -446,7 +447,7 @@ public class ExcoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.fine("Excoin uses global TX fee, currency pair not supported. \n"
+        LOG.info("Excoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -515,7 +516,7 @@ public class ExcoinWrapper implements TradeInterface {
             try {
                 date = sdf.parse(in.get("timestamp").toString());
             } catch (java.text.ParseException pe1) {
-                LOG.severe(pe1.toString());
+                LOG.error(pe1.toString());
             }
         }
         if (date != null) {
@@ -551,7 +552,7 @@ public class ExcoinWrapper implements TradeInterface {
             }
             id = sb.toString();
         } catch (java.security.NoSuchAlgorithmException e) {
-            LOG.severe(e.toString());
+            LOG.error(e.toString());
         }
         //set the id
         out.setId(id);
@@ -598,26 +599,26 @@ public class ExcoinWrapper implements TradeInterface {
                         boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
                         if (deleted) {
-                            LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                            LOG.warn("Order " + tempOrder.getId() + " deleted succesfully");
                         } else {
-                            LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                            LOG.warn("Could not delete order " + tempOrder.getId() + "");
                             ok = false;
                         }
 
                     } else {
-                        LOG.severe(deleteOrderResponse.getError().toString());
+                        LOG.error(deleteOrderResponse.getError().toString());
                     }
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException ex) {
-                        LOG.severe(ex.toString());
+                        LOG.error(ex.toString());
                     }
                 }
 
             }
             toReturn.setResponseObject(ok);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             toReturn.setError(activeOrdersResponse.getError());
             return toReturn;
         }
@@ -642,7 +643,7 @@ public class ExcoinWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = query.executeQuery(true, isGet);
         } else {
-            LOG.severe("The bot will not execute the query, there is no connection to Excoin");
+            LOG.error("The bot will not execute the query, there is no connection to Excoin");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -710,7 +711,7 @@ public class ExcoinWrapper implements TradeInterface {
             try {
                 queryUrl = new URL(url);
             } catch (MalformedURLException mal) {
-                LOG.severe(mal.toString());
+                LOG.error(mal.toString());
             }
 
             try {
@@ -738,10 +739,10 @@ public class ExcoinWrapper implements TradeInterface {
                     os.close();
                 }
             } catch (ProtocolException pe) {
-                LOG.severe(pe.toString());
+                LOG.error(pe.toString());
                 return answer;
             } catch (IOException io) {
-                LOG.severe((io.toString()));
+                LOG.error((io.toString()));
                 return answer;
             }
 
@@ -757,12 +758,12 @@ public class ExcoinWrapper implements TradeInterface {
                     br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return answer;
             }
 
             if (httpError) {
-                LOG.severe("Query to : " + queryUrl
+                LOG.error("Query to : " + queryUrl
                         + "\nHTTP Response : " + Objects.toString(response));
             }
 
@@ -771,7 +772,7 @@ public class ExcoinWrapper implements TradeInterface {
                     answer += output;
                 }
             } catch (IOException io) {
-                LOG.severe(io.toString());
+                LOG.error(io.toString());
                 return null;
             }
 
@@ -782,7 +783,7 @@ public class ExcoinWrapper implements TradeInterface {
              JSONObject obj = (JSONObject) (parser.parse(answer));
              answer = (String) obj.get(TOKEN_ERR);
              } catch (ParseException pe) {
-             LOG.severe(pe.toString());
+             LOG.error(pe.toStringSep());
              return null;
              }
              }
@@ -808,11 +809,11 @@ public class ExcoinWrapper implements TradeInterface {
                 mac.init(key);
                 sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
             } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
+                LOG.error("Unsupported encoding exception: " + uee.toString());
             } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
+                LOG.error("No such algorithm exception: " + nsae.toString());
             } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
+                LOG.error("Invalid key exception: " + ike.toString());
             }
             return sign;
         }

@@ -1,4 +1,4 @@
-package com.nubits.nubot.tests;
+package functions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -60,7 +60,7 @@ public class TestWriteOptions extends TestCase {
         try {
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File("testconfig/test.json_1.bak");
+            newbak = new File("testconfig/test.json_0.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
@@ -72,7 +72,7 @@ public class TestWriteOptions extends TestCase {
 
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File("testconfig/test.json_2.bak");
+            newbak = new File("testconfig/test.json_1.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 

@@ -21,30 +21,25 @@ package com.nubits.nubot.testsmanual;
  *
  * @author desrever <desrever at nubits.com>
  */
+
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Timer;
-import java.util.TimerTask;
-import java.util.UUID;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 public class TestSync extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(TestSync.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestSync.class.getName());
     private static final int TASK_INTERVAL = 61;
     private static final int TASK_MAX_EXECUTION_INTERVAL = 50;
     private static String id;
@@ -105,18 +100,12 @@ public class TestSync extends TimerTask {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
-        LOG.setLevel(Level.INFO);
 
         LOG.info("Set up SSL certificates");
         try {
             Utils.installKeystore(true);
         } catch (Exception ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
     }
 
@@ -134,7 +123,7 @@ public class TestSync extends TimerTask {
         try {
             Thread.sleep(rand * 1000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.getMessage());
+            LOG.error(ex.getMessage());
         }
 
     }
@@ -149,7 +138,12 @@ public class TestSync extends TimerTask {
         backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
         backupFeedList.add(PriceFeedManager.COINBASE);
 
-        PriceFeedManager pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        PriceFeedManager pfm = null;
+        try{
+            pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
+        }catch(NuBotConfigException e){
+
+        }
 
         ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 

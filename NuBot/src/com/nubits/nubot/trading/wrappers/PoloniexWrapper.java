@@ -21,9 +21,11 @@ package com.nubits.nubot.trading.wrappers;
  *
  * @author desrever <desrever at nubits.com>
  */
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -38,6 +40,7 @@ import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -56,10 +59,14 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -68,7 +75,7 @@ import org.json.simple.parser.ParseException;
 
 public class PoloniexWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(PoloniexWrapper.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PoloniexWrapper.class.getName());
     private ApiKeys keys;
     private Exchange exchange;
     private String checkConnectionUrl = "http://poloniex.com/";
@@ -121,7 +128,7 @@ public class PoloniexWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
-                LOG.severe("Poloniex API returned an error: " + errorMessage);
+                LOG.error("Poloniex API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -132,11 +139,11 @@ public class PoloniexWrapper implements TradeInterface {
                 JSONArray httpAnswerJson = (JSONArray) (parser.parse(queryResult));
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException ex) {
-            LOG.severe("httpresponse: " + queryResult + " \n" + ex.toString());
+            LOG.error("httpresponse: " + queryResult + " \n" + ex.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -154,6 +161,8 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
+        LOG.info("get balance");
+
         //Swap the pair for the request
         ApiResponse apiResponse = new ApiResponse();
         Balance balance = new Balance();
@@ -163,7 +172,10 @@ public class PoloniexWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         boolean isGet = false;
 
+        LOG.info("get from " + url);
+        LOG.info("method " + method);
         ApiResponse response = getQuery(url, method, query_args, isGet);
+        LOG.info("response " + response);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (currency != null) {
@@ -172,6 +184,7 @@ public class PoloniexWrapper implements TradeInterface {
                 if (httpAnswerJson.containsKey(lookingFor)) {
                     JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                     double balanceD = Utils.getDouble(balanceJSON.get("available"));
+                    LOG.info("balanceD: " + balanceD);
                     apiResponse.setResponseObject(new Amount(balanceD, currency));
                 } else {
                     String errorMessage = "Cannot find a balance for currency " + lookingFor;
@@ -208,7 +221,7 @@ public class PoloniexWrapper implements TradeInterface {
                 balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {
-                    LOG.warning("Cannot find a balance for currency with code "
+                    LOG.warn("Cannot find a balance for currency with code "
                             + "" + NBTcode + " or " + PEGcode + " in your balance. "
                             + "NuBot assumes that balance is 0");
                 }
@@ -252,7 +265,7 @@ public class PoloniexWrapper implements TradeInterface {
         pair = CurrencyPair.swap(pair);
         /*Params
          */
-        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("amount", Double.toString(amount));
         query_args.put("rate", Double.toString(rate));
 
@@ -289,7 +302,7 @@ public class PoloniexWrapper implements TradeInterface {
         String pairString = "all";
         if (pair != null) {
             pair = CurrencyPair.swap(pair);
-            pairString = pair.toString("_").toUpperCase();
+            pairString = pair.toStringSep().toUpperCase();
         }
 
         query_args.put("currencyPair", pairString);
@@ -364,7 +377,7 @@ public class PoloniexWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
 
         pair = CurrencyPair.swap(pair);
-        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("orderNumber", orderID);
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
@@ -390,7 +403,7 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.fine("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
+        LOG.info("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
         return getTxFee();
     }
 
@@ -431,25 +444,25 @@ public class PoloniexWrapper implements TradeInterface {
                     boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
 
                     if (deleted) {
-                        LOG.warning("Order " + tempOrder.getId() + " deleted succesfully");
+                        LOG.warn("Order " + tempOrder.getId() + " deleted succesfully");
                     } else {
-                        LOG.warning("Could not delete order " + tempOrder.getId() + "");
+                        LOG.warn("Could not delete order " + tempOrder.getId() + "");
                         ok = false;
                     }
 
                 } else {
-                    LOG.severe(deleteOrderResponse.getError().toString());
+                    LOG.error(deleteOrderResponse.getError().toString());
                 }
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException ex) {
-                    LOG.severe(ex.toString());
+                    LOG.error(ex.toString());
                 }
 
             }
             toReturn.setResponseObject(ok);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             toReturn.setError(activeOrdersResponse.getError());
             return toReturn;
         }
@@ -476,12 +489,12 @@ public class PoloniexWrapper implements TradeInterface {
     public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
         PoloniexService query = new PoloniexService(base, method, keys, args);
         String queryResult;
-        if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
-        } else {
-            LOG.severe("The bot will not execute the query, there is no connection to Poloniex");
+        //if (exchange.getLiveData().isConnected()) {
+        queryResult = query.executeQuery(true, isGet);
+        /*} else {
+            LOG.error("The bot will not execute the query, there is no connection to Poloniex");
             queryResult = TOKEN_BAD_RETURN;
-        }
+        }*/
         return queryResult;
     }
 
@@ -538,7 +551,7 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         pair = CurrencyPair.swap(pair);
-        query_args.put("currencyPair", pair.toString("_").toUpperCase());
+        query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("start", startDateArg);
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
@@ -578,7 +591,7 @@ public class PoloniexWrapper implements TradeInterface {
         Trade trade = new Trade();
         trade.setOrder_id((String) tradeObj.get("orderNumber"));
 
-        trade.setExchangeName(Constant.POLONIEX);
+        trade.setExchangeName(ExchangeFacade.POLONIEX);
         trade.setPair(pair);
 
         trade.setType(((String) tradeObj.get("type")).toUpperCase());
@@ -602,7 +615,7 @@ public class PoloniexWrapper implements TradeInterface {
         try {
             toRet = df.parse(dateStr);
         } catch (java.text.ParseException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
             toRet = new Date();
         }
         return toRet;
@@ -642,6 +655,24 @@ public class PoloniexWrapper implements TradeInterface {
             String post_data = "";
             boolean httpError = false;
             HttpsURLConnection connection = null;
+            URL queryUrl = null;
+
+            try {
+                // build URL
+
+                if (needAuth) {
+                    queryUrl = new URL(base);
+                } else {
+                    queryUrl = new URL(url);
+                }
+                LOG.info("Query " + queryUrl);
+                connection = (HttpsURLConnection) queryUrl.openConnection();
+                connection.setRequestMethod("POST");
+                LOG.info("connection " + connection);
+            }catch(IOException e){
+                LOG.error("can't connect to " + queryUrl);
+            }
+
 
             try {
                 // add nonce and build arg list
@@ -656,18 +687,7 @@ public class PoloniexWrapper implements TradeInterface {
 
                     signature = signRequest(keys.getPrivateKey(), toHash);
                 }
-                // build URL
 
-                URL queryUrl;
-                if (needAuth) {
-                    queryUrl = new URL(base);
-                } else {
-                    queryUrl = new URL(url);
-                }
-
-
-                connection = (HttpsURLConnection) queryUrl.openConnection();
-                connection.setRequestMethod("POST");
 
                 // create and setup a HTTP connection
 
@@ -701,11 +721,11 @@ public class PoloniexWrapper implements TradeInterface {
                 String output;
 
                 if (httpError) {
-                    LOG.severe("Post Data: " + post_data);
+                    LOG.error("Post Data: " + post_data);
                 }
-                LOG.fine("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.fine(output);
+                    LOG.info(output);
                     answer += output;
                 }
 
@@ -716,26 +736,25 @@ public class PoloniexWrapper implements TradeInterface {
                         answer = (String) obj2.get(TOKEN_ERR);
 
                     } catch (ParseException ex) {
-                        LOG.severe(ex.toString());
+                        LOG.error(ex.toString());
                         return null;
                     }
                 }
             } //Capture Exceptions
             catch (IllegalStateException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
 
                 answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } finally {
                 //close the connection, set all objects to null
                 connection.disconnect();
-                connection = null;
             }
             return answer;
         }
@@ -750,27 +769,27 @@ public class PoloniexWrapper implements TradeInterface {
                 try {
                     key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
                 } catch (UnsupportedEncodingException uee) {
-                    LOG.severe("Unsupported encoding exception: " + uee.toString());
+                    LOG.error("Unsupported encoding exception: " + uee.toString());
                 }
 
                 // Create a new mac
                 try {
                     mac = Mac.getInstance(SIGN_HASH_FUNCTION);
                 } catch (NoSuchAlgorithmException nsae) {
-                    LOG.severe("No such algorithm exception: " + nsae.toString());
+                    LOG.error("No such algorithm exception: " + nsae.toString());
                 }
 
                 // Init mac with key.
                 try {
                     mac.init(key);
                 } catch (InvalidKeyException ike) {
-                    LOG.severe("Invalid key exception: " + ike.toString());
+                    LOG.error("Invalid key exception: " + ike.toString());
                 }
 
                 sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
 
             } catch (UnsupportedEncodingException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
             return sign;
         }

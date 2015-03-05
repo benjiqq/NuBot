@@ -20,7 +20,9 @@ package com.nubits.nubot.launch.toolkit;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Trade;
@@ -29,14 +31,14 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
-import java.util.logging.Logger;
 
 public class NuLastTrades {
 
-    private static final Logger LOG = Logger.getLogger(NuLastTrades.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuLastTrades.class.getName());
     private final String USAGE_STRING = "java -jar NuLastTrades <exchange-name> <apikey> <apisecret> <currency_pair> [<date_from>]";
     private final String HEADER = "id,order_id,pair,type,price,amount,date";
     private String output;
@@ -59,11 +61,6 @@ public class NuLastTrades {
         //Create log dir
         FileSystem.mkdir(logsFolder);
         if (app.readParams(args)) {
-            try {
-                NuLogger.setup(false, logsFolder);
-            } catch (IOException ex) {
-                LOG.severe(ex.toString());
-            }
 
             LOG.info("Launching NuLastTrades on " + app.exchangename);
             app.prepareForExecution();
@@ -87,26 +84,26 @@ public class NuLastTrades {
         Global.exchange.setLiveData(liveData);
 
 
-        if (exchangename.equals(Constant.BTCE)) {
+        if (exchangename.equals(ExchangeFacade.BTCE)) {
             Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.INTERNAL_EXCHANGE_PEATIO)) {
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, Constant.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangename.equals(Constant.CCEDK)) {
+        } else if (exchangename.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
+            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
+        } else if (exchangename.equals(ExchangeFacade.CCEDK)) {
             Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.BTER)) {
+        } else if (exchangename.equals(ExchangeFacade.BTER)) {
             Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.ALLCOIN)) {
+        } else if (exchangename.equals(ExchangeFacade.ALLCOIN)) {
             Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.BITSPARK_PEATIO)) {
+        } else if (exchangename.equals(ExchangeFacade.BITSPARK_PEATIO)) {
             Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.POLONIEX)) {
+        } else if (exchangename.equals(ExchangeFacade.POLONIEX)) {
             Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.CCEX)) {
+        } else if (exchangename.equals(ExchangeFacade.CCEX)) {
             Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(Constant.EXCOIN)) {
+        } else if (exchangename.equals(ExchangeFacade.EXCOIN)) {
             Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
         } else {
-            LOG.severe("Exchange " + exchangename + " not supported");
+            LOG.error("Exchange " + exchangename + " not supported");
             System.exit(0);
         }
 
@@ -119,11 +116,11 @@ public class NuLastTrades {
         Global.taskManager.getCheckConnectionTask().start();
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.fine("Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
     }
@@ -132,7 +129,7 @@ public class NuLastTrades {
         boolean ok = false;
 
         if (args.length != 4 && args.length != 5) {
-            LOG.severe("wrong argument number : call it with \n" + USAGE_STRING);
+            LOG.error("wrong argument number : call it with \n" + USAGE_STRING);
             System.exit(0);
         }
 
@@ -154,7 +151,7 @@ public class NuLastTrades {
         //FileSystem.writeToFile(HEADER, output, false); //uncomment for csv outputs
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, dateFrom);
 
-        if (pair.getPaymentCurrency().equals(Constant.NBT)) {
+        if (pair.getPaymentCurrency().equals(CurrencyList.NBT)) {
             Global.swappedPair = true;
         } else {
             Global.swappedPair = false;
@@ -172,7 +169,7 @@ public class NuLastTrades {
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
             FileSystem.writeToFile("{\n", output, false);
             //FileSystem.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
-            //FileSystem.writeToFile("\"pair\":\"" + pair.toString("_") + "\",\n", output, true);
+            //FileSystem.writeToFile("\"pair\":\"" + pair.toStringSep("_") + "\",\n", output, true);
             LOG.info("Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
@@ -213,7 +210,7 @@ public class NuLastTrades {
             }
             FileSystem.writeToFile("}", output, true);
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
 
         //Report :

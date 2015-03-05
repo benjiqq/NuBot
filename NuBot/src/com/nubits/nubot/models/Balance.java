@@ -17,8 +17,6 @@
  */
 package com.nubits.nubot.models;
 
-import com.nubits.nubot.global.Constant;
-
 /**
  *
  * @author desrever < desrever@nubits.com >
@@ -49,7 +47,7 @@ public class Balance {
         this.NBTTotal = NBTTotal;
         this.PEGTotal = PEGTotal;
         this.PEGonOrder = new Amount(0, Currency.createCurrency(PEGTotal.getCurrency().getCode()));
-        this.NBTonOrder = new Amount(0, Constant.NBT);
+        this.NBTonOrder = new Amount(0, CurrencyList.NBT);
         this.PEGAvailable = PEGTotal;
         this.NBTAvailable = NBTTotal;
     }
@@ -67,7 +65,7 @@ public class Balance {
         this.PEGonOrder = PEGonOrder;
         this.NBTonOrder = NBTonOrder;
         this.PEGTotal = new Amount(PEGAvailable.getQuantity() + PEGonOrder.getQuantity(), Currency.createCurrency(PEGonOrder.getCurrency().getCode()));
-        this.NBTTotal = new Amount(NBTAvailable.getQuantity() + NBTonOrder.getQuantity(), Constant.NBT);
+        this.NBTTotal = new Amount(NBTAvailable.getQuantity() + NBTonOrder.getQuantity(), CurrencyList.NBT);
     }
 
 //Methods

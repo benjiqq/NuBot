@@ -73,7 +73,8 @@
                 .done(function( data ) {
 
                     //string values
-
+               console.log(data);console.log(data["pair"]);
+              
                     $("#exchangename").attr("placeholder", data["exchangename"]);
                     $("#apikey").attr("placeholder", data["apikey"]);
                     $("#apisecret").attr("placeholder", data["apisecret"]);
@@ -81,17 +82,18 @@
                     $("#maxsellvolume").attr("placeholder", data["maxsellordervolume"]);
                     $("#pair").attr("placeholder", data["pair"]);
 
-                    if (data["submitliquidity"]){
+                    /*if (data["submitliquidity"]){*/
                       $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
                       $("#nudport").attr("placeholder", data["nudport"]);
                       $("#rpcpass").attr("placeholder", data["rpcpass"]);
                       $("#rpcuser").attr("placeholder", data["rpcuser"]);
-                    } else {
+
+                    /*} else {
                       $("#nubitaddress").attr("placeholder", "-");
                       $("#nudport").attr("placeholder", "-");
                       $("#rpcpass").attr("placeholder", "-");
                       $("#rpcuser").attr("placeholder", "-");
-                    }
+                    }*/
 
                     //booleans
 
@@ -141,6 +143,12 @@
                     "apisecret": apisecret,
                     "maxbuyordervolume": maxbuyordervolume,
                     "maxsellordervolume": maxsellordervolume,
+                    "pair": pair,
+                    "nubitaddress": nubitaddress,
+                    "nudport": nudport,
+                    "rpcpass": rpcpass,
+                    "rpcuser": rpcuser,
+              
                     "submitliquidity": submitliquidity,
                     "dualside": dualside,
                     "multiplecustodians": multiplecustodians,
@@ -148,7 +156,7 @@
                     "verbose": verbose,
                     "hipchat": hipchat,
                     "secondarypeg": secondarypeg
-
+              
                 });
 
 

@@ -22,7 +22,8 @@ import org.apache.commons.io.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -31,7 +32,7 @@ import java.util.logging.Logger;
 public class Currency {
 
 //Class Variables
-    private static final Logger LOG = Logger.getLogger(Currency.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(Currency.class.getName());
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
@@ -54,7 +55,7 @@ public class Currency {
         }
 
         if (!found) {
-            LOG.warning("Didn't find a currency with code " + code + " in lookup table " + PATH_TO_CURRENCIES
+            LOG.warn("Didn't find a currency with code " + code + " in lookup table " + PATH_TO_CURRENCIES
                     + "\nUpdate the currency file to avoid malfunctionings.");
 
             return new Currency(false, code, "");

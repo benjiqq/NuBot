@@ -1,4 +1,4 @@
-package com.nubits.nubot.tests;
+package functions;
 
 import org.junit.Test;
 import junit.framework.TestCase;

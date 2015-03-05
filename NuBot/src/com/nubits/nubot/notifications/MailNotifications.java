@@ -17,13 +17,14 @@
  */
 package com.nubits.nubot.notifications;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import com.sun.mail.smtp.SMTPTransport;
 import java.security.Security;
 import java.util.Date;
 import java.util.Properties;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -40,7 +41,7 @@ public class MailNotifications {
     public static final String MAIL_LEVEL_NONE = "NONE";
     public static final String MAIL_LEVEL_ALL = "ALL";
     public static final String MAIL_LEVEL_SEVERE = "SEVERE";
-    private static final Logger LOG = Logger.getLogger(MailNotifications.class
+    private static final Logger LOG = LoggerFactory.getLogger(MailNotifications.class
             .getName());
 
     /**
@@ -92,9 +93,9 @@ public class MailNotifications {
         try {
             MailNotifications.Send(address, title, message);
         } catch (AddressException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         } catch (MessagingException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
     }

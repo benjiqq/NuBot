@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
@@ -15,32 +15,34 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tasks;
+package com.nubits.nubot.bot;
 
-import com.nubits.nubot.bot.Global;
-import java.util.TimerTask;
-import org.slf4j.LoggerFactory;
+import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
+import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author desrever <desrever at nubits.com>
+ * simple NuBot
  */
-public class CheckNudTask extends TimerTask {
+public class NuBotSimple extends NuBotBase {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CheckNudTask.class.getName());
+    final static Logger LOG = LoggerFactory.getLogger(NuBotSimple.class);
 
-    @Override
-    public void run() {
-        LOG.info("Executing task : CheckNudTask ");
-        Global.rpcClient.checkConnection();
-        if (Global.rpcClient.isVerbose()) {
-            String connectedString = "offline";
-            if (Global.rpcClient.isConnected()) {
-                connectedString = "online";
-            }
-            LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
-        }
+    public NuBotSimple() {
 
     }
+
+    @Override
+    public void configureStrategy() {
+        // set liquidityinfo task to the strategy
+        ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
+                .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
+
+        int delay = 7;
+        Global.taskManager.getStrategyFiatTask().start(delay);
+    }
+
+
 }

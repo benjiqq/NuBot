@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.tasks;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -25,7 +25,8 @@ import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
 import java.util.TimerTask;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 /**
  *
@@ -33,14 +34,14 @@ import java.util.logging.Logger;
  */
 public class CheckConnectionTask extends TimerTask {
 
-    private static final Logger LOG = Logger.getLogger(CheckConnectionTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(CheckConnectionTask.class.getName());
 
 //Methods
     @Override
     public void run() {
         String url = Global.exchange.getLiveData().getUrlConnectionCheck();
         Global.exchange.getLiveData().setConnected(isConnectedTo(url));
-        LOG.fine("Checking connection to " + url + " -  Connected : " + Global.exchange.getLiveData().isConnected());
+        LOG.info("Checking connection to " + url + " -  Connected : " + Global.exchange.getLiveData().isConnected());
 
     }
 
@@ -51,7 +52,7 @@ public class CheckConnectionTask extends TimerTask {
         try {
             query = new URL(url);
         } catch (MalformedURLException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         try {
             connection = (HttpURLConnection) query.openConnection();
@@ -62,10 +63,10 @@ public class CheckConnectionTask extends TimerTask {
             connected = true;
         } catch (NoRouteToHostException | UnknownHostException ex) {
             connected = false;
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         } catch (IOException ex) {
             connected = false;
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
         return connected;
     }

@@ -26,11 +26,12 @@ import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEE
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_LOW;
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_MID;
 import com.nubits.nubot.utils.Utils;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class LiquidityCurveExp extends LiquidityCurve {
 
-    private static final Logger LOG = Logger.getLogger(LiquidityCurveExp.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(LiquidityCurveExp.class.getName());
 
     public LiquidityCurveExp(String steepness) {
         super(steepness);
@@ -59,7 +60,7 @@ public class LiquidityCurveExp extends LiquidityCurve {
             case STEEPNESS_FLAT:
                 return 0;
             default:
-                LOG.severe("Not supported steepness : " + steepness);
+                LOG.error("Not supported steepness : " + steepness);
         }
         return 0;
     }

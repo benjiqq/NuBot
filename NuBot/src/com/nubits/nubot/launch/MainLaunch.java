@@ -1,13 +1,15 @@
 package com.nubits.nubot.launch;
 
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBotSecondary;
+import com.nubits.nubot.bot.NuBotSimple;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import org.json.simple.JSONObject;
 
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 
 /**
  * the main launcher class. starts bot based on configuration, not through UI
@@ -15,8 +17,8 @@ import java.util.logging.Logger;
 public class MainLaunch {
 
     private static Thread mainThread;
-    private static final Logger LOG = Logger.getLogger(MainLaunch.class.getName());
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]";
+    private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -45,7 +47,7 @@ public class MainLaunch {
      * @param msg
      */
     private static void exitWithNotice(String msg) {
-        LOG.severe(msg);
+        LOG.error(msg);
         System.exit(0);
     }
 
@@ -64,8 +66,15 @@ public class MainLaunch {
         if (Global.running) {
             exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
         } else {
-            NuBot app = new NuBot();
-            app.execute(opt);
+            if (opt.secondarypeg){
+                LOG.info("creating secondary bot");
+                NuBotSecondary bot = new NuBotSecondary();
+                bot.execute(opt);
+            }else{
+                LOG.info("creating simple bot");
+                NuBotSimple bot = new NuBotSimple ();
+                bot.execute(opt);
+            }
         }
 
     }
@@ -93,11 +102,11 @@ public class MainLaunch {
                             if (deleted) {
                                 LOG.info("Order clear request succesfully");
                             } else {
-                                LOG.severe("Could not submit request to clear orders");
+                                LOG.error("Could not submit request to clear orders");
                             }
 
                         } else {
-                            LOG.severe(deleteOrdersResponse.getError().toString());
+                            LOG.error(deleteOrdersResponse.getError().toString());
                         }
                     }
 
@@ -109,17 +118,17 @@ public class MainLaunch {
                         JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                                 0, 0, 1);
                         if (null == responseObject1) {
-                            LOG.severe("Something went wrong while sending liquidityinfo");
+                            LOG.error("Something went wrong while sending liquidityinfo");
                         } else {
-                            LOG.fine(responseObject1.toJSONString());
+                            LOG.info(responseObject1.toJSONString());
                         }
 
                         JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                                 0, 0, 2);
                         if (null == responseObject2) {
-                            LOG.severe("Something went wrong while sending liquidityinfo");
+                            LOG.error("Something went wrong while sending liquidityinfo");
                         } else {
-                            LOG.fine(responseObject2.toJSONString());
+                            LOG.info(responseObject2.toJSONString());
                         }
                     }
 
@@ -147,7 +156,7 @@ public class MainLaunch {
      * @return
      */
     private static boolean isValidArgs(String[] args) {
-        boolean valid = args.length > 0;
+        boolean valid = args.length == 1;
 
         return valid;
     }

@@ -25,12 +25,12 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.commons.net.time.TimeUDPClient;
 
 public final class NTPClient {
 
-    private static final Logger LOG = Logger.getLogger(NTPClient.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NTPClient.class.getName());
     private ArrayList<String> hostnames;
     private static final int TIMEOUT = 10 * 1000; //10 seconds timeout
 
@@ -51,7 +51,7 @@ public final class NTPClient {
         try {
             return getTimeImpl(host);
         } catch (IOException ex) {
-            LOG.severe("Cannot read the date from the time server " + host + "\n"
+            LOG.error("Cannot read the date from the time server " + host + "\n"
                     + ex.toString());
             return new Date();
         }
@@ -64,7 +64,7 @@ public final class NTPClient {
             try {
                 return getTimeImpl(hostnames.get(i));
             } catch (IOException ex) {
-                LOG.warning("Problem with timeserver " + hostnames.get(i) + ""
+                LOG.warn("Problem with timeserver " + hostnames.get(i) + ""
                         + "\n" + ex.toString());
                 if (i != hostnames.size() - 1) {
                     LOG.info("Trying next server");
@@ -72,7 +72,7 @@ public final class NTPClient {
             }
         }
         if (!found) {
-            LOG.severe("Cannot update time after querying " + hostnames.size() + " timeservers. ");
+            LOG.error("Cannot update time after querying " + hostnames.size() + " timeservers. ");
             System.exit(0);
         }
         return new Date(); //statement is never reached

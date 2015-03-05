@@ -23,7 +23,7 @@ package com.nubits.nubot.pricefeeds;
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -31,11 +31,12 @@ import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class BterPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = Logger.getLogger(BterPriceFeed.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(BterPriceFeed.class.getName());
 
     public BterPriceFeed() {
         name = "bter";
@@ -48,7 +49,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
             try {
-                Exchange exch = new Exchange(Constant.BTER);
+                Exchange exch = new Exchange(ExchangeFacade.BTER);
                 ExchangeLiveData liveData = new ExchangeLiveData();
                 exch.setLiveData(liveData);
                 ApiKeys keys = new ApiKeys("a", "b");
@@ -63,24 +64,24 @@ public class BterPriceFeed extends AbstractPriceFeed {
                     lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                     return lastPrice;
                 } else {
-                    LOG.severe(lastPriceResponse.getError().toString());
+                    LOG.error(lastPriceResponse.getError().toString());
                     lastRequest = System.currentTimeMillis();
                     return new LastPrice(true, name, pair.getOrderCurrency(), null);
                 }
 
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
         } else {
-            LOG.fine("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
+            LOG.info("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
     }
 
     private String getUrl(CurrencyPair pair) {
-        return "http://data.bter.com/api/1/ticker/" + pair.toString("_");
+        return "http://data.bter.com/api/1/ticker/" + pair.toStringSep();
     }
 }

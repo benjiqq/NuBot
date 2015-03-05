@@ -18,18 +18,17 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import org.apache.commons.io.FileUtils;
-
-import java.io.IOException;
-import java.util.logging.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -37,15 +36,15 @@ import java.util.logging.Logger;
  */
 public class TestWrappers {
 
-    private static final Logger LOG = Logger.getLogger(TestWrappers.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
     /**
      * Configure tests
      */
     private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = Constant.POLONIEX;
+    public static final String testExchange = ExchangeFacade.POLONIEX;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
-    public static final Currency testCurrency = Constant.NBT;
+    public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
         //Load settings
@@ -56,7 +55,7 @@ public class TestWrappers {
         try {
             Global.options = ParseOptions.parseOptions(inputs);
         } catch (NuBotConfigException ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
 
         WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
@@ -125,15 +124,11 @@ public class TestWrappers {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
+
         try {
             Utils.installKeystore(false);
         } catch (Exception ex) {
-            LOG.severe(ex.toString());
+            LOG.error(ex.toString());
         }
     }
 }

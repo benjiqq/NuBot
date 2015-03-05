@@ -1,6 +1,9 @@
 package com.nubits.nubot.webui;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsSerializer;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import spark.ModelAndView;
@@ -19,7 +22,6 @@ public class UiServer {
 
     //TODO path
     private static String htmlFolder = "./html/templates/";
-
     private static String configFile = "config.json";
     private static String configdir = "config";
     private static String configpath =configdir + "/" +  configFile;
@@ -52,8 +54,6 @@ public class UiServer {
         Map statusmap = new HashMap();
 
 
-
-
     }
 
 
@@ -67,7 +67,11 @@ public class UiServer {
 
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
-            LOG.info("using options " + opt);
+            GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+            gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+            Gson parser = gson.create();
+            String js = parser.toJson(opt);
+            LOG.info("using options " + js);
             startUIserver(opt);
         } catch (Exception ex) {
             LOG.error("error configuring " + ex);

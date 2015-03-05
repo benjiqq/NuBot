@@ -1,7 +1,8 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -10,19 +11,18 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.utils.logging.NuLogger;
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Created by woolly_sammoth on 24/01/15.
  */
 public class TestWrapperReturns {
 
-    private static final Logger LOG = Logger.getLogger(TestWrapperReturns.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestWrapperReturns.class.getName());
     /**
      * Configure tests
      */
@@ -43,7 +43,7 @@ public class TestWrapperReturns {
         try {
             Global.options = ParseOptions.parseOptions(inputs);
         } catch (NuBotConfigException ex) {
-            Logger.getLogger(TestWrapperReturns.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.error("" +  ex);
         }
         testExchanges = populateExchanges();
 
@@ -61,7 +61,7 @@ public class TestWrapperReturns {
     }
 
     private static void runTests() {
-        if (Global.exchange.getName().equals(Constant.EXCOIN)) {
+        if (Global.exchange.getName().equals(ExchangeFacade.EXCOIN)) {
             testPair = Constant.BTC_NBT;
         } else {
             testPair = Constant.NBT_BTC;
@@ -127,7 +127,7 @@ public class TestWrapperReturns {
     private static void clearOrders(CurrencyPair pair) {
         ApiResponse response = Global.exchange.getTrade().clearOrders(pair);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
         } else {
             print("Error: " + response.getError().toString());
         }
@@ -148,7 +148,7 @@ public class TestWrapperReturns {
     private static boolean cancelOrder(String order_id, CurrencyPair pair) {
         ApiResponse response = Global.exchange.getTrade().cancelOrder(order_id, pair);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return (boolean) response.getResponseObject();
         } else {
             print("Error: " + response.getError().toString());
@@ -159,7 +159,7 @@ public class TestWrapperReturns {
     private static Order getOrderDetail(String order_id) {
         ApiResponse response = Global.exchange.getTrade().getOrderDetail(order_id);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return (Order) response.getResponseObject();
         } else {
             print("Error: " + response.getError().toString());
@@ -182,7 +182,7 @@ public class TestWrapperReturns {
         //get the available balances for pair
         ApiResponse response = Global.exchange.getTrade().getAvailableBalances(pair);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
         } else {
             print("Error: " + response.getError().toString());
         }
@@ -192,7 +192,7 @@ public class TestWrapperReturns {
         //test that sell requests are processed correctly
         ApiResponse response = Global.exchange.getTrade().sell(pair, amount, price);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return response.getResponseObject().toString();
         } else {
             print("Error: " + response.getError().toString());
@@ -204,7 +204,7 @@ public class TestWrapperReturns {
         //test that sell requests are processed correctly
         ApiResponse response = Global.exchange.getTrade().buy(pair, amount, price);
         if (response.isPositive()) {
-            //LOG.warning("\nresponse object: " + response.getResponseObject().toString());
+            //LOG.warn("\nresponse object: " + response.getResponseObject().toStringSep());
             return response.getResponseObject().toString();
         } else {
             print("Error: " + response.getError().toString());
@@ -217,11 +217,7 @@ public class TestWrapperReturns {
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
-        try {
-            NuLogger.setup(false, logsFolder);
-        } catch (IOException ex) {
-            LOG.severe(ex.toString());
-        }
+
 
         System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
         System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
@@ -230,14 +226,14 @@ public class TestWrapperReturns {
     private static ArrayList<String> populateExchanges() {
         ArrayList<String> testExchanges = new ArrayList<>();
         //testExchanges.add(Constant.BTCE);
-        testExchanges.add(Constant.INTERNAL_EXCHANGE_PEATIO);
-        testExchanges.add(Constant.BTER);
-        testExchanges.add(Constant.CCEDK);
-        testExchanges.add(Constant.POLONIEX);
-        testExchanges.add(Constant.ALLCOIN);
-        testExchanges.add(Constant.BITSPARK_PEATIO);
-        testExchanges.add(Constant.EXCOIN);
-        testExchanges.add(Constant.BITCOINCOID);
+        testExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
+        testExchanges.add(ExchangeFacade.BTER);
+        testExchanges.add(ExchangeFacade.CCEDK);
+        testExchanges.add(ExchangeFacade.POLONIEX);
+        testExchanges.add(ExchangeFacade.ALLCOIN);
+        testExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
+        testExchanges.add(ExchangeFacade.EXCOIN);
+        testExchanges.add(ExchangeFacade.BITCOINCOID);
 
         return testExchanges;
     }

@@ -1,4 +1,4 @@
-package com.nubits.nubot.global;
+package com.nubits.nubot.bot;
 
 /**
  * Conectivity Exception

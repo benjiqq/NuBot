@@ -24,11 +24,12 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestNotifications {
 
-    private static final Logger LOG = Logger.getLogger(TestNotifications.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestNotifications.class.getName());
 
     public static void main(String[] a) {
 

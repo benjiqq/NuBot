@@ -1,7 +1,11 @@
 package com.nubits.nubot.webui;
 
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsSerializer;
+import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -20,76 +24,11 @@ import static spark.Spark.post;
  */
 public class ConfigController {
 
-
     private String configDir;
     private String configfile;
     private NuBotOptions opt;
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
-
-    //TODO: handle in parseOptions
-    private NuBotOptions parsePost(JSONObject postJson){
-
-        String variableset = "none";
-        NuBotOptions newopt = new NuBotOptions();
-
-        if (postJson.containsKey("exchangename")) {
-            String newvalue = "" + postJson.get("exchangename");
-            newopt.setExchangeName(newvalue);
-        }
-
-        if (postJson.containsKey("apikey")) {
-            String newapikey = "" + postJson.get("apikey");
-            newopt.setApiKey(newapikey);
-        }
-
-        if (postJson.containsKey("apisecret")) {
-            String newsecret = "" + postJson.get("apisecret");
-            newopt.setApiSecret(newsecret);
-        }
-
-        if (postJson.containsKey("dualside")) {
-            boolean newv = (boolean) postJson.get("dualside");
-            newopt.setDualSide(newv);
-        }
-
-        if (postJson.containsKey("multiplecustodians")) {
-            boolean newv = (boolean) postJson.get("multiplecustodians");
-            newopt.setDualSide(newv);
-        }
-
-        if (postJson.containsKey("submitliquidity")) {
-            boolean newv = (boolean) postJson.get("submitliquidity");
-            newopt.setSubmitLiquidity(newv);
-        }
-
-        if (postJson.containsKey("executeorders")) {
-            boolean newv = (boolean) postJson.get("executeorders");
-            newopt.setExecuteOrders(newv);
-        }
-
-        if (postJson.containsKey("verbose")) {
-            boolean newv = (boolean) postJson.get("verbose");
-            newopt.setVerbose(newv);
-        }
-
-        if (postJson.containsKey("hipchat")) {
-            boolean newv = (boolean) postJson.get("hipchat");
-            newopt.setSendHipchat(newv);
-        }
-
-        if (postJson.containsKey("nubitaddress")) {
-            String newv = "" + postJson.get("nubitaddress");
-            newopt.setNubitAddress(newv);
-        }
-
-        if (postJson.containsKey("nudport")) {
-            int newv = (Integer) postJson.get("nudport");
-            newopt.setNudPort(newv);
-        }
-
-        return newopt;
-    }
 
     public ConfigController(String endpoint, NuBotOptions opt, String configDir, String configfile) {
         this.opt = opt;
@@ -99,14 +38,19 @@ public class ConfigController {
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
         get(endpoint, "application/json", (request, response) -> {
-            return opt;
-        }, new JsonTransformerOptions());
+            GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+            gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+            Gson parser = gson.create();
+            String js = parser.toJson(this.opt);
+            return js;
+        });
+
 
         post(endpoint, "application/json", (request, response) -> {
 
             //not working. put is in request body
             //request.queryParams("apikey");
-
+            LOG.info("config received post" + request);
             String json_body = request.body();
 
             JSONParser parser = new JSONParser();
@@ -117,12 +61,17 @@ public class ConfigController {
 
             }
 
-            LOG.info("trying post " + postJson);
+            LOG.info("the JSON of the post " + postJson);
 
             //TODO: test validity of posted options
             boolean valid = true;
 
-            NuBotOptions newopt = parsePost(postJson);
+            NuBotOptions newopt = null;
+            try{
+                newopt = ParseOptions.parsePost(postJson);
+            }catch(Exception e){
+                //handle errors
+            }
 
             LOG.info("parsed: new opt: " + newopt);
 

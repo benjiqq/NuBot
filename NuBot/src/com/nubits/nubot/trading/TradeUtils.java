@@ -22,7 +22,8 @@ package com.nubits.nubot.trading;
  * @author desrever <desrever at nubits.com>
  */
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.global.Global;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -34,14 +35,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class TradeUtils {
 
-    private static final Logger LOG = Logger.getLogger(TradeUtils.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TradeUtils.class.getName());
 
     public static boolean tryCancelAllOrders(CurrencyPair pair) {
         boolean toRet = false;
@@ -67,13 +69,13 @@ public class TradeUtils {
                     }
                 } else {
                     toRet = false;
-                    LOG.severe(deleteOrdersResponse.getError().toString());
+                    LOG.error(deleteOrdersResponse.getError().toString());
                 }
             }
         } else {
             toRet = false;
 
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
         }
 
         return toRet;
@@ -96,7 +98,7 @@ public class TradeUtils {
                 }
             }
         } else {
-            LOG.severe(activeOrdersResponse.getError().toString());
+            LOG.error(activeOrdersResponse.getError().toString());
             return false;
         }
         return completed;
@@ -109,13 +111,13 @@ public class TradeUtils {
             boolean delRequested = (boolean) deleteOrderResponse.getResponseObject();
 
             if (delRequested) {
-                LOG.warning("Order " + orderID + " delete request submitted");
+                LOG.warn("Order " + orderID + " delete request submitted");
             } else {
-                LOG.severe("Could not submit request to delete order" + orderID);
+                LOG.error("Could not submit request to delete order" + orderID);
             }
 
         } else {
-            LOG.severe(deleteOrderResponse.getError().toString());
+            LOG.error(deleteOrderResponse.getError().toString());
         }
 
 
@@ -133,13 +135,13 @@ public class TradeUtils {
                 ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderID);
                 if (orderDetailResponse.isPositive()) {
                     deleted = !((boolean) orderDetailResponse.getResponseObject());
-                    LOG.fine("Does order " + orderID + "  still exist?" + !deleted);
+                    LOG.info("Does order " + orderID + "  still exist?" + !deleted);
                 } else {
-                    LOG.severe(orderDetailResponse.getError().toString());
+                    LOG.error(orderDetailResponse.getError().toString());
                     return false;
                 }
             } catch (InterruptedException ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return false;
             }
         } while (!deleted && !timedout);
@@ -151,7 +153,7 @@ public class TradeUtils {
     }
 
     public static double getSellPrice(double txFee) {
-        if (Global.isDualSide) {
+        if (Global.options.isDualSide()) {
             return 1 + (0.01 * txFee);
         } else {
             return 1 + (0.01 * txFee) + Global.options.getPriceIncrement();
@@ -192,7 +194,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
         return result;
@@ -208,7 +210,7 @@ public class TradeUtils {
                 result += URLEncoder.encode(hashkey, encoding) + "="
                         + URLEncoder.encode(args.get(hashkey), encoding);
             } catch (Exception ex) {
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
             }
         }
         return result;
@@ -221,18 +223,18 @@ public class TradeUtils {
         //It tries to send a wrong nonce, get the allowed window, and use it for the actual call
         String wrongNonce = "1234567891";
         String lastdigits;
-        //LOG.info("Offset = " + Objects.toString(offset));
+        //LOG.info("Offset = " + Objects.toStringSep(offset));
         String validNonce;
         if (offset == 0) {
             try {
                 String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, false);
                 //LOG.info(htmlString);
-                //LOG.info(Objects.toString(System.currentTimeMillis() / 1000L));
+                //LOG.info(Objects.toStringSep(System.currentTimeMillis() / 1000L));
                 validNonce = getCCDKEvalidNonce(htmlString);
                 offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
-                //LOG.info("Offset = " + Objects.toString(offset));
+                //LOG.info("Offset = " + Objects.toStringSep(offset));
             } catch (IOException io) {
-                //LOG.info(io.toString());
+                //LOG.info(io.toStringSep());
                 validNonce = "";
             }
         } else {
@@ -278,7 +280,7 @@ public class TradeUtils {
 
             return to;
         } catch (ParseException ex) {
-            LOG.severe(htmlString + " " + ex.toString());
+            LOG.error(htmlString + " " + ex.toString());
             return "1234567891";
         }
     }
@@ -295,9 +297,9 @@ public class TradeUtils {
          * 15, NBT
 
          */
-        final String BTC = Constant.BTC.getCode();
-        String USD = Constant.USD.getCode();
-        String PPC = Constant.PPC.getCode();
+        final String BTC = CurrencyList.BTC.getCode();
+        String USD = CurrencyList.USD.getCode();
+        String PPC = CurrencyList.PPC.getCode();
 
         int toRet = -1;
 
@@ -321,7 +323,7 @@ public class TradeUtils {
                 toRet = 4;
                 break;
             default:
-                LOG.severe("Currency " + currencyCode + "not available");
+                LOG.error("Currency " + currencyCode + "not available");
                 break;
         }
         return toRet;
@@ -360,7 +362,7 @@ public class TradeUtils {
         } else if (pair.equals(Constant.NBT_EUR)) {
             return 49;
         } else {
-            LOG.severe("Pair " + pair.toString() + " not available");
+            LOG.error("Pair " + pair.toString() + " not available");
         }
 
         return toRet;
@@ -379,7 +381,7 @@ public class TradeUtils {
          * 46, NBT USD
          * 49, NBT EUR
          */
-        CurrencyPair toRet = new CurrencyPair(Constant.BTC, Constant.BTC);
+        CurrencyPair toRet = new CurrencyPair(CurrencyList.BTC, CurrencyList.BTC);
 
         switch (id) {
             case 2:
@@ -407,7 +409,7 @@ public class TradeUtils {
                 toRet = Constant.NBT_EUR;
                 break;
             default:
-                LOG.severe("Pair with id = " + id + " not available");
+                LOG.error("Pair with id = " + id + " not available");
 
         }
         return toRet;
@@ -443,14 +445,14 @@ public class TradeUtils {
             try {
                 Thread.sleep(300); //sleep to avoid getting banned
             } catch (InterruptedException ex) {
-                LOG.severe(ex.getMessage());
+                LOG.error(ex.getMessage());
             }
 
         }
         if (success) {
             LOG.info(orders.size() + " orders placed succesfully");
         } else {
-            LOG.warning(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
+            LOG.warn(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
                     + "\nDetails : \n" + failureString);
         }
 

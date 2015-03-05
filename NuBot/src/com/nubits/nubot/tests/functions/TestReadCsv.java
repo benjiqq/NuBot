@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tests;
+package functions;
 
 /**
  *
@@ -29,11 +29,12 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class TestReadCsv  extends TestCase {
 
-    private static final Logger LOG = Logger.getLogger(TestReadCsv.class
+    private static final Logger LOG = LoggerFactory.getLogger(TestReadCsv.class
             .getName());
     private static final String TEST_FILE_PATH = "/currencies.csv";
     private static final String TEST_FILE = "currencies.csv";
@@ -49,7 +50,7 @@ public class TestReadCsv  extends TestCase {
         // TestClasspathOut.printCpInfo();
 
         final File dic = FileUtils.getFile("NuBot", "res", TEST_FILE);
-        System.out.println(dic.getAbsolutePath());
+        LOG.debug(dic.getAbsolutePath());
         //assert (dic.exists());
 
         // InputStream ins = TestReadCsv.class.getClass().
@@ -74,7 +75,7 @@ public class TestReadCsv  extends TestCase {
             //assert(message.length()>10);
             //assert(message.contains("USD"));
             //assert(message.contains("NBT"));
-            LOG.info(message);
+            LOG.debug(message);
         }
 
     }
