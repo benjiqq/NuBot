@@ -136,7 +136,8 @@ public class ParseOptions {
      */
     public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
 
-        NuBotOptions options = new NuBotOptions();
+        //default values for optional settings
+        NuBotOptions options = NuBotOptionsDefault.defaultFactory();
 
         try {
             isValidJSON(optionsJSON);
@@ -149,24 +150,6 @@ public class ParseOptions {
         double spread = -1;
         double distanceThreshold = -1;
 
-        //default values for optional settings
-
-        String nudIp = NuBotOptionsDefault.nudIp;
-        String sendMails = NuBotOptionsDefault.sendMails;
-        boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
-        boolean executeOrders = NuBotOptionsDefault.executeOrders;
-        boolean verbose = NuBotOptionsDefault.verbose;
-        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
-        boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
-        int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
-        double txFee = NuBotOptionsDefault.txFee;
-        double priceIncrement = NuBotOptionsDefault.priceIncrement;
-        double keepProceeds = NuBotOptionsDefault.keepProceeds;
-        double maxSellVolume = NuBotOptionsDefault.maxSellVolume;
-        double maxBuyVolume = NuBotOptionsDefault.maxBuyVolume;
-        int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
-        boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;
-        boolean secondarypeg = NuBotOptionsDefault.secondarypeg;
 
 
         //First try to parse compulsory parameters
@@ -186,18 +169,18 @@ public class ParseOptions {
             }
         }
 
-        String apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
+        options.apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
 
-        String apiSecret = (String) getIgnoreCase(optionsJSON, "apisecret");
+        options.apiSecret = (String) getIgnoreCase(optionsJSON, "apisecret");
 
-        String mailRecipient = (String) getIgnoreCase(optionsJSON, "mailrecipient");
+        options.mailRecipient = (String) getIgnoreCase(optionsJSON, "mailrecipient");
 
         String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
-        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(pairStr);
+        options.pair = CurrencyPair.getCurrencyPairFromString(pairStr);
 
         boolean aggregate = true; //true only for USD
-        if (!pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
-            aggregate = false; //default to false
+        if (!options.pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
+            options.aggregate = false; //default to false
         }
 
 
@@ -205,9 +188,9 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        secondarypeg = (boolean) optionsJSON.get("secondarypeg");
+        options.secondarypeg = (boolean) optionsJSON.get("secondarypeg");
 
-        if (secondarypeg) {
+        if (options.secondarypeg) {
             parseSecondary(options, optionsJSON);
         }
 
@@ -215,56 +198,56 @@ public class ParseOptions {
         //---- optional settings ----
 
         if (containsIgnoreCase(optionsJSON, "nudip")) {
-            nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
+            options.nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
         }
 
         if (containsIgnoreCase(optionsJSON, "priceincrement")) {
-            priceIncrement = Utils.getDouble(getIgnoreCase(optionsJSON, "priceincrement"));
+            options.priceIncrement = Utils.getDouble(getIgnoreCase(optionsJSON, "priceincrement"));
         }
 
         if (containsIgnoreCase(optionsJSON, "txfee")) {
-            txFee = Utils.getDouble(getIgnoreCase(optionsJSON, "txfee"));
+            options.txFee = Utils.getDouble(getIgnoreCase(optionsJSON, "txfee"));
         }
 
         if (containsIgnoreCase(optionsJSON, "submitliquidity")) {
-            submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
+            options.submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
         }
 
         if (containsIgnoreCase(optionsJSON, "maxsellordervolume")) {
-            maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxsellordervolume"));
+            options.maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxsellordervolume"));
         }
 
         if (containsIgnoreCase(optionsJSON, "maxbuyordervolume")) {
-            maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxbuyordervolume"));
+            options.maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxbuyordervolume"));
         }
 
         if (containsIgnoreCase(optionsJSON, "executeorders")) {
-            executeOrders = (boolean) getIgnoreCase(optionsJSON, "executeorders");
+            options.executeOrders = (boolean) getIgnoreCase(optionsJSON, "executeorders");
         }
 
         if (containsIgnoreCase(optionsJSON, "verbose")) {
-            verbose = (boolean) getIgnoreCase(optionsJSON, "verbose");
+            options.verbose = (boolean) getIgnoreCase(optionsJSON, "verbose");
         }
 
         if (containsIgnoreCase(optionsJSON, "hipchat")) {
-            sendHipchat = (boolean) getIgnoreCase(optionsJSON, "hipchat");
+            options.sendHipchat = (boolean) getIgnoreCase(optionsJSON, "hipchat");
         }
 
         if (containsIgnoreCase(optionsJSON, "emergencytimeout")) {
             long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, "emergencytimeout");
-            emergencyTimeout = (int) emergencyTimeoutLong;
+            options.emergencyTimeout = (int) emergencyTimeoutLong;
         }
 
         if (containsIgnoreCase(optionsJSON, "keepproceeds")) {
-            keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, "keepproceeds")));
+            options.keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, "keepproceeds")));
         }
 
         if (containsIgnoreCase(optionsJSON, "multiplecustodians")) {
-            multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiplecustodians");
+            options.multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiplecustodians");
         }
 
         if (containsIgnoreCase(optionsJSON, "distributeliquidity")) {
-            distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distributeliquidity");
+            options.distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distributeliquidity");
         }
 
         //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
@@ -292,13 +275,13 @@ public class ParseOptions {
 
 
         if (containsIgnoreCase(optionsJSON, "mailnotifications")) {
-            sendMails = (String) getIgnoreCase(optionsJSON, "mailnotifications");
-            if (sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
-                    || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
-                    || sendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
-                sendMails = sendMails.toUpperCase(); //Convert to upper case
+            String tmpsendMails = (String) getIgnoreCase(optionsJSON, "mailnotifications");
+            if (tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
+                    || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
+                    || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
+                options.sendMails = tmpsendMails.toUpperCase(); //Convert to upper case
             } else {
-                String error = "Value not accepted for \"mail-notifications\" : " + sendMails + " . Admitted values  : "
+                String error = "Value not accepted for \"mail-notifications\" : " + tmpsendMails + " . Admitted values  : "
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
                         + MailNotifications.MAIL_LEVEL_SEVERE + " or "
                         + MailNotifications.MAIL_LEVEL_NONE;
@@ -306,15 +289,6 @@ public class ParseOptions {
                 throw new NuBotConfigException(error);
             }
         }
-
-
-        //Create a new Instance
-        options = new NuBotOptions(dualside, apiKey, apiSecret, nubitAddress, rpcUser,
-                rpcPass, nudIp, nudPort, priceIncrement, txFee, submitLiquidity, exchangeName,
-                executeOrders, verbose, pair, executeStrategyInterval,
-                sendHipchat, sendMails, mailRecipient,
-                emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
-                maxSellVolume, maxBuyVolume, distributeLiquidity, secondarypeg, wallchangeThreshold, spread, distanceThreshold);
 
         //test if configuration is supported
         if (!isSupportedPair(options.getPair())) {

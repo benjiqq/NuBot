@@ -288,79 +288,46 @@ public class NuBotOptions {
     }
 
 
-    /**
-     * @return
-     */
     public boolean isDualSide() {
         return dualSide;
     }
 
-    /**
-     * @param dualSide
-     */
     public void setDualSide(boolean dualSide) {
         this.dualSide = dualSide;
     }
 
-    /**
-     * @return
-     */
     public boolean isSecondarypeg() {
         return this.secondarypeg;
     }
 
-    /**
-     * @param dualSide
-     */
     public void setSecondary(boolean secondary) {
         this.secondarypeg= secondarypeg;
     }
 
-    /**
-     * @return
-     */
     public boolean isSubmitliquidity() {
         return submitLiquidity;
     }
 
-    /**
-     * @param submitLiquidity
-     */
     public void setSubmitLiquidity(boolean submitLiquidity) {
         this.submitLiquidity = submitLiquidity;
     }
 
-    /**
-     * @return
-     */
     public boolean isExecuteOrders() {
         return executeOrders;
     }
 
-    /**
-     * @param executeOrders
-     */
     public void setExecuteOrders(boolean executeOrders) {
         this.executeOrders = executeOrders;
     }
 
-    /**
-     * @return
-     */
     public boolean isVerbose() {
         return verbose;
     }
 
-    /**
-     * @param verbose
-     */
     public void setVerbose(boolean verbose) {
         this.verbose = verbose;
     }
 
-    /**
-     * @return
-     */
     public String getApiKey() {
         return apiKey;
     }
@@ -606,16 +573,10 @@ public class NuBotOptions {
         this.maxBuyVolume = maxBuyVolume;
     }
 
-    /**
-     * @return
-     */
     public int getEmergencyTimeout() {
         return emergencyTimeout;
     }
 
-    /**
-     * @param emergencyTimeoutMinutes
-     */
     public void setEmergencyTimeoutMinutes(int emergencyTimeoutMinutes) {
         this.emergencyTimeout = emergencyTimeoutMinutes;
     }

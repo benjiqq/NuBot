@@ -8,24 +8,6 @@ import com.nubits.nubot.notifications.MailNotifications;
  */
 public class NuBotOptionsDefault {
 
-    public static String nudIp = "127.0.0.1";
-    public static int nudport = 9091;
-    public static String sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
-    public static boolean submitLiquidity = false;
-    public static boolean executeOrders = true;
-    public static boolean verbose = false;
-    public static boolean sendHipchat = true;
-    public static boolean multipleCustodians = false;
-    public static int executeStrategyInterval = 41;
-    public static double txFee = 0.2;
-    public static double priceIncrement = 0.0003;
-    public static double keepProceeds = 0;
-    public static double maxSellVolume = 0;
-    public static double maxBuyVolume = 0;
-    public static int emergencyTimeout = 60;
-    public static boolean secondarypeg = false;
-    public static boolean distributeLiquidity = false;
-
     //double wallchangeThreshold = 0.5;
     //double spread = 0;
     //double distanceThreshold = 10;
@@ -39,19 +21,26 @@ public class NuBotOptionsDefault {
         opt.rpcUser = "";
         opt.rpcPass = "";
         opt.nudIp = "127.0.0.1";
-        opt.priceIncrement = 0.0;
-        opt.txFee = 0.0;
+        opt.priceIncrement = 0.0003;
+        opt.txFee = 0.2;
         opt.submitLiquidity = false;
         opt.executeOrders = false;
-        opt.executeStrategyInterval = 30;
+        opt.executeStrategyInterval = 41;
         opt.sendHipchat = true;
-        opt.sendMails = "NONE";
+        opt.sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
         opt.mailRecipient = "";
         opt.emergencyTimeout = 30;
         opt.keepProceeds = 0.0;
         opt.distributeLiquidity = false;
         opt.secondarypeg = false;
         opt.pair = Constant.NBT_USD;
+        opt.verbose = false;
+        opt.sendHipchat = true;
+        opt.multipleCustodians = false;
+        opt.maxSellVolume = 0;
+        opt.maxBuyVolume = 0;
+        opt.nudPort = 9091;
+        opt.nudIp = "127.0.0.1";
         return opt;
     }
 }
