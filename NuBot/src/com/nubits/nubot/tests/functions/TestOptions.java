@@ -17,7 +17,7 @@ import java.nio.file.Paths;
 
 public class TestOptions extends TestCase {
 
-    private static String testconfigFile = "test.json";
+    private static String testconfigFile = "peatio.json";
     private static String testconfig = "testconfig/" + testconfigFile;
 
     @Override
@@ -103,7 +103,7 @@ public class TestOptions extends TestCase {
 
             assertTrue(nuo != null);
 
-            assertTrue(nuo.getExchangeName().equals("peatio"));
+            assertTrue(nuo.exchangeName.equals("peatio"));
 
             //assertTrue(nuo.getPair() != null);
 

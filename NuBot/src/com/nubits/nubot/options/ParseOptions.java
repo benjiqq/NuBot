@@ -146,15 +146,15 @@ public class ParseOptions {
         }
 
         //First try to parse compulsory parameters
-        String exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
+        options.exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
-        boolean supported = exchangeSupported(exchangeName);
+        boolean supported = exchangeSupported(options.exchangeName);
         if (!supported)
             throw new NuBotConfigException("exchange not supported");
 
-        boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
+        options.dualSide = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
-        if (!exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
+        if (!options.exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
             if (!containsIgnoreCase(optionsJSON, "apiKey")) {
                 throw new NuBotConfigException("The apikey parameter is compulsory.");
             } else {

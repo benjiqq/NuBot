@@ -35,7 +35,7 @@ public class TestConfigAlts extends TestCase {
     @Test
     public void testLoadComplete() {
 
-        String testconfigFile = "test.json";
+        String testconfigFile = "alts.json";
         String testconfig = "testconfig/" + testconfigFile;
         boolean catched = false;
 
@@ -56,7 +56,6 @@ public class TestConfigAlts extends TestCase {
 
             assertTrue(nuo != null);
             String exc = nuo.getExchangeName();
-            System.out.println(">>> exc" + exc);
             assertTrue(exc.equals("altstrade"));
 
         } catch (NuBotConfigException e) {
