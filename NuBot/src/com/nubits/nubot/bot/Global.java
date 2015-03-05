@@ -30,15 +30,20 @@ import java.util.Properties;
  */
 public class Global {
 
+    public static NuBotOptions options;
+
     public static Properties settings;
     public static String sessionId;
     public static boolean running = false;
-    public static Exchange exchange;
+
     public static TaskManager taskManager;
-    public static String publicAddress;
+
     public static NuRPCClient rpcClient;
-    public static NuBotOptions options;
+
     public static double conversion = 1; //Change this? update SendLiquidityinfoTask
     public static FrozenBalancesManager frozenBalances;
     public static boolean swappedPair; //true if paymen currency is NBT
+    //TODO
+    public static Exchange exchange;
+    public static String publicAddress;
 }

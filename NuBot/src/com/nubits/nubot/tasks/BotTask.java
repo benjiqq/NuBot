@@ -44,7 +44,6 @@ public class BotTask {
         this.task = task;
     }
 
-//Methods
     public void toggle() {
         if (!isRunning()) {
             this.start();

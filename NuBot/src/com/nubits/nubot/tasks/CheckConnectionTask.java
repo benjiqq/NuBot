@@ -36,7 +36,6 @@ public class CheckConnectionTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(CheckConnectionTask.class.getName());
 
-//Methods
     @Override
     public void run() {
         String url = Global.exchange.getLiveData().getUrlConnectionCheck();
