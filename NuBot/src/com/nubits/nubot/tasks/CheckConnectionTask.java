@@ -36,20 +36,21 @@ public class CheckConnectionTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(CheckConnectionTask.class.getName());
 
+    private String url;
     @Override
     public void run() {
-        String url = Global.exchange.getLiveData().getUrlConnectionCheck();
-        Global.exchange.getLiveData().setConnected(isConnectedTo(url));
+        this.url = Global.exchange.getLiveData().getUrlConnectionCheck();
+        Global.exchange.getLiveData().setConnected(isConnected());
         LOG.info("Checking connection to " + url + " -  Connected : " + Global.exchange.getLiveData().isConnected());
 
     }
 
-    private boolean isConnectedTo(String url) {
+    public boolean isConnected() {
         boolean connected = false;
         HttpURLConnection connection = null;
         URL query = null;
         try {
-            query = new URL(url);
+            query = new URL(this.url);
         } catch (MalformedURLException ex) {
             LOG.error(ex.toString());
         }
