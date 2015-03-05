@@ -1,7 +1,7 @@
 package com.nubits.nubot.coinlayer;
 
-import io.metaexchange.bitcoinrpc.BitcoinAPI;
-import io.metaexchange.bitcoinrpc.Block;
+import io.metaexchange.bitcoinapi.BitcoinAPI;
+import io.metaexchange.bitcoinapi.Block;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ public class SimpleExample {
 
     private static BitcoinAPI fullclient;
 
-    private static String rpcfile = "conf/rpc.properties";
+    private static String rpcfile = "config/rpc.properties";
 
 
     public static void main(String[] args) {
