@@ -36,51 +36,54 @@ public class TaskManager {
     private static final Logger LOG = LoggerFactory.getLogger(TaskManager.class.getName());
     private static final String STRATEGY_FIAT = "Strategy Fiat Task";
     private static final String STRATEGY_CRYPTO = "Strategy Crypto Task";
-    //Class Variables
+
     protected int interval;
     private BotTask checkConnectionTask;
     private BotTask strategyFiatTask;
     private BotTask sendLiquidityTask;
     private BotTask checkNudTask;
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
+
     //these are used for secondary peg strategy
     private BotTask secondaryPegTask;
     private BotTask priceTriggerTask;
-    //--------------end secondary peg tasks
+
     private ArrayList<BotTask> taskList;
     private boolean running;
     private boolean initialized = false;
-//Constructor
 
     public TaskManager() {
         this.running = false;
         taskList = new ArrayList<BotTask>();
-        //assign default values just for testing without Global.options loaded
-        int sendLiquidityInterval = NuBotAdminSettings.submit_liquidity_seconds,
-                executeStrategyInterval = 41,
-                checkPriceInterval = 61;
 
-        boolean verbose = false;
+        //TODO! options can't be null
+        //assign default values just for testing without Global.options loaded
+        //TODO naming mixed
+        int sendLiquidityInterval = NuBotAdminSettings.submit_liquidity_seconds,
+                executeStrategyInterval =NuBotAdminSettings.executeStrategyInterval,
+                checkPriceInterval = NuBotAdminSettings.checkPriceInterval;
 
         if (Global.options != null) {
             //If global option have been loaded
             sendLiquidityInterval = Global.options.getSendLiquidityInteval();
             executeStrategyInterval = Global.options.getExecuteStrategyInterval();
-            verbose = Global.options.isVerbose();
         }
 
+        //connectivity tasks
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), 127, "checkConnection");
         taskList.add(checkConnectionTask);
 
-        sendLiquidityTask = new BotTask(
-                new SubmitLiquidityinfoTask(verbose), sendLiquidityInterval, "sendLiquidity"); //true for verbosity
-        taskList.add(sendLiquidityTask);
-
         checkNudTask = new BotTask(
                 new CheckNudTask(), 30, "checkNud");
         taskList.add(checkNudTask);
+
+
+        sendLiquidityTask = new BotTask(
+                new SubmitLiquidityinfoTask(Global.options.verbose), sendLiquidityInterval, "sendLiquidity"); //true for verbosity
+        taskList.add(sendLiquidityTask);
+
 
         strategyFiatTask = new BotTask(
                 new StrategyPrimaryPegTask(), executeStrategyInterval, STRATEGY_FIAT);

@@ -91,11 +91,16 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else {
             count = 1;
-            executeUpdatePrice(count);
+            try{
+                executeUpdatePrice(count);
+            }catch(FeedPriceException e){
+                sendErrorNotification();
+                Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            }
         }
     }
 
-    private void executeUpdatePrice(int countTrials) {
+    private void executeUpdatePrice(int countTrials) throws FeedPriceException {
 
         if (countTrials <= MAX_ATTEMPTS) {
             ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
@@ -180,9 +185,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else {
             //Tried more than three times without success
-            LOG.error("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
-            sendErrorNotification();
-            Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            throw new FeedPriceException("The price has failed updating more than " + MAX_ATTEMPTS + " times in a row");
+
         }
     }
 
@@ -199,7 +203,11 @@ public class PriceMonitorTriggerTask extends TimerTask {
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
         }
-        executeUpdatePrice(count);
+        try {
+            executeUpdatePrice(count);
+        }catch(FeedPriceException ex){
+            LOG.error(ex.toString());
+        }
     }
 
     private void sendErrorNotification() {
@@ -308,7 +316,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else { //otherwise something bad has happened so we shutdown.
             int p = 3;
-            sleepTime = (Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")) * p);
+            sleepTime = NuBotAdminSettings.refresh_time_seconds * p;
 
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
                     + NuBotAdminSettings.refresh_time_seconds + "seconds.\nThe bot will notify and restart in "
@@ -363,7 +371,12 @@ public class PriceMonitorTriggerTask extends TimerTask {
                         + "\nShifting moving average and re-fetching exchange rate data.");
                 updateMovingAverageQueue(current);
 
-                executeUpdatePrice(1);
+                try{
+                    int trials = 1;
+                    executeUpdatePrice(trials);
+                }catch(FeedPriceException ex){
+
+                }
                 return;
             }
             //the potential price is within the % boundary.

@@ -21,5 +21,9 @@ public class NuBotAdminSettings {
      */
     public static final int submit_liquidity_seconds = 130;
 
+    public static final int executeStrategyInterval = 41;
+
+    public static final int checkPriceInterval = 61;
+
 
 }
