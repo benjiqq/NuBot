@@ -171,6 +171,12 @@ public class ParseOptions {
         String pairStr = (String) getIgnoreCase(optionsJSON, "pair");
         options.pair = CurrencyPair.getCurrencyPairFromString(pairStr);
 
+        //test if configuration is supported
+        if (!isSupportedPair(options.getPair())) {
+            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        }
+
+
         boolean aggregate = true; //true only for USD
         if (!options.pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
             options.aggregate = false; //default to false
@@ -245,25 +251,22 @@ public class ParseOptions {
 
         //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
 
-        String nubitAddress = "", rpcPass = "", rpcUser = "";
-        int nudPort = 9091;
-
 
         if (containsIgnoreCase(optionsJSON, "nubitaddress")) {
-            nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
+            options.nubitAddress = (String) getIgnoreCase(optionsJSON, "nubitaddress");
         }
 
         if (containsIgnoreCase(optionsJSON, "rpcpass")) {
-            rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
+            options.rpcPass = (String) getIgnoreCase(optionsJSON, "rpcpass");
         }
 
         if (containsIgnoreCase(optionsJSON, "rpcuser")) {
-            rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
+            options.rpcUser = (String) getIgnoreCase(optionsJSON, "rpcuser");
         }
 
         if (containsIgnoreCase(optionsJSON, "nudport")) {
             long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
-            nudPort = (int) nudPortlong;
+            options.nudPort = (int) nudPortlong;
         }
 
 
@@ -281,16 +284,6 @@ public class ParseOptions {
                 LOG.error(error);
                 throw new NuBotConfigException(error);
             }
-        }
-
-        //test if configuration is supported
-        if (!isSupportedPair(options.getPair())) {
-            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
-        }
-
-
-        if (options == null) {
-            throw new NuBotConfigException("error parsing configuration files");
         }
 
         return options;
