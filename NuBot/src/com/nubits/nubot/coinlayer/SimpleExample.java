@@ -32,20 +32,11 @@ public class SimpleExample {
             System.exit(0);
         }
 
-        Block block = client.getLastBlock();
-        System.out.println("block " + block);
-
-        System.out.println(block.getMerkleroot());
-
         BigDecimal balance = client.getBalance();
         System.out.println("balance: " + balance);
 
-        //String newaddr = client.getnewaddress("test");
-        //System.out.println("newaddr: " + newaddr);
-
-        //Map<String, String> valid = client.validateaddress(newaddr);
-        //boolean isvalid = new Boolean(valid.get("isvalid")).booleanValue();
-        //System.out.println(isvalid);
+        client.isValid("abc");
+        client.sendtoaddress("bc",new BigDecimal(0.0001));
 
 
     }
