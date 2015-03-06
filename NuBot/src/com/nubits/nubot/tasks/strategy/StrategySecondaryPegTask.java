@@ -22,6 +22,9 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+
+import java.util.Observable;
+import java.util.Observer;
 import java.util.TimerTask;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -30,7 +33,7 @@ import org.slf4j.Logger;
  *
  * @author desrever <desrever at nubits.com>
  */
-public class StrategySecondaryPegTask extends TimerTask {
+public class StrategySecondaryPegTask extends TimerTask implements Observer {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
@@ -96,6 +99,14 @@ public class StrategySecondaryPegTask extends TimerTask {
             }
             getSendLiquidityTask().setFirstOrdersPlaced(true);
         }
+    }
+
+    /**
+     * updates through observer
+     */
+    public void update(Observable o, Object arg) {
+        LOG.info("pricechanged: " + arg);
+
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
