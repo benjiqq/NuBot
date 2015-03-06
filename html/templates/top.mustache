@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+            body {
+                font-family: Helvetica;
+                padding-top: 70px;
+            }
+
+          .row {
+            margin-bottom: 20px;
+          }
+          .row .row {
+            margin-top: -20px;
+            margin-bottom: 0;
+          }
+          [class*="col-"] {
+            padding-top: 2px;
+            padding-bottom: 2px;
+            border: 0px solid #ddd;
+            border: 0px solid rgba(86,61,124,.2);
+          }
+
+          hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+          }
+
+          #logarea {
+            width:800px;
+            height:200px;
+            resize:none
+          }
+
+        </style>
+
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+
+      <script>
+
+              var host = "localhost";
+              var port = 4567;
+
+
+            function loadlog() {
+
+                var url = "http://" + host + ":" + port + "/logdump";
+
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+                })
+                .done(function( data ) {
+                  $('#logarea').text(data);
+                });
+
+            }
+
+            function loadconfig() {
+
+                var url = "http://" + host + ":" + port + "/config";
+
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+                })
+                .done(function( data ) {
+
+                    //string values
+
+                    $("#exchangename").attr("placeholder", data["exchangename"]);
+                    $("#apikey").attr("placeholder", data["apikey"]);
+                    $("#apisecret").attr("placeholder", data["apisecret"]);
+                    $("#maxbuyvolume").attr("placeholder", data["maxbuyordervolume"]);
+                    $("#maxsellvolume").attr("placeholder", data["maxsellordervolume"]);
+                    $("#pair").attr("placeholder", data["pair"]);
+
+                    if (data["submitliquidity"]){
+                      $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
+                      $("#nudport").attr("placeholder", data["nudport"]);
+                      $("#rpcpass").attr("placeholder", data["rpcpass"]);
+                      $("#rpcuser").attr("placeholder", data["rpcuser"]);
+                    } else {
+                      $("#nubitaddress").attr("placeholder", "-");
+                      $("#nudport").attr("placeholder", "-");
+                      $("#rpcpass").attr("placeholder", "-");
+                      $("#rpcuser").attr("placeholder", "-");
+                    }
+
+                    //booleans
+
+                    $('#submitliquidity').attr('checked',data["submitliquidity"]);
+                    $('#dualside').attr('checked',data["dualside"]);
+                    $('#multiplecustodians').attr('checked',data["multiplecustodians"]);
+                    $('#executeorders').attr('checked',data["executeorders"]);
+                    $('#verbose').attr('checked',data["verbose"]);
+                    $('#hipchat').attr('checked',data["hipchat"]);
+                    $('#secondarypeg').attr('checked',data["secondarypeg"]);
+
+                 });
+
+            }
+
+            function postall(){
+                var posturl = "http://" + host + ":" + port + "/config";
+
+                //get all vars and post them. smarter would be to figure out which ones changed
+
+                //string values
+
+                var exchangename = $('#exchangename').attr('placeholder');
+                var apikey = $('#apikey').attr('placeholder');
+                var apisecret = $('#apisecret').attr('placeholder');
+                var maxbuyordervolume = $('#maxbuyordervolume').attr('placeholder');
+                var maxsellordervolume = $('#maxsellordervolume').attr('placeholder');
+                var pair = $("#pair").attr("placeholder");
+                var nubitaddress = $("#nubitaddress").attr("placeholder");
+                var nudport = $("#nudport").attr("placeholder");
+                var rpcpass = $("#rpcpass").attr("placeholder");
+                var rpcuser = $("#rpcuser").attr("placeholder");
+
+                //booleans
+                var submitliquidity = $('#submitliquidity').prop('checked');
+                var dualside = $('#dualside').prop('checked');
+                var multiplecustodians = $('#multiplecustodians').prop('checked');
+                var executeorders = $('#executeorders').prop('checked');
+                var verbose = $('#verbose').prop('checked');
+                var hipchat = $('#hipchat').prop('checked');
+                var secondarypeg = $('#secondarypeg').prop('checked');
+
+
+                var jsondata = JSON.stringify({
+                    "exchangename": exchangename,
+                    "apikey": apikey,
+                    "apisecret": apisecret,
+                    "maxbuyordervolume": maxbuyordervolume,
+                    "maxsellordervolume": maxsellordervolume,
+                    "submitliquidity": submitliquidity,
+                    "dualside": dualside,
+                    "multiplecustodians": multiplecustodians,
+                    "executeorders": executeorders,
+                    "verbose": verbose,
+                    "hipchat": hipchat,
+                    "secondarypeg": secondarypeg
+
+                });
+
+
+                makePost(posturl, jsondata);
+            }
+
+            function makePost(url, jsondata){
+                //make HTTP post to server
+                $.ajax(url, {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                      console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                    }
+               });
+            }
+
+
+        </script>
+
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+
+    </head>
+
+
+

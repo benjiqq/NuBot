@@ -3,8 +3,6 @@ package com.nubits.nubot.options;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FileSystem;
 import org.apache.commons.io.FileUtils;
 
@@ -19,7 +17,7 @@ public class SaveOptions {
 
     public static String jsonPretty(NuBotOptions opt){
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new OptionsSerializer());
+        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
         String js = parser.toJson(opt);
         return js;
@@ -27,8 +25,6 @@ public class SaveOptions {
 
     public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
         String js = jsonPretty(opt);
-        System.out.println("saving js to " + filepath);
-        System.out.println("js " + js);
         FileSystem.writeToFile(js, filepath, false);
         return true;
     }
@@ -55,7 +51,7 @@ public class SaveOptions {
      * @param filepath
      * @return
      */
-    public static boolean backupOptions(String filepath) {
+    public static boolean backupOptions(String filepath) throws IOException{
         File f = new File(filepath);
         if (f.exists()) {
             boolean wrote = false;
@@ -67,12 +63,13 @@ public class SaveOptions {
                     try {
                         FileUtils.copyFile(f, dest);
                     } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        return true;
+                        throw new IOException(e);
                     }
                 }
                 i++;
+
+                if (i > 10)
+                    return false;
             }
         }
         return false;

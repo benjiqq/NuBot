@@ -1,26 +1,28 @@
 package com.nubits.nubot.webui;
 
-import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import spark.ModelAndView;
-import spark.SparkBase;
-import spark.webserver.SparkServer;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 import static spark.Spark.get;
 
 public class UiServer {
 
-    //TODO path
-    private static String htmlFolder = "./html/tmpl/";
+    final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
-    private static String testconfigFile = "test.json";
-    private static String configdir = "testconfig";
-    private static String testconfigpath = "testconfig/" + testconfigFile;
+    //TODO path
+    private static String htmlFolder = "./html/templates/";
+
+    private static String configFile = "config.json";
+    private static String configdir = "config";
+    private static String configpath =configdir + "/" +  configFile;
 
     /**
      * start the UI server
@@ -28,16 +30,28 @@ public class UiServer {
     public static void startUIserver(NuBotOptions opt) {
 
         //TODO: only load if in testmode and this is not set elsewhere
-        //should better read: load global settings
         Utils.loadProperties("settings.properties");
 
-        new ConfigController(opt, configdir, testconfigFile);
+        //binds GET and POST
+        new ConfigController("/config", opt, configdir, configFile);
 
-        Map map = new HashMap();
+        new LogController("/logdump");
 
-        get("/", (rq, rs) -> new ModelAndView(map, htmlFolder + "config.mustache"), new LayoutTemplateEngine());
+        Map emptymap = new HashMap();
 
-        get("/log", (rq, rs) -> new ModelAndView(map, htmlFolder + "log.mustache"), new LayoutTemplateEngine());
+        get("/", (rq, rs) -> new ModelAndView(emptymap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
+        get("/feeds", (rq, rs) -> new ModelAndView(emptymap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
+
+
+        Map configmap = new HashMap();
+        configmap.put("configfile", configFile);
+
+        get("/configui", (rq, rs) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
+
+
+        Map statusmap = new HashMap();
+
+
 
 
     }
@@ -45,11 +59,18 @@ public class UiServer {
 
     public static void main(String[] args) {
 
-        try{
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfigpath);
-            startUIserver(opt);
-        }catch(Exception e){
+        LOG.debug("test debug");
+        LOG.warn("test warn ");
+        LOG.error("test error");
 
+        LOG.info("starting UI server");
+
+        try {
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
+            LOG.info("using options " + opt);
+            startUIserver(opt);
+        } catch (Exception ex) {
+            LOG.error("error configuring " + ex);
         }
 
 

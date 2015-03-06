@@ -12,6 +12,7 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 
 public class TestWriteOptions extends TestCase {
 
@@ -53,16 +54,30 @@ public class TestWriteOptions extends TestCase {
     @Test
     public void testBackup() {
         NuBotOptions opt = new NuBotOptions();
-        boolean success = SaveOptions.backupOptions(testinconfig);
-        assertTrue(success);
-        File newbak = new File("testconfig/test.json_1.bak");
-        assertTrue(newbak.exists());
+        boolean success;
+        File newbak;
 
-        //backup again. increases counter
-        success = SaveOptions.backupOptions(testinconfig);
-        assertTrue(success);
-        newbak = new File("testconfig/test.json_2.bak");
-        assertTrue(newbak.exists());
+        try {
+            success = SaveOptions.backupOptions(testinconfig);
+            assertTrue(success);
+            newbak = new File("testconfig/test.json_1.bak");
+            assertTrue(newbak.exists());
+        } catch (IOException e) {
+
+        }
+
+
+        try {
+            //backup again. increases counter
+
+            success = SaveOptions.backupOptions(testinconfig);
+            assertTrue(success);
+            newbak = new File("testconfig/test.json_2.bak");
+            assertTrue(newbak.exists());
+        } catch (IOException e) {
+
+        }
+
     }
 
 

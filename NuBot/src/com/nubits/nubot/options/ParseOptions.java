@@ -1,5 +1,6 @@
 package com.nubits.nubot.options;
 
+import com.alibaba.fastjson.JSON;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -91,6 +92,21 @@ public class ParseOptions {
 
     }
 
+    /**
+     * the rules for valid configurations
+     * @param optionsJSON
+     * @return
+     * @throws NuBotConfigException
+     */
+    public static boolean isValidJSON(JSONObject optionsJSON) throws NuBotConfigException {
+
+        for (int i = 0; i < comp.length; i++) {
+            if (!containsIgnoreCase(optionsJSON, comp[i]))
+                throw new NuBotConfigException("necessary key: " + comp[i]);
+        }
+
+        return true;
+    }
 
     /**
      * parseOptions from JSON into NuBotOptions
@@ -103,11 +119,11 @@ public class ParseOptions {
 
         NuBotOptions options = new NuBotOptions();
 
-        for (int i = 0; i < comp.length; i++) {
-            if (!containsIgnoreCase(optionsJSON, comp[i]))
-                throw new NuBotConfigException("necessary key: " + comp[i]);
+        try{
+            isValidJSON(optionsJSON);
+        }catch(NuBotConfigException e){
+            throw e;
         }
-
 
         boolean secondarypeg = false;
 
@@ -138,8 +154,6 @@ public class ParseOptions {
 
         boolean dualside = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
-        String apiKey = "";
-
         if (!exchangeName.equalsIgnoreCase(Constant.CCEX)) { //for ccex this parameter can be omitted
             if (!containsIgnoreCase(optionsJSON, "apiKey")) {
                 throw new NuBotConfigException("The apikey parameter is compulsory.");
@@ -147,6 +161,8 @@ public class ParseOptions {
                 options.apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
             }
         }
+
+        String apiKey = (String) getIgnoreCase(optionsJSON, "apikey");
 
         String apiSecret = (String) getIgnoreCase(optionsJSON, "apisecret");
 
@@ -172,9 +188,6 @@ public class ParseOptions {
         }
 
 
-        if (containsIgnoreCase(optionsJSON, "nudip")) {
-            nudIp = (String) getIgnoreCase(optionsJSON, "nudip");
-        }
         //---- optional settings ----
 
         if (optionsJSON.containsKey("nudip")) {
@@ -292,6 +305,11 @@ public class ParseOptions {
                 emergencyTimeout, keepProceeds, aggregate, multipleCustodians,
                 maxSellVolume, maxBuyVolume, distributeLiquidity, secondarypeg, wallchangeThreshold, spread, distanceThreshold);
 
+        //test if configuration is supported
+        if (!isSupportedPair(options.getPair())) {
+            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        }
+
 
         if (options == null) {
             throw new NuBotConfigException("error parsing configuration files");
@@ -354,7 +372,7 @@ public class ParseOptions {
     }
 
     public static void parseBackupfeeds() {
-                //            ArrayList<String> backupFeedNames = new ArrayList<>();
+        //            ArrayList<String> backupFeedNames = new ArrayList<>();
         //            org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backup-feeds");
         //
         //            //Iterate on backupFeeds
@@ -431,5 +449,25 @@ public class ParseOptions {
         JSONObject content = new JSONObject(setMap);
         optionsObject.put("options", content);
         return optionsObject;
+    }
+
+
+    /**
+     * check if pair is supported
+     *
+     * @param pair
+     * @return
+     */
+    public static boolean isSupportedPair(CurrencyPair pair) {
+        if (pair.equals(Constant.NBT_USD)
+                || pair.equals(Constant.NBT_BTC)
+                || pair.equals(Constant.BTC_NBT)
+                || pair.equals(Constant.NBT_EUR)
+                || pair.equals(Constant.NBT_CNY)
+                || pair.equals(Constant.NBT_PPC)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

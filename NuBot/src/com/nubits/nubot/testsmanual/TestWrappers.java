@@ -42,7 +42,7 @@ public class TestWrappers {
      * Configure tests
      */
     public static final String SETTINGS = FileUtils.getFile("settings.properties").getPath();
-    private static final String TEST_OPTIONS_PATH = FileUtils.getFile("NuBot", "res", "options", "private", "options.json").getAbsolutePath();
+    private static final String TEST_OPTIONS_PATH = FileUtils.getFile("testconfig","alts.json").getAbsolutePath();
     public static final String testExchange = Constant.ALTSTRADE;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = Constant.NBT;

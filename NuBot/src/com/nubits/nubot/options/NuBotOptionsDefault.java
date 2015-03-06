@@ -1,5 +1,6 @@
 package com.nubits.nubot.options;
 
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Global;
 import com.nubits.nubot.notifications.MailNotifications;
 
@@ -31,9 +32,26 @@ public class NuBotOptionsDefault {
 
     public static NuBotOptions defaultFactory() {
 
-        NuBotOptions opt = new NuBotOptions(true, nudIp, "", "", "", "",
-                nudIp, nudport, nudport, nudport, true, "", true, true, null,
-                30, false, "", "", -1, 0, false, true, 0, 0, false, false);
+        NuBotOptions opt = new NuBotOptions();
+        opt.dualSide = true;
+        opt.apiKey = "";
+        opt.apiSecret = "";
+        opt.rpcUser = "";
+        opt.rpcPass = "";
+        opt.nudIp = "127.0.0.1";
+        opt.priceIncrement = 0.0;
+        opt.txFee = 0.0;
+        opt.submitLiquidity = false;
+        opt.executeOrders = false;
+        opt.executeStrategyInterval = 30;
+        opt.sendHipchat = true;
+        opt.sendMails = "NONE";
+        opt.mailRecipient = "";
+        opt.emergencyTimeout = 30;
+        opt.keepProceeds = 0.0;
+        opt.distributeLiquidity = false;
+        opt.secondarypeg = false;
+        opt.pair = Constant.NBT_USD;
         return opt;
     }
 }
