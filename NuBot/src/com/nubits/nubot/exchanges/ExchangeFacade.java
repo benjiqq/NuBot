@@ -21,6 +21,7 @@ public class ExchangeFacade {
     public static final String EXCOIN = "excoin";
     public static final String BITCOINCOID = "bitcoincoid";
     public static final String ALTSTRADE = "altstrade";
+    public static final String BITTREX = "bittrex";
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
 
