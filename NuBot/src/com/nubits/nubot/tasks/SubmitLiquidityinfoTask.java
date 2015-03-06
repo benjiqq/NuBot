@@ -17,8 +17,6 @@
  */
 package com.nubits.nubot.tasks;
 
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.JSONArray;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
@@ -28,11 +26,13 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.json.simple.JSONArray;
@@ -41,7 +41,6 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
  * @author desrever <desrever at nubits.com>
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
@@ -143,7 +142,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             latestOrders.put("time_stamp", timeStampLong);
             latestOrders.put("active_orders", orderList.size());
             JSONArray jsonDigest = new JSONArray();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
 
                 JSONObject thisOrder = new JSONObject();
                 Order _order = order.next();
@@ -308,7 +307,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     public void setOutputFiles(String outputFileOrders, String outputFileBalances) {
         this.outputFile_orders = outputFileOrders;
         this.jsonFile_orders = this.outputFile_orders.replace(".csv", ".json");
-
 
 
         //create json file if it doesn't already exist

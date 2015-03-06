@@ -79,7 +79,6 @@ public class UiServer {
         Map feedsmap = new HashMap();
         get("/feeds", (request, response) -> new ModelAndView(feedsmap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
 
-
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
@@ -122,24 +121,6 @@ public class UiServer {
             LOG.error("error configuring " + ex);
         }
 
-
-
-        /*if (args.length == 1) {
-            try {
-                String configFilePath = args[0]; //testconfigpath
-                NuBotOptions opt = ParseOptions.parseOptionsSingle(configFilePath);
-
-                startUIserver(opt);
-
-            } catch (NuBotConfigException e) {
-                System.out.println("could not parse config");
-                System.out.println(e);
-                System.exit(0);
-            }
-        } else if ((args.length > 1)|| (args.length ==0)){
-            System.out.println("single file config only");
-            System.exit(0);
-        }*/
 
 
     }
