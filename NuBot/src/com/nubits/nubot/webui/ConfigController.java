@@ -73,6 +73,8 @@ public class ConfigController {
                 //handle errors
             }
 
+            //TODO: if bot is running needs to handled safely
+
             LOG.info("parsed: new opt: " + newopt);
 
             try {

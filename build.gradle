@@ -205,7 +205,7 @@ task NuBotMakeDistribution(dependsOn: compileReadme) << {
 }
 
 
-task runUI(type: JavaExec) << {
+task runUI(type: JavaExec) {
     description 'run the WebUI'
     main = "com.nubits.nubot.webui.UiServer"
     classpath = sourceSets.main.runtimeClasspath
@@ -218,7 +218,7 @@ task runUI(type: JavaExec) << {
     }*/
 }
 
-task testExchanges(type: Test) << {
+task testExchanges(type: Test) {
   // explicitly include or exclude tests
   include 'NuBot/testexchanges/*'
   //include 'components/**'

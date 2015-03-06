@@ -2,17 +2,23 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsSerializer;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 import static spark.Spark.get;
 
@@ -20,11 +26,34 @@ public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
+    private static String configFile = "poloniex.json";
+    private static String configdir = "testconfig";
+
     //TODO path
     private static String htmlFolder = "./html/templates/";
-    private static String configFile = "config.json";
-    private static String configdir = "config";
-    private static String configpath =configdir + "/" +  configFile;
+
+    private static String configpath = configdir + "/" + configFile;
+
+    private static TradeInterface ti;
+
+    /**
+     * simplified balance query. returns -1 on error
+     * @param currency
+     * @return
+     */
+    private static double getBalance(Currency currency) {
+        ApiResponse balancesResponse = ti.getAvailableBalance(currency);
+        if (balancesResponse.isPositive()) {
+            Object o = balancesResponse.getResponseObject();
+            try {
+                Amount a = (Amount) o;
+                return a.getQuantity();
+            } catch (Exception e) {
+                return -1;
+            }
+        }
+        return -1;
+    }
 
     /**
      * start the UI server
@@ -39,21 +68,34 @@ public class UiServer {
 
         new LogController("/logdump");
 
-        Map emptymap = new HashMap();
+        Map opmap = new HashMap();
+        opmap.put("exchange", opt.getExchangeName());
 
-        get("/", (rq, rs) -> new ModelAndView(emptymap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
-        get("/feeds", (rq, rs) -> new ModelAndView(emptymap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
+        opmap.put("btc_balance", getBalance(CurrencyList.BTC));
+        opmap.put("nbt_balance", getBalance(CurrencyList.NBT));
+
+        get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
+
+
+        Map feedsmap = new HashMap();
+        get("/feeds", (request, response) -> new ModelAndView(feedsmap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
 
 
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
-        get("/configui", (rq, rs) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
 
+        get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
 
-        Map statusmap = new HashMap();
+    }
 
-
+    public static String opttoJson(NuBotOptions opt) {
+        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        Gson parser = gson.create();
+        String js = parser.toJson(opt);
+        LOG.info("using options " + js);
+        return js;
     }
 
 
@@ -67,12 +109,13 @@ public class UiServer {
 
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
-            GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-            gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
-            Gson parser = gson.create();
-            String js = parser.toJson(opt);
-            LOG.info("using options " + js);
+            Global.options = opt;
+
+            //TODO: use global object and update
+            ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
+
             startUIserver(opt);
+
         } catch (Exception ex) {
             LOG.error("error configuring " + ex);
         }

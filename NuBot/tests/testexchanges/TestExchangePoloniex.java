@@ -63,12 +63,12 @@ public class TestExchangePoloniex extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-
+            Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
         Utils.loadProperties("settings.properties");
-        Global.options = opt;
+
         ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
 
         Currency btc = CurrencyList.BTC;
@@ -115,6 +115,7 @@ public class TestExchangePoloniex extends TestCase {
         Utils.loadProperties("settings.properties");
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);
+
         CurrencyPair testPair = Constant.NBT_BTC;
 
         Currency btc = CurrencyList.BTC;
