@@ -21,10 +21,13 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import com.nubits.nubot.notifications.MailNotifications;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -526,6 +529,14 @@ public class NuBotOptions {
      */
     public String sendMailsLevel() {
         return sendMails;
+    }
+
+    /**
+     * @return
+     */
+    public boolean sendMails() {
+        boolean not_none = !(this.sendMails.equals(MailNotifications.MAIL_LEVEL_NONE));
+        return not_none;
     }
 
     /**

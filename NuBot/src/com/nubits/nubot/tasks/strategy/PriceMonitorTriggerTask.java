@@ -29,8 +29,10 @@ import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+
 import java.io.File;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.json.simple.JSONArray;
@@ -39,36 +41,42 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *
- *
- *
+ * A task for monitoring prices and triggering actions
  */
 public class PriceMonitorTriggerTask extends TimerTask {
 
-    private int count;
-    private final int MAX_ATTEMPTS = 5;
-    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
-    private PriceFeedManager pfm = null;
-    private StrategySecondaryPegTask strategy = null;
+    //global. TODO: in storage layer
+    private double sellPricePEG_old;
+    private double sellPriceUSD, buyPriceUSD;
+    private LastPrice currentWallPEGPrice;
     private double distanceTreshold;
     private LastPrice lastPrice;
-    private boolean isFirstTimeExecution = true;
-    private LastPrice currentWallPEGPrice;
     private double wallchangeThreshold;
-    private double sellPriceUSD, buyPriceUSD;
-    private String outputPath;
-    private String jsonFile;
-    private String emailHistory = "";
-    private String pegPriceDirection;
-    private double sellPricePEG_old;
     private boolean wallsBeingShifted = false;
-    private Long currentTime = null;
-    //set up a Queue to hold the prices used to calculate the moving average of prices
-    private Queue<Double> queueMA = new LinkedList<>();
+    private PriceFeedManager pfm = null;
+
+    //options
     private int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
     private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
     private static final int PRICE_PERCENTAGE = 10; //this is the percentage at which refresh action is taken
     private static int SLEEP_COUNT = 0;
+    private StrategySecondaryPegTask strategy = null;
+    private final int MAX_ATTEMPTS = 5;
+
+    private int count;
+
+    private boolean isFirstTimeExecution = true;
+
+    private String outputPath;
+    private String jsonFile;
+    private String emailHistory = "";
+    private String pegPriceDirection;
+
+    private Long currentTime = null;
+    //set up a Queue to hold the prices used to calculate the moving average of prices
+    private Queue<Double> queueMA = new LinkedList<>();
+
+    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
 
     @Override
     public void run() {
@@ -91,9 +99,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else {
             count = 1;
-            try{
+            try {
                 executeUpdatePrice(count);
-            }catch(FeedPriceException e){
+            } catch (FeedPriceException e) {
                 sendErrorNotification();
                 Global.exchange.getTrade().clearOrders(Global.options.getPair());
             }
@@ -106,15 +114,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
             ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
 
             LOG.info("CheckLastPrice received values from remote feeds. ");
-
-            /*
-             LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds");
-             for (int i = 0; i < priceList.size(); i++) {
-             LastPrice tempPrice = priceList.get(i);
-             LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-             + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
-             }
-             * */
 
             if (priceList.size() == pfm.getFeedList().size()) {
                 //All feeds returned a positive value
@@ -205,19 +204,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
         try {
             executeUpdatePrice(count);
-        }catch(FeedPriceException ex){
+        } catch (FeedPriceException ex) {
             LOG.error(ex.toString());
-        }
-    }
-
-    private void sendErrorNotification() {
-        if (Global.options != null) {
-            String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-            String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
-                    + " price. Please restart the bot and get in touch with Nu Dev team";
-            MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
-            HipChatNotifications.sendMessageCritical(title + message);
-            LOG.error(title + message);
         }
     }
 
@@ -275,7 +263,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     public double getMovingAverage() {
         double MA = 0;
-        for (Iterator<Double> price = queueMA.iterator(); price.hasNext();) {
+        for (Iterator<Double> price = queueMA.iterator(); price.hasNext(); ) {
             MA += price.next();
         }
         MA = MA / queueMA.size();
@@ -371,10 +359,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
                         + "\nShifting moving average and re-fetching exchange rate data.");
                 updateMovingAverageQueue(current);
 
-                try{
+                try {
                     int trials = 1;
                     executeUpdatePrice(trials);
-                }catch(FeedPriceException ex){
+                } catch (FeedPriceException ex) {
 
                 }
                 return;
@@ -398,9 +386,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
         LOG.info("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
-            try{
+            try {
                 initStrategy(lp.getPrice().getQuantity());
-            }catch(NuBotConnectionException e){
+            } catch (NuBotConnectionException e) {
 
             }
             currentWallPEGPrice = lp;
@@ -472,6 +460,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
             this.pegPriceDirection = Constant.DOWN;
         }
 
+        //Store values in class variable
+        sellPricePEG_old = sellPricePEG_new;
+
         LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
 
@@ -488,8 +479,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         strategy.notifyPriceChanged(sellPricePEG_new, buyPricePEG_new, price, pegPriceDirection);
 
         Global.conversion = price;
-        //Store values in class variable
-        sellPricePEG_old = sellPricePEG_new;
+
 
         Date currentDate = new Date();
         String row = currentDate + ","
@@ -543,13 +533,11 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //then save
         FileSystem.writeToFile(wall_shift_file.toJSONString(), jsonFile, false);
 
-
-        if (!Global.options.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_NONE)) {
+        if (Global.options.sendMails()) {
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
 
             String messageNow = row;
             emailHistory += messageNow;
-
 
             String tldr = pfm.getPair().toString() + " price changed more than " + wallchangeThreshold + "% since last notification: "
                     + "now is " + price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
@@ -566,7 +554,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private void initStrategy(double peg_price) throws NuBotConnectionException {
-        //TODO: should be in bot package
 
         Global.conversion = peg_price; //used then for liquidity info
         //Compute the buy/sell prices in USD
@@ -679,4 +666,16 @@ public class PriceMonitorTriggerTask extends TimerTask {
     public void setDistanceTreshold(double distanceTreshold) {
         this.distanceTreshold = distanceTreshold;
     }
+
+
+    private void sendErrorNotification() {
+        String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
+        String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
+                + " price. Please restart the bot and get in touch with Nu Dev team";
+        MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
+        HipChatNotifications.sendMessageCritical(title + message);
+        LOG.error(title + message);
+
+    }
+
 }
