@@ -8,11 +8,11 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
-import org.apache.commons.io.IOUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -34,7 +34,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.net.*;
+import java.net.NoRouteToHostException;
+import java.net.SocketException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -61,6 +62,8 @@ public class AltsTradeWrapper implements TradeInterface {
     private final String API_ORDERS = "orders";
     private final String API_MY = "my";
     private final String API_MY_ALL = "my_all";
+    private final String API_CANCEL = "cancel";
+    private final String API_MY_HISTORY = "my_history";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -92,10 +95,7 @@ public class AltsTradeWrapper implements TradeInterface {
             return apiResponse;
         }
 
-        System.out.println(queryResult);
-
         JSONParser parser = new JSONParser();
-
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
             boolean status = (boolean) httpAnswerJson.get("status");
@@ -229,12 +229,24 @@ public class AltsTradeWrapper implements TradeInterface {
         args.put("price", Objects.toString(rate));
         args.put("action", type);
 
-        System.out.println(args);
-
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
-            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            System.out.println(httpAnswerJson.toJSONString());
+            ApiResponse getOpenOrders = getActiveOrders(pair);
+            if (getOpenOrders.isPositive()) {
+                ArrayList<Order> orders = (ArrayList) getOpenOrders.getResponseObject();
+                Date checkDate = null;
+                String order_id = null;
+                for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                    Order thisOrder = order.next();
+                    if (checkDate == null || thisOrder.getInsertedDate().getTime() > checkDate.getTime()) {
+                        checkDate = thisOrder.getInsertedDate();
+                        order_id = thisOrder.getId();
+                    }
+                }
+                apiResponse.setResponseObject(order_id);
+            } else {
+                apiResponse = getOpenOrders;
+            }
         } else {
             apiResponse = response;
         }
@@ -254,7 +266,7 @@ public class AltsTradeWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
             for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
-               orderList.add(parseOrder(order.next()));
+               orderList.add(parseOrder(order.next(), null));
             }
             apiResponse.setResponseObject(orderList);
         } else {
@@ -278,7 +290,7 @@ public class AltsTradeWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
             for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
-                orderList.add(parseOrder(order.next()));
+                orderList.add(parseOrder(order.next(), pair));
             }
             apiResponse.setResponseObject(orderList);
         } else {
@@ -288,7 +300,7 @@ public class AltsTradeWrapper implements TradeInterface {
         return apiResponse;
     }
 
-    private Order parseOrder(JSONObject in) {
+    private Order parseOrder(JSONObject in, CurrencyPair pair) {
         Order out = new Order();
 
         out.setId(in.get("order_id").toString());
@@ -302,7 +314,9 @@ public class AltsTradeWrapper implements TradeInterface {
         if (date != null) {
             out.setInsertedDate(date);
         }
-        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(in.get("market").toString(), "/");
+        if (pair == null) {
+            pair = CurrencyPair.getCurrencyPairFromString(in.get("market").toString(), "/");
+        }
         out.setPair(pair);
         Amount price = new Amount(Utils.getDouble(in.get("price")), pair.getPaymentCurrency());
         out.setPrice(price);
@@ -333,32 +347,112 @@ public class AltsTradeWrapper implements TradeInterface {
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_ORDERS + "/" + API_CANCEL;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+
+        args.put("order_id", orderID);
+
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            apiResponse.setResponseObject(true);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setResponseObject(0);
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setResponseObject(0);
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+        return getLastTradesImpl(pair, startTime);
+    }
+
+    private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL + "/" + API_ORDERS + "/" + API_MY_HISTORY;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = false;
+        ArrayList<Trade> tradeList = new ArrayList<>();
+
+        args.put("market", pair.toString("/"));
+
+        ApiResponse response = getQuery(url, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray history = (JSONArray) httpAnswerJson.get("history");
+            for (Iterator<JSONObject> trade = history.iterator(); trade.hasNext();) {
+                Trade thisTrade = parseTrade(trade.next(), pair);
+                if (startTime > 0 && thisTrade.getDate().getTime() < startTime) continue;
+                tradeList.add(thisTrade);
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
+    }
+
+    private Trade parseTrade(JSONObject in, CurrencyPair pair) {
+        Trade out = new Trade();
+
+        out.setExchangeName(exchange.getName());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("date").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.severe(pe.toString());
+        }
+        if (date != null) {
+            out.setDate(date);
+        }
+        Amount amount = new Amount(Utils.getDouble(in.get("amount")), pair.getOrderCurrency());
+        out.setAmount(amount);
+        Amount price = new Amount(Utils.getDouble(in.get("price")), pair.getPaymentCurrency());
+        out.setPrice(price);
+        out.setType(in.get("action").toString().equals("SELL") ? Constant.SELL : Constant.BUY);
+
+        return out;
     }
 
     @Override
     public ApiResponse isOrderActive(String id) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+
+        ApiResponse getActiveOrders = getActiveOrders();
+        if (getActiveOrders.isPositive()) {
+            ArrayList<Order> orders = (ArrayList) getActiveOrders.getResponseObject();
+            boolean isActive = false;
+            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                if (order.next().getId().equals(id)) {
+                    isActive = true;
+                }
+            }
+            apiResponse.setResponseObject(isActive);
+        } else {
+            apiResponse = getActiveOrders;
+        }
+        return apiResponse;
     }
 
     @Override
@@ -368,7 +462,22 @@ public class AltsTradeWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        ApiResponse getOrders = getActiveOrders(pair);
+        if (getOrders.isPositive()) {
+            ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
+            boolean allClear = true;
+            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                ApiResponse cancel = cancelOrder(order.next().getId(), pair);
+                if (!cancel.isPositive()) {
+                    allClear = false;
+                }
+            }
+            apiResponse.setResponseObject(allClear);
+        } else {
+            apiResponse = getOrders;
+        }
+        return apiResponse;
     }
 
     @Override
@@ -457,18 +566,11 @@ public class AltsTradeWrapper implements TradeInterface {
             List< NameValuePair> urlParameters = new ArrayList< NameValuePair>();
 
             for (Iterator< Map.Entry< String, String>> argumentIterator = args.entrySet().iterator(); argumentIterator.hasNext();) {
-
                 Map.Entry< String, String> argument = argumentIterator.next();
-
                 urlParameters.add(new BasicNameValuePair(argument.getKey(), argument.getValue()));
-
-                if (post_data.length() > 0) {
-                    post_data += "&";
-                }
-
-                post_data += argument.getKey() + "=" + argument.getValue();
-
             }
+
+            post_data = TradeUtils.buildQueryString(args, ENCODING);
 
             signature = signRequest(keys.getPrivateKey(), post_data);
 
@@ -478,17 +580,10 @@ public class AltsTradeWrapper implements TradeInterface {
             headers[ 1] = new BasicHeader("Rest-Sign", signature);
             headers[ 2] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
 
-            try {
-                UrlEncodedFormEntity params = new UrlEncodedFormEntity(urlParameters, ENCODING);
-                System.out.println(url + "?" + IOUtils.toString(params.getContent()) + " [" + headers[0] + "|" + headers[1] + "|" + headers[2] + "]");
-            } catch (IOException io) {
-                System.out.println(io.toString());
-            }
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = null;
             HttpGet get = null;
             HttpResponse response = null;
-
 
             try {
                 if (!isGet) {
