@@ -35,8 +35,7 @@ import org.slf4j.Logger;
 
 /**
  * @author desrever <desrever at nubits.com>
- *         <p>
- *         USE THIS TASK ONLY WITH NuPriceMonitor bot
+ * USE THIS TASK ONLY WITH NuPriceMonitor bot
  */
 public class NuPriceMonitorTask extends TimerTask {
 
