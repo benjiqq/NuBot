@@ -4,28 +4,21 @@ package com.nubits.nubot.testsmanual;
  *
  * @author desrever <desrever at nubits.com>
  */
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Passwords;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
-import com.nubits.nubot.models.OrderToPlace;
-import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class WrapperTestUtils {
 
@@ -394,6 +387,13 @@ public class WrapperTestUtils {
             //Create a new TradeInterface object using the custom implementation
             //Assign the TradeInterface to the exchange
             Global.exchange.setTrade(new AltsTradeWrapper(keys, Global.exchange));
+        } else if (exchangeName.equals(ExchangeFacade.BITTREX)) {
+            //Wrap the keys into a new ApiKeys object
+            keys = new ApiKeys(Passwords.BITTREX_SECRET, Passwords.BITTREX_KEY);
+
+            //Create a new TradeInterface object using the custom implementation
+            //Assign the TradeInterface to the exchange
+            Global.exchange.setTrade(new BittrexWrapper(keys, Global.exchange));
         } else {
             LOG.error("Exchange " + exchangeName + " not supported");
             System.exit(0);
