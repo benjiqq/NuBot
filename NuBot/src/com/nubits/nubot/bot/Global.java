@@ -32,6 +32,12 @@ public class Global {
 
     public static NuBotOptions options;
 
+    /**
+     * storage layer
+     */
+    public static Store store;
+
+
     public static Properties settings;
     public static String sessionId;
     public static boolean running = false;
@@ -42,8 +48,9 @@ public class Global {
 
     public static double conversion = 1; //Change this? update SendLiquidityinfoTask
     public static FrozenBalancesManager frozenBalances;
-    public static boolean swappedPair; //true if paymen currency is NBT
-    //TODO
+    public static boolean swappedPair; //true if payment currency is NBT
+
     public static Exchange exchange;
+
     public static String publicAddress;
 }

@@ -21,6 +21,7 @@ import com.nubits.nubot.bot.NuBotConnectionException;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.BidAskPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -46,14 +47,17 @@ import org.json.simple.parser.ParseException;
 public class PriceMonitorTriggerTask extends TimerTask {
 
     //global. TODO: in storage layer
-    private double sellPricePEG_old;
+    private LastPrice lastPrice;
+
     private double sellPriceUSD, buyPriceUSD;
+    private String pegPriceDirection;
     private LastPrice currentWallPEGPrice;
     private double distanceTreshold;
-    private LastPrice lastPrice;
+
     private double wallchangeThreshold;
     private boolean wallsBeingShifted = false;
     private PriceFeedManager pfm = null;
+
 
     //options
     private int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
@@ -70,7 +74,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private String outputPath;
     private String jsonFile;
     private String emailHistory = "";
-    private String pegPriceDirection;
+
 
     private Long currentTime = null;
     //set up a Queue to hold the prices used to calculate the moving average of prices
@@ -105,6 +109,84 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 sendErrorNotification();
                 Global.exchange.getTrade().clearOrders(Global.options.getPair());
             }
+        }
+
+    }
+
+    private void initStrategy(double peg_price) throws NuBotConnectionException {
+
+        Global.conversion = peg_price; //used then for liquidity info
+        //Compute the buy/sell prices in USD
+
+        //get the TX fee
+        ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+        if (txFeeNTBPEGResponse.isPositive()) {
+            double txfee = (Double) txFeeNTBPEGResponse.getResponseObject();
+
+            sellPriceUSD = 1 + (0.01 * txfee);
+            if (!Global.options.isDualSide()) {
+                sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();
+            }
+            buyPriceUSD = 1 - (0.01 * txfee);
+
+            //Add(remove) the offset % from prices
+
+            //compute half of the spread
+            double halfSpread = Utils.round(Global.options.getSpread() / 2, 6);
+
+            double offset = Utils.round(halfSpread / 100, 6);
+
+            sellPriceUSD = sellPriceUSD + offset;
+            buyPriceUSD = buyPriceUSD - offset;
+
+            String message = "Computing USD prices with spread " + Global.options.getSpread() + "%  : sell @ " + sellPriceUSD;
+            if (Global.options.isDualSide()) {
+                message += " buy @ " + buyPriceUSD;
+            }
+            LOG.info(message);
+
+            //convert sell price to PEG
+
+            double sellPricePEGInitial;
+            double buyPricePEGInitial;
+            if (Global.swappedPair) { //NBT as paymentCurrency
+                sellPricePEGInitial = Utils.round(Global.conversion * sellPriceUSD, 8);
+                buyPricePEGInitial = Utils.round(Global.conversion * buyPriceUSD, 8);
+            } else {
+                sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
+                buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+            }
+
+            //store it
+            BidAskPair bidask = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
+            Global.store.setPricePEG(bidask);
+
+            String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
+                    + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
+
+            if (Global.options.isDualSide()) {
+                message2 += "; buy @ " + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode();
+            }
+            LOG.info(message2);
+
+            //Assign prices
+            if (!Global.swappedPair) {
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(buyPricePEGInitial);
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(sellPricePEGInitial);
+            } else {
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(sellPricePEGInitial);
+                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(buyPricePEGInitial);
+            }
+            //Start strategy
+            Global.taskManager.getSecondaryPegTask().start();
+
+            //Send email notification
+            String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
+            String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
+                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
+            MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
+        } else {
+            throw new NuBotConnectionException("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
         }
     }
 
@@ -444,24 +526,26 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double sellPricePEG_new;
         double buyPricePEG_new;
 
+        int precision = 8;
         if (Global.swappedPair) { //NBT as paymentCurrency
-            sellPricePEG_new = Utils.round(sellPriceUSD * Global.conversion, 8);
-            buyPricePEG_new = Utils.round(buyPriceUSD * Global.conversion, 8);
+            sellPricePEG_new = Utils.round(sellPriceUSD * Global.conversion, precision);
+            buyPricePEG_new = Utils.round(buyPriceUSD * Global.conversion, precision);
         } else {
             //convert sell price to PEG
-            sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, 8);
-            buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, 8);
+            sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, precision);
+            buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, precision);
         }
 
         //check if the price increased or decreased
-        if ((sellPricePEG_new - sellPricePEG_old) > 0) {
+        if ((sellPricePEG_new - Global.store.getPricePeg().getAsk()) > 0) {
             this.pegPriceDirection = Constant.UP;
         } else {
             this.pegPriceDirection = Constant.DOWN;
         }
 
-        //Store values in class variable
-        sellPricePEG_old = sellPricePEG_new;
+        //Store values in storage layer
+        BidAskPair bidask = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
+        Global.store.setPricePEG(bidask);
 
         LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
@@ -553,81 +637,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
     }
 
-    private void initStrategy(double peg_price) throws NuBotConnectionException {
-
-        Global.conversion = peg_price; //used then for liquidity info
-        //Compute the buy/sell prices in USD
-
-        //get the TX fee
-        ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-        if (txFeeNTBPEGResponse.isPositive()) {
-            double txfee = (Double) txFeeNTBPEGResponse.getResponseObject();
-
-            sellPriceUSD = 1 + (0.01 * txfee);
-            if (!Global.options.isDualSide()) {
-                sellPriceUSD = sellPriceUSD + Global.options.getPriceIncrement();
-            }
-            buyPriceUSD = 1 - (0.01 * txfee);
-
-            //Add(remove) the offset % from prices
-
-            //compute half of the spread
-            double halfSpread = Utils.round(Global.options.getSpread() / 2, 6);
-
-            double offset = Utils.round(halfSpread / 100, 6);
-
-            sellPriceUSD = sellPriceUSD + offset;
-            buyPriceUSD = buyPriceUSD - offset;
-
-            String message = "Computing USD prices with spread " + Global.options.getSpread() + "%  : sell @ " + sellPriceUSD;
-            if (Global.options.isDualSide()) {
-                message += " buy @ " + buyPriceUSD;
-            }
-            LOG.info(message);
-
-            //convert sell price to PEG
-
-            double sellPricePEGInitial;
-            double buyPricePEGInitial;
-            if (Global.swappedPair) { //NBT as paymentCurrency
-                sellPricePEGInitial = Utils.round(Global.conversion * sellPriceUSD, 8);
-                buyPricePEGInitial = Utils.round(Global.conversion * buyPriceUSD, 8);
-            } else {
-                sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
-                buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
-            }
-
-            //store it
-            sellPricePEG_old = sellPricePEGInitial;
-
-            String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
-                    + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
-
-            if (Global.options.isDualSide()) {
-                message2 += "; buy @ " + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode();
-            }
-            LOG.info(message2);
-
-            //Assign prices
-            if (!Global.swappedPair) {
-                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(buyPricePEGInitial);
-                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(sellPricePEGInitial);
-            } else {
-                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(sellPricePEGInitial);
-                ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(buyPricePEGInitial);
-            }
-            //Start strategy
-            Global.taskManager.getSecondaryPegTask().start();
-
-            //Send email notification
-            String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
-            String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
-                    + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
-            MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
-        } else {
-            throw new NuBotConnectionException("Cannot get txFee : " + txFeeNTBPEGResponse.getError().getDescription());
-        }
-    }
 
     public void setWallchangeThreshold(double wallchangeThreshold) {
         this.wallchangeThreshold = wallchangeThreshold;
