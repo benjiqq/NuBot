@@ -76,3 +76,4 @@ Test*.xml
 *.ipr
 *.iws
 
+testprices.db
