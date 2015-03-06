@@ -42,9 +42,9 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = ExchangeFacade.POLONIEX;
+    public static final String testExchange = ExchangeFacade.BITTREX;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
-    public static final Currency testCurrency = CurrencyList.NBT;
+    public static final Currency testCurrency = CurrencyList.BTC;
 
     public static void main(String[] args) {
         //Load settings
@@ -70,8 +70,8 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
 
-        //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testGetAvailableBalance(testCurrency);
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
