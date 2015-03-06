@@ -48,15 +48,21 @@
 
             function loadlog() {
 
+                console.log("load log");
+
                 var url = "http://" + host + ":" + port + "/logdump";
 
+                console.log("url  " + url);
                 $.ajax({
                   type: "GET",
                   dataType: "json",
                   url: url,
                 })
+                .fail(function() {
+                  alert( "error loading log" );
+                })
                 .done(function( data ) {
-                  $('#logarea').text(data);
+                  $('#logarea').val(data["log"]);
                 });
 
             }
