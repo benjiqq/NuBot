@@ -45,9 +45,9 @@ public class TestRPCLiquidityInfo {
     public static void main(String[] args) {
 
         //Default values
-        String custodian = Passwords.CUSTODIAN_PUBLIC_ADDRESS;
-        String user = Passwords.NUD_RPC_USER;
-        String pass = Passwords.NUD_RPC_PASS;
+        String custodian = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
+        String user = PasswordsTest.NUD_RPC_USER;
+        String pass = PasswordsTest.NUD_RPC_PASS;
         double sell = 0;
         double buy = 0;
         //java -jar testRPC user pass custodian sell buy

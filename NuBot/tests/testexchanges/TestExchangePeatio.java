@@ -1,4 +1,4 @@
-package exchanges;
+package testexchanges;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;

@@ -17,6 +17,8 @@
  */
 package com.nubits.nubot.exchanges;
 
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
@@ -43,6 +45,13 @@ public class Exchange {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
     }
+
+    /*public Exchange(NuBotOptions opt) {
+        this.name = name;
+        this.exchangeLiveData = new ExchangeLiveData();
+        ApiKeys keys = new ApiKeys(opt.getApiSecret(), opt.getApiKey());
+    }*/
+
 
     public String getName() {
         return name;

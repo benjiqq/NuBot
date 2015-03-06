@@ -1,17 +1,7 @@
-import com.nubits.nubot.db.NuDB;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeeds.BitfinexPriceFeed;
-import com.nubits.nubot.pricefeeds.BlockchainPriceFeed;
-import com.nubits.nubot.pricefeeds.BtcePriceFeed;
-import com.nubits.nubot.pricefeeds.CoinbasePriceFeed;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -29,11 +19,7 @@ public class TestPriceFeedsAll extends TestCase {
             ff.delete();
         }
 
-        try {
-            NuDB.createDB(dbfile);
-        } catch (Exception e) {
-            assertTrue(false);
-        }
+
     }
 
     @Test

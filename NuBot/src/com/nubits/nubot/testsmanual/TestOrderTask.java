@@ -64,8 +64,8 @@ public class TestOrderTask {
 
         ApiKeys keys;
 
-        String secret = Passwords.INTERNAL_PEATIO_SECRET;
-        String apikey = Passwords.INTERNAL_PEATIO_KEY;
+        String secret = PasswordsTest.INTERNAL_PEATIO_SECRET;
+        String apikey = PasswordsTest.INTERNAL_PEATIO_KEY;
 
         //Wrap the keys into a new ApiKeys object
         keys = new ApiKeys(secret, apikey);
@@ -91,11 +91,11 @@ public class TestOrderTask {
         Global.taskManager.getCheckConnectionTask().start();
 
 
-        Global.publicAddress = Passwords.CUSTODIAN_PUBLIC_ADDRESS;
+        Global.publicAddress = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
 
         LOG.info("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
-        Global.rpcClient = new NuRPCClient(nudip, nudport, Passwords.NUD_RPC_USER,
-                Passwords.NUD_RPC_PASS, true, true, Global.publicAddress, Constant.NBT_PPC, "testid");
+        Global.rpcClient = new NuRPCClient(nudip, nudport, PasswordsTest.NUD_RPC_USER,
+                PasswordsTest.NUD_RPC_PASS, true, true, Global.publicAddress, Constant.NBT_PPC, "testid");
 
         Utils.printSeparator();
 

@@ -1,4 +1,4 @@
-package exchanges;
+package testexchanges;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
@@ -66,13 +66,11 @@ public class TestExchangePoloniex extends TestCase {
         Global.options = opt;
         Exchange exc = new Exchange(Global.options.getExchangeName());
         assertTrue(exc != null);
-        Global.exchange =exc;
+        Global.exchange = exc;
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-
-        Global.exchange = new Exchange(Global.options.getExchangeName());
 
         CurrencyPair testPair = Constant.NBT_BTC;
 
