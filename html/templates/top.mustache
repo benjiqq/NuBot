@@ -39,41 +39,6 @@
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
-<script>
-// establish the communication channel over a websocket
-var ws = new WebSocket("ws://localhost:4568/stocks");
-
-// called when socket connection established
-ws.onopen = function() {
-    appendLog("Connected to stock service! Press 'Start' to get stock info.")
-};
-
-// called when a message received from server
-ws.onmessage = function (evt) {
-    appendLog(evt.data)
-};
-
-// called when socket connection closed
-ws.onclose = function() {
-    appendLog("Disconnected from stock service!")
-};
-
-// called in case of an error
-ws.onerror = function(err) {
-    console.log("ERROR!", err )
-};
-
-// appends logText to log text area
-function appendLog(logText) {
-    var log = document.getElementById("log");
-    log.value = log.value + logText + "\n"
-}
-
-// sends msg to the server over websocket
-function sendToServer(msg) {
-    ws.send(msg);
-}
-</script>
 
 
 
@@ -82,10 +47,16 @@ function sendToServer(msg) {
               var host = "localhost";
               var port = 4567;
 
+            /*function doPoll(){
+            $.get('ajax/test.html', function(data) {
+                  alert(data);
+                setTimeout(doPoll,1000);
+              });
+            }*/
 
             function loadlog() {
 
-                console.log("load log");
+                //console.log("load log");
 
                 var url = "http://" + host + ":" + port + "/logdump";
 
@@ -102,7 +73,32 @@ function sendToServer(msg) {
                   $('#logarea').val(data["log"]);
                 });
 
+                setTimeout(loadlog,5000);
             }
+
+            function load_status() {
+
+                var url = "http://" + host + ":" + port + "/status";
+
+                console.log("url  " + url);
+
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+                })
+                .fail(function() {
+                  alert( "error loading log" );
+                })
+                .done(function( data ) {
+                console.log(data["bci_lastprice"]);
+                  $('#btce_last').html(data["btce_lastprice"]);
+                  $('#bci_last').html(data["bci_lastprice"]);
+                });
+
+                setTimeout(load_status,1000);
+            }
+
 
             function loadconfig() {
 

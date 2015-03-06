@@ -1,6 +1,6 @@
 
 
-<body onLoad="loadlog()">
+<body onLoad="load_status()">
 
     <!-- Fixed navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -31,14 +31,16 @@
 
 
 <div class="row">
-<h3>Feeds</h3>
+<h3>Feeds {{watchcurrency}} price</h3>
 
+<p>Btce: <span id="btce_last"></span>
+<br>
+Blockchain.info: <span id="bci_last"></span>
+</p>
 
-</script>
-
-    <button onclick="sendToServer('start')">Start Blockchain.info</button>
+<!--    <button onclick="sendToServer('start')">Start Blockchain.info</button>
     <button onclick="sendToServer('stop')">Stop!</button><br/><br/>
     <textarea id="log" rows="20" cols="90"></textarea>
-
+-->
 
 </div>

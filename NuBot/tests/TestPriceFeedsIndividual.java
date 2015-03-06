@@ -20,7 +20,6 @@ public class TestPriceFeedsIndividual extends TestCase {
     public void testBtce() {
 
         CurrencyPair testPair = Constant.BTC_USD;
-
         BtcePriceFeed btce = new BtcePriceFeed();
         LastPrice lastprice = btce.getLastPrice(testPair);
         lastbtce = lastprice.getPrice().getQuantity();

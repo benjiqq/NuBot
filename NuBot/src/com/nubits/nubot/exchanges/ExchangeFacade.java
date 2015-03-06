@@ -1,12 +1,13 @@
 package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -68,4 +69,37 @@ public class ExchangeFacade {
         return null;
     }
 
+    /**
+     * simplified balance query. returns -1 on error
+     *
+     * @param currency
+     * @return
+     */
+    public static double getBalance(TradeInterface ti, Currency currency) {
+        ApiResponse balancesResponse = ti.getAvailableBalance(currency);
+        if (balancesResponse.isPositive()) {
+            Object o = balancesResponse.getResponseObject();
+            try {
+                Amount a = (Amount) o;
+                return a.getQuantity();
+            } catch (Exception e) {
+                return -1;
+            }
+        }
+        return -1;
+    }
+
+    public static ArrayList<Order> getOpenOrders(TradeInterface ti) {
+        ApiResponse orderResponse = ti.getActiveOrders();
+        if (orderResponse.isPositive()) {
+            Object o = orderResponse.getResponseObject();
+            try {
+                ArrayList<Order> orders = (ArrayList<Order>)o;
+                return orders;
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+        }
+        return null;
+    }
 }

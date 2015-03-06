@@ -4,16 +4,12 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsSerializer;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
-import com.nubits.nubot.webui.ws.StockServiceServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
@@ -38,26 +34,6 @@ public class UiServer {
     private static TradeInterface ti;
 
     /**
-     * simplified balance query. returns -1 on error
-     *
-     * @param currency
-     * @return
-     */
-    private static double getBalance(Currency currency) {
-        ApiResponse balancesResponse = ti.getAvailableBalance(currency);
-        if (balancesResponse.isPositive()) {
-            Object o = balancesResponse.getResponseObject();
-            try {
-                Amount a = (Amount) o;
-                return a.getQuantity();
-            } catch (Exception e) {
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    /**
      * start the UI server
      */
     public static void startUIserver(NuBotOptions opt) {
@@ -74,8 +50,10 @@ public class UiServer {
         Map opmap = new HashMap();
         opmap.put("exchange", opt.getExchangeName());
 
-        opmap.put("btc_balance", getBalance(CurrencyList.BTC));
-        opmap.put("nbt_balance", getBalance(CurrencyList.NBT));
+        opmap.put("btc_balance", ExchangeFacade.getBalance(ti, CurrencyList.BTC));
+        opmap.put("nbt_balance", ExchangeFacade.getBalance(ti, CurrencyList.NBT));
+        String json = new Gson().toJson(ExchangeFacade.getOpenOrders(ti));
+        opmap.put("orders", json);
 
         get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
 
@@ -85,6 +63,7 @@ public class UiServer {
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
+        new DataController("/status",ti);
 
         get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
 
@@ -114,12 +93,12 @@ public class UiServer {
         LOG.info("starting UI server");
 
 
-        try {
+        /*try {
             new StockServiceServer().run();
         } catch (Exception e) {
             e.printStackTrace();
             System.exit(0);
-        }
+        }*/
 
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
