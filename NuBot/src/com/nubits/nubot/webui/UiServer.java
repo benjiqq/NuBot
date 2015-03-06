@@ -13,6 +13,7 @@ import com.nubits.nubot.options.NuBotOptionsSerializer;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.webui.ws.StockServiceServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
@@ -38,6 +39,7 @@ public class UiServer {
 
     /**
      * simplified balance query. returns -1 on error
+     *
      * @param currency
      * @return
      */
@@ -62,6 +64,7 @@ public class UiServer {
 
         //TODO: only load if in testmode and this is not set elsewhere
         Utils.loadProperties("settings.properties");
+
 
         //binds GET and POST
         new ConfigController("/config", opt, configdir, configFile);
@@ -88,6 +91,8 @@ public class UiServer {
 
         //get("/tools", (request, response) -> new ModelAndView(configmap, htmlFolder + "tools.mustache"), new LayoutTemplateEngine(htmlFolder));
 
+
+
     }
 
     public static String opttoJson(NuBotOptions opt) {
@@ -108,6 +113,14 @@ public class UiServer {
 
         LOG.info("starting UI server");
 
+
+        try {
+            new StockServiceServer().run();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(0);
+        }
+
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
             Global.options = opt;
@@ -120,7 +133,6 @@ public class UiServer {
         } catch (Exception ex) {
             LOG.error("error configuring " + ex);
         }
-
 
 
     }

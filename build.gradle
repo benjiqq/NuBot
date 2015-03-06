@@ -68,6 +68,10 @@ dependencies {
     compile 'com.sparkjava:spark-core:2.1'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
     compile 'com.github.spullara.mustache.java:compiler:0.9.0'
+    //websocket
+    compile 'org.eclipse.jetty.websocket:websocket-server:9.3.0.M1'
+    //compile 'org.eclipse.jetty:jetty-server:9.3.0.M1' //perhaps not needed - is in all
+    //compile 'org.eclipse.jetty:jetty-servlet:9.3.0.M1'
 
     //static. no maven available
     compile files('NuBot/lib/EasyJccKit.jar')
