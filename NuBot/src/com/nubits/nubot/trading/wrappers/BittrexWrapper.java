@@ -11,7 +11,7 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -47,7 +47,8 @@ public class BittrexWrapper implements TradeInterface {
     private String checkConnectionUrl;
     //API Paths
     private final String API_BASE_URL = "https://bittrex.com/api/v1.1";
-    private final String API_BALANCE = "balance";
+    private final String API_BALANCE = "/account/getbalance";
+    private final String API_BALANCES = "/account/getbalances";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -110,6 +111,29 @@ public class BittrexWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
         return null;
+    }
+
+    private ApiResponse getBalancesImpl(CurrencyPair pair, Currency currency) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = null;
+        HashMap<String, String> args = new HashMap<>();
+        if (pair == null) { //get just single currency
+            method = API_BALANCE;
+            args.put("currency", currency.getCode().toUpperCase());
+        } else {
+            method = API_BALANCES;
+        }
+        boolean isGet = false;
+
+        ApiResponse response = getQuery(url, method, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            System.out.println(httpAnswerJson.toJSONString());
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
     }
 
     @Override
@@ -368,12 +392,12 @@ public class BittrexWrapper implements TradeInterface {
                 Mac mac;
                 SecretKeySpec key;
                 // Create a new secret key
-                key = new SecretKeySpec(Base64.decode(secret), SIGN_HASH_FUNCTION);
+                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
                 // Create a new mac
                 mac = Mac.getInstance(SIGN_HASH_FUNCTION);
                 // Init mac with key.
                 mac.init(key);
-                sign = Base64.encode(mac.doFinal(hash_data.getBytes(ENCODING)));
+                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
             } catch (UnsupportedEncodingException uee) {
                 LOG.error("Unsupported encoding exception: " + uee.toString());
             } catch (NoSuchAlgorithmException nsae) {
