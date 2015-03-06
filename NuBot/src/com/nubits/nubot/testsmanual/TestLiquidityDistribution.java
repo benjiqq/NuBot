@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
  *
  * @author desrever <desrever at nubits.com>
  */
+
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
@@ -37,7 +38,9 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import com.nubits.nubot.utils.Utils;
+
 import java.util.ArrayList;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -82,7 +85,11 @@ public class TestLiquidityDistribution {
             //Setup the exchange
             execOrders = true;
             pair = Constant.NBT_BTC;
-            WrapperTestUtils.configExchange(exchangeName);
+            try {
+                WrapperTestUtils.configExchange(exchangeName);
+            } catch (NuBotConfigException e) {
+
+            }
             WrapperTestUtils.testClearAllOrders(pair);
         }
 

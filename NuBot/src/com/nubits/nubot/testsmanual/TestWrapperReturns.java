@@ -53,11 +53,15 @@ public class TestWrapperReturns {
 
         for (Iterator<String> exchange = testExchanges.iterator(); exchange.hasNext();) {
             String testExchange = exchange.next();
-            WrapperTestUtils.configExchange(testExchange);
-            runTests();
+            try{
+                WrapperTestUtils.configExchange(testExchange);
+                runTests();
+            }catch(NuBotConfigException ex){
+
+            }
+
         }
 
-        System.exit(0);
     }
 
     private static void runTests() {

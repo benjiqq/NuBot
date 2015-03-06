@@ -54,11 +54,12 @@ public class TestWrappers {
         inputs[0] = TEST_OPTIONS_PATH;
         try {
             Global.options = ParseOptions.parseOptions(inputs);
+            WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
 
-        WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
+
 
         runTests();
         System.exit(0);

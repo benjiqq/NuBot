@@ -1,6 +1,10 @@
 package com.nubits.nubot.exchanges;
 
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
 
 import java.util.HashMap;
@@ -24,9 +28,26 @@ public class ExchangeFacade {
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
 
+    /**
+     * set up interface based on options
+     * @param opt
+     * @return
+     */
+    public static TradeInterface exchangeInterfaceSetup(NuBotOptions opt) {
+        Global.exchange = new Exchange(Global.options.getExchangeName());
+        ExchangeLiveData liveData = new ExchangeLiveData();
+        Global.exchange.setLiveData(liveData);
+        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
+        TradeInterface ti = ExchangeFacade.getInterface(Global.exchange);
+        ti.setKeys(keys);
+        ti.setExchange(Global.exchange);
+        return ti;
+    }
+
     public static TradeInterface getInterface(Exchange exc){
         return getInterfaceByName(exc.getName());
     }
+
     public static TradeInterface getInterfaceByName(String name){
         HashMap<String, TradeInterface> supportedExchanges = new HashMap<>();
 

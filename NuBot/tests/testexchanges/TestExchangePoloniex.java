@@ -9,7 +9,6 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
@@ -21,6 +20,10 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * test Poloniex exchange
+ * WARNING: this uses live orders, with small amounts, but still
+ */
 public class TestExchangePoloniex extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestExchangePoloniex.class
@@ -29,8 +32,12 @@ public class TestExchangePoloniex extends TestCase {
     private static String testconfigFile = "poloniex.json";
     private static String testconfig = "testconfig/" + testconfigFile;
 
+    private TradeInterface ti;
+
     @Test
     public void testLoadConfig() {
+        System.out.println("test load config");
+
         boolean catched = false;
 
         NuBotOptions opt = null;
@@ -39,9 +46,7 @@ public class TestExchangePoloniex extends TestCase {
                     .parseOptionsSingle(testconfig);
 
             assertTrue(opt != null);
-
             assertTrue(opt.getExchangeName().equals("poloniex"));
-
 
         } catch (NuBotConfigException e) {
             catched = true;
@@ -50,9 +55,10 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(!catched);
     }
 
+
     @Test
     public void testGetBalance() {
-
+        System.out.println("get balance");
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -62,42 +68,26 @@ public class TestExchangePoloniex extends TestCase {
             e.printStackTrace();
         }
         Utils.loadProperties("settings.properties");
-
         Global.options = opt;
-        Exchange exc = new Exchange(Global.options.getExchangeName());
-        assertTrue(exc != null);
-        Global.exchange = exc;
-        ExchangeLiveData liveData = new ExchangeLiveData();
-        Global.exchange.setLiveData(liveData);
+        ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
 
-        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-
-        CurrencyPair testPair = Constant.NBT_BTC;
-
-        WrapperTestUtils.configExchange(opt.getExchangeName());
-
-        TradeInterface ti = ExchangeFacade.getInterface(Global.exchange);
-        ti.setKeys(keys);
-        ti.setExchange(Global.exchange);
-
-        assertTrue(ti!=null);
-        Global.exchange.setTrade(ti);
         Currency btc = CurrencyList.BTC;
         assertTrue(btc != null);
+
         long start = System.currentTimeMillis();
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
-        System.out.println("delta " + delta);
+        assertTrue(delta < 2000);
 
         if (balancesResponse.isPositive()) {
             LOG.info("Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
             LOG.info("response " + o);
-            try{
+            try {
                 Amount a = (Amount) o;
-                assertTrue(a.getQuantity()>=0);
-            }catch(Exception e){
+                assertTrue(a.getQuantity() >= 0);
+            } catch (Exception e) {
                 assertTrue(false);
             }
             //Balance balance = (Balance) o;
@@ -114,7 +104,6 @@ public class TestExchangePoloniex extends TestCase {
 
     @Test
     public void testMakeOrder() {
-
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -125,30 +114,14 @@ public class TestExchangePoloniex extends TestCase {
         }
         Utils.loadProperties("settings.properties");
 
-        Global.options = opt;
-        Exchange exc = new Exchange(Global.options.getExchangeName());
-        assertTrue(exc != null);
-        Global.exchange =exc;
-        ExchangeLiveData liveData = new ExchangeLiveData();
-        Global.exchange.setLiveData(liveData);
-
-        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-
-        Global.exchange = new Exchange(Global.options.getExchangeName());
-
+        ti = ExchangeFacade.exchangeInterfaceSetup(opt);
         CurrencyPair testPair = Constant.NBT_BTC;
 
-        WrapperTestUtils.configExchange(opt.getExchangeName());
-
-        TradeInterface ti = ExchangeFacade.getInterface(Global.exchange);
-        ti.setKeys(keys);
-        ti.setExchange(Global.exchange);
-        Global.exchange.setTrade(ti);
         Currency btc = CurrencyList.BTC;
 
         double tinyQty = 0.0000001;
         double tinyPrice = 0.0000001;
-        ApiResponse orderresponse = ti.buy(testPair, tinyQty , tinyPrice);
+        ApiResponse orderresponse = ti.buy(testPair, tinyQty, tinyPrice);
         //should raise  {"error":"Total must be at least 0.0001."}
         assertTrue(!orderresponse.isPositive());
 
@@ -171,34 +144,36 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(resp.isPositive());
 
         Object o = resp.getResponseObject();
-        ArrayList<Order> orderList = (ArrayList<Order>)o;
+        ArrayList<Order> orderList = (ArrayList<Order>) o;
 
-        assertTrue(orderList.size()>0);
+        assertTrue(orderList.size() > 0);
 
         Order issued = orderList.get(0);
 
         //cancel all
         Iterator<Order> it = orderList.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             Order order = it.next();
             ApiResponse cancelresp = ti.cancelOrder(order.getId(), testPair);
-            boolean success = ((Boolean)cancelresp.getResponseObject()).booleanValue();
+            boolean success = ((Boolean) cancelresp.getResponseObject()).booleanValue();
             assertTrue(success);
         }
 
-        try{
+        try {
             Thread.sleep(1000);
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
+
+        //make sure there are no outstanding orders
 
         ApiResponse resp2 = ti.getActiveOrders();
         assertTrue(resp2.isPositive());
 
         Object o2 = resp2.getResponseObject();
-        ArrayList<Order> orderList2 = (ArrayList<Order>)o2;
+        ArrayList<Order> orderList2 = (ArrayList<Order>) o2;
 
-        assertTrue(orderList2.size()==0);
+        assertTrue(orderList2.size() == 0);
 
     }
 }

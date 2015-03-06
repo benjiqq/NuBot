@@ -48,7 +48,11 @@ public class TestExchangePeatio extends TestCase {
 
         CurrencyPair testPair = Constant.NBT_BTC;
 
-        WrapperTestUtils.configExchange(opt.getExchangeName());
+        try{
+            WrapperTestUtils.configExchange(opt.getExchangeName());
+        }catch(NuBotConfigException ex){
+
+        }
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(testPair);
 
