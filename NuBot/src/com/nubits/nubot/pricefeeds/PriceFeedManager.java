@@ -81,28 +81,6 @@ public class PriceFeedManager {
         return response;
     }
 
-    public LastPrice getLastPrice() {
-
-        for (int i = 0; i < feedList.size(); i++) {
-            AbstractPriceFeed tempFeed = feedList.get(i);
-            LastPrice lastPrice = tempFeed.getLastPrice(pair);
-            if (!lastPrice.isError()) {
-                LOG.info("Got last price of 1" + pair.getOrderCurrency().getCode() + ""
-                        + " from " + tempFeed.name + " : " + lastPrice.getPrice().getQuantity() + " " + lastPrice.getPrice().getCurrency().getCode());
-                return lastPrice;
-            } else {
-                //handle error
-                LOG.error("Problem while updating the price on " + tempFeed.name);
-            }
-        }
-
-        //None of them worked. Caution now
-        return new LastPrice(true, "", pair.getOrderCurrency(), null);
-
-    }
-
-
-
     public ArrayList<AbstractPriceFeed> getFeedList() {
         return feedList;
     }
