@@ -34,9 +34,9 @@ import org.json.simple.parser.JSONParser;
 public class CoinbasePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinbasePriceFeed.class.getName());
+    public static final String name = "coinbase";
 
     public CoinbasePriceFeed() {
-        name = "coinbase";
         refreshMinTime = 50 * 1000; //one minutee
     }
 

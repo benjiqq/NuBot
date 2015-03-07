@@ -34,9 +34,9 @@ import org.json.simple.parser.JSONParser;
 public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleUnofficialPriceFeed.class.getName());
+    public static final String name = "google-unofficial";
 
     public GoogleUnofficialPriceFeed() {
-        name = "google-unofficial";
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

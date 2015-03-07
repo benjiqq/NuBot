@@ -34,9 +34,10 @@ import org.json.simple.parser.JSONParser;
 public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
+    public static final String name = "coinmarketcap_no";
 
     public CoinmarketcapnorthpolePriceFeed() {
-        name = "coinmarketcap_no";
+
         refreshMinTime = 50 * 1000;
         lastRequest = 0L;
     }

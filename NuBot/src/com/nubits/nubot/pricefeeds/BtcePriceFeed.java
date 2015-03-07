@@ -34,9 +34,9 @@ import org.json.simple.parser.JSONParser;
 public class BtcePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BtcePriceFeed.class.getName());
-
+    public static final String name = "btce";
     public BtcePriceFeed() {
-        name = "btce";
+
         refreshMinTime = 50 * 1000; //one minutee
     }
 

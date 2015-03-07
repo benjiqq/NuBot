@@ -21,17 +21,15 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 
 /**
+ * A price feed
  *
- * @author desrever <desrever at nubits.com>
  */
 public abstract class AbstractPriceFeed {
 
-//Class Variables
     String name;
     long refreshMinTime;
     long lastRequest;
     LastPrice lastPrice;
-//Methods
 
     public abstract LastPrice getLastPrice(CurrencyPair pair);
 

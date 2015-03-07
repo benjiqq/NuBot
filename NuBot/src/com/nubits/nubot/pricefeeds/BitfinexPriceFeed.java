@@ -34,9 +34,9 @@ import org.json.simple.parser.JSONParser;
 public class BitfinexPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitfinexPriceFeed.class.getName());
-
+    public static final String name = "bitfinex";
     public BitfinexPriceFeed() {
-        name = "bitfinex";
+
         refreshMinTime = 58 * 1000; //8 hours
     }
 

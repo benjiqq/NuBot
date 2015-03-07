@@ -34,9 +34,10 @@ import org.json.simple.parser.JSONParser;
 public class BlockchainPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlockchainPriceFeed.class.getName());
+    public static final String name = "blockchain";
 
     public BlockchainPriceFeed() {
-        name = "blockchain";
+
         refreshMinTime = 50 * 1000; //one minutee
     }
 

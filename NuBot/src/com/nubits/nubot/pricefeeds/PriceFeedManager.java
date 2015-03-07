@@ -20,6 +20,9 @@ package com.nubits.nubot.pricefeeds;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,8 +31,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
- *
- * @author desrever <desrever at nubits.com>
+ * Manager for a list of price feeds
  */
 public class PriceFeedManager {
 
@@ -37,6 +39,7 @@ public class PriceFeedManager {
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
     public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
+
     public final static String BLOCKCHAIN = "blockchain"; //BTC
     public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
     public final static String COINBASE = "coinbase"; //BTC
@@ -52,9 +55,16 @@ public class PriceFeedManager {
     public final static String YAHOO = "yahoo"; //EUR CNY
     public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
     public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY
-    //When adding new feed here remember to also add to the hasmap below
 
-    public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException{
+    private final static String basepackage = "com.nubits.nubot.pricefeeds.";
+    public final static String[] feedlclasses = {"BitcoinaveragePriceFeed", "BitcoinaveragePriceFeed",
+            "CoinbasePriceFeed", "BterPriceFeed", "CcedkPriceFeed", "BtcePriceFeed",
+            "CoinmarketcapnorthpolePriceFeed", "CoinmarketcapnexuistPriceFeed",
+            "BitstampPriceFeed", "BitstampEURPriceFeed", "GoogleUnofficialPriceFeed",
+            "YahooPriceFeed", "OpenexchangeratesPriceFeed", "BitfinexPriceFeed",
+            "ExchangeratelabPriceFeed"};
+    
+    public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
         initValidFeeds();
         this.pair = pair;
 
@@ -66,23 +76,19 @@ public class PriceFeedManager {
     }
 
     private void initValidFeeds() {
-        FEED_NAMES_MAP = new HashMap<>();
 
-        FEED_NAMES_MAP.put(BLOCKCHAIN, new BlockchainPriceFeed());
-        FEED_NAMES_MAP.put(BITCOINAVERAGE, new BitcoinaveragePriceFeed());
-        FEED_NAMES_MAP.put(COINBASE, new CoinbasePriceFeed());
-        FEED_NAMES_MAP.put(BTER, new BterPriceFeed());
-        FEED_NAMES_MAP.put(CCEDK, new CcedkPriceFeed());
-        FEED_NAMES_MAP.put(BTCE, new BtcePriceFeed());
-        FEED_NAMES_MAP.put(COINMARKETCAP_NO, new CoinmarketcapnorthpolePriceFeed());
-        FEED_NAMES_MAP.put(COINMARKETCAP_NE, new CoinmarketcapnexuistPriceFeed());
-        FEED_NAMES_MAP.put(BITSTAMP, new BitstampPriceFeed());
-        FEED_NAMES_MAP.put(BITSTAMP_EURUSD, new BitstampEURPriceFeed());
-        FEED_NAMES_MAP.put(GOOGLE_UNOFFICIAL, new GoogleUnofficialPriceFeed());
-        FEED_NAMES_MAP.put(YAHOO, new YahooPriceFeed());
-        FEED_NAMES_MAP.put(OPENEXCHANGERATES, new OpenexchangeratesPriceFeed());
-        FEED_NAMES_MAP.put(EXCHANGERATELAB, new ExchangeratelabPriceFeed());
-        FEED_NAMES_MAP.put(BITFINEX, new BitfinexPriceFeed());
+        FEED_NAMES_MAP = new HashMap<>();
+        for (int i = 0; i < feedlclasses.length; i++ ) {
+            try {
+                Class<?> feedclass = Class.forName(basepackage + feedlclasses[i]);
+                Constructor<?> feed = feedclass.getConstructor(String.class);
+                Object object = feed.newInstance(new Object[]{});
+                AbstractPriceFeed f = (AbstractPriceFeed) object;
+                FEED_NAMES_MAP.put(BLOCKCHAIN, f);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 
@@ -160,7 +166,9 @@ public class PriceFeedManager {
         this.pair = pair;
     }
 
-//class to wrap results from getLastPrices
+    /**
+     * class to wrap results from getLastPrices
+     */
     public class LastPriceResponse {
 
         private boolean mainFeedValid;

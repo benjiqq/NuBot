@@ -34,9 +34,10 @@ import org.json.simple.parser.JSONParser;
 public class YahooPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(YahooPriceFeed.class.getName());
+    public static final String name = "yahoo";
 
     public YahooPriceFeed() {
-        name = "yahoo";
+
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
