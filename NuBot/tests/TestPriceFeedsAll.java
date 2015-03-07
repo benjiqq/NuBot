@@ -35,25 +35,60 @@ public class TestPriceFeedsAll extends TestCase {
         Feeds.initValidFeeds();
         ArrayList<AbstractPriceFeed> allfeeds = Feeds.getAllExistingFeeds();
 
+        int fn = allfeeds.size();
+
         Iterator<AbstractPriceFeed> it = allfeeds.iterator();
         System.out.println("query feeds " + allfeeds.size() );
         assert(allfeeds.size() > 0 );
+
+        double sum = 0.0;
+        double min = 9999.9;
+        double max = 0.0;
+        int n = 0;
+        int fails = 0;
 
         while (it.hasNext()){
 
             AbstractPriceFeed feed = it.next();
             System.out.println("query feed " + feed);
             LastPrice lastprice = feed.getLastPrice(testPair);
-            System.out.println(lastprice);
+
+
 
             assertNotNull(lastprice);
 
+            try {
+                double ld = lastprice.getPrice().getQuantity();
+                System.out.println("price: " + ld);
+
+                sum += ld;
+
+                if (ld > max)
+                    max = ld;
+
+                if (ld < min)
+                    min = ld;
+
+                n++;
+            }catch(Exception e){
+                fails++;
+            }
             //double ld = lastprice.getPrice().getQuantity();
             //System.out.println(">>> " + feed.getName() + ": " + ld);
             //assertTrue(ld > 0);
         }
 
+        System.out.println("feed n: " + fn);
+        System.out.println("succes: " + n);
+        System.out.println("fails: " + fails);
 
+        assertTrue(fails <= 4);
+
+        double avg = sum/n;
+
+        assertTrue(avg < sum);
+        assertTrue(avg > min);
+        assertTrue(avg < max);
 
 
 

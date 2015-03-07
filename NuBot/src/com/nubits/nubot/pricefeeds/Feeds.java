@@ -2,7 +2,6 @@ package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.options.NuBotConfigException;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,12 +12,13 @@ import java.util.Iterator;
 public class Feeds {
 
     private final static String basepackage = "com.nubits.nubot.pricefeeds.";
-    public final static String[] feedlclasses = {"BitcoinaveragePriceFeed",
+
+    /*public final static String[] feedlclasses = {"BitcoinaveragePriceFeed",
             "CoinbasePriceFeed", "BterPriceFeed", "CcedkPriceFeed", "BtcePriceFeed",
             "CoinmarketcapnorthpolePriceFeed", "CoinmarketcapnexuistPriceFeed",
             "BitstampPriceFeed", "BitstampEURPriceFeed", "GoogleUnofficialPriceFeed",
             "YahooPriceFeed", "OpenexchangeratesPriceFeed", "BitfinexPriceFeed",
-            "ExchangeratelabPriceFeed"};
+            "ExchangeratelabPriceFeed"};*/
 
     public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP = new HashMap<>();
 
@@ -34,13 +34,19 @@ public class Feeds {
         FEED_NAMES_MAP.put(BtcePriceFeed.name, new BtcePriceFeed());
         FEED_NAMES_MAP.put(CoinmarketcapnorthpolePriceFeed.name, new CoinmarketcapnorthpolePriceFeed());
         FEED_NAMES_MAP.put(CoinmarketcapnexuistPriceFeed.name, new CoinmarketcapnexuistPriceFeed());
-        FEED_NAMES_MAP.put(BitstampEURPriceFeed.name, new BitstampEURPriceFeed());
         FEED_NAMES_MAP.put(BitstampPriceFeed.name, new BitstampPriceFeed());
-        FEED_NAMES_MAP.put(GoogleUnofficialPriceFeed.name, new GoogleUnofficialPriceFeed());
         FEED_NAMES_MAP.put(YahooPriceFeed.name, new YahooPriceFeed());
-        FEED_NAMES_MAP.put(OpenexchangeratesPriceFeed.name, new OpenexchangeratesPriceFeed());
         FEED_NAMES_MAP.put(BitfinexPriceFeed.name, new BitfinexPriceFeed());
-        FEED_NAMES_MAP.put(ExchangeratelabPriceFeed.name, new ExchangeratelabPriceFeed());
+
+        //FAILING
+        //FEED_NAMES_MAP.put(OpenexchangeratesPriceFeed.name, new OpenexchangeratesPriceFeed());
+        //FEED_NAMES_MAP.put(GoogleUnofficialPriceFeed.name, new GoogleUnofficialPriceFeed());
+        //FEED_NAMES_MAP.put(ExchangeratelabPriceFeed.name, new ExchangeratelabPriceFeed());
+
+
+        //FEED_NAMES_MAP.put(BitstampEURPriceFeed.name, new BitstampEURPriceFeed());
+
+
 
         /*public final static String BLOCKCHAIN = "blockchain"; //BTC
         public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
