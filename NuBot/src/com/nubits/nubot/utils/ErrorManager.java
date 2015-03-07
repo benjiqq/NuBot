@@ -20,8 +20,6 @@ public class ErrorManager {
     // The description will be filled with the returned value
     public ApiError authenticationError = new ApiError(6, "Authentication Error");
 
-
-
     public void setExchangeName(Exchange exchange) {
         exchangeName = exchange;
     }

@@ -23,7 +23,6 @@ package com.nubits.nubot.models;
  */
 public class Balance {
 
-//Class Variables
     private Amount PEGTotal;
     private Amount NBTTotal;
     private Amount PEGonOrder;
@@ -31,7 +30,6 @@ public class Balance {
     private Amount PEGAvailable;
     private Amount NBTAvailable;
 
-//Constructor
     /**
      *
      */

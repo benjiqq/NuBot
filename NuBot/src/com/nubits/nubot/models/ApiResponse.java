@@ -23,7 +23,6 @@ package com.nubits.nubot.models;
  */
 public class ApiResponse {
 
-//Class Variables
     private boolean positive;
     private Object responseObject;
     private ApiError responseError;

@@ -23,11 +23,9 @@ import java.text.DecimalFormat;
 
 public class Amount {
 
-//Class Variables
     private double quantity;
     private Currency currency;
 
-    //Constructor
     /**
      *
      * @param quantity
@@ -38,7 +36,6 @@ public class Amount {
         this.currency = currency;
     }
 
-    //Methods
     /**
      *
      * @return

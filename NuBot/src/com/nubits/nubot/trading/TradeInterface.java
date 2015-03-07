@@ -32,7 +32,6 @@ import java.util.TreeMap;
  * This interface can be used to trade Please refer to readme to best practice
  * for the implementation
  *
- * @author desrever
  * @see Balance
  * @see ApiResponse
  * @see Order
