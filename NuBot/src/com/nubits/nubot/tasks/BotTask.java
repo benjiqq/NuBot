@@ -47,7 +47,6 @@ public class BotTask {
         } else {
             this.stop();
         }
-
     }
 
     public void start() {

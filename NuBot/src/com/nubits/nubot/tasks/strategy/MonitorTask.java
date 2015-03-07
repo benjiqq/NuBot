@@ -9,8 +9,7 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.TimerTask;
+import java.util.*;
 
 
 public abstract class MonitorTask extends TimerTask {
@@ -19,6 +18,11 @@ public abstract class MonitorTask extends TimerTask {
 
     protected PriceFeedManager pfm = null;
 
+    //set up a Queue to hold the prices used to calculate the moving average of prices
+    protected Queue<Double> queueMA = new LinkedList<>();
+
+    protected int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
+
     /**
      * threshold for signaling a deviation of prices
      */
@@ -26,22 +30,34 @@ public abstract class MonitorTask extends TimerTask {
 
     protected LastPrice lastPrice;
 
-    protected void notifyDeviation(ArrayList<LastPrice> priceList) {
-        String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-        String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-        for (int i = 0; i < priceList.size(); i++) {
-            LastPrice tempPrice = priceList.get(i);
-            message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
+    // ----- price utils ------
+
+    public double getMovingAverage() {
+        double MA = 0;
+        for (Iterator<Double> price = queueMA.iterator(); price.hasNext(); ) {
+            MA += price.next();
         }
-
-
-        MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
-        HipChatNotifications.sendMessageCritical(title + message);
-
-        LOG.error(title + message);
+        MA = MA / queueMA.size();
+        return MA;
     }
 
+    public void updateMovingAverageQueue(double price) {
+        if (price == 0) {
+            //don't add 0
+            return;
+        }
+        queueMA.add(price);
+        //trim the queue so that it is a moving average over the correct number of data points
+        if (queueMA.size() > MOVING_AVERAGE_SIZE) {
+            queueMA.remove();
+        }
+    }
+
+    protected void initMA(double price) {
+        for (int i = 0; i <= 30; i++) {
+            updateMovingAverageQueue(price);
+        }
+    }
 
     protected boolean closeEnough(double distanceTreshold, double mainPrice, double temp) {
         //if temp differs from mainPrice for more than a threshold%, return false
@@ -98,6 +114,23 @@ public abstract class MonitorTask extends TimerTask {
         }
 
         return overallOk;
+    }
+
+
+    protected void notifyDeviation(ArrayList<LastPrice> priceList) {
+        String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
+        String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
+        for (int i = 0; i < priceList.size(); i++) {
+            LastPrice tempPrice = priceList.get(i);
+            message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
+        }
+
+
+        MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
+        HipChatNotifications.sendMessageCritical(title + message);
+
+        LOG.error(title + message);
     }
 
 

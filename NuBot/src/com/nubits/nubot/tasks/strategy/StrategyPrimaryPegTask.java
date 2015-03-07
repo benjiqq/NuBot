@@ -51,8 +51,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private final int SHORT_WAIT_SECONDS = 5;
     private int cycles = 0;
 
-
-
     @Override
     public void run() {
         LOG.info("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
@@ -270,8 +268,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.warn("Strategy : Submit order : " + orderString);
     }
 
+    /**
+     * NTB (Sells)
+     */
     private void sellSide(Amount balanceNBT) {
-        //----------------------NTB (Sells)----------------------------
+
         //Check if NBT balance > 1
         if (balanceNBT.getQuantity() > 1) {
             String idToDelete = getSmallerWallID(Constant.SELL);
@@ -356,8 +357,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
     }
 
+    /**
+     * USD (Buys)
+     */
     private void buySide() {
-        //----------------------USD (Buys)----------------------------
+
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
             Global.frozenBalances.freezeNewFunds();

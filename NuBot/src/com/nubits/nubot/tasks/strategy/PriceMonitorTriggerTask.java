@@ -54,9 +54,8 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
     private boolean wallsBeingShifted = false;
 
-
     //options
-    private int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
+
     private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
     private static final int PRICE_PERCENTAGE = 10; //this is the percentage at which refresh action is taken
     private static int SLEEP_COUNT = 0;
@@ -71,10 +70,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private String jsonFile;
     private String emailHistory = "";
 
-
     private Long currentTime = null;
-    //set up a Queue to hold the prices used to calculate the moving average of prices
-    private Queue<Double> queueMA = new LinkedList<>();
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
 
@@ -268,11 +264,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         }
     }
 
-    private void initMA(double price) {
-        for (int i = 0; i <= 30; i++) {
-            updateMovingAverageQueue(price);
-        }
-    }
+
 
     private void unableToUpdatePrice(ArrayList<LastPrice> priceList) {
         count++;
@@ -288,26 +280,6 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         }
     }
 
-    public double getMovingAverage() {
-        double MA = 0;
-        for (Iterator<Double> price = queueMA.iterator(); price.hasNext(); ) {
-            MA += price.next();
-        }
-        MA = MA / queueMA.size();
-        return MA;
-    }
-
-    public void updateMovingAverageQueue(double price) {
-        if (price == 0) {
-            //don't add 0
-            return;
-        }
-        queueMA.add(price);
-        //trim the queue so that it is a moving average over the correct number of data points
-        if (queueMA.size() > MOVING_AVERAGE_SIZE) {
-            queueMA.remove();
-        }
-    }
 
     public void gracefulPause(LastPrice lp) {
         //This is called is an abnormal price is detected for one whole refresh period
