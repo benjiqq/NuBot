@@ -31,9 +31,6 @@ import com.nubits.nubot.notifications.MailNotifications;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- */
 public class NuBotOptions {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuBotOptions.class.getName());

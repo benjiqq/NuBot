@@ -40,9 +40,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- *
- */
+
 public class SubmitLiquidityinfoTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmitLiquidityinfoTask.class.getName());
