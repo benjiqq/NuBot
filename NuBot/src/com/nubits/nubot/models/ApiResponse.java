@@ -18,8 +18,8 @@
 package com.nubits.nubot.models;
 
 /**
+ * An API response
  *
- * @author desrever <desrever@nubits.com>
  */
 public class ApiResponse {
 

@@ -17,12 +17,10 @@
  */
 package com.nubits.nubot.pricefeeds;
 
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,11 +34,12 @@ import org.slf4j.Logger;
 public class PriceFeedManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceFeedManager.class.getName());
+    private AbstractPriceFeed mainfeed;
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
     public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
 
-    public final static String BLOCKCHAIN = "blockchain"; //BTC
+    /*public final static String BLOCKCHAIN = "blockchain"; //BTC
     public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
     public final static String COINBASE = "coinbase"; //BTC
     public final static String BITSTAMP = "bitstamp"; // BTC
@@ -54,7 +53,7 @@ public class PriceFeedManager {
     public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
     public final static String YAHOO = "yahoo"; //EUR CNY
     public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
-    public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY
+    public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY*/
 
     private final static String basepackage = "com.nubits.nubot.pricefeeds.";
     public final static String[] feedlclasses = {"BitcoinaveragePriceFeed", "BitcoinaveragePriceFeed",
@@ -68,13 +67,17 @@ public class PriceFeedManager {
         initValidFeeds();
         this.pair = pair;
 
-        feedList.add(createFeed(mainFeed)); //add the main feed at index 0
+        feedList.add(getFeed(mainFeed)); //add the main feed at index 0
+        //this.mainfeed = getFeed(mainFeed);
 
         for (int i = 0; i < backupFeedList.size(); i++) {
-            feedList.add(createFeed(backupFeedList.get(i)));
+            feedList.add(getFeed(backupFeedList.get(i)));
         }
     }
 
+    /**
+     * init feeds based on the classes. classes contains the name
+     */
     private void initValidFeeds() {
 
         FEED_NAMES_MAP = new HashMap<>();
@@ -84,7 +87,7 @@ public class PriceFeedManager {
                 Constructor<?> feed = feedclass.getConstructor(String.class);
                 Object object = feed.newInstance(new Object[]{});
                 AbstractPriceFeed f = (AbstractPriceFeed) object;
-                FEED_NAMES_MAP.put(BLOCKCHAIN, f);
+                FEED_NAMES_MAP.put(f.getName(), f);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -141,7 +144,7 @@ public class PriceFeedManager {
 
     }
 
-    private AbstractPriceFeed createFeed(String feedname) throws NuBotConfigException {
+    private AbstractPriceFeed getFeed(String feedname) throws NuBotConfigException {
         if (FEED_NAMES_MAP.containsKey(feedname)) {
             return FEED_NAMES_MAP.get(feedname);
         } else {
