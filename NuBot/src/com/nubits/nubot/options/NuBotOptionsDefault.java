@@ -25,7 +25,6 @@ public class NuBotOptionsDefault {
         opt.txFee = 0.2;
         opt.submitLiquidity = false;
         opt.executeOrders = false;
-        opt.executeStrategyInterval = 41;
         opt.sendHipchat = true;
         opt.sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
         opt.mailRecipient = "";

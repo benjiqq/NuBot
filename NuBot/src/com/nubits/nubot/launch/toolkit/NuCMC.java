@@ -149,7 +149,11 @@ public class NuCMC {
             public void run() {
                 LOG.info("Exiting...");
                 mainThread.interrupt();
-                Global.taskManager.stopAll();
+                try{
+                    Global.taskManager.stopAll();
+                }catch(IllegalStateException e){
+
+                }
 
                 Thread.currentThread().interrupt();
                 return;

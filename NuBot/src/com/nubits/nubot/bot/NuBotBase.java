@@ -99,10 +99,11 @@ public abstract class NuBotBase {
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
         LOG.info("Create a new TradeInterface object");
-        TradeInterface ti = Global.exchange.getTradeInterface();
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
+
 
         //TODO! handle on exchange level, not bot level
         if (Global.options.getExchangeName().equals(ExchangeFacade.CCEX)) {
@@ -174,8 +175,6 @@ public abstract class NuBotBase {
         //Load settings
         Utils.loadProperties("settings.properties");
 
-        setupAllConfig();
-
         //TODO: opt should be passed in constructor, not set in global
 
         //TODO refactor so we can test validity here again
@@ -194,6 +193,8 @@ public abstract class NuBotBase {
 
         //TODO set to this class
         Global.options = opt;
+
+        setupAllConfig();
 
         Global.running = true;
 

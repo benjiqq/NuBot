@@ -30,6 +30,9 @@ public class MainLaunch {
 
         NuBotOptions opt = null;
 
+        System.setProperty("javax.net.ssl.trustStore","NuBot/res");
+        System.setProperty("javax.net.ssl.trustStorePassword","asdfasdf");
+
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
             opt = parseOptionsArgs(args);
@@ -136,7 +139,11 @@ public class MainLaunch {
                     mainThread.interrupt();
                     if (Global.taskManager != null) {
                         if (Global.taskManager.isInitialized()) {
-                            Global.taskManager.stopAll();
+                            try{
+                                Global.taskManager.stopAll();
+                            }catch(IllegalStateException e){
+
+                            }
                         }
                     }
                 }

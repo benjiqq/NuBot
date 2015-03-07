@@ -171,12 +171,12 @@ public class NuBotOptions {
     /**
      * TODO
      */
-    public int executeStrategyInterval; //disabled
+    //public int executeStrategyInterval; //disabled
 
     /**
      * TODO
      */
-    public int sendLiquidityInterval; //disabled
+    //public int sendLiquidityInterval; //disabled
 
     // ------- secondary peg ----------
 
@@ -207,7 +207,7 @@ public class NuBotOptions {
     public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
                         double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-                        int executeStrategyInterval, boolean sendHipchat,
+                        boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity, boolean secondarypeg,
@@ -227,7 +227,6 @@ public class NuBotOptions {
         this.verbose = verbose;
         this.executeOrders = executeOrders;
         this.pair = pair;
-        this.executeStrategyInterval = executeStrategyInterval;
         this.sendHipchat = sendHipchat;
         this.sendMails = sendMails;
         this.mailRecipient = mailRecipient;
@@ -271,7 +270,6 @@ public class NuBotOptions {
         this.verbose = verbose;
         this.executeOrders = executeOrders;
         this.pair = pair;
-        this.executeStrategyInterval = executeStrategyInterval;
         this.sendHipchat = sendHipchat;
         this.sendMails = sendMails;
         this.mailRecipient = mailRecipient;
@@ -479,33 +477,6 @@ public class NuBotOptions {
         this.pair = pair;
     }
 
-    /**
-     * @return
-     */
-    public int getExecuteStrategyInterval() {
-        return executeStrategyInterval;
-    }
-
-    /**
-     * @param executeStrategyInterval
-     */
-    public void getExecuteStrategyInterval(int executeStrategyInterval) {
-        this.executeStrategyInterval = executeStrategyInterval;
-    }
-
-    /**
-     * @return
-     */
-    public int getSendLiquidityInteval() {
-        return sendLiquidityInterval;
-    }
-
-    /**
-     * @param sendLiquidityInterval
-     */
-    public void setSendLiquidityInteval(int sendLiquidityInterval) {
-        this.sendLiquidityInterval = sendLiquidityInterval;
-    }
 
     /**
      * @return
@@ -672,7 +643,7 @@ public class NuBotOptions {
 
     @Override
     public String toString() {
-        return "NuBotOptions{" + "dualside=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apikey=" + apiKey + ", apisecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangename=" + exchangeName + ", pair=" + pair + ", executeStrategyInterval=" + executeStrategyInterval + ", sendLiquidityInterval=" + sendLiquidityInterval + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity + '}';
+        return "NuBotOptions{" + "dualside=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apikey=" + apiKey + ", apisecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangename=" + exchangeName + ", pair=" + pair  + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity + '}';
     }
 
     //Same as above, without printing api secret key and RCP password (for logging purposes)
@@ -681,7 +652,7 @@ public class NuBotOptions {
      * @return
      */
     public String toStringNoKeys() {
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangename=" + exchangeName + "<br> pair=" + pair + "<br> executeStrategyInterval=" + executeStrategyInterval + "<br> sendLiquidityInterval=" + sendLiquidityInterval + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity + '}';
+        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangename=" + exchangeName + "<br> pair=" + pair + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity + '}';
     }
 }
 

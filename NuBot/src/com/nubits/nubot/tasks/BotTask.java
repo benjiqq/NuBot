@@ -57,6 +57,7 @@ public class BotTask {
     }
 
     public void start(int delay) {
+        LOG.info("Starting BotTask " + delay + " interval " + interval);
         timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);
         LOG.info("Started BotTask " + this.name);

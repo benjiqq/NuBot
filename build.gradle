@@ -24,7 +24,7 @@
 version = '0.15' //current project version
 
 apply plugin: 'java'
-apply plugin: 'application'
+//apply plugin: 'application'
 apply plugin: 'idea'
 
 sourceCompatibility = 1.8 // java version
@@ -106,6 +106,8 @@ sourceSets {
     }
 }
 
+
+
 compileJava {
     //enable compilation in a separate daemon process
     options.fork = true
@@ -126,7 +128,7 @@ test {
 def distdir = new File("dist-packaged")
 def logdir = new File("logs")
 def jarname = "NuBot.jar"
-def mainclass = "com.nubits.nubot.bot.NuBot"
+def mainclass = "com.nubits.nubot.launch.MainLaunch"
 def uiclass = "com.nubits.nubot.webui.UiServer"
 
 def includeTestConfig = true
@@ -165,7 +167,24 @@ task initDist << {
 }
 
 
-task NuBotJar(type: Jar) << {
+task NuBotJar(type: Jar) {
+    description 'create the jar in ' + project.file(distdir)
+    baseName = project.name
+    //baseName = jarname
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes "Main-Class": mainclass //"com.nubits.nubot.launch.MainLaunch"
+    }
+    //println 'generated jar: ' + jar.archivePath
+    with jar
+}
+
+/*task NuBotJar(type: Jar) << {
     description 'create the jar in ' + project.file(distdir)
     archiveName = jarname
     destinationDir project.file(distdir)
@@ -175,13 +194,15 @@ task NuBotJar(type: Jar) << {
         exclude 'META-INF/*.DSA'
         exclude 'META-INF/*.RSA'
     }
+    manifest {
+        attributes 'Main-Class': mainclass
+    }
+    println 'generated jar: ' + jar.archivePath
     with jar
 
-    manifest.attributes("Main-Class": mainclass)
+    //manifest.attributes("Main-Class": mainclass)
     //manifest.attributes("Main-Class": uiclass)
-
-    println 'generated jar' + jar.archivePath
-}
+}*/
 
 
 task NuBotMakeDistribution(dependsOn: compileReadme) << {

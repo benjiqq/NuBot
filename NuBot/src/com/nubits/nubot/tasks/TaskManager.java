@@ -64,11 +64,6 @@ public class TaskManager {
                 executeStrategyInterval =NuBotAdminSettings.executeStrategyInterval,
                 checkPriceInterval = NuBotAdminSettings.checkPriceInterval;
 
-        if (Global.options != null) {
-            //If global option have been loaded
-            sendLiquidityInterval = Global.options.getSendLiquidityInteval();
-            executeStrategyInterval = Global.options.getExecuteStrategyInterval();
-        }
 
         //connectivity tasks
 
@@ -114,7 +109,7 @@ public class TaskManager {
 
     }
 
-    public void stopAll() {
+    public void stopAll() throws IllegalStateException {
         LOG.info("\nStopping all tasks : -- ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
@@ -136,8 +131,7 @@ public class TaskManager {
                 bt.getTimer().cancel();
                 bt.getTimer().purge();
             } catch (IllegalStateException e) {
-                e.printStackTrace();
-                System.exit(0);
+                throw e;
             }
 
         }

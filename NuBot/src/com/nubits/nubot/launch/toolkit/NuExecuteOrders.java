@@ -195,7 +195,11 @@ public class NuExecuteOrders {
             public void run() {
                 LOG.info("Exiting...");
                 NuExecuteOrders.mainThread.interrupt();
-                Global.taskManager.stopAll();
+                try{
+                    Global.taskManager.stopAll();
+                }catch(IllegalStateException e){
+
+                }
 
                 Thread.currentThread().interrupt();
                 return;
