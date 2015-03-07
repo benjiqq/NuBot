@@ -15,12 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tasks;
+package com.nubits.nubot.tasks.strategy;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.launch.toolkit.NuPriceMonitor;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.utils.FileSystem;
@@ -28,7 +26,6 @@ import com.nubits.nubot.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.TimerTask;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -77,6 +74,7 @@ public class NuPriceMonitorTask extends MonitorTask {
             if (sanityCheck(priceList, 0)) {
                 //mainPrice is reliable compared to the others
                 this.updateLastPrice(priceList.get(0));
+                tryMoveWalls();
             } else {
                 //mainPrice is not reliable compared to the others
                 //Check if other backup prices are close enough to each other
@@ -93,11 +91,11 @@ public class NuPriceMonitorTask extends MonitorTask {
                 if (foundSomeValiBackUp) {
                     //goodPrice is a valid price backup!
                     this.updateLastPrice(goodPrice);
+                    tryMoveWalls();
                 } else {
 
                     //None of the source are in accord with others.
-
-                    //Try to send a notification
+                    //send a notification
                     notifyDeviation(priceList);
 
                 }
@@ -122,7 +120,6 @@ public class NuPriceMonitorTask extends MonitorTask {
         this.lastPrice = lp;
         LOG.info("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
-        tryMoveWalls();
     }
 
     public LastPrice getLastPriceFromFeeds() {
@@ -176,8 +173,9 @@ public class NuPriceMonitorTask extends MonitorTask {
         double peg_price = lastPrice.getPrice().getQuantity();
 
         //convert sell price to PEG
-        double sellPricePEG = Utils.round(sellPriceUSDsingleside / peg_price, 8);
-        double sellPricePEGdual = Utils.round(sellPriceUSDdoubleside / peg_price, 8);
+        int precision = 8;
+        double sellPricePEG = Utils.round(sellPriceUSDsingleside / peg_price, precision);
+        double sellPricePEGdual = Utils.round(sellPriceUSDdoubleside / peg_price, precision);
         double buyPricePEG = Utils.round(buyPriceUSD / peg_price, 8);
 
         LOG.info("Sell wall prices: \n"

@@ -27,7 +27,6 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.MonitorTask;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -87,7 +86,6 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             currentTime = System.currentTimeMillis();
             return;
         }
-
 
         //take a note of the current time.
         //sudden changes in price can cause the bot to re-request the price data repeatedly
@@ -229,7 +227,9 @@ public class PriceMonitorTriggerTask extends MonitorTask {
                 //One or more feed returned an error value
 
                 if (priceList.size() == 2) { // if only 2 values are available
-                    if (closeEnough(priceList.get(0).getPrice().getQuantity(), priceList.get(1).getPrice().getQuantity())) {
+                    double p1 = priceList.get(0).getPrice().getQuantity();
+                    double p2 = priceList.get(1).getPrice().getQuantity();
+                    if (closeEnough(distanceTreshold, p1, p2)) {
 
                         this.updateLastPrice(priceList.get(0));
                     } else {

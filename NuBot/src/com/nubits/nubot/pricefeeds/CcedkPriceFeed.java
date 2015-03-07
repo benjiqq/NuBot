@@ -20,7 +20,7 @@ package com.nubits.nubot.pricefeeds;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.trading.TradeUtilsCCEDK;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -40,7 +40,7 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = TradeUtils.getCCEDKTickerUrl(pair);
+        String url = TradeUtilsCCEDK.getCCEDKTickerUrl(pair);
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {

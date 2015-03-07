@@ -1,4 +1,4 @@
-package com.nubits.nubot.tasks;
+package com.nubits.nubot.tasks.strategy;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.LastPrice;
@@ -43,7 +43,7 @@ public abstract class MonitorTask extends TimerTask {
     }
 
 
-    protected boolean closeEnough(double mainPrice, double temp) {
+    protected boolean closeEnough(double distanceTreshold, double mainPrice, double temp) {
         //if temp differs from mainPrice for more than a threshold%, return false
         double distance = Math.abs(mainPrice - temp);
 
@@ -73,7 +73,7 @@ public abstract class MonitorTask extends TimerTask {
             if (i != mainPriceIndex) {
                 LastPrice tempPrice = priceList.get(i);
                 double temp = tempPrice.getPrice().getQuantity();
-                ok[f] = closeEnough(mainPrice, temp);
+                ok[f] = closeEnough(distanceTreshold, mainPrice, temp);
                 f++;
             }
         }

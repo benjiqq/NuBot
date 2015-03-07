@@ -33,6 +33,7 @@ import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.trading.TradeUtilsCCEDK;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
@@ -229,8 +230,8 @@ public class CcedkWrapper implements TradeInterface {
 
             //iterate on all currencies to find what I want
             if (currency == null) { //Get all balances
-                int NBTid = TradeUtils.getCCDKECurrencyId(pair.getOrderCurrency().getCode().toUpperCase());
-                int PEGid = TradeUtils.getCCDKECurrencyId(pair.getPaymentCurrency().getCode().toUpperCase());
+                int NBTid = TradeUtilsCCEDK.getCCDKECurrencyId(pair.getOrderCurrency().getCode().toUpperCase());
+                int PEGid = TradeUtilsCCEDK.getCCDKECurrencyId(pair.getPaymentCurrency().getCode().toUpperCase());
                 boolean foundNBT = false;
                 boolean foundPEG = false;
                 Amount NBTTotal = new Amount(-1, pair.getOrderCurrency());
@@ -258,7 +259,7 @@ public class CcedkWrapper implements TradeInterface {
                     apiResponse.setError(err);
                 }
             } else { //Specific currency requested
-                int id = TradeUtils.getCCDKECurrencyId(currency.getCode().toUpperCase());
+                int id = TradeUtilsCCEDK.getCCDKECurrencyId(currency.getCode().toUpperCase());
                 boolean found = false;
 
                 Amount total = new Amount(-1, currency);
@@ -309,7 +310,7 @@ public class CcedkWrapper implements TradeInterface {
         String method = API_TRADE;
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-        query_args.put("pair_id", Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair)));
+        query_args.put("pair_id", Integer.toString(TradeUtilsCCEDK.getCCDKECurrencyPairId(pair)));
         query_args.put("type", type);
         query_args.put("price", Double.toString(price));
         query_args.put("volume", Double.toString(amount));
@@ -347,7 +348,7 @@ public class CcedkWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
 
         if (pair != null) {
-            String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
+            String pair_id = Integer.toString(TradeUtilsCCEDK.getCCDKECurrencyPairId(pair));
             query_args.put("pair_id", pair_id);
         }
 
@@ -604,7 +605,7 @@ public class CcedkWrapper implements TradeInterface {
         order.setId((String) orderObject.get("order_id"));
 
         int currencyPairID = Integer.parseInt((String) orderObject.get("pair_id"));
-        CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
+        CurrencyPair cp = TradeUtilsCCEDK.getCCEDKPairFromID(currencyPairID);
         order.setPair(cp);
 
 
@@ -647,7 +648,7 @@ public class CcedkWrapper implements TradeInterface {
 
         trade.setExchangeName(ExchangeFacade.CCEDK);
         int currencyPairID = Integer.parseInt((String) orderObject.get("pair_id"));
-        CurrencyPair cp = TradeUtils.getCCEDKPairFromID(currencyPairID);
+        CurrencyPair cp = TradeUtilsCCEDK.getCCEDKPairFromID(currencyPairID);
         trade.setPair(cp);
 
         trade.setType(orderObject.get("is_seller").equals("1") ? Constant.SELL : Constant.BUY);
@@ -694,7 +695,7 @@ public class CcedkWrapper implements TradeInterface {
         String method = API_GET_TRADES;
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
-        String pair_id = Integer.toString(TradeUtils.getCCDKECurrencyPairId(pair));
+        String pair_id = Integer.toString(TradeUtilsCCEDK.getCCDKECurrencyPairId(pair));
 
         String startDateArg;
         if (startTime == 0) {
