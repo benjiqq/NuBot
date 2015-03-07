@@ -40,7 +40,7 @@ public class PriceFeedManager {
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
 
-    
+
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
         Feeds.initValidFeeds();
         this.pair = pair;
@@ -53,6 +53,10 @@ public class PriceFeedManager {
         }
     }
 
+    /**
+     * trigger fetches from all feeds
+     * @return
+     */
     public LastPriceResponse getLastPrices() {
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;
@@ -61,15 +65,10 @@ public class PriceFeedManager {
             AbstractPriceFeed tempFeed = feedList.get(i);
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
-            if (lastPrice != null) {
-                if (!lastPrice.isError()) {
-                    prices.add(lastPrice);
-                    if (i == 0) {
-                        isMainFeedValid = true;
-                    }
-                } else {
-                    LOG.warn("Error while updating " + pair.getOrderCurrency().getCode() + ""
-                            + " price from " + tempFeed.name);
+            if (lastPrice != null && !lastPrice.isError()) {
+                prices.add(lastPrice);
+                if (i == 0) {
+                    isMainFeedValid = true;
                 }
             } else {
                 LOG.warn("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
@@ -80,6 +79,8 @@ public class PriceFeedManager {
         response.setPrices(prices);
         return response;
     }
+
+
 
     public ArrayList<AbstractPriceFeed> getFeedList() {
         return feedList;

@@ -74,9 +74,6 @@ public class NuBotSecondary extends NuBotBase {
         // set price monitor task to the strategy
         strattask.setPriceMonitorTask(pmtask);
 
-        PriceMonitorTriggerTask monitorTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
-        strattask.setPriceMonitorTask(monitorTask);
-
         // set liquidityinfo task to the strategy
         SubmitLiquidityinfoTask liqtask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
         strattask.setSendLiquidityTask(liqtask);
@@ -88,7 +85,6 @@ public class NuBotSecondary extends NuBotBase {
             exitWithNotice("can't configure price feeds");
         }
 
-        //Then set the pfm
         pmtask.setPriceFeedManager(pfm);
 
         //Set the priceDistance threshold

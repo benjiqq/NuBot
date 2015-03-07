@@ -23,13 +23,11 @@ import java.util.Objects;
 
 public class CurrencyPair {
 
-//Class Variables
     private Currency orderCurrency;
     private Currency paymentCurrency;
 
     private final static String standardsep  = "_";
 
-    //Constructor
     /**
      *
      * @param orderCurrency

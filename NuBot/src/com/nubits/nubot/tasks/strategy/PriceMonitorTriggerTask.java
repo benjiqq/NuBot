@@ -27,6 +27,7 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.tasks.MonitorTask;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -44,19 +45,15 @@ import org.json.simple.parser.ParseException;
 /**
  * A task for monitoring prices and triggering actions
  */
-public class PriceMonitorTriggerTask extends TimerTask {
+public class PriceMonitorTriggerTask extends MonitorTask {
 
-    //global. TODO: in storage layer
-    private LastPrice lastPrice;
+    private double wallchangeThreshold;
 
     private double sellPriceUSD, buyPriceUSD;
     private String pegPriceDirection;
     private LastPrice currentWallPEGPrice;
-    private double distanceTreshold;
 
-    private double wallchangeThreshold;
     private boolean wallsBeingShifted = false;
-    private PriceFeedManager pfm = null;
 
 
     //options
@@ -288,58 +285,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
             executeUpdatePrice(count);
         } catch (FeedPriceException ex) {
             LOG.error(ex.toString());
-        }
-    }
-
-    private boolean sanityCheck(ArrayList<LastPrice> priceList, int mainPriceIndex) {
-        //Measure if mainPrice is close to other two values
-
-        boolean[] ok = new boolean[priceList.size() - 1];
-        double mainPrice = priceList.get(mainPriceIndex).getPrice().getQuantity();
-
-        //Test mainPrice vs backup sources
-        int f = 0;
-        for (int i = 0; i < priceList.size(); i++) {
-            if (i != mainPriceIndex) {
-                LastPrice tempPrice = priceList.get(i);
-                double temp = tempPrice.getPrice().getQuantity();
-                ok[f] = closeEnough(mainPrice, temp);
-                f++;
-            }
-        }
-
-        int countOk = 0;
-        for (int j = 0; j < ok.length; j++) {
-            if (ok[j]) {
-                countOk++;
-            }
-        }
-
-        boolean overallOk = false; //is considered ok if the mainPrice is closeEnough to more than a half of backupPrices
-        //Need to distinguish pair vs odd
-        if (ok.length % 2 == 0) {
-            if (countOk >= (int) ok.length / 2) {
-                overallOk = true;
-            }
-        } else {
-            if (countOk > (int) ok.length / 2) {
-                overallOk = true;
-            }
-        }
-
-        return overallOk;
-
-    }
-    //if temp differs from mainPrice for more than a threshold%, return false
-
-    private boolean closeEnough(double mainPrice, double temp) {
-        double distance = Math.abs(mainPrice - temp);
-
-        double percentageDistance = Utils.round(distance * 100 / mainPrice, 4);
-        if (percentageDistance > distanceTreshold) {
-            return false;
-        } else {
-            return true;
         }
     }
 

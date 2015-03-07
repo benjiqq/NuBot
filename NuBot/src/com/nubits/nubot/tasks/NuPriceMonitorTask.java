@@ -35,42 +35,23 @@ import org.slf4j.Logger;
 
 /**
  *
- * USE THIS TASK ONLY WITH NuPriceMonitor bot
  */
-public class NuPriceMonitorTask extends TimerTask {
+public class NuPriceMonitorTask extends MonitorTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitorTask.class.getName());
-    private PriceFeedManager pfm = null;
-    private double distanceTreshold;
+
     private LastPrice lastPrice;
+
+    private double wallchangeThreshold;
+
     private boolean isFirstTime = true;
     private LastPrice currentWallPEGPrice;
-    private double wallchangeThreshold;
+
     private double sellPriceUSDsingleside, sellPriceUSDdoubleside, buyPriceUSD;
     private String outputPath, recipient;
     private boolean sendEmails;
     private boolean isFirstEmail = true;
     private String emailHistory = "";
-
-    /*public NuPriceMonitorTask(PriceFeedManager pfm) {
-        this.pfm = pfm;
-    }*/
-
-    private void notifyDeviation(ArrayList<LastPrice> priceList) {
-        String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
-        String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-        for (int i = 0; i < priceList.size(); i++) {
-            LastPrice tempPrice = priceList.get(i);
-            message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
-                    + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode()) + "\n";
-        }
-
-
-        MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
-        HipChatNotifications.sendMessageCritical(title + message);
-
-        LOG.error(title + message);
-    }
 
     @Override
     public void run() {
@@ -123,58 +104,6 @@ public class NuPriceMonitorTask extends TimerTask {
             }
         }
 
-    }
-
-    private boolean sanityCheck(ArrayList<LastPrice> priceList, int mainPriceIndex) {
-        //Measure if mainPrice is close to other two values
-
-        boolean[] ok = new boolean[priceList.size() - 1];
-        double mainPrice = priceList.get(mainPriceIndex).getPrice().getQuantity();
-
-        //Test mainPrice vs backup sources
-        int f = 0;
-        for (int i = 0; i < priceList.size(); i++) {
-            if (i != mainPriceIndex) {
-                LastPrice tempPrice = priceList.get(i);
-                double temp = tempPrice.getPrice().getQuantity();
-                ok[f] = closeEnough(mainPrice, temp);
-                f++;
-            }
-        }
-
-        int countOk = 0;
-        for (int j = 0; j < ok.length; j++) {
-            if (ok[j]) {
-                countOk++;
-            }
-        }
-
-        boolean overallOk = false; //is considered ok if the mainPrice is closeEnough to more than a half of backupPrices
-        //Need to distinguish pair vs odd
-        if (ok.length % 2 == 0) {
-            if (countOk >= (int) ok.length / 2) {
-                overallOk = true;
-            }
-        } else {
-            if (countOk > (int) ok.length / 2) {
-                overallOk = true;
-            }
-        }
-
-        return overallOk;
-
-    }
-    //if temp differs from mainPrice for more than a threshold%, return false
-
-    private boolean closeEnough(double mainPrice, double temp) {
-        double distance = Math.abs(mainPrice - temp);
-
-        double percentageDistance = Utils.round(distance * 100 / mainPrice, 4);
-        if (percentageDistance > distanceTreshold) {
-            return false;
-        } else {
-            return true;
-        }
     }
 
     public void setPriceFeedManager(PriceFeedManager pfm) {
@@ -317,37 +246,6 @@ public class NuPriceMonitorTask extends TimerTask {
         }
         FileSystem.writeToFile(row, outputPath, true);
 
-        //HTML logging
-        /*
-         String preHTML = "        <tbody>\n"
-         + "            <tr>\n";
-
-         String bodyHTML = "<td>" + new Date() + "</td>"
-         + "<td>" + source + "</td>"
-         + "<td>" + crypto + "</td>"
-         + "<td>" + price + "</td>"
-         + "<td>" + currency + "</td>"
-         + "<td>" + sellPricePEG + "</td>"
-         + "<td>" + sellPricePEGdual + "</td>"
-         + "<td>" + buyPricePEG + "</td>"
-         + "<td>\n"
-         + "\n"
-         + "                    <table>\n";
-
-         for (int i = 0; i < priceList.size(); i++) {
-         LastPrice tempPrice = priceList.get(i);
-         bodyHTML += " <tr><td> { feed : " + tempPrice.getSource() + " - price : " + tempPrice.getPrice().getQuantity() + "}  </td> </tr>";
-         }
-         String footerHTML = "</table>\n"
-         + "                </td>\n"
-         + "            </tr>\n"
-         + "        </tbody>\n"
-         + "    </table>\n"
-         + "</body>\n"
-         + "</html>";
-
-         FileSystem.writeToFile(preHTML + bodyHTML + footerHTML, outputPath + ".html", true);
-         */
     }
 
     public double getWallchangeThreshold() {
