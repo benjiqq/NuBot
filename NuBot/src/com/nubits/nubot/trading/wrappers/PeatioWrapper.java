@@ -49,7 +49,7 @@ import org.jsoup.nodes.Document;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class PeatioWrapper implements TradeInterface {
 

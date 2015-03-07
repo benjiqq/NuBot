@@ -19,7 +19,7 @@ package com.nubits.nubot.exchanges;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class ExchangeStatus {
 

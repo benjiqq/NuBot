@@ -19,7 +19,7 @@ package com.nubits.nubot.notifications;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;

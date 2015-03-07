@@ -19,7 +19,7 @@ package com.nubits.nubot.launch.toolkit;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;

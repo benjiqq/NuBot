@@ -42,7 +42,7 @@ import org.json.simple.parser.ParseException;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class NuRPCClient {
 

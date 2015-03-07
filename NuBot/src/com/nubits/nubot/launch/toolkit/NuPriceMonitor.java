@@ -19,7 +19,7 @@ package com.nubits.nubot.launch.toolkit;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;

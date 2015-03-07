@@ -19,7 +19,7 @@ package functions;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 
 import com.nubits.nubot.utils.FileSystem;

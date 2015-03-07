@@ -19,7 +19,7 @@ package com.nubits.nubot.tasks.strategy;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 
 import com.nubits.nubot.global.Constant;

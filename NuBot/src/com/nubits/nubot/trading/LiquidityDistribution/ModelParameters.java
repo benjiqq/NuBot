@@ -19,7 +19,7 @@ package com.nubits.nubot.trading.LiquidityDistribution;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import java.util.Objects;
 import org.slf4j.LoggerFactory;

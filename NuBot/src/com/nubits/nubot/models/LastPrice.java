@@ -21,7 +21,7 @@ import java.util.Date;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class LastPrice {
 

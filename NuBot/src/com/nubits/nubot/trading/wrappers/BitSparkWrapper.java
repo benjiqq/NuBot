@@ -48,7 +48,7 @@ import org.jsoup.nodes.Document;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class BitSparkWrapper implements TradeInterface {
 

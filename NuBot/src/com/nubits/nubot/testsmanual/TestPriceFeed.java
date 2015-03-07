@@ -33,7 +33,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class TestPriceFeed {
     //refer to FEEDS.md for the list of price feeds

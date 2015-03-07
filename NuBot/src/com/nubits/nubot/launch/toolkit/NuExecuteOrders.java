@@ -40,7 +40,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class NuExecuteOrders {
 

@@ -19,7 +19,7 @@ package com.nubits.nubot.pricefeeds;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;

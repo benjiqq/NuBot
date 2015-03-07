@@ -29,7 +29,7 @@ import org.json.simple.parser.JSONParser;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class CoinbasePriceFeed extends AbstractPriceFeed {
 

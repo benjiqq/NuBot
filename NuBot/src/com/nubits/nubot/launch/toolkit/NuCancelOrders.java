@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class NuCancelOrders {
 

@@ -19,7 +19,7 @@ package com.nubits.nubot.trading;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;

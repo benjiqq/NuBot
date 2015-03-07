@@ -22,7 +22,7 @@ import java.util.Objects;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class CurrencyPair {
 

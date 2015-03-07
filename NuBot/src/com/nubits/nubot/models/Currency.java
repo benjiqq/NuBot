@@ -27,7 +27,7 @@ import org.slf4j.Logger;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class Currency {
 

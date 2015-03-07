@@ -19,7 +19,7 @@ package com.nubits.nubot.trading;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class Ticker {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 desrever <desrever at nubits.com>
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -19,7 +19,7 @@ package com.nubits.nubot.pricefeeds;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;

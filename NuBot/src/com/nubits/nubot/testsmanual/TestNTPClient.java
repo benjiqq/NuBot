@@ -19,7 +19,7 @@ package com.nubits.nubot.testsmanual;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.utils.Utils;

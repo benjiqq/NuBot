@@ -24,7 +24,7 @@ public class MainLaunch {
      * Start the NuBot. start if config is valid and other instance is running
      *
      * @param args a list of valid arguments
-     * @author desrever <desrever at nubits.com>
+     *
      */
     public static void main(String args[]) {
 

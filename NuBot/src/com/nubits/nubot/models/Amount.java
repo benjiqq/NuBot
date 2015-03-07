@@ -22,7 +22,7 @@ import java.text.DecimalFormat;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class Amount {
 

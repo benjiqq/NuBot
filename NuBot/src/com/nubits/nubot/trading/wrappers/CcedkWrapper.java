@@ -19,7 +19,7 @@ package com.nubits.nubot.trading.wrappers;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;

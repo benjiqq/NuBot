@@ -19,7 +19,7 @@ package com.nubits.nubot.NTP;
  */
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import java.io.IOException;
 import java.net.InetAddress;

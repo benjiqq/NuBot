@@ -41,7 +41,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- * @author desrever <desrever at nubits.com>
+ *
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
 

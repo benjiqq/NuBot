@@ -19,7 +19,7 @@ package com.nubits.nubot.trading.LiquidityDistribution;
 
 /**
  *
- * @author desrever <desrever at nubits.com>
+ *
  */
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_LOW;
 import com.nubits.nubot.utils.Utils;
