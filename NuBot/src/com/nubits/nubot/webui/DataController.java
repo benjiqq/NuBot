@@ -33,22 +33,20 @@ public class DataController {
             Map opmap = new HashMap();
 
             //TODO: handle updates in storagelayer/pricefeed
+            //TODO: use config
 
-            CurrencyPair testPair = Constant.BTC_USD;
-            opmap.put("watchcurrency",testPair.toString());
+            CurrencyPair pair = Constant.BTC_USD;
+
             opmap.put("btc_balance", ExchangeFacade.getBalance(ti, CurrencyList.BTC));
             opmap.put("nbt_balance", ExchangeFacade.getBalance(ti, CurrencyList.NBT));
             opmap.put("orders", ExchangeFacade.getOpenOrders(ti));
 
-
-
-
             BtcePriceFeed btce = new BtcePriceFeed();
-            double lastbtce= btce.getLastPrice(testPair).getPrice().getQuantity();
+            double lastbtce= btce.getLastPrice(pair).getPrice().getQuantity();
 
 
             BlockchainPriceFeed bci = new BlockchainPriceFeed();
-            double lastbci= bci.getLastPrice(testPair).getPrice().getQuantity();
+            double lastbci= bci.getLastPrice(pair).getPrice().getQuantity();
 
             opmap.put("btce_lastprice",lastbtce);
             opmap.put("bci_lastprice",lastbci);

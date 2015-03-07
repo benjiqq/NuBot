@@ -58,6 +58,8 @@ public class UiServer {
         get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
 
         Map feedsmap = new HashMap();
+        //TODO: pegging price
+        feedsmap.put("watchcurrency", opt.pair.toString());
         get("/feeds", (request, response) -> new ModelAndView(feedsmap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
 
         Map configmap = new HashMap();
