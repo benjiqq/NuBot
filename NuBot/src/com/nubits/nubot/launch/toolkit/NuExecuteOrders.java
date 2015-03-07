@@ -38,10 +38,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
-/**
- *
- *
- */
+
 public class NuExecuteOrders {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuExecuteOrders.class.getName());

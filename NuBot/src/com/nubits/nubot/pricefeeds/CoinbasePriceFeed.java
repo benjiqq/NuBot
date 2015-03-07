@@ -27,10 +27,7 @@ import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- *
- */
+
 public class CoinbasePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinbasePriceFeed.class.getName());

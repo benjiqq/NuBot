@@ -17,10 +17,7 @@
  */
 package functions;
 
-/**
- *
- *
- */
+
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.utils.Utils;

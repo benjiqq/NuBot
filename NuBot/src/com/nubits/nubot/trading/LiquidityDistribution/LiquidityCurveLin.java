@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading.LiquidityDistribution;
 
-/**
- *
- *
- */
+
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_LOW;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;

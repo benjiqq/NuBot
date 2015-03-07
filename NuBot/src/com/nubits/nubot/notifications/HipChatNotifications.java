@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.notifications;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import io.evanwong.oss.hipchat.v2.HipChatClient;

@@ -22,10 +22,7 @@ import java.util.TimerTask;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- *
- */
+
 public class BotTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(BotTask.class.getName());

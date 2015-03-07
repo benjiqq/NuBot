@@ -32,10 +32,7 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- *
- */
+
 public class TestOrderTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestOrderTask.class.getName());

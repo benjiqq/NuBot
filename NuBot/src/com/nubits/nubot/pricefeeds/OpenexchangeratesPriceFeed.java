@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.pricefeeds;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;

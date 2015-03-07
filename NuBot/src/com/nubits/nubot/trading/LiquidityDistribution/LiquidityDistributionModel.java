@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading.LiquidityDistribution;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;

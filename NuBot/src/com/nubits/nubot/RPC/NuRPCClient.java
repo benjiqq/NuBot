@@ -40,10 +40,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- *
- *
- */
+
 public class NuRPCClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuRPCClient.class.getName());

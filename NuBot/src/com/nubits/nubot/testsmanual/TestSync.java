@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.testsmanual;
 
-/**
- *
- *
- */
+
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.global.Constant;

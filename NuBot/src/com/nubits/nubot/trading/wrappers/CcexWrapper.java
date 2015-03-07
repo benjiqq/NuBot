@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;

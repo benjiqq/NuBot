@@ -20,10 +20,7 @@ package com.nubits.nubot.models;
 import com.nubits.nubot.utils.Utils;
 import java.text.DecimalFormat;
 
-/**
- *
- *
- */
+
 public class Amount {
 
 //Class Variables

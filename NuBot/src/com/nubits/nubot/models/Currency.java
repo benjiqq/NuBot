@@ -25,10 +25,7 @@ import java.util.Objects;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- *
- */
+
 public class Currency {
 
 //Class Variables

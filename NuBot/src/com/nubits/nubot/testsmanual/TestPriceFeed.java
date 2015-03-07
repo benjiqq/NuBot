@@ -31,10 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-/**
- *
- *
- */
+
 public class TestPriceFeed {
     //refer to FEEDS.md for the list of price feeds
 

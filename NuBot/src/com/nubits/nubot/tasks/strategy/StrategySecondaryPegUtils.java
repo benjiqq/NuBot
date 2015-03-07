@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.tasks.strategy;
 
-/**
- *
- *
- */
+
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;

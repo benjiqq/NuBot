@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.launch.toolkit;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;

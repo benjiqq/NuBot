@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.pricefeeds;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.exchanges.ExchangeFacade;

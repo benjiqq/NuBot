@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.testsmanual;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;

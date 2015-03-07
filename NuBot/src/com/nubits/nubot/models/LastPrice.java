@@ -19,10 +19,7 @@ package com.nubits.nubot.models;
 
 import java.util.Date;
 
-/**
- *
- *
- */
+
 public class LastPrice {
 
 //Class Variables

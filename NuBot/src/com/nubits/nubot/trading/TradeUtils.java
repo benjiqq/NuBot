@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyList;

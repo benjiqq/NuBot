@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading.LiquidityDistribution;
 
-/**
- *
- *
- */
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

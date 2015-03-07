@@ -30,10 +30,7 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- *
- */
+
 public class TestRPCLiquidityInfo {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());

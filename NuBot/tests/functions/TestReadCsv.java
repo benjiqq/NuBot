@@ -17,10 +17,6 @@
  */
 package functions;
 
-/**
- *
- *
- */
 
 import com.nubits.nubot.utils.FileSystem;
 import junit.framework.TestCase;

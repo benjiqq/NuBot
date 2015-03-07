@@ -20,10 +20,7 @@ package com.nubits.nubot.models;
 import java.util.ArrayList;
 import java.util.Objects;
 
-/**
- *
- *
- */
+
 public class CurrencyPair {
 
 //Class Variables

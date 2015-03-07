@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.exchanges;
 
-/**
- *
- *
- */
+
 public class ExchangeStatus {
 
 //Class Variables

@@ -20,10 +20,7 @@ package com.nubits.nubot.models;
 import com.nubits.nubot.utils.Utils;
 import java.util.Date;
 
-/**
- *
- *
- */
+
 public class Order {
 
     //Class Variables

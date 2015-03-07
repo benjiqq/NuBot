@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.testsmanual;
 
-/**
- *
- *
- */
+
 import com.nubits.nubot.utils.FileSystem;
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading;
 
-/**
- *
- *
- */
+
 public class Ticker {
 
 //Class Variables

@@ -47,10 +47,7 @@ import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 
-/**
- *
- *
- */
+
 public class PeatioWrapper implements TradeInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(PeatioWrapper.class.getName());

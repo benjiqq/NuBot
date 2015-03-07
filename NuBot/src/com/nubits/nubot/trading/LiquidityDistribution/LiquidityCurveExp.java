@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading.LiquidityDistribution;
 
-/**
- *
- *
- */
+
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_FLAT;
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_HIGH;
 import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_LOW;

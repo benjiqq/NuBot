@@ -31,10 +31,7 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- *
- */
+
 public class NuCancelOrders {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuCancelOrders.class.getName());

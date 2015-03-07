@@ -61,10 +61,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-/**
- *
- *
- */
+
 public class BtceWrapper implements TradeInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(BtceWrapper.class.getName());

@@ -28,10 +28,7 @@ import java.util.TimerTask;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- *
- */
+
 public class CheckConnectionTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(CheckConnectionTask.class.getName());

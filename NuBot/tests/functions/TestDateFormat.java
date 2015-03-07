@@ -17,10 +17,7 @@
  */
 package functions;
 
-/**
- *
- *
- */
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.slf4j.LoggerFactory;

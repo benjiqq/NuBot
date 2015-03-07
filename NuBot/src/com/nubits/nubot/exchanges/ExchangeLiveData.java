@@ -21,10 +21,7 @@ import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Order;
 import java.util.ArrayList;
 
-/**
- *
- *
- */
+
 public class ExchangeLiveData {
 
     private ExchangeStatus status;

@@ -46,10 +46,7 @@ import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 
-/**
- *
- *
- */
+
 public class BitSparkWrapper implements TradeInterface {
 
     //It seems that BitSpark also have a reversed pairing for NBT_BTC.

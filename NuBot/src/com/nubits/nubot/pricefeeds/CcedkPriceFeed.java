@@ -28,10 +28,7 @@ import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-/**
- *
- *
- */
+
 public class CcedkPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CcedkPriceFeed.class.getName());

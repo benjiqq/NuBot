@@ -30,10 +30,7 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- *
- */
+
 public class TestWrappers {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
