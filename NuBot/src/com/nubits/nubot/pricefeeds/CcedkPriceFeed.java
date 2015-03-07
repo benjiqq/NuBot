@@ -32,9 +32,9 @@ import org.json.simple.parser.JSONParser;
 public class CcedkPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CcedkPriceFeed.class.getName());
-    
+    public static final String name = "ccedk";
+
     public CcedkPriceFeed() {
-        name = "ccedk";
         refreshMinTime = 50 * 1000; //one minutee
     }
 

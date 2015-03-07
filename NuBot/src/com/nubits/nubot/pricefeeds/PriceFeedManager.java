@@ -23,76 +23,34 @@ import com.nubits.nubot.models.LastPrice;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import com.nubits.nubot.options.NuBotConfigException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 /**
- * Manager for a list of price feeds
+ * Manager for a selected list of price feeds
+ * see also Feeds, which manages all existing feeds
  */
 public class PriceFeedManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceFeedManager.class.getName());
-    private AbstractPriceFeed mainfeed;
+    //private AbstractPriceFeed mainfeed;
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
-    public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
 
-    /*public final static String BLOCKCHAIN = "blockchain"; //BTC
-    public final static String BITCOINAVERAGE = "bitcoinaverage"; //BTC
-    public final static String COINBASE = "coinbase"; //BTC
-    public final static String BITSTAMP = "bitstamp"; // BTC
-    public final static String BITFINEX = "bitfinex"; // BTC
-    public final static String BTER = "bter"; //BTC and PPC
-    public final static String CCEDK = "ccedk"; //BTC and PPC
-    public final static String BTCE = ExchangeFacade.BTCE;
-    public final static String COINMARKETCAP_NO = "coinmarketcap_no"; //PPC
-    public final static String COINMARKETCAP_NE = "coinmarketcap_ne"; //PPC
-    public final static String BITSTAMP_EURUSD = "bitstampeurusd"; // EUR
-    public final static String GOOGLE_UNOFFICIAL = "google-unofficial"; // EUR CNY
-    public final static String YAHOO = "yahoo"; //EUR CNY
-    public final static String OPENEXCHANGERATES = "openexchangerates"; //EUR CNY
-    public final static String EXCHANGERATELAB = "exchangeratelab"; // EUR CNY*/
-
-    private final static String basepackage = "com.nubits.nubot.pricefeeds.";
-    public final static String[] feedlclasses = {"BitcoinaveragePriceFeed", "BitcoinaveragePriceFeed",
-            "CoinbasePriceFeed", "BterPriceFeed", "CcedkPriceFeed", "BtcePriceFeed",
-            "CoinmarketcapnorthpolePriceFeed", "CoinmarketcapnexuistPriceFeed",
-            "BitstampPriceFeed", "BitstampEURPriceFeed", "GoogleUnofficialPriceFeed",
-            "YahooPriceFeed", "OpenexchangeratesPriceFeed", "BitfinexPriceFeed",
-            "ExchangeratelabPriceFeed"};
     
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
-        initValidFeeds();
+        Feeds.initValidFeeds();
         this.pair = pair;
 
-        feedList.add(getFeed(mainFeed)); //add the main feed at index 0
+        feedList.add(Feeds.getFeed(mainFeed)); //add the main feed at index 0
         //this.mainfeed = getFeed(mainFeed);
 
         for (int i = 0; i < backupFeedList.size(); i++) {
-            feedList.add(getFeed(backupFeedList.get(i)));
+            feedList.add(Feeds.getFeed(backupFeedList.get(i)));
         }
-    }
-
-    /**
-     * init feeds based on the classes. classes contains the name
-     */
-    private void initValidFeeds() {
-
-        FEED_NAMES_MAP = new HashMap<>();
-        for (int i = 0; i < feedlclasses.length; i++ ) {
-            try {
-                Class<?> feedclass = Class.forName(basepackage + feedlclasses[i]);
-                Constructor<?> feed = feedclass.getConstructor(String.class);
-                Object object = feed.newInstance(new Object[]{});
-                AbstractPriceFeed f = (AbstractPriceFeed) object;
-                FEED_NAMES_MAP.put(f.getName(), f);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
     }
 
     public LastPriceResponse getLastPrices() {
@@ -124,7 +82,6 @@ public class PriceFeedManager {
     }
 
     public LastPrice getLastPrice() {
-        boolean ok = false;
 
         for (int i = 0; i < feedList.size(); i++) {
             AbstractPriceFeed tempFeed = feedList.get(i);
@@ -144,22 +101,12 @@ public class PriceFeedManager {
 
     }
 
-    private AbstractPriceFeed getFeed(String feedname) throws NuBotConfigException {
-        if (FEED_NAMES_MAP.containsKey(feedname)) {
-            return FEED_NAMES_MAP.get(feedname);
-        } else {
-            throw new NuBotConfigException("Error wile adding price seed with name unrecognized : " + feedname);
-        }
 
-    }
 
     public ArrayList<AbstractPriceFeed> getFeedList() {
         return feedList;
     }
 
-    public void setFeedList(ArrayList<AbstractPriceFeed> feedList) {
-        this.feedList = feedList;
-    }
 
     public CurrencyPair getPair() {
         return pair;

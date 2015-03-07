@@ -26,8 +26,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
-import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -127,13 +126,20 @@ public class TestSync extends TimerTask {
 
     private double readPrice() {
 
-        String mainFeed = PriceFeedManager.BTCE;
-
+        String mainFeed = null;
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
-        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
-        backupFeedList.add(PriceFeedManager.COINBASE);
+        try{
+            mainFeed = BtcePriceFeed.name;
+            String  f1 = BitcoinaveragePriceFeed.name;
+            String f2 =BlockchainPriceFeed.name;
+            String f3 =CoinbasePriceFeed.name;
+            backupFeedList.add(f1);
+            backupFeedList.add(f2);
+            backupFeedList.add(f3);
+        }catch(Exception e){
+
+        }
 
         PriceFeedManager pfm = null;
         try{

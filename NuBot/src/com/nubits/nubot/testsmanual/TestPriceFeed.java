@@ -22,14 +22,14 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
-import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.concurrent.Exchanger;
 
 
 public class TestPriceFeed {
@@ -74,15 +74,15 @@ public class TestPriceFeed {
 
     private void trackBTC() {
 
-        String mainFeed = PriceFeedManager.BTCE;
+        String mainFeed = BtcePriceFeed.name;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(PriceFeedManager.BITCOINAVERAGE);
-        backupFeedList.add(PriceFeedManager.BLOCKCHAIN);
-        backupFeedList.add(PriceFeedManager.COINBASE);
-        backupFeedList.add(PriceFeedManager.CCEDK);
-        backupFeedList.add(PriceFeedManager.BTER);
+        backupFeedList.add(BitcoinaveragePriceFeed.name);
+        backupFeedList.add(BlockchainPriceFeed.name);
+        backupFeedList.add(CoinbasePriceFeed.name);
+        backupFeedList.add(CcedkPriceFeed.name);
+        backupFeedList.add(BterPriceFeed.name);
         //TODO add bitfinex and  bitstamp after merging this branch with develop
 
         execute(mainFeed, backupFeedList, Constant.BTC_USD);
@@ -92,57 +92,57 @@ public class TestPriceFeed {
     private void trackPPC() {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        String mainFeed = PriceFeedManager.BTCE;
+        String mainFeed = BtcePriceFeed.name;
 
-        backupFeedList.add(PriceFeedManager.COINMARKETCAP_NO);
-        backupFeedList.add(PriceFeedManager.COINMARKETCAP_NE);
+        backupFeedList.add(CoinmarketcapnorthpolePriceFeed.name);
+        backupFeedList.add(CoinmarketcapnexuistPriceFeed.name);
 
         execute(mainFeed, backupFeedList, Constant.PPC_USD);
     }
 
     private void trackEUR() {
-        String mainFeed = PriceFeedManager.BITSTAMP_EURUSD;
+        String mainFeed = BitstampEURPriceFeed.name;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(PriceFeedManager.OPENEXCHANGERATES);
-        backupFeedList.add(PriceFeedManager.GOOGLE_UNOFFICIAL);
-        backupFeedList.add(PriceFeedManager.EXCHANGERATELAB);
-        backupFeedList.add(PriceFeedManager.YAHOO);
+        backupFeedList.add(OpenexchangeratesPriceFeed.name);
+        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(ExchangeratelabPriceFeed.name);
+        backupFeedList.add(YahooPriceFeed.name);
 
         execute(mainFeed, backupFeedList, Constant.EUR_USD);
     }
 
     private void trackHKD() {
-        String mainFeed = PriceFeedManager.OPENEXCHANGERATES;
+        String mainFeed = OpenexchangeratesPriceFeed.name;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(PriceFeedManager.GOOGLE_UNOFFICIAL);
-        backupFeedList.add(PriceFeedManager.YAHOO);
+        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(YahooPriceFeed.name);
 
         execute(mainFeed, backupFeedList, Constant.HKD_USD);
     }
 
     private void trackPHP() {
-        String mainFeed = PriceFeedManager.OPENEXCHANGERATES;
+        String mainFeed = OpenexchangeratesPriceFeed.name;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(PriceFeedManager.GOOGLE_UNOFFICIAL);
-        backupFeedList.add(PriceFeedManager.YAHOO);
+        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(YahooPriceFeed.name);
 
         execute(mainFeed, backupFeedList, Constant.PHP_USD);
     }
 
     private void trackCNY() {
-        String mainFeed = PriceFeedManager.OPENEXCHANGERATES;
+        String mainFeed = OpenexchangeratesPriceFeed.name;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(PriceFeedManager.GOOGLE_UNOFFICIAL);
-        backupFeedList.add(PriceFeedManager.EXCHANGERATELAB);
-        backupFeedList.add(PriceFeedManager.YAHOO);
+        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(YahooPriceFeed.name);
+        backupFeedList.add(ExchangeratelabPriceFeed.name);
 
         execute(mainFeed, backupFeedList, Constant.CNY_USD);
     }

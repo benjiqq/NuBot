@@ -1,7 +1,15 @@
+import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
+import com.nubits.nubot.pricefeeds.BtcePriceFeed;
+import com.nubits.nubot.pricefeeds.Feeds;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -10,9 +18,9 @@ import java.util.List;
 public class TestPriceFeedsAll extends TestCase {
 
     List<Double> alllast;
-    private String dbfile = "testprices.db";
+    //private String dbfile = "testprices.db";
 
-    public void setUp(){
+    /*public void setUp(){
 
         File ff = new File(dbfile);
         if (ff.exists()) {
@@ -20,10 +28,27 @@ public class TestPriceFeedsAll extends TestCase {
         }
 
 
-    }
+    }*/
 
     @Test
-    public void testZAvg() {
+    public void testAll() {
+
+        CurrencyPair testPair = Constant.BTC_USD;
+
+        ArrayList<AbstractPriceFeed> allfeeds = Feeds.getAllExistingFeeds();
+
+        Iterator<AbstractPriceFeed> it = allfeeds.iterator();
+        while (it.hasNext()){
+            AbstractPriceFeed feed = it.next();
+            LastPrice lastprice = feed.getLastPrice(testPair);
+            assertNotNull(lastprice);
+            double ld = lastprice.getPrice().getQuantity();
+            assertTrue(ld > 0);
+        }
+
+
+
+
 
        /* alllast.add(lastbtce);
         alllast.add(lastbci);
