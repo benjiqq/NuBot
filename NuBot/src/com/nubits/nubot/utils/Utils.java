@@ -253,23 +253,18 @@ public class Utils {
         return toRet;
     }
 
-    public static void loadProperties(String filename) {
+    public static void loadProperties(String filename) throws IOException {
         Global.settings = new Properties();
         InputStream input = null;
 
         try {
-
             input = NuBotSecondary.class.getClassLoader().getResourceAsStream(filename);
-
-            if (input == null) {
-                LOG.error("Sorry, unable to find " + filename);
-                System.exit(0);
-            }
 
             //load a properties file from class path, inside static method
             Global.settings.load(input);
         } catch (IOException ex) {
             LOG.error(ex.toString());
+            throw new IOException("Sorry, unable to find " + filename);
         } finally {
             if (input != null) {
                 try {

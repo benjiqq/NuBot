@@ -53,7 +53,11 @@ public class NuExecuteOrders {
 
     public static void main(String[] args) {
         //Load settings
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         mainThread = Thread.currentThread();
 

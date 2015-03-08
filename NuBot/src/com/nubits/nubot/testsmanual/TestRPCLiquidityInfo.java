@@ -30,6 +30,8 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 
 public class TestRPCLiquidityInfo {
 
@@ -57,7 +59,11 @@ public class TestRPCLiquidityInfo {
             buy = Double.parseDouble(args[4]);
         }
 
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 

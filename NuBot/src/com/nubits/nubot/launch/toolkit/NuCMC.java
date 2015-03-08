@@ -34,6 +34,8 @@ import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
 
+import java.io.IOException;
+
 public class NuCMC {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuCMC.class.getName());
@@ -49,7 +51,11 @@ public class NuCMC {
     public static void main(String[] args) {
         mainThread = Thread.currentThread();
         //Load settings
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         String folderName = "NuCMC_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;

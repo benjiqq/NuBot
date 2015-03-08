@@ -172,8 +172,6 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-        //Load settings
-        Utils.loadProperties("settings.properties");
 
         //TODO: opt should be passed in constructor, not set in global
 

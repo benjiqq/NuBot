@@ -6,7 +6,7 @@
 		class="ch.qos.logback.core.ConsoleAppender">
 
 		<encoder>
-			<pattern>%d{HH:mm:ss} %logger{36} - %msg%n</pattern>
+			<pattern>STDOUT >> %d{HH:mm:ss} %logger{36} - %msg%n</pattern>
 		</encoder>
 
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
@@ -36,6 +36,12 @@
     <appender name="allFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 	  <file>logs/all.log</file>
 
+        <encoder>
+            <pattern>ALL: %date %logger{36} %level - %msg%n
+            </pattern>
+            <!-- [%thread] %logger{10} [%file:%line] -->
+        </encoder>
+
         <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
           <fileNamePattern>logs/all.%i.log.zip</fileNamePattern>
           <minIndex>1</minIndex>
@@ -46,11 +52,7 @@
           <maxFileSize>10MB</maxFileSize>
         </triggeringPolicy>
 
-            <encoder>
-                <pattern>%date %logger{36} %level - %msg%n
-                </pattern>
-                <!-- [%thread] %logger{10} [%file:%line] -->
-            </encoder>
+
 
 	</appender>
 

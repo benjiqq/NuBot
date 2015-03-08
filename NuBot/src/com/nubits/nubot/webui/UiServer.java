@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class UiServer {
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
     private static String configFile = "poloniex.json";
+
     private static String configdir = "testconfig";
 
     //TODO path
@@ -39,7 +41,11 @@ public class UiServer {
     public static void startUIserver(NuBotOptions opt) {
 
         //TODO: only load if in testmode and this is not set elsewhere
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+            System.exit(0);
+        }
 
 
         //binds GET and POST

@@ -7,9 +7,12 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
+
+import java.io.IOException;
 
 /**
  * the main launcher class. starts bot based on configuration, not through UI
@@ -29,6 +32,14 @@ public class MainLaunch {
     public static void main(String args[]) {
 
         NuBotOptions opt = null;
+
+        //Load settings
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+            LOG.error("could not load settings");
+            System.exit(0);
+        }
 
         System.setProperty("javax.net.ssl.trustStore","NuBot/res");
         System.setProperty("javax.net.ssl.trustStorePassword","asdfasdf");

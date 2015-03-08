@@ -31,6 +31,8 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 
 public class NuCancelOrders {
 
@@ -44,7 +46,11 @@ public class NuCancelOrders {
 
     public static void main(String[] args) {
         //Load settings
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         NuCancelOrders app = new NuCancelOrders();
         String folderName = "NuCancelOrders_" + System.currentTimeMillis() + "/";
