@@ -9,6 +9,7 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -19,7 +20,11 @@ public class TestConfigAlts extends TestCase {
 
     @Override
     public void setUp() {
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
     }
 
     @Test

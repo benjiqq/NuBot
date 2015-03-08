@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import com.nubits.nubot.utils.Utils;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.slf4j.LoggerFactory;
@@ -71,7 +72,11 @@ public class TestLiquidityDistribution {
     }
 
     private void init(String exchangeName) {
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;

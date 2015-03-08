@@ -30,6 +30,8 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+
 
 public class TestWrappers {
 
@@ -45,7 +47,11 @@ public class TestWrappers {
 
     public static void main(String[] args) {
         //Load settings
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
         init();
         String[] inputs = new String[1];
         inputs[0] = TEST_OPTIONS_PATH;

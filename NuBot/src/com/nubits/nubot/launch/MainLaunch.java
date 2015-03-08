@@ -40,8 +40,14 @@ public class MainLaunch {
             LOG.error("could not load settings");
             System.exit(0);
         }
+        LOG.info("settings loaded");
 
-        System.setProperty("javax.net.ssl.trustStore","NuBot/res");
+        String URL = "logback.xml";
+        ClassLoader.getSystemResource(URL);
+        System.out.println("logback.xml");
+
+
+        System.setProperty("javax.net.ssl.trustStore", "NuBot/res");
         System.setProperty("javax.net.ssl.trustStorePassword","asdfasdf");
 
         try {

@@ -28,13 +28,19 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import java.io.IOException;
+
 public class TestFroozenAmounts {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestFroozenAmounts.class.getName());
 
     public static void main(String[] args) {
         //Load settings that contains the path
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         CurrencyPair pair = Constant.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();

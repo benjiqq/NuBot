@@ -24,6 +24,8 @@ import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 
+import java.io.IOException;
+
 public class TestSettings extends TestCase {
 
 
@@ -32,12 +34,20 @@ public class TestSettings extends TestCase {
 
     @Override
     public void setUp() {
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
     }
 
     @Test
     public void testRead() {
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
         //Global.settings.getProperty("submit_liquidity_seconds"));
         assertTrue(Global.settings.containsKey("version"));
     }

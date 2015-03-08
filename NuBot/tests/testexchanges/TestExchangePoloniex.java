@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -64,7 +65,11 @@ public class TestExchangePoloniex extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
 
@@ -109,7 +114,11 @@ public class TestExchangePoloniex extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
-        Utils.loadProperties("settings.properties");
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+
+        }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);
 
