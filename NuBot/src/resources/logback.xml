@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+	<appender name="STDOUT" level="all"
+		class="ch.qos.logback.core.ConsoleAppender">
+
+		<encoder>
+			<pattern>STDOUT >> %d{HH:mm:ss} %logger{36} - %msg%n</pattern>
+		</encoder>
+
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator>
+            <expression>
+              return logger.contains("jetty");
+            </expression>
+        </evaluator>
+        <onMatch>DENY</onMatch>
+        <onMismatch>ALLOW</onMismatch>
+        </filter>
+
+        <!--
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator>
+            <expression>
+              return formattedMessage.contains("ch.qos");
+            </expression>
+        </evaluator>
+        <onMatch>DENY</onMatch>
+        <onMismatch>ALLOW</onMismatch>
+        </filter>
+        -->
+
+	</appender>
+
+    <appender name="allFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+	  <file>logs/all.log</file>
+
+        <encoder>
+            <pattern>ALL: %date %logger{36} %level - %msg%n
+            </pattern>
+            <!-- [%thread] %logger{10} [%file:%line] -->
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+          <fileNamePattern>logs/all.%i.log.zip</fileNamePattern>
+          <minIndex>1</minIndex>
+          <maxIndex>10</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+          <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+
+
+	</appender>
+
+	<appender name="debugFILE" level="DEBUG" class="ch.qos.logback.core.FileAppender">
+		<file>logs/debug.log</file>
+
+		<encoder>
+			<pattern>%date  %logger{36} %level - %msg%n
+			</pattern>
+			<!-- [%thread] %logger{10} [%file:%line] -->
+		</encoder>
+
+        <!--
+        <logger name="functions.TestReadCsv" level="INFO" />
+        -->
+	</appender>
+
+	<appender name="warnFILE" level="WARN" class="ch.qos.logback.core.FileAppender">
+		<file>logs/warn.log</file>
+
+		<encoder>
+			<pattern>%date %logger{36} %level - %msg%n
+			</pattern>
+			<!-- [%thread] %logger{10} [%file:%line] -->
+		</encoder>
+
+	</appender>
+
+    <appender name="infoFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logs/info.log</file>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+            <fileNamePattern>logs/info.%i.log.zip</fileNamePattern>
+            <minIndex>1</minIndex>
+            <maxIndex>10</maxIndex>
+        </rollingPolicy>
+
+        <triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+            <maxFileSize>10MB</maxFileSize>
+        </triggeringPolicy>
+
+        <encoder>
+            <pattern>%date %logger{36} %level - %msg%n
+            </pattern>
+            <!-- [%thread] %logger{10} [%file:%line] -->
+        </encoder>
+
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    return logger.contains("jetty");
+                </expression>
+            </evaluator>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ALLOW</onMismatch>
+        </filter>
+
+
+    </appender>
+
+
+
+  <!--  <logger name="functions.TestReadCsv" level="DEBUG" />
+-->
+
+	<root level="DEBUG">
+
+
+      <appender-ref ref="allFILE" />
+
+      <appender-ref ref="infoFILE" />
+
+	  <appender-ref ref="STDOUT" />
+
+
+
+	</root>
+
+</configuration>
