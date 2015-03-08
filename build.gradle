@@ -24,8 +24,8 @@
 version = '0.15' //current project version
 
 apply plugin: 'java'
-//apply plugin: 'application'
-apply plugin: 'idea'
+apply plugin: 'application'
+//apply plugin: 'idea'
 
 sourceCompatibility = 1.8 // java version
 
@@ -183,10 +183,12 @@ task initTestDist << {
 }
 
 
-task NuBotJar(type: Jar) {
-    description 'create the jar in ' + project.file(distdir)
-    baseName = project.name
-    //baseName = jarname
+task NuBotJar(type: Jar)  {
+    description 'create the NuBotjar'
+
+    destinationDir = distdir
+    archiveName = 'NuBot.jar'
+
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -194,16 +196,18 @@ task NuBotJar(type: Jar) {
         exclude 'META-INF/*.RSA'
     }
     manifest {
-        attributes "Main-Class": mainclass //"com.nubits.nubot.launch.MainLaunch"
+        attributes "Main-Class": mainclass
     }
     //println 'generated jar: ' + jar.archivePath
     with jar
 }
 
-task NuBotJarTest(type: Jar) {
-    description 'create the jar in ' + project.file(distdir)
-    baseName = project.name
-    //baseName = jarname
+task TestNuBotJar(type: Jar)  {
+    description 'create the TestNuBotjar'
+
+    destinationDir = testdistdir
+    archiveName = 'NuBot.jar'
+
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -211,11 +215,23 @@ task NuBotJarTest(type: Jar) {
         exclude 'META-INF/*.RSA'
     }
     manifest {
-        attributes "Main-Class": mainclass //"com.nubits.nubot.launch.MainLaunch"
+        attributes "Main-Class": mainclass
     }
     //println 'generated jar: ' + jar.archivePath
     with jar
 }
+
+/*task TestNuBotJar << {
+    tasks.NuBotJar.execute()
+    copy {
+        from  tasks.NuBotJar.archivePath
+        into "${testdistdir}"
+    }
+    copy {
+        from "testconfig/poloniex.json"
+        into "${testdistdir}"
+    }
+}*/
 
 
 task NuBotDist(dependsOn: compileReadme) << {
