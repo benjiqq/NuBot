@@ -27,7 +27,7 @@ public class UiServer {
     private static String configdir = "testconfig";
 
     //TODO path
-    private static String htmlFolder = "./html/templates/";
+    private static String htmlFolder = "./UI/templates/";
 
     private static String configpath = configdir + "/" + configFile;
 

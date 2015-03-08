@@ -137,7 +137,7 @@ def includeTestConfig = true
 task compileReadme(type: Exec) {
     description 'compile the HTML readme'
     executable "sh"
-    args "-c", "/bin/bash compileReadme.sh"
+    args "-c", "cd md && /bin/bash compileall.sh"
 }
 
 
@@ -249,7 +249,7 @@ task TestDist(dependsOn: compileReadme) << {
     tasks.initTestDist.execute()
 
     tasks.NuBotJarTest.execute()
-    println 'copy for distribution'
+    println 'copy for test distribution'
     tasks.copyDistTest.execute()
 
     println "finish distribution"
@@ -259,7 +259,7 @@ task TestDist(dependsOn: compileReadme) << {
     if (includeTestConfig) {
         copy {
             from "testconfig/test.json"
-            into "${distdir}"
+            into "${testdistdir}"
         }
     }
 
@@ -295,7 +295,7 @@ task copyDist(type: Copy) << {
     html_files.each { File file ->
         println file.name
         copy {
-            from file.name
+            from "md/" + file.name
             into "${distdir}/"
         }
         delete(file)
@@ -348,7 +348,7 @@ task copyDistTest(type: Copy) << {
     html_files.each { File file ->
         println file.name
         copy {
-            from file.name
+            from "md/" + file.name
             into "${testdistdir}/"
         }
         delete(file)
@@ -386,7 +386,7 @@ task copyDistTest(type: Copy) << {
 }
 
 task cleanhtml << {
-    FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
+    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html')
 
     html_files.each { File file ->
         println 'delete ' + file.name
@@ -400,12 +400,7 @@ task cleanall << {
     delete builddir
     delete distdir
 
-    FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
-
-    html_files.each { File file ->
-        println 'delete ' + file.name
-        delete(file)
-    }
+    tasks.cleanhtml.execute()
 }
 
 /*
