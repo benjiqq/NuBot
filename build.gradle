@@ -168,11 +168,11 @@ task initTestDist << {
 
     if (testdistdir.exists()) {
         println("folder " + testdistdir + " exists. delete it")
-        delete distdir
+        delete testdistdir
     }
-    println("creating distdir")
+    println("creating testdistdir")
     if (testdistdir.mkdirs()) {
-        println("succeeded in creating " + distdir)
+        println("succeeded in creating " + testdistdir)
     }
 
     copy {
@@ -224,8 +224,8 @@ task NuBotDist(dependsOn: compileReadme) << {
     println 'start making distribution'
     tasks.initDist.execute()
 
-    println 'delete ${distdir}'
-    delete "${distdir}"
+    //println 'delete ${distdir}'
+    //delete "${distdir}"
     tasks.NuBotJar.execute()
     println 'copy for distribution'
     tasks.copyDist.execute()
@@ -248,13 +248,13 @@ task TestDist(dependsOn: compileReadme) << {
     println 'start making test distribution'
     tasks.initTestDist.execute()
 
-    println 'delete ${testdistdir}'
-    delete "${testdistdir}"
     tasks.NuBotJarTest.execute()
     println 'copy for distribution'
     tasks.copyDistTest.execute()
 
     println "finish distribution"
+
+    tasks.cleanhtml.execute()
 
     if (includeTestConfig) {
         copy {
@@ -342,7 +342,7 @@ task copyDist(type: Copy) << {
 
 
 task copyDistTest(type: Copy) << {
-    println 'copy dist'
+    println 'testdist copy'
     FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
 
     html_files.each { File file ->
@@ -385,10 +385,20 @@ task copyDistTest(type: Copy) << {
 
 }
 
-task cleanall << {
+task cleanhtml << {
+    FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
 
+    html_files.each { File file ->
+        println 'delete ' + file.name
+        delete(file)
+    }
+}
+
+task cleanall << {
+    println 'clean all'
     delete testdistdir
     delete builddir
+    delete distdir
 
     FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
 
