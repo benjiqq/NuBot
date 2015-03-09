@@ -1,0 +1,38 @@
+apply plugin: 'java'
+
+version = '0.15'
+targetCompatibility = 1.8
+
+//Get dependencies from Maven central repository
+repositories {
+    mavenCentral()
+}
+
+//Project dependencies
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'ch.qos.logback:logback-core:1.1.2'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'org.codehaus.janino:janino:2.7.8' //for filtering
+
+    //dependencies for testing
+    testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
+    testCompile group: 'junit', name: 'junit', version: '4.+'
+}
+
+//create a single Jar with all dependencies
+task fatJar(type: Jar) {
+    baseName = project.name + '-all'
+
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes 'Main-Class': 'com.nubits.nubot.utils.DateUtils'
+    }
+    with jar
+}
+
