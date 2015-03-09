@@ -17,6 +17,7 @@
  */
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.utils.CSVtools;
 import com.nubits.nubot.utils.FileSystem;
 import org.apache.commons.io.FileUtils;
 
@@ -28,20 +29,18 @@ import org.slf4j.Logger;
 
 public class Currency {
 
-//Class Variables
     private static final Logger LOG = LoggerFactory.getLogger(Currency.class.getName());
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
-    private final static String PATH_TO_CURRENCIES = FileUtils.getFile("NuBot", "res", "currencies.csv").toPath().toString();
-//Constructor
+    private final static String CURRENCY_FILE = "currencies.csv";
 
     /**
      *
      */
     public static Currency createCurrency(String code) {
         Currency toRet = null;
-        ArrayList<String[]> currencyList = FileSystem.parseCsvFromFile(PATH_TO_CURRENCIES);
+        ArrayList<String[]> currencyList = CSVtools.parseCsvFromClassPath(CURRENCY_FILE);
         boolean found = false;
         for (int j = 1; j < currencyList.size(); j++) {
             String[] tempLine = currencyList.get(j);
@@ -52,7 +51,7 @@ public class Currency {
         }
 
         if (!found) {
-            LOG.warn("Didn't find a currency with code " + code + " in lookup table " + PATH_TO_CURRENCIES
+            LOG.warn("Didn't find a currency with code " + code + " in lookup table " + CURRENCY_FILE
                     + "\nUpdate the currency file to avoid malfunctionings.");
 
             return new Currency(false, code, "");

@@ -80,7 +80,7 @@ public class TestExchangePoloniex extends TestCase {
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
-        assertTrue(delta < 2000);
+        assertTrue(delta < 5000);
 
         if (balancesResponse.isPositive()) {
             LOG.info("Positive response  from TradeInterface.getBalance() ");

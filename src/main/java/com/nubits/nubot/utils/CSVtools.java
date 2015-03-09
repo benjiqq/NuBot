@@ -11,7 +11,12 @@ public class CSVtools {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVtools.class.getName());
 
-    public static ArrayList<String[]> parseCsvFromPath(File file) {
+    public static ArrayList<String[]> parseCsvFromClassPath(String filename) {
+        File f = new File(CSVtools.class.getClassLoader().getResource(filename).getFile());
+        return parseCsvFromFile(f);
+    }
+
+    public static ArrayList<String[]> parseCsvFromFile(File file) {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";

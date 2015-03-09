@@ -18,13 +18,11 @@
 package functions;
 
 
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.CSVtools;
 import junit.framework.TestCase;
-import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.InputStream;
 import java.util.ArrayList;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -38,13 +36,16 @@ public class TestReadCsv  extends TestCase {
     @Test
     public void testReadCSV() {
         // getResourceAsStream
-        File f = new File(getClass().getClassLoader().getResource(TEST_FILE).getFile());
 
+        //File f = new File(getClass().getClassLoader().getResource(TEST_FILE).getFile());
+        //assertTrue(f!=null);
+        ArrayList<String[]> parsedCsv  = CSVtools.parseCsvFromClassPath(TEST_FILE);
+        assertTrue(parsedCsv.size() > 5);
         //InputStream is = TestReadCsv.class.getResourceAsStream(TEST_FILE);
-        assertTrue(f!=null);
 
-        /*ArrayList<String[]> parsedCsv = FileSystem.parseCsvFromPath(TEST_FILE);
-        assert(parsedCsv.size()>5);
+
+        /*ArrayList<String[]> parsedCsv = FileSystem.parseCsvFromFile(TEST_FILE);
+
         for (int j = 0; j < parsedCsv.size(); j++) {
             String[] tempLine = parsedCsv.get(j);
             String message = "Line " + j + 1 + "/" + parsedCsv.size() + " = ";
