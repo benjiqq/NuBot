@@ -8,6 +8,17 @@ repositories {
     mavenCentral()
 }
 
+//definitions
+def distdir = new File("dist")
+def testdistdir = new File("testdist")
+def builddir = new File("build")
+def logdir = new File("logs")
+def jarname = "NuBot.jar"
+def mainclass = "com.nubits.nubot.launch.MainLaunch"
+def maintestclass = "com.nubits.nubot.utils.DateUtils"
+def uiclass = "com.nubits.nubot.webui.UiServer"
+
+
 //Project dependencies
 dependencies {
     compile 'org.slf4j:slf4j-api:1.7.7'
@@ -21,8 +32,10 @@ dependencies {
 }
 
 //create a single Jar with all dependencies
-task fatJar(type: Jar) {
-    baseName = project.name + '-all'
+task NubotJar(type: Jar) {
+    //baseName = project.name
+    archiveName "NuBot.jar"
+    destinationDir = distdir //file('${distdir}')
 
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
@@ -31,8 +44,28 @@ task fatJar(type: Jar) {
         exclude 'META-INF/*.RSA'
     }
     manifest {
-        attributes 'Main-Class': 'com.nubits.nubot.utils.DateUtils'
+        attributes 'Main-Class': maintestclass
     }
     with jar
 }
+
+
+task cleanhtml << {
+    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html')
+
+    html_files.each { File file ->
+        println 'delete ' + file.name
+        delete(file)
+    }
+}
+
+task cleanall << {
+    println 'clean all'
+    delete builddir
+    delete distdir
+    delete testdistdir
+
+    tasks.cleanhtml.execute()
+}
+
 
