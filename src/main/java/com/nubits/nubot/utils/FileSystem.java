@@ -120,6 +120,42 @@ public class FileSystem {
         return fileContent.toString();
     }
 
+    //
+
+    public static ArrayList<String[]> parseCsvFromPath(String file) {
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        ArrayList<String[]> toReturn = new ArrayList<>();
+        try {
+            InputStream is = FileSystem.class.getClass().getResourceAsStream(file);
+            Reader reader = new InputStreamReader(is);
+            br = new BufferedReader(reader);
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] tempLine = line.split(cvsSplitBy);
+                toReturn.add(tempLine);
+
+            }
+
+        } catch (FileNotFoundException e) {
+            LOG.error(e.toString());
+        } catch (IOException e) {
+            LOG.error(e.toString());
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    LOG.error(e.toString());
+                }
+            }
+        }
+
+        return toReturn;
+    }
+
     public static ArrayList<String[]> parseCsvFromFile(String path) {
         BufferedReader br = null;
         String line = "";

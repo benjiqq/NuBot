@@ -24,6 +24,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
+import java.io.InputStream;
 import java.util.ArrayList;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -32,35 +33,17 @@ public class TestReadCsv  extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestReadCsv.class
             .getName());
-    private static final String TEST_FILE_PATH = "/currencies.csv";
     private static final String TEST_FILE = "currencies.csv";
-
-    @Test
-    public void testFile() {
-        // try {
-        // TestClasspathOut.addPath("/conf");
-        // } catch (Exception e) {
-        // e.printStackTrace();
-        // }
-
-        // TestClasspathOut.printCpInfo();
-
-        final File dic = FileUtils.getFile("NuBot", "res", TEST_FILE);
-        LOG.debug(dic.getAbsolutePath());
-        //assert (dic.exists());
-
-        // InputStream ins = TestReadCsv.class.getClass().
-        // getResourceAsStream(TEST_FIL);
-        // System.out.println(ins);
-    }
 
     @Test
     public void testReadCSV() {
         // getResourceAsStream
-        final File f = FileUtils.getFile("NuBot", "res", TEST_FILE);
-        
-        ArrayList<String[]> parsedCsv = FileSystem
-                .parseCsvFromFile(f.getAbsolutePath());
+        File f = new File(getClass().getClassLoader().getResource(TEST_FILE).getFile());
+
+        //InputStream is = TestReadCsv.class.getResourceAsStream(TEST_FILE);
+        assertTrue(f!=null);
+
+        /*ArrayList<String[]> parsedCsv = FileSystem.parseCsvFromPath(TEST_FILE);
         assert(parsedCsv.size()>5);
         for (int j = 0; j < parsedCsv.size(); j++) {
             String[] tempLine = parsedCsv.get(j);
@@ -72,7 +55,7 @@ public class TestReadCsv  extends TestCase {
             //assert(message.contains("USD"));
             //assert(message.contains("NBT"));
             LOG.debug(message);
-        }
+        }*/
 
     }
 }
