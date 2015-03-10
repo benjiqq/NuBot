@@ -37,6 +37,7 @@ import com.nubits.nubot.trading.TradeUtilsCCEDK;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -48,11 +49,14 @@ import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -451,13 +455,9 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override

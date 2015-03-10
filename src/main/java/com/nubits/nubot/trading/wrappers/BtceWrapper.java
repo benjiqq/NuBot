@@ -316,9 +316,10 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        if (Global.options != null) {
+
             return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
+
+        /* else {
             ApiResponse apiResponse = new ApiResponse();
 
             String strDelimiterStart = "the fee for transactions is ";
@@ -340,7 +341,7 @@ public class BtceWrapper implements TradeInterface {
             }
 
             return apiResponse;
-        }
+        }*/
     }
 
     @Override

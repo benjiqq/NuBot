@@ -27,6 +27,7 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
+
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -35,11 +36,14 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.*;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -162,7 +166,7 @@ public class ExcoinWrapper implements TradeInterface {
                 Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
                 Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
                 Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext();) {
+                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext(); ) {
                     JSONObject thisWallet = wallet.next();
                     String thisCurrency = thisWallet.get("currency").toString();
                     if (thisCurrency.equals(pair.getPaymentCurrency().getCode().toUpperCase())) {
@@ -180,7 +184,7 @@ public class ExcoinWrapper implements TradeInterface {
                 apiResponse.setResponseObject(balance);
             } else { //get specific balance
                 Amount total = new Amount(0, currency);
-                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext();) {
+                for (Iterator<JSONObject> wallet = activeWallets.iterator(); wallet.hasNext(); ) {
                     JSONObject thisWallet = wallet.next();
                     String thisCurrency = thisWallet.get("currency").toString();
                     if (thisCurrency.equals(currency.getCode().toUpperCase())) {
@@ -321,7 +325,7 @@ public class ExcoinWrapper implements TradeInterface {
 
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
-            for (Iterator<JSONObject> exchange = httpAnswerJson.iterator(); exchange.hasNext();) {
+            for (Iterator<JSONObject> exchange = httpAnswerJson.iterator(); exchange.hasNext(); ) {
                 JSONObject thisExchange = exchange.next();
                 commodity = thisExchange.get("commodity").toString();
                 currency = thisExchange.get("currency").toString();
@@ -332,11 +336,11 @@ public class ExcoinWrapper implements TradeInterface {
                     continue;
                 }
                 JSONArray _orders = (JSONArray) thisExchange.get("orders");
-                for (Iterator<JSONObject> _order = _orders.iterator(); _order.hasNext();) {
+                for (Iterator<JSONObject> _order = _orders.iterator(); _order.hasNext(); ) {
                     JSONObject thisTyp = _order.next();
                     type = thisTyp.get("type").toString();
                     JSONArray orders = (JSONArray) thisTyp.get("orders");
-                    for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+                    for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
                         JSONObject orderJson = order.next();
                         returnedPair = CurrencyPair.getCurrencyPairFromString(commodity + "_" + currency, "_");
                         Order out = parseOrder(orderJson, returnedPair, type);
@@ -437,12 +441,7 @@ public class ExcoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.15;
-        if (Global.options != null) {
-            defaultFee = Global.options.getTxFee();
-        }
-        return new ApiResponse(true, defaultFee, null);
-
+        return new ApiResponse(true, Global.options.getTxFee(), null);
     }
 
     @Override
@@ -479,7 +478,7 @@ public class ExcoinWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("trades");
-            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext(); ) {
                 tradeList.add(parseTrade(trade.next()));
             }
             apiResponse.setResponseObject(tradeList);
@@ -571,7 +570,7 @@ public class ExcoinWrapper implements TradeInterface {
 
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(id)) {
                     apiResponse.setResponseObject(true);

@@ -388,13 +388,9 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override
@@ -665,7 +661,7 @@ public class PoloniexWrapper implements TradeInterface {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestMethod("POST");
                 LOG.info("connection " + connection);
-            }catch(IOException e){
+            } catch (IOException e) {
                 LOG.error("can't connect to " + queryUrl);
             }
 

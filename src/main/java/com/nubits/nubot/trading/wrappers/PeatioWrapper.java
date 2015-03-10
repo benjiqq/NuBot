@@ -20,6 +20,7 @@ package com.nubits.nubot.trading.wrappers;
 //import com.alibaba.fastjson.JSON;
 //import com.alibaba.fastjson.JSONArray;
 //import com.alibaba.fastjson.JSONObject;
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
@@ -32,14 +33,18 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
+
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -97,11 +102,11 @@ public class PeatioWrapper implements TradeInterface {
             toReturn = getNonceInternal(requester);
         } else {
             try {
-                if (Global.options != null) {
-                    if (Global.options.isVerbose()) {
-                        LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-                    }
+
+                if (Global.options.isVerbose()) {
+                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
                 }
+
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
@@ -500,13 +505,9 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     private ApiResponse getTxFeeImpl() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override
@@ -639,11 +640,10 @@ public class PeatioWrapper implements TradeInterface {
         }
 
 
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info(currentTime + " Now apiBusy! req : " + requester);
-            }
+        if (Global.options.isVerbose()) {
+            LOG.info(currentTime + " Now apiBusy! req : " + requester);
         }
+
 
         long timeElapsedSinceLastCall = currentTime - lastSentTonce;
         if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
@@ -715,7 +715,7 @@ public class PeatioWrapper implements TradeInterface {
         if (response.isPositive()) {
             LOG.info("A maximum of 1000 trades can be returned from the Peatio API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
-            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
                 if (thisTrade.getDate().getTime() < startTime) {
                     continue;

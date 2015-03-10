@@ -24,7 +24,9 @@ import com.nubits.nubot.tasks.strategy.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
+
 import java.util.ArrayList;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -61,14 +63,14 @@ public class TaskManager {
         //setTasks();
     }
 
-    public void setNudTask(){
+    public void setNudTask() {
         checkNudTask = new BotTask(
                 new CheckNudTask(), 30, "checkNud");
         taskList.add(checkNudTask);
 
     }
 
-    private void setTasks(){
+    private void setTasks() {
         //connectivity tasks
 
         checkConnectionTask = new BotTask(
@@ -117,9 +119,9 @@ public class TaskManager {
             if (bt.getName().equals(STRATEGY_FIAT) || bt.getName().equals(STRATEGY_CRYPTO)) {
                 if (!sentNotification) {
                     String additionalInfo = "";
-                    if (Global.options != null) {
-                        additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
-                    }
+
+                    additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
+
                     //dpn't send mail here for now
                     HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
                     sentNotification = true;

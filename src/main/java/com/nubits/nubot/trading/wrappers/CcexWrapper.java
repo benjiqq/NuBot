@@ -35,6 +35,7 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -101,7 +102,6 @@ public class CcexWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-
 
 
         return apiResponse;
@@ -476,13 +476,9 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.2;
+        
+        return new ApiResponse(true, Global.options.getTxFee(), null);
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
     }
 
     @Override
@@ -786,7 +782,7 @@ public class CcexWrapper implements TradeInterface {
 
             // add header
             Header[] headers = new Header[1];
-            headers[ 0] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
+            headers[0] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
 
             URL queryUrl;
             try {
@@ -822,10 +818,10 @@ public class CcexWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                LOG.error("" +  ex);
+                LOG.error("" + ex);
                 return null;
             } catch (IllegalStateException ex) {
-                LOG.error("" +  ex);
+                LOG.error("" + ex);
                 return null;
             }
             if (Global.options
