@@ -55,15 +55,14 @@ public class TestWrappers {
 
         try {
             Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
+            System.out.println("using key: " + Global.options.getApiKey());
             WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
 
 
-
         runTests();
-        System.exit(0);
     }
 
     public static void runTests() {
