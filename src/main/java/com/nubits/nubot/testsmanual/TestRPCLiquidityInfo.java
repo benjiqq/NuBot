@@ -63,10 +63,18 @@ public class TestRPCLiquidityInfo {
 
         }
 
+        Global.publicAddress = custodian; //Global.options.getNubitsAddress();
+        Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
+                user, pass, true, true,
+                custodian, CurrencyList.NBT_BTC , "");
+
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
-        test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, CurrencyList.NBT_BTC, user, pass);
+
         test.testCheckNudTask();
+
+        /*test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, CurrencyList.NBT_BTC, user, pass);
+
         try {
             Thread.sleep(2000);
 
@@ -75,12 +83,14 @@ public class TestRPCLiquidityInfo {
         }
         //test.testGetInfo();
         //test.testIsConnected();
+
         test.testSendLiquidityInfo(buy, sell, 1);
+
         //test.testGetLiquidityInfo();
         //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
         //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
+        */
 
-        System.exit(0);
 
     }
 
@@ -136,6 +146,7 @@ public class TestRPCLiquidityInfo {
     private void testCheckNudTask() {
         //Create a TaskManager and
         Global.taskManager = new TaskManager();
+        Global.taskManager.setNudTask();
         //Start checking for connection
         Global.taskManager.getCheckNudTask().start();
 
