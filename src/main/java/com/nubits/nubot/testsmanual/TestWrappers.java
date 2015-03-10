@@ -17,7 +17,6 @@
  */
 package com.nubits.nubot.testsmanual;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyList;
@@ -42,7 +41,7 @@ public class TestWrappers {
     private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = ExchangeFacade.ALTSTRADE;
-    public static final CurrencyPair testPair = Constant.NBT_BTC;
+    public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {

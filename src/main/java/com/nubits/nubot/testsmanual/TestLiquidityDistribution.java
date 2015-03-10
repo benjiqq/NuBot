@@ -86,7 +86,7 @@ public class TestLiquidityDistribution {
         if (!exchangeName.equals("")) {
             //Setup the exchange
             execOrders = true;
-            pair = Constant.NBT_BTC;
+            pair = CurrencyList.NBT_BTC;
             try {
                 WrapperTestUtils.configExchange(exchangeName);
             } catch (NuBotConfigException e) {

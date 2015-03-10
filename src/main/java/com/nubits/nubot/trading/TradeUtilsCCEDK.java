@@ -1,7 +1,6 @@
 package com.nubits.nubot.trading;
 
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.Utils;
@@ -144,21 +143,21 @@ public class TradeUtilsCCEDK {
 
         int toRet = -1;
 
-        if (pair.equals(Constant.BTC_USD)) {
+        if (pair.equals(CurrencyList.BTC_USD)) {
             return 2;
-        } else if (pair.equals(Constant.PPC_USD)) {
+        } else if (pair.equals(CurrencyList.PPC_USD)) {
             return 14;
-        } else if (pair.equals(Constant.PPC_BTC)) {
+        } else if (pair.equals(CurrencyList.PPC_BTC)) {
             return 13;
-        } else if (pair.equals(Constant.PPC_LTC)) {
+        } else if (pair.equals(CurrencyList.PPC_LTC)) {
             return 12;
-        } else if (pair.equals(Constant.NBT_BTC)) {
+        } else if (pair.equals(CurrencyList.NBT_BTC)) {
             return 47;
-        } else if (pair.equals(Constant.NBT_PPC)) {
+        } else if (pair.equals(CurrencyList.NBT_PPC)) {
             return 48;
-        } else if (pair.equals(Constant.NBT_USD)) {
+        } else if (pair.equals(CurrencyList.NBT_USD)) {
             return 46;
-        } else if (pair.equals(Constant.NBT_EUR)) {
+        } else if (pair.equals(CurrencyList.NBT_EUR)) {
             return 49;
         } else {
             LOG.error("Pair " + pair.toString() + " not available");
@@ -184,28 +183,28 @@ public class TradeUtilsCCEDK {
 
         switch (id) {
             case 2:
-                toRet = Constant.BTC_USD;
+                toRet = CurrencyList.BTC_USD;
                 break;
             case 12:
-                toRet = Constant.PPC_LTC;
+                toRet = CurrencyList.PPC_LTC;
                 break;
             case 13:
-                toRet = Constant.PPC_BTC;
+                toRet = CurrencyList.PPC_BTC;
                 break;
             case 14:
-                toRet = Constant.PPC_USD;
+                toRet = CurrencyList.PPC_USD;
                 break;
             case 46:
-                toRet = Constant.NBT_USD;
+                toRet = CurrencyList.NBT_USD;
                 break;
             case 47:
-                toRet = Constant.NBT_BTC;
+                toRet = CurrencyList.NBT_BTC;
                 break;
             case 48:
-                toRet = Constant.NBT_PPC;
+                toRet = CurrencyList.NBT_PPC;
                 break;
             case 49:
-                toRet = Constant.NBT_EUR;
+                toRet = CurrencyList.NBT_EUR;
                 break;
             default:
                 LOG.error("Pair with id = " + id + " not available");

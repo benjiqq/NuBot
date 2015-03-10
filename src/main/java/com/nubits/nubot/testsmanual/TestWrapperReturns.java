@@ -1,12 +1,8 @@
 package com.nubits.nubot.testsmanual;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FileSystem;
@@ -30,7 +26,7 @@ public class TestWrapperReturns {
     //private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
     private static final String TEST_OPTIONS_PATH = "options.json";
     public static ArrayList<String> testExchanges = new ArrayList<>();
-    public static CurrencyPair testPair = Constant.NBT_BTC;
+    public static CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final double testNBTAmount = 1;
     public static final double sellPrice = 0.04;
     public static final double buyPrice = 0.0004;
@@ -71,9 +67,9 @@ public class TestWrapperReturns {
 
     private static void runTests() {
         if (Global.exchange.getName().equals(ExchangeFacade.EXCOIN)) {
-            testPair = Constant.BTC_NBT;
+            testPair = CurrencyList.BTC_NBT;
         } else {
-            testPair = Constant.NBT_BTC;
+            testPair = CurrencyList.NBT_BTC;
         }
         print("Testing " + Global.exchange.getName());
         clearOrders(testPair);

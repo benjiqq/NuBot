@@ -17,11 +17,11 @@ package com.nubits.nubot.testsmanual;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
@@ -42,7 +42,7 @@ public class TestFroozenAmounts {
 
         }
 
-        CurrencyPair pair = Constant.NBT_BTC;
+        CurrencyPair pair = CurrencyList.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();
         String exchangeName = ExchangeFacade.BTER;
 

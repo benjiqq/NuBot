@@ -78,12 +78,11 @@ dependencies {
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
 
     //logging problem
-    /*compile 'com.sparkjava:spark-core:2.1'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
-    compile 'com.github.spullara.mustache.java:compiler:0.9.0'*/
+    compile 'com.github.spullara.mustache.java:compiler:0.9.0'
 
     //static. no maven available
-
+    compile files('lib/spark-core-2.2-SNAPSHOT.jar')
     compile files('lib/EasyJccKit.jar')
     compile files('lib/bitcoinapi-0.1.jar')
 
@@ -148,6 +147,20 @@ task compiledocs(type: Exec) {
     executable "sh"
     args "-c", "cd md && /bin/bash compileall.sh"
 }
+
+task runUI(type: JavaExec) {
+    description 'run the WebUI'
+    main = "com.nubits.nubot.webui.UiServer"
+    classpath = sourceSets.main.runtimeClasspath
+
+    //store the output instead of printing to the console:
+    /*standardOutput = new ByteArrayOutputStream()
+    //obtain the output:
+    ext.output = {
+        return standardOutput.toStringSep()
+    }*/
+}
+
 
 task cleanhtml << {
     FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html')

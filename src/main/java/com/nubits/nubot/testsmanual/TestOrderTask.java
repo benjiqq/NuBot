@@ -20,10 +20,9 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.global.Passwords;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -92,7 +91,7 @@ public class TestOrderTask {
 
         LOG.info("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
         Global.rpcClient = new NuRPCClient(nudip, nudport, PasswordsTest.NUD_RPC_USER,
-                PasswordsTest.NUD_RPC_PASS, true, true, Global.publicAddress, Constant.NBT_PPC, "testid");
+                PasswordsTest.NUD_RPC_PASS, true, true, Global.publicAddress, CurrencyList.NBT_PPC, "testid");
 
         Utils.printSeparator();
 

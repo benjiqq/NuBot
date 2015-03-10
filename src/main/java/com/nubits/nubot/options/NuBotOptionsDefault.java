@@ -1,6 +1,6 @@
 package com.nubits.nubot.options;
 
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.notifications.MailNotifications;
 
 /**
@@ -32,7 +32,7 @@ public class NuBotOptionsDefault {
         opt.keepProceeds = 0.0;
         opt.distributeLiquidity = false;
         opt.secondarypeg = false;
-        opt.pair = Constant.NBT_USD;
+        opt.pair = CurrencyList.NBT_USD;
         opt.verbose = false;
         opt.sendHipchat = true;
         opt.multipleCustodians = false;

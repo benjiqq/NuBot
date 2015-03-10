@@ -11,6 +11,11 @@ public class CSVtools {
 
     private static final Logger LOG = LoggerFactory.getLogger(CSVtools.class.getName());
 
+    /**
+     * parse csv from a file that is on the classpath
+     * @param filename
+     * @return
+     */
     public static ArrayList<String[]> parseCsvFromClassPath(String filename) {
         File f = new File(CSVtools.class.getClassLoader().getResource(filename).getFile());
         return parseCsvFromFile(f);

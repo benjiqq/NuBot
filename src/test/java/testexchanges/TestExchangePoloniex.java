@@ -110,7 +110,7 @@ public class TestExchangePoloniex extends TestCase {
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);
 
-        CurrencyPair testPair = Constant.NBT_BTC;
+        CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         Currency btc = CurrencyList.BTC;
 
