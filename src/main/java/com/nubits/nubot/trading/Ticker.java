@@ -20,11 +20,9 @@ package com.nubits.nubot.trading;
 
 public class Ticker {
 
-//Class Variables
     private double last;
     private double ask;
     private double bid;
-    //Constructor
 
     /**
      *

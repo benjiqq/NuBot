@@ -42,7 +42,7 @@ public class ExchangeLiveData {
     private double NBTonsell;
     private double NBTonbuy;
 
-    //Constructor
+
     public ExchangeLiveData() {
     }
 

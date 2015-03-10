@@ -29,7 +29,7 @@ public class ApiKeys {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiKeys.class.getName());
     public static final String VALID_KEYS = "These keys are valid! Save them to complete the setup";
-//Class Variables
+
     private String secretKey, apiKey;
 
 //Constructor (private) use the static method loadKeysFromFile instead

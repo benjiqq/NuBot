@@ -70,7 +70,7 @@ public class Feeds {
             try {
                 String classname = basepackage + feedlclasses[i];
                 Class<?> feedclass = Class.forName(classname);
-                //Constructor<?> feed = feedclass.getConstructor(String.class);
+                <?> feed = feedclass.getConstructor(String.class);
                 //Object object = feed.newInstance(new Object[]{});
                 Object obj = feedclass.newInstance();
                 AbstractPriceFeed f = (AbstractPriceFeed) obj;

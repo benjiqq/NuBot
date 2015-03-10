@@ -59,7 +59,7 @@ public class NuRPCClient {
     private String exchangeName;
     private CurrencyPair pair;
 
-    //Constructor
+
     public NuRPCClient(String ip, int port, String rpcUser, String rpcPass, boolean verbose, boolean useIdentifier, String custodianPublicAddress, CurrencyPair pair, String exchangeName) {
         this.ip = ip;
         this.port = port;

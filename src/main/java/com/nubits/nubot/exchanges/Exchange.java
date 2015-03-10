@@ -32,7 +32,7 @@ import java.util.HashMap;
  */
 public class Exchange {
 
-    //Class Variables
+
     //Persisted
     private static final Logger LOG = LoggerFactory.getLogger(Exchange.class.getName());
     private String name; //Name of the exchange

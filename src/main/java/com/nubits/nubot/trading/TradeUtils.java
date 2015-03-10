@@ -168,10 +168,9 @@ public class TradeUtils {
 
         return toRet;
     }
-    //Build the query string given a set of query parameters
 
     /**
-     *
+     * Build the query string given a set of query parameters
      * @param args
      * @param encoding
      * @return

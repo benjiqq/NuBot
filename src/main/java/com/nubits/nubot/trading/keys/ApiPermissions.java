@@ -23,7 +23,6 @@ package com.nubits.nubot.trading.keys;
  */
 public class ApiPermissions {
 
-//Class Variables
     private boolean valid_keys;
     private boolean deposit;
     private boolean get_info;
@@ -31,7 +30,7 @@ public class ApiPermissions {
     private boolean trade;
     private boolean withdraw;
 
-//Constructor
+
     public ApiPermissions() {
     }
 
