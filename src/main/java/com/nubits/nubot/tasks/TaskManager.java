@@ -20,7 +20,7 @@ package com.nubits.nubot.tasks;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
-import com.nubits.nubot.tasks.strategy.NuPriceMonitorTask;
+import com.nubits.nubot.tasks.strategy.PriceMonitorTask;
 import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
 import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
@@ -60,11 +60,11 @@ public class TaskManager {
         //assign default values just for testing without Global.options loaded
         //TODO naming mixed
 
-        //setTasks();
+        setTasks();
     }
 
     public void setNudTask() {
-        checkNudTask = new BotTask(
+        this.checkNudTask = new BotTask(
                 new CheckNudTask(), 30, "checkNud");
         taskList.add(checkNudTask);
 
@@ -95,7 +95,7 @@ public class TaskManager {
         taskList.add(secondaryPegTask);
 
         priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
+                new PriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
         initialized = true;
@@ -175,7 +175,7 @@ public class TaskManager {
     }
 
     public BotTask getCheckConnectionTask() {
-        return checkConnectionTask;
+        return this.checkConnectionTask;
     }
 
     public void setCheckConnectionTask(BotTask checkConnectionTask) {

@@ -23,6 +23,9 @@ public abstract class MonitorTask extends TimerTask {
 
     protected int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
 
+    public MonitorTask(){
+
+    }
     /**
      * threshold for signaling a deviation of prices
      */

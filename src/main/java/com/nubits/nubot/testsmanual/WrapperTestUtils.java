@@ -313,7 +313,8 @@ public class WrapperTestUtils {
         //Create a TaskManager
         Global.taskManager = new TaskManager();
         //Start checking for connection
-        Global.taskManager.getCheckConnectionTask().start();
+        Global.taskManager.setNudTask();
+        Global.taskManager.getCheckNudTask().start();
 
 
         //Wait a couple of seconds for the connectionThread to get live

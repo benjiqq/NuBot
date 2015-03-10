@@ -31,9 +31,9 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
-public class NuPriceMonitorTask extends MonitorTask {
+public class PriceMonitorTask extends MonitorTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitorTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTask.class.getName());
 
     private LastPrice lastPrice;
 
@@ -47,6 +47,10 @@ public class NuPriceMonitorTask extends MonitorTask {
     private boolean sendEmails;
     private boolean isFirstEmail = true;
     private String emailHistory = "";
+
+    /*public PriceMonitorTask(double distanceTreshhold){
+
+    }*/
 
     @Override
     public void run() {
@@ -76,22 +80,21 @@ public class NuPriceMonitorTask extends MonitorTask {
             } else {
                 //mainPrice is not reliable compared to the others
                 //Check if other backup prices are close enough to each other
-                boolean foundSomeValiBackUp = false;
+                boolean foundSomeValidBackUp = false;
                 LastPrice goodPrice = null;
                 for (int l = 1; l < priceList.size(); l++) {
                     if (sanityCheck(priceList, l)) {
                         goodPrice = priceList.get(l);
-                        foundSomeValiBackUp = true;
+                        foundSomeValidBackUp = true;
                         break;
                     }
                 }
 
-                if (foundSomeValiBackUp) {
+                if (foundSomeValidBackUp) {
                     //goodPrice is a valid price backup!
                     this.updateLastPrice(goodPrice);
                     tryMoveWalls();
                 } else {
-
                     //None of the source are in accord with others.
                     //send a notification
                     notifyDeviation(priceList);
@@ -104,10 +107,6 @@ public class NuPriceMonitorTask extends MonitorTask {
 
     public void setPriceFeedManager(PriceFeedManager pfm) {
         this.pfm = pfm;
-    }
-
-    public double getDistanceTreshold() {
-        return distanceTreshold;
     }
 
     public void setDistanceTreshold(double distanceTreshold) {
