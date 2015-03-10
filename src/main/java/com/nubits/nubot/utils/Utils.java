@@ -369,8 +369,12 @@ public class Utils {
         return Global.settings.getProperty("version");
     }
 
+    /**
+     * Install a trust manager that does not validate certificate chains for https calls
+     * @throws Exception
+     */
     private static void installTrustAllManager() throws Exception {
-        // Install a trust manager that does not validate certificate chains for https calls
+
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {

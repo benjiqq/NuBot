@@ -38,7 +38,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
+    private static final String TEST_OPTIONS_PATH = "testconfig/poloniex.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = ExchangeFacade.POLONIEX;
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
@@ -52,10 +52,9 @@ public class TestWrappers {
 
         }
         init();
-        String[] inputs = new String[1];
-        inputs[0] = TEST_OPTIONS_PATH;
+
         try {
-            Global.options = ParseOptions.parseOptions(inputs);
+            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
             WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());

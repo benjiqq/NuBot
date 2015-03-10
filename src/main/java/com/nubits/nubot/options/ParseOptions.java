@@ -33,13 +33,13 @@ public class ParseOptions {
      * @return
      * @throws NuBotConfigException
      */
-    public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigException {
+    /*public static NuBotOptions parseOptions(String[] paths) throws NuBotConfigException {
         ArrayList<String> filePaths = new ArrayList();
         filePaths.addAll(Arrays.asList(paths));
         JSONObject inputJSON = parseFiles(filePaths);
         JSONObject optionsJSON = (JSONObject) inputJSON.get("options");
         return parseOptionsFromJson(optionsJSON);
-    }
+    }*/
 
     /**
      * parse single JSON file to NuBoptions
