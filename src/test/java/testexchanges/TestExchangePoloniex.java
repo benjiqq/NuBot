@@ -1,22 +1,10 @@
 package testexchanges;
 
-import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.models.*;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * test Poloniex exchange
@@ -34,7 +22,7 @@ public class TestExchangePoloniex extends TestCase {
 
     @Test
     public void testLoadConfig() {
-        System.out.println("test load config");
+        /*System.out.println("test load config");
 
         boolean catched = false;
 
@@ -50,13 +38,13 @@ public class TestExchangePoloniex extends TestCase {
             catched = true;
         }
 
-        assertTrue(!catched);
+        assertTrue(!catched);*/
     }
 
 
     @Test
     public void testGetBalance() {
-        System.out.println("get balance");
+        /*System.out.println("get balance");
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -101,12 +89,12 @@ public class TestExchangePoloniex extends TestCase {
 
         } else {
             assertTrue(false);
-        }
+        }*/
     }
 
     @Test
     public void testMakeOrder() {
-        NuBotOptions opt = null;
+       /* NuBotOptions opt = null;
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
@@ -181,7 +169,7 @@ public class TestExchangePoloniex extends TestCase {
         ArrayList<Order> orderList2 = (ArrayList<Order>) o2;
 
         assertTrue(orderList2.size() == 0);
-
+*/
     }
 }
 

@@ -41,7 +41,7 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = ExchangeFacade.POLONIEX;
+    public static final String testExchange = ExchangeFacade.ALTSTRADE;
     public static final CurrencyPair testPair = Constant.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
@@ -50,7 +50,7 @@ public class TestWrappers {
         try{
             Utils.loadProperties("settings.properties");
         }catch(IOException e){
-
+            LOG.error(e.toString());
         }
         init();
         String[] inputs = new String[1];
@@ -62,8 +62,6 @@ public class TestWrappers {
             LOG.error(ex.toString());
         }
 
-
-
         runTests();
         System.exit(0);
     }
@@ -74,8 +72,8 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
 
-        //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testGetAvailableBalance(testCurrency);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
@@ -84,7 +82,7 @@ public class TestWrappers {
         //WrapperTestUtils.testBuy(0.003, 0.0000120, Constant.NBT_BTC);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("1139", Constant.NBT_BTC);
-        WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
+        //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
         //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
         //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
