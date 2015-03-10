@@ -17,9 +17,8 @@
  */
 package com.nubits.nubot.bot;
 
-import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
-import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
+import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

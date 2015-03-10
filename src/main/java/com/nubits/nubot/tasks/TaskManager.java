@@ -20,10 +20,8 @@ package com.nubits.nubot.tasks;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTask;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
-import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
+import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
+import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 
 import java.util.ArrayList;
 

@@ -1,8 +1,9 @@
-package com.nubits.nubot.tasks.strategy;
+package com.nubits.nubot.strategy;
 
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.trading.OrderException;
@@ -11,10 +12,16 @@ import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+
 public class BotUtil {
 
     private static final Logger LOG = LoggerFactory.getLogger(BotUtil.class.getName());
 
+    /**
+     * clear all orders
+     * @throws OrderException
+     */
     public static void clearOrders() throws OrderException {
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
         if (deleteOrdersResponse.isPositive()) {
@@ -57,5 +64,26 @@ public class BotUtil {
             LOG.error(message);
             throw new OrderException(message);
         }
+    }
+
+    public static int countActiveOrders(String type) {
+        //Get active orders
+        int toRet = 0;
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                if (tempOrder.getType().equalsIgnoreCase(type)) {
+                    toRet++;
+                }
+            }
+
+        } else {
+            LOG.error(activeOrdersResponse.getError().toString());
+            return -1;
+        }
+        return toRet;
     }
 }

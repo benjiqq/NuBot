@@ -1,4 +1,4 @@
-package com.nubits.nubot.tasks.strategy;
+package com.nubits.nubot.tasks;
 
 
 public class FeedPriceException extends Exception {
