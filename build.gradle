@@ -21,105 +21,100 @@
 * see gradle.md for details on usage
 */
 
-version = '0.15' //current project version
-
 apply plugin: 'java'
 apply plugin: 'application'
-apply plugin: 'idea'
 
+version = '0.15'
+targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
 
-
+//Get dependencies from Maven central repository
 repositories {
-    maven { url "http://mvnrepository.com/artifact" }
     mavenCentral()
-    /*flatDir {
-        dirs 'NuBot/lib'
-    }*/
+    maven { url "http://mvnrepository.com/artifact" }
 }
 
+//definitions
+def distdir = new File("dist")
+def testdistdir = new File("testdist")
+def builddir = new File("build")
+def logdir = new File("logs")
+def jarname = "NuBot.jar"
+def mainclass = "com.nubits.nubot.launch.MainLaunch"
+def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
+def uiclass = "com.nubits.nubot.webui.UiServer"
+
+
+//Project dependencies
 dependencies {
 
-    compile 'commons-codec:commons-codec:1.7'
-    compile 'commons-io:commons-io:2.4'
-    compile 'commons-net:commons-net:3.3' //note: 3.3., instead of 1.2.0
+    //logging
+    compile 'org.slf4j:slf4j-api:1.7.7'
+    compile 'ch.qos.logback:logback-core:1.1.2'
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    compile 'org.codehaus.janino:janino:2.7.8' //for filtering
+
     compile 'com.alibaba:fastjson:1.1.36'
     compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-    compile 'com.sun.mail:mailapi:1.5.2'
-    compile 'javax.mail:mail:1.4.4' //replaces mail.jar
+
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'org.codeartisans:org.json:20131017'
-    compile 'commons-logging:commons-logging:1.2'
-    compile 'com.sun.mail:smtp:1.5.2'
 
-    //new
-    compile 'io.evanwong.oss:hipchat-java:0.2.0'
-    compile 'org.zeromq:jeromq:0.3.4'
-    compile 'org.slf4j:slf4j-api:1.7.7'
-    compile 'ch.qos.logback:logback-core:1.1.2'
-    compile 'ch.qos.logback:logback-classic:1.1.2'
+    //compile 'commons-logging:commons-logging:1.2'
+    compile 'commons-codec:commons-codec:1.7'
+    compile 'commons-io:commons-io:2.4'
+    compile 'commons-net:commons-net:3.3'
+
+    compile 'com.sun.mail:mailapi:1.5.2'
+    compile 'javax.mail:mail:1.4.4' //replaces mail.jar
+    compile 'com.sun.mail:smtp:1.5.2'
+    compile 'io.evanwong.oss:hipchat-java:0.3.0'
 
     //webUI
     compile "javax.servlet:servlet-api:2.5"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
-    compile 'com.sparkjava:spark-core:2.1'
+
+    //logging problem
+    /*compile 'com.sparkjava:spark-core:2.1'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
-    compile 'com.github.spullara.mustache.java:compiler:0.9.0'
+    compile 'com.github.spullara.mustache.java:compiler:0.9.0'*/
 
     //static. no maven available
-    compile files('NuBot/lib/EasyJccKit.jar') // lib: EasyJccKit.jar
+
+    compile files('lib/EasyJccKit.jar')
+    compile files('lib/bitcoinapi-0.1.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
     testCompile group: 'junit', name: 'junit', version: '4.+'
 
-    //not used?
-    // compile 'com.fasterxml.jackson.core:jackson-annotations:2.5.1'
-    // compile 'com.fasterxml.jackson.core:jackson-databind:2.5.1'
-
-    //currently not in use
-    //compile group: 'commons-collections', name: 'commons-collections', version: '3.2'
-    //compile 'org.eclipse.jetty.websocket:javax-websocket-server-impl:9.3.0.M1'
-    //compile 'org.eclipse.jetty.websocket:javax-websocket-client-impl:9.3.0.M1'
-    //compile 'org.eclipse.jetty.websocket:websocket-server:9.3.0.M1'
-    //compile 'javax.websocket:javax.websocket-api:1.1'
-
+    //compile 'org.zeromq:jeromq:0.3.4'
 }
 
 
-sourceSets {
+//use standard sourcesets, otherwise they can be defined like this
+/*sourceSets {
     main {
         java {
             srcDir 'NuBot/src'
         }
         resources {
             srcDir 'NuBot/res'
-            //include '**/*.example'
-            //exclude '**/*.DS_Store'
         }
     }
 
     test {
         java {
-            srcDir 'NuBot/src/com/nubits/nubot/tests'
+            srcDir 'NuBot/tests'
         }
         resources {
             srcDir 'NuBot/res'
         }
     }
-}
-
-compileJava {
-    //enable compilation in a separate daemon process
-    options.fork = true
-
-    //enable incremental compilation
-    options.incremental = true
-}
-
+}*/
 
 test {
     reports {
@@ -128,160 +123,48 @@ test {
     }
 }
 
-//definitions
-def distdir = new File("dist-packaged")
-def logdir = new File("logs")
-def jarname = "NuBot.jar"
-def mainclass = "com.nubits.nubot.launch.NuBot"
-def uiclass = "com.nubits.nubot.webui.UiServer"
 
-def includeTestConfig = true
+//create a single Jar with all dependencies
+task NubotJar(type: Jar) {
+    //baseName = project.name
+    archiveName "NuBot.jar"
+    destinationDir = distdir //file('${distdir}')
 
-
-task compileReadme(type: Exec) {
-    description 'compile the HTML readme'
-    executable "sh"
-    args "-c", "/bin/bash compileReadme.sh"
-}
-
-
-task initDist << {
-    description 'init for build'
-    println "init distribution"
-
-    if (!distdir.exists()) {
-        println("creating distdir")
-
-        if (distdir.mkdirs()) {
-            println("succeeded in creating " + distdir)
-        }
-    } else {
-        println("folder " + distdir + " exists. delete it")
-        delete distdir
-        if (distdir.mkdirs()) {
-            println("succeeded in creating " + distdir)
-        }
-    }
-
-    copy {
-        from "NuBot/src/settings.properties"
-        into "NuBot/res/"
-    }
-
-}
-
-
-task NuBotJar(type: Jar) {
-    description 'create the jar in ' + project.file(distdir)
-    archiveName = jarname
-    destinationDir project.file(distdir)
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
         exclude 'META-INF/*.DSA'
         exclude 'META-INF/*.RSA'
     }
-    with jar
-
-    manifest.attributes("Main-Class": mainclass)
-    //manifest.attributes("Main-Class": uiclass)
-
-    //println 'jar created: ' + archivePath
-}
-
-
-task NuBotMakeDistribution(dependsOn: compileReadme) << {
-    description 'make NuBot distribution folder'
-
-    println 'start making distribution'
-    tasks.initDist.execute()
-
-    println 'delete ${distdir}'
-    delete "${distdir}"
-    tasks.NuBotJar.execute()
-    println 'copy for distribution'
-    tasks.copyDist.execute()
-
-
-    println "finish distribution"
-
-    if (includeTestConfig) {
-        copy {
-            from "testconfig/test.json"
-            into "${distdir}"
-        }
+    manifest {
+        attributes 'Main-Class': maintestclass
     }
+    with jar
 }
 
 
-task runCollector(type: JavaExec) {
-    description 'run the collector service on a server'
-    main = "com.nubits.nuservice.CollectService"
-    classpath = sourceSets.main.runtimeClasspath
+task compiledocs(type: Exec) {
+    description 'compile the HTML documents'
+    executable "sh"
+    args "-c", "cd md && /bin/bash compileall.sh"
 }
 
-task runUI(type: JavaExec) {
-    description 'run the WebUI'
-    main = "com.nubits.nubot.webui.UiServer"
-    classpath = sourceSets.main.runtimeClasspath
-
-    //store the output instead of printing to the console:
-    /*standardOutput = new ByteArrayOutputStream()
-    //obtain the output:
-    ext.output = {
-        return standardOutput.toString()
-    }*/
-}
-
-
-task copyDist << {
-    println 'copy dist'
-    FileCollection html_files = files('readme.html', 'setup.html', 'feeds.html', 'changelog.html')
+task cleanhtml << {
+    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html')
 
     html_files.each { File file ->
-        println file.name
-        copy {
-            from file.name
-            into "${distdir}/"
-        }
+        println 'delete ' + file.name
         delete(file)
     }
-
-    if (!logdir.exists()) {
-        println("creating logdir")
-
-        if (logdir.mkdirs()) {
-            println("succeeded in creating " + logdir)
-        }
-    }
-
-    copy {
-        from "Nubot/res/options/sample-config"
-        into "${distdir}/sample-config"
-    }
-
-    copy {
-        from "NuBot/src"
-        into "${distdir}/res/sources"
-    }
-
-    copy {
-        from "NuBot/res/logs_assets"
-        into "${distdir}/res/logs_assets"
-    }
-
-    copy {
-        from "NuBot/res/currencies.csv"
-        into "${distdir}/res"
-    }
-
-    copy {
-        from "NuBot/res/ssl"
-        into "${distdir}/res/ssl"
-        exclude 'listCertificates.sh'
-    }
-
-
-    delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
-
 }
+
+task cleanall << {
+    println 'clean all'
+    delete builddir
+    delete distdir
+    delete testdistdir
+
+    tasks.cleanhtml.execute()
+}
+
+
