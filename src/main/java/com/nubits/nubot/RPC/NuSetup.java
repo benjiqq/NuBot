@@ -4,9 +4,7 @@ import com.nubits.nubot.bot.Global;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/**
- *
- */
+
 public class NuSetup {
 
     final static Logger LOG = LoggerFactory.getLogger(NuSetup.class);

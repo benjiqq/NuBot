@@ -30,9 +30,7 @@ import java.util.Date;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- */
+
 public class NuPriceMonitorTask extends MonitorTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitorTask.class.getName());

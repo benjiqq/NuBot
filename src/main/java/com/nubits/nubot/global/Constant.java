@@ -22,9 +22,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- */
+
 public class Constant {
 
     private static final Logger LOG = LoggerFactory.getLogger(Constant.class.getName());

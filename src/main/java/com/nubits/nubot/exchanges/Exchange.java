@@ -27,9 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-/**
- *
- */
+
 public class Exchange {
 
 
@@ -45,13 +43,6 @@ public class Exchange {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
     }
-
-    /*public Exchange(NuBotOptions opt) {
-        this.name = name;
-        this.exchangeLiveData = new ExchangeLiveData();
-        ApiKeys keys = new ApiKeys(opt.getApiSecret(), opt.getApiKey());
-    }*/
-
 
     public String getName() {
         return name;
