@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 
 /**
- * @author desrever < desrever@nubits.com >
+ *
  */
 public class Exchange {
 

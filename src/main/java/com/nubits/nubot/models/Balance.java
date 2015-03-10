@@ -19,7 +19,7 @@ package com.nubits.nubot.models;
 
 /**
  *
- * @author desrever < desrever@nubits.com >
+ *
  */
 public class Balance {
 

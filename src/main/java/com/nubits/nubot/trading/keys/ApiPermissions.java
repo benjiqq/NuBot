@@ -19,7 +19,7 @@ package com.nubits.nubot.trading.keys;
 
 /**
  *
- * @author desrever < desrever@nubits.com >
+ *
  */
 public class ApiPermissions {
 

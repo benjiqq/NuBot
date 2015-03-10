@@ -64,7 +64,7 @@ import org.apache.commons.io.FileUtils;
 
 /**
  *
- * @author desrever < desrever@nubits.com >
+ *
  */
 public class Utils {
 
