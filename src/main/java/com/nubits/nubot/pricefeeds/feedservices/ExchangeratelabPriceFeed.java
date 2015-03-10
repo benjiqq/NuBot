@@ -15,35 +15,36 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeeds;
+package com.nubits.nubot.pricefeeds.feedservices;
 
+
+import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.trading.TradeUtilsCCEDK;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
 
-public class CcedkPriceFeed extends AbstractPriceFeed {
+    private static final Logger LOG = LoggerFactory.getLogger(ExchangeratelabPriceFeed.class.getName());
+    public static final String name = "exchangeratelab";
 
-    private static final Logger LOG = LoggerFactory.getLogger(CcedkPriceFeed.class.getName());
-    public static final String name = "ccedk";
-
-    public CcedkPriceFeed() {
-        refreshMinTime = 50 * 1000; //one minutee
+    public ExchangeratelabPriceFeed() {
+        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
-        String url = TradeUtilsCCEDK.getCCEDKTickerUrl(pair);
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url, true);
@@ -53,16 +54,34 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
             }
             JSONParser parser = new JSONParser();
             try {
-                //{"errors":false,"response":{"entity":{"pair_id":"2","min":"510","max":"510","avg":"510","vol":"0.0130249"}}}
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("response");
-                JSONObject entityObject = (JSONObject) tickerObject.get("entity");
+                JSONArray array = (JSONArray) httpAnswerJson.get("rates");
 
-                double last = Double.valueOf((String) entityObject.get("avg"));
+                String lookingfor = pair.getOrderCurrency().getCode().toUpperCase();
+
+                boolean found = false;
+                double rate = -1;
+                for (int i = 0; i < array.size(); i++) {
+                    JSONObject temp = (JSONObject) array.get(i);
+                    String tempCurrency = (String) temp.get("to");
+                    if (tempCurrency.equalsIgnoreCase(lookingfor)) {
+                        found = true;
+                        rate = Utils.getDouble((Double) temp.get("rate"));
+                        rate = Utils.round(1 / rate, 8);
+                    }
+                }
 
                 lastRequest = System.currentTimeMillis();
-                lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
-                return lastPrice;
+
+                if (found) {
+
+                    lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(rate, pair.getPaymentCurrency()));
+                    return lastPrice;
+                } else {
+                    LOG.warn("Cannot find currency " + lookingfor + " on feed " + name);
+                    return new LastPrice(true, name, pair.getOrderCurrency(), null);
+                }
+
             } catch (Exception ex) {
                 LOG.error(ex.toString());
                 lastRequest = System.currentTimeMillis();
@@ -73,6 +92,9 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+    }
 
+    private String getUrl(CurrencyPair pair) {
+        return "http://api.exchangeratelab.com/api/current?apikey=" + Passwords.EXCHANGE_RATE_LAB;
     }
 }

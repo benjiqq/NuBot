@@ -1,8 +1,8 @@
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
-import com.nubits.nubot.pricefeeds.Feeds;
+import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -32,8 +32,8 @@ public class TestPriceFeedsAll extends TestCase {
     public void testAll() {
 
         CurrencyPair testPair = CurrencyList.BTC_USD;
-        Feeds.initValidFeeds();
-        ArrayList<AbstractPriceFeed> allfeeds = Feeds.getAllExistingFeeds();
+        FeedFacade.initValidFeeds();
+        ArrayList<AbstractPriceFeed> allfeeds = FeedFacade.getAllExistingFeeds();
 
         int fn = allfeeds.size();
 

@@ -135,7 +135,7 @@ task NubotJar(type: Jar) {
         exclude 'META-INF/*.RSA'
     }
     manifest {
-        attributes 'Main-Class': maintestclass
+        attributes 'Main-Class': mainclass
     }
     with jar
 }

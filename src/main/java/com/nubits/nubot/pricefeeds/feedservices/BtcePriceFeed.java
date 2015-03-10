@@ -15,7 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeeds;
+package com.nubits.nubot.pricefeeds.feedservices;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -28,15 +28,13 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
 
-public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
+public class BtcePriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
-    public static final String name = "coinmarketcap_no";
+    private static final Logger LOG = LoggerFactory.getLogger(BtcePriceFeed.class.getName());
+    public static final String name = "btce";
+    public BtcePriceFeed() {
 
-    public CoinmarketcapnorthpolePriceFeed() {
-
-        refreshMinTime = 50 * 1000;
-        lastRequest = 0L;
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
@@ -45,9 +43,10 @@ public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
+            String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(getUrl(pair), true);
+                htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
                 LOG.error(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
@@ -55,11 +54,14 @@ public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Utils.getDouble(httpAnswerJson.get("price"));
+                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("ticker");
+                double last = Utils.getDouble(tickerObject.get("last"));
+
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
             } catch (Exception ex) {
+                LOG.error(htmlString);
                 LOG.error(ex.toString());
                 lastRequest = System.currentTimeMillis();
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
@@ -69,13 +71,9 @@ public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-
-
     }
 
     private String getUrl(CurrencyPair pair) {
-        //controls
-        String currency = pair.getOrderCurrency().getCode().toLowerCase();
-        return "http://coinmarketcap.northpole.ro/api/" + currency + ".json";
+        return "https://btc-e.com/api/2/" + (pair.toStringSep()).toLowerCase() + "/ticker/";
     }
 }

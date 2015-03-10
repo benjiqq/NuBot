@@ -1,6 +1,7 @@
 package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.pricefeeds.feedservices.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -9,7 +10,7 @@ import java.util.Iterator;
 /**
  * all feeds
  */
-public class Feeds {
+public class FeedFacade {
 
     private final static String basepackage = "com.nubits.nubot.pricefeeds.";
 

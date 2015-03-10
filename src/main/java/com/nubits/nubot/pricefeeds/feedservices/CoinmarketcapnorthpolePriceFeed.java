@@ -15,8 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeeds;
-
+package com.nubits.nubot.pricefeeds.feedservices;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -28,24 +27,27 @@ import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GoogleUnofficialPriceFeed.class.getName());
-    public static final String name = "google-unofficial";
+public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
 
-    public GoogleUnofficialPriceFeed() {
-        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
+    private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
+    public static final String name = "coinmarketcap_no";
+
+    public CoinmarketcapnorthpolePriceFeed() {
+
+        refreshMinTime = 50 * 1000;
+        lastRequest = 0L;
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
+
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = getUrl(pair);
             String htmlString;
             try {
-                htmlString = Utils.getHTML(url, true);
+                htmlString = Utils.getHTML(getUrl(pair), true);
             } catch (IOException ex) {
                 LOG.error(ex.toString());
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
@@ -53,8 +55,7 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Utils.getDouble((Double) httpAnswerJson.get("rate"));
-                last = Utils.round(last, 8);
+                double last = Utils.getDouble(httpAnswerJson.get("price"));
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                 return lastPrice;
@@ -68,11 +69,13 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+
+
     }
 
     private String getUrl(CurrencyPair pair) {
-        String from = pair.getOrderCurrency().getCode().toUpperCase();
-        String to = pair.getPaymentCurrency().getCode().toUpperCase();
-        return "http://rate-exchange.appspot.com/currency?from=" + from + "&to=" + to;
+        //controls
+        String currency = pair.getOrderCurrency().getCode().toLowerCase();
+        return "http://coinmarketcap.northpole.ro/api/" + currency + ".json";
     }
 }

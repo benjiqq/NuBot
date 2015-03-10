@@ -15,7 +15,8 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeeds;
+package com.nubits.nubot.pricefeeds.feedservices;
+
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -27,14 +28,13 @@ import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
+public class BitfinexPriceFeed extends AbstractPriceFeed {
 
-public class CoinbasePriceFeed extends AbstractPriceFeed {
+    private static final Logger LOG = LoggerFactory.getLogger(BitfinexPriceFeed.class.getName());
+    public static final String name = "bitfinex";
+    public BitfinexPriceFeed() {
 
-    private static final Logger LOG = LoggerFactory.getLogger(CoinbasePriceFeed.class.getName());
-    public static final String name = "coinbase";
-
-    public CoinbasePriceFeed() {
-        refreshMinTime = 50 * 1000; //one minutee
+        refreshMinTime = 58 * 1000; //8 hours
     }
 
     @Override
@@ -42,7 +42,7 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = getUrl(pair);
+            String url = "https://api.bitfinex.com/v1/pubticker/btcusd";
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url, true);
@@ -53,7 +53,10 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Double.valueOf((String) httpAnswerJson.get("amount"));
+                double last = Double.valueOf((String) httpAnswerJson.get("last_price"));
+
+                //Make the average between buy and sell
+                last = Utils.round(last, 8);
 
 
                 lastRequest = System.currentTimeMillis();
@@ -69,9 +72,5 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
-    }
-
-    private String getUrl(CurrencyPair pair) {
-        return "https://coinbase.com/api/v1/prices/spot_rate?currency=" + pair.getPaymentCurrency().getCode().toUpperCase();
     }
 }

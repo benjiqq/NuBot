@@ -15,8 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeeds;
-
+package com.nubits.nubot.pricefeeds.feedservices;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
@@ -28,14 +27,14 @@ import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class YahooPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = LoggerFactory.getLogger(YahooPriceFeed.class.getName());
-    public static final String name = "yahoo";
+public class CoinbasePriceFeed extends AbstractPriceFeed {
 
-    public YahooPriceFeed() {
+    private static final Logger LOG = LoggerFactory.getLogger(CoinbasePriceFeed.class.getName());
+    public static final String name = "coinbase";
 
-        refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
+    public CoinbasePriceFeed() {
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
@@ -54,11 +53,8 @@ public class YahooPriceFeed extends AbstractPriceFeed {
             JSONParser parser = new JSONParser();
             try {
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                JSONObject query = (JSONObject) httpAnswerJson.get("query");
-                JSONObject results = (JSONObject) query.get("results");
-                JSONObject rate = (JSONObject) results.get("rate");
+                double last = Double.valueOf((String) httpAnswerJson.get("amount"));
 
-                double last = Utils.getDouble((String) rate.get("Rate"));
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
@@ -76,11 +72,6 @@ public class YahooPriceFeed extends AbstractPriceFeed {
     }
 
     private String getUrl(CurrencyPair pair) {
-        String pairString = pair.toString().toUpperCase();
-        return "https://query.yahooapis.com/v1/public/"
-                + "yql?q=select%20*%20from%20yahoo.finance.xchange%20"
-                + "where%20pair%20in%20(%22" + pairString + "%22)&format=json"
-                + "&diagnostics=false&env=store%3A%2F%2Fdatatables.org%2Falltableswithkeys"
-                + "&callback=";
+        return "https://coinbase.com/api/v1/prices/spot_rate?currency=" + pair.getPaymentCurrency().getCode().toUpperCase();
     }
 }

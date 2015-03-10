@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.pricefeeds;
-
+package com.nubits.nubot.pricefeeds.feedservices;
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.trading.TradeUtilsCCEDK;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -28,21 +28,22 @@ import org.slf4j.Logger;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-public class BitstampPriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = LoggerFactory.getLogger(BitstampPriceFeed.class.getName());
-    public static final String name = "bitstamp";
-    public BitstampPriceFeed() {
+public class CcedkPriceFeed extends AbstractPriceFeed {
 
-        refreshMinTime = 58 * 1000; //8 hours
+    private static final Logger LOG = LoggerFactory.getLogger(CcedkPriceFeed.class.getName());
+    public static final String name = "ccedk";
+
+    public CcedkPriceFeed() {
+        refreshMinTime = 50 * 1000; //one minutee
     }
 
     @Override
     public LastPrice getLastPrice(CurrencyPair pair) {
+        String url = TradeUtilsCCEDK.getCCEDKTickerUrl(pair);
         long now = System.currentTimeMillis();
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
-            String url = "https://www.bitstamp.net/api/ticker/";
             String htmlString;
             try {
                 htmlString = Utils.getHTML(url, true);
@@ -52,12 +53,12 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
             }
             JSONParser parser = new JSONParser();
             try {
+                //{"errors":false,"response":{"entity":{"pair_id":"2","min":"510","max":"510","avg":"510","vol":"0.0130249"}}}
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Double.valueOf((String) httpAnswerJson.get("last"));
+                JSONObject tickerObject = (JSONObject) httpAnswerJson.get("response");
+                JSONObject entityObject = (JSONObject) tickerObject.get("entity");
 
-                //Make the average between buy and sell
-                last = Utils.round(last, 8);
-
+                double last = Double.valueOf((String) entityObject.get("avg"));
 
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
@@ -72,5 +73,6 @@ public class BitstampPriceFeed extends AbstractPriceFeed {
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
+
     }
 }

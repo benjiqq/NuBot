@@ -24,6 +24,7 @@ import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
+import com.nubits.nubot.pricefeeds.feedservices.*;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

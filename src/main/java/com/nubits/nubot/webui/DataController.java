@@ -2,14 +2,10 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.pricefeeds.BlockchainPriceFeed;
-import com.nubits.nubot.pricefeeds.BtcePriceFeed;
+import com.nubits.nubot.pricefeeds.feedservices.BlockchainPriceFeed;
+import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
 import com.nubits.nubot.trading.TradeInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

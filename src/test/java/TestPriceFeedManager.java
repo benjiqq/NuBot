@@ -1,7 +1,7 @@
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeeds.BitfinexPriceFeed;
-import com.nubits.nubot.pricefeeds.BtcePriceFeed;
+import com.nubits.nubot.pricefeeds.feedservices.BitfinexPriceFeed;
+import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import junit.framework.TestCase;
 import org.junit.Test;
