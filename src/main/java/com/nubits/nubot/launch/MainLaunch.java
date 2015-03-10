@@ -42,13 +42,7 @@ public class MainLaunch {
         }
         LOG.info("settings loaded");
 
-        String URL = "logback.xml";
-        ClassLoader.getSystemResource(URL);
-        System.out.println("logback.xml");
 
-
-        System.setProperty("javax.net.ssl.trustStore", "NuBot/res");
-        System.setProperty("javax.net.ssl.trustStorePassword","asdfasdf");
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
