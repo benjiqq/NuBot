@@ -17,9 +17,6 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.JSONArray;
-//import com.alibaba.fastjson.JSONObject;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
