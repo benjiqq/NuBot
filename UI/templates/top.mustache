@@ -67,7 +67,8 @@
                   url: url,
                 })
                 .fail(function() {
-                  alert( "error loading log" );
+                  console.log("error loading log");
+                  //alert( "error loading log" );
                 })
                 .done(function( data ) {
                   $('#logarea').val(data["log"]);

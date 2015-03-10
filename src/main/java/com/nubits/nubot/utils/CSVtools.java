@@ -21,7 +21,12 @@ public class CSVtools {
         return parseCsvFromFile(f);
     }
 
-    public static ArrayList<String[]> parseCsvFromFile(File file) {
+    /**
+     * parse a csv file. used by parseCsvFromClassPath to load from classhpath
+     * @param file
+     * @return
+     */
+    private static ArrayList<String[]> parseCsvFromFile(File file) {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";

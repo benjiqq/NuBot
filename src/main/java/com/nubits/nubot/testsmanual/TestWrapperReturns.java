@@ -39,10 +39,10 @@ public class TestWrapperReturns {
 
         }
         init();
-        String[] inputs = new String[1];
-        inputs[0] = TEST_OPTIONS_PATH;
+
+
         try {
-            Global.options = ParseOptions.parseOptions(inputs);
+            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
         } catch (NuBotConfigException ex) {
             LOG.error("" +  ex);
         }

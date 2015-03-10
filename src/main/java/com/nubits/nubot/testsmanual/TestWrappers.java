@@ -34,35 +34,44 @@ import java.io.IOException;
 
 public class TestWrappers {
 
+    static {
+        System.setProperty("logback.configurationFile", "testconfig/testlog.xml");
+    }
+
+
     private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "testconfig/alts.json";
+    private static final String TEST_OPTIONS_PATH = "testconfig/poloniex.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
     public static final String testExchange = ExchangeFacade.ALTSTRADE;
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
+
+
+
         //Load settings
         try{
             Utils.loadProperties("settings.properties");
         }catch(IOException e){
-            LOG.error(e.toString());
+            System.out.println("can't load settings");
+            System.exit(0);
         }
         init();
-        String[] inputs = new String[1];
-        inputs[0] = TEST_OPTIONS_PATH;
+
         try {
-            Global.options = ParseOptions.parseOptions(inputs);
+            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
+            LOG.info("using key: " + Global.options.getApiKey());
+            LOG.info("config exchange " + testExchange);
             WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
 
         runTests();
-        System.exit(0);
     }
 
     public static void runTests() {
@@ -121,12 +130,12 @@ public class TestWrappers {
     }
 
     public static void init() {
-        String folderName = "testwrappers_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        //Create log dir
-        FileSystem.mkdir(logsFolder);
+        //init logging when testing
+
+
 
         try {
+            LOG.info("install keystore");
             Utils.installKeystore(false);
         } catch (Exception ex) {
             LOG.error(ex.toString());
