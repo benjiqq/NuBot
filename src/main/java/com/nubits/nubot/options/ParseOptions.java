@@ -9,12 +9,11 @@ import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * ParseOptions from one or several JSON files
@@ -445,6 +444,7 @@ public class ParseOptions {
         supportedExchanges.add(ExchangeFacade.EXCOIN);
         supportedExchanges.add(ExchangeFacade.BITCOINCOID);
         supportedExchanges.add(ExchangeFacade.ALTSTRADE);
+        supportedExchanges.add(ExchangeFacade.COMKORT);
 
         return supportedExchanges.contains(exchangename);
     }

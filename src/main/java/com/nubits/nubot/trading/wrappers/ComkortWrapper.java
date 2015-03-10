@@ -45,6 +45,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -108,11 +109,19 @@ public class ComkortWrapper implements TradeInterface {
             return apiResponse;
         }
 
+        //LOG.error(queryResult);
         JSONParser parser = new JSONParser();
+        Integer code = 0;
 
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            apiResponse.setResponseObject(httpAnswerJson);
+            if (httpAnswerJson.containsKey("code")) {
+                ApiError error = errors.apiReturnError;
+                error.setDescription(httpAnswerJson.get("error").toString());
+                apiResponse.setError(error);
+            } else {
+                apiResponse.setResponseObject(httpAnswerJson);
+            }
         } catch (ClassCastException cce) {
             //if casting to a JSON object failed, try a JSON Array
             try {
@@ -232,9 +241,11 @@ public class ComkortWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
+        DecimalFormat nf = new DecimalFormat("0");
+        nf.setMinimumFractionDigits(8);
         args.put("market_alias", pair.toStringSepSpecial("_"));
-        args.put("amount", Objects.toString(amount));
-        args.put("price", Objects.toString(rate));
+        args.put("amount", nf.format(amount));
+        args.put("price", nf.format(rate));
 
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()){
@@ -333,6 +344,7 @@ public class ComkortWrapper implements TradeInterface {
         
         ApiResponse activeOrders = getActiveOrders();
         if (activeOrders.isPositive()) {
+            apiResponse.setResponseObject(new Order());
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrders.getResponseObject();
             for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
                 Order thisOrder = order.next();
@@ -358,8 +370,12 @@ public class ComkortWrapper implements TradeInterface {
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            boolean success = (boolean) httpAnswerJson.get("success");
-            apiResponse.setResponseObject(success);
+            try {
+                boolean success = (boolean) httpAnswerJson.get("success");
+                apiResponse.setResponseObject(success);
+            } catch (NullPointerException npe) {
+                apiResponse.setResponseObject(false);
+            }
         } else {
             apiResponse = response;
         }
@@ -417,7 +433,7 @@ public class ComkortWrapper implements TradeInterface {
 
     private Trade parseTrade(JSONObject in) {
         Trade out = new Trade();
-        
+
         CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(in.get("market_alias").toString(), "_");
         out.setPair(pair);
         Amount amount = new Amount(Utils.getDouble(in.get("amount")), pair.getOrderCurrency());
@@ -425,7 +441,7 @@ public class ComkortWrapper implements TradeInterface {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
         Date date = null;
         try {
-            date = sdf.parse(in.get("timestamp").toString());
+            date = sdf.parse(in.get("time").toString());
         } catch (java.text.ParseException pe) {
             LOG.warn(pe.toString());
         }
@@ -599,7 +615,7 @@ public class ComkortWrapper implements TradeInterface {
                     connection.setRequestProperty("apikey", keys.getApiKey());
                     connection.setRequestProperty("sign", signRequest(keys.getPrivateKey(), post_data));
                     int nonce = Integer.parseInt(Objects.toString(System.currentTimeMillis() / 1000L));
-                    if (nonce <= lastNonce) {
+                    while (nonce <= lastNonce) {
                         nonce += 1;
                     }
                     lastNonce = nonce;
@@ -643,9 +659,11 @@ public class ComkortWrapper implements TradeInterface {
             }
 
             if (httpError) {
-                LOG.warn("Query to : " + url
-                        + "\nData : " + post_data
-                        + "\nHTTP Response : " + Objects.toString(response));
+                if (Global.options.isVerbose()) {
+                    LOG.warn("Query to : " + url
+                            + "\nData : " + post_data
+                            + "\nHTTP Response : " + Objects.toString(response));
+                }
                 String error = "";
                 try {
                     while ((output = br.readLine()) != null) {
@@ -654,7 +672,7 @@ public class ComkortWrapper implements TradeInterface {
                 } catch (IOException io) {
                     LOG.warn(io.toString());
                 }
-                return "{'error': 'httpError', 'response': " + error + "}";
+                return error;
             }
 
             try {
