@@ -58,7 +58,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
         cycles++;
         if (cycles != RESET_AFTER_CYCLES) {
             if (!isFirstTime) {
-                adjust();
+                try{
+                    adjust();
+                }catch(OrderException e){
+                    //handle error
+                }
             } else {
                 init();
             }
@@ -112,7 +116,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
     }
 
-    private void adjust(){
+    private void adjust() throws OrderException{
         recount(); //Count number of active sells and buys
         if (mightNeedInit) {
 
@@ -125,8 +129,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     try{
                         clearOrders();
                     }catch(OrderException e){
-                        //TODO escalate error
-                        System.exit(0);
+                        throw e;
                     }
                 }
 
