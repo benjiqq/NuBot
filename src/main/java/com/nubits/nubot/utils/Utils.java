@@ -62,10 +62,7 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import org.apache.commons.io.FileUtils;
 
-/**
- *
- *
- */
+
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());

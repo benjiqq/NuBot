@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.trading.keys;
 
-/**
- *
- *
- */
+
 public class ApiPermissions {
 
     private boolean valid_keys;

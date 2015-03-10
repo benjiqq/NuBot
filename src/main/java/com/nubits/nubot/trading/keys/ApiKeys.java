@@ -21,10 +21,7 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- *
- */
+
 public class ApiKeys {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiKeys.class.getName());

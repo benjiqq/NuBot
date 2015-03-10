@@ -17,10 +17,7 @@
  */
 package com.nubits.nubot.models;
 
-/**
- *
- *
- */
+
 public class Balance {
 
     private Amount PEGTotal;
