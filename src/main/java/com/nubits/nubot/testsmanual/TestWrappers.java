@@ -35,7 +35,7 @@ import java.io.IOException;
 public class TestWrappers {
 
     static {
-        System.setProperty("logback.configurationFile", "testconfig/testlog.xml");
+        System.setProperty("logback.configurationFile", "allconfig  /testlog.xml");
     }
 
 
@@ -50,8 +50,6 @@ public class TestWrappers {
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
-
-
 
         //Load settings
         try{
