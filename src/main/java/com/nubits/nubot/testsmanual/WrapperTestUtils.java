@@ -335,7 +335,6 @@ public class WrapperTestUtils {
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
-
         //3.
         //Create a new TradeInterface object using the custom implementation
         //Assign the TradeInterface to the exchange
