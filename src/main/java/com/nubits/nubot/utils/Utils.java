@@ -414,8 +414,12 @@ public class Utils {
             }
 
         } else {
-            System.setProperty("javax.net.ssl.trustStore", Global.settings.getProperty("keystore_path"));
-            System.setProperty("javax.net.ssl.trustStorePassword", Global.settings.getProperty("keystore_pass"));
+            String kpath = Global.settings.getProperty("keystore_path");
+            LOG.info("keypath " + kpath);
+            String kpass = Global.settings.getProperty("keystore_pass");
+            LOG.info("kpassword " + kpass);
+            System.setProperty("javax.net.ssl.trustStore", kpath);
+            System.setProperty("javax.net.ssl.trustStorePassword", kpass);
         }
     }
 

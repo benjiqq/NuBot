@@ -56,7 +56,8 @@ public class TestWrappers {
 
         try {
             Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
-            System.out.println("using key: " + Global.options.getApiKey());
+            LOG.info("using key: " + Global.options.getApiKey());
+            LOG.info("config exchange " + testExchange);
             WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
@@ -128,6 +129,7 @@ public class TestWrappers {
         FileSystem.mkdir(logsFolder);
 
         try {
+            LOG.info("install keystore");
             Utils.installKeystore(false);
         } catch (Exception ex) {
             LOG.error(ex.toString());
