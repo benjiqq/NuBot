@@ -21,6 +21,11 @@ public class CSVtools {
         return parseCsvFromFile(f);
     }
 
+    /**
+     * parse a csv file. it is best to use the parseCsvFromClassPath method
+     * @param file
+     * @return
+     */
     public static ArrayList<String[]> parseCsvFromFile(File file) {
         BufferedReader br = null;
         String line = "";
