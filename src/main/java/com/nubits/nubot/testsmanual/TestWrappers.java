@@ -49,7 +49,8 @@ public class TestWrappers {
         try{
             Utils.loadProperties("settings.properties");
         }catch(IOException e){
-
+            System.out.println("can't load settings");
+            System.exit(0);
         }
         init();
 
