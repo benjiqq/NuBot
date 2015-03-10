@@ -22,11 +22,11 @@ public class CSVtools {
     }
 
     /**
-     * parse a csv file. it is best to use the parseCsvFromClassPath method
+     * parse a csv file. used by parseCsvFromClassPath to load from classhpath
      * @param file
      * @return
      */
-    public static ArrayList<String[]> parseCsvFromFile(File file) {
+    private static ArrayList<String[]> parseCsvFromFile(File file) {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
