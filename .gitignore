@@ -3,7 +3,7 @@ logs/
 
 dist-packaged
 config/
-testconfig/
+
 
 #A folder containing utilities that do not need to be pushed
 /gitignore/

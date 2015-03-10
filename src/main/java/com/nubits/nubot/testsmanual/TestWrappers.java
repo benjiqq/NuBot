@@ -34,6 +34,11 @@ import java.io.IOException;
 
 public class TestWrappers {
 
+    static {
+        System.setProperty("logback.configurationFile", "testconfig/testlog.xml");
+    }
+
+
     private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
     /**
      * Configure tests
@@ -45,6 +50,9 @@ public class TestWrappers {
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
+
+
+
         //Load settings
         try{
             Utils.loadProperties("settings.properties");
@@ -123,10 +131,9 @@ public class TestWrappers {
     }
 
     public static void init() {
-        String folderName = "testwrappers_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
-        //Create log dir
-        FileSystem.mkdir(logsFolder);
+        //init logging when testing
+
+
 
         try {
             LOG.info("install keystore");
