@@ -172,18 +172,7 @@ public class MainLaunch {
     }
 
 
-    /**
-     * check if arguments to NuBot are valid supported are arguments larger then
-     * 0
-     *
-     * @param args
-     * @return
-     */
-    private static boolean isValidArgs(String[] args) {
-        boolean valid = args.length == 1;
 
-        return valid;
-    }
 
     /**
      * parse the command line arguments
@@ -194,7 +183,7 @@ public class MainLaunch {
      */
     private static NuBotOptions parseOptionsArgs(String args[]) throws NuBotConfigException {
 
-        if (!isValidArgs(args)) {
+        if (args.length != 1) {
             throw new NuBotConfigException("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
 
@@ -202,11 +191,7 @@ public class MainLaunch {
         //Load Options and test for critical configuration errors
         if (args.length > 1) {
             //more than one file path given
-            try {
-                opt = ParseOptions.parseOptions(args);
-            } catch (NuBotConfigException ex) {
-                throw new NuBotConfigException("NuBot wrongly configured");
-            }
+            throw new NuBotConfigException("more than one argument");
 
         } else {
             try {
