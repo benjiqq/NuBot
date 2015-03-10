@@ -41,7 +41,7 @@ def builddir = new File("build")
 def logdir = new File("logs")
 def jarname = "NuBot.jar"
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
-def maintestclass = "com.nubits.nubot.utils.DateUtils"
+def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
 def uiclass = "com.nubits.nubot.webui.UiServer"
 
 
@@ -76,8 +76,8 @@ dependencies {
     compile 'org.zeromq:jeromq:0.3.4'
 
     //webUI
-    compile "javax.servlet:servlet-api:2.5"
-    compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
+    /*compile "javax.servlet:servlet-api:2.5"
+    compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'*/
 
     //logging problem
     /*compile 'com.sparkjava:spark-core:2.1'
