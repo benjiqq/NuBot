@@ -35,7 +35,7 @@ public class SimpleExample {
         System.out.println("balance: " + balance);
 
         client.isValid("abc");
-        client.sendtoaddress("bc",new BigDecimal(0.0001));
+        client.sendtoaddress("notworkingaddress",new BigDecimal(0.0001));
 
 
     }
