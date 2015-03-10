@@ -28,7 +28,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.NumberFormat;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -227,7 +227,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         args.put("pair", pair.toStringSep());
         args.put("type", type.toLowerCase());
-        NumberFormat nf = NumberFormat.getInstance();
+        DecimalFormat nf = new DecimalFormat("0");
         nf.setMinimumFractionDigits(8);
         args.put("price", nf.format(price));
         if (type.equals(Constant.SELL)) {
