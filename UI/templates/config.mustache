@@ -1,0 +1,332 @@
+<body onLoad="loadconfig()">
+
+
+    <!-- Fixed navbar -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">NuBot</a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li><a href="/">Operation</a></li>
+            <li class="active"><a href="/configui">Configuration</a></li>
+            <li><a href="/feeds">Feeds</a>
+
+          </ul>
+
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+
+
+    <div class="container">
+
+<div class="row">
+
+    <button type="button" class="btn btn-primary" onclick="postall()">
+    Save changes
+    </button>
+    file: {{configfile}}
+</div>
+
+<div class="row">
+  <div class="col-xs-12 col-md-6">
+    <h3>Exchange Config</h3>
+
+</h3>
+
+
+
+<table class="table table-bordered" width="500">
+
+<tr>
+    <td class="col-md-2">Exchange</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="exchangename" size="100" type="text" class="form-control" placeholder="exchangename">
+     </div>
+</td>
+
+
+</tr>
+
+
+<tr>
+    <td class="col-md-2">API key</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="apikey" size="100" type="text" class="form-control" placeholder="API Key">
+    </td>
+
+
+</tr>
+
+
+<tr>
+    <td class="col-md-2">API secret</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="apisecret" size="100" type="text" class="form-control" placeholder="API Secret">
+    </td>
+
+
+</tr>
+
+
+<tr>
+    <td class="col-md-2">pair</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="pair" size="100" type="text" class="form-control" placeholder="pair">
+    </td>
+
+
+</tr>
+
+
+
+
+
+<tr>
+    <td class="col-md-2">Maximum Buy Order Volume</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="maxbuyordervolume" size="100" type="text" class="form-control" placeholder="0.0">
+    </td>
+
+</tr>
+
+
+<tr>
+    <td class="col-md-2">Maximum Sell Order Volume</td>
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="maxsellordervolume" size="100" type="text" class="form-control" placeholder="0.0">
+    </div>
+    </td>
+</tr>
+
+<tr>
+    <td class="col-md-2">wallchangeThreshold</td>
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="wallchangeThreshold" size="100" type="text" class="form-control" placeholder="0.0">
+    </div>
+    </td>
+</tr>
+
+<tr>
+    <td class="col-md-2">spread</td>
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="maxsellordervolume" size="100" type="text" class="form-control" placeholder="0.0">
+    </div>
+    </td>
+</tr>
+
+<tr>
+    <td class="col-md-2">distanceThreshold</td>
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="maxsellordervolume" size="100" type="text" class="form-control" placeholder="0.0">
+    </div>
+    </td>
+</tr>
+
+
+
+
+</table>
+
+
+
+
+
+    </div>
+
+
+
+  <div class="col-xs-6 col-md-4"></div>
+    <!-- spacer -->
+
+      <div class="col-xs-12 col-md-6">
+
+    <h3>RPC Config</h3>
+
+
+
+<table class="table table-bordered" width="500">
+
+<tr>
+    <td class="col-md-2">nubitaddress</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="nubitaddress" size="100" type="text" class="form-control" placeholder="nubitaddress">
+    </div>
+</td>
+
+
+</tr>
+
+
+<tr>
+    <td class="col-md-2">nudport</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="nudport" size="100" type="text" class="form-control" placeholder="nudport">
+    </td>
+
+</tr>
+
+
+<tr>
+    <td class="col-md-2">rpcuser</td>
+
+<td class="col-md-8">
+    <div class="input-group">
+      <input id="rpcuser" size="100" type="text" class="form-control" placeholder="rpcuser">
+    </div>
+    </td>
+
+
+</tr>
+
+
+<tr>
+
+<td class="col-md-2">rpcpass</td>
+
+<td class="col-md-8">
+
+    <div class="input-group">
+      <input id="rpcpass" size="100" type="text" class="form-control" placeholder="rpcpass">
+    </div>
+
+</td>
+
+</tr>
+
+
+
+</table>
+
+
+
+
+
+<div class="col-xs-12 col-md-8">
+
+<table class="table table-bordered">
+
+<tr>
+    <td>submitliquidity</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="submitliquidity" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+    <td>executeorders</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="executeorders" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+</tr>
+<tr>
+    <td>Dual side</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="dualside" type="checkbox" aria-label="dualside">
+  </span>
+</td>
+
+
+<td>multiplecustodians</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="multiplecustodians" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+</tr>
+
+<tr>
+    <td>verbose</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="verbose" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+    <td>hipchat</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="hipchat" type="checkbox" aria-label="dualside">
+  </span>
+
+  </td>
+
+</tr>
+
+<tr>
+    <td>secondarypeg</td>
+
+<td>
+  <span class="input-group-addon">
+        <input id="secondarypeg" type="checkbox" aria-label="secondarypeg">
+  </span>
+
+  </td>
+
+    <td></td>
+
+<td>
+
+
+  </td>
+
+</tr>
+
+
+</table>
+</div>
+
+
+    </div>
+
+
+    </div> <!-- /container -->
+
+</div>
+
+      </div>
+
+    </div> <!-- /container -->
+

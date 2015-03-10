@@ -1,4 +1,9 @@
+dist/
+logs/
+
 dist-packaged
+config/
+
 
 #A folder containing utilities that do not need to be pushed
 /gitignore/
@@ -16,7 +21,6 @@ releases/
 /NuBot/dist-packaged/
 /NuBot/res/frozen
 /NuBot/logs/
-/logs/
 
 #Specific files to ignore
 ssl_readme.txt
@@ -72,5 +76,7 @@ NuBot/.settings
 .idea
 *.iml
 Test*.xml
+*.ipr
+*.iws
 
-testconfig/
+testprices.db
