@@ -1,7 +1,7 @@
 package com.nubits.nubot.options;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
@@ -537,12 +537,12 @@ public class ParseOptions {
      * @return
      */
     public static boolean isSupportedPair(CurrencyPair pair) {
-        if (pair.equals(Constant.NBT_USD)
-                || pair.equals(Constant.NBT_BTC)
-                || pair.equals(Constant.BTC_NBT)
-                || pair.equals(Constant.NBT_EUR)
-                || pair.equals(Constant.NBT_CNY)
-                || pair.equals(Constant.NBT_PPC)) {
+        if (pair.equals(CurrencyList.NBT_USD)
+                || pair.equals(CurrencyList.NBT_BTC)
+                || pair.equals(CurrencyList.BTC_NBT)
+                || pair.equals(CurrencyList.NBT_EUR)
+                || pair.equals(CurrencyList.NBT_CNY)
+                || pair.equals(CurrencyList.NBT_PPC)) {
             return true;
         } else {
             return false;

@@ -19,11 +19,11 @@ package com.nubits.nubot.launch.toolkit;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
@@ -238,9 +238,9 @@ public class NuExecuteOrders {
 
             switch (this.type) {
                 case "sell":
-                    return Global.exchange.getTrade().sell(Constant.BTC_CNY, amount, price);
+                    return Global.exchange.getTrade().sell(CurrencyList.BTC_CNY, amount, price);
                 case "buy":
-                    return Global.exchange.getTrade().buy(Constant.BTC_CNY, amount, price);
+                    return Global.exchange.getTrade().buy(CurrencyList.BTC_CNY, amount, price);
                 default:
                     return new ApiResponse(false, null, new ApiError(2311, "Unrecognized order type (" + this.getType() + "). "
                             + "it can either be buy or sell"));

@@ -1,4 +1,4 @@
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeeds.AbstractPriceFeed;
@@ -31,7 +31,7 @@ public class TestPriceFeedsAll extends TestCase {
     @Test
     public void testAll() {
 
-        CurrencyPair testPair = Constant.BTC_USD;
+        CurrencyPair testPair = CurrencyList.BTC_USD;
         Feeds.initValidFeeds();
         ArrayList<AbstractPriceFeed> allfeeds = Feeds.getAllExistingFeeds();
 

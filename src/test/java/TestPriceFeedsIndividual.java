@@ -1,4 +1,4 @@
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeeds.BitfinexPriceFeed;
@@ -19,7 +19,7 @@ public class TestPriceFeedsIndividual extends TestCase {
     @Test
     public void testBtce() {
 
-        CurrencyPair testPair = Constant.BTC_USD;
+        CurrencyPair testPair = CurrencyList.BTC_USD;
         BtcePriceFeed btce = new BtcePriceFeed();
         LastPrice lastprice = btce.getLastPrice(testPair);
         lastbtce = lastprice.getPrice().getQuantity();
@@ -31,7 +31,7 @@ public class TestPriceFeedsIndividual extends TestCase {
     @Test
     public void testBitfinex() {
 
-        CurrencyPair testPair = Constant.BTC_USD;
+        CurrencyPair testPair = CurrencyList.BTC_USD;
 
         BitfinexPriceFeed bf = new BitfinexPriceFeed();
         LastPrice lastprice = bf.getLastPrice(testPair);
@@ -44,7 +44,7 @@ public class TestPriceFeedsIndividual extends TestCase {
     @Test
     public void testBCI() {
 
-        CurrencyPair testPair = Constant.BTC_USD;
+        CurrencyPair testPair = CurrencyList.BTC_USD;
 
         BlockchainPriceFeed bci = new BlockchainPriceFeed();
         LastPrice lastprice = bci.getLastPrice(testPair);
@@ -55,7 +55,7 @@ public class TestPriceFeedsIndividual extends TestCase {
     @Test
     public void testCoinbase() {
 
-        CurrencyPair testPair = Constant.BTC_USD;
+        CurrencyPair testPair = CurrencyList.BTC_USD;
 
         CoinbasePriceFeed cb = new CoinbasePriceFeed();
         LastPrice lastprice = cb.getLastPrice(testPair);

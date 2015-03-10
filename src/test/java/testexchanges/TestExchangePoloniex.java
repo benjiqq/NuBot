@@ -2,7 +2,6 @@ package testexchanges;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -122,7 +121,7 @@ public class TestExchangePoloniex extends TestCase {
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);
 
-        CurrencyPair testPair = Constant.NBT_BTC;
+        CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         Currency btc = CurrencyList.BTC;
 

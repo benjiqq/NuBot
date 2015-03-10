@@ -1,9 +1,9 @@
 package testexchanges;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -46,7 +46,7 @@ public class TestExchangePeatio extends TestCase {
 
         Global.options = opt;
 
-        CurrencyPair testPair = Constant.NBT_BTC;
+        CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         try{
             WrapperTestUtils.configExchange(opt.getExchangeName());

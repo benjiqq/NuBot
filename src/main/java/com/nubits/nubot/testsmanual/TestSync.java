@@ -20,8 +20,8 @@ package com.nubits.nubot.testsmanual;
 
 
 import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
@@ -41,7 +41,7 @@ public class TestSync extends TimerTask {
     private static final int TASK_MAX_EXECUTION_INTERVAL = 50;
     private static String id;
     private static int startTime;
-    private static CurrencyPair pair = Constant.BTC_USD;
+    private static CurrencyPair pair = CurrencyList.BTC_USD;
     private static AbstractPriceFeed feed;
 
     public static void main(String[] args) throws InterruptedException {

@@ -17,8 +17,8 @@
  */
 package com.nubits.nubot.testsmanual;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.concurrent.Exchanger;
 
 
 public class TestPriceFeed {
@@ -90,7 +89,7 @@ public class TestPriceFeed {
         backupFeedList.add(BterPriceFeed.name);
         //TODO add bitfinex and  bitstamp after merging this branch with develop
 
-        execute(mainFeed, backupFeedList, Constant.BTC_USD);
+        execute(mainFeed, backupFeedList, CurrencyList.BTC_USD);
 
     }
 
@@ -102,7 +101,7 @@ public class TestPriceFeed {
         backupFeedList.add(CoinmarketcapnorthpolePriceFeed.name);
         backupFeedList.add(CoinmarketcapnexuistPriceFeed.name);
 
-        execute(mainFeed, backupFeedList, Constant.PPC_USD);
+        execute(mainFeed, backupFeedList, CurrencyList.PPC_USD);
     }
 
     private void trackEUR() {
@@ -115,7 +114,7 @@ public class TestPriceFeed {
         backupFeedList.add(ExchangeratelabPriceFeed.name);
         backupFeedList.add(YahooPriceFeed.name);
 
-        execute(mainFeed, backupFeedList, Constant.EUR_USD);
+        execute(mainFeed, backupFeedList, CurrencyList.EUR_USD);
     }
 
     private void trackHKD() {
@@ -126,7 +125,7 @@ public class TestPriceFeed {
         backupFeedList.add(GoogleUnofficialPriceFeed.name);
         backupFeedList.add(YahooPriceFeed.name);
 
-        execute(mainFeed, backupFeedList, Constant.HKD_USD);
+        execute(mainFeed, backupFeedList, CurrencyList.HKD_USD);
     }
 
     private void trackPHP() {
@@ -137,7 +136,7 @@ public class TestPriceFeed {
         backupFeedList.add(GoogleUnofficialPriceFeed.name);
         backupFeedList.add(YahooPriceFeed.name);
 
-        execute(mainFeed, backupFeedList, Constant.PHP_USD);
+        execute(mainFeed, backupFeedList, CurrencyList.PHP_USD);
     }
 
     private void trackCNY() {
@@ -149,7 +148,7 @@ public class TestPriceFeed {
         backupFeedList.add(YahooPriceFeed.name);
         backupFeedList.add(ExchangeratelabPriceFeed.name);
 
-        execute(mainFeed, backupFeedList, Constant.CNY_USD);
+        execute(mainFeed, backupFeedList, CurrencyList.CNY_USD);
     }
 
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
