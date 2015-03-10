@@ -86,6 +86,7 @@ dependencies {
 
     compile files('lib/EasyJccKit.jar')
     compile files('lib/bitcoinapi-0.1.jar')
+    compile files('lib/spark-core-2.2-SNAPSHOT.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
