@@ -203,6 +203,32 @@ public class TestOptions extends TestCase {
 
     }
 
+    @Test
+    public void testParseFeeds(){
+
+        String testconfigFile = "peatio.json";
+        String testconfig = "testconfig/" + testconfigFile;
+        boolean catched = false;
+        try {
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            assertTrue(opt.mainFeed!=null);
+            assertTrue(opt.mainFeed.equals("btce"));
+            System.out.println(opt.backupFeedNames.size());
+            assertTrue(opt.backupFeedNames.size()==2);
+            assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
+            assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
+
+        } catch (NuBotConfigException e) {
+            System.out.println("could not parse config");
+            System.out.println(e);
+            catched = true;
+        }
+
+        assertTrue(!catched);
+
+
+    }
+
 
 
 

@@ -197,7 +197,7 @@ public class NuBotOptions {
      * empty constructor. assumes safe creation of valid options
      */
     public NuBotOptions() {
-
+        backupFeedNames = new ArrayList<>();
     }
 
 
@@ -280,8 +280,9 @@ public class NuBotOptions {
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
-
         this.secondarypeg = secondarypeg;
+
+        backupFeedNames = new ArrayList<>();
 
     }
 

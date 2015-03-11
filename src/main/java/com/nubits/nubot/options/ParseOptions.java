@@ -6,7 +6,10 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import org.json.JSONException;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -191,9 +194,14 @@ public class ParseOptions {
 
         options.secondarypeg = (boolean) optionsJSON.get("secondarypeg");
 
-        if (options.secondarypeg) {
+        try{
             parseSecondary(options, optionsJSON);
+        }catch(NuBotConfigException e){
+            if (options.secondarypeg) {
+                throw e;
+            }
         }
+
 
 
         //---- optional settings ----
@@ -298,23 +306,28 @@ public class ParseOptions {
 
         options.mainFeed = (String) optionsJSON.get("mainfeed");
 
-        //ArrayList<String> backupFeedNames = new ArrayList<>();
-        //org.json.JSONObject dataJson = (org.json.JSONObject) optionsJSON.get("backupfeeds");
+        if (!containsIgnoreCase(optionsJSON, "backupfeeds"))
+            throw new NuBotConfigException("backupfeed necessary parameter");
+
+        ArrayList<String> backupFeedNames = new ArrayList<>();
 
         //Iterate on backupFeeds
 
-        /*String names[] = org.json.JSONObject.getNames(dataJson);
-        if (names.length < 2) {
+        JSONArray bfeeds = (JSONArray) optionsJSON.get("backupfeeds");
+
+        LOG.info("bfeeds " + bfeeds);
+
+        if (bfeeds.size() < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
         }
-        for (int i = 0; i < names.length; i++) {
+        for (int i = 0; i < bfeeds.size(); i++) {
             try {
-                org.json.JSONObject tempJson = dataJson.getJSONObject(names[i]);
-                options.backupFeedNames.add((String) tempJson.get("name"));
+                String feedname = (String)bfeeds.get(i);
+                options.backupFeedNames.add(feedname);
             } catch (JSONException ex) {
-                throw new NuBotConfigException(ex.toStringSep());
+                throw new NuBotConfigException("" + ex);
             }
-        }*/
+        }
 
         options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypeg");
 
@@ -338,8 +351,6 @@ public class ParseOptions {
             throw new NuBotConfigException("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
 
-
-        options.mainFeed = (String) optionsJSON.get("main-feed");
 
 
     }
