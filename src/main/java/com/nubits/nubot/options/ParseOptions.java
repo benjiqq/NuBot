@@ -4,6 +4,7 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.json.JSONException;
@@ -323,7 +324,10 @@ public class ParseOptions {
         for (int i = 0; i < bfeeds.size(); i++) {
             try {
                 String feedname = (String)bfeeds.get(i);
-                options.backupFeedNames.add(feedname);
+                if (!FeedFacade.isValidFeed(feedname))
+                    throw new NuBotConfigException("invalid feed configured");
+                else
+                    options.backupFeedNames.add(feedname);
             } catch (JSONException ex) {
                 throw new NuBotConfigException("" + ex);
             }

@@ -21,15 +21,13 @@ public class FeedFacade {
             "YahooPriceFeed", "OpenexchangeratesPriceFeed", "BitfinexPriceFeed",
             "ExchangeratelabPriceFeed"};*/
 
-    public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP = new HashMap<>();
+    public static HashMap<String, AbstractPriceFeed> FEED_NAMES_MAP;
 
-    /**
-     * init feeds based on the classes. classes contains the name
-     */
-    public static void initValidFeeds() {
-
+    static {
+        FEED_NAMES_MAP =new HashMap<>();
         FEED_NAMES_MAP.put(BitcoinaveragePriceFeed.name, new BitcoinaveragePriceFeed());
         FEED_NAMES_MAP.put(CoinbasePriceFeed.name, new CoinbasePriceFeed());
+        FEED_NAMES_MAP.put(BlockchainPriceFeed.name, new BitcoinaveragePriceFeed());
         FEED_NAMES_MAP.put(BterPriceFeed.name, new BterPriceFeed());
         FEED_NAMES_MAP.put(CcedkPriceFeed.name, new CcedkPriceFeed());
         FEED_NAMES_MAP.put(BtcePriceFeed.name, new BtcePriceFeed());
@@ -38,6 +36,13 @@ public class FeedFacade {
         FEED_NAMES_MAP.put(BitstampPriceFeed.name, new BitstampPriceFeed());
         FEED_NAMES_MAP.put(YahooPriceFeed.name, new YahooPriceFeed());
         FEED_NAMES_MAP.put(BitfinexPriceFeed.name, new BitfinexPriceFeed());
+    }
+
+    /**
+     * init feeds based on the classes. classes contains the name
+     */
+    public static void initValidFeeds() {
+
 
         //FAILING
         //FEED_NAMES_MAP.put(OpenexchangeratesPriceFeed.name, new OpenexchangeratesPriceFeed());
@@ -46,7 +51,6 @@ public class FeedFacade {
 
 
         //FEED_NAMES_MAP.put(BitstampEURPriceFeed.name, new BitstampEURPriceFeed());
-
 
 
         /*public final static String BLOCKCHAIN = "blockchain"; //BTC
@@ -91,6 +95,10 @@ public class FeedFacade {
             throw new NuBotConfigException("Error wile adding price seed with name unrecognized : " + feedname);
         }
 
+    }
+
+    public static boolean isValidFeed(String feedname){
+        return FEED_NAMES_MAP.containsKey(feedname);
     }
 
     public static ArrayList<AbstractPriceFeed> getAllExistingFeeds() {

@@ -41,6 +41,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
+/**
+ * RPC Client for Nu Wallet
+ */
 public class NuRPCClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuRPCClient.class.getName());
