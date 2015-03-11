@@ -6,10 +6,15 @@
 | AltsTrade    | -  |   |
 | BitcoinCoID    | -  |   |
 | Bitspark    | -  |   |
-| Btce    | -  |   |
-| CCEX    | -  |   |
-| Peatio    | test exchange  |   |
 | Poloniex    | -  |   |
+
+other
+
+| Exchange name        | status   |  URL |
+| Peatio    | test exchange  |   |
+| Btce    | datafeed only  |   |
+| CCEX    | -  |   |
+| ShapeShift    | -  |   |
 
 implemented, but not recommended or defunct
 
@@ -18,3 +23,4 @@ implemented, but not recommended or defunct
 | Bter    | -  |   |
 | CCEDK    | -  |   |
 | Excoin    | -  |   |
+
