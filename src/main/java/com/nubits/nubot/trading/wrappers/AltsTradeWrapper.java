@@ -104,11 +104,13 @@ public class AltsTradeWrapper implements TradeInterface {
     
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
+
         ApiResponse apiResponse = new ApiResponse();
         String url = API_BASE_URL + "/" + API_BALANCE;
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
-        
+
+        LOG.info("requesting balance" + pair + " url " + url) ;
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();

@@ -17,6 +17,7 @@ import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
@@ -371,6 +372,19 @@ public class WrapperTestUtils {
         } else {
             throw new NuBotConfigException("Exchange " + exchangeName + " not supported");
         }
+
+    }
+
+    public static void configExchangeSimple(String exchangeName) throws NuBotConfigException {
+
+        Global.exchange = new Exchange(exchangeName);
+        ExchangeLiveData liveData = new ExchangeLiveData();
+        Global.exchange.setLiveData(liveData);
+        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName);
+        ti.setKeys(keys);
+        Global.exchange.setTrade(ti);
+        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
     }
 }

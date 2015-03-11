@@ -50,6 +50,7 @@ public class ParseOptions {
      */
     public static NuBotOptions parseOptionsSingle(String filepath) throws NuBotConfigException {
 
+
         File f = new File(filepath);
         if (!f.exists())
             throw new NuBotConfigException("file " + f.getAbsolutePath() + " does not exist");
@@ -148,7 +149,8 @@ public class ParseOptions {
         //First try to parse compulsory parameters
         options.exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
-        boolean supported = exchangeSupported(options.exchangeName);
+        boolean supported = ExchangeFacade.knownExchange(options.exchangeName);
+        LOG.info("exchange supported? " + options.exchangeName + " " + supported);
         if (!supported)
             throw new NuBotConfigException("exchange not supported");
 
@@ -432,22 +434,7 @@ public class ParseOptions {
         return newopt;
     }
 
-    public static boolean exchangeSupported(String exchangename) {
-        List<String> supportedExchanges = new ArrayList<String>();
-        supportedExchanges.add(ExchangeFacade.BTCE);
-        supportedExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
-        supportedExchanges.add(ExchangeFacade.BTER);
-        supportedExchanges.add(ExchangeFacade.CCEDK);
-        supportedExchanges.add(ExchangeFacade.POLONIEX);
-        supportedExchanges.add(ExchangeFacade.CCEX);
-        supportedExchanges.add(ExchangeFacade.ALLCOIN);
-        supportedExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
-        supportedExchanges.add(ExchangeFacade.EXCOIN);
-        supportedExchanges.add(ExchangeFacade.BITCOINCOID);
-        supportedExchanges.add(ExchangeFacade.ALTSTRADE);
 
-        return supportedExchanges.contains(exchangename);
-    }
 
     public static void parseBackupfeeds() {
         //            ArrayList<String> backupFeedNames = new ArrayList<>();

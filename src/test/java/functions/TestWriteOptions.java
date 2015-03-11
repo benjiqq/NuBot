@@ -87,7 +87,7 @@ public class TestWriteOptions extends TestCase {
     @Test
     public void testCreateObject() {
         NuBotOptions opt = new NuBotOptions();
-        opt.setApiKey("test");
+        opt.apiKey = "test";
         opt.setExchangeName("testexchange");
         Currency c = Currency.createCurrency("NBT");
         Currency usd = Currency.createCurrency("USD");

@@ -3,7 +3,6 @@
 | Exchange name        | status   |  URL |
 | ------------- |:-------------:| -------------:| 
 | AllCoin    | -  |   |
-| AltsTrade    | -  |   |
 | BitcoinCoID    | -  |   |
 | Bitspark    | -  |   |
 | Poloniex    | -  |   |
@@ -11,6 +10,8 @@
 other
 
 | Exchange name        | status   |  URL |
+| Comkort    | in progress  |   |
+| AltsTrade    | in progress  |   |
 | Peatio    | test exchange  |   |
 | Btce    | datafeed only  |   |
 | CCEX    | -  |   |

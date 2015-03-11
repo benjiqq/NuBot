@@ -51,14 +51,10 @@
 
 <p>After gradle is installed, run gradle tasks. The relevant tasks appear at the end:</p>
 
-<h2>
-<a id="user-content-other-tasks" class="anchor" href="#other-tasks" aria-hidden="true"><span class="octicon octicon-link"></span></a>Other tasks</h2>
-
-<p>NuBotJar - create the jar in the folder dist</p>
-
-<p>compileReadme - compile the HTML readme</p>
-
-<p>runCollector - run the collector service on a server</p>
+<ul>
+<li><p>NuBotJar - create the jar in the folder dist</p></li>
+<li><p>runui - run the UI</p></li>
+</ul>
 
 <h2>
 <a id="user-content-directory-layout" class="anchor" href="#directory-layout" aria-hidden="true"><span class="octicon octicon-link"></span></a>Directory layout</h2>
@@ -80,6 +76,12 @@
 
 <p>md : markdown documents</p>
 
+<p>config</p>
+
+<p>testconfig</p>
+
+<p>ssltools</p>
+
 <h2>
 <a id="user-content-install" class="anchor" href="#install" aria-hidden="true"><span class="octicon octicon-link"></span></a>Install</h2>
 
@@ -97,12 +99,8 @@
 
 <p>Gradle can be used inside most IDE's.</p>
 
-<ul>
-<li><p>Eclipse</p></li>
-<li><p>IntelliJ</p></li>
-<li><p>Netbeans
-<a href="http://plugins.netbeans.org/plugin/44510/gradle-support">http://plugins.netbeans.org/plugin/44510/gradle-support</a></p></li>
-</ul>
+<p>For Netbeans integration see:
+<a href="http://plugins.netbeans.org/plugin/44510/gradle-support">http://plugins.netbeans.org/plugin/44510/gradle-support</a></p>
 
 <h2>
 <a id="user-content-dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Dependencies</h2>
@@ -112,15 +110,6 @@
 <p>dependency: Grip
  <a href="https://github.com/joeyespo/grip">https://github.com/joeyespo/grip</a>
  pip install grip</p>
-
-<h2>
-<a id="user-content-commands" class="anchor" href="#commands" aria-hidden="true"><span class="octicon octicon-link"></span></a>commands</h2>
-
-<p>gradle tasks =&gt; show the tasks available</p>
-
-<p>gradle NuBotJar =&gt; package the jar</p>
-
-<p>gradle test =&gt; run Unit tests. HTML Testout under build/reports/tests/index.html</p>
 
 <h2>
 <a id="user-content-adding-gradle-dependencies" class="anchor" href="#adding-gradle-dependencies" aria-hidden="true"><span class="octicon octicon-link"></span></a>Adding gradle dependencies</h2>
@@ -134,30 +123,6 @@
 <p>On the left, click on gradle/grails</p>
 
 <p>Copy the compile 'xyz' line</p>
-
-<h2>
-<a id="user-content-dist-layout" class="anchor" href="#dist-layout" aria-hidden="true"><span class="octicon octicon-link"></span></a>dist layout</h2>
-
-<ul>
-<li>NuBot.jar</li>
-<li>/config-sample
-
-<ul>
-<li>/logs</li>
-<li>/res</li>
-<li>readme.html</li>
-<li>setup.html</li>
-<li>LICENSE.md</li>
-<li>CHANGELOG.md</li>
-</ul>
-</li>
-</ul>
-
-<h2>
-<a id="user-content-notes" class="anchor" href="#notes" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes</h2>
-
-<p>ant build could be imported with
-ant.importBuild 'NuBot/build.xml'</p>
 
               </div>
             </div>

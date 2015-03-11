@@ -39,6 +39,7 @@ def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
+def testreportdir = new File("testreports") //$buildDir/reports
 def jarname = "NuBot.jar"
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
 def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
@@ -114,12 +115,12 @@ dependencies {
     }
 }*/
 
-test {
+/*test {
     reports {
         junitXml.enabled = false
         html.enabled = true
     }
-}
+}*/
 
 
 //create a single Jar with all dependencies
@@ -160,10 +161,16 @@ task runUI(type: JavaExec) {
     }*/
 }
 
+task testall(type: Test) {
+    description 'test all'
+    include '*/**'
+    testall.reports.html.destination = file("${testreportdir}/alltests")
+}
+
 task testexchanges(type: Test) {
   description 'test all exchanges, includes ordering'
   include 'testexchanges/*'
-  testexchanges.reports.html.destination = file("$buildDir/reports/exchangetests")
+  testexchanges.reports.html.destination = file("${testreportdir}/exchangetests")
 }
 
 //TODO: copy html output to UI templates

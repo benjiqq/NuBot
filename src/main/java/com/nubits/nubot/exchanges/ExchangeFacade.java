@@ -12,12 +12,14 @@ import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * a facade for all exchanges
  */
 public class ExchangeFacade {
-    //Exchanges
+
+    public static final String ALTSTRADE = "altstrade";
     public static final String BTCE = "btce";
     public static final String CCEDK = "ccedk";
     public static final String BTER = "bter";
@@ -28,9 +30,54 @@ public class ExchangeFacade {
     public static final String ALLCOIN = "allcoin";
     public static final String EXCOIN = "excoin";
     public static final String BITCOINCOID = "bitcoincoid";
-    public static final String ALTSTRADE = "altstrade";
+
+
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
+    private static HashMap<String, TradeInterface> supportedExchanges;
+
+    static{
+        supportedExchanges = new HashMap<>();
+
+        supportedExchanges.put(ALTSTRADE, new AltsTradeWrapper());
+        supportedExchanges.put(POLONIEX, new PoloniexWrapper());
+        supportedExchanges.put(CCEX, new CcexWrapper());
+        supportedExchanges.put(ALLCOIN, new AllCoinWrapper());
+        supportedExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
+
+        supportedExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
+        supportedExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
+
+        supportedExchanges.put(BTCE, new BtceWrapper());
+
+        /*
+        //defunct
+        supportedExchanges.put(BTER, new BterWrapper());
+        supportedExchanges.put(CCEDK, new CcedkWrapper());
+        supportedExchanges.put(EXCOIN, new ExcoinWrapper());*/
+    }
+
+    public static boolean knownExchange(String exchange){
+        return supportedExchanges.containsKey(exchange);
+    }
+
+
+    /*public static boolean exchangeSupported(String exchangename) {
+        List<String> supportedExchanges = new ArrayList<String>();
+        supportedExchanges.add(ExchangeFacade.BTCE);
+        supportedExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
+        supportedExchanges.add(ExchangeFacade.BTER);
+        supportedExchanges.add(ExchangeFacade.CCEDK);
+        supportedExchanges.add(ExchangeFacade.POLONIEX);
+        supportedExchanges.add(ExchangeFacade.CCEX);
+        supportedExchanges.add(ExchangeFacade.ALLCOIN);
+        supportedExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
+        supportedExchanges.add(ExchangeFacade.EXCOIN);
+        supportedExchanges.add(ExchangeFacade.BITCOINCOID);
+        supportedExchanges.add(ExchangeFacade.ALTSTRADE);
+
+        return supportedExchanges.contains(exchangename);
+    }*/
 
     /**
      * set up interface based on options
@@ -53,18 +100,7 @@ public class ExchangeFacade {
     }
 
     public static TradeInterface getInterfaceByName(String name){
-        HashMap<String, TradeInterface> supportedExchanges = new HashMap<>();
 
-        supportedExchanges.put(ExchangeFacade.BTCE, new BtceWrapper());
-        supportedExchanges.put(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
-        supportedExchanges.put(ExchangeFacade.BTER, new BterWrapper());
-        supportedExchanges.put(ExchangeFacade.CCEDK, new CcedkWrapper());
-        supportedExchanges.put(ExchangeFacade.POLONIEX, new PoloniexWrapper());
-        supportedExchanges.put(ExchangeFacade.CCEX, new CcexWrapper());
-        supportedExchanges.put(ExchangeFacade.ALLCOIN, new AllCoinWrapper());
-        supportedExchanges.put(ExchangeFacade.BITSPARK_PEATIO, new BitSparkWrapper());
-        supportedExchanges.put(ExchangeFacade.EXCOIN, new ExcoinWrapper());
-        supportedExchanges.put(ExchangeFacade.BITCOINCOID, new BitcoinCoIDWrapper());
 
         if (supportedExchanges.containsKey(name)) {
             return supportedExchanges.get(name);

@@ -44,6 +44,7 @@ public class ExchangeLiveData {
 
 
     public ExchangeLiveData() {
+        this.connected = false;
     }
 
     public ExchangeLiveData(ExchangeStatus status, double bid, double ask, double last, double fee, Balance balance, ArrayList<Order> orderList) {
@@ -53,7 +54,7 @@ public class ExchangeLiveData {
         this.last = last;
         this.balance = balance;
         this.fee = fee;
-
+        this.connected = false;
 
     }
 
