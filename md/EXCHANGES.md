@@ -2,26 +2,22 @@
 
 | Exchange name        | status   |  URL |
 | ------------- |:-------------:| -------------:| 
-| AllCoin    | -  |   |
-| BitcoinCoID    | -  |   |
-| Bitspark    | -  |   |
-| Poloniex    | -  |   |
-
-other
-
-| Exchange name        | status   |  URL |
-| Comkort    | in progress  |   |
-| AltsTrade    | in progress  |   |
+| [AllCoin](https://www.allcoin.com)    | live  |  https://www.allcoin.com |
+| [BitcoinCoID](https://vip.bitcoin.co.id)    | live  |  https://vip.bitcoin.co.id |
+| [Bitspark](https://www.bitspark.io)    | live  |  https://www.bitspark.io |
+| [Poloniex](https://poloniex.com)    | live  |  https://poloniex.com |
+| [Comkort](https://comkort.com)    | in progress  |  https://comkort.com |
+| [AltsTrade](https://alts.trade)    | in progress  |  https://alts.trade |
 | Peatio    | test exchange  |   |
-| Btce    | datafeed only  |   |
-| CCEX    | -  |   |
-| ShapeShift    | -  |   |
 
-implemented, but not recommended or defunct
+not operational for liquidity operations
 
 | Exchange name        | status   |  URL |
 | ------------- |:-------------:| -------------:| 
-| Bter    | -  |   |
-| CCEDK    | -  |   |
-| Excoin    | -  |   |
+| Btce    | datafeed only  |   |
+| [ShapeShift](https://shapeshift.io)    | no nubot operations  | https://shapeshift.io  |
+| CCEX    |   |   |
+| Bter    | defunct  |   |
+| CCEDK    | defunct  |   |
+| Excoin    | defunct  |   |
 
