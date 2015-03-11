@@ -119,10 +119,6 @@ public class PriceMonitorTask extends MonitorTask {
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
     }
 
-    public LastPrice getLastPriceFromFeeds() {
-        return this.lastPrice;
-    }
-
     private void tryMoveWalls() {
 
         LOG.info("Executing tryMoveWalls");
@@ -251,32 +247,18 @@ public class PriceMonitorTask extends MonitorTask {
         this.wallchangeThreshold = wallchangeThreshold;
     }
 
-    public double getSellPriceUSDsingleside() {
-        return sellPriceUSDsingleside;
-    }
 
     public void setSellPriceUSDsingleside(double sellPriceUSDsingleside) {
         this.sellPriceUSDsingleside = sellPriceUSDsingleside;
     }
 
-    public double getSellPriceUSDdoubleside() {
-        return sellPriceUSDdoubleside;
-    }
 
     public void setSellPriceUSDdoubleside(double sellPriceUSDdoubleside) {
         this.sellPriceUSDdoubleside = sellPriceUSDdoubleside;
     }
 
-    public double getBuyPriceUSD() {
-        return buyPriceUSD;
-    }
-
     public void setBuyPriceUSD(double buyPriceUSD) {
         this.buyPriceUSD = buyPriceUSD;
-    }
-
-    public String getOutputPath() {
-        return outputPath;
     }
 
     public void setOutputPath(String outputPath) {

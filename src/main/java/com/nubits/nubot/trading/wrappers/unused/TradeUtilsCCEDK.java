@@ -1,8 +1,9 @@
-package com.nubits.nubot.trading;
+package com.nubits.nubot.trading.wrappers.unused;
 
 
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

@@ -10,6 +10,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
 import com.nubits.nubot.utils.ErrorManager;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.json.simple.JSONArray;

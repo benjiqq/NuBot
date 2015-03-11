@@ -266,7 +266,6 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     }
 
 
-
     private void unableToUpdatePrice(ArrayList<LastPrice> priceList) {
         count++;
         try {

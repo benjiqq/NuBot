@@ -19,6 +19,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
@@ -81,12 +82,12 @@ public class TestWrappers {
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
         WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testGetActiveOrders(testPair);
-        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testSell(0.3, 0.00830509, Constant.NBT_BTC);  //ok
-        //WrapperTestUtils.testBuy(0.003, 0.0000120, Constant.NBT_BTC);  //ok
+        WrapperTestUtils.testGetActiveOrders(testPair);
+        WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
+        WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("1139", Constant.NBT_BTC);
         //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);

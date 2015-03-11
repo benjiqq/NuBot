@@ -57,6 +57,10 @@ public abstract class MonitorTask extends TimerTask {
         }
     }
 
+    /**
+     * init queue by filling it with one price only
+     * @param price
+     */
     protected void initMA(double price) {
         for (int i = 0; i <= 30; i++) {
             updateMovingAverageQueue(price);

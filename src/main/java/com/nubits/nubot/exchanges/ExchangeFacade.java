@@ -6,6 +6,9 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
+import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
+import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
