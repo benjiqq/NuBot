@@ -160,6 +160,12 @@ task runUI(type: JavaExec) {
     }*/
 }
 
+task testexchanges(type: Test) {
+  description 'test all exchanges, includes ordering'
+  include 'testexchanges/*'
+  testexchanges.reports.html.destination = file("$buildDir/reports/exchangetests")
+}
+
 //TODO: copy html output to UI templates
 /*task copyhtmltoui(type: copy){
     //<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>README.md - Grip</title>
