@@ -21,8 +21,10 @@ import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
+
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
 import static com.nubits.nubot.utils.LiquidityPlot.plot;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -31,9 +33,12 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
@@ -47,19 +52,17 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.TimeZone;
 import java.util.UUID;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
+
 import org.apache.commons.io.FileUtils;
 
 
@@ -68,7 +71,6 @@ public class Utils {
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
     /**
-     *
      * @param originalString
      * @param passphrase
      * @param pathToOutput
@@ -104,7 +106,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param pathToFile
      * @param passphrase
      * @return
@@ -143,7 +144,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static boolean isWindowsPlatform() {
@@ -156,7 +156,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static boolean isMacPlatform() {
@@ -169,7 +168,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param arg
      * @return
      */
@@ -178,7 +176,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static String getTimestampString() {
@@ -368,6 +365,7 @@ public class Utils {
 
     /**
      * Install a trust manager that does not validate certificate chains for https calls
+     *
      * @throws Exception
      */
     private static void installTrustAllManager() throws Exception {
@@ -375,16 +373,16 @@ public class Utils {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
             }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
         };
 
         // Install the all-trusting trust manager
@@ -412,16 +410,107 @@ public class Utils {
             }
 
         } else {
-            //String kpath = Utils.filePathClasspathFile("nubot_keystore.jks");
+            String keystorefile = "nubot_keystore.jks";
+            //String kpath = Utils.filePathClasspathFile();
             //String kpath = Global.settings.getProperty("keystore_path");
             //LOG.info("keypath " + kpath);
+
+            String fp = filePathClasspathFile(keystorefile);
+            LOG.info("### absolute filepath of keystore " + fp);
+
             String kpass = Global.settings.getProperty("keystore_pass");
             LOG.info("password " + kpass);
             String tmp = "/tmp/nubot_keystore.jks";
+            String kfile = "nubot_keystore.jks";
+            /*try{
+                setSSLFactories(kfile, kpass);
+            }catch(Exception e){
+
+            }*/
+
             System.setProperty("javax.net.ssl.trustStore", tmp);
             System.setProperty("javax.net.ssl.trustStorePassword", kpass);
         }
     }
+
+    /**
+     * get filepath from a file in the resources folder
+     *
+     * @param filename
+     * @return
+     */
+    public static String filePathClasspathFile(String filename) {
+        LOG.info("filename " + filename);
+        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
+        URL resource = Utils.class.getClassLoader().getResource(filename);
+        File f = null;
+        try {
+            URI u = resource.toURI();
+            LOG.info("u: " + u);
+            f = Paths.get(u).toFile();
+            LOG.info("f exists " + f.exists());
+            return f.getAbsolutePath();
+        } catch (Exception e) {
+
+        }
+
+        return "";
+    }
+
+
+
+   /* private static void setSSLFactories(String ksfile, String keyStorePassword) throws Exception
+    {
+        LOG.info("set ssl" + ksfile + " " + keyStorePassword);
+
+        InputStream keyStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(ksfile);
+        //InputStream truststoreInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(tspath);
+
+        //keystoreInput.close();
+        //truststoreInput.close();
+
+        // Get keyStore
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        // if your store is password protected then declare it (it can be null however)
+        char[] keyPassword = keyStorePassword.toCharArray();
+
+        // load the stream to your store
+        keyStore.load(keyStream, keyPassword);
+
+        // initialize a trust manager factory with the trusted store
+        KeyManagerFactory keyFactory =
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyFactory.init(keyStore, keyPassword);
+
+        // get the trust managers from the factory
+        KeyManager[] keyManagers = keyFactory.getKeyManagers();
+
+        // Now get trustStore
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        // if your store is password protected then declare it (it can be null however)
+        //char[] trustPassword = password.toCharArray();
+
+        // load the stream to your store
+        //trustStore.load(trustStream, null);
+
+        // initialize a trust manager factory with the trusted store
+        TrustManagerFactory trustFactory =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustFactory.init(trustStore);
+
+        // get the trust managers from the factory
+        TrustManager[] trustManagers = trustFactory.getTrustManagers();
+
+        // initialize an ssl context to use these managers and set as default
+        SSLContext currentsslContext = SSLContext.getInstance("SSL");
+        currentsslContext.init(keyManagers, trustManagers, null);
+
+        SSLContext.setDefault(currentsslContext);
+
+        keyStream.close();
+    }*/
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];
@@ -449,13 +538,4 @@ public class Utils {
 
     }
 
-    /**
-     * get filepath from a file in the resources folder
-     * @param filename
-     * @return
-     */
-    public static String filePathClasspathFile(String filename){
-        File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
-        return f.getAbsolutePath();
-    }
 }
