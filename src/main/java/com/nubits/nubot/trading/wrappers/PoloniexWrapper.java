@@ -180,7 +180,7 @@ public class PoloniexWrapper implements TradeInterface {
                 if (httpAnswerJson.containsKey(lookingFor)) {
                     JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                     double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                    LOG.info("balanceD: " + balanceD);
+                    LOG.info("balance double: " + balanceD);
                     apiResponse.setResponseObject(new Amount(balanceD, currency));
                 } else {
                     String errorMessage = "Cannot find a balance for currency " + lookingFor;
@@ -717,7 +717,7 @@ public class PoloniexWrapper implements TradeInterface {
                 }
                 LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.info(output);
+                    LOG.trace(output);
                     answer += output;
                 }
 

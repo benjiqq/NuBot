@@ -43,6 +43,12 @@ import org.slf4j.Logger;
 public class StrategyPrimaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategyPrimaryPegTask.class.getName());
+
+    /**
+     * minimum balance required
+     */
+    double treshhold_minimum_balance = 1;
+
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
@@ -53,6 +59,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
     private final int SHORT_WAIT_SECONDS = 5;
     private int cycles = 0;
+
+
 
     @Override
     public void run() {
@@ -482,6 +490,19 @@ public class StrategyPrimaryPegTask extends TimerTask {
         return true;
     }
 
+    /**
+     * cap a double at max value
+     * @param a
+     * @param max
+     * @return
+     */
+    private double cap(double a, double max){
+        if (a > max)
+            return max;
+        else
+            return a;
+    }
+
     private boolean initOrders(String type, double price) {
         boolean success = true;
         Amount balance = null;
@@ -508,7 +529,12 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 oneNBT = Utils.round(1 / Global.conversion, 8);
             }
 
-            if (balance.getQuantity() > oneNBT) {
+
+            if (balance.getQuantity() < oneNBT){
+                LOG.info(type + " available balance < " + treshhold_minimum_balance + " NBT, no need to execute orders");
+            }
+
+            else {
                 // Divide the  balance 50% 50% in balance1 and balance2
 
                 //Update TX fee :
@@ -520,6 +546,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
 
+                    double maxbuy = Global.options.getMaxBuyVolume();
 
                     //check the calculated amount against the set maximum sell amount set in the options.json file
                     if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
@@ -530,9 +557,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         amount1 = Utils.round(amount1 / price, 8);
                         //check the calculated amount against the max buy amount option, if any.
                         if (Global.options.getMaxBuyVolume() > 0) {
-                            amount1 = amount1 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount1;
+                            double most = maxbuy / 2;
+                            amount1 = cap(amount1, most);
                         }
-
                     }
 
 
@@ -611,8 +638,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         LOG.warn("Should execute : " + orderString1 + "\n and " + orderString2);
                     }
                 }
-            } else {
-                LOG.info(type + " available balance < 1 NBT, no need to execute orders");
             }
         } else {
             LOG.error(balancesResponse.getError().toString());
