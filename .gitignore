@@ -5,6 +5,7 @@ dist-packaged
 config/
 testconfig/
 myconfig/
+testreports/
 
 #A folder containing utilities that do not need to be pushed
 /gitignore/
