@@ -63,7 +63,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private int cycles = 0;
 
 
-
     @Override
     public void run() {
 
@@ -88,14 +87,15 @@ public class StrategyPrimaryPegTask extends TimerTask {
     }
 
     private void adjust() throws OrderException {
-        checkBalancesAndOrders(); //Count number of active sells and buys
-        if (mightNeedInit) {
 
+        checkBalancesAndOrders(); //Count number of active sells and buys
+
+        if (mightNeedInit) {
             // if there are 2 active orders, do nothing
             // if there are 0 orders, place initial walls
             // if there are a number of orders different than 2, cancel all and place initial walls
             if (!(ordersAndBalancesOk)) {
-                //if there orders they need to be cleared
+                //if there orders need to be cleared
                 if (totalActiveOrders > 0) {
                     try {
                         BotUtil.clearOrders();
@@ -108,7 +108,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 placeInitialWalls();
 
             } else {
-                LOG.warn("No need to init new orders since current orders seems correct");
+                LOG.warn("No need to init new orders since current orders are correct");
             }
             mightNeedInit = false;
             checkBalancesAndOrders();
@@ -216,20 +216,32 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     private void placeInitialWalls() {
 
+        LOG.info("place initial walls");
+
         ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
         if (txFeeNTBFIATResponse.isPositive()) {
+
             double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
             boolean buysOrdersOk = true;
             boolean sellsOrdersOk = initOrders(Constant.SELL, TradeUtils.getSellPrice(txFeeFIATNTB));
+
+            LOG.info("txFeeFIATNTB " + txFeeFIATNTB);
+            LOG.info("sellsOrdersOk " + sellsOrdersOk);
+
             if (Global.options.isDualSide()) {
                 buysOrdersOk = initOrders(Constant.BUY, TradeUtils.getBuyPrice(txFeeFIATNTB));
             }
+
+            LOG.info("buysOrdersOk " + buysOrdersOk);
 
             if (buysOrdersOk && sellsOrdersOk) {
                 mightNeedInit = false;
             } else {
                 mightNeedInit = true;
             }
+
+            LOG.info("mightNeedInit " + mightNeedInit);
+
         } else {
             LOG.error("An error occurred while attempting to update tx fee.");
             mightNeedInit = true;
@@ -391,27 +403,42 @@ public class StrategyPrimaryPegTask extends TimerTask {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
 
         if (balancesResponse.isPositive()) {
+
             Balance balance = (Balance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
             double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+
+            LOG.info("balance NBT " + balanceNBT);
+            LOG.info("balance FIAT " + balanceFIAT);
 
             activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
             activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
             totalActiveOrders = activeSellOrders + activeBuyOrders;
 
+            LOG.info("activeSellOrders " + activeSellOrders);
+            LOG.info("activeBuyOrders " + activeBuyOrders);
+            LOG.info("totalActiveOrders" + totalActiveOrders);
+
             ordersAndBalancesOk = false;
 
-            if (Global.options.isDualSide()) {
+            double treshholdNBT = 1;
+            double treshholdFIAT = 1;
+            int numOrdersBoth = 2;
+            int numOrdersSell = 2;
+            int numOrdersBuy = 2;
 
-                boolean bothSides = activeSellOrders == 2 && activeBuyOrders == 2;
-                boolean sellneeded = activeSellOrders == 2 && activeBuyOrders == 0 && balanceFIAT < 1;
-                boolean buyneeded = activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1;
+            if (Global.options.isDualSide()) {
+                LOG.info("checking balance and orders for dualside");
+
+                boolean bothSides = activeSellOrders == numOrdersBoth && activeBuyOrders == numOrdersBoth;
+                boolean sellinplace = activeSellOrders == numOrdersSell && activeBuyOrders == 0 && balanceFIAT < treshholdFIAT;
+                boolean buyinplace = activeSellOrders == 0 && activeBuyOrders == numOrdersBuy && balanceNBT < treshholdNBT;
 
                 LOG.info("bothSides " + bothSides);
-                LOG.info("sellneeded " + sellneeded);
-                LOG.info("buyneeded " + buyneeded);
+                LOG.info("sellneeded " + sellinplace);
+                LOG.info("buyneeded " + buyinplace);
 
-                ordersAndBalancesOk = bothSides || sellneeded || buyneeded;
+                ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
 
                 if (balanceFIAT > 1 && !isFirstTime) {
                     LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
@@ -422,6 +449,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 }
 
             } else {
+                LOG.info("checking balance and orders for one side");
 
                 boolean nobuyorders = activeBuyOrders == 0;
                 boolean twosellorders = activeSellOrders == 2;
@@ -430,7 +458,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 LOG.info("twosellorders " + twosellorders);
                 LOG.info("nonbt " + nonbt);
 
-                ordersAndBalancesOk =  twosellorders && nobuyorders && nonbt;
+                ordersAndBalancesOk = twosellorders && nobuyorders && nonbt;
             }
         } else {
             LOG.error(balancesResponse.getError().toString());
@@ -507,11 +535,12 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     /**
      * cap a double at max value
+     *
      * @param a
      * @param max
      * @return
      */
-    private double cap(double a, double max){
+    private double cap(double a, double max) {
         if (a > max)
             return max;
         else
@@ -545,11 +574,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
 
 
-            if (balance.getQuantity() < oneNBT){
+            if (balance.getQuantity() < oneNBT) {
                 LOG.info(type + " available balance (" + balance.getQuantity() + "," + currency + ") < " + treshhold_minimum_balance + " " + currency + ", no need to execute orders");
-            }
-
-            else {
+            } else {
                 // Divide the  balance 50% 50% in balance1 and balance2
 
                 //Update TX fee :
