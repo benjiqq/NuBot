@@ -132,7 +132,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             String timeStampString = timeStamp.toString();
             Long timeStampLong = Utils.getTimestampLong();
             String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
-            FileSystem.writeToFile(toWrite, outputFile_orders, true);
+            logOrderCSV(toWrite);
 
             //Also update a json version of the output file
             //build the latest data into a JSONObject
@@ -181,7 +181,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             //add the latest orders to the orders array
             orders.add(latestOrders);
             //then save
-            logOrder(orderHistory);
+            logOrderJSON(orderHistory);
 
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
@@ -212,12 +212,22 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     }
 
-    private void logOrder(JSONObject orderHistory){
+    private void logOrderCSV(String toWrite) {
+        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+    }
+
+    private void logOrderJSON(JSONObject orderHistory) {
         FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
     }
 
-    private void logBalance(JSONObject balanceHistory){
+    private void logBalanceJSON(JSONObject balanceHistory) {
         FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+    }
+
+    private JSONObject getBalanceHistory() throws ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
+        return balanceHistory;
     }
 
     private String reportTier2() {
@@ -251,19 +261,24 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             latestBalances.put("balance-not-on-order", availableBalancesArray);
 
             //now read the existing object if one exists
-            JSONParser parser = new JSONParser();
-            JSONObject balanceHistory = new JSONObject();
-            JSONArray balances = new JSONArray();
-            try { //object already exists in file
-                balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
-                balances = (JSONArray) balanceHistory.get("balances");
+            JSONObject balanceHistory = null;
+            try {
+                balanceHistory = getBalanceHistory();
             } catch (ParseException pe) {
                 LOG.error("Unable to parse " + this.jsonFile_balances);
             }
+
+            JSONArray balances = new JSONArray();
+            try { //object already exists in file
+                balances = (JSONArray) balanceHistory.get("balances");
+            } catch (Exception e) {
+
+            }
+
             //add the latest orders to the orders array
             balances.add(latestBalances);
             //then save
-            logBalance(balanceHistory);
+            logBalanceJSON(balanceHistory);
 
             buyside = Utils.round(buyside * Global.conversion, 2);
 

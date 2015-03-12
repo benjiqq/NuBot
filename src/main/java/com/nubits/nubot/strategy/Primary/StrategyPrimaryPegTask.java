@@ -407,6 +407,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 boolean sellneeded = activeSellOrders == 2 && activeBuyOrders == 0 && balanceFIAT < 1;
                 boolean buyneeded = activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1;
 
+                LOG.info("bothSides " + bothSides);
+                LOG.info("sellneeded " + sellneeded);
+                LOG.info("buyneeded " + buyneeded);
+
                 ordersAndBalancesOk = bothSides || sellneeded || buyneeded;
 
                 if (balanceFIAT > 1 && !isFirstTime) {
@@ -416,8 +420,17 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 } else {
                     proceedsInBalance = false;
                 }
+
             } else {
-                ordersAndBalancesOk = activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 0.01;
+
+                boolean nobuyorders = activeBuyOrders == 0;
+                boolean twosellorders = activeSellOrders == 2;
+                boolean nonbt = balanceNBT < 0.01;
+                LOG.info("nobuyorders " + nobuyorders);
+                LOG.info("twosellorders " + twosellorders);
+                LOG.info("nonbt " + nonbt);
+
+                ordersAndBalancesOk =  twosellorders && nobuyorders && nonbt;
             }
         } else {
             LOG.error(balancesResponse.getError().toString());
