@@ -466,12 +466,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
     }
 
     private boolean reInitiateOrders(boolean firstTime) {
+
+        LOG.info("reInitiateOrders");
+
         if (totalActiveOrders != 0) {
+
+            LOG.info("totalActiveOrders " + totalActiveOrders);
+
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
-                    LOG.warn("Clear all orders request succesfully");
+                    LOG.warn("Clear all orders request successful");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
                         Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
@@ -504,8 +510,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
                         //Continue anyway, maybe there is some balance to put up on order.
                     }
+
                     //Update the balance
                     placeInitialWalls();
+
                 } else {
                     String message = "Could not submit request to clear orders";
                     LOG.error(message);

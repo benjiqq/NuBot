@@ -113,7 +113,7 @@ public class MainLaunch {
                         boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                         if (deleted) {
-                            LOG.info("Order clear request succesfully");
+                            LOG.info("Order clear request successful");
                         } else {
                             LOG.error("Could not submit request to clear orders");
                         }
