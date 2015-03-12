@@ -403,6 +403,7 @@ public class Utils {
     }
 
     public static void installKeystore(boolean trustAll) {
+        LOG.info("installKeystore. trustall: " + trustAll);
         if (trustAll) {
             try {
                 Utils.installTrustAllManager();
@@ -411,11 +412,13 @@ public class Utils {
             }
 
         } else {
-            String kpath = Global.settings.getProperty("keystore_path");
-            LOG.info("keypath " + kpath);
+            //String kpath = Utils.filePathClasspathFile("nubot_keystore.jks");
+            //String kpath = Global.settings.getProperty("keystore_path");
+            //LOG.info("keypath " + kpath);
             String kpass = Global.settings.getProperty("keystore_pass");
-            LOG.info("kpassword " + kpass);
-            System.setProperty("javax.net.ssl.trustStore", kpath);
+            LOG.info("password " + kpass);
+            String tmp = "/tmp/nubot_keystore.jks";
+            System.setProperty("javax.net.ssl.trustStore", tmp);
             System.setProperty("javax.net.ssl.trustStorePassword", kpass);
         }
     }
@@ -444,5 +447,15 @@ public class Utils {
         plot(xSell, ySell); // create a plot using xaxis and yvalues
         addPlot(xBuy, yBuy); // create a second plot on top of first
 
+    }
+
+    /**
+     * get filepath from a file in the resources folder
+     * @param filename
+     * @return
+     */
+    public static String filePathClasspathFile(String filename){
+        File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
+        return f.getAbsolutePath();
     }
 }
