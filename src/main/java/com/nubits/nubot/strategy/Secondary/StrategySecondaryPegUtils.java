@@ -198,17 +198,17 @@ public class StrategySecondaryPegUtils {
         //Update the available balance
         Currency currency;
 
-        if (!Global.swappedPair) {
+        if (Global.swappedPair) {
             if (type.equals(Constant.SELL)) {
-                currency = Global.options.getPair().getOrderCurrency();
-            } else {
                 currency = Global.options.getPair().getPaymentCurrency();
+            } else {
+                currency = Global.options.getPair().getOrderCurrency();
             }
         } else {
             if (type.equals(Constant.SELL)) {
-                currency = Global.options.getPair().getPaymentCurrency();
-            } else {
                 currency = Global.options.getPair().getOrderCurrency();
+            } else {
+                currency = Global.options.getPair().getPaymentCurrency();
             }
         }
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
