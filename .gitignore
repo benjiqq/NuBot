@@ -30,6 +30,8 @@ readme.html
 changelog.html
 setup.html
 feeds.html
+gradle.html
+exchanges.html
 
 #launch configurations
 /NuBot/nbproject/configs/*.properties
