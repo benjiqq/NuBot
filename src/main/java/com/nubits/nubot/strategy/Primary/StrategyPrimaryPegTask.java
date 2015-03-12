@@ -47,7 +47,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
     /**
      * minimum balance required
      */
-    double treshhold_minimum_balance = 1;
+    double treshhold_minimum_balance = 0.0001;
+
     private final int precision = 8;
 
     private boolean mightNeedInit = true;
@@ -532,7 +533,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
             if (balance.getQuantity() < oneNBT){
-                LOG.info(type + " available balance < " + treshhold_minimum_balance + " NBT, no need to execute orders");
+                LOG.info(type + " available balance (" + balance.getQuantity() + "," + currency + ") < " + treshhold_minimum_balance + " " + currency + ", no need to execute orders");
             }
 
             else {

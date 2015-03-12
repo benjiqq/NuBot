@@ -411,6 +411,7 @@ public class Utils {
 
         } else {
             String keystorefile = "nubot_keystore.jks";
+
             //String kpath = Utils.filePathClasspathFile();
             //String kpath = Global.settings.getProperty("keystore_path");
             //LOG.info("keypath " + kpath);
@@ -420,8 +421,11 @@ public class Utils {
 
             String kpass = Global.settings.getProperty("keystore_pass");
             LOG.info("password " + kpass);
+
             String tmp = "/tmp/nubot_keystore.jks";
-            String kfile = "nubot_keystore.jks";
+
+            LOG.info("setting keystore to tmp " + tmp);
+
             /*try{
                 setSSLFactories(kfile, kpass);
             }catch(Exception e){

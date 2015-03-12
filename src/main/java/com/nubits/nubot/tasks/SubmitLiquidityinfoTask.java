@@ -181,7 +181,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             //add the latest orders to the orders array
             orders.add(latestOrders);
             //then save
-            FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+            logOrder(orderHistory);
 
             if (verbose) {
                 LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
@@ -210,6 +210,14 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
         return toReturn;
 
+    }
+
+    private void logOrder(JSONObject orderHistory){
+        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+    }
+
+    private void logBalance(JSONObject balanceHistory){
+        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
     }
 
     private String reportTier2() {
@@ -255,7 +263,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             //add the latest orders to the orders array
             balances.add(latestBalances);
             //then save
-            FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+            logBalance(balanceHistory);
 
             buyside = Utils.round(buyside * Global.conversion, 2);
 
