@@ -48,6 +48,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
      * minimum balance required
      */
     double treshhold_minimum_balance = 1;
+    private final int precision = 8;
 
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
@@ -526,7 +527,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 //Here its time to compute the balance to put apart, if any
                 balance = (Amount) balancesResponse.getResponseObject();
                 balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
-                oneNBT = Utils.round(1 / Global.conversion, 8);
+                oneNBT = Utils.round(1 / Global.conversion, precision);
             }
 
 
@@ -544,9 +545,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                     LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
-                    double amount1 = Utils.round(balance.getQuantity() / 2, 8);
+                    double amount1 = Utils.round(balance.getQuantity() / 2, precision);
 
                     double maxbuy = Global.options.getMaxBuyVolume();
+                    double maxsell = Global.options.getMaxSellVolume();
 
                     //check the calculated amount against the set maximum sell amount set in the options.json file
                     if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
@@ -554,7 +556,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     }
 
                     if (type.equals(Constant.BUY) && !Global.swappedPair) {
-                        amount1 = Utils.round(amount1 / price, 8);
+                        amount1 = Utils.round(amount1 / price, precision);
                         //check the calculated amount against the max buy amount option, if any.
                         if (Global.options.getMaxBuyVolume() > 0) {
                             double most = maxbuy / 2;
@@ -562,30 +564,30 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         }
                     }
 
-
                     double amount2 = balance.getQuantity() - amount1;
 
                     if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                        amount2 = amount2 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount2;
+                        double most = maxsell / 2;
+                        amount2 = cap(amount2, most);
                     }
 
                     if ((type.equals(Constant.BUY) && !Global.swappedPair)
                             || (type.equals(Constant.SELL) && Global.swappedPair)) {
                         //hotfix
-                        amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+                        amount2 = Utils.round(amount2 - (oneNBT * 0.9), precision); //multiply by .9 to keep it below one NBT
 
-                        amount2 = Utils.round(amount2 / price, 8);
+                        amount2 = Utils.round(amount2 / price, precision);
 
                         //check the calculated amount against the max buy amount option, if any.
                         if (Global.options.getMaxBuyVolume() > 0) {
-                            amount2 = amount2 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount2;
+                            double most = maxbuy / 2;
+                            amount2 = cap(amount2, most);
                         }
 
                     }
 
                     if (type.equals(Constant.BUY)) {
-                        amount2 = Utils.round(amount2 / price, 8);
-
+                        amount2 = Utils.round(amount2 / price, precision);
                     }
 
                     //Prepare the orders
