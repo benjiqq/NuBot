@@ -17,8 +17,39 @@ public class CSVtools {
      * @return
      */
     public static ArrayList<String[]> parseCsvFromClassPath(String filename) {
-        File f = new File(CSVtools.class.getClassLoader().getResource(filename).getFile());
-        return parseCsvFromFile(f);
+        InputStream is = CSVtools.class.getClassLoader().getResourceAsStream(filename);
+
+        BufferedReader br = null;
+        String line = "";
+        String cvsSplitBy = ",";
+        ArrayList<String[]> toReturn = new ArrayList<>();
+        try {
+            br= new BufferedReader(new InputStreamReader(is));
+
+            //br = new BufferedReader(new FileReader(file));
+            while ((line = br.readLine()) != null) {
+
+                // use comma as separator
+                String[] tempLine = line.split(cvsSplitBy);
+                toReturn.add(tempLine);
+
+            }
+
+        } catch (FileNotFoundException e) {
+            LOG.error(e.toString());
+        } catch (IOException e) {
+            LOG.error(e.toString());
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    LOG.error(e.toString());
+                }
+            }
+        }
+
+        return toReturn;
     }
 
     /**

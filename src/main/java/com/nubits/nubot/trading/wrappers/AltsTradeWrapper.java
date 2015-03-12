@@ -1,7 +1,7 @@
 package com.nubits.nubot.trading.wrappers;
 
-import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
@@ -12,15 +12,17 @@ import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
 import com.nubits.nubot.utils.ErrorManager;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+import javax.xml.bind.DatatypeConverter;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
@@ -30,8 +32,6 @@ import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.TreeMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * Created by sammoth on 27/02/15.
@@ -101,7 +101,7 @@ public class AltsTradeWrapper implements TradeInterface {
         }
         return apiResponse;
     }
-    
+
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
 
@@ -110,7 +110,7 @@ public class AltsTradeWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        LOG.info("requesting balance" + pair + " url " + url) ;
+        LOG.info("requesting balance" + pair + " url " + url);
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
@@ -118,7 +118,7 @@ public class AltsTradeWrapper implements TradeInterface {
         } else {
             apiResponse = response;
         }
-        
+
         return apiResponse;
     }
 
@@ -252,7 +252,7 @@ public class AltsTradeWrapper implements TradeInterface {
     public void setApiBaseUrl(String apiBaseUrl) {
 
     }
-    
+
     class AltsTradeService implements ServiceInterface {
 
         protected String url;
@@ -286,19 +286,18 @@ public class AltsTradeWrapper implements TradeInterface {
                 args.put("nonce", Objects.toString(System.currentTimeMillis()));
                 post_data = TradeUtils.buildQueryString(args, ENCODING);
             }
-            
+
             try {
                 if (isGet) {
                     queryUrl = new URL(url + "&" + post_data);
                 } else {
                     queryUrl = new URL(url);
-                }    
+                }
             } catch (MalformedURLException mal) {
                 LOG.error(mal.toString());
                 return null;
             }
 
-            
 
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
@@ -365,7 +364,7 @@ public class AltsTradeWrapper implements TradeInterface {
             connection = null;
 
             return answer;
-            
+
         }
 
         @Override
@@ -376,12 +375,15 @@ public class AltsTradeWrapper implements TradeInterface {
                 Mac mac;
                 SecretKeySpec key;
                 // Create a new secret key
-                key = new SecretKeySpec(Base64.decode(secret), SIGN_HASH_FUNCTION);
+                key = new SecretKeySpec(DatatypeConverter.parseBase64Binary(secret), SIGN_HASH_FUNCTION);
                 // Create a new mac
                 mac = Mac.getInstance(SIGN_HASH_FUNCTION);
                 // Init mac with key.
                 mac.init(key);
-                sign = Base64.encode(mac.doFinal(hash_data.getBytes(ENCODING)));
+                byte[] b = mac.doFinal(hash_data.getBytes(ENCODING));
+
+                sign = DatatypeConverter.printBase64Binary(b);
+
             } catch (UnsupportedEncodingException uee) {
                 LOG.error("Unsupported encoding exception: " + uee.toString());
             } catch (NoSuchAlgorithmException nsae) {

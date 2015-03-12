@@ -5,7 +5,7 @@
 		<layout class="ch.qos.logback.classic.PatternLayout">
 
 			<Pattern>
-				>> %logger{36} # %-5level - %msg%n
+				> %logger{36} (%line) %-5level -- %msg%n
 			</Pattern>
 
 		</layout>
@@ -26,7 +26,7 @@
 		<file>logs/all.log</file>
 
 		<encoder>
-			<pattern>ALL: %date %logger{36} %level - %msg%n
+			<pattern>%date %logger{36} %level - %msg%n
 			</pattern>
 		</encoder>
 

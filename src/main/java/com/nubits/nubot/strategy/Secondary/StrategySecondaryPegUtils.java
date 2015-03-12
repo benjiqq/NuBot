@@ -31,6 +31,7 @@ import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 
 import java.util.ArrayList;
 
+import org.apache.http.HttpEntityEnclosingRequest;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -510,6 +511,7 @@ public class StrategySecondaryPegUtils {
         boolean success = true;
 
         // Fix 156 -- reduce this value as excoin API get more responsive
+        //???exchange specific fix???
         int WAIT_TIME_FIX_156_EXCOIN = 3000; //ms
 
         //Communicate to the priceMonitorTask that a wall shift is in place

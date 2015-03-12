@@ -209,8 +209,8 @@ public abstract class NuBotBase {
 
         //Set the fileoutput for active orders
         //TODO! handle logging locally
-        String orders_outputPath = logsFolder + "orders_history.csv";
-        String balances_outputPath = logsFolder + "balance_history.json";
+        String orders_outputPath = logsFolder + "/" + "orders_history.csv";
+        String balances_outputPath = logsFolder + "/" + "balance_history.json";
 
         ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFiles(orders_outputPath, balances_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
