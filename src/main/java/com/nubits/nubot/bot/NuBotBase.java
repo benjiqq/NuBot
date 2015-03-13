@@ -1,6 +1,5 @@
 package com.nubits.nubot.bot;
 
-import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
@@ -10,6 +9,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.tasks.OrderFetchTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
@@ -243,6 +243,12 @@ public abstract class NuBotBase {
         }
 
         notifyOnline();
+
+        OrderFetchTask ft = new OrderFetchTask();
+        Global.taskManager.orderFetchTask = ft;
+        Thread t = new Thread(ft);
+        t.start();
+
     }
 
     protected void notifyOnline() {
