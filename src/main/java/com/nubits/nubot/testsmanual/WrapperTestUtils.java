@@ -8,7 +8,7 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -39,7 +39,7 @@ public class WrapperTestUtils {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getBalance() ");
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
             LOG.info(balance.toString());
 

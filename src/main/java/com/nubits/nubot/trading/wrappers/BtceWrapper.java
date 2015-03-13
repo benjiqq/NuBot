@@ -24,7 +24,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -174,7 +174,7 @@ public class BtceWrapper implements TradeInterface {
             Amount PEGTotal = new Amount(Double.parseDouble(funds.get(pegCode).toString()), CurrencyList.USD);
             Amount NBTTotal = new Amount(Double.parseDouble(funds.get(nbtCode).toString()), CurrencyList.NBT);
 
-            Balance balance = new Balance(NBTTotal, PEGTotal);
+            PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
 
             //Pack it into the ApiResponse
             apiResponse.setResponseObject(balance);

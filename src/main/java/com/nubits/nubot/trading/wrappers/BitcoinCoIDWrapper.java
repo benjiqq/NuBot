@@ -159,7 +159,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 }
                 Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());
                 Amount NBTonOrder = new Amount(nbtOnOrder, pair.getOrderCurrency());
-                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
             } else {
                 double balance = Double.parseDouble(balances.get(currency.getCode().toLowerCase()).toString());

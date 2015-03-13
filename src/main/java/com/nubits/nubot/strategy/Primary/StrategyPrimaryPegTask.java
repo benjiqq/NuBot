@@ -124,7 +124,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 LOG.error(balancesResponse.getError().toString());
             }
 
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
             Amount balanceNBT = balance.getNBTAvailable();
 
@@ -182,7 +182,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 LOG.error(balancesResponse.getError().toString());
             }
 
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
             Amount balanceNBT = balance.getNBTAvailable();
 
 
@@ -295,7 +295,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             return;
         }
 
-        Balance balance = (Balance) balancesResponse.getResponseObject();
+        PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
         balanceNBT = balance.getNBTAvailable();
 
@@ -421,7 +421,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             return;
         }
 
-        Balance balance = (Balance) balancesResponse.getResponseObject();
+        PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 
