@@ -3,21 +3,15 @@ package com.nubits.nubot.launch;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotSecondary;
 import com.nubits.nubot.bot.NuBotSimple;
-import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
-import com.sun.org.apache.xalan.internal.xsltc.cmdline.getopt.GetOpt;
-import org.json.simple.JSONObject;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-import javax.swing.text.html.Option;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 
 /**
@@ -25,7 +19,6 @@ import java.util.List;
  */
 public class MainLaunch {
 
-    private static Thread mainThread;
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
@@ -101,9 +94,9 @@ public class MainLaunch {
      */
     public static void executeBot(NuBotOptions opt) {
 
-        mainThread = Thread.currentThread();
+        Global.mainThread = Thread.currentThread();
 
-        createShutDownHook();
+        Global.createShutDownHook();
 
         //exit if already running or show info to user
         if (Global.running) {
@@ -150,74 +143,5 @@ public class MainLaunch {
     }
 
 
-    /**
-     * shutdown mechanics
-     */
-    private static void createShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                LOG.info("Bot shutting down..");
-
-                //Try to cancel all orders, if any
-                if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
-                    LOG.info("Clearing out active orders ... ");
-
-                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                    if (deleteOrdersResponse.isPositive()) {
-                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-
-                        if (deleted) {
-                            LOG.info("Order clear request successful");
-                        } else {
-                            LOG.error("Could not submit request to clear orders");
-                        }
-
-                    } else {
-                        LOG.error(deleteOrdersResponse.getError().toString());
-                    }
-                }
-
-                //reset liquidity info
-                if (Global.rpcClient.isConnected() && Global.options.isSubmitliquidity()) {
-                    //tier 1
-                    LOG.info("Resetting Liquidity Info before quit");
-
-                    JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                            0, 0, 1);
-                    if (null == responseObject1) {
-                        LOG.error("Something went wrong while sending liquidityinfo");
-                    } else {
-                        LOG.info(responseObject1.toJSONString());
-                    }
-
-                    JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                            0, 0, 2);
-                    if (null == responseObject2) {
-                        LOG.error("Something went wrong while sending liquidityinfo");
-                    } else {
-                        LOG.info(responseObject2.toJSONString());
-                    }
-                }
-
-                LOG.info("Exit. ");
-                mainThread.interrupt();
-                if (Global.taskManager != null) {
-                    if (Global.taskManager.isInitialized()) {
-                        try {
-                            Global.taskManager.stopAll();
-                        } catch (IllegalStateException e) {
-
-                        }
-                    }
-                }
-
-
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
-    }
 }
 

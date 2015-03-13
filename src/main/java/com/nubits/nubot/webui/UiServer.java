@@ -23,10 +23,6 @@ public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
-    private static String configdir;
-
-    private static String configFile;
-
     //TODO via resources
     private static String htmlFolder = "./templates/";
 
