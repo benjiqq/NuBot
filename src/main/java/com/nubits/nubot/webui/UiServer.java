@@ -23,20 +23,19 @@ public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
-    private static String configFile = "poloniex.json";
-    private static String configdir = "testconfig";
+    private static String configdir;
+
+    private static String configFile;
 
     //TODO path
     private static String htmlFolder = "./UI/templates/";
-
-    private static String configpath = configdir + "/" + configFile;
 
     private static TradeInterface ti;
 
     /**
      * start the UI server
      */
-    public static void startUIserver(NuBotOptions opt) {
+    public static void startUIserver(NuBotOptions opt, String configdir, String configFile) {
 
         //TODO: only load if in testmode and this is not set elsewhere
         try{
@@ -45,6 +44,8 @@ public class UiServer {
 
         }
 
+        //TODO. not very elegant to configure exchange here
+        ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
 
         //binds GET and POST
         new ConfigController("/config", opt, configdir, configFile);
@@ -79,48 +80,8 @@ public class UiServer {
         //get("/tools", (request, response) -> new ModelAndView(configmap, htmlFolder + "tools.mustache"), new LayoutTemplateEngine(htmlFolder));
 
 
-
-    }
-
-    public static String opttoJson(NuBotOptions opt) {
-        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
-        Gson parser = gson.create();
-        String js = parser.toJson(opt);
-        LOG.info("using options " + js);
-        return js;
     }
 
 
-    public static void main(String[] args) {
 
-        LOG.debug("test debug");
-        LOG.warn("test warn ");
-        LOG.error("test error");
-
-        LOG.info("starting UI server");
-
-
-        /*try {
-            new StockServiceServer().run();
-        } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(0);
-        }*/
-
-        try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
-            Global.options = opt;
-
-            //TODO: use global object and update
-            ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
-
-            startUIserver(opt);
-
-        } catch (Exception ex) {
-            LOG.error("error configuring " + ex);
-        }
-
-
-    }
 }

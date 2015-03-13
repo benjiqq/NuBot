@@ -47,7 +47,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     /**
      * minimum balance required
      */
-    double treshhold_minimum_balance = 0.0001;
+    double treshhold_minimum_balance = 0.0001; //1
 
     private final int precision = 8;
 
