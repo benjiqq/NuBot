@@ -58,7 +58,6 @@ public class Balance {
         this.NBTTotal = new Amount(NBTAvailable.getQuantity() + NBTonOrder.getQuantity(), CurrencyList.NBT);
     }
 
-//Methods
     /**
      * @return the PEGTotal
      */

@@ -171,59 +171,65 @@ public class PoloniexWrapper implements TradeInterface {
         LOG.trace("method " + method);
         ApiResponse response = getQuery(url, method, query_args, isGet);
         LOG.trace("response " + response);
-        if (response.isPositive()) {
-            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            if (currency != null) {
-                //looking for a specific currency
-                String lookingFor = currency.getCode().toUpperCase();
-                if (httpAnswerJson.containsKey(lookingFor)) {
-                    JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
-                    double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                    LOG.info("balance double : " + balanceD);
-                    apiResponse.setResponseObject(new Amount(balanceD, currency));
-                } else {
-                    String errorMessage = "Cannot find a balance for currency " + lookingFor;
-                    ApiError apiErr = errors.apiReturnError;
-                    apiErr.setDescription(errorMessage);
-                    apiResponse.setError(apiErr);
-                }
+        if (!response.isPositive()) {
+            return response;
+        }
+
+        JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+        LOG.info("balance answer " + httpAnswerJson);
+
+        if (currency != null) {
+            //looking for a specific currency
+            String lookingFor = currency.getCode().toUpperCase();
+            if (httpAnswerJson.containsKey(lookingFor)) {
+                JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
+                double balanceD = Utils.getDouble(balanceJSON.get("available"));
+                LOG.info("balance double : " + balanceD);
+                apiResponse.setResponseObject(new Amount(balanceD, currency));
             } else {
-                //get all balances for the pair
-                boolean foundNBTavail = false;
-                boolean foundPEGavail = false;
-                Amount NBTAvail = new Amount(0, pair.getOrderCurrency()),
-                        PEGAvail = new Amount(0, pair.getPaymentCurrency());
-                Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                String NBTcode = pair.getOrderCurrency().getCode().toUpperCase();
-                String PEGcode = pair.getPaymentCurrency().getCode().toUpperCase();
-                if (httpAnswerJson.containsKey(NBTcode)) {
-                    JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(NBTcode);
-                    double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
-                    double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
-                    NBTAvail = new Amount(tempAvailablebalance, pair.getOrderCurrency());
-                    NBTonOrder = new Amount(tempLockedebalance, pair.getOrderCurrency());
-                    foundNBTavail = true;
-                }
-                if (httpAnswerJson.containsKey(PEGcode)) {
-                    JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(PEGcode);
-                    double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
-                    double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
-                    PEGAvail = new Amount(tempAvailablebalance, pair.getPaymentCurrency());
-                    PEGonOrder = new Amount(tempLockedebalance, pair.getPaymentCurrency());
-                    foundPEGavail = true;
-                }
-                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-                apiResponse.setResponseObject(balance);
-                if (!foundNBTavail || !foundPEGavail) {
-                    LOG.warn("Cannot find a balance for currency with code "
-                            + "" + NBTcode + " or " + PEGcode + " in your balance. "
-                            + "NuBot assumes that balance is 0");
-                }
+                String errorMessage = "Cannot find a balance for currency " + lookingFor;
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
+                apiResponse.setError(apiErr);
             }
         } else {
-            apiResponse = response;
+            //get all balances for the pair
+            boolean foundNBTavail = false;
+            boolean foundPEGavail = false;
+            Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+            Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
+
+            Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
+            Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+
+            String NBTcode = pair.getOrderCurrency().getCode().toUpperCase();
+            String PEGcode = pair.getPaymentCurrency().getCode().toUpperCase();
+
+            if (httpAnswerJson.containsKey(NBTcode)) {
+                JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(NBTcode);
+                double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
+                double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
+                NBTAvail = new Amount(tempAvailablebalance, pair.getOrderCurrency());
+                NBTonOrder = new Amount(tempLockedebalance, pair.getOrderCurrency());
+                foundNBTavail = true;
+            }
+            if (httpAnswerJson.containsKey(PEGcode)) {
+                JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(PEGcode);
+                double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
+                double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
+                PEGAvail = new Amount(tempAvailablebalance, pair.getPaymentCurrency());
+                PEGonOrder = new Amount(tempLockedebalance, pair.getPaymentCurrency());
+                foundPEGavail = true;
+            }
+            Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+            apiResponse.setResponseObject(balance);
+            if (!foundNBTavail || !foundPEGavail) {
+                LOG.warn("Cannot find a balance for currency with code "
+                        + "" + NBTcode + " or " + PEGcode + " in your balance. "
+                        + "NuBot assumes that balance is 0");
+            }
         }
+
 
         return apiResponse;
     }

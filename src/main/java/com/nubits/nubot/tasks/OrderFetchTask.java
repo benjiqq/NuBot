@@ -36,7 +36,8 @@ public class OrderFetchTask implements Runnable {
                     currentOpenOrders= (ArrayList<Order>) activeOrdersResponse.getResponseObject();
                     LOG.info("got current orders " + currentOpenOrders.size());
                 }
-                //LOG.info("orders: " + currentOpenOrders.size());
+            } else{
+                LOG.error("could not get orders");
             }
 
             try{

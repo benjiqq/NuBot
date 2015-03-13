@@ -2,14 +2,14 @@ package com.nubits.nubot.tasks;
 
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 
 public class BalanceFetchTask implements Runnable {
 
@@ -20,7 +20,7 @@ public class BalanceFetchTask implements Runnable {
      */
     private final int interval_time = 1000;
 
-    private Balance balance;
+    private HashMap<Currency,Amount> balances;
 
     private final Object lock = new Object();
 
@@ -38,15 +38,24 @@ public class BalanceFetchTask implements Runnable {
         //continously update
         while(run) {
 
-            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(this.pair);
+            Iterator<Currency> it = balances.keySet().iterator();
 
-            if (balancesResponse.isPositive()) {
-                synchronized (lock) {
-                    balance = (Balance) balancesResponse.getResponseObject();
-                    LOG.info("got balance " + balance);
+            while (it.hasNext()){
+                Currency c = it.next();
+
+                ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(c);
+
+                if (balancesResponse.isPositive()) {
+                    synchronized (lock) {
+                        Amount a = (Amount)balancesResponse.getResponseObject();
+                        LOG.info("for " + c + " got amount " + a);
+                        balances.put(c,a);
+                    }
+                    //LOG.info("orders: " + currentOpenOrders.size());
                 }
-                //LOG.info("orders: " + currentOpenOrders.size());
             }
+
+
 
             try{
                 Thread.currentThread().sleep(interval_time);
@@ -57,9 +66,10 @@ public class BalanceFetchTask implements Runnable {
         }
     }
 
-    public synchronized Balance getCurrentBalances(){
+    public synchronized Amount getCurrentAmount(Currency c){
         synchronized (lock) {
-            return this.balance;
+            return this.balances.get(c);
         }
     }
+
 }

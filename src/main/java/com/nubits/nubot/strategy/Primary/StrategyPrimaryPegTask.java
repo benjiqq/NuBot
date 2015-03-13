@@ -118,7 +118,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             CurrencyPair pair = Global.options.getPair();
 
-            Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
+            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
+
+            if (!balancesResponse.isPositive()) {
+                LOG.error(balancesResponse.getError().toString());
+            }
+
+            Balance balance = (Balance) balancesResponse.getResponseObject();
 
             Amount balanceNBT = balance.getNBTAvailable();
 
@@ -170,9 +176,15 @@ public class StrategyPrimaryPegTask extends TimerTask {
         if (cancelSells) {
             //Update balances
 
-            Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
+            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+            if (!balancesResponse.isPositive()) {
+                //Cannot get balance
+                LOG.error(balancesResponse.getError().toString());
+            }
 
+            Balance balance = (Balance) balancesResponse.getResponseObject();
             Amount balanceNBT = balance.getNBTAvailable();
+
 
             Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
             LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
@@ -276,8 +288,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
 
 
-        //Update balanceNBT to aggregate new amount made available
-        Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+        if (balancesResponse.isPositive()) {
+            //Cannot get balance
+            LOG.error(balancesResponse.getError().toString());
+            return;
+        }
+
+        Balance balance = (Balance) balancesResponse.getResponseObject();
 
         balanceNBT = balance.getNBTAvailable();
 
@@ -396,8 +414,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
      */
     private void checkBalancesAndOrders() {
 
-        Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
 
+        if (!balancesResponse.isPositive()) {
+            LOG.error(balancesResponse.getError().toString());
+            return;
+        }
+
+        Balance balance = (Balance) balancesResponse.getResponseObject();
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 
