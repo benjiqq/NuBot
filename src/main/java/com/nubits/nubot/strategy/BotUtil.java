@@ -20,50 +20,50 @@ public class BotUtil {
 
     /**
      * clear all orders
+     *
      * @throws OrderException
      */
     public static void clearOrders() throws OrderException {
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-        if (deleteOrdersResponse.isPositive()) {
-            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-            if (deleted) {
-                LOG.warn("Clear all orders request succesfully");
-                //Wait until there are no active orders
-                boolean timedOut = false;
-                long timeout = Global.options.getEmergencyTimeout() * 1000;
-                long wait = 6 * 1000;
-                long count = 0L;
-                do {
-                    try {
-                        Thread.sleep(wait);
-                        count += wait;
-                        timedOut = count > timeout;
-
-                    } catch (InterruptedException ex) {
-                        LOG.error(ex.toString());
-                    }
-                } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
-
-                if (timedOut) {
-                    String message = "There was a problem cancelling all existing orders";
-                    LOG.error(message);
-                    HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
-                    MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
-                    //Continue anyway, maybe there is some balance to put up on order.
-                }
-
-            } else {
-                String message = "Could not submit request to clear orders";
-                LOG.error(message);
-                throw new OrderException(message);
-            }
-
-        } else {
+        if (!deleteOrdersResponse.isPositive()) {
             LOG.error(deleteOrdersResponse.getError().toString());
             String message = "Could not submit request to clear orders";
             LOG.error(message);
             throw new OrderException(message);
         }
+
+        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+        if (!deleted) {
+            String message = "Could not submit request to clear orders";
+            LOG.error(message);
+            throw new OrderException(message);
+        }
+
+        LOG.warn("Clear all orders request successful");
+        //Wait until there are no active orders
+        boolean timedOut = false;
+        long timeout = Global.options.getEmergencyTimeout() * 1000;
+        long wait = 6 * 1000;
+        long count = 0L;
+        do {
+            try {
+                Thread.sleep(wait);
+                count += wait;
+                timedOut = count > timeout;
+
+            } catch (InterruptedException ex) {
+                LOG.error(ex.toString());
+            }
+        } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
+
+        if (timedOut) {
+            String message = "There was a problem cancelling all existing orders";
+            LOG.error(message);
+            HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
+            MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
+            //Continue anyway, maybe there is some balance to put up on order.
+        }
+
     }
 
     public static int countActiveOrders(String type) {
@@ -76,6 +76,7 @@ public class BotUtil {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
                 if (tempOrder.getType().equalsIgnoreCase(type)) {
+                    LOG.info("active order: " + tempOrder);
                     toRet++;
                 }
             }

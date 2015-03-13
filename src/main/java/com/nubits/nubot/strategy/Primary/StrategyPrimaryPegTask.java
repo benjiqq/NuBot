@@ -326,6 +326,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
 
         double amountToSell = balanceNBT.getQuantity();
+        LOG.info("amount to sell " + amountToSell);
         if (Global.options.isExecuteOrders()) {
             //execute the order
             String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
