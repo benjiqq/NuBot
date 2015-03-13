@@ -15,7 +15,8 @@ import java.io.IOException;
 
 
 /**
- * the main launcher class. starts bot based on configuration, not through UI
+ * the main launcher class. either start bot through commandline
+ * or a GUI is launched where user starts the Bot himself
  */
 public class MainLaunch {
 
@@ -33,7 +34,7 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
-        if (args.length > 2) {
+        if (args.length > 2 || args.length == 0) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
 
@@ -48,8 +49,6 @@ public class MainLaunch {
             }
         }
 
-        NuBotOptions nuopt = null;
-
         //Load settings
         try {
             Utils.loadProperties("settings.properties");
@@ -59,6 +58,8 @@ public class MainLaunch {
 
         LOG.info("settings loaded");
 
+        NuBotOptions nuopt = null;
+
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
             nuopt = ParseOptions.parseOptionsSingle(configfile);
@@ -66,10 +67,14 @@ public class MainLaunch {
             exitWithNotice("" + e);
         }
 
+        LOG.info("------ new session ------");
+
         LOG.info("runui " + runui);
 
-        if (runui)
-            UILaunch.UIlauncher(".", configfile);
+        if (runui) {
+            String workingdir = ".";
+            UILaunch.UIlauncher(workingdir, configfile);
+        }
         else
             executeBot(nuopt);
 
@@ -113,33 +118,6 @@ public class MainLaunch {
             }
         }
 
-    }
-
-
-    /**
-     * parse the command line arguments. first argument has to be the config file
-     *
-     * @param args
-     * @return
-     * @throws NuBotConfigException
-     */
-    private static String parseOptionsArgs(String args[]) throws NuBotConfigException {
-
-        String configfile = "";
-
-        //Load Options and test for critical configuration errors
-        configfile = args[0];
-
-        try {
-            String p = System.getProperty("runui");
-            LOG.info("runui " + p);
-            runui = new Boolean(p).booleanValue();
-        } catch (Exception e) {
-            LOG.info("can't parse runui");
-        }
-
-
-        return configfile;
     }
 
 
