@@ -27,11 +27,6 @@ public class Balance {
     private Amount PEGAvailable;
     private Amount NBTAvailable;
 
-    /**
-     *
-     */
-    public Balance() {
-    }
 
     /**
      *

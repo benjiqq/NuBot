@@ -186,7 +186,7 @@ public class BterWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL + API_GET_INFO;
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
@@ -233,7 +233,7 @@ public class BterWrapper implements TradeInterface {
                         PEGonOrder = new Amount(tempbalance, pair.getOrderCurrency());
                     }
                 }
-                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {
                     LOG.info("Cannot find a balance for currency with code "

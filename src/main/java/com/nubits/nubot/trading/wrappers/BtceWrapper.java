@@ -152,7 +152,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -174,7 +174,7 @@ public class BtceWrapper implements TradeInterface {
             Amount PEGTotal = new Amount(Double.parseDouble(funds.get(pegCode).toString()), CurrencyList.USD);
             Amount NBTTotal = new Amount(Double.parseDouble(funds.get(nbtCode).toString()), CurrencyList.NBT);
 
-            balance = new Balance(NBTTotal, PEGTotal);
+            Balance balance = new Balance(NBTTotal, PEGTotal);
 
             //Pack it into the ApiResponse
             apiResponse.setResponseObject(balance);
@@ -188,7 +188,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;

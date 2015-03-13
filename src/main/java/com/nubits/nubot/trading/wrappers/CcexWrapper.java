@@ -119,7 +119,7 @@ public class CcexWrapper implements TradeInterface {
 
     public ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = baseUrl + "&a=getbalance";
 
         String queryResult = query(url, new HashMap<String, String>(), true);
@@ -209,7 +209,7 @@ public class CcexWrapper implements TradeInterface {
                     }
                 }
 
-                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
 
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {

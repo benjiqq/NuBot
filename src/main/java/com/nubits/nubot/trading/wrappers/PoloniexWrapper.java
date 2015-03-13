@@ -161,7 +161,6 @@ public class PoloniexWrapper implements TradeInterface {
 
         //Swap the pair for the request
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
 
         String url = API_BASE_URL;
         String method = API_GET_BALANCES;
@@ -214,7 +213,7 @@ public class PoloniexWrapper implements TradeInterface {
                     PEGonOrder = new Amount(tempLockedebalance, pair.getPaymentCurrency());
                     foundPEGavail = true;
                 }
-                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {
                     LOG.warn("Cannot find a balance for currency with code "

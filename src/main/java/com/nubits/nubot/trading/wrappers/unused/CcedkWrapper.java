@@ -219,7 +219,7 @@ public class CcedkWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -254,7 +254,7 @@ public class CcedkWrapper implements TradeInterface {
                 }
                 if (foundNBT && foundPEG) {
                     //Pack it into the ApiResponse
-                    balance = new Balance(NBTTotal, PEGTotal);
+                    Balance balance = new Balance(NBTTotal, PEGTotal);
                     apiResponse.setResponseObject(balance);
                 } else {
                     ApiError err = errors.genericError;
