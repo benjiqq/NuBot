@@ -318,7 +318,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
 
         //There is a cap on the order size
-        if (Global.options.getMaxSellVolume() > 0)  {
+        if (Global.options.getMaxSellVolume() > 0) {
             if (balanceNBT.getQuantity() > Global.options.getMaxSellVolume()) {
                 //put the cap
                 balanceNBT.setQuantity(Global.options.getMaxSellVolume());
@@ -377,26 +377,28 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private String getSmallerWallID(String type) {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
 
-            for (int i = 0; i < orderListCategorized.size(); i++) {
-                Order tempOrder = orderListCategorized.get(i);
-                if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    if (i == 0) {
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+
+        if (!activeOrdersResponse.isPositive()) {
+            LOG.error(activeOrdersResponse.getError().toString());
+            return "-1";
+        }
+
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
+
+        for (int i = 0; i < orderListCategorized.size(); i++) {
+            Order tempOrder = orderListCategorized.get(i);
+            if (tempOrder.getType().equalsIgnoreCase(type)) {
+                if (i == 0) {
+                    smallerOrder = tempOrder;
+                } else {
+                    if (smallerOrder.getAmount().getQuantity() > tempOrder.getAmount().getQuantity()) {
                         smallerOrder = tempOrder;
-                    } else {
-                        if (smallerOrder.getAmount().getQuantity() > tempOrder.getAmount().getQuantity()) {
-                            smallerOrder = tempOrder;
-                        }
                     }
                 }
             }
-        } else {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return "-1";
         }
 
         return smallerOrder.getId();

@@ -369,20 +369,20 @@ public class StrategySecondaryPegUtils {
         //Get active orders
         int toRet = 0;
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-            for (int i = 0; i < orderList.size(); i++) {
-                Order tempOrder = orderList.get(i);
-                if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    toRet++;
-                }
-            }
-
-        } else {
+        if (!activeOrdersResponse.isPositive()) {
             LOG.error(activeOrdersResponse.getError().toString());
             return -1;
         }
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+        for (int i = 0; i < orderList.size(); i++) {
+            Order tempOrder = orderList.get(i);
+            if (tempOrder.getType().equalsIgnoreCase(type)) {
+                toRet++;
+            }
+        }
+
+
         return toRet;
     }
 
@@ -464,27 +464,32 @@ public class StrategySecondaryPegUtils {
         smallerOrder.setId("-1");
         biggerOrder.setId("-1");
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
+        if (!activeOrdersResponse.isPositive()) {
+            LOG.error(activeOrdersResponse.getError().toString());
+            String[] err = {"-1", "-1"};
+            return err;
+        }
 
-            if (orderListCategorized.size() != 2) {
-                LOG.error("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
-                String[] err = {"-1", "-1"};
-                return err;
-            } else {
-                Order tempOrder1 = orderListCategorized.get(0);
-                Order tempOrder2 = orderListCategorized.get(1);
-                smallerOrder = tempOrder1;
-                biggerOrder = tempOrder2;
-                if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
-                    smallerOrder = tempOrder2;
-                    biggerOrder = tempOrder1;
-                }
-                toRet[0] = smallerOrder.getId();
-                toRet[1] = biggerOrder.getId();
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
 
+        if (orderListCategorized.size() != 2) {
+            LOG.error("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
+            String[] err = {"-1", "-1"};
+            return err;
+        } else {
+            Order tempOrder1 = orderListCategorized.get(0);
+            Order tempOrder2 = orderListCategorized.get(1);
+            smallerOrder = tempOrder1;
+            biggerOrder = tempOrder2;
+            if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
+                smallerOrder = tempOrder2;
+                biggerOrder = tempOrder1;
             }
+            toRet[0] = smallerOrder.getId();
+            toRet[1] = biggerOrder.getId();
+
+        }
             /* the commented code works with more than two orders, but is not needed now
              for (int i = 0; i < orderListCategorized.size(); i++) {
              Order tempOrder = orderListCategorized.get(i);
@@ -499,11 +504,7 @@ public class StrategySecondaryPegUtils {
              }
              }
              */
-        } else {
-            LOG.error(activeOrdersResponse.getError().toString());
-            String[] err = {"-1", "-1"};
-            return err;
-        }
+
         return toRet;
     }
 

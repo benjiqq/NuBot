@@ -87,9 +87,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             return toReturn;
         }
 
-        //ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-        ArrayList<Order> orderList = Global.taskManager.orderFetchTask.getCurrentOpenOrders();
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
         LOG.info("Active orders : " + orderList.size());
 
@@ -211,10 +209,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             toReturn = sendLiquidityInfoImpl(buySide, sellSide, 1);
         }
-
-
         return toReturn;
-
     }
 
     private void logOrderCSV(String toWrite) {
