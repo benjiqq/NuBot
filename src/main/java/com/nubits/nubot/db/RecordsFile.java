@@ -15,8 +15,8 @@ public class RecordsFile extends BaseRecordsFile
    protected Hashtable memIndex;
 
    /**
-    * Creates a new database file.  The initialSize parameter determines the
-    * amount of space which is allocated for the index.  The index can grow
+    * Creates a new database file. The initialSize parameter determines the
+    * amount of space which is allocated for the index. The index can grow
     * dynamically, but the parameter is provide to increase
     * efficiency.
     */
