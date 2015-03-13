@@ -19,11 +19,7 @@ package com.nubits.nubot.strategy.Primary;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
@@ -119,14 +115,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
             LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
         } else {
-            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+
+            CurrencyPair pair = Global.options.getPair();
+
+            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
+
             if (balancesResponse.isPositive()) {
                 Balance balance = (Balance) balancesResponse.getResponseObject();
                 Amount balanceNBT = balance.getNBTAvailable();
 
                 Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                        + balanceFIAT.getQuantity() + " USD");
+                LOG.info("Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
+                        + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
 
                 //Execute sellSide strategy
                 sellSide(balanceNBT);
@@ -259,89 +259,95 @@ public class StrategyPrimaryPegTask extends TimerTask {
      */
     private void sellSide(Amount balanceNBT) {
 
-        //Check if NBT balance > 1
-        if (balanceNBT.getQuantity() > 1) {
-            String idToDelete = getSmallerWallID(Constant.SELL);
-            if (!idToDelete.equals("-1")) {
-                LOG.warn("Sellside : Taking down smaller order to aggregate it with new balance");
-
-                if (TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair())) {
-
-                    //Update balanceNBT to aggregate new amount made available
-                    ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-                    if (balancesResponse.isPositive()) {
-                        Balance balance = (Balance) balancesResponse.getResponseObject();
-                        balanceNBT = balance.getNBTAvailable();
-
-                        Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-
-                        LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
-                                + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
-
-                        //Update TX fee :
-                        //Get the current transaction fee associated with a specific CurrencyPair
-                        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-                        if (txFeeNTBUSDResponse.isPositive()) {
-                            double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
-                            LOG.info("Updated Trasaction fee = " + txFeeUSDNTB + "%");
-
-                            //Prepare the sell order
-                            double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
-
-                            if (Global.options.getMaxSellVolume() > 0) //There is a cap on the order size
-                            {
-                                if (balanceNBT.getQuantity() > Global.options.getMaxSellVolume()) {
-                                    //put the cap
-                                    balanceNBT.setQuantity(Global.options.getMaxSellVolume());
-                                }
-                            }
-
-                            double amountToSell = balanceNBT.getQuantity();
-                            if (Global.options.isExecuteOrders()) {
-                                //execute the order
-                                String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                        + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
-                                orderLog(orderString);
-
-                                ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
-                                if (sellResponse.isPositive()) {
-                                    HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, MessageColor.YELLOW);
-                                    String sellResponseString = (String) sellResponse.getResponseObject();
-                                    LOG.warn("Strategy : Sell Response = " + sellResponseString);
-                                } else {
-                                    LOG.error(sellResponse.getError().toString());
-                                }
-                            } else {
-                                //Testing only : print the order without executing it
-                                LOG.warn("Strategy : (Should) Submit order : "
-                                        + "sell" + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
-                                        + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
-                            }
-                        } else {
-                            //Cannot update txfee
-                            LOG.error(txFeeNTBUSDResponse.getError().toString());
-                        }
-
-
-                    } else {
-                        //Cannot get balance
-                        LOG.error(balancesResponse.getError().toString());
-                    }
-                } else {
-                    String errMessagedeletingOrder = "could not delete order " + idToDelete;
-                    LOG.error(errMessagedeletingOrder);
-                    HipChatNotifications.sendMessage(errMessagedeletingOrder, MessageColor.YELLOW);
-                    MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
-                }
-            } else {
-                LOG.error("Can't get smaller wall id.");
-            }
-
-        } else {
+        //Don't order if NBT balance < treshhold
+        double nbttreshhold = 1;
+        if (balanceNBT.getQuantity() < nbttreshhold) {
             //NBT balance = 0
             LOG.info("NBT balance < 1, no orders to execute");
+            return;
+        }
+
+        String idToDelete = getSmallerWallID(Constant.SELL);
+        if (idToDelete.equals("-1")) {
+            LOG.error("Can't get smaller wall id.");
+            return;
+        }
+
+        LOG.warn("Sellside : Taking down smaller order to aggregate it with new balance");
+
+        boolean orderdelete = TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
+
+        if (!orderdelete) {
+            String errMessagedeletingOrder = "could not delete order " + idToDelete;
+            LOG.error(errMessagedeletingOrder);
+            HipChatNotifications.sendMessage(errMessagedeletingOrder, MessageColor.YELLOW);
+            MailNotifications.send(Global.options.getMailRecipient(), "NuBot : problem shifting walls", errMessagedeletingOrder);
+            return;
+        }
+
+
+        //Update balanceNBT to aggregate new amount made available
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+        if (balancesResponse.isPositive()) {
+            //Cannot get balance
+            LOG.error(balancesResponse.getError().toString());
+            return;
+        }
+
+        Balance balance = (Balance) balancesResponse.getResponseObject();
+        balanceNBT = balance.getNBTAvailable();
+
+        Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+
+        LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
+                + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
+
+        //Update TX fee :
+        //Get the current transaction fee associated with a specific CurrencyPair
+        ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+        if (!txFeeNTBUSDResponse.isPositive()) {
+            //Cannot update txfee
+            LOG.error(txFeeNTBUSDResponse.getError().toString());
+            return;
+        }
+
+        double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
+        LOG.info("Updated Trasaction fee = " + txFeeUSDNTB + "%");
+
+        //Prepare the sell order
+        double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
+
+        //There is a cap on the order size
+        if (Global.options.getMaxSellVolume() > 0)  {
+            if (balanceNBT.getQuantity() > Global.options.getMaxSellVolume()) {
+                //put the cap
+                balanceNBT.setQuantity(Global.options.getMaxSellVolume());
+            }
+        }
+
+        double amountToSell = balanceNBT.getQuantity();
+        if (Global.options.isExecuteOrders()) {
+            //execute the order
+            String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode();
+            orderLog(orderString);
+
+            ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
+            if (sellResponse.isPositive()) {
+                HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, MessageColor.YELLOW);
+                String sellResponseString = (String) sellResponse.getResponseObject();
+                LOG.warn("Strategy : Sell Response = " + sellResponseString);
+            } else {
+                LOG.error(sellResponse.getError().toString());
+            }
+        } else {
+            //Testing only : print the order without executing it
+            LOG.warn("Strategy : (Should) Submit order : "
+                    + "sell" + amountToSell + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + sellPrice + " " + Global.options.getPair().getPaymentCurrency().getCode());
         }
     }
+
 
     /**
      * USD (Buys)
