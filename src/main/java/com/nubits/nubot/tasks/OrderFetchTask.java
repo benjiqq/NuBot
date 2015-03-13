@@ -14,14 +14,13 @@ public class OrderFetchTask implements Runnable {
     private static final Logger LOG = LoggerFactory.getLogger(OrderFetchTask.class.getName());
 
     /**
-     * get orders every milliseconds
+     * get orders every [x] milliseconds
      */
-    private final int interval_time = 500;
+    private final int interval_time = 1000;
 
     private ArrayList<Order> currentOpenOrders;
 
     private final Object lock = new Object();
-
 
     @Override
     public void run(){
@@ -35,6 +34,7 @@ public class OrderFetchTask implements Runnable {
             if (activeOrdersResponse.isPositive()) {
                 synchronized (lock) {
                     currentOpenOrders= (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+                    LOG.info("got current orders " + currentOpenOrders.size());
                 }
                 //LOG.info("orders: " + currentOpenOrders.size());
             }

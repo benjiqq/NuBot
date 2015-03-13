@@ -69,13 +69,8 @@ public class BotUtil {
     public static int countActiveOrders(String type) {
         //Get active orders
         int toRet = 0;
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
 
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return -1;
-        }
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        ArrayList<Order> orderList = Global.taskManager.orderFetchTask.getCurrentOpenOrders();
 
         for (int i = 0; i < orderList.size(); i++) {
             Order tempOrder = orderList.get(i);

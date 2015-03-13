@@ -378,14 +378,17 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        /*ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
 
         if (!activeOrdersResponse.isPositive()) {
             LOG.error(activeOrdersResponse.getError().toString());
             return "-1";
-        }
+        }*/
 
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        //ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+        ArrayList<Order> orderList = Global.taskManager.orderFetchTask.getCurrentOpenOrders();
+
         ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
 
         for (int i = 0; i < orderListCategorized.size(); i++) {
