@@ -8,12 +8,17 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
+import com.sun.org.apache.xalan.internal.xsltc.cmdline.getopt.GetOpt;
 import org.json.simple.JSONObject;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import javax.swing.text.html.Option;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * the main launcher class. starts bot based on configuration, not through UI
@@ -21,8 +26,12 @@ import java.io.IOException;
 public class MainLaunch {
 
     private static Thread mainThread;
+
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
+
+    private static boolean runui = false;
+
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> runui=true";
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -31,26 +40,46 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
-        NuBotOptions opt = null;
+        if (args.length > 2) {
+            exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
+        }
+
+        String configfile = args[0];
+
+        if (args.length == 2) {
+            String[] s = args[1].split("=");
+            try {
+                runui = new Boolean(s[1]).booleanValue();
+            } catch (Exception e) {
+                exitWithNotice("can't parse runui flag: run nubot with \n" + USAGE_STRING);
+            }
+        }
+
+        NuBotOptions nuopt = null;
 
         //Load settings
         try {
             Utils.loadProperties("settings.properties");
         } catch (IOException e) {
-            LOG.error("could not load settings");
-            System.exit(0);
+            exitWithNotice("could not load settings");
         }
-        LOG.info("settings loaded");
 
+        LOG.info("settings loaded");
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            opt = parseOptionsArgs(args);
+            nuopt = ParseOptions.parseOptionsSingle(configfile);
         } catch (NuBotConfigException e) {
             exitWithNotice("" + e);
         }
 
-        executeBot(opt);
+        LOG.info("runui " + runui);
+
+        if (runui)
+            UILaunch.UIlauncher(".", configfile);
+        else
+            executeBot(nuopt);
+
     }
 
 
@@ -93,9 +122,36 @@ public class MainLaunch {
 
     }
 
+
+    /**
+     * parse the command line arguments. first argument has to be the config file
+     *
+     * @param args
+     * @return
+     * @throws NuBotConfigException
+     */
+    private static String parseOptionsArgs(String args[]) throws NuBotConfigException {
+
+        String configfile = "";
+
+        //Load Options and test for critical configuration errors
+        configfile = args[0];
+
+        try {
+            String p = System.getProperty("runui");
+            LOG.info("runui " + p);
+            runui = new Boolean(p).booleanValue();
+        } catch (Exception e) {
+            LOG.info("can't parse runui");
+        }
+
+
+        return configfile;
+    }
+
+
     /**
      * shutdown mechanics
-     * TODO: some of the logic can be handled by NuBot in an async way
      */
     private static void createShutDownHook() {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -163,38 +219,5 @@ public class MainLaunch {
             }
         }));
     }
-
-
-    /**
-     * parse the command line arguments
-     *
-     * @param args
-     * @return
-     * @throws NuBotConfigException
-     */
-    private static NuBotOptions parseOptionsArgs(String args[]) throws NuBotConfigException {
-
-        if (args.length != 1) {
-            throw new NuBotConfigException("wrong argument number : run nubot with \n" + USAGE_STRING);
-        }
-
-        NuBotOptions opt = null;
-        //Load Options and test for critical configuration errors
-        if (args.length > 1) {
-            //more than one file path given
-            throw new NuBotConfigException("more than one argument");
-
-        } else {
-            try {
-                opt = ParseOptions.parseOptionsSingle(args[0]);
-            } catch (NuBotConfigException ex) {
-                throw new NuBotConfigException("NuBot wrongly configured");
-            }
-        }
-        if (opt == null)
-            throw new NuBotConfigException("");
-
-        return opt;
-    }
-
 }
+

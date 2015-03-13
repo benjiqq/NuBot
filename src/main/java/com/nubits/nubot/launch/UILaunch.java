@@ -15,10 +15,6 @@ public class UILaunch {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
-    private static String configFile = "poloniex.json";
-    private static String configdir = "testconfig";
-
-
     public static String opttoJson(NuBotOptions opt) {
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
         gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
@@ -28,8 +24,7 @@ public class UILaunch {
         return js;
     }
 
-
-    private static void printlogall(){
+    private static void printlogall() {
         LOG.trace("test log trace");
         LOG.debug("test log debug");
         LOG.info("test log info");
@@ -37,8 +32,7 @@ public class UILaunch {
         LOG.error("test log error");
     }
 
-    public static void main(String[] args) {
-
+    public static void UIlauncher(String configdir, String configFile) {
         LOG.info("starting UI server");
 
         printlogall();
@@ -54,7 +48,13 @@ public class UILaunch {
         } catch (Exception ex) {
             LOG.error("error configuring " + ex);
         }
+    }
 
+    public static void main(String[] args) {
+        String configFile = "poloniex.json";
+        String configdir = "testconfig";
+
+        UIlauncher(configdir, configFile);
 
     }
 }

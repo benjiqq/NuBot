@@ -27,8 +27,8 @@ public class UiServer {
 
     private static String configFile;
 
-    //TODO path
-    private static String htmlFolder = "./UI/templates/";
+    //TODO via resources
+    private static String htmlFolder = "./templates/";
 
     private static TradeInterface ti;
 
