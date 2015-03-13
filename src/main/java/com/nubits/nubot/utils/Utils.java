@@ -422,7 +422,9 @@ public class Utils {
             String kpass = Global.settings.getProperty("keystore_pass");
             LOG.info("password " + kpass);
 
-            String tmp = "/tmp/nubot_keystore.jks";
+            String wdir = System.getProperty("user.dir");
+
+            String tmp = wdir + "/" + "nubot_keystore.jks";
 
             LOG.info("setting keystore to tmp " + tmp);
 
