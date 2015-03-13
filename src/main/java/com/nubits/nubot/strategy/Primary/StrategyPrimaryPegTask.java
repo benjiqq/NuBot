@@ -118,28 +118,23 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             CurrencyPair pair = Global.options.getPair();
 
-            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
+            Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
 
-            if (balancesResponse.isPositive()) {
-                Balance balance = (Balance) balancesResponse.getResponseObject();
-                Amount balanceNBT = balance.getNBTAvailable();
+            Amount balanceNBT = balance.getNBTAvailable();
 
-                Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                LOG.info("Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
-                        + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
+            Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            LOG.info("Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
+                    + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
 
-                //Execute sellSide strategy
-                sellSide(balanceNBT);
+            //Execute sellSide strategy
+            sellSide(balanceNBT);
 
-                //Execute buy Side strategy
-                if (Global.options.isDualSide() && proceedsInBalance) {
-                    buySide();
-                }
-
-            } else {
-                //Cannot get balance
-                LOG.error(balancesResponse.getError().toString());
+            //Execute buy Side strategy
+            if (Global.options.isDualSide() && proceedsInBalance) {
+                buySide();
             }
+
+
         }
     }
 
@@ -174,30 +169,25 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         if (cancelSells) {
             //Update balances
-            ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-            if (balancesResponse.isPositive()) {
-                Balance balance = (Balance) balancesResponse.getResponseObject();
-                Amount balanceNBT = balance.getNBTAvailable();
 
-                Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-                LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
-                        + balanceFIAT.getQuantity() + " USD");
+            Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
 
-                //Execute sellSide strategy
-                //Introuce an aleatory sleep time to desync bots at the time of placing orders.
-                //This will favour competition in markets with multiple custodians
-                try {
-                    Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
-                } catch (InterruptedException ex) {
-                    LOG.error(ex.toString());
-                }
+            Amount balanceNBT = balance.getNBTAvailable();
 
-                sellSide(balanceNBT);
+            Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
+                    + balanceFIAT.getQuantity() + " USD");
+
+            //Execute sellSide strategy
+            //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+            //This will favour competition in markets with multiple custodians
+            try {
+                Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+            } catch (InterruptedException ex) {
+                LOG.error(ex.toString());
             }
-            {
-                //Cannot get balance
-                LOG.error(balancesResponse.getError().toString());
-            }
+
+            sellSide(balanceNBT);
         }
 
         //Execute buy Side strategy
@@ -287,14 +277,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
         //Update balanceNBT to aggregate new amount made available
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-        if (balancesResponse.isPositive()) {
-            //Cannot get balance
-            LOG.error(balancesResponse.getError().toString());
-            return;
-        }
+        Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
 
-        Balance balance = (Balance) balancesResponse.getResponseObject();
         balanceNBT = balance.getNBTAvailable();
 
         Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
@@ -412,69 +396,64 @@ public class StrategyPrimaryPegTask extends TimerTask {
      */
     private void checkBalancesAndOrders() {
 
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+        Balance balance = Global.taskManager.balanceFetchTask.getCurrentBalances();
 
-        if (balancesResponse.isPositive()) {
+        double balanceNBT = balance.getNBTAvailable().getQuantity();
+        double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 
-            Balance balance = (Balance) balancesResponse.getResponseObject();
-            double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+        LOG.info("balance NBT " + balanceNBT);
+        LOG.info("balance FIAT " + balanceFIAT);
 
-            LOG.info("balance NBT " + balanceNBT);
-            LOG.info("balance FIAT " + balanceFIAT);
+        activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
+        activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
+        totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-            activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
-            activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
-            totalActiveOrders = activeSellOrders + activeBuyOrders;
+        LOG.info("activeSellOrders " + activeSellOrders);
+        LOG.info("activeBuyOrders " + activeBuyOrders);
+        LOG.info("totalActiveOrders" + totalActiveOrders);
 
-            LOG.info("activeSellOrders " + activeSellOrders);
-            LOG.info("activeBuyOrders " + activeBuyOrders);
-            LOG.info("totalActiveOrders" + totalActiveOrders);
+        ordersAndBalancesOk = false;
 
-            ordersAndBalancesOk = false;
+        double treshholdNBT = 1;
+        double treshholdFIAT = 1;
+        int numOrdersBoth = 2;
+        int numOrdersSell = 2;
+        int numOrdersBuy = 2;
 
-            double treshholdNBT = 1;
-            double treshholdFIAT = 1;
-            int numOrdersBoth = 2;
-            int numOrdersSell = 2;
-            int numOrdersBuy = 2;
+        if (Global.options.isDualSide()) {
+            LOG.info("checking balance and orders for dualside");
 
-            if (Global.options.isDualSide()) {
-                LOG.info("checking balance and orders for dualside");
+            boolean bothSides = activeSellOrders == numOrdersBoth && activeBuyOrders == numOrdersBoth;
+            boolean sellinplace = activeSellOrders == numOrdersSell && activeBuyOrders == 0 && balanceFIAT < treshholdFIAT;
+            boolean buyinplace = activeSellOrders == 0 && activeBuyOrders == numOrdersBuy && balanceNBT < treshholdNBT;
 
-                boolean bothSides = activeSellOrders == numOrdersBoth && activeBuyOrders == numOrdersBoth;
-                boolean sellinplace = activeSellOrders == numOrdersSell && activeBuyOrders == 0 && balanceFIAT < treshholdFIAT;
-                boolean buyinplace = activeSellOrders == 0 && activeBuyOrders == numOrdersBuy && balanceNBT < treshholdNBT;
+            LOG.info("bothSides " + bothSides);
+            LOG.info("sellneeded " + sellinplace);
+            LOG.info("buyneeded " + buyinplace);
 
-                LOG.info("bothSides " + bothSides);
-                LOG.info("sellneeded " + sellinplace);
-                LOG.info("buyneeded " + buyinplace);
+            ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
 
-                ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
-
-                if (balanceFIAT > 1 && !isFirstTime) {
-                    LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
-                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
-                    proceedsInBalance = true;
-                } else {
-                    proceedsInBalance = false;
-                }
-
+            if (balanceFIAT > 1 && !isFirstTime) {
+                LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
+                        + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                proceedsInBalance = true;
             } else {
-                LOG.info("checking balance and orders for one side");
-
-                boolean nobuyorders = activeBuyOrders == 0;
-                boolean twosellorders = activeSellOrders == 2;
-                boolean nonbt = balanceNBT < 0.01;
-                LOG.info("nobuyorders " + nobuyorders);
-                LOG.info("twosellorders " + twosellorders);
-                LOG.info("nonbt " + nonbt);
-
-                ordersAndBalancesOk = twosellorders && nobuyorders && nonbt;
+                proceedsInBalance = false;
             }
+
         } else {
-            LOG.error(balancesResponse.getError().toString());
+            LOG.info("checking balance and orders for one side");
+
+            boolean nobuyorders = activeBuyOrders == 0;
+            boolean twosellorders = activeSellOrders == 2;
+            boolean nonbt = balanceNBT < 0.01;
+            LOG.info("nobuyorders " + nobuyorders);
+            LOG.info("twosellorders " + twosellorders);
+            LOG.info("nonbt " + nonbt);
+
+            ordersAndBalancesOk = twosellorders && nobuyorders && nonbt;
         }
+
     }
 
     private boolean reInitiateOrders(boolean firstTime) {

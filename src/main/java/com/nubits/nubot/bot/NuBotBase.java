@@ -9,6 +9,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.tasks.BalanceFetchTask;
 import com.nubits.nubot.tasks.OrderFetchTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
@@ -246,8 +247,14 @@ public abstract class NuBotBase {
 
         OrderFetchTask ft = new OrderFetchTask();
         Global.taskManager.orderFetchTask = ft;
-        Thread t = new Thread(ft);
-        t.start();
+        Thread t1 = new Thread(ft);
+        t1.start();
+
+        BalanceFetchTask bt = new BalanceFetchTask(opt.getPair());
+        Global.taskManager.balanceFetchTask = bt;
+        Thread t2 = new Thread(bt);
+        t2.start();
+
 
     }
 
