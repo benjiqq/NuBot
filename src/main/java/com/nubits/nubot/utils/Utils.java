@@ -63,6 +63,8 @@ public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
+    private static String  nubotconfigfile= ".nubot";
+
     /**
      * @param originalString
      * @param passphrase
@@ -429,16 +431,26 @@ public class Utils {
     public static String versionName() {
         if (insideJar()) {
             String wdir = System.getProperty("user.dir");
-            String fp = wdir + "/" + ".nubot";
+
+            String fp = wdir + "/" + nubotconfigfile;
 
             File file = new File(fp);
             try {
                 List lines = FileUtils.readLines(file, "UTF-8");
-                String l = "" + lines.get(0);
-                String[] a = l.split("=");
-                if (a[0].equals("version"))
-                    return a[1];
+                HashMap km = new HashMap();
+                for (Object o : lines){
+                    String l = "" +o;
+                    try{
+                        String[] a = l.split("=");
+                        km.put(a[0],a[1]);
+                    }catch(Exception e){
+                        //ignore line with "="
+                    }
 
+                }
+
+                if (km.containsKey("version"))
+                    return "" + km.get("version");
 
             } catch (Exception e) {
                 //throw e;
