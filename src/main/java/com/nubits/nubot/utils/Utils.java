@@ -416,17 +416,16 @@ public class Utils {
             //String kpath = Global.settings.getProperty("keystore_path");
             //LOG.info("keypath " + kpath);
 
-            String fp = filePathClasspathFile(keystorefile);
-            LOG.info("### absolute filepath of keystore " + fp);
+            String viaclasspath = filePathClasspathFile(keystorefile);
+            LOG.info("### absolute filepath of keystore " + viaclasspath);
 
             String kpass = Global.settings.getProperty("keystore_pass");
             LOG.info("password " + kpass);
 
             String wdir = System.getProperty("user.dir");
+            String wdirpath = wdir + "/" + "nubot_keystore.jks";
 
-            String tmp = wdir + "/" + "nubot_keystore.jks";
-
-            LOG.info("setting keystore to tmp " + tmp);
+            LOG.info("setting keystore to tmp " + wdirpath);
 
             /*try{
                 setSSLFactories(kfile, kpass);
@@ -434,7 +433,14 @@ public class Utils {
 
             }*/
 
-            System.setProperty("javax.net.ssl.trustStore", tmp);
+            String c = "" + Utils.class.getResource("Utils.class");
+            String path = "";
+            if (c.startsWith("jar:"))
+                path = wdirpath;
+            else
+                path = viaclasspath;
+
+            System.setProperty("javax.net.ssl.trustStore", path);
             System.setProperty("javax.net.ssl.trustStorePassword", kpass);
         }
     }
