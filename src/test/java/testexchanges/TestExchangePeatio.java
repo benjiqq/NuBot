@@ -20,8 +20,10 @@ public class TestExchangePeatio extends TestCase {
     private static final Logger LOG = LoggerFactory.getLogger(TestExchangePeatio.class
             .getName());
 
+
     private static String testconfigFile = "peatio.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
+    private static String testconfigdir = "config/testconfig";
+    private static String testconfig = testconfigdir + "/" + testconfigFile;
 
     @Test
     public void testPing() {

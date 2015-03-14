@@ -16,7 +16,7 @@ import java.nio.file.Paths;
 public class TestConfigAlts extends TestCase {
 
     private static String testconfigFile = "alts.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
+    private static String testconfig = "config/testconfig/" + testconfigFile;
 
     @Override
     public void setUp() {

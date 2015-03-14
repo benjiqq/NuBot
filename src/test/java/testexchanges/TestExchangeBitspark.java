@@ -29,7 +29,8 @@ public class TestExchangeBitspark extends TestCase {
             .getName());
 
     private static String testconfigFile = "spark.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
+    private static String testconfigdir = "config/testconfig";
+    private static String testconfig = testconfigdir + "/" + testconfigFile;
 
     /*static {
         System.setProperty("logback.configurationFile", "allconfig  /testlog.xml");
