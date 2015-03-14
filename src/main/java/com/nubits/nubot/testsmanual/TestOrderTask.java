@@ -87,11 +87,11 @@ public class TestOrderTask {
         Global.taskManager.getCheckConnectionTask().start();
 
 
-        Global.publicAddress = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
+        Global.options.nubitAddress = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
 
         LOG.info("Setting up (verbose) RPC client on " + nudip + ":" + nudport);
         Global.rpcClient = new NuRPCClient(nudip, nudport, PasswordsTest.NUD_RPC_USER,
-                PasswordsTest.NUD_RPC_PASS, true, true, Global.publicAddress, CurrencyList.NBT_PPC, "testid");
+                PasswordsTest.NUD_RPC_PASS, true, true, Global.options.nubitAddress, CurrencyList.NBT_PPC, "testid");
 
         Utils.printSeparator();
 

@@ -35,7 +35,6 @@ import java.util.Properties;
 
 /**
  * Global object for NuBot
- *
  */
 public class Global {
 
@@ -67,7 +66,7 @@ public class Global {
 
     public static Exchange exchange;
 
-    public static String publicAddress;
+
 
 
     /**
@@ -100,24 +99,26 @@ public class Global {
                 }
 
                 //reset liquidity info
-                if (rpcClient.isConnected() && options.isSubmitliquidity()) {
-                    //tier 1
-                    LOG.info("Resetting Liquidity Info before quit");
+                if (options.isSubmitliquidity()) {
+                    if (rpcClient.isConnected()) {
+                        //tier 1
+                        LOG.info("Resetting Liquidity Info before quit");
 
-                    JSONObject responseObject1 = rpcClient.submitLiquidityInfo(rpcClient.USDchar,
-                            0, 0, 1);
-                    if (null == responseObject1) {
-                        LOG.error("Something went wrong while sending liquidityinfo");
-                    } else {
-                        LOG.info(responseObject1.toJSONString());
-                    }
+                        JSONObject responseObject1 = rpcClient.submitLiquidityInfo(rpcClient.USDchar,
+                                0, 0, 1);
+                        if (null == responseObject1) {
+                            LOG.error("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.info(responseObject1.toJSONString());
+                        }
 
-                    JSONObject responseObject2 = rpcClient.submitLiquidityInfo(rpcClient.USDchar,
-                            0, 0, 2);
-                    if (null == responseObject2) {
-                        LOG.error("Something went wrong while sending liquidityinfo");
-                    } else {
-                        LOG.info(responseObject2.toJSONString());
+                        JSONObject responseObject2 = rpcClient.submitLiquidityInfo(rpcClient.USDchar,
+                                0, 0, 2);
+                        if (null == responseObject2) {
+                            LOG.error("Something went wrong while sending liquidityinfo");
+                        } else {
+                            LOG.info(responseObject2.toJSONString());
+                        }
                     }
                 }
 

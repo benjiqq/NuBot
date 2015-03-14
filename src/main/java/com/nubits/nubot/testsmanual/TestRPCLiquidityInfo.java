@@ -63,7 +63,7 @@ public class TestRPCLiquidityInfo {
 
         }
 
-        Global.publicAddress = custodian; //Global.options.getNubitsAddress();
+
         Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
                 user, pass, true, true,
                 custodian, CurrencyList.NBT_BTC , "");
@@ -137,10 +137,10 @@ public class TestRPCLiquidityInfo {
 
         Utils.installKeystore(true);
 
-        Global.publicAddress = custodianAddress;
+        String custodian = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
 
         //Create the client
-        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodianAddress, pair, exchangeName);
+        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodian, pair, exchangeName);
     }
 
     private void testCheckNudTask() {

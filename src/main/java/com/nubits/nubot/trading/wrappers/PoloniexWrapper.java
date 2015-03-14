@@ -157,7 +157,7 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
-        LOG.info("get balance");
+        LOG.trace("get balance");
 
         //Swap the pair for the request
         ApiResponse apiResponse = new ApiResponse();
@@ -168,10 +168,10 @@ public class PoloniexWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         boolean isGet = false;
 
-        LOG.info("get from " + url);
-        LOG.info("method " + method);
+        LOG.trace("get from " + url);
+        LOG.trace("method " + method);
         ApiResponse response = getQuery(url, method, query_args, isGet);
-        LOG.info("response " + response);
+        LOG.trace("balance response " + response);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (currency != null) {
@@ -715,7 +715,7 @@ public class PoloniexWrapper implements TradeInterface {
                 if (httpError) {
                     LOG.error("Post Data: " + post_data);
                 }
-                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.trace("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
                     LOG.trace(output);
                     answer += output;

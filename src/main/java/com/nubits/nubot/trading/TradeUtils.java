@@ -38,15 +38,20 @@ public class TradeUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TradeUtils.class.getName());
 
+    /**
+     * cancel all outstanding orders
+     * @param pair
+     * @return
+     */
     public static boolean tryCancelAllOrders(CurrencyPair pair) {
         boolean toRet = false;
         //get all orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (!activeOrdersResponse.isPositive()) {
-            toRet = false;
-
             LOG.error(activeOrdersResponse.getError().toString());
+            return false;
         }
+
         ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
         if (orderList.size() == 0) {
@@ -59,7 +64,7 @@ public class TradeUtils {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                 if (deleted) {
-                    LOG.info("Order clear request succesfully");
+                    LOG.info("Order clear request succesful");
                 } else {
                     toRet = false;
                     LOG.info("Could not submit request to clear orders");

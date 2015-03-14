@@ -14,7 +14,7 @@ public class NuSetup {
      */
     public static void setupNuRPCTask() {
         LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
-        Global.publicAddress = Global.options.getNubitsAddress();
+
         Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
                 Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
                 Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
