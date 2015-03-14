@@ -141,76 +141,10 @@ task NuBotJar(type: Jar) {
     with jar
 }
 
-task copyDist(type: Copy) {
-    println 'copy dist'
-
-    html_files.each { File file ->
-        println file.name
-        copy {
-            from "md/" + file.name
-            into "${distdir}/"
-        }
-        delete(file)
-    }
-
-    if (!logdir.exists()) {
-        println("creating logdir")
-
-        if (logdir.mkdirs()) {
-            println("succeeded in creating " + logdir)
-        }
-    }
-
-    copy {
-        from "config/sampleconfig/sample.json"
-        into "${distdir}/sampleconfig.json"
-    }
-
-    /*copy {
-        from "src"
-        into "${distdir}/res/sources"
-    }*/
-
-    /*copy {
-        from "res/logs_assets"
-        into "${distdir}/res/logs_assets"
-    }*/
-
-    /*copy {
-        from "res/currencies.csv"
-        into "${distdir}/res"
-    }*/
-
-    copy {
-        from "src/main/resources/nubot_keystore.jks"
-        into "${distdir}"
-        //exclude 'listCertificates.sh'
-    }
-
-
-    //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
-
-}
-
-task NuBotDist() << {
+task NuBotDist() {
     description 'make NuBot distribution folder'
 
     println 'start making distribution'
-    tasks.initDist.execute()
-    tasks.compiledocs.execute()
-    //println 'delete ${distdir}'
-    //delete "${distdir}"
-    tasks.NuBotJar.execute()
-    tasks.propfile.execute()
-    println 'copy for distribution'
-    tasks.copyDist.execute()
-
-    println "finish distribution"
-
-    copy {
-        from "config/testconfig/poloniex.json"
-        into "${distdir}"
-    }
 
     /*if (includeTestConfig) {
         copy {
@@ -218,7 +152,60 @@ task NuBotDist() << {
             into "${distdir}"
         }
     }*/
+
+    doFirst {
+        println 'dist do first'
+        println "delete ${distdir}"
+        delete "${distdir}"
+        tasks.compiledocs.execute()
+        tasks.initDist.execute()
+    }
+
+    doLast {
+        println 'dist do last'
+        tasks.NuBotJar.execute()
+        tasks.propfile.execute()
+
+        println "finish distribution"
+
+        copy {
+            from "config/testconfig/poloniex.json"
+            into "${distdir}"
+        }
+
+        html_files.each { File file ->
+            println 'copy ' + file.name
+            copy {
+                from "md/" + file.name
+                into "${distdir}/"
+            }
+            delete(file)
+        }
+
+        /*if (!logdir.exists()) {
+            println("creating logdir")
+
+            if (logdir.mkdirs()) {
+                println("succeeded in creating " + logdir)
+            }
+        }*/
+
+        copy {
+            from "config/sampleconfig/sample.json"
+            into "${distdir}/sampleconfig.json"
+        }
+
+        copy {
+            from "src/main/resources/nubot_keystore.jks"
+            into "${distdir}"
+            //exclude 'listCertificates.sh'
+        }
+
+        //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+    }
+
 }
+
 
 task runUI(type: JavaExec) {
     description 'run the WebUI'
@@ -277,73 +264,3 @@ task cleanall << {
 
     tasks.cleanhtml.execute()
 }
-
-
-//----------------------------------------------------------------------
-
-//TODO: copy html output to UI templates
-/*task copyhtmltoui(type: copy){
-    //<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>README.md - Grip</title>
-
-    //</body>
-    //</html>
-}*/
-
-//use standard sourcesets, otherwise they can be defined like this
-/*sourceSets {
-    main {
-        java {
-            srcDir 'NuBot/src'
-        }
-        resources {
-            srcDir 'NuBot/res'
-        }
-    }
-
-    test {
-        java {
-            srcDir 'NuBot/tests'
-        }
-        resources {
-            srcDir 'NuBot/res'
-        }
-    }
-}*/
-
-/*test {
-    reports {
-        junitXml.enabled = false
-        html.enabled = true
-    }
-}*/
-
-/*task TestNuBotJar(type: Jar)  {
-    description 'create the TestNuBotjar'
-
-    destinationDir = testdistdir
-    archiveName = 'NuBot.jar'
-
-    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
-        exclude 'META-INF/MANIFEST.MF'
-        exclude 'META-INF/*.SF'
-        exclude 'META-INF/*.DSA'
-        exclude 'META-INF/*.RSA'
-    }
-    manifest {
-        attributes "Main-Class": mainclass
-    }
-    //println 'generated jar: ' + jar.archivePath
-    with jar
-}*/
-
-/*task TestNuBotJar << {
-    tasks.NuBotJar.execute()
-    copy {
-        from  tasks.NuBotJar.archivePath
-        into "${testdistdir}"
-    }
-    copy {
-        from "testconfig/poloniex.json"
-        into "${testdistdir}"
-    }
-}*/
