@@ -31,10 +31,12 @@ public class LogController {
 
             try {
                 String l = new String(Files.readAllBytes(Paths.get(logfile)));
-                LOG.trace("log fetched " + l.substring(0,50));
+
+                LOG.trace(">> log fetched " + l.substring(0,100));
 
                 object.addProperty("log", l);
                 return object;
+
             }catch(Exception e){
 
             }

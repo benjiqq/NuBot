@@ -187,6 +187,11 @@ task NuBotDist() {
         }
 
         copy {
+            from "UI/templates"
+            into "${distdir}/UI/templates"
+        }
+
+        copy {
             from "src/main/resources/nubot_keystore.jks"
             into "${distdir}"
             //exclude 'listCertificates.sh'
