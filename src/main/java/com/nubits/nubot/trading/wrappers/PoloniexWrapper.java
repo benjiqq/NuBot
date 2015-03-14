@@ -177,7 +177,7 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-        LOG.info("balance answer " + httpAnswerJson);
+        LOG.debug("balance answer " + httpAnswerJson);
 
         if (currency != null) {
             //looking for a specific currency
@@ -793,7 +793,7 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         private String createNonce() {
-            long toRet = System.currentTimeMillis();
+            long toRet = System.currentTimeMillis() + 2000;
             return Long.toString(toRet);
         }
     }

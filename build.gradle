@@ -176,7 +176,7 @@ task NuBotDist() {
             println 'copy ' + file.name
             copy {
                 from "md/" + file.name
-                into "${distdir}/"
+                into "${distdir}/docs"
             }
             delete(file)
         }
@@ -191,7 +191,7 @@ task NuBotDist() {
 
         copy {
             from "config/sampleconfig/sample.json"
-            into "${distdir}/sampleconfig.json"
+            into "${distdir}"
         }
 
         copy {
@@ -212,6 +212,12 @@ task runUI(type: JavaExec) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
+
+task runpoloniex(type: JavaExec) {
+    description 'run bot with poloniex'
+    main = "com.nubits.nubot.launch.TestLaunch"
+    classpath = sourceSets.main.runtimeClasspath
+}
 
 task testall(type: Test) {
     description 'test all'

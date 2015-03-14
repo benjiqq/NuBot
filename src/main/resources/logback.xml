@@ -3,12 +3,15 @@
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
-
 			<Pattern>
 				%date{HH:mm:ss.SSS} %logger{36} %line %-5level - %msg%n
 			</Pattern>
 
 		</layout>
+
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>INFO</level>
+		</filter>
 
 		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
 			<evaluator>

@@ -37,9 +37,7 @@ public class MainLaunch {
         if (args.length > 2 || args.length == 0) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
-
         String configfile = args[0];
-
         if (args.length == 2) {
             String[] s = args[1].split("=");
             try {
@@ -48,6 +46,16 @@ public class MainLaunch {
                 exitWithNotice("can't parse runui flag: run nubot with \n" + USAGE_STRING);
             }
         }
+        mainLaunch(configfile, runui);
+
+    }
+
+    /**
+     * main launch of a bot
+     * @param configfile
+     * @param runui
+     */
+    public static void mainLaunch(String configfile, boolean runui) {
 
         //Load settings
         try {
@@ -68,16 +76,14 @@ public class MainLaunch {
         }
 
         LOG.info("------ new session ------");
-
-        LOG.info("runui " + runui);
-
         if (runui) {
+            LOG.info("* run with ui *");
             String workingdir = ".";
             UILaunch.UIlauncher(workingdir, configfile);
-        }
-        else
+        } else {
+            LOG.info("** run command line **");
             executeBot(nuopt);
-
+        }
     }
 
 

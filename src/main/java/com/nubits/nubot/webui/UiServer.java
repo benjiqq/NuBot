@@ -24,7 +24,7 @@ public class UiServer {
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
     //TODO via resources
-    private static String htmlFolder = "./templates/";
+    private static String htmlFolder = "./UI/templates/";
 
     private static TradeInterface ti;
 

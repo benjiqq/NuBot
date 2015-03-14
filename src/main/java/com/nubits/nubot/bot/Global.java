@@ -73,6 +73,9 @@ public class Global {
      * shutdown mechanics
      */
     public static void createShutDownHook() {
+
+        LOG.info("adding shutdown hook");
+
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {

@@ -35,12 +35,19 @@ public class BalanceFetchTask implements Runnable {
 
         boolean run = true;
 
+        balances = new HashMap<>();
+        balances.put(this.pair.getOrderCurrency(), new Amount(0.0, this.pair.getOrderCurrency()));
+        balances.put(this.pair.getPaymentCurrency(), new Amount(0.0, this.pair.getPaymentCurrency()));
+
         //continously update
         while(run) {
 
             Iterator<Currency> it = balances.keySet().iterator();
 
+            LOG.info("balance fetch loop");
+
             while (it.hasNext()){
+
                 Currency c = it.next();
 
                 ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(c);
@@ -51,8 +58,11 @@ public class BalanceFetchTask implements Runnable {
                         LOG.info("for " + c + " got amount " + a);
                         balances.put(c,a);
                     }
-                    //LOG.info("orders: " + currentOpenOrders.size());
+                } else{
+                    LOG.error("balance fetch failed");
                 }
+
+
             }
 
 
