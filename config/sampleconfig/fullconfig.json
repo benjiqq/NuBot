@@ -1,7 +1,7 @@
 {
   "exchangename":"poloniex",
-  "apikey": "KRL2I0HP-DDRDKK1C-9X4BRSK0-IEP93DPE",
-  "apisecret": "27826c1689489977ec368fa6b1f23443bb00c7ca05d79f4ca1f1a370571ecbe94819bde0081accc49b180c10b04eecbb5959e871c16ee252aea029cbdd347378",
+  "apikey": "xxx",
+  "apisecret": "xxx",
   "txfee": 0.2,
   "pair":"nbt_btc",
   "nubitaddress": "xxx",
