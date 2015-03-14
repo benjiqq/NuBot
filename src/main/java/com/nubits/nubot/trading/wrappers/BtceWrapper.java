@@ -740,7 +740,7 @@ public class BtceWrapper implements TradeInterface {
                 // create and setup a HTTP connection
 
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Global.app_name);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());

@@ -41,6 +41,8 @@ public class Global {
 
     final static Logger LOG = LoggerFactory.getLogger(Global.class);
 
+    public final static String app_name = "NuBot";
+
     public static Thread mainThread;
 
     public static NuBotOptions options;
