@@ -44,14 +44,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Properties;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -352,16 +345,13 @@ public class Utils {
         //Generate a random alfanumeric id of 6 chars
         String uid = UUID.randomUUID().toString().substring(0, 6);
         //Get nubot version
-        String version = Utils.getVersion();
+        String version = Utils.versionName();
         //Get timestamp
         String timest = "" + getTimestampLong();
         //conatenate
         return version + sep + timest + sep + uid;
     }
 
-    public static String getVersion() {
-        return Global.settings.getProperty("version");
-    }
 
     /**
      * Install a trust manager that does not validate certificate chains for https calls
@@ -401,6 +391,7 @@ public class Utils {
     }
 
     public static void installKeystore(boolean trustAll) {
+
         LOG.info("installKeystore. trustall: " + trustAll);
         if (trustAll) {
             try {
@@ -410,11 +401,10 @@ public class Utils {
             }
 
         } else {
-            String keystorefile = "nubot_keystore.jks";
 
-            //String kpath = Utils.filePathClasspathFile();
-            //String kpath = Global.settings.getProperty("keystore_path");
-            //LOG.info("keypath " + kpath);
+            //load file depending whether run from inside a Jar or not
+
+            String keystorefile = "nubot_keystore.jks";
 
             String viaclasspath = filePathClasspathFile(keystorefile);
             LOG.info("### absolute filepath of keystore " + viaclasspath);
@@ -423,19 +413,10 @@ public class Utils {
             LOG.info("password " + kpass);
 
             String wdir = System.getProperty("user.dir");
-            String wdirpath = wdir + "/" + "nubot_keystore.jks";
+            String wdirpath = wdir + "/" + keystorefile;
 
-            LOG.info("setting keystore to tmp " + wdirpath);
-
-            /*try{
-                setSSLFactories(kfile, kpass);
-            }catch(Exception e){
-
-            }*/
-
-            String c = "" + Utils.class.getResource("Utils.class");
             String path = "";
-            if (c.startsWith("jar:"))
+            if (insideJar())
                 path = wdirpath;
             else
                 path = viaclasspath;
@@ -443,6 +424,40 @@ public class Utils {
             System.setProperty("javax.net.ssl.trustStore", path);
             System.setProperty("javax.net.ssl.trustStorePassword", kpass);
         }
+    }
+
+    public static String versionName() {
+        if (insideJar()) {
+            String wdir = System.getProperty("user.dir");
+            String fp = wdir + "/" + ".nubot";
+
+            File file = new File(fp);
+            try {
+                List lines = FileUtils.readLines(file, "UTF-8");
+                String l = "" + lines.get(0);
+                String[] a = l.split("=");
+                if (a[0].equals("version"))
+                    return a[1];
+
+
+            } catch (Exception e) {
+                //throw e;
+            }
+
+            return "load version error";
+
+        } else {
+            return "develop";
+        }
+    }
+
+    public static boolean insideJar() {
+        String c = "" + Utils.class.getResource("Utils.class");
+        String path = "";
+        if (c.startsWith("jar:"))
+            return true;
+        else
+            return false;
     }
 
     /**

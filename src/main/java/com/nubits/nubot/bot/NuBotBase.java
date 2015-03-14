@@ -161,13 +161,14 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-
         //TODO: opt should be passed in constructor, not set in global
 
         //TODO refactor so we can test validity here again
 
+        LOG.info("----- new session -----");
+        LOG.info("Setting up NuBot version : " + Utils.versionName());
+
         LOG.info("NuBot logging");
-        LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {

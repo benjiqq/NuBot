@@ -28,6 +28,7 @@ version = '0.15'
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
 
+
 //Get dependencies from Maven central repository
 repositories {
     mavenCentral()
@@ -170,6 +171,28 @@ task testexchanges(type: Test) {
   description 'test all exchanges, includes ordering'
   include 'testexchanges/*'
   testexchanges.reports.html.destination = file("${testreportdir}/exchangetests")
+}
+
+
+//produce the ".nubot" file in distribution folder
+//when run as jar NuBot will look for this file
+task propfile << {
+    def prop = new Properties()
+    prop.put("version",project.version)
+
+    //determine hash of current branch
+    def proc = "git rev-parse HEAD".execute()
+    def b = new StringBuffer()
+    proc.consumeProcessErrorStream(b)
+    def h = proc.text
+    h = h.replace("\n","")
+    prop.put("lastcommit",h);
+
+    def propFile = new File("${distdir}/.nubot")
+    propFile.createNewFile();
+    prop.store(propFile.newWriter(), null);
+
+    println 'this project is version ' + project.version
 }
 
 //TODO: copy html output to UI templates
