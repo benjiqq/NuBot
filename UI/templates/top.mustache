@@ -54,6 +54,7 @@
               });
             }*/
 
+
             function loadlog() {
 
                 //console.log("load log");
@@ -73,6 +74,11 @@
                 .done(function( data ) {
                   $('#logarea').val(data["log"]);
                 });
+
+                var psconsole = $('#logarea');
+                if(psconsole.length)
+                  psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());  
+                //bottom = $("#logarea")[0].scrollHeight - $("#logarea").height()
 
                 setTimeout(loadlog,5000);
             }

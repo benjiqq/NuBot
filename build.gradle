@@ -127,7 +127,7 @@ task NuBotJar(type: Jar) {
     //baseName = project.name
     archiveName "NuBot.jar"
     destinationDir = distdir //file('${distdir}')
-
+    println 'archived to ' + destinationDir + " " + archiveName
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -180,14 +180,6 @@ task NuBotDist() {
             }
             delete(file)
         }
-
-        /*if (!logdir.exists()) {
-            println("creating logdir")
-
-            if (logdir.mkdirs()) {
-                println("succeeded in creating " + logdir)
-            }
-        }*/
 
         copy {
             from "config/sampleconfig/sample.json"
