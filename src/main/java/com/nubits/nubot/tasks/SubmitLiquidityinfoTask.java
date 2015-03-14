@@ -22,7 +22,7 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -81,7 +81,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         String toReturn = "";
 
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-
 
         if (!activeOrdersResponse.isPositive()) {
             LOG.error(activeOrdersResponse.getError().toString());
@@ -210,7 +209,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             toReturn = sendLiquidityInfoImpl(buySide, sellSide, 1);
         }
-
         return toReturn;
     }
 
@@ -236,7 +234,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         String toReturn = "";
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
             Amount NBTbalance = balance.getNBTAvailable();
             Amount PEGbalance = balance.getPEGAvailableBalance();

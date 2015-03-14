@@ -18,7 +18,7 @@
 package com.nubits.nubot.models;
 
 
-public class Balance {
+public class PairBalance {
 
     private Amount PEGTotal;
     private Amount NBTTotal;
@@ -27,18 +27,13 @@ public class Balance {
     private Amount PEGAvailable;
     private Amount NBTAvailable;
 
-    /**
-     *
-     */
-    public Balance() {
-    }
 
     /**
      *
      * @param NBTTotal
      * @param PEGTotal
      */
-    public Balance(Amount NBTTotal, Amount PEGTotal) {
+    public PairBalance(Amount NBTTotal, Amount PEGTotal) {
         this.NBTTotal = NBTTotal;
         this.PEGTotal = PEGTotal;
         this.PEGonOrder = new Amount(0, Currency.createCurrency(PEGTotal.getCurrency().getCode()));
@@ -54,7 +49,7 @@ public class Balance {
      * @param PEGonOrder
      * @param NBTonOrder
      */
-    public Balance(Amount PEGAvail, Amount NBTAvail, Amount PEGonOrder, Amount NBTonOrder) {
+    public PairBalance(Amount PEGAvail, Amount NBTAvail, Amount PEGonOrder, Amount NBTonOrder) {
         this.PEGAvailable = PEGAvail;
         this.NBTAvailable = NBTAvail;
         this.PEGonOrder = PEGonOrder;
@@ -63,7 +58,6 @@ public class Balance {
         this.NBTTotal = new Amount(NBTAvailable.getQuantity() + NBTonOrder.getQuantity(), CurrencyList.NBT);
     }
 
-//Methods
     /**
      * @return the PEGTotal
      */
@@ -72,24 +66,10 @@ public class Balance {
     }
 
     /**
-     * @param PEGTotal the PEGTotal to set
-     */
-    private void setPegBalance(Amount PEGTotal) {
-        this.PEGTotal = PEGTotal;
-    }
-
-    /**
      * @return the NBTTotal
      */
     public Amount getNubitsBalance() {
         return NBTTotal;
-    }
-
-    /**
-     * @param NBTTotal
-     */
-    private void setNubitsBalance(Amount NBTTotal) {
-        this.NBTTotal = NBTTotal;
     }
 
     /**
@@ -102,26 +82,10 @@ public class Balance {
 
     /**
      *
-     * @param PEGonOrder
-     */
-    private void setPEGBalanceonOrder(Amount PEGonOrder) {
-        this.PEGonOrder = PEGonOrder;
-    }
-
-    /**
-     *
      * @return
      */
     public Amount getNBTonOrder() {
         return NBTonOrder;
-    }
-
-    /**
-     *
-     * @param NBTonOrder
-     */
-    private void setNBTonOrder(Amount NBTonOrder) {
-        this.NBTonOrder = NBTonOrder;
     }
 
     /**
@@ -134,34 +98,19 @@ public class Balance {
 
     /**
      *
-     * @param PEGAvailable
-     */
-    private void setPEGAvailableBalance(Amount PEGAvailable) {
-        this.PEGAvailable = PEGAvailable;
-    }
-
-    /**
-     *
      * @return
      */
     public Amount getNBTAvailable() {
         return NBTAvailable;
     }
 
-    /**
-     *
-     * @param NBTAvailable
-     */
-    private void setNBTAvailableBalance(Amount NBTAvailable) {
-        this.NBTAvailable = NBTAvailable;
-    }
 
     @Override
     public String toString() {
         return "Balance{" + "PEGTotal=" + PEGTotal + ", PEGonOrder=" + PEGonOrder + ", PEGAvailable=" + PEGAvailable + ", NBTTotal=" + NBTTotal + ", NBTonOrder=" + NBTonOrder + ", NBTAvailable=" + NBTAvailable + '}';
     }
 
-    public static Balance getSwappedBalance(Balance original) {
-        return new Balance(original.NBTAvailable, original.getPEGAvailableBalance(), original.getNBTonOrder(), original.getPEGBalanceonOrder());
+    public static PairBalance getSwappedBalance(PairBalance original) {
+        return new PairBalance(original.NBTAvailable, original.getPEGAvailableBalance(), original.getNBTonOrder(), original.getPEGBalanceonOrder());
     }
 }

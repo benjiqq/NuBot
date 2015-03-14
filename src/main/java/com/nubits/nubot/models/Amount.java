@@ -24,6 +24,7 @@ import java.text.DecimalFormat;
 public class Amount {
 
     private double quantity;
+
     private Currency currency;
 
     /**

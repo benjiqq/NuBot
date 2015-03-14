@@ -179,7 +179,7 @@ public class BitSparkWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = null;
+        PairBalance balance = null;
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = true;
@@ -218,7 +218,7 @@ public class BitSparkWrapper implements TradeInterface {
                 }
                 if (NBTAvail != null && NBTonOrder != null
                         && PEGAvail != null && PEGonOrder != null) {
-                    balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                     //Pack it into the ApiResponse
                     apiResponse.setResponseObject(balance);
                 } else {

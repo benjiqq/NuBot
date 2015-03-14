@@ -42,6 +42,12 @@ public class TaskManager {
     private BotTask checkNudTask;
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
 
+    // --- fetcher tasks ---
+
+    public OrderFetchTask orderFetchTask;
+    public BalanceFetchTask balanceFetchTask;
+
+
     //these are used for secondary peg strategy
     private BotTask secondaryPegTask;
     private BotTask priceTriggerTask;

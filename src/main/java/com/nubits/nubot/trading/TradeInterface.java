@@ -20,7 +20,6 @@ package com.nubits.nubot.trading;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -32,7 +31,7 @@ import java.util.TreeMap;
  * This interface can be used to trade Please refer to readme to best practice
  * for the implementation
  *
- * @see Balance
+ * @see com.nubits.nubot.models.PairBalance
  * @see ApiResponse
  * @see Order
  * @see ApiError

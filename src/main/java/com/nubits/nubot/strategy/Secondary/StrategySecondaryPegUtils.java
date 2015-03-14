@@ -31,7 +31,6 @@ import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 
 import java.util.ArrayList;
 
-import org.apache.http.HttpEntityEnclosingRequest;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -389,7 +388,7 @@ public class StrategySecondaryPegUtils {
     public void recount() {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
             double balancePEG = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 

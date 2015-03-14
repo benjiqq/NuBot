@@ -2,7 +2,7 @@ package testexchanges;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -59,7 +59,7 @@ public class TestExchangePeatio extends TestCase {
 
         if (balancesResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getBalance() ");
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
             LOG.info(balance.toString());
 

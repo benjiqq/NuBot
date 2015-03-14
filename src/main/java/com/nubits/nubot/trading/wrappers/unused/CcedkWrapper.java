@@ -25,7 +25,7 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -219,7 +219,7 @@ public class CcedkWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -254,7 +254,7 @@ public class CcedkWrapper implements TradeInterface {
                 }
                 if (foundNBT && foundPEG) {
                     //Pack it into the ApiResponse
-                    balance = new Balance(NBTTotal, PEGTotal);
+                    PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
                     apiResponse.setResponseObject(balance);
                 } else {
                     ApiError err = errors.genericError;

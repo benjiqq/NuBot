@@ -178,9 +178,9 @@ public class ExcoinWrapper implements TradeInterface {
                         NBTonOrder.setQuantity(Double.parseDouble(thisWallet.get("order_balance").toString()));
                     }
                 }
-                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
 
-                balance = Balance.getSwappedBalance(balance); //Swap here for BTC_NBT
+                balance = PairBalance.getSwappedBalance(balance); //Swap here for BTC_NBT
                 apiResponse.setResponseObject(balance);
             } else { //get specific balance
                 Amount total = new Amount(0, currency);
