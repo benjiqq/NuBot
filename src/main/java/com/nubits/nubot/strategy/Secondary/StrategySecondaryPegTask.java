@@ -30,7 +30,6 @@ import org.slf4j.Logger;
 
 
 public class StrategySecondaryPegTask extends TimerTask  {
-    //implements Observer
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
