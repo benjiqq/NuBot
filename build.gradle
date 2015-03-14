@@ -162,7 +162,7 @@ task copyDist(type: Copy) {
     }
 
     copy {
-        from "sampleconfig/sample.json"
+        from "config/sampleconfig/sample.json"
         into "${distdir}/sampleconfig.json"
     }
 
@@ -208,7 +208,7 @@ task NuBotDist() << {
     println "finish distribution"
 
     copy {
-        from "testconfig/poloniex.json"
+        from "config/testconfig/poloniex.json"
         into "${distdir}"
     }
 
