@@ -55,10 +55,12 @@ public class FrozenBalancesManager {
     private Amount amountAlreadyThere;
     private Currency toFreezeCurrency;
 
+    public final static String frozenfolder = "frozen";
+
     //Call this on bot startup
-    public FrozenBalancesManager(String exchangName, CurrencyPair pair, String folder) {
+    public FrozenBalancesManager(String exchangName, CurrencyPair pair) {
         String fileName = pair.toStringSep() + "-" + exchangName + "-frozen.json";
-        this.pathToFrozenBalancesFiles = folder + fileName;
+        this.pathToFrozenBalancesFiles = frozenfolder + "/" + fileName;
         if (Global.swappedPair) {
             toFreezeCurrency = pair.getOrderCurrency();
         } else {

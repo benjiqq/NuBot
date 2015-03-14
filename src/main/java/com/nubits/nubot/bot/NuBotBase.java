@@ -236,7 +236,8 @@ public abstract class NuBotBase {
         LOG.info(Global.options.toStringNoKeys());
 
         // Set the frozen balance manager in the global variable
-        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.settings.getProperty("frozen_folder"));
+
+        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.frozenfolder);
 
         try{
             configureStrategy();
