@@ -2,6 +2,10 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.launch.MainLaunch;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,19 +32,32 @@ public class BotController {
             return json;
         });
 
+        // we expect options are set
         post(endpoint, "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
             boolean success = false;
 
-            // we expect options are set
+            String json_body = request.body();
 
-            String s= request.params().get("start");
-            LOG.info("bot >> " + s);
+            JSONParser parser = new JSONParser();
+            JSONObject postJson = null;
+            try {
+                postJson = (JSONObject) (parser.parse(json_body));
+            } catch (ParseException e) {
 
-            //MainLaunch.executeBot(Global.options);
+            }
 
-            opmap.put("success", success);
+            opmap.put("success", "" + false);
+
+            boolean start = new Boolean("" + postJson.get("start")).booleanValue();
+            LOG.info("bot start >> " + start);
+
+            if (start){
+                MainLaunch.executeBot(Global.options);
+                opmap.put("success", success);
+            }
+
 
             String json = new Gson().toJson(opmap);
 

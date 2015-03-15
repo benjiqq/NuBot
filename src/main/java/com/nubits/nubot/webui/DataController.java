@@ -1,6 +1,7 @@
 package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
@@ -22,7 +23,7 @@ public class DataController {
 
     final static Logger LOG = LoggerFactory.getLogger(DataController.class);
 
-    public DataController(String endpoint, TradeInterface ti) {
+    public DataController(String endpoint) {
 
 
         get(endpoint, "application/json", (request, response) -> {
@@ -34,19 +35,30 @@ public class DataController {
 
             CurrencyPair pair = CurrencyList.BTC_USD;
 
-            opmap.put("btc_balance", ExchangeFacade.getBalance(ti, CurrencyList.BTC));
-            opmap.put("nbt_balance", ExchangeFacade.getBalance(ti, CurrencyList.NBT));
-            opmap.put("orders", ExchangeFacade.getOpenOrders(ti));
+            //if bot is running
 
-            //TODO: use internal feeder
-            BtcePriceFeed btce = new BtcePriceFeed();
-            double lastbtce= btce.getLastPrice(pair).getPrice().getQuantity();
+            if (Global.exchange.getTradeInterface()!=null) {
+                TradeInterface ti = Global.exchange.getTradeInterface();
+                opmap.put("btc_balance", ExchangeFacade.getBalance(ti, CurrencyList.BTC));
+                opmap.put("nbt_balance", ExchangeFacade.getBalance(ti, CurrencyList.NBT));
+                opmap.put("orders", ExchangeFacade.getOpenOrders(ti));
+                //TODO: use internal feeder
+                BtcePriceFeed btce = new BtcePriceFeed();
+                double lastbtce= btce.getLastPrice(pair).getPrice().getQuantity();
 
-            BlockchainPriceFeed bci = new BlockchainPriceFeed();
-            double lastbci= bci.getLastPrice(pair).getPrice().getQuantity();
+                BlockchainPriceFeed bci = new BlockchainPriceFeed();
+                double lastbci= bci.getLastPrice(pair).getPrice().getQuantity();
 
-            opmap.put("btce_lastprice",lastbtce);
-            opmap.put("bci_lastprice",lastbci);
+                opmap.put("btce_lastprice",lastbtce);
+                opmap.put("bci_lastprice",lastbci);
+            } else{
+                opmap.put("btc_balance", 0);
+                opmap.put("nbt_balance", 0);
+                opmap.put("orders", "");
+                opmap.put("btce_lastprice",0);
+                opmap.put("bci_lastprice",0);
+            }
+
 
             String json = new Gson().toJson(opmap);
 

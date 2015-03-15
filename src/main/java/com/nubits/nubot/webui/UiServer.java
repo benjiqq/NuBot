@@ -30,23 +30,12 @@ public class UiServer {
 
     private static int port = 4567; //standard port, can't change
 
-    public static void setupOp(){
-        Map opmap = new HashMap();
-        opmap.put("exchange", Global.options.getExchangeName());
-        opmap.put("btc_balance", 0);
-        opmap.put("nbt_balance", 0);
-
-        String json = new Gson().toJson(ExchangeFacade.getOpenOrders(ti));
-        opmap.put("orders", json);
-
-        get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), new LayoutTemplateEngine(htmlFolder));
-
-    }
-
     /**
      * start the UI server
      */
     public static void startUIserver(String configdir, String configFile) {
+
+        //set up all endpoints. currently not very pretty code.
 
         LOG.info("launching on http://localhost:" + port);
 
@@ -57,31 +46,44 @@ public class UiServer {
             LOG.error("error loading properties");
         }
 
-
         //binds GET and POST
         new ConfigController("/config", configdir, configFile);
 
         new LogController("/logdump");
 
+        LayoutTemplateEngine tmpl = new LayoutTemplateEngine(htmlFolder);
+
         Map feedsmap = new HashMap();
         //TODO: pegging price
         feedsmap.put("watchcurrency", Global.options.pair.toString());
-        get("/feeds", (request, response) -> new ModelAndView(feedsmap, htmlFolder + "feeds.mustache"), new LayoutTemplateEngine(htmlFolder));
+        get("/feeds", (request, response) -> new ModelAndView(feedsmap, htmlFolder + "feeds.mustache"), tmpl);
 
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
-        //TODO. not very elegant to configure exchange here
-        ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
-        new DataController("/status",ti);
+        //TODO
+        //ti = Global.exchange.getTradeInterface();
+
+        Map opmap = new HashMap();
+        opmap.put("exchange", Global.options.getExchangeName());
+        opmap.put("btc_balance", 0);
+        opmap.put("nbt_balance", 0);
+
+        //String json = new Gson().toJson(ExchangeFacade.getOpenOrders(ti));
+        opmap.put("orders", "");
+
+        get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), tmpl);
 
 
-        get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
+        new DataController("/status");
 
-        get("/about", (request, response) -> new ModelAndView(configmap, htmlFolder + "about.mustache"), new LayoutTemplateEngine(htmlFolder));
+        get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), tmpl);
+
+        get("/about", (request, response) -> new ModelAndView(configmap, htmlFolder + "about.mustache"), tmpl);
 
 
-        //new BotController("/startstop");
+
+        new BotController("/startstop");
 
         //get("/tools", (request, response) -> new ModelAndView(configmap, htmlFolder + "tools.mustache"), new LayoutTemplateEngine(htmlFolder));
 

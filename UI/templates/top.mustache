@@ -27,7 +27,7 @@
             margin-bottom: 20px;
           }
 
-          #logarea {
+          #logarea, #logarea2 {
             width:500px;
             height:200px;
             resize:none
@@ -46,6 +46,64 @@
 
               var host = "localhost";
               var port = 4567;
+              var baseurl = "http://" + host + ":" + port
+
+$(document).ready(function() {
+
+          $('#startbot').click(function(){
+
+                console.log("calling start on server");
+
+                var jsondata = JSON.stringify({
+                    "start": true});
+
+              $.ajax(baseurl + "/startstop", {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                        console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                    }
+               });
+
+
+                /*
+                $.ajax({
+                  type: "POST",
+                  dataType: "json",
+                  url: baseurl + "/startstop",
+                })
+                .fail(function() {
+                  console.log("error start");
+                  //alert( "error loading log" );
+                })
+                .done(function( data ) {
+                  $('#logarea2').val("running: " + data["running"]);
+                });
+                */
+
+                /*
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: baseurl + "/startstop",
+                })
+                .fail(function() {
+                  console.log("error start");
+                  //alert( "error loading log" );
+                })
+                .done(function( data ) {
+                  $('#logarea2').val("running: " + data["running"]);
+                });
+                */
+
+            });
+});
+
+
 
             /*function doPoll(){
             $.get('ajax/test.html', function(data) {
@@ -54,16 +112,16 @@
               });
             }*/
 
-            $('#startbot').click(function(){
 
-            });
+
+
 
 
             function loadlog() {
 
                 //console.log("load log");
 
-                var url = "http://" + host + ":" + port + "/logdump";
+                var url = baseurl + "/logdump";
 
                 console.log("url  " + url);
                 $.ajax({
