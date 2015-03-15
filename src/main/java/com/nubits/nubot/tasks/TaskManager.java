@@ -25,8 +25,8 @@ import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 
 import java.util.ArrayList;
 
-import com.nubits.nubot.tasks.fetch.BalanceFetchTask;
-import com.nubits.nubot.tasks.fetch.OrderFetchTask;
+import com.nubits.nubot.store.BalanceFetchTask;
+import com.nubits.nubot.store.OrderFetchTask;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

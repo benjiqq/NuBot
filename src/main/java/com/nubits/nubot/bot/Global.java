@@ -24,6 +24,7 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.store.BidAskStore;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FrozenBalancesManager;
@@ -49,7 +50,7 @@ public class Global {
     /**
      * storage layer
      */
-    public static Store store;
+    public static BidAskStore store;
 
 
     public static Properties settings;

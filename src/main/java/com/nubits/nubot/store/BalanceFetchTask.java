@@ -1,4 +1,4 @@
-package com.nubits.nubot.tasks.fetch;
+package com.nubits.nubot.store;
 
 
 import com.nubits.nubot.bot.Global;
