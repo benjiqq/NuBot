@@ -123,7 +123,7 @@ task compiledocs(type: Exec) {
 
 
 //create a single Jar with all dependencies
-task NuBotJar(type: Jar) {
+task NuBotJar(type: Jar) << {
     //baseName = project.name
     archiveName "NuBot.jar"
     destinationDir = distdir //file('${distdir}')
@@ -140,7 +140,7 @@ task NuBotJar(type: Jar) {
     with jar
 }
 
-task NuBotDist() {
+task NuBotDist() << {
     description 'make NuBot distribution folder'
 
     println 'start making distribution'

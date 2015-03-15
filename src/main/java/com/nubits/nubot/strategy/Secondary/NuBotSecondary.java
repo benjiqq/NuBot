@@ -85,6 +85,9 @@ public class NuBotSecondary extends NuBotBase {
             pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
         } catch (NuBotConfigException e) {
             exitWithNotice("can't configure price feeds");
+        } catch(Exception e){
+            LOG.error("" + opt);
+            exitWithNotice("something wrong with options");
         }
 
         pmtask.setPriceFeedManager(pfm);

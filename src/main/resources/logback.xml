@@ -29,7 +29,7 @@
 		<file>logs/main.log</file>
 
 		<encoder>
-			<pattern>%date %logger{36} %line %level - %msg%n
+			<pattern>%date{HH:mm:ss.SSS} - %msg%n
 			</pattern>
 		</encoder>
 

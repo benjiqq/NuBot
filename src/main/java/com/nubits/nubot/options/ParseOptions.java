@@ -142,6 +142,7 @@ public class ParseOptions {
     public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
 
         //default values for optional settings
+
         NuBotOptions options = NuBotOptionsDefault.defaultFactory();
 
         try {

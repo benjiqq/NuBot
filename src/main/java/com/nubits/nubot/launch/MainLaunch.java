@@ -1,6 +1,7 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -49,6 +50,14 @@ public class MainLaunch {
                 exitWithNotice("can't parse runui flag: run nubot with \n" + USAGE_STRING);
             }
         }
+
+        try {
+            Utils.loadProperties("settings.properties");
+        } catch (IOException e) {
+            exitWithNotice("could not load settings");
+        }
+        LOG.info("settings loaded");
+
         mainLaunch(configfile, runui);
 
     }
@@ -60,14 +69,8 @@ public class MainLaunch {
      */
     public static void mainLaunch(String configfile, boolean runui) {
         LOG.info("main launch. with configfile " + configfile + " " + runui);
-        //Load settings
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            exitWithNotice("could not load settings");
-        }
 
-        LOG.info("settings loaded");
+        CurrencyList.init();
 
         NuBotOptions nuopt = null;
 
