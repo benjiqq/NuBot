@@ -33,12 +33,15 @@ public class MainLaunch {
      * @param args a list of valid arguments
      */
     public static void main(String args[]) {
-
+        LOG.info("main. with args " + args.length);
         if (args.length > 2 || args.length == 0) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
         String configfile = args[0];
         if (args.length == 2) {
+            LOG.info("args0 " + args[0]);
+            LOG.info("args1 " + args[1]);
+
             String[] s = args[1].split("=");
             try {
                 runui = new Boolean(s[1]).booleanValue();
@@ -56,7 +59,7 @@ public class MainLaunch {
      * @param runui
      */
     public static void mainLaunch(String configfile, boolean runui) {
-
+        LOG.info("main launch. with configfile " + configfile + " " + runui);
         //Load settings
         try {
             Utils.loadProperties("settings.properties");

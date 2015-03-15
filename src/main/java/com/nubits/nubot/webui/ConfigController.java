@@ -3,6 +3,7 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsSerializer;
 import com.nubits.nubot.options.ParseOptions;
@@ -26,12 +27,11 @@ public class ConfigController {
 
     private String configDir;
     private String configfile;
-    private NuBotOptions opt;
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
 
-    public ConfigController(String endpoint, NuBotOptions opt, String configDir, String configfile) {
-        this.opt = opt;
+    public ConfigController(String endpoint, String configDir, String configfile) {
+
         this.configDir = configDir;
         this.configfile = configfile;
 
@@ -41,7 +41,7 @@ public class ConfigController {
             GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
             gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
             Gson parser = gson.create();
-            String js = parser.toJson(this.opt);
+            String js = parser.toJson(Global.options);
             return js;
         });
 
@@ -83,14 +83,14 @@ public class ConfigController {
                 LOG.info("error with backup " + e);
             }
 
-            this.opt = newopt;
+            Global.options = newopt;
 
             String saveTo = this.configDir + File.separator + this.configfile;
-            String js = SaveOptions.jsonPretty(this.opt);
+            String js = SaveOptions.jsonPretty(Global.options);
             LOG.info("new opt: " + js);
 
             try {
-                SaveOptions.saveOptionsPretty(this.opt, saveTo);
+                SaveOptions.saveOptionsPretty(Global.options, saveTo);
             }catch(Exception e){
                 LOG.info("error saving " + e);
             }

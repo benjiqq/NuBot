@@ -30,16 +30,22 @@ public class UILaunch {
 
         printlogall();
 
+        NuBotOptions opt = null;
+
         try {
             String configpath = configdir + "/" + configFile;
 
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(configpath);
+            opt = ParseOptions.parseOptionsSingle(configpath);
             Global.options = opt;
 
-            UiServer.startUIserver(opt, configdir, configFile);
-
         } catch (Exception ex) {
-            LOG.error("error configuring " + ex);
+            LOG.error("error configuring UI server " + ex);
+        }
+
+        try{
+            UiServer.startUIserver(configdir, configFile);
+        }catch(Exception e){
+            LOG.error("error setting up UI server " + e);
         }
     }
 
