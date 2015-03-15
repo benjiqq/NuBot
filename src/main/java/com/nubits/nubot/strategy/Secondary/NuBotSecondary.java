@@ -15,8 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.bot;
+package com.nubits.nubot.strategy.Secondary;
 
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBotBase;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
@@ -24,7 +26,6 @@ import com.nubits.nubot.options.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
-import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
@@ -43,6 +44,7 @@ public class NuBotSecondary extends NuBotBase {
 
     @Override
     public void configureStrategy() throws NuBotConfigException {
+
         if (Global.options.isDualSide()) {
             LOG.info("Configuring NuBot for Dual-Side strategy");
         } else {
@@ -61,7 +63,7 @@ public class NuBotSecondary extends NuBotBase {
 
         CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, CurrencyList.USD);
 
-        //TODO strategy tasks be in bots package
+        //TODO
 
         PriceMonitorTriggerTask pmtask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
         StrategySecondaryPegTask strattask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());

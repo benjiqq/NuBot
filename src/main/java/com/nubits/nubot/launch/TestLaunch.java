@@ -5,7 +5,7 @@ public class TestLaunch {
 
     public static void main(String args[]) {
 
-        String configfile = "config/testconfig/poloniex.json";
+        String configfile = "config/testconfig/poloniex_sec.json";
 
         MainLaunch.mainLaunch(configfile, false);
 

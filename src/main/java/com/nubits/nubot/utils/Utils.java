@@ -19,7 +19,7 @@ package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBotSecondary;
+import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
 
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
@@ -38,7 +38,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Paths;
 import java.security.InvalidKeyException;
-import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;

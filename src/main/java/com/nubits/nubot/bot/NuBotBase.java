@@ -9,8 +9,8 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.tasks.BalanceFetchTask;
-import com.nubits.nubot.tasks.OrderFetchTask;
+import com.nubits.nubot.tasks.fetch.BalanceFetchTask;
+import com.nubits.nubot.tasks.fetch.OrderFetchTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
@@ -225,6 +225,7 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
+                //TODO: handle gracefully
                 exitWithNotice("" + e);
             }
         }
@@ -246,6 +247,8 @@ public abstract class NuBotBase {
         }
 
         notifyOnline();
+
+        // fetcher tasks
 
         OrderFetchTask ft = new OrderFetchTask();
         Global.taskManager.orderFetchTask = ft;

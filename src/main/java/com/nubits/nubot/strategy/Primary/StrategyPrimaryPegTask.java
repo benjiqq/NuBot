@@ -23,7 +23,7 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
-import com.nubits.nubot.strategy.BotUtil;
+import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;

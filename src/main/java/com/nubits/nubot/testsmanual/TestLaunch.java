@@ -1,8 +1,8 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBotSecondary;
-import com.nubits.nubot.bot.NuBotSimple;
+import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
+import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;

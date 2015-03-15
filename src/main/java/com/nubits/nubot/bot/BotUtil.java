@@ -1,7 +1,6 @@
-package com.nubits.nubot.strategy;
+package com.nubits.nubot.bot;
 
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;

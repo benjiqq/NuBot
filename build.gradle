@@ -127,7 +127,7 @@ task NuBotJar(type: Jar) {
     //baseName = project.name
     archiveName "NuBot.jar"
     destinationDir = distdir //file('${distdir}')
-    println 'archived to ' + destinationDir + " " + archiveName
+    println 'create jar: ' + destinationDir + "/" + archiveName
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'

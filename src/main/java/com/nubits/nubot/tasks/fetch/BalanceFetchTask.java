@@ -1,4 +1,4 @@
-package com.nubits.nubot.tasks;
+package com.nubits.nubot.tasks.fetch;
 
 
 import com.nubits.nubot.bot.Global;
@@ -6,8 +6,6 @@ import com.nubits.nubot.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 
