@@ -548,7 +548,6 @@ public class BitSparkWrapper implements TradeInterface {
             }
         }
 
-
         //Create a CurrencyPair object
         CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(jsonObject.get("market").toString(), "");
 
