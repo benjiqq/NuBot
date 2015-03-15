@@ -15,15 +15,6 @@ public class UILaunch {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
-    public static String opttoJson(NuBotOptions opt) {
-        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
-        Gson parser = gson.create();
-        String js = parser.toJson(opt);
-        LOG.info("using options " + js);
-        return js;
-    }
-
     private static void printlogall() {
         LOG.trace("test log trace");
         LOG.debug("test log debug");
@@ -33,7 +24,9 @@ public class UILaunch {
     }
 
     public static void UIlauncher(String configdir, String configFile) {
+
         LOG.info("starting UI server");
+
 
         printlogall();
 

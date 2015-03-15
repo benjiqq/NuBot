@@ -28,10 +28,15 @@ public class UiServer {
 
     private static TradeInterface ti;
 
+    private static int port =4567; //standard port, can't change
+
     /**
      * start the UI server
      */
     public static void startUIserver(NuBotOptions opt, String configdir, String configFile) {
+
+        LOG.info("launching on http://localhost:" + port);
+
 
         //TODO: only load if in testmode and this is not set elsewhere
         try{
