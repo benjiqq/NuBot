@@ -29,7 +29,37 @@ public class CurrencyList {
     public static CurrencyPair PHP_USD;
     public static CurrencyPair HKD_USD;
 
+    static {
+        USD = Currency.createCurrency("USD");
+        CNY = Currency.createCurrency("CNY");
+        EUR = Currency.createCurrency("EUR");
+        PHP = Currency.createCurrency("PHP");
+        HKD = Currency.createCurrency("HKD");
+        BTC = Currency.createCurrency("BTC");
+        NBT = Currency.createCurrency("NBT");
+        NSR = Currency.createCurrency("NSR");
+        PPC = Currency.createCurrency("PPC");
+        LTC = Currency.createCurrency("LTC");
+        NBT_USD = new CurrencyPair(NBT, USD);
+        BTC_USD = new CurrencyPair(BTC, USD);
+        NBT_BTC = new CurrencyPair(NBT, BTC);
+        BTC_NBT = new CurrencyPair(BTC, NBT);
+        NBT_PPC = new CurrencyPair(NBT, PPC);
+        NBT_EUR = new CurrencyPair(NBT, EUR);
+        NBT_CNY = new CurrencyPair(NBT, CNY);
+        BTC_USD = new CurrencyPair(BTC, USD);
+        PPC_USD = new CurrencyPair(PPC, USD);
+        PPC_BTC = new CurrencyPair(PPC, BTC);
+        PPC_LTC = new CurrencyPair(PPC, LTC);
+        BTC_CNY = new CurrencyPair(BTC, CNY);
+        EUR_USD = new CurrencyPair(EUR, USD);
+        CNY_USD = new CurrencyPair(CNY, USD);
+        PHP_USD = new CurrencyPair(PHP, USD);
+        HKD_USD = new CurrencyPair(HKD, USD);
+    }
+
     public static void init(){
+        //workaround .. initing again
         USD = Currency.createCurrency("USD");
         CNY = Currency.createCurrency("CNY");
         EUR = Currency.createCurrency("EUR");

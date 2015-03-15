@@ -65,11 +65,21 @@
 		</rollingPolicy>
 
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<maxFileSize>10MB</maxFileSize>
+			<maxFileSize>50MB</maxFileSize>
 		</triggeringPolicy>
 
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>DEBUG</level>
+		</filter>
+
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator>
+				<expression>
+					return logger.contains("jetty");
+				</expression>
+			</evaluator>
+			<onMatch>DENY</onMatch>
+			<onMismatch>NEUTRAL</onMismatch>
 		</filter>
 
 

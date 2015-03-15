@@ -127,7 +127,7 @@ public class TestExchangeBitspark extends TestCase {
         }
     }
 
-    /*@Test
+    @Test
     public void testMakeOrder() {
         System.out.println("get balance");
         NuBotOptions opt = null;
@@ -177,8 +177,9 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(!orderresponse.isPositive());
 
         double minimialQty = 1;
-        double minimalPrice = 0.001;
+        double minimalPrice = 0.2;
         ApiResponse orderresponse2 = ti.buy(testPair, minimialQty, minimalPrice);
+        System.out.println("response " + orderresponse2);
         //should raise  {"error":"Total must be at least 0.0001."}
         assertTrue(orderresponse2.isPositive());
 
@@ -226,6 +227,6 @@ public class TestExchangeBitspark extends TestCase {
 
         assertTrue(orderList2.size() == 0);
 
-    }*/
+    }
 }
 

@@ -37,4 +37,25 @@ public class TestSSL extends TestCase {
         assertTrue(success);
 
     }
+
+    @Test
+    public void testBitspark() {
+
+        //Load settings
+        try {
+            Utils.loadProperties("settings.properties");
+        } catch (IOException e) {
+            //System.exit(0);
+            assertTrue(false);
+        }
+
+
+        Utils.installKeystore(false);
+
+        String API_BASE_URL = "bitspark.io";
+
+        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        assertTrue(success);
+
+    }
 }

@@ -70,8 +70,6 @@ public class MainLaunch {
     public static void mainLaunch(String configfile, boolean runui) {
         LOG.info("main launch. with configfile " + configfile + " " + runui);
 
-        CurrencyList.init();
-
         NuBotOptions nuopt = null;
 
         try {
@@ -80,6 +78,8 @@ public class MainLaunch {
         } catch (NuBotConfigException e) {
             exitWithNotice("" + e);
         }
+
+        CurrencyList.init();
 
         LOG.info("------ new session ------");
         if (runui) {
