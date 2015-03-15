@@ -50,11 +50,5 @@ public class UILaunch {
         }
     }
 
-    public static void main(String[] args) {
-        String configFile = "poloniex.json";
-        String configdir = "config/testconfig";
 
-        UIlauncher(configdir, configFile);
-
-    }
 }
