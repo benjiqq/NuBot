@@ -75,6 +75,10 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
 
+    public void setPriceFeedManager(PriceFeedManager pfm) {
+        this.pfm = pfm;
+    }
+
     @Override
     public void run() {
         //if a problem occurred we sleep for a period using the SLEEP_COUNTER
@@ -185,7 +189,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private void executeUpdatePrice(int countTrials) throws FeedPriceException {
 
         if (countTrials <= MAX_ATTEMPTS) {
-            ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+            ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
             LOG.info("CheckLastPrice received values from remote feeds. ");
 
@@ -494,7 +498,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         JSONArray backup_feeds = new JSONArray();
         JSONObject otherPricesAtThisTime = new JSONObject();
 
-        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
@@ -585,9 +589,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         this.wallsBeingShifted = wallsBeingShifted;
     }
 
-    public void setPriceFeedManager(PriceFeedManager pfm) {
-        this.pfm = pfm;
-    }
+
 
     public void setDistanceTreshold(double distanceTreshold) {
         this.distanceTreshold = distanceTreshold;

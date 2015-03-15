@@ -98,7 +98,7 @@ public class TaskManager {
 
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), NuBotAdminSettings.checkPriceInterval, "priceTriggerTask");
-        taskList.add(secondaryPegTask);
+        taskList.add(priceTriggerTask);
 
         priceMonitorTask = new BotTask(
                 new PriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);

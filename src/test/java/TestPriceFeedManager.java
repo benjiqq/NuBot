@@ -26,7 +26,7 @@ public class TestPriceFeedManager extends TestCase {
 
         }
 
-        ArrayList<LastPrice> prices = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> prices = pfm.fetchLastPrices().getPrices();
         Iterator<LastPrice> it = prices.iterator();
         while(it.hasNext()){
             LastPrice p = it.next();

@@ -52,11 +52,16 @@ public class PriceMonitorTask extends MonitorTask {
 
     }*/
 
+    public void setPriceFeedManager(PriceFeedManager pfm) {
+        this.pfm = pfm;
+    }
+
+
     @Override
     public void run() {
         LOG.info("Executing task : CheckLastPriceTask ");
 
-        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
         LOG.info("CheckLastPrice received values from remote feeds. ");
 
@@ -105,9 +110,6 @@ public class PriceMonitorTask extends MonitorTask {
 
     }
 
-    public void setPriceFeedManager(PriceFeedManager pfm) {
-        this.pfm = pfm;
-    }
 
     public void setDistanceTreshold(double distanceTreshold) {
         this.distanceTreshold = distanceTreshold;
@@ -194,7 +196,7 @@ public class PriceMonitorTask extends MonitorTask {
 
         String otherPricesAtThisTime = "";
 
-        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);

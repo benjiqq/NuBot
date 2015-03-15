@@ -55,7 +55,7 @@ public class PriceFeedManager {
      * trigger fetches from all feeds
      * @return
      */
-    public LastPriceResponse getLastPrices() {
+    public LastPriceResponse fetchLastPrices() {
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;
         ArrayList<LastPrice> prices = new ArrayList<>();
@@ -94,7 +94,7 @@ public class PriceFeedManager {
     }
 
     /**
-     * class to wrap results from getLastPrices
+     * class to wrap results from fetchLastPrices
      */
     public class LastPriceResponse {
 

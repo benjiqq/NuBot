@@ -154,7 +154,7 @@ public class TestSync extends TimerTask {
 
         }
 
-        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
         return priceList.get(0).getPrice().getQuantity();
 

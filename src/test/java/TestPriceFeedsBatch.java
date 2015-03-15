@@ -1,7 +1,6 @@
 package com.nubits.nubot.global;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -56,9 +55,9 @@ public class TestPriceFeedsBatch extends TestCase {
 
         }
 
-        PriceFeedManager.LastPriceResponse lpr = pfm.getLastPrices();
+        PriceFeedManager.LastPriceResponse lpr = pfm.fetchLastPrices();
 
-        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
         int s = pfm.getFeedList().size();
         int ps = priceList.size();
