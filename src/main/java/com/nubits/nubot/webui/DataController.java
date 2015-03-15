@@ -38,9 +38,9 @@ public class DataController {
             opmap.put("nbt_balance", ExchangeFacade.getBalance(ti, CurrencyList.NBT));
             opmap.put("orders", ExchangeFacade.getOpenOrders(ti));
 
+            //TODO: use internal feeder
             BtcePriceFeed btce = new BtcePriceFeed();
             double lastbtce= btce.getLastPrice(pair).getPrice().getQuantity();
-
 
             BlockchainPriceFeed bci = new BlockchainPriceFeed();
             double lastbci= bci.getLastPrice(pair).getPrice().getQuantity();
