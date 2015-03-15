@@ -55,7 +55,7 @@ $(document).ready(function() {
                 console.log("calling start on server");
 
                 var jsondata = JSON.stringify({
-                    "start": true});
+                    "operation": "start"});
 
               $.ajax(baseurl + "/startstop", {
                     data : jsondata,
@@ -69,10 +69,9 @@ $(document).ready(function() {
                     }
                });
 
-
                 /*
                 $.ajax({
-                  type: "POST",
+                  type: "GET",
                   dataType: "json",
                   url: baseurl + "/startstop",
                 })
@@ -84,6 +83,29 @@ $(document).ready(function() {
                   $('#logarea2').val("running: " + data["running"]);
                 });
                 */
+
+            });
+
+
+
+          $('#stopbot').click(function(){
+
+                console.log("calling stop on server");
+
+                var jsondata = JSON.stringify({
+                    "operation": "stop"});
+
+              $.ajax(baseurl + "/startstop", {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                        console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                    }
+               });
 
                 /*
                 $.ajax({

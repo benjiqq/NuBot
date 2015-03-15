@@ -36,7 +36,6 @@ public class BotController {
         post(endpoint, "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
-            boolean success = false;
 
             String json_body = request.body();
 
@@ -48,21 +47,47 @@ public class BotController {
 
             }
 
-            opmap.put("success", "" + false);
-
-            boolean start = new Boolean("" + postJson.get("start")).booleanValue();
-            LOG.info("bot start >> " + start);
-
-            if (start){
-                MainLaunch.executeBot(Global.options);
-                opmap.put("success", success);
-            }
-
+            String startstop = "" + postJson.get("operation");
+            LOG.info("bot start/stop  >> " + startstop);
 
             String json = new Gson().toJson(opmap);
 
-            return json;
+            if (startstop.equals("start")) {
+                boolean success = false;
 
+                opmap.put("success", "" + false);
+                LOG.info("bot start >> " + startstop);
+
+                try {
+                    MainLaunch.executeBot(Global.options);
+                } catch (Exception e) {
+                    success = true;
+                }
+                opmap.put("success", success);
+
+                json = new Gson().toJson(opmap);
+
+                return json;
+            }
+
+            if (startstop.equals("stop")) {
+                boolean success = true;
+                try {
+                    LOG.info("try interrupt bot");
+                    Global.mainThread.interrupt();
+                } catch (Exception e) {
+                    success = false;
+                }
+
+                MainLaunch.executeBot(Global.options);
+                opmap.put("success", success);
+
+                json = new Gson().toJson(opmap);
+
+                return json;
+            }
+
+            return json;
         });
 
 

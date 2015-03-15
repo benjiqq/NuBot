@@ -138,7 +138,7 @@ public class Global {
                     }
                 }
 
-
+                //TODO! this shuts down UI as well
                 Thread.currentThread().interrupt();
                 return;
             }
