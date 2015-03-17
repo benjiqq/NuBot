@@ -135,6 +135,10 @@ $(document).ready(function() {
             }*/
 
 
+            function loadbot() {
+                loadlog();
+                load_status();
+            }
 
             function loadlog() {
 
@@ -168,7 +172,7 @@ $(document).ready(function() {
 
                 var url = "http://" + host + ":" + port + "/status";
 
-                console.log("url  " + url);
+                console.log("get status from url  " + url);
 
                 $.ajax({
                   type: "GET",
