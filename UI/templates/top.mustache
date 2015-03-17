@@ -135,11 +135,6 @@ $(document).ready(function() {
             }*/
 
 
-            function loadbot() {
-                loadlog();
-                load_status();
-            }
-
             function loadlog() {
 
                 //console.log("load log");
@@ -170,7 +165,7 @@ $(document).ready(function() {
 
             function load_status() {
 
-                var url = "http://" + host + ":" + port + "/status";
+                var url = baseurl + "/status";
 
                 console.log("get status from url  " + url);
 
@@ -183,13 +178,25 @@ $(document).ready(function() {
                     /*alert( "error loading status" );*/
                 })
                 .done(function( data ) {
-                console.log(data["bci_lastprice"]);
-                  $('#btce_last').html(data["btce_lastprice"]);
-                  $('#bci_last').html(data["bci_lastprice"]);
+                    console.log(data["btc_balance"]);
+
+                    $('#btc_balance').html(data["btc_balance"]);
+                    $('#nbt_balance').html(data["nbt_balance"]);
+
+                /*  $('#btce_last').html(data["btce_lastprice"]);
+                  $('#bci_last').html(data["bci_lastprice"]);*/
                 });
+
+
 
                 setTimeout(load_status,1000);
             }
+
+            function loadbot() {
+                loadlog();
+                load_status();
+            }
+
 
 
             function loadconfig() {

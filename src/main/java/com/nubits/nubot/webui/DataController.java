@@ -7,6 +7,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.pricefeeds.feedservices.BlockchainPriceFeed;
 import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
+import com.nubits.nubot.store.BalanceFetchTask;
 import com.nubits.nubot.trading.TradeInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,12 +36,24 @@ public class DataController {
 
             CurrencyPair pair = CurrencyList.BTC_USD;
 
-            //if bot is running
 
-            if (Global.exchange.getTradeInterface()!=null) {
-                TradeInterface ti = Global.exchange.getTradeInterface();
-                opmap.put("btc_balance", ExchangeFacade.getBalance(ti, CurrencyList.BTC));
-                opmap.put("nbt_balance", ExchangeFacade.getBalance(ti, CurrencyList.NBT));
+            TradeInterface ti = null;
+
+            try{
+                ti = Global.exchange.getTradeInterface();
+            }catch(Exception e){
+
+            }
+
+            BalanceFetchTask bt = Global.taskManager.balanceFetchTask;
+
+            //if bot is running
+            if (ti!=null && bt!=null) {
+
+                LOG.info("bot is running. get balance");
+
+                opmap.put("btc_balance", bt.getCurrentAmount(CurrencyList.BTC));
+                opmap.put("nbt_balance", bt.getCurrentAmount(CurrencyList.NBT));
                 opmap.put("orders", ExchangeFacade.getOpenOrders(ti));
                 //TODO: use internal feeder
                 BtcePriceFeed btce = new BtcePriceFeed();
@@ -52,12 +65,16 @@ public class DataController {
                 opmap.put("btce_lastprice",lastbtce);
                 opmap.put("bci_lastprice",lastbci);
             } else{
+
+                LOG.error("balance request, but TI not available");
+
                 opmap.put("btc_balance", 0);
                 opmap.put("nbt_balance", 0);
                 opmap.put("orders", "");
                 opmap.put("btce_lastprice",0);
                 opmap.put("bci_lastprice",0);
             }
+
 
 
             String json = new Gson().toJson(opmap);
