@@ -45,6 +45,8 @@ def testreportdir = new File("testreports") //$buildDir/reports
 def jarname = "NuBot.jar"
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
 def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
+def includeTestConfig = true
+
 def uiclass = "com.nubits.nubot.webui.UiServer"
 FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
@@ -84,7 +86,7 @@ dependencies {
     //static. no maven available
     compile files('lib/spark-core-2.2-SNAPSHOT.jar')
     compile files('lib/EasyJccKit.jar')
-    compile files('lib/bitcoinapi-0.1.jar')
+    compile files('lib/bitcoinapi-0.11.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
@@ -106,12 +108,6 @@ task initDist << {
         println("succeeded in creating " + distdir)
     }
 
-
-    copy {
-        from "NuBot/src/settings.properties"
-        into "NuBot/res/"
-    }
-
 }
 
 
@@ -123,11 +119,20 @@ task compiledocs(type: Exec) {
 
 
 //create a single Jar with all dependencies
-task NuBotJar(type: Jar) << {
-    //baseName = project.name
-    archiveName "NuBot.jar"
-    destinationDir = distdir //file('${distdir}')
-    println 'create jar: ' + destinationDir + "/" + archiveName
+task NuBotJar(type: Jar) {
+
+    doFirst {
+        archiveName "NuBot.jar"
+        destinationDir = distdir //file('${distdir}')
+        def f = new File("${distdir}/" + archiveName)
+        println 'jar ' + f + ' exists ' + f.exists()
+        if (f.exists()) {
+            println 'delete ' + f
+            f.delete()
+        }
+    }
+
+
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -138,22 +143,16 @@ task NuBotJar(type: Jar) << {
         attributes 'Main-Class': mainclass
     }
     with jar
+    doLast {
+        println "created jar: " + destinationDir + "/" + archiveName
+    }
 }
 
-task NuBotDist() << {
-    description 'make NuBot distribution folder'
-
-    println 'start making distribution'
-
-    /*if (includeTestConfig) {
-        copy {
-            from "testconfig/test.json"
-            into "${distdir}"
-        }
-    }*/
+task NuBotDist() {
+    //description 'make NuBot distribution folder'
 
     doFirst {
-        println 'dist do first'
+        println 'start making distribution'
         println "delete ${distdir}"
         delete "${distdir}"
         tasks.compiledocs.execute()
@@ -167,9 +166,11 @@ task NuBotDist() << {
 
         println "finish distribution"
 
-        copy {
-            from "config/testconfig/poloniex.json"
-            into "${distdir}"
+        if (includeTestConfig) {
+            copy {
+                from "config/testconfig/poloniex.json"
+                into "${distdir}"
+            }
         }
 
         html_files.each { File file ->
@@ -196,6 +197,7 @@ task NuBotDist() << {
             into "${distdir}"
             //exclude 'listCertificates.sh'
         }
+
 
         //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
     }
