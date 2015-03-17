@@ -26,7 +26,7 @@ public class MainLaunch {
 
     private static boolean runui = false;
 
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> runui=true";
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -39,13 +39,13 @@ public class MainLaunch {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
         String configfile = args[0];
+
         if (args.length == 2) {
             LOG.info("args0 " + args[0]);
             LOG.info("args1 " + args[1]);
 
-            String[] s = args[1].split("=");
             try {
-                runui = new Boolean(s[1]).booleanValue();
+                runui = args[1].equals("runui");
             } catch (Exception e) {
                 exitWithNotice("can't parse runui flag: run nubot with \n" + USAGE_STRING);
             }
@@ -81,7 +81,7 @@ public class MainLaunch {
 
         CurrencyList.init();
 
-        LOG.info("------ new session ------");
+        LOG.info("-- new main launched --");
         if (runui) {
             LOG.info("* run with ui *");
             String workingdir = ".";

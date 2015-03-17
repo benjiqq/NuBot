@@ -86,7 +86,7 @@ dependencies {
     //static. no maven available
     compile files('lib/spark-core-2.2-SNAPSHOT.jar')
     compile files('lib/EasyJccKit.jar')
-    compile files('lib/bitcoinapi-0.11.jar')
+    //compile files('lib/bitcoinapi-0.11.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
