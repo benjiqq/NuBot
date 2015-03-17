@@ -218,7 +218,7 @@ java -jar NuBot.jar <path/to/options.json>
 
 Additionally to run the UI
 ```
-java -jar NuBot.jar example.json runui=true
+java -jar NuBot.jar example.json runui
 ```
 
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
