@@ -57,7 +57,7 @@ public class CSVtools {
      * @param file
      * @return
      */
-    private static ArrayList<String[]> parseCsvFromFile(File file) {
+    public static ArrayList<String[]> parseCsvFromFile(File file) {
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";
