@@ -1,8 +1,11 @@
 dist/
 logs/
 
+#Config files
 config/testconfig/
 config/myconfig/
+
+#Reports
 testreports/
 
 #A folder containing utilities that do not need to be pushed
