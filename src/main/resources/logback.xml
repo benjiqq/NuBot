@@ -4,7 +4,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
-				%date{HH:mm:ss.SSS} %logger{36} %line %-5level - %msg%n
+				>> %date{HH:mm:ss.SSS} %logger{36} %line %-5level - %msg%n
 			</Pattern>
 
 		</layout>
@@ -51,7 +51,7 @@
 	</appender>
 
 	<appender name="allFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>logs/all.log</file>
+		<file>logs/debug.log</file>
 
 		<encoder>
 			<pattern>%date %logger{36} %line %level - %msg%n
@@ -85,15 +85,32 @@
 
 	</appender>
 
+	<!-- Daily rollover appender that also appends timestamp and rolls over on startup -->
+	<appender name="startupDailyRolloverAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!--<file>${LOG_FILE}</file>-->
+		<file>roll.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>roll.%d{yyyyMMdd}_%d{HHmmss,aux}</fileNamePattern>
+			<TimeBasedFileNamingAndTriggeringPolicy class="com.nubits.nubot.utils.StartupTimeBasedTriggeringPolicy" />
+		</rollingPolicy>
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+		</encoder>
+	</appender>
+
 	<root level="debug">
 		<appender-ref ref="allFILE" />
 		<appender-ref ref="mainFILE" />
 		<appender-ref ref="STDOUT" />
+		<appender-ref ref="startupDailyRolloverAppender" />
+
 	</root>
 
 
 
 	<!-- to surpress logback startup messages -->
+	<!--
 	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+	-->
 
 </configuration>

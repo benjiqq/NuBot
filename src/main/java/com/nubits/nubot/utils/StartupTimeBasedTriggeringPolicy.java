@@ -6,7 +6,7 @@ import ch.qos.logback.core.rolling.DefaultTimeBasedFileNamingAndTriggeringPolicy
 import ch.qos.logback.core.rolling.RolloverFailure;
 
 @NoAutoStart
-public class LogStartupTriggeringPolicy<E>
+public class StartupTimeBasedTriggeringPolicy<E>
         extends DefaultTimeBasedFileNamingAndTriggeringPolicy<E> {
 
     @Override
