@@ -33,7 +33,6 @@ $ sudo add-apt-repository ppa:webupd8team/java
 $ sudo apt-get update
 $ sudo apt-get install oracle-java8-installer
 ```
-In the future we will make available a docker container pre-prepared. 
 
 ###1) Prepare the NuBits client 
 
@@ -93,18 +92,16 @@ Parameters :
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | pair |  The currency pair where the bot operates     |   valid currency pair for the specified  eg. "nbt_usd" |
 
-** List of accepted names : "bter" ; "ccedk" ; "btce" ; "peatio" ; "poloniex" ;  "ccex" ; "excoin" ;  "bitcoinid" 
+** List of accepted names : see exchanges.html
 
-Sample file : *markets.json*: 
+Sample file :
 ```json
-{"options": 
-    {
-    "exchangename":"bter",
-    "apikey": "xxx",
-    "apisecret": "xxx",
-    "txfee": 0.2,
-    "pair":"nbt_btc"
- }
+{
+  "exchangename":"bter",
+  "apikey": "xxx",
+  "apisecret": "xxx",
+  "txfee": 0.2,
+  "pair":"nbt_btc"
 }
   
 ```
@@ -118,36 +115,34 @@ Parameters :
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
 | dualside | / |  If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.     | true,false |
-| multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
+| multiplecustodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  if set to false will disable hipchat notifications | boolean |
-| mail-notifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
-| mail-recipient | / |  the email to which emergency email are sent  |  String  |
+| mailnotifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
+| mailrecipient | / |  the email to which emergency email are sent  |  String  |
 | emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
-| keep-proceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| max-sell-order-volume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT . 0=no limit; |
-| max-buy-order-volume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
+| keepproceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
+| maxsellordervolume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT . 0=no limit; |
+| maxbuyordervolume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD |
 
 Sample file : *misc.json*: 
 ```json
-{"options": 
-    {
+{
     "dualside": true,  
-    "multiple-custodians":false,
-    "submit-liquidity":true,
+    "multiplecustodians":false,
+    "submitliquidity":true,
     "executeorders":false,
     "verbose":false,
     "hipchat":true,
-    "mail-notifications":false,
-    "mail-recipient":"xxx@xxx.xxx",
+    "mailnotifications":false,
+    "mailrecipient":"xxx@xxx.xxx",
     "emergency-timeout":60,
-    "keep-proceeds":0,
-    "max-sell-order-volume" : 0,
-    "max-buy-order-volume" : 0,
+    "keepproceeds":0,
+    "maxsellordervolume" : 0,
+    "maxbuy-ordervolume" : 0,
     "priceincrement": 0.1,
- }
 }
   
 ```
@@ -160,7 +155,7 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
+| submitliquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
 | nubitaddress | / | The public address where the custodial grant has been received    |   valid custodian NBT addresses (String) |
 | nudip    | "127.0.0.1"  |  The IP address of the machine that hosts the Nu Client |  IP address (String) |
 | nudport | / |The RPC port of the Nu daemon |   1024...65535 |
@@ -169,17 +164,14 @@ Parameters :
 
 Sample file : *liquidity-info.json*: 
 ```json
-{"options": 
-    {
-    "submit-liquidity":true,
+{
+    "submitliquidity":true,
     "nubitaddress": "xxx",
     "nudip": "127.0.0.1",
     "nudport": 9091,
     "rpcpass": "xxx",
     "rpcuser": "xxx"
- }
-}
-  
+}  
 ```
 
 ---
@@ -193,32 +185,22 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| wallshift-threshold | / | how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
+| wallshiftthreshold | / | how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 | spread  | / | the spread between buy and sell walls | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| main-feed  | / | the name of the main price feed that has priority over the others | **see following table |
-| backup-feeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
+| mainfeed  | / | the name of the main price feed that has priority over the others | **see following table |
+| backupfeeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 
 See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master) for an updated list of valid feed names.
 
 
 Sample file : *price-tracking.json*: 
 ```json
-{"options": 
-    {
-     "secondary-peg-options":
-    {
-            "wallshift-threshold": 0.3,
-            "spread": 0,
-            "main-feed": "bitfinex",
-            "backup-feeds": {
-                "backup1" : { "name" : "blockchain"},
-                "backup2" : { "name" : "coinbase"},
-                "backup3" : { "name" : "bitstamp"}
-                }
-    }
- }
+{
+ "wallshiftthreshold": 0.3,
+ "spread": 0,
+ "mainfeed": "bitfinex",
+ "backupfeeds": ["blockchain", "coinbase", "bitstamp"]
 }
-  
 ```
 
 ---
@@ -231,7 +213,12 @@ You can also merge all the configuration parameter under a unique .json file, al
 Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
 This is the syntax : 
 ```
-java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]
+java -jar NuBot.jar <path/to/options.json>
+```
+
+Additionally to run the UI
+```
+java -jar NuBot.jar example.json runui
 ```
 
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
@@ -244,14 +231,12 @@ The bot will start and write output in the */logs* folder.
 
 To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders. 
 
-
 ##Logging on HTML and csv
 
+TODO
+
 The bot produces different output log files, all stored in a special folder created for each session under *logs/*.  
-The bot creates a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. 
-*fine* are never logged to file (only to console).
+The bot creates a csv and html log for each session. 
 *info* are logged to file if we set`"verbose"=true`. 
-*warning* are used for logging trading-related messages.
-*severe* are used for errors.
 
 Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 

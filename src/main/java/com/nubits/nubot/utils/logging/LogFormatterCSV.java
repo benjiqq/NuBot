@@ -26,7 +26,7 @@ import java.util.logging.LogRecord;
 
 /**
  *
- * @author desrever < desrever@nubits.com >
+ *
  * adapted from vogella tutorial
  */
 public class LogFormatterCSV extends Formatter {

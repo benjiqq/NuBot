@@ -30,6 +30,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -37,38 +38,43 @@ public class TradeUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TradeUtils.class.getName());
 
+    /**
+     * cancel all outstanding orders
+     * @param pair
+     * @return
+     */
     public static boolean tryCancelAllOrders(CurrencyPair pair) {
         boolean toRet = false;
         //get all orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        if (!activeOrdersResponse.isPositive()) {
+            LOG.error(activeOrdersResponse.getError().toString());
+            return false;
+        }
 
-            if (orderList.size() == 0) {
-                toRet = true;
-            } else {
-                LOG.info("There are still : " + orderList.size() + " active orders");
-                //Retry to cancel them to fix issue #14
-                ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
-                if (deleteOrdersResponse.isPositive()) {
-                    boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-                    if (deleted) {
-                        LOG.info("Order clear request succesfully");
-                    } else {
-                        toRet = false;
-                        LOG.info("Could not submit request to clear orders");
-                    }
+        if (orderList.size() == 0) {
+            toRet = true;
+        } else {
+            LOG.info("There are still : " + orderList.size() + " active orders");
+            //Retry to cancel them to fix issue #14
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                if (deleted) {
+                    LOG.info("Order clear request succesful");
                 } else {
                     toRet = false;
-                    LOG.error(deleteOrdersResponse.getError().toString());
+                    LOG.info("Could not submit request to clear orders");
                 }
+            } else {
+                toRet = false;
+                LOG.error(deleteOrdersResponse.getError().toString());
             }
-        } else {
-            toRet = false;
-
-            LOG.error(activeOrdersResponse.getError().toString());
         }
+
 
         return toRet;
     }
@@ -77,22 +83,23 @@ public class TradeUtils {
         boolean completed = true;
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-            for (int i = 0; i < orderList.size(); i++) {
-                Order tempOrder = orderList.get(i);
-                if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000, pair);
-                    if (!tempDeleted) {
-                        completed = false;
-                    }
-                }
-            }
-        } else {
+        if (!activeOrdersResponse.isPositive()) {
             LOG.error(activeOrdersResponse.getError().toString());
             return false;
         }
+
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+        for (int i = 0; i < orderList.size(); i++) {
+            Order tempOrder = orderList.get(i);
+            if (tempOrder.getType().equalsIgnoreCase(type)) {
+                boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000, pair);
+                if (!tempDeleted) {
+                    completed = false;
+                }
+            }
+        }
+
         return completed;
     }
 
@@ -168,9 +175,9 @@ public class TradeUtils {
 
         return toRet;
     }
-    //Build the query string given a set of query parameters
 
     /**
+     * Build the query string given a set of query parameters
      *
      * @param args
      * @param encoding
@@ -207,6 +214,7 @@ public class TradeUtils {
         }
         return result;
     }
+
     //The two methods below have been amalgamated into the CCDEK wrapper
     //TODO - get rid of these ccedk =methods once testing has taken place
     public static int offset = 0;

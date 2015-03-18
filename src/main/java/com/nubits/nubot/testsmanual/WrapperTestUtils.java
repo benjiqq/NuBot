@@ -6,10 +6,18 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.PairBalance;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.OrderToPlace;
+import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
+import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
@@ -17,6 +25,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+
+import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
+import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
 
 public class WrapperTestUtils {
 
@@ -27,7 +39,9 @@ public class WrapperTestUtils {
         LOG.warn("Get Balances for " + pair.toString());
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
+
             LOG.info(balance.toString());
         } else {
             LOG.error(balancesResponse.getError().toString());
@@ -289,7 +303,8 @@ public class WrapperTestUtils {
         //Create a TaskManager
         Global.taskManager = new TaskManager();
         //Start checking for connection
-        Global.taskManager.getCheckConnectionTask().start();
+        Global.taskManager.setNudTask();
+        Global.taskManager.getCheckNudTask().start();
 
 
         //Wait a couple of seconds for the connectionThread to get live
@@ -343,6 +358,19 @@ public class WrapperTestUtils {
         } else {
             throw new NuBotConfigException("Exchange " + exchangeName + " not supported");
         }
+
+    }
+
+    public static void configExchangeSimple(String exchangeName) throws NuBotConfigException {
+
+        Global.exchange = new Exchange(exchangeName);
+        ExchangeLiveData liveData = new ExchangeLiveData();
+        Global.exchange.setLiveData(liveData);
+        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName);
+        ti.setKeys(keys);
+        Global.exchange.setTrade(ti);
+        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
     }
 }

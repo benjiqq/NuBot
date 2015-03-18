@@ -20,12 +20,10 @@ package com.nubits.nubot.pricefeeds;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -42,14 +40,14 @@ public class PriceFeedManager {
 
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
-        Feeds.initValidFeeds();
+        FeedFacade.initValidFeeds();
         this.pair = pair;
 
-        feedList.add(Feeds.getFeed(mainFeed)); //add the main feed at index 0
+        feedList.add(FeedFacade.getFeed(mainFeed)); //add the main feed at index 0
         //this.mainfeed = getFeed(mainFeed);
 
         for (int i = 0; i < backupFeedList.size(); i++) {
-            feedList.add(Feeds.getFeed(backupFeedList.get(i)));
+            feedList.add(FeedFacade.getFeed(backupFeedList.get(i)));
         }
     }
 
@@ -57,7 +55,7 @@ public class PriceFeedManager {
      * trigger fetches from all feeds
      * @return
      */
-    public LastPriceResponse getLastPrices() {
+    public LastPriceResponse fetchLastPrices() {
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;
         ArrayList<LastPrice> prices = new ArrayList<>();
@@ -96,7 +94,7 @@ public class PriceFeedManager {
     }
 
     /**
-     * class to wrap results from getLastPrices
+     * class to wrap results from fetchLastPrices
      */
     public class LastPriceResponse {
 

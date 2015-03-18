@@ -1,6 +1,6 @@
 
 
-<body onLoad="loadlog()">
+<body onLoad="loadbot()">
 
     <!-- Fixed navbar -->
     <nav class="navbar navbar-default navbar-fixed-top">
@@ -35,8 +35,8 @@
 <div class="col-md-6">
 <h3>NuBot Operation</h3>
 
-  <button>Start</button>
-  <button>Stop</button>
+  <button id="startbot">Start</button>
+  <button id="stopbot">Stop</button>
 </div>
 <div class="col-md-6">
 </div>
@@ -49,8 +49,8 @@
   <div class="panel-heading">Balances for exchange: {{exchange}}</div>
 
 <table class="table">
-<tr><td>BTC</td><td>{{btc_balance}}</td></tr>
-<tr><td>NBT</td><td>{{nbt_balance}}</td></tr>
+<tr><td>BTC</td><td><span id="btc_balance">{{btc_balance}}</span></td></tr>
+<tr><td>NBT</td><td><span id="nbt_balance">{{nbt_balance}}</span></td></tr>
 </table>
 
 </div>

@@ -28,6 +28,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -36,6 +37,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.commons.io.FileUtils;
@@ -53,10 +55,12 @@ public class FrozenBalancesManager {
     private Amount amountAlreadyThere;
     private Currency toFreezeCurrency;
 
+    public final static String frozenfolder = "frozen";
+
     //Call this on bot startup
-    public FrozenBalancesManager(String exchangName, CurrencyPair pair, String folder) {
+    public FrozenBalancesManager(String exchangName, CurrencyPair pair) {
         String fileName = pair.toStringSep() + "-" + exchangName + "-frozen.json";
-        this.pathToFrozenBalancesFiles = folder + fileName;
+        this.pathToFrozenBalancesFiles = frozenfolder + "/" + fileName;
         if (Global.swappedPair) {
             toFreezeCurrency = pair.getOrderCurrency();
         } else {
@@ -176,11 +180,11 @@ public class FrozenBalancesManager {
         this.frozenAmount = new FrozenAmount(newAmount);
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(8);
-        if (Global.options != null) {
-            if (Global.options.getKeepProceeds() != 0) {
-                LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
-            }
+
+        if (Global.options.getKeepProceeds() != 0) {
+            LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
         }
+
         if (writeToFile) {
             updateFrozenFilesystem();
         }

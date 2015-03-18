@@ -24,7 +24,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -152,7 +152,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -174,7 +174,7 @@ public class BtceWrapper implements TradeInterface {
             Amount PEGTotal = new Amount(Double.parseDouble(funds.get(pegCode).toString()), CurrencyList.USD);
             Amount NBTTotal = new Amount(Double.parseDouble(funds.get(nbtCode).toString()), CurrencyList.NBT);
 
-            balance = new Balance(NBTTotal, PEGTotal);
+            PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
 
             //Pack it into the ApiResponse
             apiResponse.setResponseObject(balance);
@@ -188,7 +188,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -316,9 +316,10 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        if (Global.options != null) {
+
             return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
+
+        /* else {
             ApiResponse apiResponse = new ApiResponse();
 
             String strDelimiterStart = "the fee for transactions is ";
@@ -340,7 +341,7 @@ public class BtceWrapper implements TradeInterface {
             }
 
             return apiResponse;
-        }
+        }*/
     }
 
     @Override
@@ -739,7 +740,7 @@ public class BtceWrapper implements TradeInterface {
                 // create and setup a HTTP connection
 
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Global.app_name);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());

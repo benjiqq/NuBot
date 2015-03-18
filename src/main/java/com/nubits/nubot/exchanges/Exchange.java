@@ -27,12 +27,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-/**
- * @author desrever < desrever@nubits.com >
- */
+
 public class Exchange {
 
-    //Class Variables
+
     //Persisted
     private static final Logger LOG = LoggerFactory.getLogger(Exchange.class.getName());
     private String name; //Name of the exchange
@@ -45,13 +43,6 @@ public class Exchange {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
     }
-
-    /*public Exchange(NuBotOptions opt) {
-        this.name = name;
-        this.exchangeLiveData = new ExchangeLiveData();
-        ApiKeys keys = new ApiKeys(opt.getApiSecret(), opt.getApiKey());
-    }*/
-
 
     public String getName() {
         return name;

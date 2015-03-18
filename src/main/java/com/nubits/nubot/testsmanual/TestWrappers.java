@@ -19,8 +19,8 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
@@ -97,7 +97,22 @@ public class TestWrappers {
         WrapperTestUtils.testIsOrderActive("1139");
         WrapperTestUtils.testGetTxFee();
         WrapperTestUtils.testGetTxFeeWithArgs(testPair);
-
+        WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
+        WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
+        //WrapperTestUtils.testGetActiveOrders();
+        //WrapperTestUtils.testCancelOrder("1139", Constant.NBT_BTC);
+        //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
+        //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
+        //WrapperTestUtils.testGetActiveOrders();
+        //WrapperTestUtils.testCancelOrder("2063803", testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testGetOrderDetail("1139");
+        //WrapperTestUtils.testIsOrderActive("1139");
+        //WrapperTestUtils.testGetTxFee();
+        //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
 
 

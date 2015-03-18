@@ -17,7 +17,7 @@
  */
 package com.nubits.nubot.exchanges;
 
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
 import java.util.ArrayList;
 
@@ -33,7 +33,7 @@ public class ExchangeLiveData {
     private double last;
     private boolean connected;
     //assets
-    private Balance balance;
+    private PairBalance balance;
     //fee
     private double fee;
     //Orders
@@ -42,18 +42,19 @@ public class ExchangeLiveData {
     private double NBTonsell;
     private double NBTonbuy;
 
-    //Constructor
+
     public ExchangeLiveData() {
+        this.connected = false;
     }
 
-    public ExchangeLiveData(ExchangeStatus status, double bid, double ask, double last, double fee, Balance balance, ArrayList<Order> orderList) {
+    public ExchangeLiveData(ExchangeStatus status, double bid, double ask, double last, double fee, PairBalance balance, ArrayList<Order> orderList) {
         this.status = status;
         this.bid = bid;
         this.ask = ask;
         this.last = last;
         this.balance = balance;
         this.fee = fee;
-
+        this.connected = false;
 
     }
 
@@ -82,11 +83,11 @@ public class ExchangeLiveData {
         this.ask = ask;
     }
 
-    public Balance getBalance() {
+    public PairBalance getBalance() {
         return balance;
     }
 
-    public void setBalance(Balance balance) {
+    public void setBalance(PairBalance balance) {
         this.balance = balance;
     }
 

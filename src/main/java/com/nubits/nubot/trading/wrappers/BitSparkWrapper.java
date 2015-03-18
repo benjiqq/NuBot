@@ -17,9 +17,7 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.JSONArray;
-//import com.alibaba.fastjson.JSONObject;
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
@@ -31,14 +29,18 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
+
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -97,11 +99,11 @@ public class BitSparkWrapper implements TradeInterface {
             toReturn = getNonceInternal(requester);
         } else {
             try {
-                if (Global.options != null) {
-                    if (Global.options.isVerbose()) {
-                        LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-                    }
+
+                if (Global.options.isVerbose()) {
+                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
                 }
+
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
@@ -177,7 +179,7 @@ public class BitSparkWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = null;
+        PairBalance balance = null;
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = true;
@@ -216,7 +218,7 @@ public class BitSparkWrapper implements TradeInterface {
                 }
                 if (NBTAvail != null && NBTonOrder != null
                         && PEGAvail != null && PEGonOrder != null) {
-                    balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                     //Pack it into the ApiResponse
                     apiResponse.setResponseObject(balance);
                 } else {
@@ -492,13 +494,9 @@ public class BitSparkWrapper implements TradeInterface {
     }
 
     private ApiResponse getTxFeeImpl() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override
@@ -549,7 +547,6 @@ public class BitSparkWrapper implements TradeInterface {
                 break;
             }
         }
-
 
         //Create a CurrencyPair object
         CurrencyPair cp = CurrencyPair.getCurrencyPairFromString(jsonObject.get("market").toString(), "");
@@ -623,11 +620,11 @@ public class BitSparkWrapper implements TradeInterface {
     private long getNonceInternal(String requester) {
         apiBusy = true;
         long currentTime = System.currentTimeMillis();
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info(currentTime + " Now apiBusy! req : " + requester);
-            }
+
+        if (Global.options.isVerbose()) {
+            LOG.info(currentTime + " Now apiBusy! req : " + requester);
         }
+
         long timeElapsedSinceLastCall = currentTime - lastSentTonce;
         if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
             try {
@@ -645,11 +642,11 @@ public class BitSparkWrapper implements TradeInterface {
         }
 
         lastSentTonce = currentTime;
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
-            }
+
+        if (Global.options.isVerbose()) {
+            LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
         }
+
         apiBusy = false;
         return lastSentTonce;
     }
@@ -698,7 +695,7 @@ public class BitSparkWrapper implements TradeInterface {
         if (response.isPositive()) {
             LOG.info("A maximum of 1000 trades can be returned from the BitSpark API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
-            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
                 if (thisTrade.getDate().getTime() < (startTime * 1000L)) {
                     continue;

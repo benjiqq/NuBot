@@ -24,9 +24,11 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = '0.15'
+version = '0.20-rc1' //will be used for logging
+
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
+
 
 //Get dependencies from Maven central repository
 repositories {
@@ -39,11 +41,14 @@ def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
+def testreportdir = new File("testreports") //$buildDir/reports
 def jarname = "NuBot.jar"
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
 def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
-def uiclass = "com.nubits.nubot.webui.UiServer"
+def includeTestConfig = true
 
+def uiclass = "com.nubits.nubot.webui.UiServer"
+FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
 //Project dependencies
 dependencies {
@@ -54,16 +59,14 @@ dependencies {
     compile 'ch.qos.logback:logback-classic:1.1.2'
     compile 'org.codehaus.janino:janino:2.7.8' //for filtering
 
-    compile 'com.alibaba:fastjson:1.1.36'
-    compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
+    compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
 
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'org.codeartisans:org.json:20131017'
 
-    //compile 'commons-logging:commons-logging:1.2'
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-net:commons-net:3.3'
@@ -77,14 +80,13 @@ dependencies {
     compile "javax.servlet:servlet-api:2.5"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
 
-    //logging problem
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
     compile 'com.github.spullara.mustache.java:compiler:0.9.0'
 
     //static. no maven available
     compile files('lib/spark-core-2.2-SNAPSHOT.jar')
     compile files('lib/EasyJccKit.jar')
-    compile files('lib/bitcoinapi-0.1.jar')
+    //compile files('lib/bitcoinapi-0.11.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
@@ -93,52 +95,19 @@ dependencies {
     //compile 'org.zeromq:jeromq:0.3.4'
 }
 
+task initDist << {
+    description 'init for build'
+    println "init distribution"
 
-//use standard sourcesets, otherwise they can be defined like this
-/*sourceSets {
-    main {
-        java {
-            srcDir 'NuBot/src'
-        }
-        resources {
-            srcDir 'NuBot/res'
-        }
+    if (!distdir.exists()) {
+        println("folder " + distdir + " exists. delete it")
+        delete distdir
+    }
+    println("creating distdir")
+    if (distdir.mkdirs()) {
+        println("succeeded in creating " + distdir)
     }
 
-    test {
-        java {
-            srcDir 'NuBot/tests'
-        }
-        resources {
-            srcDir 'NuBot/res'
-        }
-    }
-}*/
-
-test {
-    reports {
-        junitXml.enabled = false
-        html.enabled = true
-    }
-}
-
-
-//create a single Jar with all dependencies
-task NubotJar(type: Jar) {
-    //baseName = project.name
-    archiveName "NuBot.jar"
-    destinationDir = distdir //file('${distdir}')
-
-    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
-        exclude 'META-INF/MANIFEST.MF'
-        exclude 'META-INF/*.SF'
-        exclude 'META-INF/*.DSA'
-        exclude 'META-INF/*.RSA'
-    }
-    manifest {
-        attributes 'Main-Class': maintestclass
-    }
-    with jar
 }
 
 
@@ -148,29 +117,142 @@ task compiledocs(type: Exec) {
     args "-c", "cd md && /bin/bash compileall.sh"
 }
 
+
+//create a single Jar with all dependencies
+task NuBotJar(type: Jar) {
+
+    doFirst {
+        archiveName "NuBot.jar"
+        destinationDir = distdir //file('${distdir}')
+        def f = new File("${distdir}/" + archiveName)
+        println 'jar ' + f + ' exists ' + f.exists()
+        if (f.exists()) {
+            println 'delete ' + f
+            f.delete()
+        }
+    }
+
+
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes 'Main-Class': mainclass
+    }
+    with jar
+    doLast {
+        println "created jar: " + destinationDir + "/" + archiveName
+    }
+}
+
+task NuBotDist() {
+    //description 'make NuBot distribution folder'
+
+    doFirst {
+        println 'start making distribution'
+        println "delete ${distdir}"
+        delete "${distdir}"
+        tasks.compiledocs.execute()
+        tasks.initDist.execute()
+    }
+
+    doLast {
+        println 'dist do last'
+        tasks.NuBotJar.execute()
+        tasks.propfile.execute()
+
+        println "finish distribution"
+
+        if (includeTestConfig) {
+            copy {
+                from "config/testconfig/poloniex.json"
+                into "${distdir}"
+            }
+        }
+
+        html_files.each { File file ->
+            println 'copy ' + file.name
+            copy {
+                from "md/" + file.name
+                into "${distdir}/docs"
+            }
+            delete(file)
+        }
+
+        copy {
+            from "config/sampleconfig/sample.json"
+            into "${distdir}"
+        }
+
+        copy {
+            from "UI/templates"
+            into "${distdir}/UI/templates"
+        }
+
+        copy {
+            from "src/main/resources/nubot_keystore.jks"
+            into "${distdir}"
+            //exclude 'listCertificates.sh'
+        }
+
+
+        //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+    }
+
+}
+
+
 task runUI(type: JavaExec) {
     description 'run the WebUI'
     main = "com.nubits.nubot.webui.UiServer"
     classpath = sourceSets.main.runtimeClasspath
-
-    //store the output instead of printing to the console:
-    /*standardOutput = new ByteArrayOutputStream()
-    //obtain the output:
-    ext.output = {
-        return standardOutput.toStringSep()
-    }*/
 }
 
-//TODO: copy html output to UI templates
-/*task copyhtmltoui(type: copy){
-    //<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>README.md - Grip</title>
 
-    //</body>
-    //</html>
-}*/
+task runpoloniex(type: JavaExec) {
+    description 'run bot with poloniex'
+    main = "com.nubits.nubot.launch.TestLaunch"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task testall(type: Test) {
+    description 'test all'
+    include '*/**'
+    testall.reports.html.destination = file("${testreportdir}/alltests")
+}
+
+task testexchanges(type: Test) {
+  description 'test all exchanges, includes ordering'
+  include 'testexchanges/*'
+  testexchanges.reports.html.destination = file("${testreportdir}/exchangetests")
+}
+
+
+//produce the ".nubot" file in distribution folder
+//when run as jar NuBot will look for this file
+task propfile << {
+    def prop = new Properties()
+    prop.put("version",project.version)
+
+    //determine hash of current branch
+    def proc = "git rev-parse HEAD".execute()
+    def b = new StringBuffer()
+    proc.consumeProcessErrorStream(b)
+    def h = proc.text
+    h = h.replace("\n","")
+    prop.put("lastcommit",h);
+
+    def propFile = new File("${distdir}/.nubot")
+    propFile.createNewFile();
+    prop.store(propFile.newWriter(), null);
+
+    println 'this project is version ' + project.version
+}
 
 task cleanhtml << {
-    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
     html_files.each { File file ->
         println 'delete ' + file.name
@@ -186,5 +268,3 @@ task cleanall << {
 
     tasks.cleanhtml.execute()
 }
-
-

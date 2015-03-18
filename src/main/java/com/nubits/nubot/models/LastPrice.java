@@ -22,14 +22,14 @@ import java.util.Date;
 
 public class LastPrice {
 
-//Class Variables
+
     private boolean error;
     private String source; //The name of the datasource where the price was taken
     private Currency currencyMeasured; // The currency which price is being taken
     private Amount price;  // the last price
     private Date timestamp; //the time stamp at when price was registered
 
-    //Constructor
+
     /**
      *
      * @param error

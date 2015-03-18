@@ -18,7 +18,8 @@ import java.nio.file.Paths;
 public class TestOptions extends TestCase {
 
     private static String testconfigFile = "peatio.json";
-    private static String testconfig = "testconfig/" + testconfigFile;
+    private static String testconfigdir = "config/testconfig";
+    private static String testconfig = testconfigdir + "/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -123,7 +124,7 @@ public class TestOptions extends TestCase {
     public void testLoadComplete() {
 
         String testconfigFile = "test.json";
-        String testconfig = "testconfig/" + testconfigFile;
+        String testconfig = testconfigdir + "/" + testconfigFile;
         boolean catched = false;
 
         try {
@@ -141,7 +142,8 @@ public class TestOptions extends TestCase {
     public void testLoadOptions(){
 
         String testconfigFile = "peatio.json";
-        String testconfig = "testconfig/" + testconfigFile;
+        String testconfig = testconfigdir + "/" + testconfigFile;
+
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
@@ -163,8 +165,7 @@ public class TestOptions extends TestCase {
     public void testLoadOptionsAll(){
 
         String configFile = "config.json";
-        String configdir = "config";
-        String testconfig =configdir + "/" +  configFile;
+        String testconfig = testconfigdir + "/" + configFile;
 
         boolean catched = false;
         NuBotOptions opt = null;
@@ -201,6 +202,42 @@ public class TestOptions extends TestCase {
 
 
     }
+
+    @Test
+    public void testParseFeeds(){
+
+        String testconfigFile = "peatio.json";
+        String testconfig = testconfigdir + "/" + testconfigFile;
+        boolean catched = false;
+        try {
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            assertTrue(opt.mainFeed!=null);
+            assertTrue(opt.mainFeed.equals("btce"));
+            System.out.println(opt.backupFeedNames.size());
+            assertTrue(opt.backupFeedNames.size()==2);
+            assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
+            assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
+
+        } catch (NuBotConfigException e) {
+            System.out.println("could not parse config");
+            System.out.println(e);
+            catched = true;
+        }
+
+        assertTrue(!catched);
+
+
+    }
+
+
+
+    /*@Test
+    public void testInvalidFeed(){
+
+        //
+
+    }*/
+
 
 
 

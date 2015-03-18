@@ -197,7 +197,7 @@ public class NuBotOptions {
      * empty constructor. assumes safe creation of valid options
      */
     public NuBotOptions() {
-
+        backupFeedNames = new ArrayList<>();
     }
 
 
@@ -280,8 +280,9 @@ public class NuBotOptions {
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
-
         this.secondarypeg = secondarypeg;
+
+        backupFeedNames = new ArrayList<>();
 
     }
 
@@ -331,24 +332,10 @@ public class NuBotOptions {
     }
 
     /**
-     * @param apiKey
-     */
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    /**
      * @return
      */
     public String getApiSecret() {
         return apiSecret;
-    }
-
-    /**
-     * @param apiSecret
-     */
-    public void setApiSecret(String apiSecret) {
-        this.apiSecret = apiSecret;
     }
 
     /**
@@ -359,24 +346,10 @@ public class NuBotOptions {
     }
 
     /**
-     * @param nubitAddress
-     */
-    public void setNubitsAddress(String nubitAddress) {
-        this.nubitAddress = nubitAddress;
-    }
-
-    /**
      * @return
      */
     public String getRpcUser() {
         return rpcUser;
-    }
-
-    /**
-     * @param rpcUser
-     */
-    public void setRpcUser(String rpcUser) {
-        this.rpcUser = rpcUser;
     }
 
     /**
@@ -401,13 +374,6 @@ public class NuBotOptions {
     }
 
     /**
-     * @param nudIp
-     */
-    public void setNudIp(String nudIp) {
-        this.nudIp = nudIp;
-    }
-
-    /**
      * @return
      */
     public int getNudPort() {
@@ -426,13 +392,6 @@ public class NuBotOptions {
      */
     public double getPriceIncrement() {
         return priceIncrement;
-    }
-
-    /**
-     * @param priceIncrement
-     */
-    public void setPriceIncrement(double priceIncrement) {
-        this.priceIncrement = priceIncrement;
     }
 
     /**
@@ -486,13 +445,6 @@ public class NuBotOptions {
     }
 
     /**
-     * @param sendHipchat
-     */
-    public void setSendHipchat(boolean sendHipchat) {
-        this.sendHipchat = sendHipchat;
-    }
-
-    /**
      * @return
      */
     public String sendMailsLevel() {
@@ -508,102 +460,51 @@ public class NuBotOptions {
     }
 
     /**
-     * @param sendMails
-     */
-    public void setSendMailsLevel(String sendMails) {
-        this.sendMails = sendMails;
-    }
-
-    /**
      * @return
      */
     public String getMailRecipient() {
         return mailRecipient;
     }
 
-    /**
-     * @param mailRecipient
-     */
-    public void setMailRecipient(String mailRecipient) {
-        this.mailRecipient = mailRecipient;
-    }
-
     public boolean isMultipleCustodians() {
         return multipleCustodians;
-    }
-
-    public void setMultipleCustodians(boolean multipleCustodians) {
-        this.multipleCustodians = multipleCustodians;
     }
 
     public double getMaxSellVolume() {
         return maxSellVolume;
     }
 
-    public void setMaxSellVolume(double maxSellVolume) {
-        this.maxSellVolume = maxSellVolume;
-    }
-
     public double getMaxBuyVolume() {
         return maxBuyVolume;
-    }
-
-    public void setMaxBuyVolume(double maxBuyVolume) {
-        this.maxBuyVolume = maxBuyVolume;
     }
 
     public int getEmergencyTimeout() {
         return emergencyTimeout;
     }
 
-    public void setEmergencyTimeoutMinutes(int emergencyTimeoutMinutes) {
-        this.emergencyTimeout = emergencyTimeoutMinutes;
-    }
 
     public double getKeepProceeds() {
         return keepProceeds;
     }
 
-    public void setKeepProceeds(double keepProceeds) {
-        this.keepProceeds = keepProceeds;
-    }
-
-    public String getNubitAddress() {
+      public String getNubitAddress() {
         return nubitAddress;
-    }
-
-    public void setNubitAddress(String nubitAddress) {
-        this.nubitAddress = nubitAddress;
     }
 
     public boolean isAggregate() {
         return aggregate;
     }
 
-    public void setAggregate(boolean aggregate) {
-        this.aggregate = aggregate;
-    }
-
     public boolean isDistributeLiquidity() {
         return distributeLiquidity;
-    }
-
-    public void setDistributeLiquidity(boolean distributeLiquidity) {
-        this.distributeLiquidity = distributeLiquidity;
     }
 
     public double getSpread() {
         return this.spread;
     }
 
-
     public String getMainFeed() {
         return mainFeed;
-    }
-
-
-    public void setMainFeed(String mainFeed) {
-        this.mainFeed = mainFeed;
     }
 
 
@@ -621,10 +522,6 @@ public class NuBotOptions {
 
     public ArrayList<String> getBackupFeedNames() {
         return backupFeedNames;
-    }
-
-    public void setBackupFeedNames(ArrayList<String> backupFeedNames) {
-        this.backupFeedNames = backupFeedNames;
     }
 
     /**

@@ -1,8 +1,8 @@
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
@@ -12,7 +12,6 @@ import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -31,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.xml.bind.DatatypeConverter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -42,6 +42,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 /**
  * Created by sammoth on 27/02/15.
@@ -168,7 +169,7 @@ public class AltsTradeWrapper implements TradeInterface {
                         PEGonOrder.setQuantity(Utils.getDouble(thisWallet.get("held_for_orders")));
                     }
                 }
-                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
             }
         } else {
@@ -660,12 +661,15 @@ public class AltsTradeWrapper implements TradeInterface {
                 Mac mac;
                 SecretKeySpec key;
                 // Create a new secret key
-                key = new SecretKeySpec(Base64.decode(secret), SIGN_HASH_FUNCTION);
+                key = new SecretKeySpec(DatatypeConverter.parseBase64Binary(secret), SIGN_HASH_FUNCTION);
                 // Create a new mac
                 mac = Mac.getInstance(SIGN_HASH_FUNCTION);
                 // Init mac with key.
                 mac.init(key);
-                sign = Base64.encode(mac.doFinal(hash_data.getBytes(ENCODING)));
+                byte[] b = mac.doFinal(hash_data.getBytes(ENCODING));
+
+                sign = DatatypeConverter.printBase64Binary(b);
+
             } catch (UnsupportedEncodingException uee) {
                 LOG.warn("Unsupported encoding exception: " + uee.toString());
             } catch (NoSuchAlgorithmException nsae) {

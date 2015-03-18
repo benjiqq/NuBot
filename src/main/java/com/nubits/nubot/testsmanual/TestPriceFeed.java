@@ -24,6 +24,7 @@ import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
+import com.nubits.nubot.pricefeeds.feedservices.*;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -160,10 +161,10 @@ public class TestPriceFeed {
 
         }
 
-        LastPriceResponse lpr = pfm.getLastPrices();
+        LastPriceResponse lpr = pfm.fetchLastPrices();
 
 
-        ArrayList<LastPrice> priceList = pfm.getLastPrices().getPrices();
+        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
         LOG.info("\n\n\n ---------------------- Testing " + pair.toStringSepSpecial("/"));
         LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");

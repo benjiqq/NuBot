@@ -159,7 +159,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 }
                 Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());
                 Amount NBTonOrder = new Amount(nbtOnOrder, pair.getOrderCurrency());
-                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
             } else {
                 double balance = Double.parseDouble(balances.get(currency.getCode().toLowerCase()).toString());
@@ -601,7 +601,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Global.app_name);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());

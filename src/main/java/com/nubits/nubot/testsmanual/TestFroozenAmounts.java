@@ -46,7 +46,7 @@ public class TestFroozenAmounts {
         Currency currency = pair.getPaymentCurrency();
         String exchangeName = ExchangeFacade.BTER;
 
-        FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair, Global.settings.getProperty("frozen_folder"));
+        FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair);
 
         fbm.updateFrozenBalance(new Amount(0.000000091, currency));
         fbm.updateFrozenBalance(new Amount(5032, currency));

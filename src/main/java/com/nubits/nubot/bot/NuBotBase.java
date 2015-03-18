@@ -1,15 +1,16 @@
 package com.nubits.nubot.bot;
 
-import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.store.BalanceFetchTask;
+import com.nubits.nubot.store.OrderFetchTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
@@ -161,13 +162,14 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-
         //TODO: opt should be passed in constructor, not set in global
 
         //TODO refactor so we can test validity here again
 
+        LOG.info("----- new session -----");
+        LOG.info("Setting up NuBot version : " + Utils.versionName());
+
         LOG.info("NuBot logging");
-        LOG.info("Setting up  NuBot version : " + Global.settings.getProperty("version"));
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
@@ -209,8 +211,8 @@ public abstract class NuBotBase {
 
         //Set the fileoutput for active orders
         //TODO! handle logging locally
-        String orders_outputPath = logsFolder + "orders_history.csv";
-        String balances_outputPath = logsFolder + "balance_history.json";
+        String orders_outputPath = logsFolder + "/" + "orders_history.csv";
+        String balances_outputPath = logsFolder + "/" + "balance_history.json";
 
         ((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())).setOutputFiles(orders_outputPath, balances_outputPath);
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", orders_outputPath, false);
@@ -223,6 +225,7 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
+                //TODO: handle gracefully
                 exitWithNotice("" + e);
             }
         }
@@ -234,7 +237,8 @@ public abstract class NuBotBase {
         LOG.info(Global.options.toStringNoKeys());
 
         // Set the frozen balance manager in the global variable
-        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair(), Global.settings.getProperty("frozen_folder"));
+
+        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
 
         try{
             configureStrategy();
@@ -243,6 +247,20 @@ public abstract class NuBotBase {
         }
 
         notifyOnline();
+
+        // fetcher tasks
+
+        OrderFetchTask ft = new OrderFetchTask();
+        Global.taskManager.orderFetchTask = ft;
+        Thread t1 = new Thread(ft);
+        t1.start();
+
+        BalanceFetchTask bt = new BalanceFetchTask(opt.getPair());
+        Global.taskManager.balanceFetchTask = bt;
+        Thread t2 = new Thread(bt);
+        t2.start();
+
+
     }
 
     protected void notifyOnline() {
