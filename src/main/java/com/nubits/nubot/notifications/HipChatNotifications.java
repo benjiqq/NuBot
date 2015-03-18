@@ -39,17 +39,17 @@ public class HipChatNotifications {
     }
 
     private static void sendMessageImpl(String message, MessageColor color,
-            boolean critical) {
+                                        boolean critical) {
 
         String publicAddress = "";
 
-        if (Global.options != null) {
-            publicAddress = Global.options.getNubitsAddress();
-            boolean send = Global.options.isSendHipchat();
-            if (!send) {
-                return;
-            }
+
+        publicAddress = Global.options.getNubitsAddress();
+        boolean send = Global.options.isSendHipchat();
+        if (!send) {
+            return;
         }
+
         String sessionId = "";
         if (Global.sessionId != null) {
             sessionId = Global.sessionId;

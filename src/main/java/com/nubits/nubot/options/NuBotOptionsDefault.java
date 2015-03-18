@@ -1,6 +1,8 @@
 package com.nubits.nubot.options;
 
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 
 /**
@@ -11,6 +13,11 @@ public class NuBotOptionsDefault {
     //double wallchangeThreshold = 0.5;
     //double spread = 0;
     //double distanceThreshold = 10;
+
+
+    static {
+        CurrencyList.init();
+    }
 
     public static NuBotOptions defaultFactory() {
 
@@ -32,7 +39,7 @@ public class NuBotOptionsDefault {
         opt.keepProceeds = 0.0;
         opt.distributeLiquidity = false;
         opt.secondarypeg = false;
-        opt.pair = CurrencyList.NBT_USD;
+        opt.pair = CurrencyList.NBT_BTC;
         opt.verbose = false;
         opt.sendHipchat = true;
         opt.multipleCustodians = false;

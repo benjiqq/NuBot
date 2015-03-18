@@ -25,7 +25,7 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -157,74 +157,80 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
-        LOG.info("get balance");
+        LOG.trace("get balance");
 
         //Swap the pair for the request
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
 
         String url = API_BASE_URL;
         String method = API_GET_BALANCES;
         HashMap<String, String> query_args = new HashMap<>();
         boolean isGet = false;
 
-        LOG.info("get from " + url);
-        LOG.info("method " + method);
+        LOG.trace("get from " + url);
+        LOG.trace("method " + method);
         ApiResponse response = getQuery(url, method, query_args, isGet);
-        LOG.info("response " + response);
-        if (response.isPositive()) {
-            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            if (currency != null) {
-                //looking for a specific currency
-                String lookingFor = currency.getCode().toUpperCase();
-                if (httpAnswerJson.containsKey(lookingFor)) {
-                    JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
-                    double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                    LOG.info("balanceD: " + balanceD);
-                    apiResponse.setResponseObject(new Amount(balanceD, currency));
-                } else {
-                    String errorMessage = "Cannot find a balance for currency " + lookingFor;
-                    ApiError apiErr = errors.apiReturnError;
-                    apiErr.setDescription(errorMessage);
-                    apiResponse.setError(apiErr);
-                }
+
+        LOG.trace("response " + response);
+        if (!response.isPositive()) {
+            return response;
+        }
+
+        JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+        LOG.debug("balance answer " + httpAnswerJson);
+
+        if (currency != null) {
+            //looking for a specific currency
+            String lookingFor = currency.getCode().toUpperCase();
+            if (httpAnswerJson.containsKey(lookingFor)) {
+                JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
+                double balanceD = Utils.getDouble(balanceJSON.get("available"));
+                LOG.info("balance double : " + balanceD);
+                apiResponse.setResponseObject(new Amount(balanceD, currency));
             } else {
-                //get all balances for the pair
-                boolean foundNBTavail = false;
-                boolean foundPEGavail = false;
-                Amount NBTAvail = new Amount(0, pair.getOrderCurrency()),
-                        PEGAvail = new Amount(0, pair.getPaymentCurrency());
-                Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-                Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                String NBTcode = pair.getOrderCurrency().getCode().toUpperCase();
-                String PEGcode = pair.getPaymentCurrency().getCode().toUpperCase();
-                if (httpAnswerJson.containsKey(NBTcode)) {
-                    JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(NBTcode);
-                    double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
-                    double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
-                    NBTAvail = new Amount(tempAvailablebalance, pair.getOrderCurrency());
-                    NBTonOrder = new Amount(tempLockedebalance, pair.getOrderCurrency());
-                    foundNBTavail = true;
-                }
-                if (httpAnswerJson.containsKey(PEGcode)) {
-                    JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(PEGcode);
-                    double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
-                    double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
-                    PEGAvail = new Amount(tempAvailablebalance, pair.getPaymentCurrency());
-                    PEGonOrder = new Amount(tempLockedebalance, pair.getPaymentCurrency());
-                    foundPEGavail = true;
-                }
-                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
-                apiResponse.setResponseObject(balance);
-                if (!foundNBTavail || !foundPEGavail) {
-                    LOG.warn("Cannot find a balance for currency with code "
-                            + "" + NBTcode + " or " + PEGcode + " in your balance. "
-                            + "NuBot assumes that balance is 0");
-                }
+                String errorMessage = "Cannot find a balance for currency " + lookingFor;
+                ApiError apiErr = errors.apiReturnError;
+                apiErr.setDescription(errorMessage);
+                apiResponse.setError(apiErr);
             }
         } else {
-            apiResponse = response;
+            //get all balances for the pair
+            boolean foundNBTavail = false;
+            boolean foundPEGavail = false;
+            Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+            Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
+
+            Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
+            Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+
+            String NBTcode = pair.getOrderCurrency().getCode().toUpperCase();
+            String PEGcode = pair.getPaymentCurrency().getCode().toUpperCase();
+
+            if (httpAnswerJson.containsKey(NBTcode)) {
+                JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(NBTcode);
+                double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
+                double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
+                NBTAvail = new Amount(tempAvailablebalance, pair.getOrderCurrency());
+                NBTonOrder = new Amount(tempLockedebalance, pair.getOrderCurrency());
+                foundNBTavail = true;
+            }
+            if (httpAnswerJson.containsKey(PEGcode)) {
+                JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(PEGcode);
+                double tempAvailablebalance = Utils.getDouble(balanceJSON.get("available"));
+                double tempLockedebalance = Utils.getDouble(balanceJSON.get("onOrders"));
+                PEGAvail = new Amount(tempAvailablebalance, pair.getPaymentCurrency());
+                PEGonOrder = new Amount(tempLockedebalance, pair.getPaymentCurrency());
+                foundPEGavail = true;
+            }
+            PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+            apiResponse.setResponseObject(balance);
+            if (!foundNBTavail || !foundPEGavail) {
+                LOG.warn("Cannot find a balance for currency with code "
+                        + "" + NBTcode + " or " + PEGcode + " in your balance. "
+                        + "NuBot assumes that balance is 0");
+            }
         }
+
 
         return apiResponse;
     }
@@ -388,13 +394,9 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override
@@ -661,11 +663,11 @@ public class PoloniexWrapper implements TradeInterface {
                 } else {
                     queryUrl = new URL(url);
                 }
-                LOG.info("Query " + queryUrl);
+                LOG.trace("Query " + queryUrl);
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestMethod("POST");
-                LOG.info("connection " + connection);
-            }catch(IOException e){
+                LOG.trace("connection " + connection);
+            } catch (IOException e) {
                 LOG.error("can't connect to " + queryUrl);
             }
 
@@ -688,7 +690,7 @@ public class PoloniexWrapper implements TradeInterface {
                 // create and setup a HTTP connection
 
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Global.app_name);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());
@@ -719,9 +721,9 @@ public class PoloniexWrapper implements TradeInterface {
                 if (httpError) {
                     LOG.error("Post Data: " + post_data);
                 }
-                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.trace("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.info(output);
+                    LOG.trace(output);
                     answer += output;
                 }
 
@@ -791,7 +793,9 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         private String createNonce() {
-            long toRet = System.currentTimeMillis();
+            //FIX: add some time to the nonce, since time sync has issues
+            long fixtime = 500;
+            long toRet = System.currentTimeMillis() + fixtime;
             return Long.toString(toRet);
         }
     }

@@ -18,9 +18,10 @@ public class TestWriteOptions extends TestCase {
 
 
     private static String testOutconfigFile = "testout.json";
-    private static String testconfig = "testconfig/" + testOutconfigFile;
+    private static String testconfigdir = "config/testconfig";
+    private static String testconfig = testconfigdir + "/" + testOutconfigFile;
     private static String testconfigFile = "peatio.json";
-    private static String testinconfig = "testconfig/" + testconfigFile;
+    private static String testinconfig = testconfigdir + "/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -60,7 +61,7 @@ public class TestWriteOptions extends TestCase {
         try {
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File("testconfig/" + testconfigFile + "_0.bak");
+            newbak = new File(testconfigdir + "/" + testconfigFile + "_0.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
@@ -72,7 +73,7 @@ public class TestWriteOptions extends TestCase {
 
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File("testconfig/" + testconfigFile + "_1.bak");
+            newbak = new File(testconfigdir + "/" + testconfigFile + "_1.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
@@ -87,12 +88,12 @@ public class TestWriteOptions extends TestCase {
     @Test
     public void testCreateObject() {
         NuBotOptions opt = new NuBotOptions();
-        opt.setApiKey("test");
+        opt.apiKey = "test";
         opt.setExchangeName("testexchange");
         Currency c = Currency.createCurrency("NBT");
         Currency usd = Currency.createCurrency("USD");
         opt.setPair(new CurrencyPair(c, usd));
-        String testout = "testconfig/test_out.json";
+        String testout = testconfigdir + "/"  + "test_out.json";
         SaveOptions.saveOptionsPretty(opt, testout);
         File newout = new File(testout);
         assertTrue(newout.exists());

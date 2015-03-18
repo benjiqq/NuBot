@@ -20,12 +20,12 @@ package com.nubits.nubot.exchanges;
 
 public class ExchangeStatus {
 
-//Class Variables
+
     public static final String STOPPED = "Bot Stopped";
     public static final String RUNNING = "Bot Running";
     private String botStatusString;
 
-//Constructor
+
     public ExchangeStatus(String botStatusString) throws WrongBotStatusException {
         if (botStatusString.equals(STOPPED) || botStatusString.equals(RUNNING)) {
             this.botStatusString = botStatusString;

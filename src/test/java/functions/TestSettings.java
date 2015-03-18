@@ -48,8 +48,8 @@ public class TestSettings extends TestCase {
         }catch(IOException e){
 
         }
-        //Global.settings.getProperty("submit_liquidity_seconds"));
-        assertTrue(Global.settings.containsKey("version"));
+
+        assertTrue(Global.settings.containsKey("keystore_pass"));
     }
 
 

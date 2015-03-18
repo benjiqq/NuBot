@@ -20,18 +20,17 @@ package com.nubits.nubot.tasks;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
-import com.nubits.nubot.tasks.strategy.NuPriceMonitorTask;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
-import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
+import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
+import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
+
 import java.util.ArrayList;
+
+import com.nubits.nubot.store.BalanceFetchTask;
+import com.nubits.nubot.store.OrderFetchTask;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- * @author desrever < desrever@nubits.com >
- */
+
 public class TaskManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskManager.class.getName());
@@ -44,6 +43,12 @@ public class TaskManager {
     private BotTask sendLiquidityTask;
     private BotTask checkNudTask;
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
+
+    // --- fetcher tasks ---
+
+    public OrderFetchTask orderFetchTask;
+    public BalanceFetchTask balanceFetchTask;
+
 
     //these are used for secondary peg strategy
     private BotTask secondaryPegTask;
@@ -61,17 +66,17 @@ public class TaskManager {
         //assign default values just for testing without Global.options loaded
         //TODO naming mixed
 
-        //setTasks();
+        setTasks();
     }
 
-    public void setNudTask(){
-        checkNudTask = new BotTask(
+    public void setNudTask() {
+        this.checkNudTask = new BotTask(
                 new CheckNudTask(), 30, "checkNud");
         taskList.add(checkNudTask);
 
     }
 
-    private void setTasks(){
+    private void setTasks() {
         //connectivity tasks
 
         checkConnectionTask = new BotTask(
@@ -93,10 +98,10 @@ public class TaskManager {
 
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), NuBotAdminSettings.checkPriceInterval, "priceTriggerTask");
-        taskList.add(secondaryPegTask);
+        taskList.add(priceTriggerTask);
 
         priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
+                new PriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
         initialized = true;
@@ -120,9 +125,9 @@ public class TaskManager {
             if (bt.getName().equals(STRATEGY_FIAT) || bt.getName().equals(STRATEGY_CRYPTO)) {
                 if (!sentNotification) {
                     String additionalInfo = "";
-                    if (Global.options != null) {
-                        additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
-                    }
+
+                    additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
+
                     //dpn't send mail here for now
                     HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
                     sentNotification = true;
@@ -176,7 +181,7 @@ public class TaskManager {
     }
 
     public BotTask getCheckConnectionTask() {
-        return checkConnectionTask;
+        return this.checkConnectionTask;
     }
 
     public void setCheckConnectionTask(BotTask checkConnectionTask) {

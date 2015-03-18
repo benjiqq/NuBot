@@ -23,7 +23,7 @@ import java.util.Date;
 
 public class Order {
 
-    //Class Variables
+
     private String id; // A String containing a unique identifier for this order
     private Date insertedDate; //the time at which this trade was inserted place.
     private Date executedDate; //the time at which this trade was filled.
@@ -34,7 +34,7 @@ public class Order {
     private Amount amountPlusFee; //Object representing the total costs/proceeds of this trade. Expressed in pair.OrderCurrency
     private boolean completed; // true if the order is filled completely
 
-    //Constructor
+
     /**
      *
      * @param id

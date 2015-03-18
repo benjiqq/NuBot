@@ -25,7 +25,7 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -35,6 +35,7 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -103,7 +104,6 @@ public class CcexWrapper implements TradeInterface {
         ApiResponse apiResponse = new ApiResponse();
 
 
-
         return apiResponse;
     }
 
@@ -119,7 +119,7 @@ public class CcexWrapper implements TradeInterface {
 
     public ApiResponse getBalanceImpl(CurrencyPair pair, Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = baseUrl + "&a=getbalance";
 
         String queryResult = query(url, new HashMap<String, String>(), true);
@@ -209,7 +209,7 @@ public class CcexWrapper implements TradeInterface {
                     }
                 }
 
-                balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
 
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {
@@ -476,13 +476,9 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.2;
+        
+        return new ApiResponse(true, Global.options.getTxFee(), null);
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
     }
 
     @Override
@@ -786,7 +782,7 @@ public class CcexWrapper implements TradeInterface {
 
             // add header
             Header[] headers = new Header[1];
-            headers[ 0] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
+            headers[0] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
 
             URL queryUrl;
             try {
@@ -822,10 +818,10 @@ public class CcexWrapper implements TradeInterface {
 
                 answer = buffer.toString();
             } catch (IOException ex) {
-                LOG.error("" +  ex);
+                LOG.error("" + ex);
                 return null;
             } catch (IllegalStateException ex) {
-                LOG.error("" +  ex);
+                LOG.error("" + ex);
                 return null;
             }
             if (Global.options

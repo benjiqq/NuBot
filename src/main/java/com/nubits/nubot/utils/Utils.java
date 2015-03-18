@@ -19,10 +19,12 @@ package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBotSecondary;
+import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
+
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
 import static com.nubits.nubot.utils.LiquidityPlot.plot;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -31,47 +33,38 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Properties;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
+
 import org.apache.commons.io.FileUtils;
 
-/**
- *
- * @author desrever < desrever@nubits.com >
- */
+
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
+    private static String  nubotconfigfile= ".nubot";
+
     /**
-     *
      * @param originalString
      * @param passphrase
      * @param pathToOutput
@@ -107,7 +100,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param pathToFile
      * @param passphrase
      * @return
@@ -146,7 +138,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static boolean isWindowsPlatform() {
@@ -159,7 +150,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static boolean isMacPlatform() {
@@ -172,7 +162,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param arg
      * @return
      */
@@ -181,7 +170,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static String getTimestampString() {
@@ -358,19 +346,17 @@ public class Utils {
         //Generate a random alfanumeric id of 6 chars
         String uid = UUID.randomUUID().toString().substring(0, 6);
         //Get nubot version
-        String version = Utils.getVersion();
+        String version = Utils.versionName();
         //Get timestamp
         String timest = "" + getTimestampLong();
         //conatenate
         return version + sep + timest + sep + uid;
     }
 
-    public static String getVersion() {
-        return Global.settings.getProperty("version");
-    }
 
     /**
      * Install a trust manager that does not validate certificate chains for https calls
+     *
      * @throws Exception
      */
     private static void installTrustAllManager() throws Exception {
@@ -378,16 +364,16 @@ public class Utils {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
             }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
         };
 
         // Install the all-trusting trust manager
@@ -406,6 +392,8 @@ public class Utils {
     }
 
     public static void installKeystore(boolean trustAll) {
+
+        LOG.info("installKeystore. trustall: " + trustAll);
         if (trustAll) {
             try {
                 Utils.installTrustAllManager();
@@ -414,14 +402,153 @@ public class Utils {
             }
 
         } else {
-            String kpath = Global.settings.getProperty("keystore_path");
-            LOG.info("keypath " + kpath);
+
+            //load file depending whether run from inside a Jar or not
+
+            String keystorefile = "nubot_keystore.jks";
+
+            String viaclasspath = filePathClasspathFile(keystorefile);
+            LOG.info("### absolute filepath of keystore " + viaclasspath);
+
             String kpass = Global.settings.getProperty("keystore_pass");
-            LOG.info("kpassword " + kpass);
-            System.setProperty("javax.net.ssl.trustStore", kpath);
+            LOG.info("password " + kpass);
+
+            String wdir = System.getProperty("user.dir");
+            String wdirpath = wdir + "/" + keystorefile;
+
+            String path = "";
+            if (insideJar())
+                path = wdirpath;
+            else
+                path = viaclasspath;
+
+            System.setProperty("javax.net.ssl.trustStore", path);
             System.setProperty("javax.net.ssl.trustStorePassword", kpass);
         }
     }
+
+    public static String versionName() {
+        if (insideJar()) {
+            String wdir = System.getProperty("user.dir");
+
+            String fp = wdir + "/" + nubotconfigfile;
+
+            File file = new File(fp);
+            try {
+                List lines = FileUtils.readLines(file, "UTF-8");
+                HashMap km = new HashMap();
+                for (Object o : lines){
+                    String l = "" +o;
+                    try{
+                        String[] a = l.split("=");
+                        km.put(a[0],a[1]);
+                    }catch(Exception e){
+                        //ignore line with "="
+                    }
+
+                }
+
+                if (km.containsKey("version"))
+                    return "" + km.get("version");
+
+            } catch (Exception e) {
+                //throw e;
+            }
+
+            return "load version error";
+
+        } else {
+            return "develop";
+        }
+    }
+
+    public static boolean insideJar() {
+        String c = "" + Utils.class.getResource("Utils.class");
+        String path = "";
+        if (c.startsWith("jar:"))
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * get filepath from a file in the resources folder
+     *
+     * @param filename
+     * @return
+     */
+    public static String filePathClasspathFile(String filename) {
+        LOG.info("filename " + filename);
+        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
+        URL resource = Utils.class.getClassLoader().getResource(filename);
+        File f = null;
+        try {
+            URI u = resource.toURI();
+            LOG.info("u: " + u);
+            f = Paths.get(u).toFile();
+            LOG.info("f exists " + f.exists());
+            return f.getAbsolutePath();
+        } catch (Exception e) {
+
+        }
+
+        return "";
+    }
+
+
+
+   /* private static void setSSLFactories(String ksfile, String keyStorePassword) throws Exception
+    {
+        LOG.info("set ssl" + ksfile + " " + keyStorePassword);
+
+        InputStream keyStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(ksfile);
+        //InputStream truststoreInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(tspath);
+
+        //keystoreInput.close();
+        //truststoreInput.close();
+
+        // Get keyStore
+        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        // if your store is password protected then declare it (it can be null however)
+        char[] keyPassword = keyStorePassword.toCharArray();
+
+        // load the stream to your store
+        keyStore.load(keyStream, keyPassword);
+
+        // initialize a trust manager factory with the trusted store
+        KeyManagerFactory keyFactory =
+                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        keyFactory.init(keyStore, keyPassword);
+
+        // get the trust managers from the factory
+        KeyManager[] keyManagers = keyFactory.getKeyManagers();
+
+        // Now get trustStore
+        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
+
+        // if your store is password protected then declare it (it can be null however)
+        //char[] trustPassword = password.toCharArray();
+
+        // load the stream to your store
+        //trustStore.load(trustStream, null);
+
+        // initialize a trust manager factory with the trusted store
+        TrustManagerFactory trustFactory =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustFactory.init(trustStore);
+
+        // get the trust managers from the factory
+        TrustManager[] trustManagers = trustFactory.getTrustManagers();
+
+        // initialize an ssl context to use these managers and set as default
+        SSLContext currentsslContext = SSLContext.getInstance("SSL");
+        currentsslContext.init(keyManagers, trustManagers, null);
+
+        SSLContext.setDefault(currentsslContext);
+
+        keyStream.close();
+    }*/
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];
@@ -448,4 +575,5 @@ public class Utils {
         addPlot(xBuy, yBuy); // create a second plot on top of first
 
     }
+
 }

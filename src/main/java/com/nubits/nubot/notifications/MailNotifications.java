@@ -56,9 +56,9 @@ public class MailNotifications {
     public static void send(String address, String title, String message) {
         boolean any = true; //Default to severe
 
-        if (Global.options != null) {
-            any = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL);
-        }
+
+        any = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL);
+
         if (any) {
             sendImpl(address, title, message);
         }
@@ -74,10 +74,10 @@ public class MailNotifications {
     public static void sendCritical(String address, String title, String message) {
         boolean isCritical = true;
 
-        if (Global.options != null) {
-            isCritical = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL)
-                    || Global.options.sendMailsLevel().equals(MAIL_LEVEL_SEVERE);
-        }
+
+        isCritical = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL)
+                || Global.options.sendMailsLevel().equals(MAIL_LEVEL_SEVERE);
+
         if (isCritical) {
             sendImpl(address, title, message);
         }

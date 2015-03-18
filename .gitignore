@@ -1,27 +1,20 @@
 dist/
 logs/
 
-dist-packaged
-config/
-testconfig/
-myconfig/
+#Config files
+config/testconfig/
+config/myconfig/
+
+#Reports
+testreports/
 
 #A folder containing utilities that do not need to be pushed
 /gitignore/
-
 
 #Folder with builds
 releases/
 
 #Directories to ignore
-
-/NuBot/res/options/private/
-/NuBot/nbproject/private/
-/NuBot/build/
-/NuBot/dist/
-/NuBot/dist-packaged/
-/NuBot/res/frozen
-/NuBot/logs/
 
 #Specific files to ignore
 ssl_readme.txt
@@ -29,9 +22,10 @@ readme.html
 changelog.html
 setup.html
 feeds.html
+gradle.html
+exchanges.html
 
 #launch configurations
-/NuBot/nbproject/configs/*.properties
 
 #Prevent test passwords to be pushed
 Passwords.java
@@ -68,10 +62,6 @@ hs_err_pid*
 .classpath
 .project
 .settings
-NuBot/.classpath
-NuBot/.gitignore
-NuBot/.project
-NuBot/.settings
 
 #IJ
 .idea

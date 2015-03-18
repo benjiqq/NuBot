@@ -21,15 +21,12 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- * @author desrever < desrever@nubits.com >
- */
+
 public class ApiKeys {
 
     private static final Logger LOG = LoggerFactory.getLogger(ApiKeys.class.getName());
     public static final String VALID_KEYS = "These keys are valid! Save them to complete the setup";
-//Class Variables
+
     private String secretKey, apiKey;
 
 //Constructor (private) use the static method loadKeysFromFile instead

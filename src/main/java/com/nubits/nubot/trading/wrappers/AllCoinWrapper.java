@@ -224,7 +224,7 @@ public class AllCoinWrapper implements TradeInterface {
                     Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
                     Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
                     Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                    Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                     apiResponse.setResponseObject(balance);
                 } else {
                     Amount total = new Amount(0, currency);
@@ -259,7 +259,7 @@ public class AllCoinWrapper implements TradeInterface {
                         NBTonOrder.setQuantity(Double.parseDouble(s));
                     }
 
-                    Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                     apiResponse.setResponseObject(balance);
                 } else { //specific currency requested
                     Amount total = new Amount(0, currency);
@@ -743,7 +743,7 @@ public class AllCoinWrapper implements TradeInterface {
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Global.app_name);
 
                 connection.setDoOutput(true);
                 connection.setDoInput(true);

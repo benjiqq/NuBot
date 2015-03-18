@@ -70,7 +70,6 @@ public final class NTPClient {
         }
         if (!found) {
             LOG.error("Cannot update time after querying " + hostnames.size() + " timeservers. ");
-            System.exit(0);
         }
         return new Date(); //statement is never reached
 

@@ -4,33 +4,30 @@
 
 After gradle is installed, run gradle tasks. The relevant tasks appear at the end:
 
-* NuBotJar - create the jar in the folder dist
+* NuBotDist - create the distribution in the dist folder
 
 * runui - run the UI
+
+* testall - test all unit-tests
+
+* testexchanges - test all exchanges, includes live ordering
 
 ## Directory layout
 
 The project uses the standard Gradle directory layout:
 
-src : all source files
-- main
--- java
--- resources : resource files for production
+* src : all source files
+* src/main/java
+* src/main/resources : resource files for production
+* src/test
 
-- test
--- java : test files
--- resources : 
+* md : markdown documents
 
-dist
+* config
 
-md : markdown documents
+* ssltools
 
-config
-
-testconfig
-
-ssltools
-
+* templates: html files for UI
 
 ## Install
 

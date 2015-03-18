@@ -22,7 +22,7 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -81,142 +81,160 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         String toReturn = "";
 
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-            LOG.info("Active orders : " + orderList.size());
-
-            if (verbose) {
-                LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
-                LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
-            }
-
-            double nbt_onsell = 0;
-            double nbt_onbuy = 0;
-            int sells = 0;
-            int buys = 0;
-            String digest = "";
-            for (int i = 0; i < orderList.size(); i++) {
-                Order tempOrder = orderList.get(i);
-                digest = digest + tempOrder.getDigest();
-                double toAdd = tempOrder.getAmount().getQuantity();
-                if (verbose) {
-                    LOG.info(tempOrder.toString());
-                }
-
-                if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
-                    //Start summing up amounts of NBT
-                    nbt_onsell += toAdd;
-                    sells++;
-                } else if (tempOrder.getType().equalsIgnoreCase(Constant.BUY)) {
-                    //Start summing up amounts of NBT
-                    nbt_onbuy += toAdd;
-                    buys++;
-                }
-            }
-            //Update the order
-            Global.exchange.getLiveData().setOrdersList(orderList);
-
-            if (Global.conversion != 1
-                    && Global.swappedPair) {  //For swapped pair, need to convert the amounts to NBT
-                nbt_onbuy = nbt_onbuy * Global.conversion;
-                nbt_onsell = nbt_onsell * Global.conversion;
-            }
-
-
-            Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
-            Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
-
-            //Write to file timestamp,activeOrders, sells,buys, digest
-            Date timeStamp = new Date();
-            String timeStampString = timeStamp.toString();
-            Long timeStampLong = Utils.getTimestampLong();
-            String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
-            FileSystem.writeToFile(toWrite, outputFile_orders, true);
-
-            //Also update a json version of the output file
-            //build the latest data into a JSONObject
-            JSONObject latestOrders = new JSONObject();
-            latestOrders.put("time_stamp", timeStampLong);
-            latestOrders.put("active_orders", orderList.size());
-            JSONArray jsonDigest = new JSONArray();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
-
-                JSONObject thisOrder = new JSONObject();
-                Order _order = order.next();
-
-                //issue 160 - convert all amounts in NBT
-
-                double amount = _order.getAmount().getQuantity();
-                //special case: swapped pair
-                if (Global.conversion != 1) {
-                    if (Global.swappedPair)//For swapped pair, need to convert the amounts to NBT
-                    {
-                        amount = _order.getAmount().getQuantity() * Global.conversion;
-                    }
-                }
-
-                thisOrder.put("order_id", _order.getId());
-                thisOrder.put("time", _order.getInsertedDate().getTime());
-                thisOrder.put("order_type", _order.getType());
-                thisOrder.put("order_currency", _order.getPair().getOrderCurrency().getCode());
-                thisOrder.put("amount", amount);
-                thisOrder.put("payment_currency", _order.getPair().getPaymentCurrency().getCode());
-                thisOrder.put("price", _order.getPrice().getQuantity());
-                jsonDigest.add(thisOrder);
-            }
-            latestOrders.put("digest", jsonDigest);
-
-
-            //now read the existing object if one exists
-            JSONParser parser = new JSONParser();
-            JSONObject orderHistory = new JSONObject();
-            JSONArray orders = new JSONArray();
-            try { //object already exists in file
-                orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_orders));
-                orders = (JSONArray) orderHistory.get("orders");
-            } catch (ParseException pe) {
-                LOG.error("Unable to parse " + this.jsonFile_orders);
-            }
-            //add the latest orders to the orders array
-            orders.add(latestOrders);
-            //then save
-            FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
-
-            if (verbose) {
-                LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
-                LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
-            }
-
-            if (Global.options.isSubmitliquidity()) {
-                //Call RPC
-
-                double buySide;
-                double sellSide;
-
-                if (!Global.swappedPair) {
-                    buySide = Global.exchange.getLiveData().getNBTonbuy();
-                    sellSide = Global.exchange.getLiveData().getNBTonsell();
-                } else {
-                    buySide = Global.exchange.getLiveData().getNBTonsell();
-                    sellSide = Global.exchange.getLiveData().getNBTonbuy();
-                }
-
-                toReturn = sendLiquidityInfoImpl(buySide, sellSide, 1);
-            }
-
-        } else {
+        if (!activeOrdersResponse.isPositive()) {
             LOG.error(activeOrdersResponse.getError().toString());
+            return toReturn;
+        }
+
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+        LOG.info("Active orders : " + orderList.size());
+
+        if (verbose) {
+            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
+            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
+        }
+
+        double nbt_onsell = 0;
+        double nbt_onbuy = 0;
+        int sells = 0;
+        int buys = 0;
+        String digest = "";
+        for (int i = 0; i < orderList.size(); i++) {
+            Order tempOrder = orderList.get(i);
+            digest = digest + tempOrder.getDigest();
+            double toAdd = tempOrder.getAmount().getQuantity();
+            if (verbose) {
+                LOG.info(tempOrder.toString());
+            }
+
+            if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
+                //Start summing up amounts of NBT
+                nbt_onsell += toAdd;
+                sells++;
+            } else if (tempOrder.getType().equalsIgnoreCase(Constant.BUY)) {
+                //Start summing up amounts of NBT
+                nbt_onbuy += toAdd;
+                buys++;
+            }
+        }
+        //Update the order
+        Global.exchange.getLiveData().setOrdersList(orderList);
+
+        if (Global.conversion != 1
+                && Global.swappedPair) {  //For swapped pair, need to convert the amounts to NBT
+            nbt_onbuy = nbt_onbuy * Global.conversion;
+            nbt_onsell = nbt_onsell * Global.conversion;
+        }
+
+
+        Global.exchange.getLiveData().setNBTonbuy(nbt_onbuy);
+        Global.exchange.getLiveData().setNBTonsell(nbt_onsell);
+
+        //Write to file timestamp,activeOrders, sells,buys, digest
+        Date timeStamp = new Date();
+        String timeStampString = timeStamp.toString();
+        Long timeStampLong = Utils.getTimestampLong();
+        String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
+        logOrderCSV(toWrite);
+
+        //Also update a json version of the output file
+        //build the latest data into a JSONObject
+        JSONObject latestOrders = new JSONObject();
+        latestOrders.put("time_stamp", timeStampLong);
+        latestOrders.put("active_orders", orderList.size());
+        JSONArray jsonDigest = new JSONArray();
+        for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
+
+            JSONObject thisOrder = new JSONObject();
+            Order _order = order.next();
+
+            //issue 160 - convert all amounts in NBT
+
+            double amount = _order.getAmount().getQuantity();
+            //special case: swapped pair
+            if (Global.conversion != 1) {
+                if (Global.swappedPair)//For swapped pair, need to convert the amounts to NBT
+                {
+                    amount = _order.getAmount().getQuantity() * Global.conversion;
+                }
+            }
+
+            thisOrder.put("order_id", _order.getId());
+            thisOrder.put("time", _order.getInsertedDate().getTime());
+            thisOrder.put("order_type", _order.getType());
+            thisOrder.put("order_currency", _order.getPair().getOrderCurrency().getCode());
+            thisOrder.put("amount", amount);
+            thisOrder.put("payment_currency", _order.getPair().getPaymentCurrency().getCode());
+            thisOrder.put("price", _order.getPrice().getQuantity());
+            jsonDigest.add(thisOrder);
+        }
+        latestOrders.put("digest", jsonDigest);
+
+
+        //now read the existing object if one exists
+        JSONParser parser = new JSONParser();
+        JSONObject orderHistory = new JSONObject();
+        JSONArray orders = new JSONArray();
+        try { //object already exists in file
+            orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_orders));
+            orders = (JSONArray) orderHistory.get("orders");
+        } catch (ParseException pe) {
+            LOG.error("Unable to parse " + this.jsonFile_orders);
+        }
+        //add the latest orders to the orders array
+        orders.add(latestOrders);
+        //then save
+        logOrderJSON(orderHistory);
+
+        if (verbose) {
+            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
+            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
+        }
+
+        if (Global.options.isSubmitliquidity()) {
+            //Call RPC
+
+            double buySide;
+            double sellSide;
+
+            if (!Global.swappedPair) {
+                buySide = Global.exchange.getLiveData().getNBTonbuy();
+                sellSide = Global.exchange.getLiveData().getNBTonsell();
+            } else {
+                buySide = Global.exchange.getLiveData().getNBTonsell();
+                sellSide = Global.exchange.getLiveData().getNBTonbuy();
+            }
+
+            toReturn = sendLiquidityInfoImpl(buySide, sellSide, 1);
         }
         return toReturn;
+    }
 
+    private void logOrderCSV(String toWrite) {
+        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+    }
+
+    private void logOrderJSON(JSONObject orderHistory) {
+        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+    }
+
+    private void logBalanceJSON(JSONObject balanceHistory) {
+        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+    }
+
+    private JSONObject getBalanceHistory() throws ParseException {
+        JSONParser parser = new JSONParser();
+        JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
+        return balanceHistory;
     }
 
     private String reportTier2() {
         String toReturn = "";
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
-            Balance balance = (Balance) balancesResponse.getResponseObject();
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
             Amount NBTbalance = balance.getNBTAvailable();
             Amount PEGbalance = balance.getPEGAvailableBalance();
@@ -243,19 +261,24 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             latestBalances.put("balance-not-on-order", availableBalancesArray);
 
             //now read the existing object if one exists
-            JSONParser parser = new JSONParser();
-            JSONObject balanceHistory = new JSONObject();
-            JSONArray balances = new JSONArray();
-            try { //object already exists in file
-                balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
-                balances = (JSONArray) balanceHistory.get("balances");
+            JSONObject balanceHistory = null;
+            try {
+                balanceHistory = getBalanceHistory();
             } catch (ParseException pe) {
                 LOG.error("Unable to parse " + this.jsonFile_balances);
             }
+
+            JSONArray balances = new JSONArray();
+            try { //object already exists in file
+                balances = (JSONArray) balanceHistory.get("balances");
+            } catch (Exception e) {
+
+            }
+
             //add the latest orders to the orders array
             balances.add(latestBalances);
             //then save
-            FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+            logBalanceJSON(balanceHistory);
 
             buyside = Utils.round(buyside * Global.conversion, 2);
 
