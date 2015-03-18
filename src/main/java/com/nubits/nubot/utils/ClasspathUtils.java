@@ -45,6 +45,8 @@ public class ClasspathUtils {
         //see
         // http://docs.oracle.com/javase/8/docs/api/java/lang/ClassLoader.html#getResources-java.lang.String-
 
+        System.out.println("classloader roots");
+
         ClassLoader classLoader = ClasspathUtils.class.getClassLoader();
         // or use:
         // ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
