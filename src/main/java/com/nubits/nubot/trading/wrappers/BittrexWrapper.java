@@ -105,12 +105,12 @@ public class BittrexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
-        return null;
+        return getBalancesImpl(pair, null);
     }
 
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
-        return null;
+        return getBalancesImpl(null, currency);
     }
 
     private ApiResponse getBalancesImpl(CurrencyPair pair, Currency currency) {

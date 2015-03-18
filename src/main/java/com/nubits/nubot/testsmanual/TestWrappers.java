@@ -19,12 +19,11 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,7 +44,7 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "testconfig/poloniex.json";
     //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = ExchangeFacade.POLONIEX;
+    public static final String testExchange = ExchangeFacade.BITTREX;
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
