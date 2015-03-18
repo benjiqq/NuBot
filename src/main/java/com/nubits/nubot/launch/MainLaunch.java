@@ -26,7 +26,8 @@ public class MainLaunch {
 
     private static boolean runui = false;
 
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
+    //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -35,21 +36,12 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
         LOG.info("main. with args " + args.length);
-        if (args.length > 2 || args.length == 0) {
+        if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
         String configfile = args[0];
 
-        if (args.length == 2) {
-            LOG.info("args0 " + args[0]);
-            LOG.info("args1 " + args[1]);
 
-            try {
-                runui = args[1].equals("runui");
-            } catch (Exception e) {
-                exitWithNotice("can't parse runui flag: run nubot with \n" + USAGE_STRING);
-            }
-        }
 
         try {
             Utils.loadProperties("settings.properties");
@@ -58,7 +50,7 @@ public class MainLaunch {
         }
         LOG.info("settings loaded");
 
-        mainLaunch(configfile, runui);
+        mainLaunch(configfile, false);
 
     }
 
