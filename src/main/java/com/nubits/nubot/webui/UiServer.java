@@ -73,6 +73,8 @@ public class UiServer {
 
         get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), new LayoutTemplateEngine(htmlFolder));
 
+        get("/about", (request, response) -> new ModelAndView(configmap, htmlFolder + "about.mustache"), new LayoutTemplateEngine(htmlFolder));
+
 
         //get("/tools", (request, response) -> new ModelAndView(configmap, htmlFolder + "tools.mustache"), new LayoutTemplateEngine(htmlFolder));
 

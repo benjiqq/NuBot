@@ -60,41 +60,43 @@ public class TaskManager {
         //TODO! options can't be null
         //assign default values just for testing without Global.options loaded
         //TODO naming mixed
-        int sendLiquidityInterval = NuBotAdminSettings.submit_liquidity_seconds,
-                executeStrategyInterval =NuBotAdminSettings.executeStrategyInterval,
-                checkPriceInterval = NuBotAdminSettings.checkPriceInterval;
 
+        //setTasks();
+    }
 
+    public void setNudTask(){
+        checkNudTask = new BotTask(
+                new CheckNudTask(), 30, "checkNud");
+        taskList.add(checkNudTask);
+
+    }
+
+    private void setTasks(){
         //connectivity tasks
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), 127, "checkConnection");
         taskList.add(checkConnectionTask);
 
-        checkNudTask = new BotTask(
-                new CheckNudTask(), 30, "checkNud");
-        taskList.add(checkNudTask);
-
-
         sendLiquidityTask = new BotTask(
-                new SubmitLiquidityinfoTask(Global.options.verbose), sendLiquidityInterval, "sendLiquidity"); //true for verbosity
+                new SubmitLiquidityinfoTask(Global.options.verbose), NuBotAdminSettings.submit_liquidity_seconds, "sendLiquidity");
         taskList.add(sendLiquidityTask);
 
 
         strategyFiatTask = new BotTask(
-                new StrategyPrimaryPegTask(), executeStrategyInterval, STRATEGY_FIAT);
+                new StrategyPrimaryPegTask(), NuBotAdminSettings.executeStrategyInterval, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
 
         secondaryPegTask = new BotTask(
-                new StrategySecondaryPegTask(), executeStrategyInterval, STRATEGY_CRYPTO);
+                new StrategySecondaryPegTask(), NuBotAdminSettings.executeStrategyInterval, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
 
         priceTriggerTask = new BotTask(
-                new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
+                new PriceMonitorTriggerTask(), NuBotAdminSettings.checkPriceInterval, "priceTriggerTask");
         taskList.add(secondaryPegTask);
 
         priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), checkPriceInterval, STRATEGY_CRYPTO);
+                new NuPriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
         initialized = true;

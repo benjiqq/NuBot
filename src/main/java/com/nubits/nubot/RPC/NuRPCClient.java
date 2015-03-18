@@ -53,9 +53,9 @@ public class NuRPCClient {
     private String rpcUsername;
     private String rpcPassword;
     private boolean connected;
-    private boolean verbose;
     private boolean useIdentifier;
     private String custodianPublicAddress;
+    private boolean verbose;
     private String exchangeName;
     private CurrencyPair pair;
 

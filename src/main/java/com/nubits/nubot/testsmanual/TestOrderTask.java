@@ -60,8 +60,8 @@ public class TestOrderTask {
 
         ApiKeys keys;
 
-        String secret = PasswordsTest.INTERNAL_PEATIO_SECRET;
-        String apikey = PasswordsTest.INTERNAL_PEATIO_KEY;
+        String secret = Global.options.apiSecret;
+        String apikey = Global.options.apiKey;
 
         //Wrap the keys into a new ApiKeys object
         keys = new ApiKeys(secret, apikey);
@@ -113,11 +113,6 @@ public class TestOrderTask {
             System.exit(0);
         }
 
-
-
-
-
-        /* Setup (end) ------------------------------------------------------------------------------------------------------ */
 
     }
 }

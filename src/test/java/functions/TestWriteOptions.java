@@ -19,7 +19,7 @@ public class TestWriteOptions extends TestCase {
 
     private static String testOutconfigFile = "testout.json";
     private static String testconfig = "testconfig/" + testOutconfigFile;
-    private static String testconfigFile = "test.json";
+    private static String testconfigFile = "peatio.json";
     private static String testinconfig = "testconfig/" + testconfigFile;
 
     @Override
@@ -60,7 +60,7 @@ public class TestWriteOptions extends TestCase {
         try {
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File("testconfig/test.json_0.bak");
+            newbak = new File("testconfig/" + testconfigFile + "_0.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
@@ -72,7 +72,7 @@ public class TestWriteOptions extends TestCase {
 
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File("testconfig/test.json_1.bak");
+            newbak = new File("testconfig/" + testconfigFile + "_1.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
