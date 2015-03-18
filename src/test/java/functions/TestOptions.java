@@ -140,7 +140,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptions(){
 
-        String testconfigFile = "test.json";
+        String testconfigFile = "peatio.json";
         String testconfig = "testconfig/" + testconfigFile;
         boolean catched = false;
         try {

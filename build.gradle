@@ -161,9 +161,16 @@ task runUI(type: JavaExec) {
     }*/
 }
 
+//TODO: copy html output to UI templates
+/*task copyhtmltoui(type: copy){
+    //<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>README.md - Grip</title>
+
+    //</body>
+    //</html>
+}*/
 
 task cleanhtml << {
-    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html')
+    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
     html_files.each { File file ->
         println 'delete ' + file.name

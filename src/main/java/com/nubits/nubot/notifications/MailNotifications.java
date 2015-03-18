@@ -20,11 +20,14 @@ package com.nubits.nubot.notifications;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import com.sun.mail.smtp.SMTPTransport;
+
 import java.security.Security;
 import java.util.Date;
 import java.util.Properties;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -33,7 +36,6 @@ import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 /**
- *
  * @author doraemon
  */
 public class MailNotifications {
@@ -106,14 +108,14 @@ public class MailNotifications {
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username GMail username
-     * @param password GMail password
+     * @param username       GMail username
+     * @param password       GMail password
      * @param recipientEmail TO recipient
-     * @param title title of the message
-     * @param message message to be sent
-     * @throws AddressException if the email address parse failed
+     * @param title          title of the message
+     * @param message        message to be sent
+     * @throws AddressException   if the email address parse failed
      * @throws MessagingException if the connection is dead or not in the
-     * connected state or if the message is not a MimeMessage
+     *                            connected state or if the message is not a MimeMessage
      */
     private static void Send(String recipientEmail, String title, String message)
             throws AddressException, MessagingException {
@@ -124,12 +126,11 @@ public class MailNotifications {
             sessionId = Global.sessionId;
         }
         String footer = "\n --- \n Message generated at " + now;
-        if (Global.options != null) {
-            footer += "from bot with custodial address "
-                    + Global.options.getNubitsAddress() + " , "
-                    + "session id = " + sessionId + " "
-                    + "on " + Global.options.getExchangeName();
-        }
+        footer += "from bot with custodial address "
+                + Global.options.getNubitsAddress() + " , "
+                + "session id = " + sessionId + " "
+                + "on " + Global.options.getExchangeName();
+
         message = message + footer;
         MailNotifications.Send(recipientEmail, "", title, message);
     }
@@ -137,18 +138,18 @@ public class MailNotifications {
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username username
-     * @param password password
+     * @param username       username
+     * @param password       password
      * @param recipientEmail TO recipient
-     * @param ccEmail CC recipient. Can be empty if there is no CC recipient
-     * @param title title of the message
-     * @param message message to be sent
-     * @throws AddressException if the email address parse failed
+     * @param ccEmail        CC recipient. Can be empty if there is no CC recipient
+     * @param title          title of the message
+     * @param message        message to be sent
+     * @throws AddressException   if the email address parse failed
      * @throws MessagingException if the connection is dead or not in the
-     * connected state or if the message is not a MimeMessage
+     *                            connected state or if the message is not a MimeMessage
      */
     private static void Send(String recipientEmail, String ccEmail,
-            String title, String message) throws AddressException,
+                             String title, String message) throws AddressException,
             MessagingException {
         Security.addProvider(new com.sun.net.ssl.internal.ssl.Provider());
         final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";

@@ -1,6 +1,7 @@
 package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
+import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.exchanges.ExchangeFacade;
@@ -142,19 +143,7 @@ public abstract class NuBotBase {
         }
     }
 
-    /**
-     * setup the task for checking Nu RPC
-     */
-    protected void setupNuRPCTask() {
-        LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
-        Global.publicAddress = Global.options.getNubitsAddress();
-        Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
-                Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
-                Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
 
-        LOG.info("Starting task : Check connection with Nud");
-        Global.taskManager.getCheckNudTask().start();
-    }
 
     protected void checkNuConn() throws NuBotConnectionException {
 
@@ -200,7 +189,9 @@ public abstract class NuBotBase {
         Global.taskManager = new TaskManager();
 
         if (Global.options.isSubmitliquidity()) {
-            setupNuRPCTask();
+            NuSetup.setupNuRPCTask();
+            NuSetup.startTask();
+           // setupNuRPCTask();
         }
 
 
