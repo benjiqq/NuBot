@@ -58,4 +58,27 @@ public class TestSSL extends TestCase {
         assertTrue(success);
 
     }
+
+    @Test
+    public void testAlts() {
+
+        //Load settings
+        try {
+            Utils.loadProperties("settings.properties");
+        } catch (IOException e) {
+            //System.exit(0);
+            assertTrue(false);
+        }
+
+
+        Utils.installKeystore(false);
+
+        String API_BASE_URL = "https://alts.trade";
+
+        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        assertTrue(success);
+
+    }
+
+
 }
