@@ -120,18 +120,14 @@ task compiledocs(type: Exec) {
 
 //create a single Jar with all dependencies
 task NuBotJar(type: Jar) {
-
-    doFirst {
-        archiveName "NuBot.jar"
-        destinationDir = distdir //file('${distdir}')
-        def f = new File("${distdir}/" + archiveName)
-        println 'jar ' + f + ' exists ' + f.exists()
-        if (f.exists()) {
-            println 'delete ' + f
-            f.delete()
-        }
-    }
-
+    archiveName "NuBot.jar"
+    destinationDir = distdir //file('${distdir}')
+    /*def f = new File("${distdir}/" + archiveName)
+    println 'jar ' + f + ' exists ' + f.exists()
+    if (f.exists()) {
+        println 'delete ' + f
+        f.delete()
+    }*/
 
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
@@ -143,9 +139,7 @@ task NuBotJar(type: Jar) {
         attributes 'Main-Class': mainclass
     }
     with jar
-    doLast {
-        println "created jar: " + destinationDir + "/" + archiveName
-    }
+
 }
 
 task NuBotDist() {

@@ -73,7 +73,7 @@ public class TestSSL extends TestCase {
 
         Utils.installKeystore(false);
 
-        String API_BASE_URL = "https://alts.trade";
+            String API_BASE_URL = "alts.trade";
 
         boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
