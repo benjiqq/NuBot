@@ -79,21 +79,39 @@ public class TestExchangeAlts extends TestCase {
 
         }
 
+
+        Global.options = opt;
+
+        CurrencyPair testPair = CurrencyList.NBT_BTC;
+
         try{
-            WrapperTestUtils.configExchangeSimple(opt.getExchangeName());
+            WrapperTestUtils.configExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }
 
-        //ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
-        ti = Global.exchange.getTradeInterface();
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(testPair);
+
+
+        if (balancesResponse.isPositive()) {
+            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
+            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
+
+            LOG.info(balance.toString());
+
+            //assertTrue(balance.getNubitsBalance().getQuantity()==0.0);
+            //assertTrue(balance.getPEGBalance().getQuantity()==1000.0);
+
+        } else {
+            assertTrue(false);
+        }
 
         assertTrue(ti != null);
 
         Currency btc = CurrencyList.BTC;
 
         long start = System.currentTimeMillis();
-        ApiResponse balancesResponse = ti.getAvailableBalance(btc);
+
         assertTrue(balancesResponse!=null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;

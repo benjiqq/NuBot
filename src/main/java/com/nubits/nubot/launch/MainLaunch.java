@@ -1,5 +1,7 @@
 package com.nubits.nubot.launch;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
@@ -13,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 import java.io.IOException;
+import java.net.URL;
 
 
 /**
@@ -35,12 +38,18 @@ public class MainLaunch {
      * @param args a list of valid arguments
      */
     public static void main(String args[]) {
+
+
+        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
+        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
+        LOG.info("Logback used '{}' as the configuration file.", mainURL);
+
         LOG.info("main. with args " + args.length);
+
         if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
         String configfile = args[0];
-
 
 
         try {
@@ -56,6 +65,7 @@ public class MainLaunch {
 
     /**
      * main launch of a bot
+     *
      * @param configfile
      * @param runui
      */
@@ -74,14 +84,10 @@ public class MainLaunch {
         CurrencyList.init();
 
         LOG.info("-- new main launched --");
-        if (runui) {
-            LOG.info("* run with ui *");
-            String workingdir = ".";
-            UILaunch.UIlauncher(workingdir, configfile);
-        } else {
-            LOG.info("** run command line **");
-            executeBot(nuopt);
-        }
+
+        LOG.info("** run command line **");
+        executeBot(nuopt);
+
     }
 
 
