@@ -135,7 +135,7 @@ public class StrategySecondaryPegTask extends TimerTask  {
             if (!Global.options.isMultipleCustodians()) {
                 message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getWallchangeThreshold() + " %";
             } else {
-                message += NuBotAdminSettings.reset_every_minutes + " minutes elapsed since last shift";
+                message += NuBotAdminSettings.RESET_EVERY_MINUTES + " minutes elapsed since last shift";
             }
             HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
             LOG.warn(message);

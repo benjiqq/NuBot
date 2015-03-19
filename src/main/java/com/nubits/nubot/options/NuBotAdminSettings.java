@@ -9,21 +9,21 @@ public class NuBotAdminSettings {
     /**
      *
      */
-    public static final int reset_every_minutes = 3;
+    public static final int RESET_EVERY_MINUTES = 3;
 
     /**
      *
      */
-    public static final int refresh_time_seconds = 61;
+    public static final int REFRESH_TIME_SECONDS = 61;
 
     /**
      *
      */
-    public static final int submit_liquidity_seconds = 130;
+    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;
 
-    public static final int executeStrategyInterval = 41;
+    public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
-    public static final int checkPriceInterval = 61;
+    public static final int CHECK_PRICE_INTERVAL = 61;
 
 
 }

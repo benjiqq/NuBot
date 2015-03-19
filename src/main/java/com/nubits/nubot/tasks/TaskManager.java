@@ -84,24 +84,24 @@ public class TaskManager {
         taskList.add(checkConnectionTask);
 
         sendLiquidityTask = new BotTask(
-                new SubmitLiquidityinfoTask(Global.options.verbose), NuBotAdminSettings.submit_liquidity_seconds, "sendLiquidity");
+                new SubmitLiquidityinfoTask(Global.options.verbose), NuBotAdminSettings.SUBMIT_LIQUIDITY_SECONDS, "sendLiquidity");
         taskList.add(sendLiquidityTask);
 
 
         strategyFiatTask = new BotTask(
-                new StrategyPrimaryPegTask(), NuBotAdminSettings.executeStrategyInterval, STRATEGY_FIAT);
+                new StrategyPrimaryPegTask(), NuBotAdminSettings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
 
         secondaryPegTask = new BotTask(
-                new StrategySecondaryPegTask(), NuBotAdminSettings.executeStrategyInterval, STRATEGY_CRYPTO);
+                new StrategySecondaryPegTask(), NuBotAdminSettings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
 
         priceTriggerTask = new BotTask(
-                new PriceMonitorTriggerTask(), NuBotAdminSettings.checkPriceInterval, "priceTriggerTask");
+                new PriceMonitorTriggerTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, "priceTriggerTask");
         taskList.add(priceTriggerTask);
 
         priceMonitorTask = new BotTask(
-                new PriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
+                new PriceMonitorTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);
 
         initialized = true;

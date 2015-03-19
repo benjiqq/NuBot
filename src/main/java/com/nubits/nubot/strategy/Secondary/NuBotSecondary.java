@@ -110,13 +110,13 @@ public class NuBotSecondary extends NuBotBase {
         //Bot needs to wait for next 3 min window before placing walls
         //set the interval from settings
 
-        int reset_every = NuBotAdminSettings.reset_every_minutes;
+        int reset_every = NuBotAdminSettings.RESET_EVERY_MINUTES;
 
         int interval = 1;
         if (Global.options.isMultipleCustodians()) {
             interval = 60 * reset_every;
         } else {
-            interval = NuBotAdminSettings.refresh_time_seconds;
+            interval = NuBotAdminSettings.REFRESH_TIME_SECONDS;
         }
         Global.taskManager.getPriceTriggerTask().setInterval(interval);
 

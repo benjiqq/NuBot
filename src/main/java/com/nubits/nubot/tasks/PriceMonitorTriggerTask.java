@@ -299,7 +299,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             currentTime = System.currentTimeMillis();
 
 
-            logMessage = "There has been a connection issue for " + NuBotAdminSettings.refresh_time_seconds + " seconds\n"
+            logMessage = "There has been a connection issue for " + NuBotAdminSettings.REFRESH_TIME_SECONDS + " seconds\n"
                     + "Consider restarting the bot if the connection issue persists";
             notification = "";
             notificationColor = MessageColor.YELLOW;
@@ -307,10 +307,10 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
         } else { //otherwise something bad has happened so we shutdown.
             int p = 3;
-            sleepTime = NuBotAdminSettings.refresh_time_seconds * p;
+            sleepTime = NuBotAdminSettings.REFRESH_TIME_SECONDS * p;
 
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
-                    + NuBotAdminSettings.refresh_time_seconds + "seconds.\nThe bot will notify and restart in "
+                    + NuBotAdminSettings.REFRESH_TIME_SECONDS + "seconds.\nThe bot will notify and restart in "
                     + sleepTime + "seconds.";
             notification = "A large price difference was detected at " + Global.exchange.getName()
                     + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
@@ -373,7 +373,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             //the potential price is within the % boundary.
             //add it to the MA-Queue to keep the moving average moving
             // Only do this if the standard update interval hasn't passed
-            if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < NuBotAdminSettings.refresh_time_seconds) {
+            if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < NuBotAdminSettings.REFRESH_TIME_SECONDS) {
                 updateMovingAverageQueue(current);
             } else {
                 //If we get here, we haven't had a price within % of the average for as long as a standard update period
