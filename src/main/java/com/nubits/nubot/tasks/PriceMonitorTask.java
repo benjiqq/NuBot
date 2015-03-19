@@ -32,6 +32,10 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 
+/**
+ *
+ * Note: USE THIS TASK ONLY WITH NuPriceMonitor bot
+ */
 public class PriceMonitorTask extends MonitorTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTask.class.getName());
