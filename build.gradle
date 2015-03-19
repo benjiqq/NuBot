@@ -222,6 +222,12 @@ task testall(type: Test) {
     testall.reports.html.destination = file("${testreportdir}/alltests")
 }
 
+task testfunctions(type: Test) {
+    description 'test functions'
+    include 'functions/**'
+    testfunctions.reports.html.destination = file("${testreportdir}/functions")
+}
+
 task testexchanges(type: Test) {
   description 'test all exchanges, includes ordering'
   include 'testexchanges/*'
