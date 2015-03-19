@@ -46,8 +46,7 @@ public class TestWrappers {
      * Configure tests
      */
     private static final String TEST_OPTIONS_PATH = "config/testconfig/poloniex.json";
-    //private static final String TEST_OPTIONS_PATH = "options.json";
-    public static final String testExchange = ExchangeFacade.POLONIEX;
+
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
@@ -65,8 +64,8 @@ public class TestWrappers {
         try {
             Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
             LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + testExchange);
-            WrapperTestUtils.configExchange(testExchange); //Replace to test a different API implementation
+            LOG.info("config exchange " + Global.options.getExchangeName());
+            WrapperTestUtils.configExchange( Global.options.getExchangeName()); //Replace to test a different API implementation
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
@@ -85,10 +84,10 @@ public class TestWrappers {
         WrapperTestUtils.testGetAvailableBalances(testPair);
         WrapperTestUtils.testGetActiveOrders(testPair);
         WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
-        WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
-        WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
+        //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
+        //WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("1139", Constant.NBT_BTC);
         //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
