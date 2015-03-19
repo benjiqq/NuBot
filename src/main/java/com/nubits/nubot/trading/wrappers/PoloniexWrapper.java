@@ -178,7 +178,7 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-        LOG.debug("balance answer " + httpAnswerJson);
+        LOG.trace("balance answer " + httpAnswerJson);
 
         if (currency != null) {
             //looking for a specific currency
