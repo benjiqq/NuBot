@@ -89,9 +89,6 @@ public class NuBotSecondary extends NuBotBase {
 
         pmTask.setPriceFeedManager(pfm);
 
-        //Set the priceDistance threshold
-        pmTask.setDistanceTreshold(opt.getDistanceThreshold());
-
         //Set the wallet shift threshold
         pmTask.setWallchangeThreshold(opt.getWallchangeThreshold());
 

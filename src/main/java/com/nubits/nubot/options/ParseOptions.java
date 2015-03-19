@@ -375,11 +375,6 @@ public class ParseOptions {
         else
             options.spread = (double) getIgnoreCase(optionsJSON, "spread");
 
-        if (!containsIgnoreCase(optionsJSON, "distanceThreshold"))
-            throw new NuBotConfigException("distanceThreshold needed if secondary peg defined");
-        else
-            options.distanceThreshold = (double) getIgnoreCase(optionsJSON, "distanceThreshold");
-
         if (options.spread != 0) {
             throw new NuBotConfigException("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }

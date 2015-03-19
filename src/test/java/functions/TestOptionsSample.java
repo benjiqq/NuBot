@@ -92,7 +92,7 @@ public class TestOptionsSample extends TestCase {
 
             assertTrue(nuo != null);
 
-            assertTrue(nuo.exchangeName.equals("peatio"));
+            assertTrue(nuo.exchangeName.equals("poloniex"));
 
             //assertTrue(nuo.getPair() != null);
 
@@ -107,8 +107,6 @@ public class TestOptionsSample extends TestCase {
     @Test
     public void testLoadComplete() {
 
-        String testconfigFile = "test.json";
-        String testconfig = testconfigdir + "/" + testconfigFile;
         boolean catched = false;
         JSONObject inputJSON = null;
         try {
@@ -171,17 +169,15 @@ public class TestOptionsSample extends TestCase {
     @Test
     public void testParseFeeds(){
 
-        String testconfigFile = "peatio.json";
-        String testconfig = testconfigdir + "/" + testconfigFile;
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
             assertTrue(opt.mainFeed!=null);
-            assertTrue(opt.mainFeed.equals("btce"));
+            assertTrue(opt.mainFeed.equals("blockchain"));
             System.out.println(opt.backupFeedNames.size());
             assertTrue(opt.backupFeedNames.size()==2);
             assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
-            assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
+            assertTrue(opt.backupFeedNames.get(1).equals("btce"));
 
         } catch (NuBotConfigException e) {
             System.out.println("could not parse config");
