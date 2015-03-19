@@ -202,6 +202,51 @@ task NuBotDist() {
 
 }
 
+task quickdist() {
+    //description 'make NuBot distribution folder'
+
+    doFirst {
+        println 'start making distribution'
+        println "delete ${distdir}"
+        delete "${distdir}"
+        tasks.initDist.execute()
+    }
+
+    doLast {
+        println 'dist do last'
+        tasks.NuBotJar.execute()
+
+        println "finish distribution"
+
+        if (includeTestConfig) {
+            copy {
+                from "config/testconfig/poloniex.json"
+                into "${distdir}"
+            }
+        }
+
+        copy {
+            from "config/sampleconfig/sample.json"
+            into "${distdir}"
+        }
+
+        /*copy {
+            from "UI/templates"
+            into "${distdir}/UI/templates"
+        }*/
+
+        copy {
+            from "src/main/resources/nubot_keystore.jks"
+            into "${distdir}"
+            //exclude 'listCertificates.sh'
+        }
+
+
+        //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+    }
+
+}
+
 
 /*task runUI(type: JavaExec) {
     description 'run the WebUI'

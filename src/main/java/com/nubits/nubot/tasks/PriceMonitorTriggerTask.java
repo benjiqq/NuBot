@@ -84,7 +84,6 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
         FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
-
         //create json file if it doesn't already exist
         File json = new File(this.jsonFile);
         if (!json.exists()) {

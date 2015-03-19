@@ -26,18 +26,30 @@
 	</appender>
 
 	<appender name="mainFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-		<file>logs/main.log</file>
+		<!--<file>logs/main.log</file>
 
 		<encoder>
 			<pattern>%date{HH:mm:ss.SSS} - %msg%n
 			</pattern>
-		</encoder>
+		</encoder>-->
 
-		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+			<layout class="ch.qos.logback.classic.html.HTMLLayout">
+				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
+			</layout>
+		</encoder>
+		<file>logs/main{LOG_FILE}.%d{yyyyMMdd}_%d{HHmmss,aux}</file>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_FILE}.%d{yyyyMMdd}_%d{HHmmss,aux}</fileNamePattern>
+			<TimeBasedFileNamingAndTriggeringPolicy class="com.nubits.nubot.utils.StartupTimeBasedTriggeringPolicy" />
+		</rollingPolicy>
+
+		<!--<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<fileNamePattern>logs/main.%i.log.zip</fileNamePattern>
 			<minIndex>1</minIndex>
 			<maxIndex>10</maxIndex>
-		</rollingPolicy>
+		</rollingPolicy>-->
 
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<maxFileSize>10MB</maxFileSize>
