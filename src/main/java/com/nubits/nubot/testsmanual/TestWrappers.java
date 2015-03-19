@@ -127,6 +127,7 @@ public class TestWrappers {
 
         LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
+        System.exit(0);
     }
 
     public static void init() {
