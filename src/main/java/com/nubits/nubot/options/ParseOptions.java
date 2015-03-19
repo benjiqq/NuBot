@@ -149,6 +149,15 @@ public class ParseOptions {
         return true;
     }
 
+    public static boolean requiresSecondaryPegStrategy(CurrencyPair pair) {
+        //Return TRUE when it requires a dedicated NBT peg to something that is not USD
+        if (pair.equals(CurrencyList.NBT_USD)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
     /**
      * parseOptions from JSON into NuBotOptions
      * makes sure the parses object is valid
@@ -211,7 +220,9 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        options.secondarypeg = (boolean) optionsJSON.get("secondarypeg");
+        boolean requireCryptoOptions = requiresSecondaryPegStrategy(options.pair);
+
+        options.secondarypeg = requireCryptoOptions;
 
         try{
             parseSecondary(options, optionsJSON);
