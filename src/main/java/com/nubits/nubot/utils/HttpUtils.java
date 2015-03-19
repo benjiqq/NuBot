@@ -1,5 +1,7 @@
-/* 
- * Copyright (C) 2014-2015 Nu Development Team
+package com.nubits.nubot.utils;
+
+/*
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.utils;
 
 import java.net.SocketTimeoutException;
 import java.util.Map;

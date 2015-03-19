@@ -1,5 +1,7 @@
+package com.nubits.nubot.tasks;
+
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,7 +17,6 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.NuBotConnectionException;
 import com.nubits.nubot.global.Constant;
@@ -54,6 +55,8 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private LastPrice currentWallPEGPrice;
 
     private boolean wallsBeingShifted = false;
+
+    private static BidAskPair bidaskPEG;
 
     //options
 
@@ -154,8 +157,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             }
 
             //store it
-            BidAskPair bidask = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
-            Global.store.setPricePEG(bidask);
+            bidaskPEG = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
 
             String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
                     + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
@@ -457,16 +459,16 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, precision);
         }
 
+        //Store values
+        bidaskPEG = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
+
         //check if the price increased or decreased
-        if ((sellPricePEG_new - Global.store.getPricePeg().getAsk()) > 0) {
+        if ((sellPricePEG_new - bidaskPEG.getAsk()) > 0) {
             this.pegPriceDirection = Constant.UP;
         } else {
             this.pegPriceDirection = Constant.DOWN;
         }
 
-        //Store values in storage layer
-        BidAskPair bidask = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
-        Global.store.setPricePEG(bidask);
 
         LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);

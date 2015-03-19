@@ -1,18 +1,35 @@
 package com.nubits.nubot.exchanges;
 
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
-import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * a facade for all exchanges
@@ -30,11 +47,11 @@ public class ExchangeFacade {
     public static final String ALLCOIN = "allcoin";
     public static final String EXCOIN = "excoin";
     public static final String BITCOINCOID = "bitcoincoid";
-
+    public static final String BITTREX = "bittrex";
 
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
-    private static HashMap<String, TradeInterface> supportedExchanges;
+    private static HashMap<String, TradeInterface> supportedExchanges, liveExchanges;
 
     static{
         supportedExchanges = new HashMap<>();
@@ -44,40 +61,36 @@ public class ExchangeFacade {
         supportedExchanges.put(CCEX, new CcexWrapper());
         supportedExchanges.put(ALLCOIN, new AllCoinWrapper());
         supportedExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
-
         supportedExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
         supportedExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
-
         supportedExchanges.put(BTCE, new BtceWrapper());
 
-        /*
-        //defunct
         supportedExchanges.put(BTER, new BterWrapper());
         supportedExchanges.put(CCEDK, new CcedkWrapper());
-        supportedExchanges.put(EXCOIN, new ExcoinWrapper());*/
+        supportedExchanges.put(EXCOIN, new ExcoinWrapper());
     }
 
-    public static boolean knownExchange(String exchange){
+    static {
+        liveExchanges = new HashMap<>();
+
+        liveExchanges.put(ALTSTRADE, new AltsTradeWrapper());
+        liveExchanges.put(POLONIEX, new PoloniexWrapper());
+        liveExchanges.put(CCEX, new CcexWrapper());
+        liveExchanges.put(ALLCOIN, new AllCoinWrapper());
+        liveExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
+        liveExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
+        liveExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
+        liveExchanges.put(BTCE, new BtceWrapper());
+    }
+
+    public static boolean exchangeSupported(String exchange){
         return supportedExchanges.containsKey(exchange);
     }
 
 
-    /*public static boolean exchangeSupported(String exchangename) {
-        List<String> supportedExchanges = new ArrayList<String>();
-        supportedExchanges.add(ExchangeFacade.BTCE);
-        supportedExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
-        supportedExchanges.add(ExchangeFacade.BTER);
-        supportedExchanges.add(ExchangeFacade.CCEDK);
-        supportedExchanges.add(ExchangeFacade.POLONIEX);
-        supportedExchanges.add(ExchangeFacade.CCEX);
-        supportedExchanges.add(ExchangeFacade.ALLCOIN);
-        supportedExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
-        supportedExchanges.add(ExchangeFacade.EXCOIN);
-        supportedExchanges.add(ExchangeFacade.BITCOINCOID);
-        supportedExchanges.add(ExchangeFacade.ALTSTRADE);
-
-        return supportedExchanges.contains(exchangename);
-    }*/
+    public static boolean exchangeIsLive(String exchangename) {
+        return liveExchanges.containsKey(exchangename);
+    }
 
     /**
      * set up interface based on options

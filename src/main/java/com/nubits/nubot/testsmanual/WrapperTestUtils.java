@@ -2,10 +2,28 @@ package com.nubits.nubot.testsmanual;
 
 
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.PairBalance;
@@ -21,14 +39,14 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
-import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
 
 public class WrapperTestUtils {
 
@@ -36,13 +54,13 @@ public class WrapperTestUtils {
 
     public static void testGetAvailableBalances(CurrencyPair pair) {
         //Get all the balances  associated with the account
+        LOG.warn("Get Balances for " + pair.toString());
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
         if (balancesResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getBalance() ");
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
             LOG.info(balance.toString());
-
         } else {
             LOG.error(balancesResponse.getError().toString());
         }
@@ -50,11 +68,10 @@ public class WrapperTestUtils {
 
     public static void testGetAvailableBalance(Currency cur) {
         //Get the USD balance associated with the account
+        LOG.warn("Get Balance for " + cur.getCode());
         ApiResponse balanceResponse = Global.exchange.getTrade().getAvailableBalance(cur);
         if (balanceResponse.isPositive()) {
-            LOG.info("Positive response from TradeInterface.getBalance(CurrencyPair pair) ");
             Amount balance = (Amount) balanceResponse.getResponseObject();
-
             LOG.info(balance.toString());
         } else {
             LOG.error(balanceResponse.getError().toString());
@@ -63,9 +80,9 @@ public class WrapperTestUtils {
 
     public static void testGetLastPrice(CurrencyPair pair) {
         //Get lastPrice for a given CurrencyPair
+        LOG.warn("Get last price for " + pair.toString());
         ApiResponse lastPriceResponse = Global.exchange.getTrade().getLastPrice(pair);
         if (lastPriceResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getLastPrice(CurrencyPair pair) ");
             Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
             LOG.info("Last price : 1 " + pair.getOrderCurrency().getCode() + " = "
                     + ticker.getLast() + " " + pair.getPaymentCurrency().getCode());
@@ -73,7 +90,6 @@ public class WrapperTestUtils {
                     + ticker.getAsk() + " " + pair.getPaymentCurrency().getCode());
             LOG.info("bid  : 1 " + pair.getOrderCurrency().getCode() + " = "
                     + ticker.getBid() + " " + pair.getPaymentCurrency().getCode());
-
         } else {
             LOG.error(lastPriceResponse.getError().toString());
         }
@@ -82,16 +98,11 @@ public class WrapperTestUtils {
 
     public static void testSell(double amountSell, double priceSell, CurrencyPair pair) {
         //Place a sell order
-
-
+        LOG.warn("Place a SELL order");
         ApiResponse sellResponse = Global.exchange.getTrade().sell(pair, amountSell, priceSell);
         if (sellResponse.isPositive()) {
-
-            LOG.info("\nPositive response  from TradeInterface.sell(...) ");
-            LOG.warn("Strategy : Submit order : "
-                    + "sell" + amountSell + " " + pair.getOrderCurrency().getCode()
+            LOG.info("SELL" + amountSell + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceSell + " " + pair.getPaymentCurrency().getCode());
-
             String sellResponseString = (String) sellResponse.getResponseObject();
             LOG.info("Response = " + sellResponseString);
         } else {
@@ -101,16 +112,14 @@ public class WrapperTestUtils {
 
     public static void testBuy(double amountBuy, double priceBuy, CurrencyPair pair) {
         //Place a buy order
-
+        LOG.warn("Place a BUY order");
         ApiResponse buyResponse = Global.exchange.getTrade().buy(pair, amountBuy, priceBuy);
         if (buyResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.buy(...) ");
-            LOG.info(": Submit order : "
-                    + "buy" + amountBuy + " " + pair.getOrderCurrency().getCode()
+            LOG.info("BUY" + amountBuy + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceBuy + " " + pair.getPaymentCurrency().getCode());
             String buyResponseString = (String) buyResponse.getResponseObject();
             LOG.info("Response = " + buyResponseString);
-
         } else {
             LOG.error(buyResponse.getError().toString());
         }
@@ -118,17 +127,15 @@ public class WrapperTestUtils {
 
     public static void testGetActiveOrders() {
         //Get active orders
+        LOG.warn("Get ALL Active Orders");
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getActiveOrders() ");
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
             LOG.info("Active orders : " + orderList.size());
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
                 LOG.info(tempOrder.toString());
             }
-
         } else {
             LOG.error(activeOrdersResponse.getError().toString());
         }
@@ -136,11 +143,10 @@ public class WrapperTestUtils {
 
     public static void testGetActiveOrders(CurrencyPair pair) {
         //Get active orders associated with a specific CurrencyPair
+        LOG.warn("Get Active Orders for " + pair.toString());
         ApiResponse activeOrdersUSDNTBResponse = Global.exchange.getTrade().getActiveOrders(pair);
         if (activeOrdersUSDNTBResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getActiveOrders(CurrencyPair pair) ");
             ArrayList<Order> orderListUSDNBT = (ArrayList<Order>) activeOrdersUSDNTBResponse.getResponseObject();
-
             LOG.info("Active orders : " + orderListUSDNBT.size());
             for (int i = 0; i < orderListUSDNBT.size(); i++) {
                 Order tempOrder = orderListUSDNBT.get(i);
@@ -153,9 +159,9 @@ public class WrapperTestUtils {
 
     public static void testGetOrderDetail(String order_id_detail) {
         //Get the order details for a specific order_id
+        LOG.warn("Get Order Detail for " + order_id_detail);
         ApiResponse orderDetailResponse = Global.exchange.getTrade().getOrderDetail(order_id_detail);
         if (orderDetailResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getOrderDetail(id) ");
             Order order = (Order) orderDetailResponse.getResponseObject();
             LOG.info(order.toString());
         } else {
@@ -165,16 +171,15 @@ public class WrapperTestUtils {
 
     public static void testCancelOrder(String order_id_delete, CurrencyPair pair) {
         //Cancel an order
+        LOG.warn("Cancel Order " + order_id_delete + " for " + pair.toString());
         ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(order_id_delete, pair);
         if (deleteOrderResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrderResponse.getResponseObject();
-
             if (deleted) {
-                LOG.info("Order deleted succesfully");
+                LOG.info("Order deleted successfully");
             } else {
                 LOG.info("Could not delete order");
             }
-
         } else {
             LOG.error(deleteOrderResponse.getError().toString());
         }
@@ -182,9 +187,9 @@ public class WrapperTestUtils {
 
     public static void testGetTxFee() {
         //Get current trascation fee
+        LOG.warn("Get the tx fee");
         ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee();
         if (txFeeResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getTxFee()");
             double txFee = (Double) txFeeResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFee + "%");
         } else {
@@ -194,9 +199,9 @@ public class WrapperTestUtils {
 
     public static void testGetTxFeeWithArgs(CurrencyPair pair) {
         //Get the current transaction fee associated with a specific CurrencyPair
+        LOG.warn("Get tx fee for " + pair.toString());
         ApiResponse txFeeNTBUSDResponse = Global.exchange.getTrade().getTxFee(pair);
         if (txFeeNTBUSDResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getTxFee(CurrencyPair pair)");
             double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
             LOG.info("Trasaction fee = " + txFeeUSDNTB + "%");
         } else {
@@ -206,9 +211,9 @@ public class WrapperTestUtils {
 
     public static void testIsOrderActive(String orderId) {
         //Check if orderId is active
+        LOG.warn("Test if " + orderId + " is active");
         ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderId);
         if (orderDetailResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.isOrderActive(id) ");
             boolean exist = (boolean) orderDetailResponse.getResponseObject();
             LOG.info("Order " + orderId + "  active? " + exist);
         } else {
@@ -217,16 +222,15 @@ public class WrapperTestUtils {
     }
 
     public static void testClearAllOrders(CurrencyPair pair) {
+        LOG.warn("Clear all orders");
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-
             if (deleted) {
                 LOG.info("Order clear request succesfully");
             } else {
                 LOG.info("Could not submit request to clear orders");
             }
-
         } else {
             LOG.error(deleteOrdersResponse.getError().toString());
         }
@@ -234,9 +238,9 @@ public class WrapperTestUtils {
 
     public static void testGetLastTrades(CurrencyPair pair) {
         //Get active orders
+        LOG.warn("Get last trades for " + pair.toString());
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair);
         if (activeOrdersResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getLastTrades(pair) ");
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
             LOG.info("Last 24h trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
@@ -250,9 +254,9 @@ public class WrapperTestUtils {
 
     public static void testGetLastTrades(CurrencyPair pair, long startTime) {
         //Get active orders
+        LOG.warn("Get last trades for " + pair.toString() + " starting from " + startTime);
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, startTime);
         if (activeOrdersResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getLastTrades(pair,startTime) ");
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
             LOG.info("Last trades from " + startTime + " : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
