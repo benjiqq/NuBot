@@ -81,16 +81,16 @@ public class TestWrappers {
         //-------------
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
-        WrapperTestUtils.testGetActiveOrders(testPair);
-        WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testGetActiveOrders(testPair);
+        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
         //WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
-        //WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.003, 0.0000120, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
-        //WrapperTestUtils.testCancelOrder("1139", Constant.NBT_BTC);
-        //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
+        //WrapperTestUtils.testCancelOrder("123199680", testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
         //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
         //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
