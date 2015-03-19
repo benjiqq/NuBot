@@ -325,7 +325,7 @@ public class WrapperTestUtils {
         //try to clear orders
         testClearAllOrders(pair);
     }
-    
+
     public static void startConnectionCheck()
     {
         //Create a TaskManager
