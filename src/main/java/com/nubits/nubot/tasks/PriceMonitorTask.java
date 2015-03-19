@@ -49,10 +49,6 @@ public class PriceMonitorTask extends MonitorTask {
     private boolean isFirstEmail = true;
     private String emailHistory = "";
 
-    /*public PriceMonitorTask(double distanceTreshhold){
-
-    }*/
-
     public void setPriceFeedManager(PriceFeedManager pfm) {
         this.pfm = pfm;
     }
