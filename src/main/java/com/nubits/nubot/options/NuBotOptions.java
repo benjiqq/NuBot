@@ -187,8 +187,6 @@ public class NuBotOptions {
 
     public double spread;
 
-    public double distanceThreshold;
-
     // feeds
 
     public String mainFeed;
@@ -212,7 +210,7 @@ public class NuBotOptions {
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity, boolean secondarypeg,
-                        double wallchangeThreshold, double spread, double distanceThreshold) {
+                        double wallchangeThreshold, double spread) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -242,7 +240,6 @@ public class NuBotOptions {
         this.secondarypeg = secondarypeg;
         this.wallchangeThreshold = wallchangeThreshold;
         this.spread = spread;
-        this.distanceThreshold = distanceThreshold;
 
     }
 
@@ -523,20 +520,6 @@ public class NuBotOptions {
 
     public ArrayList<String> getBackupFeedNames() {
         return backupFeedNames;
-    }
-
-    /**
-     * @return
-     */
-    public double getDistanceThreshold() {
-        return distanceThreshold;
-    }
-
-    /**
-     * @param distanceThreshold
-     */
-    public void setDistanceThreshold(double distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
     }
 
     @Override
