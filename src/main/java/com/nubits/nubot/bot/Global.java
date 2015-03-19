@@ -18,7 +18,6 @@
 
 package com.nubits.nubot.bot;
 
-import ch.qos.logback.core.util.FileUtil;
 import com.github.mustachejava.DefaultMustacheFactory;
 import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
@@ -68,7 +67,7 @@ public class Global {
     public static Exchange exchange;
 
     public static String sessionId;
-    public static long timeStarted, timeStopped;
+    public static long sessionStarted, sessionStopped;
     public static SessionData sessiondata;
 
 
@@ -76,7 +75,7 @@ public class Global {
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("name", "NuBot Sessions");
-        scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.timeStarted, "" + Global.timeStopped));
+        scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.sessionStarted, "" + Global.sessionStopped));
 
         Writer writer = new OutputStreamWriter(new FileOutputStream("output_session.html")); //System.out);
         MustacheFactory mf = new DefaultMustacheFactory();
