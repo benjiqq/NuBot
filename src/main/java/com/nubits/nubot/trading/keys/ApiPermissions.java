@@ -1,5 +1,4 @@
-ackage com.nubits.nubot.trading.keys;
-
+package com.nubits.nubot.trading.keys;
 
 /*
  * Copyright (C) 2015 Nu Development Team

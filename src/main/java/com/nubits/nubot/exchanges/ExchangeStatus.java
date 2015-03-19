@@ -1,5 +1,4 @@
-ackage com.nubits.nubot.exchanges;
-
+package com.nubits.nubot.exchanges;
 
 /*
  * Copyright (C) 2015 Nu Development Team
@@ -36,7 +35,7 @@ public class ExchangeStatus {
 
     }
 
-//Methods
+    //Methods
     public String getBotStatusString() {
         return botStatusString;
     }
