@@ -55,6 +55,8 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
     private boolean wallsBeingShifted = false;
 
+    private static BidAskPair bidaskPEG;
+
     //options
 
     private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
@@ -154,8 +156,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             }
 
             //store it
-            BidAskPair bidask = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
-            Global.store.setPricePEG(bidask);
+            bidaskPEG = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
 
             String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
                     + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
@@ -457,16 +458,16 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, precision);
         }
 
+        //Store values
+        bidaskPEG = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
+
         //check if the price increased or decreased
-        if ((sellPricePEG_new - Global.store.getPricePeg().getAsk()) > 0) {
+        if ((sellPricePEG_new - bidaskPEG.getAsk()) > 0) {
             this.pegPriceDirection = Constant.UP;
         } else {
             this.pegPriceDirection = Constant.DOWN;
         }
 
-        //Store values in storage layer
-        BidAskPair bidask = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
-        Global.store.setPricePEG(bidask);
 
         LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
