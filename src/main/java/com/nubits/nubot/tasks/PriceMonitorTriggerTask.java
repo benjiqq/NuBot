@@ -39,6 +39,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Objects;
@@ -79,8 +80,18 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
 
     public PriceMonitorTriggerTask(){
-        String outputPath = Global.logsFolders + "/" + "wall_shifts.csv";
+        this.outputPath = Global.logsFolders + "/" + "wall_shifts.csv";
         FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
+
+
+        //create json file if it doesn't already exist
+        File json = new File(this.jsonFile);
+        if (!json.exists()) {
+            JSONObject history = new JSONObject();
+            JSONArray wall_shifts = new JSONArray();
+            history.put("wall_shifts", wall_shifts);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
+        }
     }
 
     public void setPriceFeedManager(PriceFeedManager pfm) {
@@ -518,7 +529,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
-        FileSystem.writeToFile(row, outputPath, true);
+        logrow(row, outputPath, true);
 
         //Also update a json version of the output file
         //build the latest data into a JSONObject
@@ -533,19 +544,20 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         wall_shift.put("backup_feed", backup_feeds);
         //now read the existing object if one exists
         JSONParser parser = new JSONParser();
-        JSONObject wall_shift_file = new JSONObject();
+        JSONObject wall_shift_info = new JSONObject();
         JSONArray wall_shifts = new JSONArray();
         try { //object already exists in file
-            wall_shift_file = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
-            wall_shifts = (JSONArray) wall_shift_file.get("wall_shifts");
+            wall_shift_info = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
+            wall_shifts = (JSONArray) wall_shift_info.get("wall_shifts");
         } catch (ParseException pe) {
             LOG.error("Unable to parse order_history.json");
         }
         //add the latest orders to the orders array
         wall_shifts.add(wall_shift);
-        wall_shift_file.put("wall_shifts", wall_shifts);
+        wall_shift_info.put("wall_shifts", wall_shifts);
         //then save
-        FileSystem.writeToFile(wall_shift_file.toJSONString(), jsonFile, false);
+
+        logWallShift(wall_shift_info.toJSONString());
 
         if (Global.options.sendMails()) {
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
@@ -572,19 +584,6 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         this.wallchangeThreshold = wallchangeThreshold;
     }
 
-    /*public void setOutputPath(String outputPath) {
-        this.outputPath = outputPath;
-        this.jsonFile = this.outputPath.replace(".csv", ".json");
-        //create json file if it doesn't already exist
-        File json = new File(this.jsonFile);
-        if (!json.exists()) {
-            JSONObject history = new JSONObject();
-            JSONArray wall_shifts = new JSONArray();
-            history.put("wall_shifts", wall_shifts);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
-        }
-    }*/
-
     public void setStrategy(StrategySecondaryPegTask strategy) {
         this.strategy = strategy;
     }
@@ -599,12 +598,6 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     }
 
 
-
-    public void setDistanceTreshold(double distanceTreshold) {
-        this.distanceTreshold = distanceTreshold;
-    }
-
-
     private void sendErrorNotification() {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
         String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
@@ -614,5 +607,15 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         LOG.error(title + message);
 
     }
+
+
+    private void logrow(String row, String outputPath, boolean append){
+        FileSystem.writeToFile(row, outputPath, append);
+    }
+
+    private void logWallShift(String wall_shift){
+        FileSystem.writeToFile(wall_shift, this.jsonFile, false);
+    }
+
 
 }

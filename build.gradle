@@ -203,11 +203,11 @@ task NuBotDist() {
 }
 
 
-task runUI(type: JavaExec) {
+/*task runUI(type: JavaExec) {
     description 'run the WebUI'
     main = "com.nubits.nubot.webui.UiServer"
     classpath = sourceSets.main.runtimeClasspath
-}
+}*/
 
 
 task runpoloniex(type: JavaExec) {
