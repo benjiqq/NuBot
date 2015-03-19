@@ -42,9 +42,9 @@ import com.nubits.nubot.trading.wrappers.*;
 
 import java.util.ArrayList;
 
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
-import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 

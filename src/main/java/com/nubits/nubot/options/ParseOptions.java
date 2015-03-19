@@ -28,7 +28,6 @@ import com.nubits.nubot.utils.Utils;
 import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -172,7 +171,7 @@ public class ParseOptions {
         //First try to parse compulsory parameters
         options.exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
-        boolean supported = ExchangeFacade.knownExchange(options.exchangeName);
+        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
         LOG.info("exchange supported? " + options.exchangeName + " " + supported);
         if (!supported)
             throw new NuBotConfigException("exchange not supported");

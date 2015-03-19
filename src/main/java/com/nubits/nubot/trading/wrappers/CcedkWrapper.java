@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.nubits.nubot.trading.wrappers.unused;
+package com.nubits.nubot.trading.wrappers;
 
 
 import com.nubits.nubot.exchanges.Exchange;

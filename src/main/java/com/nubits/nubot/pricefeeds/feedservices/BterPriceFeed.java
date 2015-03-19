@@ -28,7 +28,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
