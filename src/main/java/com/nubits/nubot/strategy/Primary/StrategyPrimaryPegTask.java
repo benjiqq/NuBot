@@ -1,7 +1,5 @@
-package com.nubits.nubot.strategy.Primary;
-
 /*
- * Copyright (C) 2015 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +15,7 @@ package com.nubits.nubot.strategy.Primary;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.nubits.nubot.strategy.Primary;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
@@ -381,6 +380,15 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
+        /*ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+
+        if (!activeOrdersResponse.isPositive()) {
+            LOG.error(activeOrdersResponse.getError().toString());
+            return "-1";
+        }*/
+
+        //ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
         ArrayList<Order> orderList = Global.taskManager.orderFetchTask.getCurrentOpenOrders();
 
         ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
@@ -590,6 +598,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             amount = Global.frozenBalances.removeFrozenAmount(amount, Global.frozenBalances.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, precision);
         }
+
 
         if (amount.getQuantity() < oneNBT) {
             LOG.info(type + " available balance (" + amount.getQuantity() + "," + currency + ") < " + treshhold_minimum_balance + " " + currency + ", no need to execute orders");

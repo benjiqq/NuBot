@@ -1,23 +1,5 @@
 package com.nubits.nubot.options;
 
-/*
- * Copyright (C) 2015 Nu Development Team
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
@@ -28,6 +10,7 @@ import com.nubits.nubot.utils.Utils;
 import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -171,7 +154,7 @@ public class ParseOptions {
         //First try to parse compulsory parameters
         options.exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
-        boolean supported = ExchangeFacade.exchangeSupported(options.exchangeName);
+        boolean supported = ExchangeFacade.knownExchange(options.exchangeName);
         LOG.info("exchange supported? " + options.exchangeName + " " + supported);
         if (!supported)
             throw new NuBotConfigException("exchange not supported");

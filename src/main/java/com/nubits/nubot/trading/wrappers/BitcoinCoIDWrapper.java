@@ -1,23 +1,5 @@
 package com.nubits.nubot.trading.wrappers;
 
-/*
- * Copyright (C) 2015 Nu Development Team
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
- */
-
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
@@ -46,7 +28,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.*;
 
 /**
@@ -245,7 +227,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         args.put("pair", pair.toStringSep());
         args.put("type", type.toLowerCase());
-        DecimalFormat nf = new DecimalFormat("0");
+        NumberFormat nf = NumberFormat.getInstance();
         nf.setMinimumFractionDigits(8);
         args.put("price", nf.format(price));
         if (type.equals(Constant.SELL)) {

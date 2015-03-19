@@ -1,7 +1,5 @@
-package com.nubits.nubot.strategy.Secondary;
-
 /*
- * Copyright (C) 2015 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,6 +15,7 @@ package com.nubits.nubot.strategy.Secondary;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
@@ -66,20 +65,20 @@ public class NuBotSecondary extends NuBotBase {
 
         //TODO
 
-        PriceMonitorTriggerTask pmTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
-        StrategySecondaryPegTask straTtask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
+        PriceMonitorTriggerTask pmtask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
+        StrategySecondaryPegTask strattask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
 
         // set trading strategy to the price monitor task
-        pmTask.setStrategy(straTtask);
+        pmtask.setStrategy(strattask);
 
         //TODO circular
 
         // set price monitor task to the strategy
-        straTtask.setPriceMonitorTask(pmTask);
+        strattask.setPriceMonitorTask(pmtask);
 
         // set liquidityinfo task to the strategy
         SubmitLiquidityinfoTask liqtask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
-        straTtask.setSendLiquidityTask(liqtask);
+        strattask.setSendLiquidityTask(liqtask);
 
         PriceFeedManager pfm = null;
         try {
@@ -91,13 +90,13 @@ public class NuBotSecondary extends NuBotBase {
             exitWithNotice("something wrong with options");
         }
 
-        pmTask.setPriceFeedManager(pfm);
+        pmtask.setPriceFeedManager(pfm);
 
         //Set the priceDistance threshold
-        pmTask.setDistanceTreshold(opt.getDistanceThreshold());
+        pmtask.setDistanceTreshold(opt.getDistanceThreshold());
 
         //Set the wallet shift threshold
-        pmTask.setWallchangeThreshold(opt.getWallchangeThreshold());
+        pmtask.setWallchangeThreshold(opt.getWallchangeThreshold());
 
         //Set the outputpath for wallshifts
 

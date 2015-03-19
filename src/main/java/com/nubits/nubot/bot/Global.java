@@ -1,7 +1,5 @@
-package com.nubits.nubot.bot;
-
 /*
- * Copyright (C) 2015 Nu Development Team
+ * Copyright (C) 2014-2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,12 +15,18 @@ package com.nubits.nubot.bot;
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.store.BidAskStore;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -42,6 +46,11 @@ public class Global {
     public static Thread mainThread;
 
     public static NuBotOptions options;
+
+    /**
+     * storage layer
+     */
+    public static BidAskStore store;
 
 
     public static Properties settings;

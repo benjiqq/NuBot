@@ -1,6 +1,6 @@
 package com.nubits.nubot.trading.wrappers;
 /*
- * Copyright (C) 2015 Nu Development Team
+ * Copyright (C) 2014 desrever < woolly_sammoth at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
