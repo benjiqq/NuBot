@@ -328,9 +328,7 @@ public class WrapperTestUtils {
 
     public static void configExchange(String exchangeName) throws NuBotConfigException {
 
-        configExchangeWrapper(exchangeName);
-
-        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
+        configureExchange(exchangeName);
 
         //Create a TaskManager
         Global.taskManager = new TaskManager();
@@ -348,61 +346,28 @@ public class WrapperTestUtils {
 
     }
 
-    private static void configExchangeWrapper(String exchangeName) throws NuBotConfigException {
-        //config exchange in 3 steps
+    public static void configureExchange(String exchangeName) throws NuBotConfigException {
 
-        //1. create exchange object
+        //Create exchange object
         Global.exchange = new Exchange(exchangeName);
 
-        //2. Create e ExchangeLiveData object to accomodate liveData from the Global.exchange
+        //Create e ExchangeLiveData object to accomodate liveData from the Global.exchange
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
-        //3.
+        //Create the ApiKeys object reading from option files
+        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
+
         //Create a new TradeInterface object using the custom implementation
-        //Assign the TradeInterface to the exchange
-        //Wrap the keys into a new ApiKeys object
-
-        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-
-        if (exchangeName.equals(ExchangeFacade.BTCE)) {
-            Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangeName.equals(ExchangeFacade.CCEDK)) {
-            Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BTER)) {
-            Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.POLONIEX)) {
-            Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.CCEX)) {
-            Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.ALLCOIN)) {
-            Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BITSPARK_PEATIO)) {
-            Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.EXCOIN)) {
-            Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BITCOINCOID)) {
-            Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.ALTSTRADE)) {
-            Global.exchange.setTrade(new AltsTradeWrapper(keys, Global.exchange));
-        } else {
-            throw new NuBotConfigException("Exchange " + exchangeName + " not supported");
-        }
-
-    }
-
-    public static void configExchangeSimple(String exchangeName) throws NuBotConfigException {
-
-        Global.exchange = new Exchange(exchangeName);
-        ExchangeLiveData liveData = new ExchangeLiveData();
-        Global.exchange.setLiveData(liveData);
-        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName);
-        ti.setKeys(keys);
-        Global.exchange.setTrade(ti);
-        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
+        //Assign the keys to the TradeInterface
+        ti.setKeys(keys);
+
+        //Assign the TradeInterface to the exchange
+        Global.exchange.setTrade(ti);
+
+        //Set the connection check url
+        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
     }
 }

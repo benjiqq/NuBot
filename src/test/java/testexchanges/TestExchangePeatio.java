@@ -125,7 +125,7 @@ public class TestExchangePeatio extends TestCase {
         }
 
         try{
-            WrapperTestUtils.configExchangeSimple(opt.getExchangeName());
+            WrapperTestUtils.configureExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }

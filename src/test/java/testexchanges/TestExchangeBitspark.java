@@ -99,7 +99,7 @@ public class TestExchangeBitspark extends TestCase {
         }
 
         try{
-            WrapperTestUtils.configExchangeSimple(opt.getExchangeName());
+            WrapperTestUtils.configureExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }
@@ -166,7 +166,7 @@ public class TestExchangeBitspark extends TestCase {
         }
 
         try{
-            WrapperTestUtils.configExchangeSimple(opt.getExchangeName());
+            WrapperTestUtils.configureExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }
