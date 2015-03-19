@@ -185,10 +185,10 @@ task NuBotDist() {
             into "${distdir}"
         }
 
-        copy {
+        /*copy {
             from "UI/templates"
             into "${distdir}/UI/templates"
-        }
+        }*/
 
         copy {
             from "src/main/resources/nubot_keystore.jks"
