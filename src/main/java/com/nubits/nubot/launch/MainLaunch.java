@@ -32,8 +32,11 @@ import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 
 /**
@@ -57,10 +60,43 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
-
+        //log info
         LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
+
         LOG.info("Logback used '{}' as the configuration file.", mainURL);
+
+        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+
+        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
+        while (it.hasNext()){
+            ch.qos.logback.classic.Logger l = it.next();
+            LOG.info("" + l);
+        }
+
+        String wdir = System.getProperty("user.dir");
+
+        File f = new File(wdir + "/" + "logs"); // current directory
+
+        //TODO: move to past after session done
+
+        File[] files = f.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                LOG.info("directory:");
+                String currentLogfoldername = file.getName();
+                LOG.info(currentLogfoldername);
+                Global.logsFolders = "logs" + "/" + currentLogfoldername;
+            }
+        }
+
+
+
+        LOG.trace("test logging level: trace");
+        LOG.debug("test logging level: debug");
+        LOG.info("test logging level: info");
+        LOG.error("test logging level: error");
+        LOG.warn("test logging level: warn");
 
         LOG.info("main. with args " + args.length);
 

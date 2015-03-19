@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
+
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
@@ -38,7 +40,7 @@
 				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
 			</layout>
 		</encoder>
-		<file>logs/main{LOG_FILE}.%d{yyyyMMdd}_%d{HHmmss,aux}</file>
+		<file>logs/${bySecond}/main.html</file>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${LOG_FILE}.%d{yyyyMMdd}_%d{HHmmss,aux}</fileNamePattern>
@@ -65,10 +67,17 @@
 	<appender name="allFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 		<file>logs/all.log</file>
 
-		<encoder>
+		<!--<encoder>
 			<pattern>%date %logger{36} %line %level - %msg%n
 			</pattern>
+		</encoder>-->
+
+		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+			<layout class="ch.qos.logback.classic.html.HTMLLayout">
+				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
+			</layout>
 		</encoder>
+		<file>logs/${bySecond}/all.html</file>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<fileNamePattern>logs/all.%i.log.zip</fileNamePattern>

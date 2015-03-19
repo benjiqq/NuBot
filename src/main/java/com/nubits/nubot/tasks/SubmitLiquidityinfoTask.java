@@ -42,10 +42,10 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 /**
- *  Submit info via NuWalletRPC
- *
- *  Logging: preserving state of orders and balances will be handled differently in the future.
- *  this is to preserve functionality of 0.15 version
+ * Submit info via NuWalletRPC
+ * <p>
+ * Logging: preserving state of orders and balances will be handled differently in the future.
+ * this is to preserve functionality of 0.15 version
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
@@ -55,9 +55,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private boolean wallsBeingShifted = false;
     private boolean firstOrdersPlaced = false;
 
-    private final String outputFile_orders = Global.logsFolders + "/" + "orders_history.csv";
-    private final String jsonFile_orders = Global.logsFolders + "/" + "orders_history.json";
-    private final String jsonFile_balances = Global.logsFolders + "/" + "balance_history.json";
+    private String outputFile_orders = Global.logsFolders + "/" + "orders_history.csv";
+    private String jsonFile_orders = Global.logsFolders + "/" + "orders_history.json";
+    private String jsonFile_balances = Global.logsFolders + "/" + "balance_history.json";
 
     public SubmitLiquidityinfoTask(boolean verbose) {
 
@@ -66,10 +66,16 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         initFiles();
     }
 
-    private void initFiles(){
+    private void initFiles() {
         //create json file if it doesn't already exist
         File jsonF1 = new File(this.jsonFile_orders);
         if (!jsonF1.exists()) {
+            try{
+                jsonF1.createNewFile();
+            }catch(Exception e){
+                LOG.error("error creating file " + jsonF1 + " " + e);
+            }
+
             JSONObject history = new JSONObject();
             JSONArray orders = new JSONArray();
             history.put("orders", orders);
@@ -79,10 +85,25 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         //create json file if it doesn't already exist
         File jsonF2 = new File(this.jsonFile_balances);
         if (!jsonF2.exists()) {
+            try{
+                jsonF2.createNewFile();
+            }catch(Exception e){
+                LOG.error("error creating file " + jsonF1 + " " + e);
+            }
+
             JSONObject history = new JSONObject();
             JSONArray balances = new JSONArray();
             history.put("balances", balances);
             FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
+        }
+
+        File of = new File(this.outputFile_orders);
+        if (!of.exists()){
+            try{
+                of.createNewFile();
+            }catch(Exception e){
+                LOG.error("error creating file " + of + "  " + e);
+            }
         }
 
         FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);

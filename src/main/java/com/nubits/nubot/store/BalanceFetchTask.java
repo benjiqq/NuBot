@@ -60,7 +60,7 @@ public class BalanceFetchTask implements Runnable {
 
             Iterator<Currency> it = balances.keySet().iterator();
 
-            LOG.info("balance fetch loop");
+            LOG.trace("balance fetch loop");
 
             while (it.hasNext()){
 

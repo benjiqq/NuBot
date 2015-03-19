@@ -48,7 +48,7 @@ public class OrderFetchTask implements Runnable {
         //continously update
         while(run) {
 
-            LOG.info("order fetch loop");
+            LOG.trace("order fetch loop");
 
             ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
             if (activeOrdersResponse.isPositive()) {

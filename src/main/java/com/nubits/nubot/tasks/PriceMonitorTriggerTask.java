@@ -71,8 +71,8 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
     private boolean isFirstTimeExecution = true;
 
-    private String outputPath =  Global.logsFolders + "/" + "wall_shifts.csv";
-    private String jsonFile = Global.logsFolders + "/" + "wall_shifts.json";
+    private String wallshiftsFilePath =  Global.logsFolders + "/" + "wall_shifts.csv";
+    private String wallshiftsFilePathJson = Global.logsFolders + "/" + "wall_shifts.json";
 
     private String emailHistory = "";
 
@@ -82,15 +82,29 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
     public PriceMonitorTriggerTask(){
 
-        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
+        File c = new File(this.wallshiftsFilePath);
+        if (!c.exists()){
+            try{
+                c.createNewFile();
+            }catch(Exception e){
+                LOG.error("error creating " + c);
+            }
+        }
+
+        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", wallshiftsFilePath, true);
 
         //create json file if it doesn't already exist
-        File json = new File(this.jsonFile);
+        File json = new File(this.wallshiftsFilePathJson);
         if (!json.exists()) {
+            try{
+                json.createNewFile();
+            }catch(Exception e){
+                LOG.error("error creating " + json);
+            }
             JSONObject history = new JSONObject();
             JSONArray wall_shifts = new JSONArray();
             history.put("wall_shifts", wall_shifts);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
+            FileSystem.writeToFile(history.toJSONString(), this.wallshiftsFilePathJson, true);
         }
     }
 
@@ -248,7 +262,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
                 if (priceList.size() == 2) { // if only 2 values are available
                     double p1 = priceList.get(0).getPrice().getQuantity();
                     double p2 = priceList.get(1).getPrice().getQuantity();
-                    if (closeEnough(distanceTreshold, p1, p2)) {
+                    if (closeEnough(this.distanceTreshold, p1, p2)) {
 
                         this.updateLastPrice(priceList.get(0));
                     } else {
@@ -529,7 +543,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
-        logrow(row, outputPath, true);
+        logrow(row, wallshiftsFilePath, true);
 
         //Also update a json version of the output file
         //build the latest data into a JSONObject
@@ -547,7 +561,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         JSONObject wall_shift_info = new JSONObject();
         JSONArray wall_shifts = new JSONArray();
         try { //object already exists in file
-            wall_shift_info = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile));
+            wall_shift_info = (JSONObject) parser.parse(FileSystem.readFromFile(this.wallshiftsFilePathJson));
             wall_shifts = (JSONArray) wall_shift_info.get("wall_shifts");
         } catch (ParseException pe) {
             LOG.error("Unable to parse order_history.json");
@@ -614,7 +628,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     }
 
     private void logWallShift(String wall_shift){
-        FileSystem.writeToFile(wall_shift, this.jsonFile, false);
+        FileSystem.writeToFile(wall_shift, this.wallshiftsFilePathJson, false);
     }
 
 
