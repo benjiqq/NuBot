@@ -20,7 +20,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.trading.wrappers.unused.TradeUtilsCCEDK;
+import com.nubits.nubot.trading.wrappers.TradeUtilsCCEDK;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;

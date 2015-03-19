@@ -43,17 +43,12 @@ public class ExchangeFacade {
         supportedExchanges.put(CCEX, new CcexWrapper());
         supportedExchanges.put(ALLCOIN, new AllCoinWrapper());
         supportedExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
-
         supportedExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
         supportedExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
-
         supportedExchanges.put(BTCE, new BtceWrapper());
-
-        /*
-        //defunct
         supportedExchanges.put(BTER, new BterWrapper());
         supportedExchanges.put(CCEDK, new CcedkWrapper());
-        supportedExchanges.put(EXCOIN, new ExcoinWrapper());*/
+        supportedExchanges.put(EXCOIN, new ExcoinWrapper());
     }
 
     public static boolean knownExchange(String exchange){

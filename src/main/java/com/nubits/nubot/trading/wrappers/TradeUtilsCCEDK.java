@@ -1,4 +1,4 @@
-package com.nubits.nubot.trading.wrappers.unused;
+package com.nubits.nubot.trading.wrappers;
 
 
 import com.nubits.nubot.models.CurrencyList;
