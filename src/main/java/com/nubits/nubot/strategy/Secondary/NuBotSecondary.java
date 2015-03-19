@@ -39,10 +39,6 @@ public class NuBotSecondary extends NuBotBase {
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotSecondary.class);
 
-    public NuBotSecondary() {
-
-    }
-
     @Override
     public void configureStrategy() throws NuBotConfigException {
 
@@ -66,20 +62,20 @@ public class NuBotSecondary extends NuBotBase {
 
         //TODO
 
-        PriceMonitorTriggerTask pmtask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
-        StrategySecondaryPegTask strattask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
+        PriceMonitorTriggerTask pmTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
+        StrategySecondaryPegTask straTask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
 
         // set trading strategy to the price monitor task
-        pmtask.setStrategy(strattask);
+        pmTask.setStrategy(straTask);
 
         //TODO circular
 
         // set price monitor task to the strategy
-        strattask.setPriceMonitorTask(pmtask);
+        straTask.setPriceMonitorTask(pmTask);
 
         // set liquidityinfo task to the strategy
-        SubmitLiquidityinfoTask liqtask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
-        strattask.setSendLiquidityTask(liqtask);
+        SubmitLiquidityinfoTask liqTask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
+        straTask.setSendLiquidityTask(liqTask);
 
         PriceFeedManager pfm = null;
         try {
@@ -91,13 +87,13 @@ public class NuBotSecondary extends NuBotBase {
             exitWithNotice("something wrong with options");
         }
 
-        pmtask.setPriceFeedManager(pfm);
+        pmTask.setPriceFeedManager(pfm);
 
         //Set the priceDistance threshold
-        pmtask.setDistanceTreshold(opt.getDistanceThreshold());
+        pmTask.setDistanceTreshold(opt.getDistanceThreshold());
 
         //Set the wallet shift threshold
-        pmtask.setWallchangeThreshold(opt.getWallchangeThreshold());
+        pmTask.setWallchangeThreshold(opt.getWallchangeThreshold());
 
 
         //read the delay to sync with remote clock
