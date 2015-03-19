@@ -103,7 +103,7 @@ public class TestExchangeAlts extends TestCase {
         CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         try{
-            WrapperTestUtils.configExchange(opt.getExchangeName());
+            WrapperTestUtils.configureExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }

@@ -67,7 +67,7 @@ public class TestExchangePeatio extends TestCase {
         CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         try{
-            WrapperTestUtils.configExchange(opt.getExchangeName());
+            WrapperTestUtils.configureExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }
@@ -110,7 +110,7 @@ public class TestExchangePeatio extends TestCase {
         CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         try{
-            WrapperTestUtils.configExchange(opt.getExchangeName());
+            WrapperTestUtils.configureExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
         }
