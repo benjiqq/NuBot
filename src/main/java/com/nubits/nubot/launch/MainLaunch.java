@@ -81,7 +81,7 @@ public class MainLaunch {
 
         String wdir = System.getProperty("user.dir");
 
-        File f = new File(wdir + "/" + "logs"); // current directory
+        File f = new File(wdir + "/" + "logs/current"); // current directory
 
         File[] files = f.listFiles();
         String currentLogfoldername = "";
@@ -90,13 +90,13 @@ public class MainLaunch {
                 LOG.info("directory:");
                 currentLogfoldername = file.getName();
                 LOG.info(currentLogfoldername);
-                Global.logsFolders = "logs" + "/" + currentLogfoldername;
+                Global.logsFolders = "logs" + "/" + "current" + "/" + currentLogfoldername;
             }
         }
 
         Global.sessionStarted = System.currentTimeMillis();
 
-        sessionLOG.info("session log;" + currentLogfoldername + ";" + Global.sessionStarted + ";" + Global.sessionId);
+        sessionLOG.info("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
 
         LOG.trace("test logging level: trace");
         LOG.debug("test logging level: debug");

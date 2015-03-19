@@ -71,43 +71,72 @@ public class Global {
     public static SessionData sessiondata;
 
 
-    public static void createSessionOverview() throws IOException {
+    public static void createSessionOverview() {
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("name", "NuBot Sessions");
         scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.sessionStarted, "" + Global.sessionStopped));
 
-        Writer writer = new OutputStreamWriter(new FileOutputStream("output_session.html")); //System.out);
-        MustacheFactory mf = new DefaultMustacheFactory();
-        try{
-            String wdir = System.getProperty("user.dir") + "/" + "templates";
-            File f = new File(wdir + "/" + "session.mustache");
-            String tmpl = FileUtils.readFileToString(f);
-            Mustache mustache = mf.compile(new StringReader(tmpl), "template");
-            mustache.execute(writer, scopes);
-        }catch(Exception e){
+
+        try {
+            String s = FileUtils.readFileToString(new File("logs/session.log"));
+            String[] arr = s.split("\n");
+            for (int i = 0; i < arr.length; i++) {
+                String[] row = arr[i].split(";");
+                if (row[0].equals("session start")) {
+                    scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + Global.sessionStarted, "" + row[1]));
+                }
+            }
+
+        } catch (Exception e) {
 
         }
 
-        writer.flush();
+
+        try {
+            Writer writer = new OutputStreamWriter(new FileOutputStream("logs/output_session.html")); //System.out);
+            MustacheFactory mf = new DefaultMustacheFactory();
+            try {
+                String wdir = System.getProperty("user.dir") + "/" + "templates";
+                File f = new File(wdir + "/" + "session.mustache");
+                String tmpl = FileUtils.readFileToString(f);
+                Mustache mustache = mf.compile(new StringReader(tmpl), "template");
+                mustache.execute(writer, scopes);
+            } catch (Exception e) {
+
+            }
+
+            writer.flush();
+        } catch (Exception e) {
+
+        }
     }
 
     public static void moveSessionLogs() {
 
         String wdir = System.getProperty("user.dir");
 
-        File f = new File(wdir + "/" + "logs"); // current directory
+        File f = new File(wdir + "/" + "logs" + "/" + "current"); // current directory
 
         File[] files = f.listFiles();
+
+        File past = new File(wdir + "/" + "logs" + "/" + "pastsession/");
+        if (!past.exists()) {
+            try {
+                past.mkdir();
+            } catch (Exception e) {
+
+            }
+        }
+
         for (File file : files) {
             if (file.isDirectory()) {
-                LOG.info("directory:");
                 String currentLogfoldername = file.getName();
                 LOG.info(currentLogfoldername);
 
-                File sessionLogDir = new File(Global.logsFolders = "logs" + "/" + currentLogfoldername);
+                File sessionLogDir = new File(Global.logsFolders = "logs" + "/" + "current" + "/" + currentLogfoldername);
                 File historyDir = new File("logs/pastsession" + "/" + currentLogfoldername);
-
+                LOG.info("move from: " + sessionLogDir + " >> to: " + historyDir);
                 try {
                     FileUtils.moveDirectory(sessionLogDir, historyDir);
                 } catch (Exception e) {
@@ -173,8 +202,15 @@ public class Global {
                     }
                 }
 
+                Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
+                Global.sessionStopped = System.currentTimeMillis();
+                sessionLOG.info("session end;" + Global.sessionStopped);
+
                 LOG.info("move session log dir");
                 moveSessionLogs();
+
+                LOG.info("create session overview");
+                createSessionOverview();
 
                 LOG.info("Exit. ");
                 mainThread.interrupt();

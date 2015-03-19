@@ -40,7 +40,7 @@
 				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
 			</layout>
 		</encoder>
-		<file>logs/${bySecond}/main.html</file>
+		<file>logs/current/${bySecond}/main.html</file>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
 			<fileNamePattern>${LOG_FILE}.%d{yyyyMMdd}_%d{HHmmss,aux}</fileNamePattern>
@@ -76,7 +76,7 @@
 				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
 			</layout>
 		</encoder>
-		<file>logs/${bySecond}/all.html</file>
+		<file>logs/current/${bySecond}/all.html</file>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<fileNamePattern>logs/all.%i.log.zip</fileNamePattern>
@@ -108,17 +108,9 @@
 	<appender name="sessionFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
 		<encoder>
-			<pattern>%date %logger{36} %line %level - %msg%n
+			<pattern>%msg%n
 			</pattern>
 		</encoder>
-
-		<!--
-		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="ch.qos.logback.classic.html.HTMLLayout">
-				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
-			</layout>
-		</encoder>
-		-->
 
 		<file>logs/session.log</file>
 
