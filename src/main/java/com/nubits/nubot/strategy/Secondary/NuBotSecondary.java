@@ -99,11 +99,6 @@ public class NuBotSecondary extends NuBotBase {
         //Set the wallet shift threshold
         pmtask.setWallchangeThreshold(opt.getWallchangeThreshold());
 
-        //Set the outputpath for wallshifts
-
-        String outputPath = logsFolder + "wall_shifts.csv";
-        ((PriceMonitorTriggerTask) (Global.taskManager.getPriceTriggerTask().getTask())).setOutputPath(outputPath);
-        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
         //read the delay to sync with remote clock
         //issue 136 - multi custodians on a pair.

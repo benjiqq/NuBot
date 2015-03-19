@@ -18,9 +18,9 @@
 
 package com.nubits.nubot.tasks;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotConnectionException;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.BidAskPair;
 import com.nubits.nubot.models.LastPrice;
@@ -32,16 +32,16 @@ import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
-
-import java.io.File;
-import java.util.*;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Objects;
 
 /**
  * A task for monitoring prices and triggering actions
@@ -55,6 +55,8 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private LastPrice currentWallPEGPrice;
 
     private boolean wallsBeingShifted = false;
+
+    private BidAskPair bidask;
 
     //options
 
@@ -75,6 +77,11 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private Long currentTime = null;
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
+
+    public PriceMonitorTriggerTask(){
+        String outputPath = Global.logsFolders + "/" + "wall_shifts.csv";
+        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
+    }
 
     public void setPriceFeedManager(PriceFeedManager pfm) {
         this.pfm = pfm;
@@ -154,9 +161,8 @@ public class PriceMonitorTriggerTask extends MonitorTask {
                 buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
             }
 
-            //store it
-            BidAskPair bidask = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
-            Global.store.setPricePEG(bidask);
+            //store first value
+            this.bidask = new BidAskPair(buyPricePEGInitial, sellPricePEGInitial);
 
             String message2 = "Converted price (using 1 " + Global.options.getPair().getPaymentCurrency().getCode() + " = " + peg_price + " USD)"
                     + " : sell @ " + sellPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode() + "";
@@ -458,16 +464,18 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, precision);
         }
 
-        //check if the price increased or decreased
-        if ((sellPricePEG_new - Global.store.getPricePeg().getAsk()) > 0) {
+        BidAskPair newPrice = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
+
+        //check if the price increased or decreased compared to last
+        if ((newPrice.getAsk() - this.bidask.getAsk()) > 0) {
             this.pegPriceDirection = Constant.UP;
         } else {
             this.pegPriceDirection = Constant.DOWN;
         }
 
-        //Store values in storage layer
-        BidAskPair bidask = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
-        Global.store.setPricePEG(bidask);
+        //Store new value
+        this.bidask = newPrice;
+
 
         LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
@@ -564,7 +572,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
         this.wallchangeThreshold = wallchangeThreshold;
     }
 
-    public void setOutputPath(String outputPath) {
+    /*public void setOutputPath(String outputPath) {
         this.outputPath = outputPath;
         this.jsonFile = this.outputPath.replace(".csv", ".json");
         //create json file if it doesn't already exist
@@ -575,7 +583,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
             history.put("wall_shifts", wall_shifts);
             FileSystem.writeToFile(history.toJSONString(), this.jsonFile, true);
         }
-    }
+    }*/
 
     public void setStrategy(StrategySecondaryPegTask strategy) {
         this.strategy = strategy;

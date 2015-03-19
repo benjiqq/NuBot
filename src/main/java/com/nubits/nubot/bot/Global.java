@@ -20,14 +20,9 @@ package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.store.BidAskStore;
 import com.nubits.nubot.tasks.TaskManager;
-import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -48,10 +43,8 @@ public class Global {
 
     public static NuBotOptions options;
 
-    /**
-     * storage layer
-     */
-    public static BidAskStore store;
+    //path of logs. also defined in logback.xml
+    public static String logsFolders = "logs";
 
 
     public static Properties settings;

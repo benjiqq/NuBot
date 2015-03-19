@@ -57,7 +57,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private final String logfolder = "logs";
     private final String outputFile_orders = "orders_history.csv";
-    private final String outputFile_balances = "balance_history.json";
+
     private final String jsonFile_orders = "orders_history.json";
     private final String jsonFile_balances = "balance_history.json";
 
@@ -248,18 +248,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         return toReturn;
     }
 
-    private void logOrderCSV(String toWrite) {
-        FileSystem.writeToFile(toWrite, outputFile_orders, true);
-    }
-
-    private void logOrderJSON(JSONObject orderHistory) {
-        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
-    }
-
-    private void logBalanceJSON(JSONObject balanceHistory) {
-        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
-    }
-
     private JSONObject getBalanceHistory() throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
@@ -384,4 +372,20 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     public void setFirstOrdersPlaced(boolean firstOrdersPlaced) {
         this.firstOrdersPlaced = firstOrdersPlaced;
     }
+
+    //---------------- storage related -----------------
+
+    private void logOrderCSV(String toWrite) {
+        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+    }
+
+    private void logOrderJSON(JSONObject orderHistory) {
+        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+    }
+
+    private void logBalanceJSON(JSONObject balanceHistory) {
+        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+    }
+
+
 }
