@@ -43,6 +43,9 @@ public class Global {
 
     public static NuBotOptions options;
 
+    //path of logs. also defined in logback.xml
+    public static String logsFolders = "logs";
+
     public static Properties settings;
     public static String sessionId;
     public static boolean running = false;

@@ -41,19 +41,54 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
+/**
+ *  Submit info via NuWalletRPC
+ *
+ *  Logging: preserving state of orders and balances will be handled differently in the future.
+ *  this is to preserve functionality of 0.15 version
+ */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmitLiquidityinfoTask.class.getName());
     private boolean verbose;
-    private String outputFile_orders;
-    private String jsonFile_orders;
-    private String jsonFile_balances;
+
     private boolean wallsBeingShifted = false;
     private boolean firstOrdersPlaced = false;
 
+    private final String logfolder = "logs";
+    private final String outputFile_orders = "orders_history.csv";
+
+    private final String jsonFile_orders = "orders_history.json";
+    private final String jsonFile_balances = "balance_history.json";
+
     public SubmitLiquidityinfoTask(boolean verbose) {
+
         this.verbose = verbose;
+
+        initFiles();
+    }
+
+    private void initFiles(){
+        //create json file if it doesn't already exist
+        File jsonF1 = new File(this.jsonFile_orders);
+        if (!jsonF1.exists()) {
+            JSONObject history = new JSONObject();
+            JSONArray orders = new JSONArray();
+            history.put("orders", orders);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
+        }
+
+        //create json file if it doesn't already exist
+        File jsonF2 = new File(this.jsonFile_balances);
+        if (!jsonF2.exists()) {
+            JSONObject history = new JSONObject();
+            JSONArray balances = new JSONArray();
+            history.put("balances", balances);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
+        }
+
+        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.logfolder + "/" + this.outputFile_orders, false);
+
     }
 
     @Override
@@ -213,18 +248,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         return toReturn;
     }
 
-    private void logOrderCSV(String toWrite) {
-        FileSystem.writeToFile(toWrite, outputFile_orders, true);
-    }
-
-    private void logOrderJSON(JSONObject orderHistory) {
-        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
-    }
-
-    private void logBalanceJSON(JSONObject balanceHistory) {
-        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
-    }
-
     private JSONObject getBalanceHistory() throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
@@ -326,32 +349,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         return toReturn;
     }
 
-    public void setOutputFiles(String outputFileOrders, String outputFileBalances) {
-        this.outputFile_orders = outputFileOrders;
-        this.jsonFile_orders = this.outputFile_orders.replace(".csv", ".json");
-
-
-        //create json file if it doesn't already exist
-        File jsonF1 = new File(this.jsonFile_orders);
-        if (!jsonF1.exists()) {
-            JSONObject history = new JSONObject();
-            JSONArray orders = new JSONArray();
-            history.put("orders", orders);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
-        }
-
-        this.jsonFile_balances = outputFileBalances;
-
-        //create json file if it doesn't already exist
-        File jsonF2 = new File(this.jsonFile_balances);
-        if (!jsonF2.exists()) {
-            JSONObject history = new JSONObject();
-            JSONArray balances = new JSONArray();
-            history.put("balances", balances);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
-        }
-    }
-
     public boolean isVerbose() {
         return verbose;
     }
@@ -375,4 +372,20 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     public void setFirstOrdersPlaced(boolean firstOrdersPlaced) {
         this.firstOrdersPlaced = firstOrdersPlaced;
     }
+
+    //---------------- storage related -----------------
+
+    private void logOrderCSV(String toWrite) {
+        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+    }
+
+    private void logOrderJSON(JSONObject orderHistory) {
+        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+    }
+
+    private void logBalanceJSON(JSONObject balanceHistory) {
+        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+    }
+
+
 }

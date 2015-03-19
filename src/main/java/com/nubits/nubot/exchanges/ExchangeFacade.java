@@ -24,13 +24,12 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
-import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 /**
  * a facade for all exchanges
@@ -52,9 +51,10 @@ public class ExchangeFacade {
 
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
-    private static HashMap<String, TradeInterface> supportedExchanges;
+    private static HashMap<String, TradeInterface> supportedExchanges, liveExchanges;
+    ;
 
-    static{
+    static {
         supportedExchanges = new HashMap<>();
 
         supportedExchanges.put(ALTSTRADE, new AltsTradeWrapper());
@@ -68,37 +68,37 @@ public class ExchangeFacade {
 
         supportedExchanges.put(BTCE, new BtceWrapper());
 
-        /*
-        //defunct
         supportedExchanges.put(BTER, new BterWrapper());
         supportedExchanges.put(CCEDK, new CcedkWrapper());
-        supportedExchanges.put(EXCOIN, new ExcoinWrapper());*/
+        supportedExchanges.put(EXCOIN, new ExcoinWrapper());
     }
 
-    public static boolean knownExchange(String exchange){
+    static {
+        liveExchanges = new HashMap<>();
+
+        liveExchanges.put(ALTSTRADE, new AltsTradeWrapper());
+        liveExchanges.put(POLONIEX, new PoloniexWrapper());
+        liveExchanges.put(CCEX, new CcexWrapper());
+        liveExchanges.put(ALLCOIN, new AllCoinWrapper());
+        liveExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
+        liveExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
+        liveExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
+        liveExchanges.put(BTCE, new BtceWrapper());
+    }
+
+    public static boolean supportedExchange(String exchange) {
         return supportedExchanges.containsKey(exchange);
     }
 
+    public static boolean isLiveExchange(String exchange) {
+        return liveExchanges.containsKey(exchange);
+    }
 
-    /*public static boolean exchangeSupported(String exchangename) {
-        List<String> supportedExchanges = new ArrayList<String>();
-        supportedExchanges.add(ExchangeFacade.BTCE);
-        supportedExchanges.add(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO);
-        supportedExchanges.add(ExchangeFacade.BTER);
-        supportedExchanges.add(ExchangeFacade.CCEDK);
-        supportedExchanges.add(ExchangeFacade.POLONIEX);
-        supportedExchanges.add(ExchangeFacade.CCEX);
-        supportedExchanges.add(ExchangeFacade.ALLCOIN);
-        supportedExchanges.add(ExchangeFacade.BITSPARK_PEATIO);
-        supportedExchanges.add(ExchangeFacade.EXCOIN);
-        supportedExchanges.add(ExchangeFacade.BITCOINCOID);
-        supportedExchanges.add(ExchangeFacade.ALTSTRADE);
 
-        return supportedExchanges.contains(exchangename);
-    }*/
 
     /**
      * set up interface based on options
+     *
      * @param opt
      * @return
      */
@@ -113,11 +113,11 @@ public class ExchangeFacade {
         return ti;
     }
 
-    public static TradeInterface getInterface(Exchange exc){
+    public static TradeInterface getInterface(Exchange exc) {
         return getInterfaceByName(exc.getName());
     }
 
-    public static TradeInterface getInterfaceByName(String name){
+    public static TradeInterface getInterfaceByName(String name) {
 
 
         if (supportedExchanges.containsKey(name)) {
@@ -151,7 +151,7 @@ public class ExchangeFacade {
         if (orderResponse.isPositive()) {
             Object o = orderResponse.getResponseObject();
             try {
-                ArrayList<Order> orders = (ArrayList<Order>)o;
+                ArrayList<Order> orders = (ArrayList<Order>) o;
                 return orders;
             } catch (Exception e) {
                 return new ArrayList<>();

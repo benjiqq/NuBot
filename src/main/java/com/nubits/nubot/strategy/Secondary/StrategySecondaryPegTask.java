@@ -98,14 +98,6 @@ public class StrategySecondaryPegTask extends TimerTask  {
         }
     }
 
-    /**
-     * updates through observer
-     */
-    /*public void update(Observable o, Object arg) {
-        LOG.info("pricechanged: " + arg);
-
-    }*/
-
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
         if (!shiftingWalls) {
             shiftingWalls = true;

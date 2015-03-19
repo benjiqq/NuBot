@@ -490,20 +490,7 @@ public class StrategySecondaryPegUtils {
             toRet[1] = biggerOrder.getId();
 
         }
-            /* the commented code works with more than two orders, but is not needed now
-             for (int i = 0; i < orderListCategorized.size(); i++) {
-             Order tempOrder = orderListCategorized.get(i);
-             if (tempOrder.getType().equalsIgnoreCase(type)) {
-             if (i == 0) {
-             smallerOrder = tempOrder;
-             } else {
-             if (smallerOrder.getAmount().getQuantity() > tempOrder.getAmount().getQuantity()) {
-             smallerOrder = tempOrder;
-             }
-             }
-             }
-             }
-             */
+
 
         return toRet;
     }
