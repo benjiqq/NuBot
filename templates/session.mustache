@@ -1,0 +1,33 @@
+<html>
+<style>
+body {
+font-family: Helvetica:
+font-size: 22px;
+}
+
+table {
+    border-spacing: 8px;
+    border-collapse: separate;
+}
+</style>
+<body>
+
+<h1>{{name}}</h1>
+
+<table border="1">
+<tr><th>SessionName</th>
+<th>SessionID</th>
+<th>Exchange</th>
+<th>StartTime</th>
+<th>StopTime</th>
+</tr>
+<tr>
+<td>{{sessiondata.description}}</td>
+<td>{{sessiondata.sessionid}}</td>
+<td>{{sessiondata.exchange}}</td>
+<td>{{sessiondata.startTime}}</td>
+<td>{{sessiondata.stopTime}}</td>
+</tr>
+</table>
+
+</body>

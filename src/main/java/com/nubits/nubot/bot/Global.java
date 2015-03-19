@@ -81,7 +81,7 @@ public class Global {
         Writer writer = new OutputStreamWriter(new FileOutputStream("output_session.html")); //System.out);
         MustacheFactory mf = new DefaultMustacheFactory();
         try{
-            String wdir = System.getProperty("user.dir");
+            String wdir = System.getProperty("user.dir") + "/" + "templates";
             File f = new File(wdir + "/" + "session.mustache");
             String tmpl = FileUtils.readFileToString(f);
             Mustache mustache = mf.compile(new StringReader(tmpl), "template");
