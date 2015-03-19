@@ -226,10 +226,6 @@ public abstract class NuBotBase {
             LOG.error(ex.toString());
         }
 
-        //Set the fileoutput for active orders
-        //TODO! handle logging locally
-
-
 
         //Start task to check orders
         int start_delay = 40;

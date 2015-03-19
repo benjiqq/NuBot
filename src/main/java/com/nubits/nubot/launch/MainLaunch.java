@@ -48,6 +48,8 @@ public class MainLaunch {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
+    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
+
     private static boolean runui = false;
 
     //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
@@ -59,6 +61,8 @@ public class MainLaunch {
      * @param args a list of valid arguments
      */
     public static void main(String args[]) {
+
+        sessionLOG.info("session log");
 
         //log info
         LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
@@ -91,12 +95,13 @@ public class MainLaunch {
         }
 
 
-
         LOG.trace("test logging level: trace");
         LOG.debug("test logging level: debug");
         LOG.info("test logging level: info");
         LOG.error("test logging level: error");
         LOG.warn("test logging level: warn");
+
+
 
         LOG.info("main. with args " + args.length);
 

@@ -18,16 +18,23 @@
 
 package com.nubits.nubot.bot;
 
+import ch.qos.logback.core.util.FileUtil;
+import com.github.mustachejava.DefaultMustacheFactory;
+import com.github.mustachejava.Mustache;
+import com.github.mustachejava.MustacheFactory;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
+import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.*;
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -47,7 +54,7 @@ public class Global {
     public static String logsFolders;
 
     public static Properties settings;
-    public static String sessionId;
+
     public static boolean running = false;
 
     public static TaskManager taskManager;
@@ -60,8 +67,56 @@ public class Global {
 
     public static Exchange exchange;
 
+    public static String sessionId;
+    public static long timeStarted, timeStopped;
+    public static SessionData sessiondata;
 
 
+    public static void createSessionOverview() throws IOException {
+
+        HashMap<String, Object> scopes = new HashMap<String, Object>();
+        scopes.put("name", "NuBot Sessions");
+        scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.timeStarted, "" + Global.timeStopped));
+
+        Writer writer = new OutputStreamWriter(new FileOutputStream("output_session.html")); //System.out);
+        MustacheFactory mf = new DefaultMustacheFactory();
+        try{
+            String wdir = System.getProperty("user.dir");
+            File f = new File(wdir + "/" + "session.mustache");
+            String tmpl = FileUtils.readFileToString(f);
+            Mustache mustache = mf.compile(new StringReader(tmpl), "template");
+            mustache.execute(writer, scopes);
+        }catch(Exception e){
+
+        }
+
+        writer.flush();
+    }
+
+    public static void moveSessionLogs() {
+
+        String wdir = System.getProperty("user.dir");
+
+        File f = new File(wdir + "/" + "logs"); // current directory
+
+        File[] files = f.listFiles();
+        for (File file : files) {
+            if (file.isDirectory()) {
+                LOG.info("directory:");
+                String currentLogfoldername = file.getName();
+                LOG.info(currentLogfoldername);
+
+                File sessionLogDir = new File(Global.logsFolders = "logs" + "/" + currentLogfoldername);
+                File historyDir = new File("logs/pastsession" + "/" + currentLogfoldername);
+
+                try {
+                    FileUtils.moveDirectory(sessionLogDir, historyDir);
+                } catch (Exception e) {
+
+                }
+            }
+        }
+    }
 
     /**
      * shutdown mechanics
@@ -118,6 +173,9 @@ public class Global {
                         }
                     }
                 }
+
+                LOG.info("move session log dir");
+                moveSessionLogs();
 
                 LOG.info("Exit. ");
                 mainThread.interrupt();

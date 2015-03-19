@@ -18,6 +18,7 @@
 
 package com.nubits.nubot.launch;
 
+import com.nubits.nubot.bot.Global;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,12 @@ public class TestLaunch {
      * @param args a list of valid arguments
      */
     public static void main(String args[]) {
+
+        try{
+            Global.createSessionOverview();
+        }catch(Exception e){
+
+        }
 
         /*NuBotOptions opt = null;
 
@@ -58,7 +65,7 @@ public class TestLaunch {
 
         String configfile = "config/testconfig/poloniex_sec.json";
         boolean runui = true;
-        MainLaunch.mainLaunch(configfile, runui);
+        //MainLaunch.mainLaunch(configfile, runui);
     }
 
 
