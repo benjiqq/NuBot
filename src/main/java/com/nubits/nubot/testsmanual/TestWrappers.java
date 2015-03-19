@@ -65,7 +65,8 @@ public class TestWrappers {
             Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
             LOG.info("using key: " + Global.options.getApiKey());
             LOG.info("config exchange " + Global.options.getExchangeName());
-            WrapperTestUtils.configExchange( Global.options.getExchangeName()); //Replace to test a different API implementation
+            WrapperTestUtils.configExchange(Global.options.getExchangeName());
+            WrapperTestUtils.startConnectionCheck();
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
