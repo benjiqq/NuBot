@@ -84,10 +84,10 @@ public class TestWrappers {
         WrapperTestUtils.testGetAvailableBalances(testPair);
         WrapperTestUtils.testGetActiveOrders(testPair);
         WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
-        WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
-        WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
+        //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testSell(0.3, 0.00830509, CurrencyList.NBT_BTC);  //ok
+        //WrapperTestUtils.testBuy(0.003, 0.0000120, CurrencyList.NBT_BTC);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("1139", Constant.NBT_BTC);
         //WrapperTestUtils.testClearAllOrders(Constant.NBT_BTC);
@@ -123,10 +123,9 @@ public class TestWrappers {
         //WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
         //WrapperTestUtils.testGetLastTrades(testPair);
-
-
+        
         LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
-
+        System.exit(0);
     }
 
     public static void init() {
