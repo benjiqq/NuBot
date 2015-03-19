@@ -71,7 +71,7 @@ public class TaskManager {
 
     public void setNudTask() {
         this.checkNudTask = new BotTask(
-                new CheckNudTask(), 30, "checkNud");
+                new CheckNudTask(), NuBotAdminSettings.CHECK_NUD_INTERVAL, "checkNud");
         taskList.add(checkNudTask);
 
     }
@@ -80,7 +80,7 @@ public class TaskManager {
         //connectivity tasks
 
         checkConnectionTask = new BotTask(
-                new CheckConnectionTask(), 127, "checkConnection");
+                new CheckConnectionTask(), NuBotAdminSettings.CHECK_CONNECTION_INTERVAL, "checkConnection");
         taskList.add(checkConnectionTask);
 
         sendLiquidityTask = new BotTask(

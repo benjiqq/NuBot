@@ -25,5 +25,9 @@ public class NuBotAdminSettings {
 
     public static final int CHECK_PRICE_INTERVAL = 61;
 
+    public static final int CHECK_NUD_INTERVAL = 30;
+
+    public static final int CHECK_CONNECTION_INTERVAL = 127;
+
 
 }
