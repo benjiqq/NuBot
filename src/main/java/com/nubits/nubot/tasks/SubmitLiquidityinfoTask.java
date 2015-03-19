@@ -55,11 +55,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private boolean wallsBeingShifted = false;
     private boolean firstOrdersPlaced = false;
 
-    private final String logfolder = "logs";
-    private final String outputFile_orders = "orders_history.csv";
-
-    private final String jsonFile_orders = "orders_history.json";
-    private final String jsonFile_balances = "balance_history.json";
+    private final String outputFile_orders = Global.logsFolders + "/" + "orders_history.csv";
+    private final String jsonFile_orders = Global.logsFolders + "/" + "orders_history.json";
+    private final String jsonFile_balances = Global.logsFolders + "/" + "balance_history.json";
 
     public SubmitLiquidityinfoTask(boolean verbose) {
 
@@ -87,7 +85,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
         }
 
-        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.logfolder + "/" + this.outputFile_orders, false);
+        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);
 
     }
 
