@@ -71,8 +71,9 @@ public class PriceMonitorTriggerTask extends MonitorTask {
 
     private boolean isFirstTimeExecution = true;
 
-    private String outputPath;
-    private String jsonFile;
+    private String outputPath =  Global.logsFolders + "/" + "wall_shifts.csv";
+    private String jsonFile = Global.logsFolders + "/" + "wall_shifts.json";
+
     private String emailHistory = "";
 
     private Long currentTime = null;
@@ -80,7 +81,7 @@ public class PriceMonitorTriggerTask extends MonitorTask {
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
 
     public PriceMonitorTriggerTask(){
-        this.outputPath = Global.logsFolders + "/" + "wall_shifts.csv";
+
         FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", outputPath, false);
 
 

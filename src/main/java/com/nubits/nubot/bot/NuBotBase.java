@@ -91,6 +91,9 @@ public abstract class NuBotBase {
         //Setting up log folder for this session
         //done over logback.xml
 
+        String folderName = "NuBot_" + System.currentTimeMillis() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
+        Global.logsFolders = "logs" + "/" + folderName;
+
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     }
