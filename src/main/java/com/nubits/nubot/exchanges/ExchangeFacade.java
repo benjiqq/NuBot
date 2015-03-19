@@ -65,14 +65,10 @@ public class ExchangeFacade {
         liveExchanges.put(BTCE, new BtceWrapper());
     }
 
-    public static boolean knownExchange(String exchange){
+    public static boolean exchangeSupported(String exchange){
         return supportedExchanges.containsKey(exchange);
     }
 
-
-    public static boolean exchangeSupported(String exchangename) {
-        return supportedExchanges.containsKey(exchangename);
-    }
 
     public static boolean exchangeIsLive(String exchangename) {
         return liveExchanges.containsKey(exchangename);
