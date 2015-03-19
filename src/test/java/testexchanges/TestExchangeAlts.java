@@ -84,13 +84,15 @@ public class TestExchangeAlts extends TestCase {
 
         CurrencyPair testPair = CurrencyList.NBT_BTC;
 
-        try{
+        /*try{
             WrapperTestUtils.configExchange(opt.getExchangeName());
         }catch(NuBotConfigException ex){
 
-        }
+        }*/
 
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(testPair);
+        ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
+
+        ApiResponse balancesResponse = ti.getAvailableBalances(testPair);
 
 
         if (balancesResponse.isPositive()) {
