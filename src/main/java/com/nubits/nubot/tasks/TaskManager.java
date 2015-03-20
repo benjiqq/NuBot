@@ -101,9 +101,9 @@ public class TaskManager {
                 new PriceMonitorTriggerTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, "priceTriggerTask");
         taskList.add(priceTriggerTask);
 
-        priceMonitorTask = new BotTask(
+        /*priceMonitorTask = new BotTask(
                 new NuPriceMonitorTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
-        taskList.add(priceMonitorTask);
+        taskList.add(priceMonitorTask);*/
 
         initialized = true;
     }
