@@ -29,13 +29,15 @@ public class SessionData {
     String exchange;
     String startTime;
     String stopTime;
+    String link;
 
-    public SessionData(String description, String sessionid, String exchange, String startTime, String stopTime) {
+    public SessionData(String description, String sessionid, String exchange, String startTime, String stopTime, String link) {
         this.description = description;
         this.sessionid = sessionid;
         this.exchange = exchange;
         this.startTime = startTime;
         this.stopTime = stopTime;
+        this.link = link;
     }
 
     public String toCSVrow() {

@@ -23,7 +23,7 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.PriceMonitorTask;
+import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -89,19 +89,19 @@ public class NuPriceMonitor {
             }
 
             //Then set the pfm
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setPriceFeedManager(pfm);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setPriceFeedManager(pfm);
 
             //Set the priceDistance threshold
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setDistanceTreshold(distanceTreshold);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setDistanceTreshold(distanceTreshold);
 
             //Set the priceDistance threshold
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setWallchangeThreshold(wallchangeTreshold);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setWallchangeThreshold(wallchangeTreshold);
 
             //Set the priceDistance threshold
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setSendEmails(emails);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setSendEmails(emails);
 
             //Set the priceDistance threshold
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setRecipient(recipient);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setRecipient(recipient);
 
             //Compute the buy/sell prices in USD
             double sellPriceUSDdoubleside = 1 + (0.01 * tx_fee);
@@ -118,13 +118,13 @@ public class NuPriceMonitor {
 
 
             //Set the prices in USD
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setSellPriceUSDdoubleside(sellPriceUSDdoubleside);
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setSellPriceUSDsingleside(sellPriceUSDsellside);
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setBuyPriceUSD(buyPriceUSD);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setSellPriceUSDdoubleside(sellPriceUSDdoubleside);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setSellPriceUSDsingleside(sellPriceUSDsellside);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setBuyPriceUSD(buyPriceUSD);
 
 
             //Set output for csv
-            ((PriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setOutputPath(outputPath);
+            ((NuPriceMonitorTask) (Global.taskManager.getPriceMonitorTask().getTask())).setOutputPath(outputPath);
 
 
             //Write the header for Bens csv

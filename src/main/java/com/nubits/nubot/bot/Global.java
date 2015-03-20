@@ -75,26 +75,33 @@ public class Global {
 
         HashMap<String, Object> scopes = new HashMap<String, Object>();
         scopes.put("name", "NuBot Sessions");
-        scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.sessionStarted, "" + Global.sessionStopped));
+
+        //scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.sessionStarted, "" + Global.sessionStopped));
 
 
         try {
+            LOG.info("read session log");
             String s = FileUtils.readFileToString(new File("logs/session.log"));
             String[] arr = s.split("\n");
+            LOG.info("records found " + arr.length);
             for (int i = 0; i < arr.length; i++) {
                 String[] row = arr[i].split(";");
-                if (row[0].equals("session start")) {
-                    scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + Global.sessionStarted, "" + row[1]));
+                LOG.info("row " + row[0]);
+                if (row[0].contains("session start")) {
+                    String started = row[1];
+                    String link = "pastsession" + "/" + Global.logsFolders + "/" + "all.html";
+                    LOG.info("new session object . link: " + link);
+                    scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + started, "" + row[1], link));
                 }
             }
 
         } catch (Exception e) {
-
+            LOG.error("can't parse session.log");
         }
 
 
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream("logs/output_session.html")); //System.out);
+            Writer writer = new OutputStreamWriter(new FileOutputStream("logs/session.html")); //System.out);
             MustacheFactory mf = new DefaultMustacheFactory();
             try {
                 String wdir = System.getProperty("user.dir") + "/" + "templates";

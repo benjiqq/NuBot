@@ -141,8 +141,45 @@
 
 	</appender>
 
+	<appender name="sessionHTMLFile" class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+			<layout class="ch.qos.logback.classic.html.HTMLLayout">
+				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
+			</layout>
+		</encoder>
+		<file>logs/session.html</file>
+
+		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
+			<fileNamePattern>logs/all.%i.log.zip</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>10</maxIndex>
+		</rollingPolicy>
+
+		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
+			<maxFileSize>50MB</maxFileSize>
+		</triggeringPolicy>
+
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>DEBUG</level>
+		</filter>
+
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator>
+				<expression>
+					return logger.contains("SessionLOG");
+				</expression>
+			</evaluator>
+			<onMatch>NEUTRAL</onMatch>
+			<onMismatch>DENY</onMismatch>
+		</filter>
+
+
+	</appender>
+
 	<root level="debug">
 		<appender-ref ref="sessionFile" />
+		<appender-ref ref="sessionHTMLFile" />
 		<appender-ref ref="allFILE" />
 		<appender-ref ref="mainFILE" />
 		<appender-ref ref="STDOUT" />

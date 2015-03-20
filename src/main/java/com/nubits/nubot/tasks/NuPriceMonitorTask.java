@@ -36,9 +36,9 @@ import org.slf4j.Logger;
  *
  * Note: USE THIS TASK ONLY WITH NuPriceMonitor bot
  */
-public class PriceMonitorTask extends MonitorTask {
+public class NuPriceMonitorTask extends MonitorTask {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTask.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitorTask.class.getName());
 
     private LastPrice lastPrice;
 
