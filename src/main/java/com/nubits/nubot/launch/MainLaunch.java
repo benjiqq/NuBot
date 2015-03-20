@@ -178,7 +178,7 @@ public class MainLaunch {
         if (Global.running) {
             exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
         } else {
-            if (opt.secondarypeg) {
+            if (opt.requiresSecondaryPegStrategy()) {
                 LOG.info("creating secondary bot");
                 NuBotSecondary bot = new NuBotSecondary();
                 bot.execute(opt);

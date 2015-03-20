@@ -56,7 +56,6 @@ public class NuBotOptionsDefault {
         opt.emergencyTimeout = 30;
         opt.keepProceeds = 0.0;
         opt.distributeLiquidity = false;
-        opt.secondarypeg = false;
         opt.pair = CurrencyList.NBT_BTC;
         opt.verbose = false;
         opt.sendHipchat = true;

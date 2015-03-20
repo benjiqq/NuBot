@@ -149,14 +149,6 @@ public class ParseOptions {
         return true;
     }
 
-    public static boolean requiresSecondaryPegStrategy(CurrencyPair pair) {
-        //Return TRUE when it requires a dedicated NBT peg to something that is not USD
-        if (pair.equals(CurrencyList.NBT_USD)) {
-            return false;
-        } else {
-            return true;
-        }
-    }
 
     /**
      * parseOptions from JSON into NuBotOptions
@@ -220,19 +212,13 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        boolean requireCryptoOptions = requiresSecondaryPegStrategy(options.pair);
-
-        options.secondarypeg = requireCryptoOptions;
-
-        try{
-            parseSecondary(options, optionsJSON);
-        }catch(NuBotConfigException e){
-            if (options.secondarypeg) {
+        if (options.requiresSecondaryPegStrategy()) {
+            try {
+                parseSecondary(options, optionsJSON);
+            } catch (NuBotConfigException e) {
                 throw e;
             }
         }
-
-
 
         //---- optional settings ----
 
@@ -362,8 +348,6 @@ public class ParseOptions {
             }
         }
 
-        options.secondarypeg = (boolean) getIgnoreCase(optionsJSON, "secondarypeg");
-
         if (!containsIgnoreCase(optionsJSON, "wallchangeThreshold"))
             throw new NuBotConfigException("wallchangeThreshold needed if secondary peg defined");
         else
@@ -376,7 +360,7 @@ public class ParseOptions {
             options.spread = Utils.getDouble(getIgnoreCase(optionsJSON, "spread"));
 
         if (options.spread != 0) {
-            throw new NuBotConfigException("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
+            LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
 
 
@@ -415,10 +399,6 @@ public class ParseOptions {
 
         if (containsIgnoreCase(postJson, "submitliquidity")) {
             newopt.submitLiquidity= (boolean) getIgnoreCase(postJson,"submitliquidity");
-        }
-
-        if (containsIgnoreCase(postJson, "secondarypeg")) {
-            newopt.secondarypeg =(boolean) getIgnoreCase(postJson,"secondarypeg");
         }
 
         if (containsIgnoreCase(postJson, "executeorders")) {

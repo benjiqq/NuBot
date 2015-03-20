@@ -23,6 +23,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonSerializationContext;
 import com.google.gson.JsonSerializer;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
@@ -179,9 +180,6 @@ public class NuBotOptions {
      */
     //public int sendLiquidityInterval; //disabled
 
-    // ------- secondary peg ----------
-
-    public boolean secondarypeg;
 
     public double wallchangeThreshold;
 
@@ -209,7 +207,7 @@ public class NuBotOptions {
                         boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity, boolean secondarypeg,
+                        boolean distributeLiquidity,
                         double wallchangeThreshold, double spread) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
@@ -236,8 +234,6 @@ public class NuBotOptions {
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
-
-        this.secondarypeg = secondarypeg;
         this.wallchangeThreshold = wallchangeThreshold;
         this.spread = spread;
 
@@ -252,7 +248,7 @@ public class NuBotOptions {
                         int executeStrategyInterval, boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity, boolean secondarypeg) {
+                        boolean distributeLiquidity) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -278,7 +274,6 @@ public class NuBotOptions {
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
-        this.secondarypeg = secondarypeg;
 
         backupFeedNames = new ArrayList<>();
 
@@ -293,12 +288,13 @@ public class NuBotOptions {
         this.dualSide = dualSide;
     }
 
-    public boolean isSecondarypeg() {
-        return this.secondarypeg;
-    }
-
-    public void setSecondary(boolean secondary) {
-        this.secondarypeg= secondarypeg;
+    public boolean requiresSecondaryPegStrategy() {
+        //Return TRUE when it requires a dedicated NBT peg to something that is not USD
+        if (this.pair.equals(CurrencyList.NBT_USD)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public boolean isSubmitliquidity() {
