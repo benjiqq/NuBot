@@ -37,7 +37,7 @@ import java.io.IOException;
 public class TestWrappers {
 
     static {
-        System.setProperty("logback.configurationFile", "allconfig  /testlog.xml");
+        System.setProperty("logback.configurationFile", "allconfig/testlog.xml");
     }
 
 

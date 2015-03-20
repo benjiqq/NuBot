@@ -62,13 +62,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
     //set up a Queue to hold the prices used to calculate the moving average of prices
     protected Queue<Double> queueMA = new LinkedList<>();
 
-    protected int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
+    private final int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
 
 
     /**
      * threshold for signaling a deviation of prices
      */
-    protected double distanceTreshold = 10;
+    private final double DISTANCE_TRESHHOLD = 10;
 
     protected LastPrice lastPrice;
 
@@ -275,7 +275,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 if (priceList.size() == 2) { // if only 2 values are available
                     double p1 = priceList.get(0).getPrice().getQuantity();
                     double p2 = priceList.get(1).getPrice().getQuantity();
-                    if (closeEnough(this.distanceTreshold, p1, p2)) {
+                    if (closeEnough(this.DISTANCE_TRESHHOLD, p1, p2)) {
 
                         this.updateLastPrice(priceList.get(0));
                     } else {
@@ -698,7 +698,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             if (i != mainPriceIndex) {
                 LastPrice tempPrice = priceList.get(i);
                 double temp = tempPrice.getPrice().getQuantity();
-                ok[f] = closeEnough(distanceTreshold, mainPrice, temp);
+                ok[f] = closeEnough(DISTANCE_TRESHHOLD, mainPrice, temp);
                 f++;
             }
         }
