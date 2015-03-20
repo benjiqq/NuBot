@@ -52,7 +52,6 @@ public class TestExchangePoloniex extends TestCase {
 
     @Test
     public void testLoadConfig() {
-        System.out.println("test load config");
 
         boolean catched = false;
 
@@ -74,7 +73,6 @@ public class TestExchangePoloniex extends TestCase {
 
     @Test
     public void testGetBalance() {
-        System.out.println("get balance");
         NuBotOptions opt = null;
         try {
             opt = ParseOptions

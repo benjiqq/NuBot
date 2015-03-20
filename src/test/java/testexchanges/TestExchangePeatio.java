@@ -116,7 +116,6 @@ public class TestExchangePeatio extends TestCase {
         }
 
 
-        System.out.println("get balance");
 
         try{
             Utils.loadProperties("settings.properties");

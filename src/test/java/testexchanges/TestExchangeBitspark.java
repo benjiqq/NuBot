@@ -58,7 +58,6 @@ public class TestExchangeBitspark extends TestCase {
 
     @Test
     public void testLoadConfig() {
-        System.out.println("test load config");
 
         boolean catched = false;
 
@@ -80,7 +79,6 @@ public class TestExchangeBitspark extends TestCase {
 
     @Test
     public void testGetBalance() {
-        System.out.println("get balance");
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -147,7 +145,6 @@ public class TestExchangeBitspark extends TestCase {
 
     @Test
     public void testMakeOrder() {
-        System.out.println("get balance");
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -197,7 +194,6 @@ public class TestExchangeBitspark extends TestCase {
         double minimialQty = 1;
         double minimalPrice = 0.2;
         ApiResponse orderresponse2 = ti.buy(testPair, minimialQty, minimalPrice);
-        System.out.println("response " + orderresponse2);
         //should raise  {"error":"Total must be at least 0.0001."}
         assertTrue(orderresponse2.isPositive());
 
