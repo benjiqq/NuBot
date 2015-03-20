@@ -35,7 +35,7 @@ import java.nio.file.Paths;
 
 public class TestOptionsSample extends TestCase {
 
-    private static String testconfigFile = "sample.json";
+    private static String testconfigFile = "sample-config.json";
     private static String testconfigdir = "config/sampleconfig";
     private static String testconfig = testconfigdir + "/" + testconfigFile;
 

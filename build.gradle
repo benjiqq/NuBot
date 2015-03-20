@@ -226,7 +226,7 @@ task quickdist() {
         }
 
         copy {
-            from "config/sampleconfig/sample.json"
+            from "config/sampleconfig/sample-config.json"
             into "${distdir}"
         }
 
