@@ -43,7 +43,7 @@ public class TestExchangePeatio extends TestCase {
 
 
     private static String testconfigFile = "peatio.json";
-    private static String testconfigdir = "config/testconfig";
+    private static String testconfigdir = "config/myconfig";
     private static String testconfig = testconfigdir + "/" + testconfigFile;
 
     @Test
