@@ -70,6 +70,8 @@ public class Global {
     public static long sessionStarted, sessionStopped;
     public static SessionData sessiondata;
 
+    private static String mainlogfolder = "logs";
+
 
     public static void createSessionOverview() {
 
@@ -81,7 +83,7 @@ public class Global {
 
         try {
             LOG.trace("read session log");
-            String s = FileUtils.readFileToString(new File("logs/session.log"));
+            String s = FileUtils.readFileToString(new File(mainlogfolder  + "/" + "session.log"));
             String[] arr = s.split("\n");
             LOG.trace("records found " + arr.length);
             for (int i = 0; i < arr.length; i++) {
@@ -101,7 +103,7 @@ public class Global {
 
 
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream("logs/session.html")); //System.out);
+            Writer writer = new OutputStreamWriter(new FileOutputStream(mainlogfolder + "sessions.html")); //System.out);
             MustacheFactory mf = new DefaultMustacheFactory();
             try {
                 String wdir = System.getProperty("user.dir") + "/" + "templates";
@@ -123,11 +125,11 @@ public class Global {
 
         String wdir = System.getProperty("user.dir");
 
-        File f = new File(wdir + "/" + "logs" + "/" + "current"); // current directory
+        File f = new File(wdir + "/" + mainlogfolder + "/" + "current"); // current directory
 
         File[] files = f.listFiles();
 
-        File past = new File(wdir + "/" + "logs" + "/" + "pastsession/");
+        File past = new File(wdir + "/" + mainlogfolder  + "/" + "pastsession/");
         if (!past.exists()) {
             try {
                 past.mkdir();
@@ -141,8 +143,8 @@ public class Global {
                 String currentLogfoldername = file.getName();
                 LOG.trace(currentLogfoldername);
 
-                File sessionLogDir = new File(Global.logsFolders = "logs" + "/" + "current" + "/" + currentLogfoldername);
-                File historyDir = new File("logs/pastsession" + "/" + currentLogfoldername);
+                File sessionLogDir = new File(Global.logsFolders = mainlogfolder  + "/" + "current" + "/" + currentLogfoldername);
+                File historyDir = new File(mainlogfolder  + "/" + "pastsession" + "/" + currentLogfoldername);
                 LOG.debug("move from: " + sessionLogDir + " >> to: " + historyDir);
                 try {
                     FileUtils.moveDirectory(sessionLogDir, historyDir);
