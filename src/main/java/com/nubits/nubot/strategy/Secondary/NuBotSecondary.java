@@ -79,18 +79,18 @@ public class NuBotSecondary extends NuBotBase {
 
         PriceFeedManager pfm = null;
         try {
-            pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeedNames(), toTrackCurrencyPair);
+            pfm = new PriceFeedManager(opt.getMainFeed(), opt.getBackupFeedNames(), toTrackCurrencyPair);
         } catch (NuBotConfigException e) {
             exitWithNotice("can't configure price feeds");
         } catch(Exception e){
-            LOG.error("" + Global.options);
+            LOG.error("" + opt);
             exitWithNotice("something wrong with options");
         }
 
         pmTask.setPriceFeedManager(pfm);
 
         //Set the wallet shift threshold
-        pmTask.setWallchangeThreshold(Global.options.getWallchangeThreshold());
+        pmTask.setWallchangeThreshold(opt.getWallchangeThreshold());
 
 
         //read the delay to sync with remote clock

@@ -51,6 +51,11 @@ public abstract class NuBotBase {
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
 
+    /**
+     * configuration options tied to one instance of NuBot
+     */
+    protected NuBotOptions opt;
+
     protected String mode;
 
     protected boolean liveTrading;
