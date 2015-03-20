@@ -34,7 +34,7 @@ public class BalanceFetchTask implements Runnable {
     /**
      * get balance every [x] milliseconds
      */
-    private final int interval_time = 1000;
+    private final int INTERVAL_TIME = 1000* 60 ;
 
     private HashMap<Currency,Amount> balances;
 
@@ -84,7 +84,7 @@ public class BalanceFetchTask implements Runnable {
 
 
             try{
-                Thread.currentThread().sleep(interval_time);
+                Thread.currentThread().sleep(INTERVAL_TIME);
             }catch(Exception e){
                 LOG.error("" + e);
             }

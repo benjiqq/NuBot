@@ -34,7 +34,7 @@ public class OrderFetchTask implements Runnable {
     /**
      * get orders every [x] milliseconds
      */
-    private final int interval_time = 1000;
+    private final int INTERVAL_TIME = 1000 * 60;
 
     private ArrayList<Order> currentOpenOrders;
 
@@ -61,7 +61,7 @@ public class OrderFetchTask implements Runnable {
             }
 
             try{
-                Thread.currentThread().sleep(interval_time);
+                Thread.currentThread().sleep(INTERVAL_TIME);
             }catch(Exception e){
                 LOG.error("" + e);
             }
