@@ -80,17 +80,17 @@ public class Global {
 
 
         try {
-            LOG.info("read session log");
+            LOG.trace("read session log");
             String s = FileUtils.readFileToString(new File("logs/session.log"));
             String[] arr = s.split("\n");
-            LOG.info("records found " + arr.length);
+            LOG.trace("records found " + arr.length);
             for (int i = 0; i < arr.length; i++) {
                 String[] row = arr[i].split(";");
-                LOG.info("row " + row[0]);
+                LOG.trace("row " + row[0]);
                 if (row[0].contains("session start")) {
                     String started = row[1];
                     String link = "pastsession" + "/" + Global.logsFolders + "/" + "all.html";
-                    LOG.info("new session object . link: " + link);
+                    LOG.trace("new session object . link: " + link);
                     scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + started, "" + row[1], link));
                 }
             }
@@ -139,11 +139,11 @@ public class Global {
         for (File file : files) {
             if (file.isDirectory()) {
                 String currentLogfoldername = file.getName();
-                LOG.info(currentLogfoldername);
+                LOG.trace(currentLogfoldername);
 
                 File sessionLogDir = new File(Global.logsFolders = "logs" + "/" + "current" + "/" + currentLogfoldername);
                 File historyDir = new File("logs/pastsession" + "/" + currentLogfoldername);
-                LOG.info("move from: " + sessionLogDir + " >> to: " + historyDir);
+                LOG.debug("move from: " + sessionLogDir + " >> to: " + historyDir);
                 try {
                     FileUtils.moveDirectory(sessionLogDir, historyDir);
                 } catch (Exception e) {
