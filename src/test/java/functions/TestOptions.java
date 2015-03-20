@@ -54,10 +54,8 @@ public class TestOptions extends TestCase {
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
         final String wdir = System.getProperty("user.dir");
-        System.out.println("wdir: " + wdir);
 
         File f = new File(testconfig);
-        System.out.println(">>> " + f.getAbsolutePath() + " exists : " + f.exists());
         assertTrue(f.exists());
     }
 
@@ -65,7 +63,6 @@ public class TestOptions extends TestCase {
     public void testLoadconfig() {
         try {
             JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
-            System.out.println(inputJSON);
             assertTrue(inputJSON.keySet().size() > 0);
         } catch (ParseException e) {
             // e.printStackTrace();
@@ -192,8 +189,6 @@ public class TestOptions extends TestCase {
              opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
-            System.out.println("could not parse config");
-            System.out.println(e);
             catched = true;
         }
 
@@ -232,14 +227,13 @@ public class TestOptions extends TestCase {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
             assertTrue(opt.mainFeed!=null);
             assertTrue(opt.mainFeed.equals("btce"));
-            System.out.println(opt.backupFeedNames.size());
+
             assertTrue(opt.backupFeedNames.size()==2);
             assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
             assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
 
         } catch (NuBotConfigException e) {
-            System.out.println("could not parse config");
-            System.out.println(e);
+
             catched = true;
         }
 
@@ -248,35 +242,4 @@ public class TestOptions extends TestCase {
 
     }
 
-
-
-    /*@Test
-    public void testInvalidFeed(){
-
-        //
-
-    }*/
-
-
-
-
-
-
-    // @Test
-    // public void testDefaultOptions() {
-    // // TODO
-    // assert (false);
-    // }
-    //
-    // @Test
-    // public void testcompulsory() {
-    // assert (false);
-    // }
-    //
-    // @Test
-    // public void testWrongConfig() {
-    // // TODO
-    // // if wrongly configured throws ParseError
-    // assert (false);
-    // }
 }
