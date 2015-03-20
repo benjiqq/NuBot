@@ -139,7 +139,6 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadComplete() {
 
-        String testconfigFile = "test.json";
         String testconfig = testconfigdir + "/" + testconfigFile;
         boolean catched = false;
 
@@ -157,7 +156,6 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptions(){
 
-        String testconfigFile = "peatio.json";
         String testconfig = testconfigdir + "/" + testconfigFile;
 
         boolean catched = false;
@@ -180,8 +178,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptionsAll(){
 
-        String configFile = "config.json";
-        String testconfig = testconfigdir + "/" + configFile;
+        String testconfig = testconfigdir + "/" + testconfigFile;
 
         boolean catched = false;
         NuBotOptions opt = null;
@@ -193,7 +190,7 @@ public class TestOptions extends TestCase {
         }
 
         assertTrue(!catched);
-        
+
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
         String sendMails = NuBotOptionsDefault.sendMails;
@@ -221,7 +218,6 @@ public class TestOptions extends TestCase {
     @Test
     public void testParseFeeds(){
 
-        String testconfigFile = "peatio.json";
         String testconfig = testconfigdir + "/" + testconfigFile;
         boolean catched = false;
         try {
