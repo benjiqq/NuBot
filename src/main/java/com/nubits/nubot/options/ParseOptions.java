@@ -376,7 +376,7 @@ public class ParseOptions {
             options.spread = Utils.getDouble(getIgnoreCase(optionsJSON, "spread"));
 
         if (options.spread != 0) {
-            throw new NuBotConfigException("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
+            LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
 
 
