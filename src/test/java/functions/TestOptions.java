@@ -193,6 +193,7 @@ public class TestOptions extends TestCase {
         }
 
         assertTrue(!catched);
+        
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
         String sendMails = NuBotOptionsDefault.sendMails;
