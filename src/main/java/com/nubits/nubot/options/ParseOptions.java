@@ -42,7 +42,7 @@ import org.slf4j.Logger;
  */
 public class ParseOptions {
 
-    private static String[] comp = {"secondarypeg", "exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
+    private static String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
     private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
 
