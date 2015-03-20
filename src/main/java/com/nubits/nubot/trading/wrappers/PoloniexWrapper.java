@@ -186,7 +186,7 @@ public class PoloniexWrapper implements TradeInterface {
             if (httpAnswerJson.containsKey(lookingFor)) {
                 JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                 double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                LOG.info("balance double : " + balanceD);
+                LOG.debug("balance double : " + balanceD);
                 apiResponse.setResponseObject(new Amount(balanceD, currency));
             } else {
                 String errorMessage = "Cannot find a balance for currency " + lookingFor;

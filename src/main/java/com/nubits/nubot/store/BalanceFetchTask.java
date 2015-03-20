@@ -71,7 +71,7 @@ public class BalanceFetchTask implements Runnable {
                 if (balancesResponse.isPositive()) {
                     synchronized (lock) {
                         Amount a = (Amount)balancesResponse.getResponseObject();
-                        LOG.info("for " + c + " got amount " + a);
+                        LOG.debug("for " + c + " got amount " + a);
                         balances.put(c,a);
                     }
                 } else{

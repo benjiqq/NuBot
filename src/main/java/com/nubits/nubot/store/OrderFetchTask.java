@@ -54,7 +54,7 @@ public class OrderFetchTask implements Runnable {
             if (activeOrdersResponse.isPositive()) {
                 synchronized (lock) {
                     currentOpenOrders= (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-                    LOG.info("got current orders " + currentOpenOrders.size());
+                    LOG.debug("got current orders " + currentOpenOrders.size());
                 }
             } else{
                 LOG.error("could not get orders");

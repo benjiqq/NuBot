@@ -37,6 +37,9 @@ public class NuBotSimple extends NuBotBase {
 
     @Override
     public void configureStrategy() {
+
+        LOG.info("configuring strategy NuBotSimple");
+
         // set liquidityinfo task to the strategy
         ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
                 .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
