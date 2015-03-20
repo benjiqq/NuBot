@@ -2,7 +2,7 @@ dist/
 logs/
 
 #Config files
-config/testconfig/
+config/myconfig/
 
 #Reports
 testreports/

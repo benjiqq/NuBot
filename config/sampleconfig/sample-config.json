@@ -11,7 +11,6 @@
   "rpcuser": "xxx",
   "mainfeed":"blockchain",
   "backupfeeds": ["coinbase", "btce"],
-  "wallchangeThreshold": 0.1,
   "mailnotifications":"none",
   "mailrecipient":"xxx@xxx.xxx",
   "emergencytimeout":60,
