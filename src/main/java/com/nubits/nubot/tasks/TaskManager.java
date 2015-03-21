@@ -23,13 +23,10 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-
-import com.nubits.nubot.store.BalanceFetchTask;
-import com.nubits.nubot.store.OrderFetchTask;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class TaskManager {
@@ -44,12 +41,6 @@ public class TaskManager {
     private BotTask sendLiquidityTask;
     private BotTask checkNudTask;
     private BotTask priceMonitorTask; //use only with NuPriceMonitor
-
-    // --- fetcher tasks ---
-
-    public OrderFetchTask orderFetchTask;
-    public BalanceFetchTask balanceFetchTask;
-
 
     //these are used for secondary peg strategy
     private BotTask secondaryPegTask;

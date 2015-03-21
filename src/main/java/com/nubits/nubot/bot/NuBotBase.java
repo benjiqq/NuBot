@@ -27,8 +27,6 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.store.BalanceFetchTask;
-import com.nubits.nubot.store.OrderFetchTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
@@ -252,19 +250,6 @@ public abstract class NuBotBase {
         }
 
         notifyOnline();
-
-        // fetcher tasks
-
-        OrderFetchTask ft = new OrderFetchTask();
-        Global.taskManager.orderFetchTask = ft;
-        Thread t1 = new Thread(ft);
-        t1.start();
-
-        BalanceFetchTask bt = new BalanceFetchTask(opt.getPair());
-        Global.taskManager.balanceFetchTask = bt;
-        Thread t2 = new Thread(bt);
-        t2.start();
-
 
     }
 
