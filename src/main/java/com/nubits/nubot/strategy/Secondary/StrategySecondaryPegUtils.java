@@ -124,10 +124,14 @@ public class StrategySecondaryPegUtils {
     public void placeInitialWalls() {
 
         boolean buysOrdersOk = true;
-        boolean sellsOrdersOk = initOrders(Constant.SELL, strategy.getSellPricePEG());
+        double sellPrice = strategy.getSellPricePEG();
+        LOG.info("init sell orders. price: " + sellPrice);
+        boolean sellsOrdersOk = initOrders(Constant.SELL, sellPrice);
 
         if (Global.options.isDualSide()) {
-            buysOrdersOk = initOrders(Constant.BUY, strategy.getBuyPricePEG());
+            double buyPrice = strategy.getBuyPricePEG();
+            LOG.info("init buy orders. price: " + buyPrice);
+            buysOrdersOk = initOrders(Constant.BUY, buyPrice);
         }
 
         if (buysOrdersOk && sellsOrdersOk) {
@@ -183,21 +187,31 @@ public class StrategySecondaryPegUtils {
         //Update TX fee :
         //Get the current transaction fee associated with a specific CurrencyPair
         ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+
+        //short hand variables
+        double maxSell = Global.options.getMaxSellVolume();
+        double maxBuy = Global.options.getMaxBuyVolume();
+
         if (txFeeNTBPEGResponse.isPositive()) {
             double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
             LOG.trace("Updated Transaction fee = " + txFeePEGNTB + "%");
 
             double amount1 = Utils.round(balance.getQuantity() / 2, 8);
             //check the calculated amount against the set maximum sell amount set in the options.json file
-            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                amount1 = amount1 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount1;
+
+
+            if (maxSell > 0 && type.equals(Constant.SELL)) {
+                if (amount1 > (maxSell / 2))
+                    amount1 = (maxSell / 2);
             }
+
 
             if (type.equals(Constant.BUY) && !Global.swappedPair) {
                 amount1 = Utils.round(amount1 / price, 8);
                 //check the calculated amount against the max buy amount option, if any.
-                if (Global.options.getMaxBuyVolume() > 0) {
-                    amount1 = amount1 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount1;
+                if (maxBuy > 0) {
+                    if (amount1 > (maxBuy / 2))
+                        amount1 = (maxBuy / 2);
                 }
 
             }
@@ -216,7 +230,8 @@ public class StrategySecondaryPegUtils {
                     typeStr = Constant.BUY;
                     amount1 = Utils.round(amount1 / Global.conversion, 8);
                     if (Global.options.getMaxSellVolume() > 0) {
-                        amount1 = amount1 > Global.options.getMaxSellVolume() ? Global.options.getMaxSellVolume() : amount1;
+                        if (amount1 > maxSell)
+                            amount1 = maxSell;
                     }
                 } else {
                     typeStr = Constant.SELL;
@@ -263,7 +278,6 @@ public class StrategySecondaryPegUtils {
 
                     balance = (Amount) balancesResponse2.getResponseObject();
 
-
                     if (type.equals(Constant.BUY)) {
                         balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                     }
@@ -274,7 +288,7 @@ public class StrategySecondaryPegUtils {
                     //check the calculated amount against the set maximum sell amount set in the options.json file
 
                     if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                        amount2 = amount2 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount2;
+                        amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
                     }
 
                     if ((type.equals(Constant.BUY) && !Global.swappedPair)
@@ -285,8 +299,9 @@ public class StrategySecondaryPegUtils {
                         amount2 = Utils.round(amount2 / price, 8);
 
                         //check the calculated amount against the max buy amount option, if any.
-                        if (Global.options.getMaxBuyVolume() > 0) {
-                            amount2 = amount2 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount2;
+                        if (maxBuy > 0) {
+                            if (amount2 > (maxBuy / 2))
+                                amount2 = (maxBuy / 2);
                         }
 
                     }
@@ -346,9 +361,9 @@ public class StrategySecondaryPegUtils {
 
     public int countActiveOrders(String type) {
 
-        LOG.info("countActiveOrders " + type);
+        LOG.trace("countActiveOrders " + type);
         //Get active orders
-        int toRet = 0;
+        int numOrders = 0;
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
@@ -356,7 +371,7 @@ public class StrategySecondaryPegUtils {
             for (int i = 0; i < orderList.size(); i++) {
                 Order tempOrder = orderList.get(i);
                 if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    toRet++;
+                    numOrders++;
                 }
             }
 
@@ -364,7 +379,8 @@ public class StrategySecondaryPegUtils {
             LOG.error(activeOrdersResponse.getError().toString());
             return -1;
         }
-        return toRet;
+        LOG.debug("activeorders " + type + " " + numOrders);
+        return numOrders;
     }
 
     public void recount() {
@@ -433,7 +449,9 @@ public class StrategySecondaryPegUtils {
                 LOG.error(ex.toString());
             }
 
-            initOrders(Constant.BUY, strategy.getBuyPricePEG());
+            double buyPrice = strategy.getBuyPricePEG();
+            LOG.info("init buy orders. price " + buyPrice);
+            initOrders(Constant.BUY, buyPrice);
 
         } else {
             LOG.error("An error occurred while attempting to cancel buy orders.");

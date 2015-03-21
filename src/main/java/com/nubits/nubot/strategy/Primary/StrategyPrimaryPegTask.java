@@ -85,6 +85,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     private void adjust() throws OrderException {
 
+        LOG.debug("adjust");
+
         checkBalancesAndOrders(); //Count number of active sells and buys
 
         if (mightNeedInit) {
@@ -146,7 +148,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
     }
 
     private void init() {
+
         LOG.info("Initializing strategy");
+
         checkBalancesAndOrders();
         isFirstTime = false;
 
@@ -164,6 +168,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
      * Execute this block every RESET_AFTER_CYCLES cycles to ensure fairness with competing custodians
      */
     private void reset() {
+
+        LOG.debug("reset");
 
         //Reset cycle number
         cycles = 0;
@@ -226,13 +232,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
             boolean buysOrdersOk = true;
-            boolean sellsOrdersOk = initOrders(Constant.SELL, TradeUtils.getSellPrice(txFeeFIATNTB));
+            double sellprice = TradeUtils.getSellPrice(txFeeFIATNTB);
+            LOG.info("init sell orders. price " + sellprice);
+            boolean sellsOrdersOk = initOrders(Constant.SELL, sellprice);
 
             LOG.info("txFeeFIATNTB " + txFeeFIATNTB);
             LOG.info("sellsOrdersOk " + sellsOrdersOk);
 
             if (Global.options.isDualSide()) {
-                buysOrdersOk = initOrders(Constant.BUY, TradeUtils.getBuyPrice(txFeeFIATNTB));
+
+                double buyprice = TradeUtils.getBuyPrice(txFeeFIATNTB);
+                LOG.info("init buy orders. price " + buyprice);
+                buysOrdersOk = initOrders(Constant.BUY, buyprice);
             }
 
             LOG.info("buysOrdersOk " + buysOrdersOk);
@@ -261,6 +272,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
      * NTB (Sells)
      */
     private void sellSide(Amount balanceNBT) {
+
+        LOG.debug("sellSide " + balanceNBT);
 
         //Don't order if NBT balance < treshhold
         double nbttreshhold = 1;
@@ -358,15 +371,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
      */
     private void buySide() {
 
+        LOG.debug("buySide");
+
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
             Global.frozenBalances.freezeNewFunds();
             ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBFIATResponse.isPositive()) {
                 double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
-                {
-                    initOrders(Constant.BUY, TradeUtils.getBuyPrice(txFeeFIATNTB));
-                }
+                double buyprice = TradeUtils.getBuyPrice(txFeeFIATNTB);
+                LOG.info("buy side. price: " + buyprice);
+                initOrders(Constant.BUY, buyprice);
+
             } else {
                 LOG.error("An error occurred while attempting to update tx fee.");
             }
@@ -412,6 +428,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
      * check whether outstanding orders are according to the strategy
      */
     private void checkBalancesAndOrders() {
+
+        LOG.debug("checkBalancesAndOrders");
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
 
@@ -557,6 +575,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
     private boolean initOrders(String type, double price) {
+
+        LOG.debug("initOrders. type: " + type + " .  price: " + price);
+
         boolean success = true;
         Amount amount = null;
         //Update the available balance

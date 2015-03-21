@@ -177,6 +177,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void setSellPricePEG(double sellPricePEG) {
+        LOG.info("set setSellPricePEG : " + sellPricePEG);
         this.sellPricePEG = sellPricePEG;
     }
 
@@ -185,6 +186,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void setBuyPricePEG(double buyPricePEG) {
+        LOG.info("setBuyPricePEG : " + buyPricePEG);
         this.buyPricePEG = buyPricePEG;
     }
 
