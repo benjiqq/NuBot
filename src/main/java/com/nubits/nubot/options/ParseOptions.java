@@ -212,6 +212,8 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
+        LOG.info("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
+
         if (options.requiresSecondaryPegStrategy()) {
             try {
                 parseSecondary(options, optionsJSON);
@@ -311,6 +313,8 @@ public class ParseOptions {
                 throw new NuBotConfigException(error);
             }
         }
+
+        LOG.debug("parsed options: " + options);
 
         return options;
     }
