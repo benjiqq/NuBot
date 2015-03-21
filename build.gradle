@@ -140,7 +140,7 @@ task compiledocs(type: Exec) {
 }*/
 
 task NuBotJar(type: Jar) {
-    archiveName "NuBotKK.jar"
+    archiveName "NuBot.jar"
     destinationDir = distdir
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
