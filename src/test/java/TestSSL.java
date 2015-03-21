@@ -98,5 +98,26 @@ public class TestSSL extends TestCase {
 
     }
 
+    @Test
+    public void testCoinbase() {
+
+        //Load settings
+        try {
+            Utils.loadProperties("settings.properties");
+        } catch (IOException e) {
+            //System.exit(0);
+            assertTrue(false);
+        }
+
+
+        Utils.installKeystore(false);
+
+        String API_BASE_URL = "coinbase.com";
+
+        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        assertTrue(success);
+
+    }
+
 
 }
