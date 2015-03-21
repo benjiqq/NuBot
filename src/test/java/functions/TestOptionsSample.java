@@ -41,9 +41,9 @@ public class TestOptionsSample extends TestCase {
 
     @Override
     public void setUp() {
-        try{
+        try {
             Utils.loadProperties("settings.properties");
-        }catch(IOException e){
+        } catch (IOException e) {
 
         }
     }
@@ -78,7 +78,6 @@ public class TestOptionsSample extends TestCase {
             // e.printStackTrace();
         }
     }
-
 
 
     @Test
@@ -124,13 +123,13 @@ public class TestOptionsSample extends TestCase {
     }
 
     @Test
-    public void testLoadOptionsAll(){
+    public void testLoadOptionsAll() {
 
 
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-             opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
             catched = true;
@@ -154,22 +153,21 @@ public class TestOptionsSample extends TestCase {
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;*/
 
-        assertTrue(opt.getPair()!=null);
-        assertTrue(opt.getExchangeName()!=null);
-
+        assertTrue(opt.getPair() != null);
+        assertTrue(opt.getExchangeName() != null);
 
 
     }
 
     @Test
-    public void testParseFeeds(){
+    public void testParseFeeds() {
 
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
-            assertTrue(opt.mainFeed!=null);
+            assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("blockchain"));
-            assertTrue(opt.backupFeedNames.size()==2);
+            assertTrue(opt.backupFeedNames.size() == 2);
             assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
             assertTrue(opt.backupFeedNames.get(1).equals("btce"));
 
@@ -183,34 +181,4 @@ public class TestOptionsSample extends TestCase {
     }
 
 
-
-    /*@Test
-    public void testInvalidFeed(){
-
-        //
-
-    }*/
-
-
-
-
-
-
-    // @Test
-    // public void testDefaultOptions() {
-    // // TODO
-    // assert (false);
-    // }
-    //
-    // @Test
-    // public void testcompulsory() {
-    // assert (false);
-    // }
-    //
-    // @Test
-    // public void testWrongConfig() {
-    // // TODO
-    // // if wrongly configured throws ParseError
-    // assert (false);
-    // }
 }

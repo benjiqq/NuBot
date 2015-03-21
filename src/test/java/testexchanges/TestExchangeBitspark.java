@@ -47,7 +47,7 @@ public class TestExchangeBitspark extends TestCase {
             .getName());
 
     private static String testconfigFile = "spark.json";
-    private static String testconfigdir = "config/myconfig";
+
     private static String testconfig = testconfigdir + "/" + testconfigFile;
 
     /*static {

@@ -26,6 +26,7 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
+import functions.TestGlobal;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -45,8 +46,7 @@ public class TestExchangePoloniex extends TestCase {
             .getName());
 
     private static String testconfigFile = "poloniex.json";
-    private static String testconfigdir = "config/myconfig";
-    private static String testconfig = testconfigdir + "/" + testconfigFile;
+    private static String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
 
     private TradeInterface ti;
 

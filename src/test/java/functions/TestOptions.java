@@ -21,7 +21,6 @@ package functions;
 
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
@@ -37,8 +36,7 @@ import java.nio.file.Paths;
 public class TestOptions extends TestCase {
 
     private static String testconfigFile = "peatio.json";
-    private static String testconfigdir = "config/myconfig";
-    private static String testconfig = testconfigdir + "/" + testconfigFile;
+    private static String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -139,7 +137,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadComplete() {
 
-        String testconfig = testconfigdir + "/" + testconfigFile;
+        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
         boolean catched = false;
 
         try {
@@ -156,7 +154,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptions(){
 
-        String testconfig = testconfigdir + "/" + testconfigFile;
+        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
 
         boolean catched = false;
         try {
@@ -178,7 +176,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptionsAll(){
 
-        String testconfig = testconfigdir + "/" + testconfigFile;
+        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
 
         boolean catched = false;
         NuBotOptions opt = null;
@@ -218,7 +216,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testParseFeeds(){
 
-        String testconfig = testconfigdir + "/" + testconfigFile;
+        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
