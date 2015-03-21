@@ -148,7 +148,7 @@
 				<pattern>%date{HH:mm:ss.SSS}%level%logger%msg</pattern>
 			</layout>
 		</encoder>
-		<file>logs/session.html</file>
+		<file>logs/tmp_session.html</file>
 
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<fileNamePattern>logs/all.%i.log.zip</fileNamePattern>
