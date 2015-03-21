@@ -39,7 +39,7 @@ import java.util.ArrayList;
 public class StrategySecondaryPegUtils {
 
 
-    final static Logger LOG = LoggerFactory.getLogger(Global.class);
+    final static Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegUtils.class);
 
     private StrategySecondaryPegTask strategy;
     private final int MAX_RANDOM_WAIT_SECONDS = 5;

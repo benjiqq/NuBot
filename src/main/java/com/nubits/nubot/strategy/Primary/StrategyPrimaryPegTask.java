@@ -481,7 +481,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     private boolean reInitiateOrders(boolean firstTime) {
 
-        LOG.info("reInitiateOrders");
+        LOG.debug("reInitiateOrders");
 
         if (totalActiveOrders != 0) {
 
