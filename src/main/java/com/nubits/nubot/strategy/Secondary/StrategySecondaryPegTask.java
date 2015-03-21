@@ -70,7 +70,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         if (shiftingWalls) {
-            LOG.info("shifting wallsa already. orders will not be chage at present");
+            LOG.info("shifting walls already. orders will not be chage at present");
             return;
         }
 

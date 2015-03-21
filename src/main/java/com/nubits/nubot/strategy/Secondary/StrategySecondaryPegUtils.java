@@ -27,7 +27,7 @@ import com.nubits.nubot.models.*;
 
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
+import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -47,6 +47,9 @@ public class StrategySecondaryPegUtils {
     }
 
     public boolean reInitiateOrders(boolean firstTime) {
+
+        LOG.info("reInitiateOrders" + firstTime);
+
         //They are either 0 or need to be cancelled
         if (strategy.getTotalActiveOrders() != 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -116,6 +119,7 @@ public class StrategySecondaryPegUtils {
     }
 
     public void placeInitialWalls() {
+
         boolean buysOrdersOk = true;
         boolean sellsOrdersOk = initOrders(Constant.SELL, strategy.getSellPricePEG());
 
@@ -132,6 +136,9 @@ public class StrategySecondaryPegUtils {
     }
 
     public boolean initOrders(String type, double price) {
+
+        LOG.info("initOrders " + type + " " + price);
+
         boolean success = true;
         Amount balance = null;
         //Update the available balance
@@ -332,6 +339,8 @@ public class StrategySecondaryPegUtils {
     }
 
     public int countActiveOrders(String type) {
+
+        LOG.info("countActiveOrders " + type);
         //Get active orders
         int toRet = 0;
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -400,6 +409,9 @@ public class StrategySecondaryPegUtils {
     }
 
     public void aggregateAndKeepProceeds() {
+
+        LOG.info("aggregateAndKeepProceeds");
+
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
 
@@ -475,13 +487,16 @@ public class StrategySecondaryPegUtils {
     }
 
     public boolean shiftWalls() {
+
+        LOG.info("shiftWalls");
+
         boolean success = true;
 
         // Fix 156 -- reduce this value as excoin API get more responsive
         int WAIT_TIME_FIX_156_EXCOIN = 3500; //ms
 
         //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconds to take down orders
-        int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
+        int refresh_time_seconds = NuBotAdminSettings.REFRESH_TIME_SECONDS;
 
 
         //Communicate to the priceMonitorTask that a wall shift is in place
