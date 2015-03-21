@@ -236,7 +236,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (countTrials <= MAX_ATTEMPTS) {
             ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
-            LOG.info("CheckLastPrice received values from remote feeds. ");
+            LOG.debug("CheckLastPrice received values from remote feeds. ");
 
             if (priceList.size() == pfm.getFeedList().size()) {
                 //All feeds returned a positive value
@@ -448,7 +448,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private void verifyPegPrices() {
 
-        LOG.info("Executing tryMoveWalls");
+        LOG.debug("Executing tryMoveWalls");
 
         boolean needToShift = true;
         if (!Global.options.isMultipleCustodians()) {
@@ -474,7 +474,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double currentWallPEGprice = currentWallPEGPrice.getPrice().getQuantity();
         double distance = Math.abs(last.getPrice().getQuantity() - currentWallPEGprice);
         double percentageDistance = Utils.round((distance * 100) / currentWallPEGprice, 4);
-        LOG.info("d=" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
+        LOG.info("delta =" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
 
         if (percentageDistance < wallchangeThreshold) {
             return false;
