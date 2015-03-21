@@ -555,19 +555,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
         return true;
     }
 
-    /**
-     * cap a double at max value
-     *
-     * @param a
-     * @param max
-     * @return
-     */
-    private double cap(double a, double max) {
-        if (a > max)
-            return max;
-        else
-            return a;
-    }
 
     private boolean initOrders(String type, double price) {
         boolean success = true;
@@ -613,28 +600,48 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                 double amount1 = Utils.round(amount.getQuantity() / 2, precision);
 
-                double maxbuy = Global.options.getMaxBuyVolume();
-                double maxsell = Global.options.getMaxSellVolume();
+                double maxBuy = Global.options.getMaxBuyVolume();
+                double maxSell = Global.options.getMaxSellVolume();
+
+                LOG.info("check the calculated amount against the set maximum sell amount");
 
                 //check the calculated amount against the set maximum sell amount set in the options.json file
-                if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                    amount1 = amount1 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount1;
+
+                LOG.info("max sell volume " + maxSell);
+
+                if (maxSell > 0 && type.equals(Constant.SELL)) {
+                    double most = (maxSell / 2);
+                    if (amount1 > most) {
+                        amount1 = most;
+                        LOG.debug("cap sell amount at " + most);
+                    }
                 }
+
 
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
                     amount1 = Utils.round(amount1 / price, precision);
                     //check the calculated amount against the max buy amount option, if any.
-                    if (Global.options.getMaxBuyVolume() > 0) {
-                        double most = maxbuy / 2;
-                        amount1 = cap(amount1, most);
+                    LOG.info("check the calculated amount against the max buy amount option, if any.");
+                    LOG.info("max buy volume " + maxBuy);
+                    if (maxBuy > 0) {
+
+                        double most = maxBuy / 2;
+                        if (amount1 > most) {
+                            amount1 = most;
+                            LOG.info("cap buy amount at " + most);
+                        }
                     }
                 }
 
                 double amount2 = amount.getQuantity() - amount1;
 
-                if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                    double most = maxsell / 2;
-                    amount2 = cap(amount2, most);
+                if (maxSell > 0 && type.equals(Constant.SELL)) {
+                    double most = maxSell / 2;
+
+                    if (amount2 > most) {
+                        amount2 = most;
+                        LOG.info("cap sell amount at " + most);
+                    }
                 }
 
                 if ((type.equals(Constant.BUY) && !Global.swappedPair)
@@ -645,9 +652,12 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     amount2 = Utils.round(amount2 / price, precision);
 
                     //check the calculated amount against the max buy amount option, if any.
-                    if (Global.options.getMaxBuyVolume() > 0) {
-                        double most = maxbuy / 2;
-                        amount2 = cap(amount2, most);
+                    if (maxBuy > 0) {
+                        double most = maxBuy / 2;
+                        if (amount2 > most) {
+                            amount2 = most;
+                            LOG.info("cap buy at " + most);
+                        }
                     }
 
                 }
