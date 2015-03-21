@@ -103,7 +103,7 @@ public class Global {
 
 
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(mainlogfolder + "sessions.html")); //System.out);
+            Writer writer = new OutputStreamWriter(new FileOutputStream(mainlogfolder + "/" + "sessions.html")); //System.out);
             MustacheFactory mf = new DefaultMustacheFactory();
             try {
                 String wdir = System.getProperty("user.dir") + "/" + "templates";
