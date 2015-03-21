@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015 Nu Development Team
+ * Copyright (C) 2014 desrever <desrever at nubits.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,29 +15,29 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
-
 package com.nubits.nubot.strategy.Secondary;
 
-
-import com.nubits.nubot.global.Constant;
+/**
+ *
+ * @author desrever <desrever at nubits.com>
+ */
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.*;
+
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
-import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
+import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 
 import java.util.ArrayList;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 public class StrategySecondaryPegUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegUtils.class.getName());
+    private static final Logger LOG = Logger.getLogger(StrategySecondaryPegUtils.class.getName());
     private StrategySecondaryPegTask strategy;
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
     private final int SHORT_WAIT_SECONDS = 6;
@@ -53,7 +53,7 @@ public class StrategySecondaryPegUtils {
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
-                    LOG.warn("Clear all orders request succesfully");
+                    LOG.warning("Clear all orders request succesfully");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
                         Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
@@ -75,13 +75,13 @@ public class StrategySecondaryPegUtils {
                             timedOut = count > timeout;
 
                         } catch (InterruptedException ex) {
-                            LOG.error(ex.toString());
+                            LOG.severe(ex.toString());
                         }
                     } while (!areAllOrdersCanceled && !timedOut);
 
                     if (timedOut) {
                         String message = "There was a problem cancelling all existing orders";
-                        LOG.error(message);
+                        LOG.severe(message);
                         HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);
                         //Continue anyway, maybe there is some balance to put up on order.
@@ -90,14 +90,14 @@ public class StrategySecondaryPegUtils {
                     placeInitialWalls();
                 } else {
                     String message = "Could not submit request to clear orders";
-                    LOG.error(message);
+                    LOG.severe(message);
                     return false;
                 }
 
             } else {
-                LOG.error(deleteOrdersResponse.getError().toString());
+                LOG.severe(deleteOrdersResponse.getError().toString());
                 String message = "Could not submit request to clear orders";
-                LOG.error(message);
+                LOG.severe(message);
                 return false;
             }
         } else {
@@ -110,7 +110,7 @@ public class StrategySecondaryPegUtils {
         try {
             Thread.sleep(SHORT_WAIT_SECONDS); //Give the time to new orders to be placed before counting again
         } catch (InterruptedException ex) {
-            LOG.error(ex.toString());
+            LOG.severe(ex.toString());
         }
         return true;
     }
@@ -132,83 +132,22 @@ public class StrategySecondaryPegUtils {
     }
 
     public boolean initOrders(String type, double price) {
-        if (Global.options.isDistributeLiquidity()) {
-            LOG.info("Initializing orders [distributed liquidity mode]");
-            return initDistributedOrders(type, price);
-        } else {
-            LOG.info("Initializing orders [classic mode]");
-            return initWallsOnly(type, price);
-        }
-    }
-
-    private boolean initDistributedOrders(String type, double price) {
-        boolean success;
-
-        //Cancel all orders
-        ApiResponse clearOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-        if (clearOrdersResponse.isPositive()) {
-            boolean deleted = (boolean) clearOrdersResponse.getResponseObject();
-            if (deleted) {
-                LOG.info("Order clear request succesfully");
-            } else {
-                LOG.info("Could not submit request to clear orders");
-            }
-
-        } else {
-            LOG.error(clearOrdersResponse.getError().toString());
-            return false;
-        }
-
-        Amount balance;
-        if (type.equals(Constant.SELL)) {
-            ApiResponse balanceNBTResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getOrderCurrency());
-            if (balanceNBTResponse.isPositive()) {
-                Amount amount = (Amount) balanceNBTResponse.getResponseObject();
-                balance = amount;
-            } else {
-                LOG.error(balanceNBTResponse.getError().toString());
-                return false;
-            }
-        } else { //BUY orders
-            ApiResponse balancePEGResponse = Global.exchange.getTrade().getAvailableBalance(Global.options.getPair().getPaymentCurrency());
-            if (balancePEGResponse.isPositive()) {
-                Amount amount = (Amount) balancePEGResponse.getResponseObject();
-                balance = amount;
-            } else {
-                LOG.error(balancePEGResponse.getError().toString());
-                return false;
-            }
-        }
-
-        double wallHeight = 1000; //TODO later
-        ModelParameters params = LiquidityDistributionModel.getStandardParams(type, wallHeight);
-        LiquidityDistributionModel ldm = new LiquidityDistributionModel(params, type);
-        ArrayList<OrderToPlace> orders = ldm.getOrdersToPlace(type, balance, price, Global.options.getPair(), Global.options.getTxFee());
-
-        success = TradeUtils.placeMultipleOrders(orders);
-        LOG.info("Multiple orders (" + orders + ") placed. success = " + success);
-
-
-        return success;
-    }
-
-    private boolean initWallsOnly(String type, double price) {
         boolean success = true;
         Amount balance = null;
         //Update the available balance
         Currency currency;
 
-        if (Global.swappedPair) {
+        if (!Global.swappedPair) {
             if (type.equals(Constant.SELL)) {
-                currency = Global.options.getPair().getPaymentCurrency();
-            } else {
                 currency = Global.options.getPair().getOrderCurrency();
+            } else {
+                currency = Global.options.getPair().getPaymentCurrency();
             }
         } else {
             if (type.equals(Constant.SELL)) {
-                currency = Global.options.getPair().getOrderCurrency();
-            } else {
                 currency = Global.options.getPair().getPaymentCurrency();
+            } else {
+                currency = Global.options.getPair().getOrderCurrency();
             }
         }
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
@@ -228,12 +167,21 @@ public class StrategySecondaryPegUtils {
                 ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
                 if (txFeeNTBPEGResponse.isPositive()) {
                     double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                    LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                    LOG.fine("Updated Transaction fee = " + txFeePEGNTB + "%");
 
                     double amount1 = Utils.round(balance.getQuantity() / 2, 8);
+                    //check the calculated amount against the set maximum sell amount set in the options.json file
+                    if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                        amount1 = amount1 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount1;
+                    }
 
                     if (type.equals(Constant.BUY) && !Global.swappedPair) {
                         amount1 = Utils.round(amount1 / price, 8);
+                        //check the calculated amount against the max buy amount option, if any.
+                        if (Global.options.getMaxBuyVolume() > 0) {
+                            amount1 = amount1 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount1;
+                        }
+
                     }
                     //Prepare the orders
 
@@ -249,6 +197,9 @@ public class StrategySecondaryPegUtils {
                         if (type.equals(Constant.SELL)) {
                             typeStr = Constant.BUY;
                             amount1 = Utils.round(amount1 / Global.conversion, 8);
+                            if (Global.options.getMaxSellVolume() > 0) {
+                                amount1 = amount1 > Global.options.getMaxSellVolume() ? Global.options.getMaxSellVolume() : amount1;
+                            }
                         } else {
                             typeStr = Constant.SELL;
                         }
@@ -257,7 +208,7 @@ public class StrategySecondaryPegUtils {
                     }
 
                     if (Global.options.isExecuteOrders()) {
-                        LOG.warn("Strategy - Submit order : " + orderString1);
+                        LOG.warning("Strategy - Submit order : " + orderString1);
 
                         ApiResponse order1Response;
                         if (type.equals(Constant.SELL)) { //Place sellSide order 1
@@ -276,9 +227,9 @@ public class StrategySecondaryPegUtils {
                         if (order1Response.isPositive()) {
                             HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, MessageColor.YELLOW);
                             String response1String = (String) order1Response.getResponseObject();
-                            LOG.warn("Strategy - " + type + " Response1 = " + response1String);
+                            LOG.warning("Strategy - " + type + " Response1 = " + response1String);
                         } else {
-                            LOG.error(order1Response.getError().toString());
+                            LOG.severe(order1Response.getError().toString());
                             success = false;
                         }
                         //wait a while to give the time to the new amount to update
@@ -286,25 +237,40 @@ public class StrategySecondaryPegUtils {
                         try {
                             Thread.sleep(5 * 1000);
                         } catch (InterruptedException ex) {
-                            LOG.error(ex.toString());
+                            LOG.severe(ex.toString());
                         }
                         //read balance again
                         ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
                         if (balancesResponse2.isPositive()) {
-                            if (type.equals(Constant.SELL)) {
-                                balance = (Amount) balancesResponse2.getResponseObject();
-                            } else {
-                                //Here its time to compute the balance to put apart, if any
-                                balance = (Amount) balancesResponse2.getResponseObject();
+
+                            balance = (Amount) balancesResponse2.getResponseObject();
+
+
+                            if (type.equals(Constant.BUY)) {
                                 balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
                             }
+
+
                             double amount2 = balance.getQuantity();
+
+                            //check the calculated amount against the set maximum sell amount set in the options.json file
+
+                            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                                amount2 = amount2 > (Global.options.getMaxSellVolume() / 2) ? (Global.options.getMaxSellVolume() / 2) : amount2;
+                            }
 
                             if ((type.equals(Constant.BUY) && !Global.swappedPair)
                                     || (type.equals(Constant.SELL) && Global.swappedPair)) {
                                 //hotfix
                                 amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+
                                 amount2 = Utils.round(amount2 / price, 8);
+
+                                //check the calculated amount against the max buy amount option, if any.
+                                if (Global.options.getMaxBuyVolume() > 0) {
+                                    amount2 = amount2 > (Global.options.getMaxBuyVolume() / 2) ? (Global.options.getMaxBuyVolume() / 2) : amount2;
+                                }
+
                             }
 
                             String orderString2;
@@ -324,7 +290,7 @@ public class StrategySecondaryPegUtils {
                             }
                             //put it on order
 
-                            LOG.warn("Strategy - Submit order : " + orderString2);
+                            LOG.warning("Strategy - Submit order : " + orderString2);
                             ApiResponse order2Response;
                             if (type.equals(Constant.SELL)) { //Place sellSide order 2
                                 if (Global.swappedPair) {
@@ -342,24 +308,24 @@ public class StrategySecondaryPegUtils {
                             if (order2Response.isPositive()) {
                                 HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
                                 String response2String = (String) order2Response.getResponseObject();
-                                LOG.warn("Strategy : " + type + " Response2 = " + response2String);
+                                LOG.warning("Strategy : " + type + " Response2 = " + response2String);
                             } else {
-                                LOG.error(order2Response.getError().toString());
+                                LOG.severe(order2Response.getError().toString());
                                 success = false;
                             }
                         } else {
-                            LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
+                            LOG.severe("Error while reading the balance the second time " + balancesResponse2.getError().toString());
                         }
                     } else {
                         //Just print the order without executing it
-                        LOG.warn("Should execute orders");
+                        LOG.warning("Should execute orders");
                     }
                 }
             } else {
-                LOG.info(type + " available balance < 1 NBT, no need to execute orders");
+                LOG.fine(type + " available balance < 1 NBT, no need to execute orders");
             }
         } else {
-            LOG.error(balancesResponse.getError().toString());
+            LOG.severe(balancesResponse.getError().toString());
             success = false;
         }
         return success;
@@ -369,20 +335,20 @@ public class StrategySecondaryPegUtils {
         //Get active orders
         int toRet = 0;
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+            for (int i = 0; i < orderList.size(); i++) {
+                Order tempOrder = orderList.get(i);
+                if (tempOrder.getType().equalsIgnoreCase(type)) {
+                    toRet++;
+                }
+            }
+
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
             return -1;
         }
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-        for (int i = 0; i < orderList.size(); i++) {
-            Order tempOrder = orderList.get(i);
-            if (tempOrder.getType().equalsIgnoreCase(type)) {
-                toRet++;
-            }
-        }
-
-
         return toRet;
     }
 
@@ -411,8 +377,11 @@ public class StrategySecondaryPegUtils {
                         || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
 
 
-                if (balancePEG > oneNBT && Global.options.getPair().getPaymentCurrency().isFiat() && !strategy.isFirstTime()) { //Only for EUR...CNY etc
-                    LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
+                if (balancePEG > oneNBT
+                        && Global.options.getPair().getPaymentCurrency().isFiat()
+                        && !strategy.isFirstTime()
+                        && Global.options.getMaxBuyVolume() != 0) { //Only for EUR...CNY etc
+                    LOG.warning("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
                             + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                     strategy.setProceedsInBalance(true);
                 } else {
@@ -426,7 +395,7 @@ public class StrategySecondaryPegUtils {
                 }
             }
         } else {
-            LOG.error(balancesResponse.getError().toString());
+            LOG.severe(balancesResponse.getError().toString());
         }
     }
 
@@ -443,20 +412,18 @@ public class StrategySecondaryPegUtils {
             try {
                 Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
             } catch (InterruptedException ex) {
-                LOG.error(ex.toString());
+                LOG.severe(ex.toString());
             }
 
             initOrders(Constant.BUY, strategy.getBuyPricePEG());
 
         } else {
-            LOG.error("An error occurred while attempting to cancel buy orders.");
+            LOG.severe("An error occurred while attempting to cancel buy orders.");
         }
     }
 
-    /**
-     * Returns an array of two strings representing orders id.
-     * the first element of the array is the smallest order and the second the largest
-     */
+    /* Returns an array of two strings representing orders id.
+     * the first element of the array is the smallest order and the second the largest */
     public String[] getSmallerWallID(String type) {
         String[] toRet = new String[2];
         Order smallerOrder = new Order();
@@ -464,34 +431,46 @@ public class StrategySecondaryPegUtils {
         smallerOrder.setId("-1");
         biggerOrder.setId("-1");
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            String[] err = {"-1", "-1"};
-            return err;
-        }
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
 
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-        ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
+            if (orderListCategorized.size() != 2) {
+                LOG.severe("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
+                String[] err = {"-1", "-1"};
+                return err;
+            } else {
+                Order tempOrder1 = orderListCategorized.get(0);
+                Order tempOrder2 = orderListCategorized.get(1);
+                smallerOrder = tempOrder1;
+                biggerOrder = tempOrder2;
+                if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
+                    smallerOrder = tempOrder2;
+                    biggerOrder = tempOrder1;
+                }
+                toRet[0] = smallerOrder.getId();
+                toRet[1] = biggerOrder.getId();
 
-        if (orderListCategorized.size() != 2) {
-            LOG.error("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
-            String[] err = {"-1", "-1"};
-            return err;
-        } else {
-            Order tempOrder1 = orderListCategorized.get(0);
-            Order tempOrder2 = orderListCategorized.get(1);
-            smallerOrder = tempOrder1;
-            biggerOrder = tempOrder2;
-            if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
-                smallerOrder = tempOrder2;
-                biggerOrder = tempOrder1;
             }
-            toRet[0] = smallerOrder.getId();
-            toRet[1] = biggerOrder.getId();
-
+            /* the commented code works with more than two orders, but is not needed now
+             for (int i = 0; i < orderListCategorized.size(); i++) {
+             Order tempOrder = orderListCategorized.get(i);
+             if (tempOrder.getType().equalsIgnoreCase(type)) {
+             if (i == 0) {
+             smallerOrder = tempOrder;
+             } else {
+             if (smallerOrder.getAmount().getQuantity() > tempOrder.getAmount().getQuantity()) {
+             smallerOrder = tempOrder;
+             }
+             }
+             }
+             }
+             */
+        } else {
+            LOG.severe(activeOrdersResponse.getError().toString());
+            String[] err = {"-1", "-1"};
+            return err;
         }
-
-
         return toRet;
     }
 
@@ -499,8 +478,11 @@ public class StrategySecondaryPegUtils {
         boolean success = true;
 
         // Fix 156 -- reduce this value as excoin API get more responsive
-        //???exchange specific fix???
-        int WAIT_TIME_FIX_156_EXCOIN = 3000; //ms
+        int WAIT_TIME_FIX_156_EXCOIN = 3500; //ms
+
+        //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconds to take down orders
+        int refresh_time_seconds = Integer.parseInt(Global.settings.getProperty("refresh_time_seconds")); //read from propeprties file
+
 
         //Communicate to the priceMonitorTask that a wall shift is in place
         strategy.getPriceMonitorTask().setWallsBeingShifted(true);
@@ -545,6 +527,8 @@ public class StrategySecondaryPegUtils {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
 
 
+
+
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
@@ -556,7 +540,7 @@ public class StrategySecondaryPegUtils {
                         try {
                             Thread.sleep(SHORT_WAIT_SECONDS + Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000); //SHORT_WAIT_SECONDS gives the time to other bots to take down their order
                         } catch (InterruptedException ex) {
-                            LOG.error(ex.toString());
+                            LOG.severe(ex.toString());
                         }
                     }
 
@@ -575,7 +559,7 @@ public class StrategySecondaryPegUtils {
                         try {
                             Thread.sleep(WAIT_TIME_FIX_156_EXCOIN);
                         } catch (InterruptedException ex) {
-                            LOG.error(ex.toString());
+                            LOG.severe(ex.toString());
                         }
                         init1 = initOrders(waitAndShiftOrderType, priceImmediatelyType);
                     }
@@ -595,6 +579,7 @@ public class StrategySecondaryPegUtils {
                             boolean init2;
 
 
+
                             if (!Global.swappedPair) {
                                 init2 = initOrders(waitAndShiftOrderType, priceWaitType);
                             } else {
@@ -602,7 +587,7 @@ public class StrategySecondaryPegUtils {
                                 try {
                                     Thread.sleep(WAIT_TIME_FIX_156_EXCOIN);
                                 } catch (InterruptedException ex) {
-                                    LOG.error(ex.toString());
+                                    LOG.severe(ex.toString());
                                 }
                                 init2 = initOrders(shiftImmediatelyOrderType, priceWaitType);
                             }
@@ -613,7 +598,7 @@ public class StrategySecondaryPegUtils {
                     } else { //success false with the first part of the shift
                         if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
                                 || Global.options.isDualSide()) { //dualside
-                            LOG.error("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
+                            LOG.severe("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
                         }
                     }
 
@@ -621,7 +606,7 @@ public class StrategySecondaryPegUtils {
                     try {
                         Thread.sleep(SHORT_WAIT_SECONDS * 1000);
                     } catch (InterruptedException ex) {
-                        LOG.error(ex.toString());
+                        LOG.severe(ex.toString());
                     }
 
                     //Communicate to the priceMonitorTask that the wall shift is over
@@ -637,7 +622,7 @@ public class StrategySecondaryPegUtils {
                 //Communicate to the priceMonitorTask that the wall shift is over
                 strategy.getPriceMonitorTask().setWallsBeingShifted(false);
                 strategy.getSendLiquidityTask().setWallsBeingShifted(false);
-                LOG.error(deleteOrdersResponse.getError().toString());
+                LOG.severe(deleteOrdersResponse.getError().toString());
             }
         }
         return success;

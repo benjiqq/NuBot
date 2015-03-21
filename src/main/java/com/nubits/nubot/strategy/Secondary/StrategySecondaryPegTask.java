@@ -21,16 +21,16 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotAdminSettings;
-import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.TimerTask;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
-public class StrategySecondaryPegTask extends TimerTask  {
+public class StrategySecondaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
@@ -52,105 +52,126 @@ public class StrategySecondaryPegTask extends TimerTask  {
 
         LOG.info("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
-        if (!isFirstTime) {
-            if (!Global.options.isMultipleCustodians()) {
-                if (!shiftingWalls) {
-                    strategyUtils.recount(); //Count number of active sells and buys
-                    if (mightNeedInit) {
-                        boolean reset = mightNeedInit && !(ordersAndBalancesOK);
-                        if (reset) {
-                            String message = "Order reset needed on " + Global.exchange.getName();
-                            HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
-                            LOG.warn(message);
-                            boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
-                            if (reinitiateSuccess) {
-                                mightNeedInit = false;
-                            }
-                        } else {
-                            LOG.info("No need to init new orders since current orders are correct");
-                        }
-                        strategyUtils.recount();
-                    }
+        if (isFirstTime) {
 
-                    //Make sure the orders and balances are ok or try to aggregate
-                    if (!ordersAndBalancesOK) {
-                        LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
-                        mightNeedInit = true;
-                    } else {
-                        if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
-                            //Execute buy Side strategy
-                            if (Global.options.isDualSide() && proceedsInBalance && !needWallShift) {
-                                strategyUtils.aggregateAndKeepProceeds();
-                            }
-                        }
-                    }
-                }
-            } //multiple custodians do not need strategy exec
+            adaptOrders();
 
         } else {
-            //First execution : reset orders and init strategy
-            LOG.info("Initializing strategy");
-            isFirstTime = false;
-            strategyUtils.recount();
-            boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
-            if (!reinitiateSuccess) {
-                LOG.error("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
-                isFirstTime = true;
-            }
-            getSendLiquidityTask().setFirstOrdersPlaced(true);
+
+            initStrategy();
         }
+    }
+
+    public void adaptOrders() {
+
+        if (Global.options.isMultipleCustodians()) {
+            //multiple custodians do not need strategy exec
+            return;
+        }
+
+        if (shiftingWalls) {
+            LOG.info("shifting wallsa already. orders will not be chage at present");
+            return;
+        }
+
+        strategyUtils.recount(); //Count number of active sells and buys
+        if (mightNeedInit) {
+            LOG.info("might need init");
+            boolean reset = mightNeedInit && !(ordersAndBalancesOK);
+            if (reset) {
+                String message = "Order reset needed on " + Global.exchange.getName();
+                HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
+                LOG.warn(message);
+                boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
+                if (reinitiateSuccess) {
+                    mightNeedInit = false;
+                }
+            } else {
+                LOG.info("No need to init new orders since current orders are correct");
+            }
+            strategyUtils.recount();
+        }
+
+        //Make sure the orders and balances are ok or try to aggregate
+        if (!ordersAndBalancesOK) {
+            LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+            mightNeedInit = true;
+        } else {
+            if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
+                //Execute buy Side strategy
+                if (Global.options.isDualSide() && proceedsInBalance && !needWallShift) {
+                    strategyUtils.aggregateAndKeepProceeds();
+                }
+            }
+        }
+
+    }
+
+    public void initStrategy() {
+        //First execution : reset orders and init strategy
+        LOG.info("Initializing strategy");
+        isFirstTime = false;
+        strategyUtils.recount();
+        boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
+        if (!reinitiateSuccess) {
+            LOG.error("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
+            isFirstTime = true;
+        }
+        getSendLiquidityTask().setFirstOrdersPlaced(true);
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
-        if (!shiftingWalls) {
-            shiftingWalls = true;
 
-            LOG.info("Strategy received a price change notification.");
-            needWallShift = true;
-
-            if (!Global.swappedPair) {
-                sellPricePEG = new_sellPricePEG;
-                buyPricePEG = new_buyPricePEG;
-            } else {
-                sellPricePEG = new_buyPricePEG;
-                buyPricePEG = new_sellPricePEG;
-            }
-            this.priceDirection = direction;
-
-            //execute immediately
-            boolean shiftSuccess = false;
-
-            String currencyTracked = "";
-            if (Global.swappedPair) {
-                currencyTracked = Global.options.getPair().getOrderCurrency().getCode().toUpperCase();
-            } else {
-                currencyTracked = Global.options.getPair().getPaymentCurrency().getCode().toUpperCase();
-            }
-
-            String message = "Shift needed on " + Global.exchange.getName() + "\nReason : ";
-            if (!Global.options.isMultipleCustodians()) {
-                message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getWallchangeThreshold() + " %";
-            } else {
-                message += NuBotAdminSettings.RESET_EVERY_MINUTES + " minutes elapsed since last shift";
-            }
-            HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
-            LOG.warn(message);
-
-            shiftSuccess = strategyUtils.shiftWalls();
-            if (shiftSuccess) {
-                mightNeedInit = false;
-                needWallShift = false;
-                LOG.info("Wall shift successful");
-            } else {
-                LOG.error("Wall shift failed");
-            }
-            shiftingWalls = false;
-        } else {
+        if (shiftingWalls) {
             LOG.warn("Shift request failed, shift in progress.");
+            return;
         }
+
+        shiftingWalls = true;
+
+        LOG.info("Strategy received a price change notification.");
+        needWallShift = true;
+
+        if (!Global.swappedPair) {
+            sellPricePEG = new_sellPricePEG;
+            buyPricePEG = new_buyPricePEG;
+        } else {
+            sellPricePEG = new_buyPricePEG;
+            buyPricePEG = new_sellPricePEG;
+        }
+        this.priceDirection = direction;
+
+        //execute immediately
+        boolean shiftSuccess = false;
+
+        String currencyTracked = "";
+        if (Global.swappedPair) {
+            currencyTracked = Global.options.getPair().getOrderCurrency().getCode().toUpperCase();
+        } else {
+            currencyTracked = Global.options.getPair().getPaymentCurrency().getCode().toUpperCase();
+        }
+
+        String message = "Shift needed on " + Global.exchange.getName() + "\nReason : ";
+        if (!Global.options.isMultipleCustodians()) {
+            message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getWallchangeThreshold() + " %";
+        } else {
+            message += NuBotAdminSettings.RESET_EVERY_MINUTES + " minutes elapsed since last shift";
+        }
+        HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
+        LOG.warn(message);
+
+        shiftSuccess = strategyUtils.shiftWalls();
+        if (shiftSuccess) {
+            mightNeedInit = false;
+            needWallShift = false;
+            LOG.info("Wall shift successful");
+        } else {
+            LOG.error("Wall shift failed");
+        }
+        shiftingWalls = false;
+
     }
 
-    //Getters and setters ----------------------------------------
     public double getSellPricePEG() {
         return sellPricePEG;
     }
