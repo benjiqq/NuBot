@@ -49,7 +49,9 @@ public class StrategySecondaryPegTask extends TimerTask  {
 
     @Override
     public void run() {
+
         LOG.info("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
+
         if (!isFirstTime) {
             if (!Global.options.isMultipleCustodians()) {
                 if (!shiftingWalls) {
@@ -65,7 +67,7 @@ public class StrategySecondaryPegTask extends TimerTask  {
                                 mightNeedInit = false;
                             }
                         } else {
-                            LOG.info("No need to init new orders since current orders seems correct");
+                            LOG.info("No need to init new orders since current orders are correct");
                         }
                         strategyUtils.recount();
                     }
@@ -84,8 +86,9 @@ public class StrategySecondaryPegTask extends TimerTask  {
                     }
                 }
             } //multiple custodians do not need strategy exec
-        } else //First execution : reset orders and init strategy
-        {
+
+        } else {
+            //First execution : reset orders and init strategy
             LOG.info("Initializing strategy");
             isFirstTime = false;
             strategyUtils.recount();
@@ -102,7 +105,7 @@ public class StrategySecondaryPegTask extends TimerTask  {
         if (!shiftingWalls) {
             shiftingWalls = true;
 
-            LOG.warn("Strategy received a price change notification.");
+            LOG.info("Strategy received a price change notification.");
             needWallShift = true;
 
             if (!Global.swappedPair) {

@@ -123,15 +123,9 @@ task compiledocs(type: Exec) {
 
 
 //create a single Jar with all dependencies
-task NuBotJar(type: Jar) {
+/*task NuBotJar(type: Jar) {
     archiveName "NuBot.jar"
     destinationDir = distdir //file('${distdir}')
-    /*def f = new File("${distdir}/" + archiveName)
-    println 'jar ' + f + ' exists ' + f.exists()
-    if (f.exists()) {
-        println 'delete ' + f
-        f.delete()
-    }*/
 
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
@@ -143,30 +137,49 @@ task NuBotJar(type: Jar) {
         attributes 'Main-Class': mainclass
     }
     with jar
+}*/
 
+task NuBotJar(type: Jar) {
+    archiveName "NuBotKK.jar"
+    destinationDir = distdir
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes 'Main-Class': mainclass
+    }
+    with jar
 }
 
-task NuBotDist() {
+task NuBotDist(dependsOn: NuBotJar) {
     //description 'make NuBot distribution folder'
 
-    doFirst {
+    /*doFirst {
         println 'start making distribution'
         println "delete ${distdir}"
         delete "${distdir}"
         tasks.compiledocs.execute()
         tasks.initDist.execute()
-    }
+    }*/
+
+
 
     doLast {
         println 'dist do last'
-        tasks.NuBotJar.execute()
+        //tasks.NuBotJar.execute()
+
+        //copy {}
+
         tasks.propfile.execute()
 
         println "finish distribution"
 
         if (includeTestConfig) {
             copy {
-                from "config/testconfig/poloniex.json"
+                from "config/myconfig/poloniex.json"
                 into "${distdir}"
             }
         }

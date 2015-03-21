@@ -43,9 +43,7 @@ import org.json.simple.parser.ParseException;
 
 /**
  * Submit info via NuWalletRPC
- * <p>
- * Logging: preserving state of orders and balances will be handled differently in the future.
- * this is to preserve functionality of 0.15 version
+ *
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
@@ -112,10 +110,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.info("Executing task : CheckOrdersTask ");
+        LOG.debug("Executing task : CheckOrdersTask ");
         checkOrders();
     }
-    //Taken the input exchange, updates it and returns it.
 
     private void checkOrders() {
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
@@ -144,7 +141,13 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
         ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-        LOG.info("Active orders : " + orderList.size());
+        LOG.debug("Active orders : " + orderList.size());
+
+        Iterator<Order> it = orderList.iterator();
+        while (it.hasNext()){
+            Order o = it.next();
+            LOG.debug("order: " + o.getDigest());
+        }
 
         if (verbose) {
             LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
