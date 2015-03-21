@@ -44,7 +44,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     /**
      * minimum balance required
      */
-    double TRESHHOLD_MIN_BALANCE = 1;
+    //double THRESHOLD_MIN_BALANCE = 1;
 
     private final int precision = 8;
 
@@ -587,7 +587,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
         if (amount.getQuantity() < oneNBT) {
-            LOG.info(type + " available balance (" + amount.getQuantity() + "," + currency + ") < " + TRESHHOLD_MIN_BALANCE + " " + currency + ", no need to execute orders");
+            LOG.info(type + " available balance (" + amount.getQuantity() + "," + currency + ") < " + oneNBT + " " + currency + ", no need to execute orders");
         } else {
             // Divide the  balance 50% 50% in balance1 and balance2
 
