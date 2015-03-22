@@ -1,5 +1,5 @@
 {
-  "exchangename":"poloniex",
+  "exchangename":"Poloniex",
   "apikey": "xxx",
   "apisecret": "xxx",
   "txfee": 0.2,
