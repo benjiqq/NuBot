@@ -21,6 +21,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -32,9 +33,9 @@ import org.json.simple.parser.JSONParser;
 public class CoinmarketcapnexuistPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
-    public static final String name = "coinmarketcap_ne";
 
     public CoinmarketcapnexuistPriceFeed() {
+        super(FeedFacade.CoinmarketcapnexuistPriceFeed);
         refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }

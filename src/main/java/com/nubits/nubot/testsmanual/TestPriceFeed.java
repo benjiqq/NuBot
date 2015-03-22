@@ -80,15 +80,15 @@ public class TestPriceFeed {
 
     private void trackBTC() {
 
-        String mainFeed = BtcePriceFeed.name;
+        String mainFeed = FeedFacade.BtcePriceFeed;
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(BitcoinaveragePriceFeed.name);
-        backupFeedList.add(BlockchainPriceFeed.name);
-        backupFeedList.add(CoinbasePriceFeed.name);
-        backupFeedList.add(CcedkPriceFeed.name);
-        backupFeedList.add(BterPriceFeed.name);
+        backupFeedList.add(FeedFacade.BitcoinaveragePriceFeed);
+        backupFeedList.add(FeedFacade.BlockchainPriceFeed);
+        backupFeedList.add(FeedFacade.CoinbasePriceFeed);
+        backupFeedList.add(FeedFacade.CcedkPriceFeed);
+        backupFeedList.add(FeedFacade.BterPriceFeed);
         //TODO add bitfinex and  bitstamp after merging this branch with develop
 
         execute(mainFeed, backupFeedList, CurrencyList.BTC_USD);
@@ -98,10 +98,10 @@ public class TestPriceFeed {
     private void trackPPC() {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        String mainFeed = BtcePriceFeed.name;
+        String mainFeed = FeedFacade.BtcePriceFeed;
 
-        backupFeedList.add(CoinmarketcapnorthpolePriceFeed.name);
-        backupFeedList.add(CoinmarketcapnexuistPriceFeed.name);
+        backupFeedList.add(FeedFacade.CoinmarketcapnorthpolePriceFeed);
+        backupFeedList.add(FeedFacade.CoinmarketcapnexuistPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.PPC_USD);
     }
@@ -114,7 +114,7 @@ public class TestPriceFeed {
         backupFeedList.add(OpenexchangeratesPriceFeed.name);
         backupFeedList.add(GoogleUnofficialPriceFeed.name);
         backupFeedList.add(ExchangeratelabPriceFeed.name);
-        backupFeedList.add(YahooPriceFeed.name);
+        backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.EUR_USD);
     }
@@ -125,7 +125,7 @@ public class TestPriceFeed {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         backupFeedList.add(GoogleUnofficialPriceFeed.name);
-        backupFeedList.add(YahooPriceFeed.name);
+        backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.HKD_USD);
     }
@@ -136,7 +136,7 @@ public class TestPriceFeed {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         backupFeedList.add(GoogleUnofficialPriceFeed.name);
-        backupFeedList.add(YahooPriceFeed.name);
+        backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.PHP_USD);
     }
@@ -147,7 +147,7 @@ public class TestPriceFeed {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         backupFeedList.add(GoogleUnofficialPriceFeed.name);
-        backupFeedList.add(YahooPriceFeed.name);
+        backupFeedList.add(FeedFacade.YahooPriceFeed);
         backupFeedList.add(ExchangeratelabPriceFeed.name);
 
         execute(mainFeed, backupFeedList, CurrencyList.CNY_USD);

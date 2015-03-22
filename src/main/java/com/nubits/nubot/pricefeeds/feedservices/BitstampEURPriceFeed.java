@@ -22,6 +22,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ public class BitstampEURPriceFeed extends AbstractPriceFeed {
     private static final Logger LOG = LoggerFactory.getLogger(BitstampEURPriceFeed.class.getName());
     public static final String name = "bitstampeurusd";
     public BitstampEURPriceFeed() {
-
+        super(FeedFacade.BitstampEURPriceFeed);
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

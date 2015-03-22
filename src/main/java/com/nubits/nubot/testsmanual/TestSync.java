@@ -137,10 +137,10 @@ public class TestSync extends TimerTask {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         try{
-            mainFeed = BtcePriceFeed.name;
-            String  f1 = BitcoinaveragePriceFeed.name;
-            String f2 = BlockchainPriceFeed.name;
-            String f3 = CoinbasePriceFeed.name;
+            mainFeed = FeedFacade.BtcePriceFeed;
+            String  f1 = FeedFacade.BitcoinaveragePriceFeed;
+            String f2 = FeedFacade.BlockchainPriceFeed;
+            String f3 = FeedFacade.CoinbasePriceFeed;
             backupFeedList.add(f1);
             backupFeedList.add(f2);
             backupFeedList.add(f3);

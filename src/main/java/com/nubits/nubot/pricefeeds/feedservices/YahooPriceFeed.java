@@ -22,6 +22,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -32,10 +33,9 @@ import org.json.simple.parser.JSONParser;
 public class YahooPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(YahooPriceFeed.class.getName());
-    public static final String name = "yahoo";
 
     public YahooPriceFeed() {
-
+        super(FeedFacade.YahooPriceFeed);
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

@@ -41,7 +41,7 @@ public class PriceFeedManager {
 
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
-        FeedFacade.initValidFeeds();
+
         this.pair = pair;
 
         feedList.add(FeedFacade.getFeed(mainFeed)); //add the main feed at index 0

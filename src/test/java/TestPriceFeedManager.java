@@ -18,6 +18,7 @@
 
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.pricefeeds.feedservices.BitfinexPriceFeed;
 import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
@@ -36,10 +37,10 @@ public class TestPriceFeedManager extends TestCase {
 
         //public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws
         ArrayList<String>backup = new ArrayList<>();
-        backup.add(BitfinexPriceFeed.name);
+        backup.add(FeedFacade.BitfinexPriceFeed);
         PriceFeedManager pfm = null;
         try{
-             pfm = new PriceFeedManager(BtcePriceFeed.name, backup, CurrencyList.BTC_USD);
+             pfm = new PriceFeedManager(FeedFacade.BtcePriceFeed, backup, CurrencyList.BTC_USD);
         }catch(Exception e){
 
         }

@@ -50,7 +50,6 @@ public class TestPriceFeedsAll extends TestCase {
     public void testAll() {
 
         CurrencyPair testPair = CurrencyList.BTC_USD;
-        FeedFacade.initValidFeeds();
         ArrayList<AbstractPriceFeed> allfeeds = FeedFacade.getAllExistingFeeds();
 
         int fn = allfeeds.size();

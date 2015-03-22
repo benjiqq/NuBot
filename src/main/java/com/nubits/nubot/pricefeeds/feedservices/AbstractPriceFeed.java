@@ -27,10 +27,14 @@ import com.nubits.nubot.models.LastPrice;
  */
 public abstract class AbstractPriceFeed {
 
-    protected String name;
     long refreshMinTime;
     long lastRequest;
     LastPrice lastPrice;
+    protected static String name;
+
+    public AbstractPriceFeed(String name){
+        this.name = name;
+    }
 
     public abstract LastPrice getLastPrice(CurrencyPair pair);
 

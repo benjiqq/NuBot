@@ -26,6 +26,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
@@ -35,10 +36,10 @@ import org.slf4j.Logger;
 public class BterPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BterPriceFeed.class.getName());
-    public static final String name = "bter";
+
 
     public BterPriceFeed() {
-
+        super(FeedFacade.BterPriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

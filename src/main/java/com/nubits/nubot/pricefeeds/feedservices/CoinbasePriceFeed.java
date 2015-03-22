@@ -21,6 +21,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -32,9 +33,9 @@ import org.json.simple.parser.JSONParser;
 public class CoinbasePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinbasePriceFeed.class.getName());
-    public static final String name = "coinbase";
 
     public CoinbasePriceFeed() {
+        super(FeedFacade.CoinbasePriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

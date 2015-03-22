@@ -21,6 +21,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.trading.wrappers.TradeUtilsCCEDK;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
@@ -33,9 +34,10 @@ import org.json.simple.parser.JSONParser;
 public class CcedkPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CcedkPriceFeed.class.getName());
-    public static final String name = "ccedk";
+
 
     public CcedkPriceFeed() {
+        super(FeedFacade.CcedkPriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

@@ -22,6 +22,7 @@ package com.nubits.nubot.pricefeeds.feedservices;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -35,6 +36,7 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
     public static final String name = "google-unofficial";
 
     public GoogleUnofficialPriceFeed() {
+        super(FeedFacade.GoogleUnofficialPriceFeed);
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
