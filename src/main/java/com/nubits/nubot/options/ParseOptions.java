@@ -160,7 +160,7 @@ public class ParseOptions {
         boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
         LOG.info("exchange supported? " + options.exchangeName + " " + supported);
         if (!supported)
-            throw new NuBotConfigException("exchange not supported");
+            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
 
         options.dualSide = (boolean) getIgnoreCase(optionsJSON, "dualSide");
 
@@ -333,7 +333,7 @@ public class ParseOptions {
                 else
                     options.backupFeedNames.add(feedname);
             } catch (JSONException ex) {
-                throw new NuBotConfigException("" + ex);
+                throw new NuBotConfigException("parse feeds json error" + ex);
             }
         }
 

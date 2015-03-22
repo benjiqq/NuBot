@@ -122,7 +122,7 @@ public class TestOptions extends TestCase {
 
             assertTrue(nuo != null);
 
-            assertTrue(nuo.exchangeName.equals("peatio"));
+            assertTrue(nuo.exchangeName.equals("Peatio"));
 
             //assertTrue(nuo.getPair() != null);
 

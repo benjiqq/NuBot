@@ -77,17 +77,15 @@ public class ExchangeFacade {
         supportedExchanges.add(CCEDK);
         supportedExchanges.add(EXCOIN);
 
-        exchangeInterfaces.put(POLONIEX,AltsTradeWrapper.class);
+        exchangeInterfaces.put(ALTSTRADE,AltsTradeWrapper.class);
         exchangeInterfaces.put(POLONIEX,PoloniexWrapper.class);
-        exchangeInterfaces.put(POLONIEX,CcedkWrapper.class);
-        exchangeInterfaces.put(POLONIEX,AllCoinWrapper.class);
-        exchangeInterfaces.put(POLONIEX,BitSparkWrapper.class);
-        exchangeInterfaces.put(POLONIEX,BitcoinCoIDWrapper.class);
-        exchangeInterfaces.put(POLONIEX,PeatioWrapper.class);
-        exchangeInterfaces.put(POLONIEX,BtceWrapper.class);
-        exchangeInterfaces.put(POLONIEX,CcedkWrapper.class);
-        exchangeInterfaces.put(POLONIEX,ExcoinWrapper.class);
-
+        exchangeInterfaces.put(CCEX,CcexWrapper.class);
+        exchangeInterfaces.put(ALLCOIN,AllCoinWrapper.class);
+        exchangeInterfaces.put(BITSPARK_PEATIO,BitSparkWrapper.class);
+        exchangeInterfaces.put(BITCOINCOID,BitcoinCoIDWrapper.class);
+        exchangeInterfaces.put(INTERNAL_EXCHANGE_PEATIO,PeatioWrapper.class);
+        exchangeInterfaces.put(BTCE,BtceWrapper.class);
+        exchangeInterfaces.put(EXCOIN,ExcoinWrapper.class);
 
     }
 

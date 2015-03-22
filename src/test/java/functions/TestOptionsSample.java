@@ -88,7 +88,7 @@ public class TestOptionsSample extends TestCase {
 
             assertTrue(nuo != null);
 
-            assertTrue(nuo.exchangeName.equals("poloniex"));
+            assertTrue(nuo.exchangeName.equals("Poloniex"));
 
             //assertTrue(nuo.getPair() != null);
 

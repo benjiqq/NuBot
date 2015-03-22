@@ -36,7 +36,7 @@ import java.nio.file.Paths;
 public class TestOptionsStandard extends TestCase {
 
     private static String testconfigFile = "poloniex_standard.json";
-    private static String testconfig = TestGlobal.static_testconfigdir + "/" + testconfigFile;
+    private static String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
 
     @Override
     public void setUp() {
