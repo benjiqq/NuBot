@@ -353,7 +353,7 @@ public class WrapperTestUtils {
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
 
         //Create a new TradeInterface object using the custom implementation
-        TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName);
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName, keys, Global.exchange);
 
         //Assign the keys to the TradeInterface
         ti.setKeys(keys);

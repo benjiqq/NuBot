@@ -91,11 +91,6 @@ public class PoloniexWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    public PoloniexWrapper() {
-        setupErrors();
-
-    }
-
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;

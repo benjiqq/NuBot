@@ -34,7 +34,7 @@ public class TestTasksConnectivity extends TestCase {
     public void test() {
 
         Global.exchange = new Exchange(ExchangeFacade.BTCE);
-        TradeInterface ti = ExchangeFacade.getInterfaceByName(ExchangeFacade.BTCE);
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(ExchangeFacade.BTCE, null, Global.exchange);
         Global.exchange.getLiveData().setUrlConnectionCheck(ti.getUrlConnectionCheck());
 
         BotTask checkConnectionTask = new BotTask(

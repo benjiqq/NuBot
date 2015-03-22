@@ -27,7 +27,10 @@ import com.nubits.nubot.trading.wrappers.*;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -36,64 +39,67 @@ import java.util.HashMap;
  */
 public class ExchangeFacade {
 
-    public static final String ALTSTRADE = "altstrade";
-    public static final String BTCE = "btce";
-    public static final String CCEDK = "ccedk";
-    public static final String BTER = "bter";
-    public static final String INTERNAL_EXCHANGE_PEATIO = "peatio";
-    public static final String BITSPARK_PEATIO = "bitspark";
-    public static final String POLONIEX = "poloniex";
-    public static final String CCEX = "ccex";
-    public static final String ALLCOIN = "allcoin";
-    public static final String EXCOIN = "excoin";
-    public static final String BITCOINCOID = "bitcoincoid";
+    private static final Logger LOG = LoggerFactory.getLogger(ExchangeFacade.class.getName());
+
+
+    public static final String ALTSTRADE = "Altstrade";
+    public static final String BTCE = "Btce";
+    public static final String CCEDK = "Ccedk";
+    public static final String BTER = "Bter";
+    public static final String INTERNAL_EXCHANGE_PEATIO = "Peatio";
+    public static final String BITSPARK_PEATIO = "Bitspark";
+    public static final String POLONIEX = "Poloniex";
+    public static final String CCEX = "Ccex";
+    public static final String ALLCOIN = "Allcoin";
+    public static final String EXCOIN = "Excoin";
+    public static final String BITCOINCOID = "Bitcoincoid";
 
 
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
-    private static HashMap<String, TradeInterface> supportedExchanges, liveExchanges;
+    private static ArrayList<String> supportedExchanges, liveExchanges;
+    private static HashMap<String, Class> exchangeInterfaces;
     ;
 
     static {
-        supportedExchanges = new HashMap<>();
+        supportedExchanges = new ArrayList<>();
+        exchangeInterfaces = new HashMap<>();
 
-        supportedExchanges.put(ALTSTRADE, new AltsTradeWrapper());
-        supportedExchanges.put(POLONIEX, new PoloniexWrapper());
-        supportedExchanges.put(CCEX, new CcexWrapper());
-        supportedExchanges.put(ALLCOIN, new AllCoinWrapper());
-        supportedExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
+        supportedExchanges.add(ALTSTRADE);
+        supportedExchanges.add(POLONIEX);
+        supportedExchanges.add(CCEX);
+        supportedExchanges.add(ALLCOIN);
+        supportedExchanges.add(BITSPARK_PEATIO);
+        supportedExchanges.add(BITCOINCOID);
+        supportedExchanges.add(INTERNAL_EXCHANGE_PEATIO);
+        supportedExchanges.add(BTCE);
+        supportedExchanges.add(BTER);
+        supportedExchanges.add(CCEDK);
+        supportedExchanges.add(EXCOIN);
 
-        supportedExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
-        supportedExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
-
-        supportedExchanges.put(BTCE, new BtceWrapper());
-
-        supportedExchanges.put(BTER, new BterWrapper());
-        supportedExchanges.put(CCEDK, new CcedkWrapper());
-        supportedExchanges.put(EXCOIN, new ExcoinWrapper());
+        exchangeInterfaces.put(POLONIEX,PoloniexWrapper.class);
     }
 
     static {
-        liveExchanges = new HashMap<>();
+        liveExchanges = new ArrayList<>();
 
-        liveExchanges.put(ALTSTRADE, new AltsTradeWrapper());
-        liveExchanges.put(POLONIEX, new PoloniexWrapper());
-        liveExchanges.put(CCEX, new CcexWrapper());
-        liveExchanges.put(ALLCOIN, new AllCoinWrapper());
-        liveExchanges.put(BITSPARK_PEATIO, new BitSparkWrapper());
-        liveExchanges.put(BITCOINCOID, new BitcoinCoIDWrapper());
-        liveExchanges.put(INTERNAL_EXCHANGE_PEATIO, new PeatioWrapper());
-        liveExchanges.put(BTCE, new BtceWrapper());
+        liveExchanges.add(ALTSTRADE);
+        liveExchanges.add(POLONIEX);
+        liveExchanges.add(CCEX);
+        liveExchanges.add(ALLCOIN);
+        liveExchanges.add(BITSPARK_PEATIO);
+        liveExchanges.add(BITCOINCOID);
+        liveExchanges.add(INTERNAL_EXCHANGE_PEATIO);
+        liveExchanges.add(BTCE);
     }
 
     public static boolean supportedExchange(String exchange) {
-        return supportedExchanges.containsKey(exchange);
+        return supportedExchanges.contains(exchange);
     }
 
     public static boolean isLiveExchange(String exchange) {
-        return liveExchanges.containsKey(exchange);
+        return liveExchanges.contains(exchange);
     }
-
 
 
     /**
@@ -107,21 +113,29 @@ public class ExchangeFacade {
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-        TradeInterface ti = ExchangeFacade.getInterface(Global.exchange);
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.exchange.getName(), keys, Global.exchange);
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
         return ti;
     }
 
-    public static TradeInterface getInterface(Exchange exc) {
-        return getInterfaceByName(exc.getName());
-    }
+    public static TradeInterface getInterfaceByName(String name, ApiKeys keys, Exchange exchange) {
 
-    public static TradeInterface getInterfaceByName(String name) {
+        LOG.info("get exchange interface for " + name);
 
+        if (exchangeInterfaces.containsKey(name)) {
 
-        if (supportedExchanges.containsKey(name)) {
-            return supportedExchanges.get(name);
+            TradeInterface ti = null;
+            try {
+
+                Class<?> wrapperClazz = exchangeInterfaces.get(name);
+                Constructor<?> constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
+                Object instance = constructor.newInstance(keys, exchange);
+                ti = (TradeInterface) instance;
+                return ti;
+            } catch (Exception e) {
+                LOG.error("" + e);
+            }
         }
         return null;
     }
