@@ -162,7 +162,11 @@ public class ParseOptions {
         if (!supported)
             throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
 
-        options.dualSide = (boolean) getIgnoreCase(optionsJSON, "dualSide");
+        try {
+            options.dualSide = (boolean) getIgnoreCase(optionsJSON, "dualSide");
+        } catch (Exception e) {
+            throw new NuBotConfigException("can not cast dualSide to boolean " + e);
+        }
 
         if (!options.exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
             if (!containsIgnoreCase(optionsJSON, "apiKey")) {
@@ -222,7 +226,11 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(optionsJSON, "submitliquidity")) {
-            options.submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
+            try {
+                options.submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
+            } catch (Exception e) {
+                throw new NuBotConfigException("can not cast submitLiquidity to boolean " + e);
+            }
         }
 
         if (containsIgnoreCase(optionsJSON, "maxsellordervolume")) {
@@ -234,7 +242,11 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(optionsJSON, "executeorders")) {
-            options.executeOrders = (boolean) getIgnoreCase(optionsJSON, "executeorders");
+            try {
+                options.executeOrders = (boolean) getIgnoreCase(optionsJSON, "executeorders");
+            } catch (Exception e) {
+                throw new NuBotConfigException("can not cast executeOrders to boolean " + e);
+            }
         }
 
         if (containsIgnoreCase(optionsJSON, "verbose")) {
@@ -246,8 +258,12 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(optionsJSON, "emergencytimeout")) {
-            long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, "emergencytimeout");
-            options.emergencyTimeout = (int) emergencyTimeoutLong;
+            try {
+                long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, "emergencytimeout");
+                options.emergencyTimeout = (int) emergencyTimeoutLong;
+            } catch (Exception e) {
+                throw new NuBotConfigException("can not cast emergencytimeout to long " + e);
+            }
         }
 
         if (containsIgnoreCase(optionsJSON, "keepproceeds")) {
@@ -255,11 +271,20 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(optionsJSON, "multiplecustodians")) {
-            options.multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiplecustodians");
+            try {
+                options.multipleCustodians = (boolean) getIgnoreCase(optionsJSON, "multiplecustodians");
+            } catch (Exception e) {
+                throw new NuBotConfigException("can not cast multipleCustodians to boolean " + e);
+            }
         }
 
         if (containsIgnoreCase(optionsJSON, "distributeliquidity")) {
-            options.distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distributeliquidity");
+            try {
+                options.distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, "distributeliquidity");
+            } catch (Exception e) {
+                throw new NuBotConfigException("can not cast distributeLiquidity to boolean " + e);
+            }
+
         }
 
         //Now require the parameters only if submitLiquidity is true, otherwise can use the default value
@@ -278,8 +303,12 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(optionsJSON, "nudport")) {
-            long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
-            options.nudPort = (int) nudPortlong;
+            try {
+                long nudPortlong = (long) getIgnoreCase(optionsJSON, "nudport");
+                options.nudPort = (int) nudPortlong;
+            } catch (Exception e) {
+                throw new NuBotConfigException("can not cast nudPortlong to long " + e);
+            }
         }
 
 
@@ -327,7 +356,7 @@ public class ParseOptions {
         }
         for (int i = 0; i < bfeeds.size(); i++) {
             try {
-                String feedname = (String)bfeeds.get(i);
+                String feedname = (String) bfeeds.get(i);
                 if (!FeedFacade.isValidFeed(feedname))
                     throw new NuBotConfigException("invalid feed configured");
                 else
@@ -340,7 +369,7 @@ public class ParseOptions {
         if (!containsIgnoreCase(optionsJSON, "wallchangeThreshold"))
             throw new NuBotConfigException("wallchangeThreshold needed if secondary peg defined");
         else
-            options.wallchangeThreshold =Utils.getDouble(getIgnoreCase(optionsJSON, "wallchangeThreshold"));
+            options.wallchangeThreshold = Utils.getDouble(getIgnoreCase(optionsJSON, "wallchangeThreshold"));
 
 
         if (!containsIgnoreCase(optionsJSON, "spread"))
@@ -353,7 +382,6 @@ public class ParseOptions {
         }
 
 
-
     }
 
     //TODO: redundant. this handles webUI json parsing
@@ -363,7 +391,7 @@ public class ParseOptions {
         NuBotOptions newopt = new NuBotOptions();
 
         if (containsIgnoreCase(postJson, "exchangename")) {
-            newopt.exchangeName ="" + getIgnoreCase(postJson,"exchangename");
+            newopt.exchangeName = "" + getIgnoreCase(postJson, "exchangename");
         }
 
         if (containsIgnoreCase(postJson, "apikey")) {
@@ -375,57 +403,57 @@ public class ParseOptions {
         }
 
         if (containsIgnoreCase(postJson, "mailRecipient")) {
-            newopt.mailRecipient = "" + getIgnoreCase(postJson,"mailRecipient");
+            newopt.mailRecipient = "" + getIgnoreCase(postJson, "mailRecipient");
         }
 
         if (containsIgnoreCase(postJson, "dualside")) {
-            newopt.dualSide = (boolean) getIgnoreCase(postJson,"dualside");
+            newopt.dualSide = (boolean) getIgnoreCase(postJson, "dualside");
         }
 
         if (containsIgnoreCase(postJson, "multiplecustodians")) {
-            newopt.multipleCustodians =(boolean) getIgnoreCase(postJson,"multiplecustodians");
+            newopt.multipleCustodians = (boolean) getIgnoreCase(postJson, "multiplecustodians");
         }
 
         if (containsIgnoreCase(postJson, "submitliquidity")) {
-            newopt.submitLiquidity= (boolean) getIgnoreCase(postJson,"submitliquidity");
+            newopt.submitLiquidity = (boolean) getIgnoreCase(postJson, "submitliquidity");
         }
 
         if (containsIgnoreCase(postJson, "executeorders")) {
-            newopt.executeOrders =(boolean) getIgnoreCase(postJson,"executeorders");
+            newopt.executeOrders = (boolean) getIgnoreCase(postJson, "executeorders");
         }
 
         if (containsIgnoreCase(postJson, "verbose")) {
-            newopt.verbose =(boolean) getIgnoreCase(postJson,"verbose");
+            newopt.verbose = (boolean) getIgnoreCase(postJson, "verbose");
         }
 
         if (containsIgnoreCase(postJson, "hipchat")) {
-            newopt.sendHipchat =(boolean) getIgnoreCase(postJson,"hipchat");
+            newopt.sendHipchat = (boolean) getIgnoreCase(postJson, "hipchat");
         }
 
         if (containsIgnoreCase(postJson, "nubitaddress")) {
-            newopt.nubitAddress = "" + getIgnoreCase(postJson,"nubitaddress");
+            newopt.nubitAddress = "" + getIgnoreCase(postJson, "nubitaddress");
         }
 
         if (containsIgnoreCase(postJson, "rpcUser")) {
-            newopt.rpcUser = "" + getIgnoreCase(postJson,"rpcUser");
+            newopt.rpcUser = "" + getIgnoreCase(postJson, "rpcUser");
         }
 
-        if (containsIgnoreCase(postJson,"rpcPass")) {
-            newopt.rpcPass = "" + getIgnoreCase(postJson,"rpcPass");
+        if (containsIgnoreCase(postJson, "rpcPass")) {
+            newopt.rpcPass = "" + getIgnoreCase(postJson, "rpcPass");
         }
 
         if (containsIgnoreCase(postJson, "nudIp")) {
-            newopt.nudIp = "" + getIgnoreCase(postJson,"nudIp");
+            newopt.nudIp = "" + getIgnoreCase(postJson, "nudIp");
         }
 
         if (containsIgnoreCase(postJson, "sendMails")) {
-            newopt.sendMails = "" + getIgnoreCase(postJson,"sendMails");
+            newopt.sendMails = "" + getIgnoreCase(postJson, "sendMails");
         }
 
 
         if (postJson.containsKey("nudport")) {
             try {
-                int newv = (new Integer("" + getIgnoreCase(postJson,"nudport"))).intValue();
+                int newv = (new Integer("" + getIgnoreCase(postJson, "nudport"))).intValue();
                 newopt.setNudPort(newv);
             } catch (Exception e) {
                 //TODO
@@ -433,7 +461,7 @@ public class ParseOptions {
         }
 
         if (postJson.containsKey("pair")) {
-            String p = "" + getIgnoreCase(postJson,"pair");
+            String p = "" + getIgnoreCase(postJson, "pair");
             CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
             newopt.setPair(newpair);
         }
@@ -441,7 +469,6 @@ public class ParseOptions {
 
         return newopt;
     }
-
 
 
     /**
