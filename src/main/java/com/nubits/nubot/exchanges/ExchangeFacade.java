@@ -36,6 +36,7 @@ import java.util.HashMap;
 
 /**
  * a facade for all exchanges
+ * Changes need to be made in 1. Strings, 2. supportedExchanges ArrayList and 3. exchangeInterfaces
  */
 public class ExchangeFacade {
 
@@ -53,7 +54,6 @@ public class ExchangeFacade {
     public static final String ALLCOIN = "Allcoin";
     public static final String EXCOIN = "Excoin";
     public static final String BITCOINCOID = "Bitcoincoid";
-
 
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
@@ -77,28 +77,22 @@ public class ExchangeFacade {
         supportedExchanges.add(CCEDK);
         supportedExchanges.add(EXCOIN);
 
+        exchangeInterfaces.put(POLONIEX,AltsTradeWrapper.class);
         exchangeInterfaces.put(POLONIEX,PoloniexWrapper.class);
-    }
+        exchangeInterfaces.put(POLONIEX,CcedkWrapper.class);
+        exchangeInterfaces.put(POLONIEX,AllCoinWrapper.class);
+        exchangeInterfaces.put(POLONIEX,BitSparkWrapper.class);
+        exchangeInterfaces.put(POLONIEX,BitcoinCoIDWrapper.class);
+        exchangeInterfaces.put(POLONIEX,PeatioWrapper.class);
+        exchangeInterfaces.put(POLONIEX,BtceWrapper.class);
+        exchangeInterfaces.put(POLONIEX,CcedkWrapper.class);
+        exchangeInterfaces.put(POLONIEX,ExcoinWrapper.class);
 
-    static {
-        liveExchanges = new ArrayList<>();
 
-        liveExchanges.add(ALTSTRADE);
-        liveExchanges.add(POLONIEX);
-        liveExchanges.add(CCEX);
-        liveExchanges.add(ALLCOIN);
-        liveExchanges.add(BITSPARK_PEATIO);
-        liveExchanges.add(BITCOINCOID);
-        liveExchanges.add(INTERNAL_EXCHANGE_PEATIO);
-        liveExchanges.add(BTCE);
     }
 
     public static boolean supportedExchange(String exchange) {
         return supportedExchanges.contains(exchange);
-    }
-
-    public static boolean isLiveExchange(String exchange) {
-        return liveExchanges.contains(exchange);
     }
 
 
