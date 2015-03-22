@@ -35,9 +35,9 @@ public class CcedkPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CcedkPriceFeed.class.getName());
 
+    public static final String name = FeedFacade.CcedkPriceFeed;
 
     public CcedkPriceFeed() {
-        super(FeedFacade.CcedkPriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

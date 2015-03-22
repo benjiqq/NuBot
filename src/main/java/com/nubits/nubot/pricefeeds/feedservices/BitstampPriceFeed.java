@@ -33,8 +33,11 @@ import org.json.simple.parser.JSONParser;
 public class BitstampPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitstampPriceFeed.class.getName());
+
+    public static final String name = FeedFacade.BitstampPriceFeed;
+
     public BitstampPriceFeed() {
-        super(FeedFacade.BitstampPriceFeed);
+
         refreshMinTime = 58 * 1000; //8 hours
     }
 

@@ -33,8 +33,10 @@ import org.json.simple.parser.JSONParser;
 public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
+
+    public final static String name  = FeedFacade.BitcoinaveragePriceFeed;
+
     public BitcoinaveragePriceFeed() {
-        super(FeedFacade.BitcoinaveragePriceFeed);
         refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }

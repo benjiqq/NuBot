@@ -34,9 +34,9 @@ public class BlockchainPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BlockchainPriceFeed.class.getName());
 
+    public static final String name = FeedFacade.BlockchainPriceFeed;
 
     public BlockchainPriceFeed() {
-        super(FeedFacade.BlockchainPriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

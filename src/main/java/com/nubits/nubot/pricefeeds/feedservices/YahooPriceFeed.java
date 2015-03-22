@@ -34,8 +34,10 @@ public class YahooPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(YahooPriceFeed.class.getName());
 
+    public final static String name  = FeedFacade.YahooPriceFeed;
+
     public YahooPriceFeed() {
-        super(FeedFacade.YahooPriceFeed);
+
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

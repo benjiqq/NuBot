@@ -34,9 +34,9 @@ public class CoinmarketcapnorthpolePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
 
+    public static final String name = FeedFacade.CoinmarketcapnorthpolePriceFeed;
 
     public CoinmarketcapnorthpolePriceFeed() {
-        super(FeedFacade.CoinmarketcapnorthpolePriceFeed);
         refreshMinTime = 50 * 1000;
         lastRequest = 0L;
     }

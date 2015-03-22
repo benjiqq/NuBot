@@ -37,9 +37,9 @@ public class BterPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BterPriceFeed.class.getName());
 
+    public static final String name = FeedFacade.BterPriceFeed;
 
     public BterPriceFeed() {
-        super(FeedFacade.BterPriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

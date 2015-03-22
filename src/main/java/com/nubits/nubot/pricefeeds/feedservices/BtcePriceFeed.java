@@ -34,8 +34,9 @@ public class BtcePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BtcePriceFeed.class.getName());
 
+    public static final String name = FeedFacade.BtcePriceFeed;
+
     public BtcePriceFeed() {
-        super(FeedFacade.BtcePriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 

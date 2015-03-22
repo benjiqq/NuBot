@@ -30,15 +30,11 @@ public abstract class AbstractPriceFeed {
     long refreshMinTime;
     long lastRequest;
     LastPrice lastPrice;
-    protected static String name;
 
-    public AbstractPriceFeed(String name){
-        this.name = name;
+    public AbstractPriceFeed(){
     }
 
     public abstract LastPrice getLastPrice(CurrencyPair pair);
 
-    public String getName() {
-        return this.name;
-    }
+
 }

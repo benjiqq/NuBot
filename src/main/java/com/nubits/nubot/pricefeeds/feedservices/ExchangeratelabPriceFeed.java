@@ -35,10 +35,10 @@ import org.json.simple.parser.JSONParser;
 public class ExchangeratelabPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExchangeratelabPriceFeed.class.getName());
-    public static final String name = "exchangeratelab";
+
+    public static final String name = FeedFacade.ExchangeratelabPriceFeed;
 
     public ExchangeratelabPriceFeed() {
-        super(FeedFacade.ExchangeratelabPriceFeed);
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

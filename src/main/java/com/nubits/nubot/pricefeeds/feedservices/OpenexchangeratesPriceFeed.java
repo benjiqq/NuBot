@@ -35,10 +35,10 @@ import org.json.simple.parser.ParseException;
 public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(OpenexchangeratesPriceFeed.class.getName());
-    public static final String name = "openexchangerates";
+
+    public static final String name = FeedFacade.OpenexchangeratesPriceFeed;
 
     public OpenexchangeratesPriceFeed() {
-        super(FeedFacade.OpenexchangeratesPriceFeed);
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 

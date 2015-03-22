@@ -68,7 +68,7 @@ public class TestPriceFeed {
     }
 
     private void executeSingle(AbstractPriceFeed feed, CurrencyPair pair) {
-        LOG.info("Testing feed :  " + feed.getName() + " , pair : " + pair.toString());
+        LOG.info("Testing feed :  " + feed.getClass() + " , pair : " + pair.toString());
         LastPrice lastPrice = feed.getLastPrice(pair);
         if (!lastPrice.isError()) {
             LOG.info(lastPrice.toString());

@@ -68,14 +68,15 @@ public class PriceFeedManager {
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (lastPrice != null && !lastPrice.isError()) {
-                LOG.debug("got price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getName());
+                LOG.debug("feed: " + tempFeed.getClass());
+                LOG.debug("got price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getClass());
                 prices.add(lastPrice);
                 if (i == 0) {
                     isMainFeedValid = true;
                 }
             } else {
                 LOG.warn("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
-                        + " price from " + tempFeed.getName());
+                        + " price from " + tempFeed.getClass());
             }
         }
         response.setMainFeedValid(isMainFeedValid);

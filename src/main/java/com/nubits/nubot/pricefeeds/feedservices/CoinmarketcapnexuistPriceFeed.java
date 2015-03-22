@@ -34,8 +34,9 @@ public class CoinmarketcapnexuistPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BitcoinaveragePriceFeed.class.getName());
 
+    public static final String name = FeedFacade.CoinmarketcapnexuistPriceFeed;
+
     public CoinmarketcapnexuistPriceFeed() {
-        super(FeedFacade.CoinmarketcapnexuistPriceFeed);
         refreshMinTime = 50 * 1000; //Two minutes
         lastRequest = 0L;
     }

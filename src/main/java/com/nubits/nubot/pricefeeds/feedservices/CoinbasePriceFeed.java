@@ -34,8 +34,9 @@ public class CoinbasePriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(CoinbasePriceFeed.class.getName());
 
+    public final static String name  = FeedFacade.CoinbasePriceFeed;
+
     public CoinbasePriceFeed() {
-        super(FeedFacade.CoinbasePriceFeed);
         refreshMinTime = 50 * 1000; //one minutee
     }
 
