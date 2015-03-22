@@ -671,7 +671,9 @@ public class PoloniexWrapper implements TradeInterface {
             try {
                 // add nonce and build arg list
                 if (needAuth) {
-                    args.put("nonce", createNonce());
+                    String nonce = createNonce();
+                    LOG.debug("nonce used " + nonce);
+                    args.put("nonce", nonce);
                     args.put("command", method);
 
                     post_data = TradeUtils.buildQueryString(args, ENCODING);
