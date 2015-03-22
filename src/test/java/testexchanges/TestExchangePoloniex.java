@@ -61,7 +61,7 @@ public class TestExchangePoloniex extends TestCase {
                     .parseOptionsSingle(testconfig);
 
             assertTrue(opt != null);
-            assertTrue(opt.getExchangeName().equals("poloniex"));
+            assertTrue(opt.getExchangeName().equals("Poloniex"));
 
         } catch (NuBotConfigException e) {
             catched = true;
@@ -96,7 +96,7 @@ public class TestExchangePoloniex extends TestCase {
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
-        assertTrue(delta < 5000);
+        assertTrue(delta < 10000);
 
         if (balancesResponse.isPositive()) {
             LOG.info("Positive response  from TradeInterface.getBalance() ");

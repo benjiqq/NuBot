@@ -112,7 +112,7 @@ public class TestSSL extends TestCase {
 
         Utils.installKeystore(false);
 
-        String API_BASE_URL = "coinbase.com";
+        String API_BASE_URL = "www.coinbase.com";
 
         boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
