@@ -120,10 +120,13 @@ public class NuBotSecondary extends NuBotBase {
 
         int delaySeconds = 0;
 
+        LOG.info("multiple custodians: " + Global.options.isMultipleCustodians());
+
         if (Global.options.isMultipleCustodians()) {
             delaySeconds = Utils.getSecondsToNextwindow(reset_every);
             LOG.info("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
         } else {
+
             LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
         }
         //then start the thread

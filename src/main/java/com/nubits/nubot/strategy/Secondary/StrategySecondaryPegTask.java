@@ -53,19 +53,18 @@ public class StrategySecondaryPegTask extends TimerTask {
         LOG.info("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
         if (isFirstTime) {
-
-            adaptOrders();
-
-        } else {
-
             initStrategy();
+        } else {
+            adaptOrders();
         }
     }
 
     public void adaptOrders() {
 
+        LOG.info("adapt orders");
+
         if (Global.options.isMultipleCustodians()) {
-            //multiple custodians do not need strategy exec
+            LOG.info("multiple custodians do not need strategy exec");
             return;
         }
 
