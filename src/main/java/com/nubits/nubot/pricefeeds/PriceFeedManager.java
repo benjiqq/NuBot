@@ -57,6 +57,9 @@ public class PriceFeedManager {
      * @return
      */
     public LastPriceResponse fetchLastPrices() {
+
+        LOG.debug("fetch last prices");
+
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;
         ArrayList<LastPrice> prices = new ArrayList<>();
@@ -65,13 +68,14 @@ public class PriceFeedManager {
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (lastPrice != null && !lastPrice.isError()) {
+                LOG.debug("got price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getName());
                 prices.add(lastPrice);
                 if (i == 0) {
                     isMainFeedValid = true;
                 }
             } else {
                 LOG.warn("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
-                        + " price from " + tempFeed.name);
+                        + " price from " + tempFeed.getName());
             }
         }
         response.setMainFeedValid(isMainFeedValid);

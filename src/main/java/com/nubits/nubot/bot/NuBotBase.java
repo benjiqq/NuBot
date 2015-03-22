@@ -24,6 +24,7 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -36,6 +37,8 @@ import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  * Abstract NuBot. implements all primitives without the strategy itself
@@ -111,13 +114,22 @@ public abstract class NuBotBase {
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
-        TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
+        TradeInterface ti = null;
+        try{
+            //Class<?> wrapper = Class.forName("com.nubits.nubot.trading.wrappers."+Global.options.getExchangeName() + "Wrapper");
+            //ti = (TradeInterface )wrapper.newInstance();
+            ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
+        }catch(Exception e){
+            exitWithNotice("exchange unknown");
+        }
+
+        //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
         LOG.info("Create a new TradeInterface object");
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
 
 
-        //TODO! handle on exchange level, not bot level
+        //TODO handle on exchange level, not bot level
         if (Global.options.getExchangeName().equals(ExchangeFacade.CCEX)) {
             ((CcexWrapper) (ti)).initBaseUrl();
         }
@@ -131,7 +143,7 @@ public abstract class NuBotBase {
         LOG.info("Swapped pair mode : " + Global.swappedPair);
 
         String apibase = "";
-        //TODO! handle on exchange level, not bot level
+        //TODO handle on exchange level, not bot level
         if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             ti.setApiBaseUrl(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE);
         }
@@ -139,6 +151,18 @@ public abstract class NuBotBase {
         //TODO exchange and tradeinterface are circular referenced
         Global.exchange.setTrade(ti);
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
+
+        //test setup exchange
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            if (orderList.size() != 0){
+                exitWithNotice("already open orders");
+            }
+        } else{
+            exitWithNotice("could not query exchange. exchange setup went wrong");
+        }
+
 
         //For a 0 tx fee market, force a price-offset of 0.1%
         ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
@@ -190,7 +214,6 @@ public abstract class NuBotBase {
             //inform user we're in demo mode
         }
 
-        //TODO set to this class
         Global.options = opt;
 
         setupAllConfig();

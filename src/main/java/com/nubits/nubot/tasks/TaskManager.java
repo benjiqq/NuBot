@@ -71,26 +71,33 @@ public class TaskManager {
     private void setTasks() {
         //connectivity tasks
 
+        LOG.info("setting up tasks");
+
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), NuBotAdminSettings.CHECK_CONNECTION_INTERVAL, "checkConnection");
         taskList.add(checkConnectionTask);
+        LOG.info("checkConnectionTask : " + checkConnectionTask);
 
         sendLiquidityTask = new BotTask(
                 new SubmitLiquidityinfoTask(Global.options.verbose), NuBotAdminSettings.SUBMIT_LIQUIDITY_SECONDS, "sendLiquidity");
         taskList.add(sendLiquidityTask);
+        LOG.info("sendLiquidityTask : " + sendLiquidityTask);
 
 
         strategyFiatTask = new BotTask(
                 new StrategyPrimaryPegTask(), NuBotAdminSettings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
+        LOG.info("strategyFiatTask : " + sendLiquidityTask);
 
         secondaryPegTask = new BotTask(
                 new StrategySecondaryPegTask(), NuBotAdminSettings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
+        LOG.info("secondaryPegTask : " + sendLiquidityTask);
 
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, "priceTriggerTask");
         taskList.add(priceTriggerTask);
+        LOG.info("priceTriggerTask : " + sendLiquidityTask);
 
         /*priceMonitorTask = new BotTask(
                 new NuPriceMonitorTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);

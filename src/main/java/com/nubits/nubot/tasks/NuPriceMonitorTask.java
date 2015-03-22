@@ -53,7 +53,7 @@ public class NuPriceMonitorTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.info("Executing task : CheckLastPriceTask ");
+        LOG.info("Executing NuPriceMonitorTask : CheckLastPriceTask ");
         if (pfm == null) {
             LOG.severe("CheckLastPrice task needs a PriceFeedManager to work. Please assign it before running it");
 

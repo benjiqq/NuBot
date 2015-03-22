@@ -443,7 +443,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //carry on with updating the wall price shift
         this.lastPrice = lp;
 
-        LOG.info("Price Updated." + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
+        LOG.info("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
             try {
