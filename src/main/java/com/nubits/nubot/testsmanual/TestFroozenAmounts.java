@@ -36,12 +36,7 @@ public class TestFroozenAmounts {
     private static final Logger LOG = LoggerFactory.getLogger(TestFroozenAmounts.class.getName());
 
     public static void main(String[] args) {
-        //Load settings that contains the path
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
+        InitTests.loadSettings();
 
         CurrencyPair pair = CurrencyList.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();

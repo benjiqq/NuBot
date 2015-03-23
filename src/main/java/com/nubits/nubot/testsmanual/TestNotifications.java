@@ -45,31 +45,9 @@ public class TestNotifications {
 
     public static void main(String[] a) {
 
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-            System.out.println("can't load settings");
-            System.exit(0);
-        }
-
-
-        //Load config
-        try {
-            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
-            LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + Global.options.getExchangeName());
-        } catch (NuBotConfigException ex) {
-            LOG.error(ex.toString());
-        }
-
-        //Load keystore
-        try {
-            LOG.info("install keystore");
-            Utils.installKeystore(false);
-        } catch (Exception ex) {
-            LOG.error(ex.toString());
-        }
+        InitTests.loadSettings();
+        InitTests.loadConfig(TEST_OPTIONS_PATH);
+        InitTests.loadKeystore(false);
 
         //Send email notifications
         String email = "desrever.nu@gmail.com";

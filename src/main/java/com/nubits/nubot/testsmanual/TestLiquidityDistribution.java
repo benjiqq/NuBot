@@ -60,11 +60,8 @@ public class TestLiquidityDistribution {
     public static void main(String a[]) {
         TestLiquidityDistribution test = new TestLiquidityDistribution();
 
-        try {
-            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
-        } catch (NuBotConfigException ex) {
-            LOG.error(ex.toString());
-        }
+        InitTests.loadConfig(TEST_OPTIONS_PATH);
+
         test.init(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
         test.exec();
@@ -72,11 +69,8 @@ public class TestLiquidityDistribution {
     }
 
     private void init(String exchangeName) {
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
+        InitTests.loadSettings();
 
-        }
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;

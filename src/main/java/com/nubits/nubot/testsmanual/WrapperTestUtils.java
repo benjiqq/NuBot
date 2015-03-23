@@ -326,19 +326,7 @@ public class WrapperTestUtils {
         testClearAllOrders(pair);
     }
 
-    public static void startConnectionCheck()
-    {
-        //Create a TaskManager
-        Global.taskManager = new TaskManager();
-        //Start checking for connection with the exchange
-        Global.taskManager.getCheckConnectionTask().start();
-        //Wait a couple of seconds for the connectionThread to get live
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            LOG.error(ex.toString());
-        }
-    }
+
 
     public static void configureExchange(String exchangeName) throws NuBotConfigException {
 
