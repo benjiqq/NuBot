@@ -84,8 +84,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private boolean isFirstTimeExecution = true;
 
-    private String wallshiftsFilePath = Global.logsFolders + "/" + "wall_shifts.csv";
-    private String wallshiftsFilePathJson = Global.logsFolders + "/" + "wall_shifts.json";
+    private String wallshiftsFilePath = Global.sessionLogFolders + "/" + "wall_shifts.csv";
+    private String wallshiftsFilePathJson = Global.sessionLogFolders + "/" + "wall_shifts.json";
 
     private String emailHistory = "";
 

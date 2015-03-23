@@ -90,7 +90,7 @@ public class MainLaunch {
                 LOG.info("directory:");
                 currentLogfoldername = file.getName();
                 LOG.info(currentLogfoldername);
-                Global.logsFolders = "logs" + "/" + "current" + "/" + currentLogfoldername;
+                Global.sessionLogFolders = "logs" + "/" + "current" + "/" + currentLogfoldername;
             }
         }
 
