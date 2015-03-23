@@ -86,7 +86,7 @@ public abstract class NuBotBase {
         //done over logback.xml
 
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
-        //System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     }
 
     protected void setupSSL() {
