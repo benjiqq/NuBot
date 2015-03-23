@@ -28,7 +28,7 @@ import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
-import functions.TestGlobal;
+import global.TestGlobal;
 import junit.framework.TestCase;
 import org.junit.Test;
 

@@ -27,11 +27,12 @@ import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
-import functions.TestGlobal;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import global.TestGlobal;
+
 
 import java.io.IOException;
 import java.util.ArrayList;

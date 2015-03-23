@@ -26,7 +26,7 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.utils.Utils;
-import functions.TestGlobal;
+import global.TestGlobal;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -108,12 +108,6 @@ public class TestExchangePoloniex extends TestCase {
             } catch (Exception e) {
                 assertTrue(false);
             }
-            //Balance balance = (Balance) o;
-
-            //LOG.info(balance.toStringSep());
-
-            //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
-            //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);
 
         } else {
             assertTrue(false);
@@ -199,5 +193,7 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(orderList2.size() == 0);
 
     }
+
+
 }
 
