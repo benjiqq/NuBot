@@ -58,7 +58,7 @@ public class TestNotifications {
         String email = "desrever.nu@gmail.com";
         MailNotifications.send(email, "Test Title", "Test Message");
         MailNotifications.sendCritical(email, "Test Critical Title", "Test critical message");
-        //USES RED FOR CRITICAL, ANYTHING ELSE FOR STANDARD
+        //USES RED FOR CRITICAL, SPECIFY FOR OTHERS
         HipChatNotifications.sendMessageCritical("Critical notification test");
         HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN);
 
