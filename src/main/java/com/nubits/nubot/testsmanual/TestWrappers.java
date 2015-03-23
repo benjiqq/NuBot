@@ -132,10 +132,6 @@ public class TestWrappers {
     }
 
     public static void init() {
-        //init logging when testing
-
-
-
         try {
             LOG.info("install keystore");
             Utils.installKeystore(false);
