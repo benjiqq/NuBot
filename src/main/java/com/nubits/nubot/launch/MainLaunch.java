@@ -21,6 +21,7 @@ package com.nubits.nubot.launch;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
@@ -81,7 +82,7 @@ public class MainLaunch {
 
         String wdir = System.getProperty("user.dir");
 
-        File f = new File(wdir + "/" + "logs/current"); // current directory
+        File f = new File(wdir + "/" + Settings.LOGS_PATH+Settings.CURRENT_LOGS_FOLDER); // current directory
 
         File[] files = f.listFiles();
         String currentLogfoldername = "";
@@ -90,7 +91,7 @@ public class MainLaunch {
                 LOG.info("directory:");
                 currentLogfoldername = file.getName();
                 LOG.info(currentLogfoldername);
-                Global.sessionLogFolders = "logs" + "/" + "current" + "/" + currentLogfoldername;
+                Global.sessionLogFolders = Settings.LOGS_PATH+Settings.CURRENT_LOGS_FOLDER + currentLogfoldername;
             }
         }
 
