@@ -64,7 +64,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         LOG.info("adapt orders");
 
         if (Global.options.isMultipleCustodians()) {
-            LOG.info("multiple custodians do not need strategy exec");
+            LOG.trace("multiple custodians do not need strategy exec");
             return;
         }
 
