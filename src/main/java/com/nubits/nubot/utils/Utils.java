@@ -20,6 +20,7 @@ package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
 
@@ -242,6 +243,7 @@ public class Utils {
         return toRet;
     }
 
+    /*
     public static void loadProperties(String filename) throws IOException {
         Global.settings = new Properties();
         InputStream input = null;
@@ -263,8 +265,8 @@ public class Utils {
                 }
             }
         }
-
     }
+    */
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
@@ -411,9 +413,6 @@ public class Utils {
             String viaclasspath = filePathClasspathFile(keystorefile);
             LOG.info("### absolute filepath of keystore " + viaclasspath);
 
-            String kpass = Global.settings.getProperty("keystore_pass");
-            LOG.info("password " + kpass);
-
             String wdir = System.getProperty("user.dir");
             String wdirpath = wdir + "/" + keystorefile;
 
@@ -424,7 +423,7 @@ public class Utils {
                 path = viaclasspath;
 
             System.setProperty("javax.net.ssl.trustStore", path);
-            System.setProperty("javax.net.ssl.trustStorePassword", kpass);
+            System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }
 
@@ -496,60 +495,6 @@ public class Utils {
         return "";
     }
 
-
-
-   /* private static void setSSLFactories(String ksfile, String keyStorePassword) throws Exception
-    {
-        LOG.info("set ssl" + ksfile + " " + keyStorePassword);
-
-        InputStream keyStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(ksfile);
-        //InputStream truststoreInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(tspath);
-
-        //keystoreInput.close();
-        //truststoreInput.close();
-
-        // Get keyStore
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        // if your store is password protected then declare it (it can be null however)
-        char[] keyPassword = keyStorePassword.toCharArray();
-
-        // load the stream to your store
-        keyStore.load(keyStream, keyPassword);
-
-        // initialize a trust manager factory with the trusted store
-        KeyManagerFactory keyFactory =
-                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyFactory.init(keyStore, keyPassword);
-
-        // get the trust managers from the factory
-        KeyManager[] keyManagers = keyFactory.getKeyManagers();
-
-        // Now get trustStore
-        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        // if your store is password protected then declare it (it can be null however)
-        //char[] trustPassword = password.toCharArray();
-
-        // load the stream to your store
-        //trustStore.load(trustStream, null);
-
-        // initialize a trust manager factory with the trusted store
-        TrustManagerFactory trustFactory =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustFactory.init(trustStore);
-
-        // get the trust managers from the factory
-        TrustManager[] trustManagers = trustFactory.getTrustManagers();
-
-        // initialize an ssl context to use these managers and set as default
-        SSLContext currentsslContext = SSLContext.getInstance("SSL");
-        currentsslContext.init(keyManagers, trustManagers, null);
-
-        SSLContext.setDefault(currentsslContext);
-
-        keyStream.close();
-    }*/
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];

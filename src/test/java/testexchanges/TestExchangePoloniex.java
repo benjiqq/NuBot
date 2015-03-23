@@ -81,11 +81,6 @@ public class TestExchangePoloniex extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
 
@@ -123,11 +118,6 @@ public class TestExchangePoloniex extends TestCase {
 
         } catch (NuBotConfigException e) {
             e.printStackTrace();
-        }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
         }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);

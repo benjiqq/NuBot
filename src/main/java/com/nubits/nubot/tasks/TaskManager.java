@@ -20,7 +20,7 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.options.NuBotAdminSettings;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class TaskManager {
 
     public void setNudTask() {
         this.checkNudTask = new BotTask(
-                new CheckNudTask(), NuBotAdminSettings.CHECK_NUD_INTERVAL, "checkNud");
+                new CheckNudTask(), Settings.CHECK_NUD_INTERVAL, "checkNud");
         taskList.add(checkNudTask);
 
     }
@@ -74,31 +74,31 @@ public class TaskManager {
         LOG.info("setting up tasks");
 
         checkConnectionTask = new BotTask(
-                new CheckConnectionTask(), NuBotAdminSettings.CHECK_CONNECTION_INTERVAL, "checkConnection");
+                new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
         taskList.add(checkConnectionTask);
         LOG.info("checkConnectionTask : " + checkConnectionTask);
 
         sendLiquidityTask = new BotTask(
-                new SubmitLiquidityinfoTask(Global.options.verbose), NuBotAdminSettings.SUBMIT_LIQUIDITY_SECONDS, "sendLiquidity");
+                new SubmitLiquidityinfoTask(Global.options.verbose), Settings.SUBMIT_LIQUIDITY_SECONDS, "sendLiquidity");
         taskList.add(sendLiquidityTask);
         LOG.info("sendLiquidityTask : " + sendLiquidityTask);
 
 
         strategyFiatTask = new BotTask(
-                new StrategyPrimaryPegTask(), NuBotAdminSettings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
+                new StrategyPrimaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
         LOG.info("strategyFiatTask : " + sendLiquidityTask);
 
         secondaryPegTask = new BotTask(
-                new StrategySecondaryPegTask(), NuBotAdminSettings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
+                new StrategySecondaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
         LOG.info("secondaryPegTask : " + sendLiquidityTask);
 
         //Select the correct interval
-        int checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL;
+        int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
         if (Global.options.pair.getPaymentCurrency().isFiat() && !Global.swappedPair
                 || Global.options.pair.getOrderCurrency().isFiat() && Global.swappedPair) {
-            checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL_FIAT;
+            checkPriceInterval = Settings.CHECK_PRICE_INTERVAL_FIAT;
         }
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
@@ -106,7 +106,7 @@ public class TaskManager {
         LOG.info("priceTriggerTask : " + sendLiquidityTask);
 
         /*priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
+                new NuPriceMonitorTask(), Settings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(priceMonitorTask);*/
 
         initialized = true;

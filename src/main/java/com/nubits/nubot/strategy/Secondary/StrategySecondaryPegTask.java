@@ -19,8 +19,9 @@
 package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.options.NuBotAdminSettings;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -154,7 +155,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (!Global.options.isMultipleCustodians()) {
             message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getWallchangeThreshold() + " %";
         } else {
-            message += NuBotAdminSettings.RESET_EVERY_MINUTES + " minutes elapsed since last shift";
+            message += Settings.RESET_EVERY_MINUTES + " minutes elapsed since last shift";
         }
         HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
         LOG.warn(message);

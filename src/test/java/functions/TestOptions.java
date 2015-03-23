@@ -43,11 +43,7 @@ public class TestOptions extends TestCase {
 
     @Override
     public void setUp() {
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
     }
 
     @Test

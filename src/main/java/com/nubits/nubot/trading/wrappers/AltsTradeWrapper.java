@@ -18,8 +18,8 @@
 
 package com.nubits.nubot.trading.wrappers;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
@@ -28,7 +28,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -319,7 +319,7 @@ public class AltsTradeWrapper implements TradeInterface {
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.app_name);
+                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
 
                 if (needAuth) {
                     connection.setRequestProperty("Rest-Key", keys.getApiKey());

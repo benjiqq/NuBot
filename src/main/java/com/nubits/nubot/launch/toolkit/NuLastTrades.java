@@ -23,6 +23,7 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -55,17 +56,12 @@ public class NuLastTrades {
     private ApiKeys keys;
 
     public static void main(String[] args) {
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
 
         NuLastTrades app = new NuLastTrades();
 
         String folderName = "NuLastTrades_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        String logsFolder = Settings.LOGS_PATH + folderName;
 
         //Create log dir
         FileSystem.mkdir(logsFolder);

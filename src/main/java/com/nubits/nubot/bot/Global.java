@@ -23,6 +23,7 @@ import com.github.mustachejava.Mustache;
 import com.github.mustachejava.MustacheFactory;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
@@ -43,19 +44,12 @@ public class Global {
 
     final static Logger LOG = LoggerFactory.getLogger(Global.class);
 
-    public final static String app_name = "NuBot";
-
     public static Thread mainThread;
 
     public static NuBotOptions options;
 
     //path of logs in this session
     public static String sessionLogFolders;
-
-    public static String logsFolder = "logs";
-
-
-    public static Properties settings;
 
     public static boolean running = false;
 
@@ -85,7 +79,7 @@ public class Global {
 
         try {
             LOG.trace("read session log");
-            String s = FileUtils.readFileToString(new File(logsFolder  + "/" + "session.log"));
+            String s = FileUtils.readFileToString(new File(Settings.LOGS_PATH  + Settings.CURRENT_SESSION_FILENAME));
             String[] arr = s.split("\n");
             LOG.trace("records found " + arr.length);
             for (int i = 0; i < arr.length; i++) {
@@ -93,7 +87,7 @@ public class Global {
                 LOG.trace("row " + row[0]);
                 if (row[0].contains("session start")) {
                     String started = row[1];
-                    String link = "pastsession" + "/" + Global.sessionLogFolders + "/" + "all.html";
+                    String link = Settings.PAST_LOGS_FOLDER + Global.sessionLogFolders + "/" + Settings.DEFAULT_HTML_LOG_FILENAME;
                     LOG.trace("new session object . link: " + link);
                     scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + started, "" + row[1], link));
                 }
@@ -105,7 +99,7 @@ public class Global {
 
 
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(logsFolder + "/" + "sessions.html")); //System.out);
+            Writer writer = new OutputStreamWriter(new FileOutputStream(Settings.LOGS_PATH + "sessions.html")); //System.out);
             MustacheFactory mf = new DefaultMustacheFactory();
             try {
                 String wdir = System.getProperty("user.dir") + "/" + "templates";
@@ -127,11 +121,11 @@ public class Global {
 
         String wdir = System.getProperty("user.dir");
 
-        File f = new File(wdir + "/" + logsFolder + "/" + "current"); // current directory
+        File f = new File(wdir + "/" + Settings.LOGS_PATH + Settings.CURRENT_LOGS_FOLDER); // current directory
 
         File[] files = f.listFiles();
 
-        File past = new File(wdir + "/" + logsFolder  + "/" + "pastsession/");
+        File past = new File(wdir + "/" + Settings.LOGS_PATH + Settings.PAST_LOGS_FOLDER);
         if (!past.exists()) {
             try {
                 past.mkdir();
@@ -145,8 +139,8 @@ public class Global {
                 String currentLogfoldername = file.getName();
                 LOG.trace(currentLogfoldername);
 
-                File sessionLogDir = new File(Global.sessionLogFolders = logsFolder  + "/" + "current" + "/" + currentLogfoldername);
-                File historyDir = new File(logsFolder  + "/" + "pastsession" + "/" + currentLogfoldername);
+                File sessionLogDir = new File(Global.sessionLogFolders = Settings.LOGS_PATH  + Settings.CURRENT_LOGS_FOLDER + currentLogfoldername);
+                File historyDir = new File(Settings.LOGS_PATH + Settings.PAST_LOGS_FOLDER + currentLogfoldername);
                 LOG.debug("move from: " + sessionLogDir + " >> to: " + historyDir);
                 try {
                     FileUtils.moveDirectory(sessionLogDir, historyDir);

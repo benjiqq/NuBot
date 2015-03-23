@@ -21,6 +21,7 @@ package com.nubits.nubot.utils;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
+import com.nubits.nubot.global.Settings;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,8 +34,7 @@ public class DateUtils {
     private static ILoggerFactory lfac = LoggerFactory.getILoggerFactory();
     private static LoggerContext lctx = (LoggerContext) lfac;
     private static Logger log = lctx.getLogger(DateUtils.class);
-    private static String NAME_OF_CURRENT_APPLICATION = "NuBot";
-    private static String customxml = "./config/custom.xml";
+    private static String customxml = "./config/custom.xml"; //TODO
 
     public static void main(String[] args) {
 
@@ -43,7 +43,7 @@ public class DateUtils {
         lctx.reset(); // override default configuration
         // inject the name of the current application as "application-name"
         // property of the LoggerContext
-        lctx.putProperty("application-name", NAME_OF_CURRENT_APPLICATION);
+        lctx.putProperty("application-name", Settings.APP_NAME);
         try {
             jc.doConfigure(customxml);
         } catch (Exception e) {

@@ -22,6 +22,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
@@ -46,16 +47,11 @@ public class NuCancelOrders {
     public static final String USAGE_STRING = "java -jar NuCancelOrders <apikey> <secretkey> <exchange-name> <pair>";
 
     public static void main(String[] args) {
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
 
         NuCancelOrders app = new NuCancelOrders();
         String folderName = "NuCancelOrders_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        String logsFolder = Settings.LOGS_PATH + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
         if (app.readParams(args)) {
