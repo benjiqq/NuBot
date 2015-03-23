@@ -20,6 +20,7 @@ package functions;
 
 
 import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
@@ -206,6 +207,8 @@ public class TestOptions extends TestCase {
         assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
         assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
         assertTrue(opt.wallchangeThreshold==0.1);
+        assertTrue(opt.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_ALL));
+        assertTrue(opt.sendMails()==true);
         assertTrue(opt.isDualSide()==true);
         assertTrue(opt.isSubmitliquidity()==false);
         assertTrue(opt.isMultipleCustodians()==false);
