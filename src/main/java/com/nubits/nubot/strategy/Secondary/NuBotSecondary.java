@@ -20,6 +20,7 @@ package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
@@ -27,7 +28,6 @@ import com.nubits.nubot.options.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
-import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -99,13 +99,13 @@ public class NuBotSecondary extends NuBotBase {
         //Bot needs to wait for next 3 min window before placing walls
         //set the interval from settings
 
-        int reset_every = NuBotAdminSettings.RESET_EVERY_MINUTES;
+        int reset_every = Settings.RESET_EVERY_MINUTES;
 
         int interval = 1;
         if (Global.options.isMultipleCustodians()) {
             interval = 60 * reset_every;
         } else {
-            interval = NuBotAdminSettings.REFRESH_TIME_SECONDS;
+            interval = Settings.CHECK_PRICE_INTERVAL;
         }
         Global.taskManager.getPriceTriggerTask().setInterval(interval);
 

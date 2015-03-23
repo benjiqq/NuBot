@@ -24,11 +24,30 @@ package com.nubits.nubot.global;
  */
 public class Settings {
 
-    //Misc ------
+    /**
+     * Misc
+     */
     public final static String APP_NAME = "NuBot";
 
-    //Paths and Filenames ------
+    public static final int NTP_TIMEOUT = 10 * 1000; //Timeout for NTP calls
 
+    /**
+     * Timing
+     */
+
+    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // (seconds) Submit liquidity info
+    public static final int EXECUTE_STRATEGY_INTERVAL = 41;  // (seconds)Execute StrategyTask
+    public static final int CHECK_CONNECTION_INTERVAL = 127; //(seconds) Check connection with exchanges API
+    public static final int CHECK_NUD_INTERVAL = 30; //(seconds)Check connection with nudaemon
+
+    public static final int RESET_EVERY_MINUTES = 3; // Used in multi-custodian mode
+    public static final int CHECK_PRICE_INTERVAL = 61;
+    public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000 ; //~ 8 hours, used for fiat only
+
+
+    /**
+     * Paths and filenames
+     */
     //Logging
     public final static String LOGS_PATH = "logs/"; //name of the log folder
     public final static String CURRENT_SESSION_FILENAME = "session.log";

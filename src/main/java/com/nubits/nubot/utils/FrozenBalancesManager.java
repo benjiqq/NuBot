@@ -23,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
@@ -56,7 +57,7 @@ public class FrozenBalancesManager {
     private Amount amountAlreadyThere;
     private Currency toFreezeCurrency;
 
-    public final static String frozenfolder = Global.logsFolder + "/" + "frozen";
+    public final static String frozenfolder = Settings.LOGS_PATH + "frozen";
 
     //Call this on bot startup
     public FrozenBalancesManager(String exchangName, CurrencyPair pair) {

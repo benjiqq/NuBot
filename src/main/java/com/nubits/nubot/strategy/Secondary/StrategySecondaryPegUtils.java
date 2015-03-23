@@ -27,7 +27,6 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.options.NuBotAdminSettings;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -505,10 +504,6 @@ public class StrategySecondaryPegUtils {
 
         // Fix 156 -- reduce this value as excoin API get more responsive
         int WAIT_TIME_FIX_156_EXCOIN = 3500; //ms
-
-        //Compute the waiting time as the strategyInterval + refreshPrice interval + 10 seconds to take down orders
-        int refresh_time_seconds = NuBotAdminSettings.REFRESH_TIME_SECONDS;
-
 
         //Communicate to the priceMonitorTask that a wall shift is in place
         strategy.getPriceMonitorTask().setWallsBeingShifted(true);
