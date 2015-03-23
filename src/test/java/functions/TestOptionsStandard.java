@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import global.TestGlobal;
 
 public class TestOptionsStandard extends TestCase {
 

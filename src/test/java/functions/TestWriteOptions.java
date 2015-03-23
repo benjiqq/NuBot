@@ -25,6 +25,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
+import global.TestGlobal;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.junit.Test;

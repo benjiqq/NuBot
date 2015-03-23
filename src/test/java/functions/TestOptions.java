@@ -23,6 +23,7 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
+import global.TestGlobal;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
