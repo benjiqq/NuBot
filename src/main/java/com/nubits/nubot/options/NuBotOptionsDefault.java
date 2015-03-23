@@ -33,10 +33,6 @@ public class NuBotOptionsDefault {
     //double distanceThreshold = 10;
 
 
-    static {
-        CurrencyList.init();
-    }
-
     public static NuBotOptions defaultFactory() {
 
         NuBotOptions opt = new NuBotOptions();

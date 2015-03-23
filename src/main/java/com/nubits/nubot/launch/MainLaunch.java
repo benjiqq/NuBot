@@ -135,7 +135,6 @@ public class MainLaunch {
             exitWithNotice("" + e);
         }
 
-        CurrencyList.init();
 
         LOG.info("-- new main launched --");
 

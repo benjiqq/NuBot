@@ -76,6 +76,12 @@ public abstract class NuBotBase {
         setupSSL();
 
         setupExchange();
+
+        if (!CurrencyList.BTC.getCode().equals("BTC"))
+            LOG.error("currency file not loaded");
+
+
+
     }
 
     /**
