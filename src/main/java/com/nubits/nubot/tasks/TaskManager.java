@@ -98,7 +98,7 @@ public class TaskManager {
         int checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL;
         if (Global.options.pair.getPaymentCurrency().isFiat() && !Global.swappedPair
                 || Global.options.pair.getOrderCurrency().isFiat() && Global.swappedPair) {
-            checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL_FIAT; 
+            checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL_FIAT;
         }
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
