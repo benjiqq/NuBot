@@ -614,7 +614,9 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
 
 
-            MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
+            if(!Global.options.isMultipleCustodians()) {
+                MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
+            }
         }
     }
 
