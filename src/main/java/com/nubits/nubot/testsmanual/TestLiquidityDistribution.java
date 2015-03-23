@@ -46,7 +46,7 @@ import org.slf4j.Logger;
 public class TestLiquidityDistribution {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLiquidityDistribution.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/poloniex.json";
     private LiquidityDistributionModel ldm;
     private ModelParameters sellParams;
     private ModelParameters buyParams;
@@ -65,7 +65,6 @@ public class TestLiquidityDistribution {
         test.init(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
         test.exec();
-
     }
 
     private void init(String exchangeName) {
