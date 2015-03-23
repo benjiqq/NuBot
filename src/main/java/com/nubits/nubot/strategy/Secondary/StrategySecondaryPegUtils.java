@@ -24,6 +24,7 @@ package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -175,7 +176,7 @@ public class StrategySecondaryPegUtils {
             //Here its time to compute the balance to put apart, if any
             balance = (Amount) balancesResponse.getResponseObject();
             balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
-            oneNBT = Utils.round(1 / Global.conversion, 8);
+            oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
@@ -195,7 +196,7 @@ public class StrategySecondaryPegUtils {
             double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
             LOG.trace("Updated Transaction fee = " + txFeePEGNTB + "%");
 
-            double amount1 = Utils.round(balance.getQuantity() / 2, 8);
+            double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
             //check the calculated amount against the set maximum sell amount set in the options.json file
 
 
@@ -206,7 +207,7 @@ public class StrategySecondaryPegUtils {
 
 
             if (type.equals(Constant.BUY) && !Global.swappedPair) {
-                amount1 = Utils.round(amount1 / price, 8);
+                amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
                 //check the calculated amount against the max buy amount option, if any.
                 if (maxBuy > 0) {
                     if (amount1 > (maxBuy / 2))
@@ -227,7 +228,7 @@ public class StrategySecondaryPegUtils {
                 String typeStr;
                 if (type.equals(Constant.SELL)) {
                     typeStr = Constant.BUY;
-                    amount1 = Utils.round(amount1 / Global.conversion, 8);
+                    amount1 = Utils.round(amount1 / Global.conversion, Settings.DEFAULT_PRECISION);
                     if (Global.options.getMaxSellVolume() > 0) {
                         if (amount1 > maxSell)
                             amount1 = maxSell;
@@ -293,9 +294,9 @@ public class StrategySecondaryPegUtils {
                     if ((type.equals(Constant.BUY) && !Global.swappedPair)
                             || (type.equals(Constant.SELL) && Global.swappedPair)) {
                         //hotfix
-                        amount2 = Utils.round(amount2 - (oneNBT * 0.9), 8); //multiply by .9 to keep it below one NBT
+                        amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
 
-                        amount2 = Utils.round(amount2 / price, 8);
+                        amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
 
                         //check the calculated amount against the max buy amount option, if any.
                         if (maxBuy > 0) {
@@ -395,7 +396,7 @@ public class StrategySecondaryPegUtils {
 
             strategy.setOrdersAndBalancesOK(false);
 
-            double oneNBT = Utils.round(1 / Global.conversion, 8);
+            double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
 
             int activeSellOrders = strategy.getActiveSellOrders();

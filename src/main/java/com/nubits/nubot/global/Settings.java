@@ -31,18 +31,23 @@ public class Settings {
 
     public static final int NTP_TIMEOUT = 10 * 1000; //Timeout for NTP calls
 
+    public static final int DEFAULT_PRECISION = 8 ; //Used to round
+
+    public static final double FORCED_SPREAD = 0.9 ; //[%] Force the a spread to avoid collisions (multi-custodians)
+
     /**
      * Timing
      */
 
-    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // (seconds) Submit liquidity info
-    public static final int EXECUTE_STRATEGY_INTERVAL = 41;  // (seconds)Execute StrategyTask
-    public static final int CHECK_CONNECTION_INTERVAL = 127; //(seconds) Check connection with exchanges API
-    public static final int CHECK_NUD_INTERVAL = 30; //(seconds)Check connection with nudaemon
+    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
+    public static final int EXECUTE_STRATEGY_INTERVAL = 41;  // [seconds)Execute StrategyTask
+    public static final int CHECK_CONNECTION_INTERVAL = 127; //[seconds) Check connection with exchanges API
+    public static final int CHECK_NUD_INTERVAL = 30; //[seconds)Check connection with nudaemon
 
-    public static final int RESET_EVERY_MINUTES = 3; // Used in multi-custodian mode
-    public static final int CHECK_PRICE_INTERVAL = 61;
-    public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000 ; //~ 8 hours, used for fiat only
+    public static final int CHECK_PRICE_INTERVAL = 61; //[seconds]
+    public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000 ; //[seconds] ~ 8 hours, used for fiat only
+
+    public static final int RESET_EVERY_MINUTES = 3; //[minutes] Used in multi-custodian mode
 
 
     /**

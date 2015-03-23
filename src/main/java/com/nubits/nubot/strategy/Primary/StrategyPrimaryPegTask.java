@@ -20,6 +20,7 @@ package com.nubits.nubot.strategy.Primary;
 
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -40,14 +41,7 @@ import org.slf4j.Logger;
 public class StrategyPrimaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategyPrimaryPegTask.class.getName());
-
-    /**
-     * minimum balance required
-     */
-    //double THRESHOLD_MIN_BALANCE = 1;
-
-    private final int precision = 8;
-
+    
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
@@ -603,7 +597,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             //Here its time to compute the balance to put apart, if any
             amount = (Amount) balancesResponse.getResponseObject();
             amount = Global.frozenBalances.removeFrozenAmount(amount, Global.frozenBalances.getFrozenAmount());
-            oneNBT = Utils.round(1 / Global.conversion, precision);
+            oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
 
 
@@ -619,7 +613,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
                 LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
 
-                double amount1 = Utils.round(amount.getQuantity() / 2, precision);
+                double amount1 = Utils.round(amount.getQuantity() / 2, Settings.DEFAULT_PRECISION);
 
                 double maxBuy = Global.options.getMaxBuyVolume();
                 double maxSell = Global.options.getMaxSellVolume();
@@ -640,7 +634,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
-                    amount1 = Utils.round(amount1 / price, precision);
+                    amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
                     //check the calculated amount against the max buy amount option, if any.
                     LOG.info("check the calculated amount against the max buy amount option, if any.");
                     LOG.info("max buy volume " + maxBuy);
@@ -668,9 +662,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 if ((type.equals(Constant.BUY) && !Global.swappedPair)
                         || (type.equals(Constant.SELL) && Global.swappedPair)) {
                     //hotfix
-                    amount2 = Utils.round(amount2 - (oneNBT * 0.9), precision); //multiply by .9 to keep it below one NBT
+                    amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
 
-                    amount2 = Utils.round(amount2 / price, precision);
+                    amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
 
                     //check the calculated amount against the max buy amount option, if any.
                     if (maxBuy > 0) {
@@ -684,7 +678,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 }
 
                 if (type.equals(Constant.BUY)) {
-                    amount2 = Utils.round(amount2 / price, precision);
+                    amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
                 }
 
                 //Prepare the orders

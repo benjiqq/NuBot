@@ -111,7 +111,7 @@ public class NuBotSecondary extends NuBotBase {
 
         if (Global.options.isMultipleCustodians()) {
             //Force the a spread to avoid collisions
-            double forcedSpread = 0.9;
+            double forcedSpread = Settings.FORCED_SPREAD;
             if (Global.options.getSpread() < forcedSpread) {
                 Global.options.setSpread(forcedSpread);
                 LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
