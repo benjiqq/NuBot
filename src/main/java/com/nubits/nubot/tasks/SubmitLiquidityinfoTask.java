@@ -53,9 +53,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private boolean wallsBeingShifted = false;
     private boolean firstOrdersPlaced = false;
 
-    private String outputFile_orders = Global.logsFolders + "/" + "orders_history.csv";
-    private String jsonFile_orders = Global.logsFolders + "/" + "orders_history.json";
-    private String jsonFile_balances = Global.logsFolders + "/" + "balance_history.json";
+    private String outputFile_orders = Global.sessionLogFolders + "/" + "orders_history.csv";
+    private String jsonFile_orders = Global.sessionLogFolders + "/" + "orders_history.json";
+    private String jsonFile_balances = Global.sessionLogFolders + "/" + "balance_history.json";
 
     public SubmitLiquidityinfoTask(boolean verbose) {
 

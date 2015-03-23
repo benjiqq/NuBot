@@ -49,8 +49,11 @@ public class Global {
 
     public static NuBotOptions options;
 
-    //path of logs
-    public static String logsFolders;
+    //path of logs in this session
+    public static String sessionLogFolders;
+
+    public static String logsFolder = "logs";
+
 
     public static Properties settings;
 
@@ -70,7 +73,6 @@ public class Global {
     public static long sessionStarted, sessionStopped;
     public static SessionData sessiondata;
 
-    private static String mainlogfolder = "logs";
 
 
     public static void createSessionOverview() {
@@ -83,7 +85,7 @@ public class Global {
 
         try {
             LOG.trace("read session log");
-            String s = FileUtils.readFileToString(new File(mainlogfolder  + "/" + "session.log"));
+            String s = FileUtils.readFileToString(new File(logsFolder  + "/" + "session.log"));
             String[] arr = s.split("\n");
             LOG.trace("records found " + arr.length);
             for (int i = 0; i < arr.length; i++) {
@@ -91,7 +93,7 @@ public class Global {
                 LOG.trace("row " + row[0]);
                 if (row[0].contains("session start")) {
                     String started = row[1];
-                    String link = "pastsession" + "/" + Global.logsFolders + "/" + "all.html";
+                    String link = "pastsession" + "/" + Global.sessionLogFolders + "/" + "all.html";
                     LOG.trace("new session object . link: " + link);
                     scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + started, "" + row[1], link));
                 }
@@ -103,7 +105,7 @@ public class Global {
 
 
         try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(mainlogfolder + "/" + "sessions.html")); //System.out);
+            Writer writer = new OutputStreamWriter(new FileOutputStream(logsFolder + "/" + "sessions.html")); //System.out);
             MustacheFactory mf = new DefaultMustacheFactory();
             try {
                 String wdir = System.getProperty("user.dir") + "/" + "templates";
@@ -125,11 +127,11 @@ public class Global {
 
         String wdir = System.getProperty("user.dir");
 
-        File f = new File(wdir + "/" + mainlogfolder + "/" + "current"); // current directory
+        File f = new File(wdir + "/" + logsFolder + "/" + "current"); // current directory
 
         File[] files = f.listFiles();
 
-        File past = new File(wdir + "/" + mainlogfolder  + "/" + "pastsession/");
+        File past = new File(wdir + "/" + logsFolder  + "/" + "pastsession/");
         if (!past.exists()) {
             try {
                 past.mkdir();
@@ -143,8 +145,8 @@ public class Global {
                 String currentLogfoldername = file.getName();
                 LOG.trace(currentLogfoldername);
 
-                File sessionLogDir = new File(Global.logsFolders = mainlogfolder  + "/" + "current" + "/" + currentLogfoldername);
-                File historyDir = new File(mainlogfolder  + "/" + "pastsession" + "/" + currentLogfoldername);
+                File sessionLogDir = new File(Global.sessionLogFolders = logsFolder  + "/" + "current" + "/" + currentLogfoldername);
+                File historyDir = new File(logsFolder  + "/" + "pastsession" + "/" + currentLogfoldername);
                 LOG.debug("move from: " + sessionLogDir + " >> to: " + historyDir);
                 try {
                     FileUtils.moveDirectory(sessionLogDir, historyDir);
