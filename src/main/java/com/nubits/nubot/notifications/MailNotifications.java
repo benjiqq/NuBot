@@ -127,7 +127,7 @@ public class MailNotifications {
             sessionId = Global.sessionId;
         }
         String footer = "\n --- \n Message generated at " + now;
-        footer += "from bot with custodial address "
+        footer += " from bot with custodial address "
                 + Global.options.getNubitsAddress() + " , "
                 + "session id = " + sessionId + " "
                 + "on " + Global.options.getExchangeName();
