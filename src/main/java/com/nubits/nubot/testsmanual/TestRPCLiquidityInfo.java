@@ -126,8 +126,6 @@ public class TestRPCLiquidityInfo {
 
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
-
 
         Utils.installKeystore(true);
 

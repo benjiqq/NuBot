@@ -21,7 +21,6 @@ package com.nubits.nubot.testsmanual;
 
 
 import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -29,7 +28,6 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.feedservices.*;
-import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -95,14 +93,8 @@ public class TestSync extends TimerTask {
     }
 
     private static void init() {
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         InitTests.loadKeystore(true);
 

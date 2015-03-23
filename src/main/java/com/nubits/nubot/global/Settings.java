@@ -31,8 +31,6 @@ public class Settings {
      */
     public final static String APP_NAME = "NuBot";
 
-    public static final int NTP_TIMEOUT = 10 * 1000; //Timeout for NTP calls
-
     public static final int DEFAULT_PRECISION = 8 ; //Used to round
 
     public static final double FORCED_SPREAD = 0.9 ; //[%] Force the a spread to avoid collisions (multi-custodians)
@@ -51,6 +49,7 @@ public class Settings {
 
     public static final int RESET_EVERY_MINUTES = 3; //[minutes] Used in multi-custodian mode
 
+    public static final int NTP_TIMEOUT = 10 * 1000; //Timeout for NTP calls
 
     /**
      * Paths and filenames

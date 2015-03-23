@@ -117,11 +117,6 @@ public class TestExchangePeatio extends TestCase {
 
 
 
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
 
         try{
             WrapperTestUtils.configureExchange(opt.getExchangeName());

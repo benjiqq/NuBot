@@ -50,8 +50,6 @@ public class Global {
 
     //path of logs in this session
     public static String sessionLogFolders;
-    
-    public static Properties settings;
 
     public static boolean running = false;
 

@@ -91,11 +91,7 @@ public class TestExchangeAlts extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
 
 
         Global.options = opt;
@@ -166,11 +162,6 @@ public class TestExchangeAlts extends TestCase {
 
         } catch (NuBotConfigException e) {
             e.printStackTrace();
-        }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
         }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);

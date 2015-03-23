@@ -43,14 +43,11 @@ public class TestPriceFeedsBatch extends TestCase {
 
     public void setup(){
         TestPriceFeed test = new TestPriceFeed();
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
+
+
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);

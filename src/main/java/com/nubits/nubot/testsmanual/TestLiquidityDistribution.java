@@ -71,7 +71,6 @@ public class TestLiquidityDistribution {
 
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
 
         execOrders = false;

@@ -113,14 +113,6 @@ public class MainLaunch {
         }
         String configfile = args[0];
 
-
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            exitWithNotice("could not load settings");
-        }
-        LOG.info("settings loaded");
-
         mainLaunch(configfile, false);
 
     }
