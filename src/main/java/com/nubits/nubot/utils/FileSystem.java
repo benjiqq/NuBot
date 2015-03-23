@@ -24,10 +24,6 @@ import java.util.ArrayList;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- * @author desrever
- */
 public class FileSystem {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileSystem.class.getName());

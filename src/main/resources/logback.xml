@@ -39,11 +39,6 @@
 		</encoder>
 		<file>${logfolder}/current/${bySecond}/standard.html</file>
 
-		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-			<fileNamePattern>${LOG_FILE}.%d{yyyyMMdd}_%d{HHmmss,aux}</fileNamePattern>
-			<TimeBasedFileNamingAndTriggeringPolicy class="com.nubits.nubot.utils.StartupTimeBasedTriggeringPolicy" />
-		</rollingPolicy>
-
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<maxFileSize>10MB</maxFileSize>
 		</triggeringPolicy>

@@ -23,7 +23,7 @@ import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 
 /**
- * Created by sammoth on 25/11/14.
+ *
  */
 public class ErrorManager {
     //ErrorManager Class wants to have an Exchange name as a property
