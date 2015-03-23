@@ -33,6 +33,7 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 /**
  * a facade for all exchanges
@@ -90,7 +91,17 @@ public class ExchangeFacade {
     }
 
     public static boolean supportedExchange(String exchange) {
-        return supportedExchanges.contains(exchange);
+
+        Iterator<String> iter = supportedExchanges.iterator();
+        boolean contains = false;
+        while (iter.hasNext()) {
+            String key = iter.next();
+            if (key.equalsIgnoreCase(exchange))
+                return true;
+        }
+
+        return contains;
+
     }
 
 
@@ -132,37 +143,4 @@ public class ExchangeFacade {
         return null;
     }
 
-    /**
-     * simplified balance query. returns -1 on error
-     *
-     * @param currency
-     * @return
-     */
-    public static double getBalance(TradeInterface ti, Currency currency) {
-        ApiResponse balancesResponse = ti.getAvailableBalance(currency);
-        if (balancesResponse.isPositive()) {
-            Object o = balancesResponse.getResponseObject();
-            try {
-                Amount a = (Amount) o;
-                return a.getQuantity();
-            } catch (Exception e) {
-                return -1;
-            }
-        }
-        return -1;
-    }
-
-    public static ArrayList<Order> getOpenOrders(TradeInterface ti) {
-        ApiResponse orderResponse = ti.getActiveOrders();
-        if (orderResponse.isPositive()) {
-            Object o = orderResponse.getResponseObject();
-            try {
-                ArrayList<Order> orders = (ArrayList<Order>) o;
-                return orders;
-            } catch (Exception e) {
-                return new ArrayList<>();
-            }
-        }
-        return null;
-    }
 }
