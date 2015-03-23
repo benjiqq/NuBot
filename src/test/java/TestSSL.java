@@ -38,14 +38,6 @@ public class TestSSL extends TestCase {
     @Test
     public void testPolo() {
 
-        //Load settings
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            //System.exit(0);
-            assertTrue(false);
-        }
-
 
         Utils.installKeystore(false);
 
@@ -58,14 +50,6 @@ public class TestSSL extends TestCase {
 
     @Test
     public void testBitspark() {
-
-        //Load settings
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            //System.exit(0);
-            assertTrue(false);
-        }
 
 
         Utils.installKeystore(false);
@@ -80,14 +64,6 @@ public class TestSSL extends TestCase {
     @Test
     public void testAlts() {
 
-        //Load settings
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            //System.exit(0);
-            assertTrue(false);
-        }
-
 
         Utils.installKeystore(false);
 
@@ -101,15 +77,6 @@ public class TestSSL extends TestCase {
     @Test
     public void testCoinbase() {
 
-        //Load settings
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            //System.exit(0);
-            assertTrue(false);
-        }
-
-
         Utils.installKeystore(false);
 
         String API_BASE_URL = "coinbase.com";
@@ -121,15 +88,6 @@ public class TestSSL extends TestCase {
 
     @Test
     public void testHipchat() {
-
-        //Load settings
-        try {
-            Utils.loadProperties("settings.properties");
-        } catch (IOException e) {
-            //System.exit(0);
-            assertTrue(false);
-        }
-
 
         Utils.installKeystore(false);
 

@@ -26,7 +26,7 @@ import com.nubits.nubot.models.BidAskPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.options.NuBotAdminSettings;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import com.nubits.nubot.utils.FileSystem;
@@ -356,7 +356,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             currentTime = System.currentTimeMillis();
 
 
-            logMessage = "There has been a connection issue for " + NuBotAdminSettings.REFRESH_TIME_SECONDS + " seconds\n"
+            logMessage = "There has been a connection issue for " + Settings.CHECK_PRICE_INTERVAL + " seconds\n"
                     + "Consider restarting the bot if the connection issue persists";
             notification = "";
             notificationColor = MessageColor.YELLOW;
@@ -364,10 +364,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         } else { //otherwise something bad has happened so we shutdown.
             int p = 3;
-            sleepTime = NuBotAdminSettings.REFRESH_TIME_SECONDS * p;
+            sleepTime = Settings.CHECK_PRICE_INTERVAL * p;
 
             logMessage = "The Fetched Exchange rate data has remained outside of the required price band for "
-                    + NuBotAdminSettings.REFRESH_TIME_SECONDS + "seconds.\nThe bot will notify and restart in "
+                    + Settings.CHECK_PRICE_INTERVAL + "seconds.\nThe bot will notify and restart in "
                     + sleepTime + "seconds.";
             notification = "A large price difference was detected at " + Global.exchange.getName()
                     + ".\nThe Last obtained price of " + Objects.toString(lp.getPrice().getQuantity()) + " was outside of "
@@ -430,7 +430,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             //the potential price is within the % boundary.
             //add it to the MA-Queue to keep the moving average moving
             // Only do this if the standard update interval hasn't passed
-            if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < NuBotAdminSettings.REFRESH_TIME_SECONDS) {
+            if (((System.currentTimeMillis() - (currentTime + REFRESH_OFFSET)) / 1000L) < Settings.CHECK_PRICE_INTERVAL) {
                 updateMovingAverageQueue(current);
             } else {
                 //If we get here, we haven't had a price within % of the average for as long as a standard update period

@@ -54,11 +54,9 @@ public class TestPriceFeed {
     }
 
     private void init() {
-        InitTests.loadSettings();
 
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
         LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);

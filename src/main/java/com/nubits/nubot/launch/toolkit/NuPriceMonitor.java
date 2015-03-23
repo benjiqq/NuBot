@@ -20,6 +20,7 @@ package com.nubits.nubot.launch.toolkit;
 
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
@@ -53,15 +54,9 @@ public class NuPriceMonitor {
 
     public static void main(String[] args) {
         mainThread = Thread.currentThread();
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
 
         String folderName = "NuPriceMonitor_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        String logsFolder = Settings.LOGS_PATH + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
 

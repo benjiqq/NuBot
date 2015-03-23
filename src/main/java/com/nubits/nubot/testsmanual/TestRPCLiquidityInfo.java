@@ -58,8 +58,6 @@ public class TestRPCLiquidityInfo {
             buy = Double.parseDouble(args[4]);
         }
 
-        InitTests.loadSettings();
-
         Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
                 user, pass, true, true,
                 custodian, CurrencyList.NBT_BTC , "");
@@ -128,8 +126,6 @@ public class TestRPCLiquidityInfo {
 
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
-
 
         Utils.installKeystore(true);
 

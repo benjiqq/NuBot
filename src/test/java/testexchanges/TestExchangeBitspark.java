@@ -91,11 +91,6 @@ public class TestExchangeBitspark extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
 
         try{
             WrapperTestUtils.configureExchange(opt.getExchangeName());
@@ -157,11 +152,7 @@ public class TestExchangeBitspark extends TestCase {
         } catch (NuBotConfigException e) {
             e.printStackTrace();
         }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
 
         try{
             WrapperTestUtils.configureExchange(opt.getExchangeName());

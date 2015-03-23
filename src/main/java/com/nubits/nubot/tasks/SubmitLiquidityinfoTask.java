@@ -21,6 +21,7 @@ package com.nubits.nubot.tasks;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.PairBalance;
@@ -53,9 +54,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private boolean wallsBeingShifted = false;
     private boolean firstOrdersPlaced = false;
 
-    private String outputFile_orders = Global.sessionLogFolders + "/" + "orders_history.csv";
-    private String jsonFile_orders = Global.sessionLogFolders + "/" + "orders_history.json";
-    private String jsonFile_balances = Global.sessionLogFolders + "/" + "balance_history.json";
+    private String outputFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME +".csv";
+    private String jsonFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME + ".json";
+    private String jsonFile_balances = Global.sessionLogFolders + "/" + Settings.BALANCES_FILEAME + ".json";
 
     public SubmitLiquidityinfoTask(boolean verbose) {
 

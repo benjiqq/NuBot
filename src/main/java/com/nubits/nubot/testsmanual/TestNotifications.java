@@ -45,7 +45,6 @@ public class TestNotifications {
 
     public static void main(String[] a) {
 
-        InitTests.loadSettings();
         InitTests.loadConfig(TEST_OPTIONS_PATH);
         InitTests.loadKeystore(false);
 
