@@ -119,7 +119,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             if (isFirstOrdersPlaced()) {
                 String response1 = reportTier1(); //active orders
                 String response2 = reportTier2(); //balance
-                LOG.info(response1 + "\n" + response2);
+                LOG.info("RPC Response : " + response1 + "\n" + response2);
             } else {
                 LOG.warn("Liquidity is not being sent : orders are not yet initialized");
 
