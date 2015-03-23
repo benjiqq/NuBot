@@ -45,22 +45,40 @@ public class TestNotifications {
 
     public static void main(String[] a) {
 
+        //Load settings
+        try{
+            Utils.loadProperties("settings.properties");
+        }catch(IOException e){
+            System.out.println("can't load settings");
+            System.exit(0);
+        }
+
+
         //Load config
         try {
             Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
             LOG.info("using key: " + Global.options.getApiKey());
             LOG.info("config exchange " + Global.options.getExchangeName());
-
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
 
+        //Load keystore
+        try {
+            LOG.info("install keystore");
+            Utils.installKeystore(false);
+        } catch (Exception ex) {
+            LOG.error(ex.toString());
+        }
+
+        //Send email notifications
         String email = "desrever.nu@gmail.com";
         MailNotifications.send(email, "Test Title", "Test Message");
         MailNotifications.sendCritical(email, "Test Critical Title", "Test critical message");
-        //USES RED FOR CRITICAL, SPECIFY FOR OTHERS
-        HipChatNotifications.sendMessageCritical("Critical notification test");
-        HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN);
+
+        //Send hipchat notifications
+        HipChatNotifications.sendMessageCritical("Critical notification test"); //will result in red
+        HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN); //chose color at will
 
     }
 }
