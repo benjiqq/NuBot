@@ -112,7 +112,28 @@ public class TestSSL extends TestCase {
 
         Utils.installKeystore(false);
 
-        String API_BASE_URL = "www.coinbase.com";
+        String API_BASE_URL = "coinbase.com";
+
+        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        assertTrue(success);
+
+    }
+
+    @Test
+    public void testHipchat() {
+
+        //Load settings
+        try {
+            Utils.loadProperties("settings.properties");
+        } catch (IOException e) {
+            //System.exit(0);
+            assertTrue(false);
+        }
+
+
+        Utils.installKeystore(false);
+
+        String API_BASE_URL = "hipchat.com";
 
         boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
