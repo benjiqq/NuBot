@@ -17,19 +17,12 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.pricefeeds.feedservices.BitfinexPriceFeed;
-import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
-import com.nubits.nubot.utils.SSLConnectionTest;
+import com.nubits.nubot.testsmanual.SSLConnectionTest;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 
 public class TestSSL extends TestCase {

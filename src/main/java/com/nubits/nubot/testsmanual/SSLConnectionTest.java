@@ -16,7 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.nubits.nubot.utils;
+package com.nubits.nubot.testsmanual;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
