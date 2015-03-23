@@ -19,6 +19,7 @@
 package functions;
 
 
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
@@ -189,6 +190,36 @@ public class TestOptions extends TestCase {
         }
 
         assertTrue(!catched);
+
+        assertTrue(opt.getExchangeName().equals("Peatio"));
+        assertTrue(opt.getApiKey().equals("testapikey"));
+        assertTrue(opt.getApiSecret().equals("testapisecret"));
+        assertTrue(opt.getTxFee() == 0.2);
+        assertTrue(opt.getPair().getPaymentCurrency().equals(CurrencyList.BTC));
+        assertTrue(opt.getPair().getOrderCurrency().equals(CurrencyList.NBT));
+        assertTrue(opt.nubitAddress.equals("xxx"));
+        assertTrue(opt.nudIp.equals("127.0.0.1"));
+        assertTrue(opt.nudPort == 9091);
+        assertTrue(opt.rpcPass.equals("xxx"));
+        assertTrue(opt.rpcUser.equals("xxx"));
+        assertTrue(opt.mainFeed.equals("btce"));
+        assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
+        assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
+        assertTrue(opt.wallchangeThreshold==0.1);
+        assertTrue(opt.isDualSide()==true);
+        assertTrue(opt.isSubmitliquidity()==false);
+        assertTrue(opt.isMultipleCustodians()==false);
+        assertTrue(opt.isExecuteOrders()==false);
+        assertTrue(opt.isVerbose()==false);
+        assertTrue(opt.isSendHipchat()==true);
+        assertTrue(opt.emergencyTimeout==60);
+        assertTrue(opt.keepProceeds==0);
+        assertTrue(opt.maxBuyVolume==0.0);
+        assertTrue(opt.maxSellVolume==0.0);
+        assertTrue(opt.priceIncrement==0.1);
+        assertTrue(opt.spread==0.0);
+        assertTrue(opt.wallchangeThreshold==0.1);
+
 
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
