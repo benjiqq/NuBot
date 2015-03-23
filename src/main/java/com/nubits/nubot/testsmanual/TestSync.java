@@ -104,12 +104,8 @@ public class TestSync extends TimerTask {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
         String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
-        LOG.info("Set up SSL certificates");
-        try {
-            Utils.installKeystore(true);
-        } catch (Exception ex) {
-            LOG.error(ex.toString());
-        }
+        InitTests.loadKeystore(true);
+
     }
 
     @Override

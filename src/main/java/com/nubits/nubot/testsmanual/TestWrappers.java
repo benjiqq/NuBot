@@ -53,24 +53,18 @@ public class TestWrappers {
     public static void main(String[] args) {
 
         //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-            System.out.println("can't load settings");
-            System.exit(0);
-        }
-        init();
-
+        InitTests.loadSettings();
+        InitTests.loadKeystore(false);
+        InitTests.loadConfig(TEST_OPTIONS_PATH);
         try {
-            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
             LOG.info("using key: " + Global.options.getApiKey());
             LOG.info("config exchange " + Global.options.getExchangeName());
             WrapperTestUtils.configureExchange(Global.options.getExchangeName());
-            WrapperTestUtils.startConnectionCheck();
+            InitTests.startConnectionCheck();
+
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
-
 
         runTests();
     }
@@ -131,12 +125,5 @@ public class TestWrappers {
         System.exit(0);
     }
 
-    public static void init() {
-        try {
-            LOG.info("install keystore");
-            Utils.installKeystore(false);
-        } catch (Exception ex) {
-            LOG.error(ex.toString());
-        }
-    }
+
 }
