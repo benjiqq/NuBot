@@ -94,8 +94,14 @@ public class TaskManager {
         taskList.add(secondaryPegTask);
         LOG.info("secondaryPegTask : " + sendLiquidityTask);
 
+        //Select the correct interval
+        int checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL;
+        if (Global.options.pair.getPaymentCurrency().isFiat() && !Global.swappedPair
+                || Global.options.pair.getOrderCurrency().isFiat() && Global.swappedPair) {
+            checkPriceInterval = NuBotAdminSettings.CHECK_PRICE_INTERVAL_FIAT; 
+        }
         priceTriggerTask = new BotTask(
-                new PriceMonitorTriggerTask(), NuBotAdminSettings.CHECK_PRICE_INTERVAL, "priceTriggerTask");
+                new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
         taskList.add(priceTriggerTask);
         LOG.info("priceTriggerTask : " + sendLiquidityTask);
 

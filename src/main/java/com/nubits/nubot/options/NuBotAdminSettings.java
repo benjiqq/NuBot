@@ -42,6 +42,7 @@ public class NuBotAdminSettings {
     public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
     public static final int CHECK_PRICE_INTERVAL = 61;
+    public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000 ; //∞ 8 hours, used for fiat only
 
     public static final int CHECK_NUD_INTERVAL = 30;
 
