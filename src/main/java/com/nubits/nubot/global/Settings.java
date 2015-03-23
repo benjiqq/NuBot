@@ -18,6 +18,8 @@
 
 package com.nubits.nubot.global;
 
+import com.nubits.nubot.bot.Global;
+
 /**
  * This class contains a list of settings that can be configured by developers
  * Settings are grouped and commented.
@@ -61,9 +63,10 @@ public class Settings {
     public final static String CURRENT_LOGS_FOLDER = "current/";
 
     public final static String DEFAULT_HTML_LOG_FILENAME = "standard-output";    //Change this? Update the logback.xml
-    public final static String VERBOSE_HTML_LOG_FILENAME = "verbose-output";   //Change this? Update the logback.xml
+    public final static String VERBOSE_HTML_LOG_FILENAME = "verbose-output";   //Change this? Update the logback.xml //TODO not being used in the code
 
-
+    public final static String ORDERS_FILENAME  = "orders_history"; //Filename for historical snapshot of active orders
+    public final static String BALANCES_FILEAME = "balance_history"; //Fukebane for historical snapshot of balance
 
 
 }
