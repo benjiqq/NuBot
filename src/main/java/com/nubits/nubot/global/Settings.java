@@ -68,4 +68,5 @@ public class Settings {
     public final static String BALANCES_FILEAME = "balance_history"; //Fukebane for historical snapshot of balance
 
 
+    public static String testconfigdir = "config/myconfig";
 }

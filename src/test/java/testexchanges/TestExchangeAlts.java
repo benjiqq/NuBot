@@ -20,21 +20,19 @@ package testexchanges;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import global.TestGlobal;
 
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -49,7 +47,7 @@ public class TestExchangeAlts extends TestCase {
 
     private static String testconfigFile = "alts.json";
 
-    private static String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
 
     /*static {
         System.setProperty("logback.configurationFile", "allconfig  /testlog.xml");

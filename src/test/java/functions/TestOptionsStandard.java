@@ -19,23 +19,21 @@
 package functions;
 
 
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import global.TestGlobal;
 
 public class TestOptionsStandard extends TestCase {
 
     private static String testconfigFile = "poloniex_standard.json";
-    private static String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
 
     @Override
     public void setUp() {

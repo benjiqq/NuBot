@@ -19,27 +19,25 @@
 package functions;
 
 
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
-import global.TestGlobal;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TestOptions extends TestCase {
 
     private static String testconfigFile = "peatio.json";
-    private static String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -136,7 +134,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadComplete() {
 
-        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
         boolean catched = false;
 
         try {
@@ -153,7 +151,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptions(){
 
-        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
 
         boolean catched = false;
         try {
@@ -175,7 +173,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptionsAll(){
 
-        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
 
         boolean catched = false;
         NuBotOptions opt = null;
@@ -247,7 +245,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testParseFeeds(){
 
-        String testconfig = TestGlobal.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
