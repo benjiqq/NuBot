@@ -397,7 +397,7 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.info("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
+        LOG.debug("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
         return getTxFee();
     }
 
