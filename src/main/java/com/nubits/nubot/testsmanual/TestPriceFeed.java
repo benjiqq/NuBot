@@ -54,7 +54,6 @@ public class TestPriceFeed {
     }
 
     private void init() {
-        InitTests.loadSettings();
 
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";

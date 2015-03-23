@@ -58,8 +58,6 @@ public class TestRPCLiquidityInfo {
             buy = Double.parseDouble(args[4]);
         }
 
-        InitTests.loadSettings();
-
         Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
                 user, pass, true, true,
                 custodian, CurrencyList.NBT_BTC , "");

@@ -68,7 +68,6 @@ public class TestLiquidityDistribution {
     }
 
     private void init(String exchangeName) {
-        InitTests.loadSettings();
 
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";

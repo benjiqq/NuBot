@@ -53,7 +53,6 @@ public class TestWrappers {
     public static void main(String[] args) {
 
         //Load settings
-        InitTests.loadSettings();
         InitTests.loadKeystore(false);
         InitTests.loadConfig(TEST_OPTIONS_PATH);
         try {

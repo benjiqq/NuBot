@@ -49,17 +49,6 @@ public class InitTests {
         }
     }
 
-    public static void loadSettings()
-    {
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-            System.out.println("can't load settings");
-            System.exit(0);
-        }
-    }
-
     public static void loadKeystore(boolean trustAll)
     {
         //Load keystore
