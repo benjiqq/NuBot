@@ -85,11 +85,8 @@ public abstract class NuBotBase {
         //Setting up log folder for this session
         //done over logback.xml
 
-        //String folderName = "NuBot_" + System.currentTimeMillis() + "_" + Global.options.getExchangeName() + "_" + Global.options.getPair().toString().toUpperCase() + "/";
-        //Global.logsFolders = "logs" + "/" + folderName;
-
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
-        System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+        //System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
     }
 
     protected void setupSSL() {
@@ -277,7 +274,10 @@ public abstract class NuBotBase {
     }
 
     protected void notifyOnline() {
-        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + Global.options.getExchangeName() + " pair (" + Global.options.getPair().toStringSep() + ")";
+        String exc = Global.options.getExchangeName();
+        String p = Global.options.getPair().toStringSep();
+        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc  + " pair (" + p + ")";
+        LOG.info("notify online " + msg);
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
