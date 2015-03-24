@@ -25,6 +25,5 @@
   "executeorders":true,
   "verbose":false,
   "hipchat":false,
-  "submitliquidity":false,
-  "secondarypeg": false
+  "submitliquidity":false
 }

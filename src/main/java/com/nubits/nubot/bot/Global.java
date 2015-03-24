@@ -117,7 +117,7 @@ public class Global {
 
                 LOG.info("Bot shutting down..");
 
-                String additionalInfo = "after "+ Utils.getBotUptime()+ " uptime on"
+                String additionalInfo = "after "+ Utils.getBotUptime()+ " uptime on "
                         + Global.options.getExchangeName() + " ["
                         + Global.options.getPair().toStringSep()+"]";
 
