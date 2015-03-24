@@ -18,30 +18,35 @@
 
 package com.nubits.nubot.testsmanual;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.FileSystem;
-import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
+import java.io.File;
+import java.net.URL;
 
 
 public class TestWrappers {
 
+    //define Logging by using predefined Settings which points to an XML
     static {
-        System.setProperty("logback.configurationFile", "allconfig/testlog.xml");
+        String wdir = System.getProperty("user.dir");
+        File f = new File(wdir + Settings.TEST_LOGXML);
+        if (f.exists())
+            System.setProperty("logback.configurationFile", f.getAbsolutePath());
+
     }
 
 
     private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
+
     /**
      * Configure tests
      */
@@ -51,9 +56,6 @@ public class TestWrappers {
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
-
-        //Set the logging directory
-        Global.sessionLogFolders = Utils.generateLogPath(TestWrappers.class.getSimpleName());
 
         //Load settings
         InitTests.loadKeystore(false);
@@ -67,6 +69,10 @@ public class TestWrappers {
         } catch (NuBotConfigException ex) {
             LOG.error(ex.toString());
         }
+
+        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger)LOG).getLoggerContext();
+        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
+        LOG.debug("Logback used '{}' as the configuration file.", mainURL);
 
         runTests();
     }

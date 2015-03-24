@@ -18,6 +18,8 @@
 
 package com.nubits.nubot.bot;
 
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
@@ -38,6 +40,7 @@ import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -83,8 +86,11 @@ public abstract class NuBotBase {
      * setup logging
      */
     protected void setupLog() {
-        //Setting up log folder for this session
-        //done over logback.xml
+
+        //for debug purposes: determine the logback.xml file used
+        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger)LOG).getLoggerContext();
+        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
+        LOG.debug("Logback used '{}' as the configuration file.", mainURL);
 
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
