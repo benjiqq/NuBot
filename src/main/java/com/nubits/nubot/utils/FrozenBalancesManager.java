@@ -57,7 +57,7 @@ public class FrozenBalancesManager {
     private Amount amountAlreadyThere;
     private Currency toFreezeCurrency;
 
-    public final static String frozenfolder = Settings.LOGS_PATH + "frozen";
+    public final static String frozenfolder = Settings.FROZEN_PATH;
 
     //Call this on bot startup
     public FrozenBalancesManager(String exchangName, CurrencyPair pair) {

@@ -58,6 +58,8 @@ public class Settings {
     public final static String LOGS_PATH = "logs/"; //name of the log folder
     public final static String CURRENT_SESSION_FILENAME = "session.log";
 
+    public final static String FROZEN_PATH = "frozen/";
+
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
 

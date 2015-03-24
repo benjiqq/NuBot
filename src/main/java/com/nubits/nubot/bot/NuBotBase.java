@@ -188,11 +188,6 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-
-        //TODO: opt should be passed in constructor, not set in global
-
-        //TODO refactor so we can test validity here again
-
         LOG.debug("----- new session -----");
 
         LOG.info("Setting up NuBot version : " + Utils.versionName());
