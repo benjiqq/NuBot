@@ -22,19 +22,15 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
-
-import org.slf4j.LoggerFactory;
+import com.nubits.nubot.strategy.Primary.NuBotSimple;
+import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.List;
@@ -56,16 +52,10 @@ public class MainLaunch {
 
     private static boolean runui = false;
 
-    //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
+    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
 
-    /**
-     * Start the NuBot. start if config is valid and other instance is running
-     *
-     * @param args a list of valid arguments
-     */
-    public static void main(String args[]) {
 
+    private static void sessionLogging(){
         //log info
         LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
@@ -95,25 +85,40 @@ public class MainLaunch {
             }
         }
 
+        sessionLOG.debug("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
+    }
+    /**
+     * Start the NuBot. start if config is valid and other instance is running
+     *
+     * @param args a list of valid arguments
+     */
+    public static void main(String args[]) {
+
         Global.sessionStarted = System.currentTimeMillis();
 
-        sessionLOG.debug("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
-
-        LOG.trace("test logging level: trace");
-        LOG.debug("test logging level: debug");
-        LOG.info("test logging level: info");
-        LOG.error("test logging level: error");
-        LOG.warn("test logging level: warn");
-
+        sessionLogging();
 
         LOG.debug("main. with args " + args.length);
 
-        if (args.length != 1) {
+        if (args.length != 2) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
+
+        if (args.length == 2) {
+            LOG.info("args0 " + args[0]);
+            LOG.info("args1 " + args[1]);
+
+            try {
+                runui = args[1].equals("runui");
+            } catch (Exception e) {
+                exitWithNotice("can't parse runui flag: run nubot with \n" + USAGE_STRING);
+            }
+        }
+
         String configfile = args[0];
 
-        mainLaunch(configfile, false);
+
+        mainLaunch(configfile, runui);
 
     }
 
