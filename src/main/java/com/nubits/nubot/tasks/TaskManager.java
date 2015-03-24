@@ -122,13 +122,13 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        LOG.info("\nStopping all tasks : -- ");
+        LOG.info("\nStopping all tasks... ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
             BotTask bt = taskList.get(i);
 
-            LOG.info("Shutting down " + bt.getName());
+            LOG.debug("Shutting down " + bt.getName());
             try {
                 bt.getTimer().cancel();
                 bt.getTimer().purge();

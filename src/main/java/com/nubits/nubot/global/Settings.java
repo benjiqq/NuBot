@@ -24,6 +24,7 @@ import com.nubits.nubot.bot.Global;
  * This class contains a list of settings that can be configured by developers
  * Settings are grouped and commented.
  */
+
 public class Settings {
 
     /**
@@ -57,9 +58,7 @@ public class Settings {
     //Logging
     public final static String LOGS_PATH = "logs/"; //name of the log folder
 
-    public final static String CURRENT_SESSION_FILENAME = "session.log"; //TODO unused?
-
-    public final static String FROZEN_PATH = "frozen/";
+    public final static String FROZEN_FUNDS_PATH =   "frozen-funds/"; //folder containing resources needed at runtime
 
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
