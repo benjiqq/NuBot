@@ -37,7 +37,7 @@ import java.nio.file.Paths;
 public class TestOptions extends TestCase {
 
     private static String testconfigFile = "peatio.json";
-    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -134,7 +134,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadComplete() {
 
-        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
         boolean catched = false;
 
         try {
@@ -151,7 +151,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptions(){
 
-        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
         boolean catched = false;
         try {
@@ -173,7 +173,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testLoadOptionsAll(){
 
-        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
         boolean catched = false;
         NuBotOptions opt = null;
@@ -245,7 +245,7 @@ public class TestOptions extends TestCase {
     @Test
     public void testParseFeeds(){
 
-        String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+        String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);

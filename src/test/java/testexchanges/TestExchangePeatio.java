@@ -41,7 +41,7 @@ public class TestExchangePeatio extends TestCase {
 
 
     private static String testconfigFile = "peatio.json";
-    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
     @Test
     public void testPing() {

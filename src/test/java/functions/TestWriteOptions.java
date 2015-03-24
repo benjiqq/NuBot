@@ -38,9 +38,9 @@ public class TestWriteOptions extends TestCase {
 
     private static String testOutconfigFile = "testout.json";
 
-    private static String testconfig = Settings.testconfigdir + "/" + testOutconfigFile;
+    private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testOutconfigFile;
     private static String testconfigFile = "peatio.json";
-    private static String testinconfig = Settings.testconfigdir + "/" + testconfigFile;
+    private static String testinconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
     @Override
     public void setUp() {
@@ -80,7 +80,7 @@ public class TestWriteOptions extends TestCase {
         try {
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File(Settings.testconfigdir + "/" + testconfigFile + "_0.bak");
+            newbak = new File(Settings.TESTS_CONFIG_PATH + "/" + testconfigFile + "_0.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
@@ -92,7 +92,7 @@ public class TestWriteOptions extends TestCase {
 
             success = SaveOptions.backupOptions(testinconfig);
             assertTrue(success);
-            newbak = new File(Settings.testconfigdir + "/" + testconfigFile + "_1.bak");
+            newbak = new File(Settings.TESTS_CONFIG_PATH + "/" + testconfigFile + "_1.bak");
             assertTrue(newbak.exists());
         } catch (IOException e) {
 
@@ -112,7 +112,7 @@ public class TestWriteOptions extends TestCase {
         Currency c = Currency.createCurrency("NBT");
         Currency usd = Currency.createCurrency("USD");
         opt.setPair(new CurrencyPair(c, usd));
-        String testout = Settings.testconfigdir + "/"  + "test_out.json";
+        String testout = Settings.TESTS_CONFIG_PATH + "/"  + "test_out.json";
         SaveOptions.saveOptionsPretty(opt, testout);
         File newout = new File(testout);
         assertTrue(newout.exists());

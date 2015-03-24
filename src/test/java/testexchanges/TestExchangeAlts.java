@@ -47,7 +47,7 @@ public class TestExchangeAlts extends TestCase {
 
     private static String testconfigFile = "alts.json";
 
-    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
     /*static {
         System.setProperty("logback.configurationFile", "allconfig  /testlog.xml");

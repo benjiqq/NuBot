@@ -21,6 +21,7 @@ package com.nubits.nubot.utils;
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
 
@@ -267,6 +268,13 @@ public class Utils {
         }
     }
     */
+
+    public static String generateLogPath(String className)
+    {
+        String toReturn= Settings.TESTS_LOG_PREFIX+"_"+className+"_"+getTimestampLong()+"/";
+        LOG.info("Logging folder :  "+toReturn);
+        return toReturn;
+    }
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;

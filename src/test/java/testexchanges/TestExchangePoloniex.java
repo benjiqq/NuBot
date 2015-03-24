@@ -44,7 +44,7 @@ public class TestExchangePoloniex extends TestCase {
             .getName());
 
     private static String testconfigFile = "poloniex.json";
-    private static String testconfig = Settings.testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
     private TradeInterface ti;
 
