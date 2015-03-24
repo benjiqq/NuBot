@@ -147,7 +147,7 @@ public abstract class NuBotBase {
         //TODO exchange and tradeinterface are circular referenced
         Global.exchange.setTrade(ti);
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
-        Global.exchange.getLiveData().setConnected(true);
+        Global.exchange.getLiveData().setConnected(true); //TODO what is this?
 
         //test setup exchange
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
