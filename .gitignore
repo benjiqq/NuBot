@@ -46,6 +46,5 @@ hs_err_pid*
 #IJ
 .idea
 *.iml
-Test*.xml
 *.ipr
 *.iws
