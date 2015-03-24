@@ -114,6 +114,7 @@ public class ExchangeFacade {
     public static TradeInterface exchangeInterfaceSetup(NuBotOptions opt) {
         Global.exchange = new Exchange(Global.options.getExchangeName());
         ExchangeLiveData liveData = new ExchangeLiveData();
+        liveData.setConnected(true);
         Global.exchange.setLiveData(liveData);
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.exchange.getName(), keys, Global.exchange);
@@ -122,14 +123,23 @@ public class ExchangeFacade {
         return ti;
     }
 
+    private static String capitalizieName(String name){
+        char firstChar = name.charAt(0);
+        char fu = Character.toUpperCase(firstChar);
+        name = fu + name.substring(1,name.length());
+        return name;
+    }
+
     public static TradeInterface getInterfaceByName(String name, ApiKeys keys, Exchange exchange) {
 
         LOG.info("get exchange interface for " + name);
 
-        if (exchangeInterfaces.containsKey(name)) {
+        if (supportedExchange(name)) {
 
             TradeInterface ti = null;
             try {
+
+                name = capitalizieName(name);
 
                 Class<?> wrapperClazz = exchangeInterfaces.get(name);
                 Constructor<?> constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
