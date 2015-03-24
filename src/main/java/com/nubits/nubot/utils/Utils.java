@@ -419,7 +419,7 @@ public class Utils {
             String keystorefile = "nubot_keystore.jks";
 
             String viaclasspath = filePathClasspathFile(keystorefile);
-            LOG.info("### absolute filepath of keystore " + viaclasspath);
+            LOG.info("absolute path of keystore " + viaclasspath);
 
             String wdir = System.getProperty("user.dir");
             String wdirpath = wdir + "/" + keystorefile;
@@ -486,15 +486,15 @@ public class Utils {
      * @return
      */
     public static String filePathClasspathFile(String filename) {
-        LOG.info("filename " + filename);
+        LOG.debug("filename " + filename);
         //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
         URL resource = Utils.class.getClassLoader().getResource(filename);
         File f = null;
         try {
             URI u = resource.toURI();
-            LOG.info("u: " + u);
+            LOG.debug("u: " + u);
             f = Paths.get(u).toFile();
-            LOG.info("f exists " + f.exists());
+            LOG.debug("f exists " + f.exists());
             return f.getAbsolutePath();
         } catch (Exception e) {
 

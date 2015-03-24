@@ -76,23 +76,23 @@ public class TaskManager {
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
         taskList.add(checkConnectionTask);
-        LOG.info("checkConnectionTask : " + checkConnectionTask);
+        LOG.debug("checkConnectionTask : " + checkConnectionTask);
 
         sendLiquidityTask = new BotTask(
                 new SubmitLiquidityinfoTask(Global.options.verbose), Settings.SUBMIT_LIQUIDITY_SECONDS, "sendLiquidity");
         taskList.add(sendLiquidityTask);
-        LOG.info("sendLiquidityTask : " + sendLiquidityTask);
+        LOG.debug("sendLiquidityTask : " + sendLiquidityTask);
 
 
         strategyFiatTask = new BotTask(
                 new StrategyPrimaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
-        LOG.info("strategyFiatTask : " + sendLiquidityTask);
+        LOG.debug("strategyFiatTask : " + sendLiquidityTask);
 
         secondaryPegTask = new BotTask(
                 new StrategySecondaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
-        LOG.info("secondaryPegTask : " + sendLiquidityTask);
+        LOG.debug("secondaryPegTask : " + sendLiquidityTask);
 
         //Select the correct interval
         int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
@@ -103,7 +103,7 @@ public class TaskManager {
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
         taskList.add(priceTriggerTask);
-        LOG.info("priceTriggerTask : " + sendLiquidityTask);
+        LOG.debug("priceTriggerTask : " + sendLiquidityTask);
 
         /*priceMonitorTask = new BotTask(
                 new NuPriceMonitorTask(), Settings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);

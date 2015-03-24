@@ -132,7 +132,7 @@ public class ExchangeFacade {
 
     public static TradeInterface getInterfaceByName(String name, ApiKeys keys, Exchange exchange) {
 
-        LOG.info("get exchange interface for " + name);
+        LOG.debug("get exchange interface for " + name);
 
         if (supportedExchange(name)) {
 
