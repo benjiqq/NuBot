@@ -58,6 +58,8 @@ public class Settings {
     public final static String LOGS_PATH = "logs/"; //name of the log folder
     public final static String CURRENT_SESSION_FILENAME = "session.log";
 
+    public final static String FROZEN_PATH = "frozen/";
+
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
 
@@ -70,4 +72,10 @@ public class Settings {
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
+
+    public static final String TEST_LOGXML = "/config/allconfig/test_logback.xml";
+
+    public static final String TEST_LOGFOLDER = "testlog"; //same as in test_logback.xml
+
+
 }

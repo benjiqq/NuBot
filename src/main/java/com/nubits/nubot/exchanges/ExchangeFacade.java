@@ -114,7 +114,6 @@ public class ExchangeFacade {
     public static TradeInterface exchangeInterfaceSetup(NuBotOptions opt) {
         Global.exchange = new Exchange(Global.options.getExchangeName());
         ExchangeLiveData liveData = new ExchangeLiveData();
-        liveData.setConnected(true);
         Global.exchange.setLiveData(liveData);
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.exchange.getName(), keys, Global.exchange);
