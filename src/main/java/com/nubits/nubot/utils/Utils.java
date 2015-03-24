@@ -534,7 +534,6 @@ public class Utils {
     public static String getBotUptime()
     {
         long upTimeMs = System.currentTimeMillis() - Global.sessionStarted ;
-        System.out.println("\n\n\n\n upTimeMs="+upTimeMs+"\n\n\n\n"); //TODO remove
         String toReturn = "";
         if(getDaysFromMillis(upTimeMs)>2) {
             toReturn = getDaysFromMillis(upTimeMs) + " days";
