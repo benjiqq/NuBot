@@ -499,7 +499,7 @@ public class StrategySecondaryPegUtils {
 
     public boolean shiftWalls() {
 
-        LOG.info("shiftWalls");
+        LOG.debug("Executing shiftWalls()");
 
         boolean success = true;
 

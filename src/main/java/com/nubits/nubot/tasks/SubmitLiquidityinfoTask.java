@@ -138,7 +138,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             }
         } else {
-            LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            if (Global.options.isSubmitliquidity()) {
+                LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            }
         }
     }
 
