@@ -446,7 +446,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         this.lastPrice = lp;
         this.lastPrices = priceList ;
 
-        LOG.debug("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
+        LOG.info("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
         if (isFirstTimeExecution) {
             try {
