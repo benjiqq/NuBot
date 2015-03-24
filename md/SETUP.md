@@ -77,7 +77,7 @@ Its good practice separating configuration parameters in different files. In thi
 * liquidity-info options: define nubits client communication ;
 * price-tracking options: for non-USD pairs, define price feeds ;
 
-The same structure is used in the `config-sample` files provided with the bot. You can edit the provided sample file or create new configuration files.
+The same structure is used in the `sample-config.json` file provided with the bot. You can edit the provided sample file or create a new configuration file.
 
 ---
 #### Market options 
@@ -94,7 +94,7 @@ Parameters :
 
 ** List of accepted names : see exchanges.html
 
-Sample file :
+Sample options:
 ```json
 {
   "exchangename":"bter",
@@ -121,13 +121,13 @@ Parameters :
 | hipchat    | true |  if set to false will disable hipchat notifications | boolean |
 | mailnotifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
 | mailrecipient | / |  the email to which emergency email are sent  |  String  |
-| emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
+| emergencytimeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
 | keepproceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
 | maxsellordervolume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT . 0=no limit; |
 | maxbuyordervolume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD |
 
-Sample file : *misc.json*: 
+Sample options:
 ```json
 {
     "dualside": true,  
@@ -138,11 +138,11 @@ Sample file : *misc.json*:
     "hipchat":true,
     "mailnotifications":false,
     "mailrecipient":"xxx@xxx.xxx",
-    "emergency-timeout":60,
+    "emergencytimeout":60,
     "keepproceeds":0,
     "maxsellordervolume" : 0,
-    "maxbuy-ordervolume" : 0,
-    "priceincrement": 0.1,
+    "maxbuyordervolume" : 0,
+    "priceincrement": 0.1
 }
   
 ```
@@ -162,7 +162,7 @@ Parameters :
 | rpcpass | / |  The RPC password of the Nu daemon    |  String |
 | rpcuser | / |  The RPC username  of the Nu daemon    |    String |
 
-Sample file : *liquidity-info.json*: 
+Sample options : 
 ```json
 {
     "submitliquidity":true,
@@ -193,7 +193,7 @@ Parameters :
 See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master) for an updated list of valid feed names.
 
 
-Sample file : *price-tracking.json*: 
+Sample options:
 ```json
 {
  "wallshiftthreshold": 0.3,
@@ -216,15 +216,10 @@ This is the syntax :
 java -jar NuBot.jar <path/to/options.json>
 ```
 
-Additionally to run the UI
-```
-java -jar NuBot.jar example.json runui
-```
-
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-nohup java -jar NuBot.jar market.json misc.json liquidity-info.json price-tracking.json  &
+nohup java -jar NuBot.jar sample-config.json
 ```
 
 The bot will start and write output in the */logs* folder. 
