@@ -188,10 +188,6 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-        //TODO: opt should be passed in constructor, not set in global
-
-        //TODO refactor so we can test validity here again
-
         LOG.info("----- new session -----");
         LOG.info("Setting up NuBot version : " + Utils.versionName());
 
@@ -199,11 +195,11 @@ public abstract class NuBotBase {
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
+            LOG.info("live trading activated");
             liveTrading = true;
-            //inform user about real trading (he should be informed by now)
         } else {
+            LOG.info("demo mode: no trades will be executed");
             liveTrading = false;
-            //inform user we're in demo mode
         }
 
         Global.options = opt;
@@ -218,7 +214,6 @@ public abstract class NuBotBase {
         if (Global.options.isSubmitliquidity()) {
             NuSetup.setupNuRPCTask();
             NuSetup.startTask();
-           // setupNuRPCTask();
         }
 
 
@@ -243,8 +238,7 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
-                //TODO: handle gracefully
-                exitWithNotice("" + e);
+                exitWithNotice("can't connect to Nu " + e);
             }
         }
 
