@@ -66,7 +66,7 @@ public class BitSparkWrapper implements TradeInterface {
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
     public String checkConnectionUrl;
-    private final String API_BASE_URL = "https://bitspark.io";
+    private final String API_BASE_URL = "https://bitspark.io/";
     private final String API_GET_INFO = "/api/v2/members/me"; //GET
     private final String API_TRADE = "/api/v2/orders"; //POST
     private final String API_ACTIVE_ORDERS = "/api/v2/orders"; //GET
@@ -263,7 +263,13 @@ public class BitSparkWrapper implements TradeInterface {
         double bid = -1;
 
         String ticker_url = API_BASE_URL + getTickerPath(pair);
-        String queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
+        LOG.trace("get content from url " + ticker_url);
+        String queryResult = null;
+        try{
+            queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
+        }catch(Exception e){
+            LOG.error("error getting content from " + ticker_url + " " + e);
+        }
 
         /*Sample result
          * {"at":1398410899,
@@ -282,9 +288,9 @@ public class BitSparkWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) parser.parse(queryResult);
             JSONObject tickerOBJ = (JSONObject) httpAnswerJson.get("ticker");
 
-            last = (Double) tickerOBJ.get("last");
-            ask = (Double) tickerOBJ.get("buy");
-            bid = (Double) tickerOBJ.get("sell");
+            last = new Double((String) tickerOBJ.get("last"));
+            ask = new Double((String) tickerOBJ.get("buy"));
+            bid = new Double((String) tickerOBJ.get("sell"));
 
             ticker.setAsk(ask);
             ticker.setBid(bid);
@@ -805,6 +811,8 @@ public class BitSparkWrapper implements TradeInterface {
                 }
                 response = doc.body().text();
 
+                //possible errors
+                // {"error":{"code":2002,"message":"Failed to create order. Reason: invalid price"}}
                 return response;
             } catch (Exception e) {
                 LOG.error(e.toString());
