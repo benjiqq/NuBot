@@ -87,12 +87,12 @@ public class TaskManager {
         strategyFiatTask = new BotTask(
                 new StrategyPrimaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
-        LOG.info("strategyFiatTask : " + sendLiquidityTask);
+        LOG.info("strategyFiatTask : " + strategyFiatTask);
 
         secondaryPegTask = new BotTask(
                 new StrategySecondaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
-        LOG.info("secondaryPegTask : " + sendLiquidityTask);
+        LOG.info("secondaryPegTask : " + secondaryPegTask);
 
         //Select the correct interval
         int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
@@ -103,7 +103,7 @@ public class TaskManager {
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
         taskList.add(priceTriggerTask);
-        LOG.info("priceTriggerTask : " + sendLiquidityTask);
+        LOG.info("priceTriggerTask : " + priceTriggerTask);
 
         /*priceMonitorTask = new BotTask(
                 new NuPriceMonitorTask(), Settings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
