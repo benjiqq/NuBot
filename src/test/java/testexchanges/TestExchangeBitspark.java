@@ -177,6 +177,7 @@ public class TestExchangeBitspark extends TestCase {
             LOG.info("response " + o);
             try {
                 Ticker t = (Ticker) o;
+                //bitspark bug: prices are 0.0
                 assertTrue(t.getAsk() >= -1);
             } catch (Exception e) {
                 assertTrue(false);

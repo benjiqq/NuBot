@@ -77,11 +77,6 @@ public abstract class NuBotBase {
 
         setupExchange();
 
-        if (!CurrencyList.BTC.getCode().equals("BTC"))
-            LOG.error("currency file not loaded");
-
-
-
     }
 
     /**
@@ -119,8 +114,6 @@ public abstract class NuBotBase {
 
         TradeInterface ti = null;
         try{
-            //Class<?> wrapper = Class.forName("com.nubits.nubot.trading.wrappers."+Global.options.getExchangeName() + "Wrapper");
-            //ti = (TradeInterface )wrapper.newInstance();
             ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
         }catch(Exception e){
             exitWithNotice("exchange unknown");
@@ -195,21 +188,21 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
+
         //TODO: opt should be passed in constructor, not set in global
 
         //TODO refactor so we can test validity here again
 
         LOG.debug("----- new session -----");
+
         LOG.info("Setting up NuBot version : " + Utils.versionName());
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
-            //inform user about real trading (he should be informed by now)
         } else {
+            LOG.info("Trades will not be executed [executetrade:false]");
             liveTrading = false;
-            //inform user we're in demo mode
-            LOG.warn("Orders will not execute since 'executeorders' has been set to 'false'");
         }
 
         Global.options = opt;
@@ -224,7 +217,6 @@ public abstract class NuBotBase {
         if (Global.options.isSubmitliquidity()) {
             NuSetup.setupNuRPCTask();
             NuSetup.startTask();
-           // setupNuRPCTask();
         }
 
 
@@ -249,8 +241,7 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
-                //TODO: handle gracefully
-                exitWithNotice("" + e);
+                exitWithNotice("can't connect to Nu " + e);
             }
         }
 
