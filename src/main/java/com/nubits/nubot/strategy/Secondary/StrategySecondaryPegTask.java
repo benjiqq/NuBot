@@ -62,7 +62,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void adaptOrders() {
 
-        LOG.info("adapt orders");
+        LOG.debug("adapt orders");
 
         if (Global.options.isMultipleCustodians()) {
             LOG.trace("multiple custodians do not need strategy exec");
@@ -70,7 +70,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         if (shiftingWalls) {
-            LOG.info("shifting walls already. orders will not be chage at present");
+            LOG.info("already shifting walls . orders will not be chage at present");
             return;
         }
 

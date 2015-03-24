@@ -103,12 +103,12 @@ public abstract class NuBotBase {
     protected void setupExchange() {
         LOG.info("setup Exchange object");
 
-        LOG.info("Wrap the keys into a new ApiKeys object");
+        LOG.debug("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
 
         Global.exchange = new Exchange(Global.options.getExchangeName());
 
-        LOG.info("Create e ExchangeLiveData object to accommodate liveData from the exchange");
+        LOG.debug("Create e ExchangeLiveData object to accommodate liveData from the exchange");
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
@@ -120,7 +120,7 @@ public abstract class NuBotBase {
         }
 
         //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
-        LOG.info("Create a new TradeInterface object");
+        LOG.debug("Create a new TradeInterface object");
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
 
@@ -189,17 +189,20 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-        LOG.info("----- new session -----");
-        LOG.info("Setting up NuBot version : " + Utils.versionName());
 
-        LOG.info("NuBot logging");
+        //TODO: opt should be passed in constructor, not set in global
+
+        //TODO refactor so we can test validity here again
+
+        LOG.debug("----- new session -----");
+
+        LOG.info("Setting up NuBot version : " + Utils.versionName());
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
-            LOG.info("live trading activated");
             liveTrading = true;
         } else {
-            LOG.info("demo mode: no trades will be executed");
+            LOG.info("Trades will not be executed [executetrade:false]");
             liveTrading = false;
         }
 
@@ -209,7 +212,7 @@ public abstract class NuBotBase {
 
         Global.running = true;
 
-        LOG.info("Create a TaskManager ");
+        LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
 
         if (Global.options.isSubmitliquidity()) {
