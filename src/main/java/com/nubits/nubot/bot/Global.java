@@ -25,9 +25,11 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
+import com.nubits.nubot.utils.Utils;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -163,6 +165,11 @@ public class Global {
             public void run() {
 
                 LOG.info("Bot shutting down..");
+
+                String additionalInfo = Global.options.getExchangeName() + " "
+                        + Global.options.getPair().toStringSep()
+                        + "Uptime: "+ Utils.getBotUptime();
+                HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
 
                 //Try to cancel all orders, if any
                 if (exchange.getTrade() != null && options.getPair() != null) {

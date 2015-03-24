@@ -530,4 +530,30 @@ public class Utils {
 
     }
 
+    //Return the uptime of the bot [hours]
+    public static String getBotUptime()
+    {
+        long upTimeMs= Global.sessionStarted - System.currentTimeMillis();
+
+
+        return getHoursFromMillis(upTimeMs) + "h";
+    }
+
+
+    public static double getHoursFromMillis(long millis)
+    {
+        return round( (getMinutesFromMillis(millis))/60,2);
+    }
+
+
+    public static double getMinutesFromMillis(long millis)
+    {
+        return round( ((millis/1000)/60),2);
+    }
+
+    public static double getDaysFromMillis(long millis)
+    {
+        return round( ((millis/1000)/60)/60,2);
+    }
+
 }

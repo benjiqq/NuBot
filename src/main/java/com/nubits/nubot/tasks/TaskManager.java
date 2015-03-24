@@ -127,17 +127,7 @@ public class TaskManager {
         for (int i = 0; i < taskList.size(); i++) {
 
             BotTask bt = taskList.get(i);
-            if (bt.getName().equals(STRATEGY_FIAT) || bt.getName().equals(STRATEGY_CRYPTO)) {
-                if (!sentNotification) {
-                    String additionalInfo = "";
 
-                    additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
-
-                    //dpn't send mail here for now
-                    HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
-                    sentNotification = true;
-                }
-            }
             LOG.info("Shutting down " + bt.getName());
             try {
                 bt.getTimer().cancel();
