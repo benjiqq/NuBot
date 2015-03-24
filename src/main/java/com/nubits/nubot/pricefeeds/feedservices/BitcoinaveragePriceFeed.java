@@ -68,7 +68,7 @@ public class BitcoinaveragePriceFeed extends AbstractPriceFeed {
             }
         } else {
             double t = (refreshMinTime - (System.currentTimeMillis() - lastRequest));
-            LOG.info("Wait " + t + " ms "
+            LOG.warn("Wait " + t + " ms "
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }
