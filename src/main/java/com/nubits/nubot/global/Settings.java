@@ -65,8 +65,9 @@ public class Settings {
     public final static String VERBOSE_HTML_LOG_FILENAME = "verbose-output";   //Change this? Update the logback.xml //TODO not being used in the code
 
     public final static String ORDERS_FILENAME  = "orders_history"; //Filename for historical snapshot of active orders
-    public final static String BALANCES_FILEAME = "balance_history"; //Fukebane for historical snapshot of balance
+    public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
 
+    public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
-    public static String testconfigdir = "config/myconfig";
+    public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 }

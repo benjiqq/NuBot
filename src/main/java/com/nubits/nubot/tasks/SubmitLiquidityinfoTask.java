@@ -53,6 +53,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private boolean wallsBeingShifted = false;
     private boolean firstOrdersPlaced = false;
+    private boolean firstExecution = true;
 
     private String outputFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME +".csv";
     private String jsonFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME + ".json";
@@ -62,7 +63,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
         this.verbose = verbose;
 
-        initFiles();
     }
 
     private void initFiles() {
@@ -112,7 +112,13 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     @Override
     public void run() {
         LOG.debug("Executing task : CheckOrdersTask ");
+        if(firstExecution)
+        {
+            initFiles();
+            firstExecution = false;
+        }
         checkOrders();
+
     }
 
     private void checkOrders() {

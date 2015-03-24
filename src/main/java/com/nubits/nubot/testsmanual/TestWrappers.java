@@ -52,6 +52,9 @@ public class TestWrappers {
 
     public static void main(String[] args) {
 
+        //Set the logging directory
+        Global.sessionLogFolders = Utils.generateLogPath(TestWrappers.class.getSimpleName());
+
         //Load settings
         InitTests.loadKeystore(false);
         InitTests.loadConfig(TEST_OPTIONS_PATH);
@@ -75,7 +78,7 @@ public class TestWrappers {
         //-------------
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
