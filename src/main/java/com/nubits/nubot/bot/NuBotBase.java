@@ -154,13 +154,6 @@ public abstract class NuBotBase {
         Global.exchange.setTrade(ti);
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
-        //test setup exchange
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-        } else{
-            exitWithNotice("could not query exchange. exchange setup went wrong [ " +  activeOrdersResponse.getError() + " ]");
-        }
-
 
         //For a 0 tx fee market, force a price-offset of 0.1%
         ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
@@ -231,6 +224,13 @@ public abstract class NuBotBase {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
+        }
+
+        //test setup exchange
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+        } else{
+            exitWithNotice("could not query exchange. exchange setup went wrong [ " +  activeOrdersResponse.getError() + " ]");
         }
 
 
