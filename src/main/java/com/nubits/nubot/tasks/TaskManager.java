@@ -122,7 +122,7 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        LOG.info("\nStopping all tasks... ");
+        LOG.info("Stopping all tasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
