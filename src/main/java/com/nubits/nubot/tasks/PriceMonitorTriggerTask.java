@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -71,6 +72,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private final double DISTANCE_TRESHHOLD = 10;
 
     protected LastPrice lastPrice;
+    protected ArrayList<LastPrice> lastPrices;
 
     //options
 
@@ -256,7 +258,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 // I am assuming that mainPrice is the first element of the list
                 if (sanityCheck(priceList, 0)) {
                     //mainPrice is reliable compared to the others
-                    this.updateLastPrice(priceList.get(0));
+                    this.updateLastPrice(priceList.get(0),priceList);
 
                 } else {
                     //mainPrice is not reliable compared to the others
@@ -274,7 +276,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
 
-                        this.updateLastPrice(goodPrice);
+                        this.updateLastPrice(goodPrice,priceList);
                     } else {
                         //None of the source are in accord with others.
                         //Try to send a notification
@@ -289,7 +291,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     double p2 = priceList.get(1).getPrice().getQuantity();
                     if (closeEnough(this.DISTANCE_TRESHHOLD, p1, p2)) {
 
-                        this.updateLastPrice(priceList.get(0));
+                        this.updateLastPrice(priceList.get(0),priceList);
                     } else {
                         //The two values are too unreliable
                         unableToUpdatePrice(priceList);
@@ -308,7 +310,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
 
-                        this.updateLastPrice(goodPrice);
+                        this.updateLastPrice(goodPrice,priceList);
                     } else {
                         //None of the source are in accord with others.
                         //Try to send a notification
@@ -397,7 +399,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         currentTime = System.currentTimeMillis();
     }
 
-    public void updateLastPrice(LastPrice lp) {
+    public void updateLastPrice(LastPrice lp,ArrayList<LastPrice> priceList) {
 
         //We need to fill up the moving average queue so that 30 data points exist.
         if (queueMA.size() < MOVING_AVERAGE_SIZE) {
@@ -442,6 +444,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //carry on with updating the wall price shift
         this.lastPrice = lp;
+        this.lastPrices = priceList ;
 
         LOG.info("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
@@ -551,13 +554,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         JSONArray backup_feeds = new JSONArray();
         JSONObject otherPricesAtThisTime = new JSONObject();
 
-        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
-        for (int i = 0; i < priceList.size(); i++) {
-            LastPrice tempPrice = priceList.get(i);
+        for (int i = 0; i < this.lastPrices.size(); i++) {
+            LastPrice tempPrice = lastPrices.get(i);
             otherPricesAtThisTime.put("feed", tempPrice.getSource());
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
+
         LOG.warn(row);
 
         row += otherPricesAtThisTime.toString() + "\n";
