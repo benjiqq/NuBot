@@ -166,10 +166,11 @@ public class Global {
 
                 LOG.info("Bot shutting down..");
 
-                String additionalInfo = Global.options.getExchangeName() + " "
-                        + Global.options.getPair().toStringSep()
-                        + "Uptime: "+ Utils.getBotUptime();
-                HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
+                String additionalInfo = "after "+ Utils.getBotUptime()+ " uptime on"
+                        + Global.options.getExchangeName() + " ["
+                        + Global.options.getPair().toStringSep()+"]";
+
+                HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 
                 //Try to cancel all orders, if any
                 if (exchange.getTrade() != null && options.getPair() != null) {

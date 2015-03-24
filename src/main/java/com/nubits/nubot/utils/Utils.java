@@ -533,10 +533,19 @@ public class Utils {
     //Return the uptime of the bot [hours]
     public static String getBotUptime()
     {
-        long upTimeMs= Global.sessionStarted - System.currentTimeMillis();
-
-
-        return getHoursFromMillis(upTimeMs) + "h";
+        long upTimeMs = System.currentTimeMillis() - Global.sessionStarted ;
+        System.out.println("\n\n\n\n upTimeMs="+upTimeMs+"\n\n\n\n"); //TODO remove
+        String toReturn = "";
+        if(getDaysFromMillis(upTimeMs)>2) {
+            toReturn = getDaysFromMillis(upTimeMs) + " days";
+        }
+        else if (getHoursFromMillis(upTimeMs)>2) {
+            toReturn = getHoursFromMillis(upTimeMs) + " hours";
+        }
+        else {
+            toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
+        }
+        return toReturn;
     }
 
 
@@ -545,7 +554,6 @@ public class Utils {
         return round( (getMinutesFromMillis(millis))/60,2);
     }
 
-
     public static double getMinutesFromMillis(long millis)
     {
         return round( ((millis/1000)/60),2);
@@ -553,7 +561,7 @@ public class Utils {
 
     public static double getDaysFromMillis(long millis)
     {
-        return round( ((millis/1000)/60)/60,2);
+        return round( (getHoursFromMillis(millis))/24,2);
     }
 
 }
