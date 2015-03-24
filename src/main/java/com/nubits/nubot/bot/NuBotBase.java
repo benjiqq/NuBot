@@ -77,11 +77,6 @@ public abstract class NuBotBase {
 
         setupExchange();
 
-        if (!CurrencyList.BTC.getCode().equals("BTC"))
-            LOG.error("currency file not loaded");
-
-
-
     }
 
     /**
@@ -119,8 +114,6 @@ public abstract class NuBotBase {
 
         TradeInterface ti = null;
         try{
-            //Class<?> wrapper = Class.forName("com.nubits.nubot.trading.wrappers."+Global.options.getExchangeName() + "Wrapper");
-            //ti = (TradeInterface )wrapper.newInstance();
             ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
         }catch(Exception e){
             exitWithNotice("exchange unknown");
