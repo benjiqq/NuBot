@@ -93,8 +93,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
 
-    private boolean first = true;
-
     public void init(){
         File c = new File(this.wallshiftsFilePath);
         if (!c.exists()) {
@@ -129,10 +127,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
     @Override
     public void run() {
 
-        if (first) {
+        if (isFirstTimeExecution) {
             LOG.info("running PriceMonitorTrigger for first time");
             init();
-            first = false;
+            isFirstTimeExecution = false;
         }
 
         //if a problem occurred we sleep for a period using the SLEEP_COUNTER
