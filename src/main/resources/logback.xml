@@ -92,7 +92,7 @@
 
 	</appender>
 
-	<appender name="sessionFile" class="ch.qos.logback.core.rolling.FileAppender">
+	<appender name="sessionFile" class="ch.qos.logback.core.FileAppender">
 
 		<encoder>
 			<pattern>%msg%n

@@ -172,13 +172,6 @@ task NuBotDist(dependsOn: NuBotJar) {
             delete(file)
         }
 
-
-        copy {
-            from "templates/session.mustache"
-            into "${distdir}/templates"
-        }
-
-
         copy {
             from "config/sampleconfig/sample.json"
             into "${distdir}"

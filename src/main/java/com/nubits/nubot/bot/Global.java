@@ -70,55 +70,6 @@ public class Global {
     public static SessionData sessiondata;
 
 
-
-    public static void createSessionOverview() {
-
-        HashMap<String, Object> scopes = new HashMap<String, Object>();
-        scopes.put("name", "NuBot Sessions");
-
-        //scopes.put("sessiondata", new SessionData("Session", Global.sessionId, Global.exchange.getName(), "" + Global.sessionStarted, "" + Global.sessionStopped));
-
-
-        try {
-            LOG.trace("read session log");
-            String s = FileUtils.readFileToString(new File(Settings.LOGS_PATH  + Settings.CURRENT_SESSION_FILENAME));
-            String[] arr = s.split("\n");
-            LOG.trace("records found " + arr.length);
-            for (int i = 0; i < arr.length; i++) {
-                String[] row = arr[i].split(";");
-                LOG.trace("row " + row[0]);
-                if (row[0].contains("session start")) {
-                    String started = row[1];
-                    String link = Settings.PAST_LOGS_FOLDER + Global.sessionLogFolders + "/" + Settings.DEFAULT_HTML_LOG_FILENAME;
-                    LOG.trace("new session object . link: " + link);
-                    scopes.put("sessiondata", new SessionData("Session", "id", "exchange", "" + started, "" + row[1], link));
-                }
-            }
-
-        } catch (Exception e) {
-            LOG.error("can't parse session.log");
-        }
-
-
-        try {
-            Writer writer = new OutputStreamWriter(new FileOutputStream(Settings.LOGS_PATH + "sessions.html")); //System.out);
-            MustacheFactory mf = new DefaultMustacheFactory();
-            try {
-                String wdir = System.getProperty("user.dir") + "/" + "templates";
-                File f = new File(wdir + "/" + "session.mustache");
-                String tmpl = FileUtils.readFileToString(f);
-                Mustache mustache = mf.compile(new StringReader(tmpl), "template");
-                mustache.execute(writer, scopes);
-            } catch (Exception e) {
-
-            }
-
-            writer.flush();
-        } catch (Exception e) {
-
-        }
-    }
-
     public static void moveSessionLogs() {
 
         String wdir = System.getProperty("user.dir");
@@ -222,8 +173,6 @@ public class Global {
                 LOG.info("move session log dir");
                 moveSessionLogs();
 
-                LOG.info("create session overview");
-                createSessionOverview();
 
                 LOG.info("Exit. ");
                 mainThread.interrupt();
