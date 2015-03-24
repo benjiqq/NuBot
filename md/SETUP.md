@@ -86,13 +86,13 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| exchangename     | / | Name of the exchange where the bots operates |  see list of accepted exchange names* |
+| exchangename     | / | Name of the exchange where the bots operates |  **see list of accepted exchange names |
 | apikey      |  / | Custodian's public key to access the exchange . *this param is optional for ccex*     |  String |
 | apisecret |  / |  Custodian's secret key to access the exchange    | String |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | pair |  The currency pair where the bot operates     |   valid currency pair for the specified  eg. "nbt_usd" |
 
-** List of accepted names : see exchanges.html
+See exchanges.md for an updated list of valid exchange names.
 
 Sample options:
 ```json
@@ -205,7 +205,6 @@ Sample options:
 
 ---
 
-You can also merge all the configuration parameter under a unique .json file, although we do not recommend it.
 
 ###3) Run NuBot
 
@@ -213,7 +212,7 @@ You can also merge all the configuration parameter under a unique .json file, al
 Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
 This is the syntax : 
 ```
-java -jar NuBot.jar <path/to/options.json>
+java -jar NuBot.jar sample-config.json
 ```
 
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
