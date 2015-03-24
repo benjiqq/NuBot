@@ -474,7 +474,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             computeNewPrices();
 
         } else {
-            LOG.info("No need to move walls");
+            LOG.debug("No need to move walls");
             currentTime = System.currentTimeMillis();
             if (isWallsBeingShifted() && needToShift) {
                 LOG.warn("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
@@ -486,7 +486,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double currentWallPEGprice = currentWallPEGPrice.getPrice().getQuantity();
         double distance = Math.abs(last.getPrice().getQuantity() - currentWallPEGprice);
         double percentageDistance = Utils.round((distance * 100) / currentWallPEGprice, 4);
-        LOG.info("delta =" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
+        LOG.debug("delta =" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
 
         if (percentageDistance < wallchangeThreshold) {
             return false;
