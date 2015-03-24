@@ -122,14 +122,23 @@ public class ExchangeFacade {
         return ti;
     }
 
+    private static String capitalizieName(String name){
+        char firstChar = name.charAt(0);
+        char fu = Character.toUpperCase(firstChar);
+        name = fu + name.substring(1,name.length());
+        return name;
+    }
+
     public static TradeInterface getInterfaceByName(String name, ApiKeys keys, Exchange exchange) {
 
         LOG.info("get exchange interface for " + name);
 
-        if (exchangeInterfaces.containsKey(name)) {
+        if (supportedExchange(name)) {
 
             TradeInterface ti = null;
             try {
+
+                name = capitalizieName(name);
 
                 Class<?> wrapperClazz = exchangeInterfaces.get(name);
                 Constructor<?> constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
