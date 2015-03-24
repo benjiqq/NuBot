@@ -327,7 +327,7 @@ public class ParseOptions {
                 throw new NuBotConfigException(error);
             }
         }
-        
+
         return options;
     }
 

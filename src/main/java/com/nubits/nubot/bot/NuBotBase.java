@@ -245,8 +245,6 @@ public abstract class NuBotBase {
             }
         }
 
-        LOG.info("Checking bot working mode");
-
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
         LOG.info(Global.options.toStringNoKeys());
