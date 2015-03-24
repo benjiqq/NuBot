@@ -108,6 +108,39 @@ public class TestExchangePoloniex extends TestCase {
     }
 
     @Test
+    public void testGetPrices() {
+        NuBotOptions opt = null;
+        try {
+            opt = ParseOptions
+                    .parseOptionsSingle(testconfig);
+            Global.options = opt;
+        } catch (NuBotConfigException e) {
+            e.printStackTrace();
+        }
+
+        ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
+
+        CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
+        ApiResponse priceResponse = ti.getLastPrice(pair);
+
+        if (priceResponse.isPositive()) {
+            LOG.info("Positive response  from TradeInterface.priceResponse() ");
+            Object o = priceResponse.getResponseObject();
+            LOG.info("response " + o);
+            try {
+                Amount a = (Amount) o;
+                assertTrue(a.getQuantity() >= 0);
+            } catch (Exception e) {
+                assertTrue(false);
+            }
+
+        } else {
+            assertTrue(false);
+        }
+    }
+
+
+    @Test
     public void testMakeOrder() {
         NuBotOptions opt = null;
         try {

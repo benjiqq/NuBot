@@ -474,7 +474,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             computeNewPrices();
 
         } else {
-            LOG.info("No need to move walls");
+            LOG.debug("No need to move walls");
             currentTime = System.currentTimeMillis();
             if (isWallsBeingShifted() && needToShift) {
                 LOG.warn("Wall shift is postponed: another process is already shifting existing walls. Will try again on next execution.");
@@ -486,7 +486,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double currentWallPEGprice = currentWallPEGPrice.getPrice().getQuantity();
         double distance = Math.abs(last.getPrice().getQuantity() - currentWallPEGprice);
         double percentageDistance = Utils.round((distance * 100) / currentWallPEGprice, 4);
-        LOG.info("delta =" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
+        LOG.debug("delta =" + percentageDistance + "% (old : " + currentWallPEGprice + " new " + last.getPrice().getQuantity() + ")");
 
         if (percentageDistance < wallchangeThreshold) {
             return false;
@@ -497,21 +497,18 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private void computeNewPrices() {
 
-        //Sell-side custodian sell-wall
-
         double peg_price = lastPrice.getPrice().getQuantity();
 
         double sellPricePEG_new;
         double buyPricePEG_new;
 
-        int precision = 8;
         if (Global.swappedPair) { //NBT as paymentCurrency
-            sellPricePEG_new = Utils.round(sellPriceUSD * Global.conversion, precision);
-            buyPricePEG_new = Utils.round(buyPriceUSD * Global.conversion, precision);
+            sellPricePEG_new = Utils.round(sellPriceUSD * Global.conversion, Settings.DEFAULT_PRECISION);
+            buyPricePEG_new = Utils.round(buyPriceUSD * Global.conversion, Settings.DEFAULT_PRECISION);
         } else {
             //convert sell price to PEG
-            sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, precision);
-            buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, precision);
+            sellPricePEG_new = Utils.round(sellPriceUSD / peg_price, Settings.DEFAULT_PRECISION);
+            buyPricePEG_new = Utils.round(buyPriceUSD / peg_price, Settings.DEFAULT_PRECISION);
         }
 
         BidAskPair newPrice = new BidAskPair(buyPricePEG_new, sellPricePEG_new);
@@ -526,10 +523,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Store new value
         this.bidask = newPrice;
 
-
         LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
-
 
         //------------ here for output csv
 
@@ -538,12 +533,11 @@ public class PriceMonitorTriggerTask extends TimerTask {
         String currency = currentWallPEGPrice.getPrice().getCurrency().getCode();
         String crypto = pfm.getPair().getOrderCurrency().getCode();
 
-        //Call
+        //Call Strategy and notify the price change
 
         strategy.notifyPriceChanged(sellPricePEG_new, buyPricePEG_new, price, pegPriceDirection);
 
         Global.conversion = price;
-
 
         Date currentDate = new Date();
         String row = currentDate + ","

@@ -77,11 +77,6 @@ public abstract class NuBotBase {
 
         setupExchange();
 
-        if (!CurrencyList.BTC.getCode().equals("BTC"))
-            LOG.error("currency file not loaded");
-
-
-
     }
 
     /**
@@ -108,26 +103,24 @@ public abstract class NuBotBase {
     protected void setupExchange() {
         LOG.info("setup Exchange object");
 
-        LOG.info("Wrap the keys into a new ApiKeys object");
+        LOG.debug("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
 
         Global.exchange = new Exchange(Global.options.getExchangeName());
 
-        LOG.info("Create e ExchangeLiveData object to accommodate liveData from the exchange");
+        LOG.debug("Create e ExchangeLiveData object to accommodate liveData from the exchange");
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
         TradeInterface ti = null;
         try{
-            //Class<?> wrapper = Class.forName("com.nubits.nubot.trading.wrappers."+Global.options.getExchangeName() + "Wrapper");
-            //ti = (TradeInterface )wrapper.newInstance();
             ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
         }catch(Exception e){
             exitWithNotice("exchange unknown");
         }
 
         //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
-        LOG.info("Create a new TradeInterface object");
+        LOG.debug("Create a new TradeInterface object");
         ti.setKeys(keys);
         ti.setExchange(Global.exchange);
 
@@ -195,22 +188,21 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
+
         //TODO: opt should be passed in constructor, not set in global
 
         //TODO refactor so we can test validity here again
 
-        LOG.info("----- new session -----");
-        LOG.info("Setting up NuBot version : " + Utils.versionName());
+        LOG.debug("----- new session -----");
 
-        LOG.info("NuBot logging");
+        LOG.info("Setting up NuBot version : " + Utils.versionName());
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
-            //inform user about real trading (he should be informed by now)
         } else {
+            LOG.info("Trades will not be executed [executetrade:false]");
             liveTrading = false;
-            //inform user we're in demo mode
         }
 
         Global.options = opt;
@@ -219,13 +211,12 @@ public abstract class NuBotBase {
 
         Global.running = true;
 
-        LOG.info("Create a TaskManager ");
+        LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
 
         if (Global.options.isSubmitliquidity()) {
             NuSetup.setupNuRPCTask();
             NuSetup.startTask();
-           // setupNuRPCTask();
         }
 
 
@@ -250,8 +241,7 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
-                //TODO: handle gracefully
-                exitWithNotice("" + e);
+                exitWithNotice("can't connect to Nu " + e);
             }
         }
 

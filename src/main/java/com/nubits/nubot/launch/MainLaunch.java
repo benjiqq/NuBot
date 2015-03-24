@@ -77,7 +77,7 @@ public class MainLaunch {
         Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
         while (it.hasNext()){
             ch.qos.logback.classic.Logger l = it.next();
-            LOG.info("" + l);
+            LOG.debug("" + l);
         }
 
         String wdir = System.getProperty("user.dir");
@@ -88,16 +88,16 @@ public class MainLaunch {
         String currentLogfoldername = "";
         for (File file : files) {
             if (file.isDirectory()) {
-                LOG.info("directory:");
+
                 currentLogfoldername = file.getName();
-                LOG.info(currentLogfoldername);
+                LOG.info("directory:"+currentLogfoldername);
                 Global.sessionLogFolders = Settings.LOGS_PATH+Settings.CURRENT_LOGS_FOLDER + currentLogfoldername;
             }
         }
 
         Global.sessionStarted = System.currentTimeMillis();
 
-        sessionLOG.info("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
+        sessionLOG.debug("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
 
         LOG.trace("test logging level: trace");
         LOG.debug("test logging level: debug");
@@ -106,7 +106,7 @@ public class MainLaunch {
         LOG.warn("test logging level: warn");
 
 
-        LOG.info("main. with args " + args.length);
+        LOG.debug("main. with args " + args.length);
 
         if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
@@ -124,7 +124,7 @@ public class MainLaunch {
      * @param runui
      */
     public static void mainLaunch(String configfile, boolean runui) {
-        LOG.info("main launch. with configfile " + configfile + " " + runui);
+        LOG.info("Configuration file :  " + configfile + " , UI: " + runui);
 
         NuBotOptions nuopt = null;
 
@@ -135,10 +135,9 @@ public class MainLaunch {
             exitWithNotice("" + e);
         }
 
+        LOG.debug("-- new main launched --");
 
-        LOG.info("-- new main launched --");
-
-        LOG.info("** run command line **");
+        LOG.debug("** run command line **");
         executeBot(nuopt);
 
     }
@@ -171,11 +170,11 @@ public class MainLaunch {
             exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
         } else {
             if (opt.requiresSecondaryPegStrategy()) {
-                LOG.info("creating secondary bot");
+                LOG.debug("creating secondary bot object");
                 NuBotSecondary bot = new NuBotSecondary();
                 bot.execute(opt);
             } else {
-                LOG.info("creating simple bot");
+                LOG.debug("creating simple bot object");
                 NuBotSimple bot = new NuBotSimple();
                 bot.execute(opt);
             }
