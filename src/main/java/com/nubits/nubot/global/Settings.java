@@ -57,7 +57,7 @@ public class Settings {
     //Logging
     public final static String LOGS_PATH = "logs/"; //name of the log folder
 
-    public final static String CURRENT_SESSION_FILENAME = "session.log";
+    public final static String CURRENT_SESSION_FILENAME = "session.log"; //TODO unused?
 
     public final static String FROZEN_PATH = "frozen/";
 
