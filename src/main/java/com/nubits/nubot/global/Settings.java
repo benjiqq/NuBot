@@ -56,15 +56,13 @@ public class Settings {
      */
     //Logging
     public final static String LOGS_PATH = "logs/"; //name of the log folder
+
     public final static String CURRENT_SESSION_FILENAME = "session.log";
 
     public final static String FROZEN_PATH = "frozen/";
 
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
-
-    public final static String DEFAULT_HTML_LOG_FILENAME = "standard-output";    //!!!Change this? Update the logback.xml //TODO load value from xml?
-    public final static String VERBOSE_HTML_LOG_FILENAME = "verbose-output";   //!!!Change this? Update the logback.xml //TODO not being used in the code
 
     public final static String ORDERS_FILENAME  = "orders_history"; //Filename for historical snapshot of active orders
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
