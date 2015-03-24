@@ -149,7 +149,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         // until the moving average is within 10% of the reported price.
         //we don't want that process to take longer than the price refresh interval
         currentTime = System.currentTimeMillis();
-        LOG.info("Executing task : PriceMonitorTriggerTask ");
+        LOG.debug("Executing task : PriceMonitorTriggerTask ");
         if (pfm == null || strategy == null) {
             LOG.error("PriceMonitorTriggerTask task needs a PriceFeedManager and a Strategy to work. Please assign it before running it");
 

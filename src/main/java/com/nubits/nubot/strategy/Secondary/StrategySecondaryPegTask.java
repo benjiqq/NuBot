@@ -51,7 +51,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     @Override
     public void run() {
 
-        LOG.info("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
+        LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
         if (isFirstTime) {
             initStrategy();
