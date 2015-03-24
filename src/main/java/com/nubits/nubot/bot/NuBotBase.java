@@ -213,7 +213,7 @@ public abstract class NuBotBase {
         }
 
 
-        LOG.info("Starting task : Check connection with exchange");
+        LOG.debug("Starting task : Check connection with exchange");
         int conn_delay = 1;
         Global.taskManager.getCheckConnectionTask().start(conn_delay);
 

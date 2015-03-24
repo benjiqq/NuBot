@@ -14,7 +14,7 @@ testreports/
 releases/
 
 #Directories to ignore
-frozen/
+
 
 #Specific files to ignore
 ssl_readme.txt
