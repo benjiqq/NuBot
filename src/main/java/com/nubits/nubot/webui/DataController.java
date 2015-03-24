@@ -7,7 +7,6 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.pricefeeds.feedservices.BlockchainPriceFeed;
 import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
-import com.nubits.nubot.store.BalanceFetchTask;
 import com.nubits.nubot.trading.TradeInterface;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,16 +44,16 @@ public class DataController {
 
             }
 
-            BalanceFetchTask bt = Global.taskManager.balanceFetchTask;
+            //BalanceFetchTask bt = Global.taskManager.balanceFetchTask;
 
             //if bot is running
-            if (ti!=null && bt!=null) {
+            if (ti!=null) {
 
                 LOG.info("bot is running. get balance");
 
-                opmap.put("btc_balance", bt.getCurrentAmount(CurrencyList.BTC));
-                opmap.put("nbt_balance", bt.getCurrentAmount(CurrencyList.NBT));
-                opmap.put("orders", ExchangeFacade.getOpenOrders(ti));
+                opmap.put("btc_balance", 0); //bt.getCurrentAmount(CurrencyList.BTC));
+                opmap.put("nbt_balance", 0); //bt.getCurrentAmount(CurrencyList.NBT));
+                opmap.put("orders", ""); //ExchangeFacade.getOpenOrders(ti));
                 //TODO: use internal feeder
                 BtcePriceFeed btce = new BtcePriceFeed();
                 double lastbtce= btce.getLastPrice(pair).getPrice().getQuantity();

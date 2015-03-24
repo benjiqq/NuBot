@@ -39,12 +39,6 @@ public class UiServer {
 
         LOG.info("launching on http://localhost:" + port);
 
-        //TODO: only load if in testmode and this is not set elsewhere
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(Exception e){
-            LOG.error("error loading properties");
-        }
 
         //binds GET and POST
         new ConfigController("/config", configdir, configFile);

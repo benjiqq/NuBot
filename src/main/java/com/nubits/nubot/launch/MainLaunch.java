@@ -142,8 +142,16 @@ public class MainLaunch {
 
         LOG.debug("-- new main launched --");
 
-        LOG.debug("** run command line **");
-        executeBot(nuopt);
+        if (runui) {
+            LOG.info("* run with ui *");
+            String workingdir = ".";
+            UILaunch.UIlauncher(workingdir, configfile);
+        } else {
+            LOG.info("** run command line **");
+            executeBot(nuopt);
+        }
+
+
 
     }
 
