@@ -67,10 +67,12 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void initFiles() {
         //create json file if it doesn't already exist
+        LOG.debug("init files");
         File jsonF1 = new File(this.jsonFile_orders);
         if (!jsonF1.exists()) {
             try{
                 jsonF1.createNewFile();
+                LOG.debug("created " + jsonF1);
             }catch(Exception e){
                 LOG.error("error creating file " + jsonF1 + " " + e);
             }
@@ -86,6 +88,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         if (!jsonF2.exists()) {
             try{
                 jsonF2.createNewFile();
+                LOG.debug("created " + jsonF2);
             }catch(Exception e){
                 LOG.error("error creating file " + jsonF1 + " " + e);
             }
@@ -100,6 +103,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         if (!of.exists()){
             try{
                 of.createNewFile();
+                LOG.debug("created " + of);
             }catch(Exception e){
                 LOG.error("error creating file " + of + "  " + e);
             }

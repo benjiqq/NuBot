@@ -74,4 +74,8 @@ public class Settings {
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
     public static final String TEST_LOGXML = "/config/allconfig/test_logback.xml";
+
+    public static final String TEST_LOGFOLDER = "testlog"; //same as in test_logback.xml
+
+
 }

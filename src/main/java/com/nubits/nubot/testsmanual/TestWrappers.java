@@ -74,6 +74,8 @@ public class TestWrappers {
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
         LOG.debug("Logback used '{}' as the configuration file.", mainURL);
 
+        Global.sessionLogFolders = Settings.TEST_LOGFOLDER;
+
         runTests();
     }
 
