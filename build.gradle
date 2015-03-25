@@ -41,6 +41,7 @@ def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
+def docdir = new File("md")
 def testreportdir = new File("testreports") //$buildDir/reports
 def jarname = "NuBot.jar"
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
