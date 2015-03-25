@@ -112,10 +112,20 @@ task initDist << {
 
 
 task compiledocs(type: Exec) {
+    //copy from root into md first
+    doFirst {
+        copy {
+            from "README.md"
+            into "${docdir}"
+        }
+    }
+
     description 'compile the HTML documents'
     executable "sh"
-    args "-c", "cd md && /bin/bash compileall.sh"
+
+    args "-c", "cd " + "${docdir}" + " && /bin/bash compileAll.sh"
 }
+
 
 
 //create a single Jar with all dependencies
