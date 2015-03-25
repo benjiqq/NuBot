@@ -1,15 +1,7 @@
 package com.nubits.nubot.webui;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsSerializer;
-import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
@@ -23,7 +15,7 @@ public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
-    //TODO via resources
+    //TODO via settings
     private static String htmlFolder = "./UI/templates/";
 
     private static TradeInterface ti;

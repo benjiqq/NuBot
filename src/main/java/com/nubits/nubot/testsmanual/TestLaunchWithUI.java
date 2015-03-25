@@ -18,9 +18,8 @@
 
 package com.nubits.nubot.testsmanual;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.launch.UILaunch;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
@@ -29,14 +28,9 @@ import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
-
 
 /**
- * the test launcher class for all functions
+ * the test launcher class with UI
  */
 public class TestLaunchWithUI {
 
@@ -45,7 +39,7 @@ public class TestLaunchWithUI {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunchWithUI.class.getName());
 
-    private static boolean runui = false;
+    private static boolean runui = true;
 
 
     /**
@@ -57,44 +51,12 @@ public class TestLaunchWithUI {
 
         //TestWrappers.runTests();
 
-        //log info
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
-
-        LOG.info("Logback used '{}' as the configuration file.", mainURL);
-
-        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
-
-        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
-        while (it.hasNext()){
-            ch.qos.logback.classic.Logger l = it.next();
-            LOG.info("" + l);
-        }
-
-        String wdir = System.getProperty("user.dir");
-
-        File f = new File(wdir + "/" + "logs/current"); // current directory
-
-        File[] files = f.listFiles();
-        String currentLogfoldername = "";
-        for (File file : files) {
-            if (file.isDirectory()) {
-                LOG.info("directory:");
-                currentLogfoldername = file.getName();
-                LOG.info(currentLogfoldername);
-                Global.sessionLogFolders = "logs" + "/" + "current" + "/" + currentLogfoldername;
-            }
-        }
-
         Global.sessionStarted = System.currentTimeMillis();
-
 
 
         LOG.info("main. with args " + args.length);
 
-
-
-        mainLaunch(configfile, false);
+        mainLaunch(configfile, runui);
 
     }
 
@@ -116,11 +78,14 @@ public class TestLaunchWithUI {
             exitWithNotice("" + e);
         }
 
-
-        LOG.info("-- new main launched --");
-
-        LOG.info("** run command line **");
-        executeBot(nuopt);
+        if (runui) {
+            LOG.info("* run with ui *");
+            String workingdir = ".";
+            UILaunch.UIlauncher(workingdir, configfile);
+        } else {
+            LOG.info("** run command line **");
+            executeBot(nuopt);
+        }
 
     }
 
