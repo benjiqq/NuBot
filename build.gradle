@@ -125,6 +125,11 @@ task compiledocs(type: Exec) {
     executable "sh"
 
     args "-c", "cd " + "${docdir}" + " && /bin/bash compileAll.sh"
+
+    doLast {
+       delete "${docdir}/README.md"
+
+    }
 }
 
 
