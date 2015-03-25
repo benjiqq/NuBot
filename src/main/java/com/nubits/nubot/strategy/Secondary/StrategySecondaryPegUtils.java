@@ -635,6 +635,9 @@ public class StrategySecondaryPegUtils {
                 } else {
                     LOG.info("Could not submit request to clear orders");
                     success = false;
+                    //Communicate to the priceMonitorTask that the wall shift is over
+                    strategy.getPriceMonitorTask().setWallsBeingShifted(false);
+                    strategy.getSendLiquidityTask().setWallsBeingShifted(false);
                 }
             } else {
                 success = false;
