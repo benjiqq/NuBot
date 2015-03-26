@@ -144,7 +144,7 @@ public class StrategySecondaryPegUtils {
 
     public boolean initOrders(String type, double price) {
 
-        LOG.info("initOrders " + type + " " + price);
+        LOG.info("initOrders " + type + ", price " + price);
 
         boolean success = true;
         Amount balance = null;
@@ -180,7 +180,7 @@ public class StrategySecondaryPegUtils {
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
-            LOG.trace(type + " available balance < 1 NBT, no need to execute orders");
+            LOG.info("no need to execute " +type + "orders : available balance < 1 NBT");
             return false;
         }
 
