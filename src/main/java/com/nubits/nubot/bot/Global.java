@@ -67,10 +67,8 @@ public class Global {
 
     public static String sessionId;
     public static long sessionStarted, sessionStopped;
-    public static SessionData sessiondata;
 
-
-    public static void moveSessionLogs() {
+    /*public static void moveSessionLogs() {
 
         LOG.debug("moving session logs");
 
@@ -106,7 +104,7 @@ public class Global {
                 }
             }
         }
-    }
+    }*/
 
     /**
      * shutdown mechanics
@@ -174,8 +172,8 @@ public class Global {
                 Global.sessionStopped = System.currentTimeMillis();
                 sessionLOG.info("session end;" + Global.sessionStopped);
 
-                LOG.info("move session log dir");
-                moveSessionLogs();
+                LOG.info("change session logs");
+                //moveSessionLogs();
 
 
                 LOG.info("Exit. ");

@@ -24,6 +24,7 @@ import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Order;
@@ -40,7 +41,12 @@ import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract NuBot. implements all primitives without the strategy itself
@@ -53,6 +59,11 @@ public abstract class NuBotBase {
     abstract public void configureStrategy() throws NuBotConfigException;
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
+
+    /**
+     * Logger for session data. called only once per session
+     */
+    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
 
     protected String mode;
 
@@ -75,10 +86,71 @@ public abstract class NuBotBase {
 
         setupLog();
 
+        setupSessionLog();
+
         setupSSL();
 
         setupExchange();
 
+    }
+
+    /**
+     * setup all the logging and storage for one session
+     */
+    private static void setupSessionLog() {
+
+        //log info
+        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
+        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
+
+        LOG.info("Logback used '{}' as the configuration file.", mainURL);
+
+        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+
+        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
+        while (it.hasNext()) {
+            ch.qos.logback.classic.Logger l = it.next();
+            LOG.debug("" + l);
+        }
+
+
+        //set up session dir
+        String wdir = System.getProperty("user.dir");
+
+        //loop over timestamps in the unlikely case of a duplicate
+        boolean done = false;
+        while (!done) {
+            String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
+            File ldir = new File(wdir + "/" + Settings.LOGS_PATH);
+            if (!ldir.exists())
+                ldir.mkdir();
+
+            String sessiondir = wdir + "/" + Settings.LOGS_PATH + Settings.SESSION_LOG + timeStamp;
+            File f = new File(sessiondir); // current directory
+            if (!f.exists()) {
+
+                f.mkdir();
+                done = true;
+                Global.sessionLogFolders = f.getAbsolutePath();
+                Global.sessionStarted = System.currentTimeMillis();
+                sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
+            }
+        }
+
+
+
+
+
+        /*File[] files = f.listFiles();
+        String currentLogfoldername = "";
+        for (File file : files) {
+            if (file.isDirectory()) {
+                currentLogfoldername = file.getName();
+                LOG.debug("directory:" + currentLogfoldername);
+                Global.sessionLogFolders = Settings.LOGS_PATH+Settings.CURRENT_LOGS_FOLDER + currentLogfoldername;
+                LOG.debug("set session log folder: " + Global.sessionLogFolders);
+            }
+        }*/
     }
 
     /**

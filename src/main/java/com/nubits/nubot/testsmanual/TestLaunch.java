@@ -32,6 +32,7 @@ import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,7 @@ public class TestLaunch {
 
 
     static {
+        System.setProperty("testlogfolder","abc");
         System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
@@ -63,6 +65,13 @@ public class TestLaunch {
      * @param args a list of valid arguments
      */
     public static void main(String args[]) {
+
+        MDC.put("session", "session_" + System.currentTimeMillis());
+
+        LOG.info("bla");
+
+        MDC.put("session", "session_" + System.currentTimeMillis());
+        LOG.info("sssbla");
 
         MainLaunch.mainLaunch(configfile, false);
 

@@ -19,25 +19,21 @@
 package com.nubits.nubot.launch;
 
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.joran.JoranConfigurator;
-import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
-
-import org.slf4j.LoggerFactory;
+import com.nubits.nubot.strategy.Primary.NuBotSimple;
+import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -54,11 +50,6 @@ public class MainLaunch {
 
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
-
-    /**
-     * Logger for session data. called only once per session
-     */
-    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
 
     private static boolean runui = false;
 
@@ -91,9 +82,8 @@ public class MainLaunch {
      */
     public static void mainLaunch(String configfile, boolean runui) {
 
-        LOG.debug("main launch. with configfile " + configfile + " " + " runui " + runui);
 
-        logSetup();
+        LOG.debug("main launch. with configfile " + configfile + " " + " runui " + runui);
 
         NuBotOptions nuopt = null;
 
@@ -111,48 +101,7 @@ public class MainLaunch {
 
     }
 
-    private static void logSetup() {
 
-        //log info
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
-
-        LOG.info("Logback used '{}' as the configuration file.", mainURL);
-
-        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
-
-        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
-        while (it.hasNext()) {
-            ch.qos.logback.classic.Logger l = it.next();
-            LOG.debug("" + l);
-        }
-
-
-        //set up session dir
-        String wdir = System.getProperty("user.dir");
-
-        File f = new File(wdir + "/" + Settings.LOGS_PATH + Settings.CURRENT_LOGS_FOLDER); // current directory
-
-        if (!f.exists()) {
-            f.mkdir();
-            Global.sessionLogFolders = f.getAbsolutePath();
-            Global.sessionStarted = System.currentTimeMillis();
-            sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
-        } else {
-            //should have been moved
-        }
-
-        /*File[] files = f.listFiles();
-        String currentLogfoldername = "";
-        for (File file : files) {
-            if (file.isDirectory()) {
-                currentLogfoldername = file.getName();
-                LOG.debug("directory:" + currentLogfoldername);
-                Global.sessionLogFolders = Settings.LOGS_PATH+Settings.CURRENT_LOGS_FOLDER + currentLogfoldername;
-                LOG.debug("set session log folder: " + Global.sessionLogFolders);
-            }
-        }*/
-    }
 
 
     /**

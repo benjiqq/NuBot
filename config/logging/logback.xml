@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
+	<!--
 	<property scope="context" name="logfolder" value="logs" />
+	-->
 
 	<!-- timestamp var used for log session folder -->
 	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
@@ -51,7 +53,7 @@
 				<pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
 			</layout>
 		</encoder>
-		<file>${logfolder}/current/${bySecond}/standard.html</file>
+		<file>${logfolder}/standard.html</file>
 
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
 			<maxFileSize>10MB</maxFileSize>
@@ -136,7 +138,7 @@
 
 	<!--
 	***************
-	definitions of all loggers
+	definition of all loggers
 	***************
 	-->
 
