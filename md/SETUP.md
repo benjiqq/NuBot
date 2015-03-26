@@ -223,7 +223,9 @@ nohup java -jar NuBot.jar sample-config.json
 
 The bot will start and write output in the */logs* folder. 
 
-To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders. 
+To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders.
+
+**You can only run ONE instance of nubot at the time. To run multiple instances simoultaneusly, you can create one separate nubot folder for each instance. FIX coming soon **
 
 ##Logging on HTML and csv
 
