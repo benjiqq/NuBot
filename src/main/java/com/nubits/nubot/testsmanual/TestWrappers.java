@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
@@ -50,16 +51,23 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/poloniex.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/peatio.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
 
-        //Load settings
-        InitTests.loadKeystore(false);
-        InitTests.loadConfig(TEST_OPTIONS_PATH);
+        InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
+
+        //Load keystore
+        boolean trustAll = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO))
+        {
+            trustAll = true;
+        }
+        InitTests.loadKeystore(trustAll);
+
         try {
             LOG.info("using key: " + Global.options.getApiKey());
             LOG.info("config exchange " + Global.options.getExchangeName());
