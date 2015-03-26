@@ -103,6 +103,11 @@ public class Settings {
     public static final String TEST_LOGXML = "config/logging/test_logback.xml";
 
     /**
+     * configuration file for test launches
+     */
+    public static final String TEST_LAUNCH_XML = "config/logging/test_launch.xml";
+
+    /**
      * main logs file. also defined in logback.xml
      */
     public final static String LOGS_PATH = "logs/";

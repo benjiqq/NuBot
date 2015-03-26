@@ -18,27 +18,10 @@
 
 package com.nubits.nubot.testsmanual;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
-import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
 
 
 /**
@@ -49,7 +32,7 @@ public class TestLaunch {
 
     static {
         System.setProperty("testlogfolder","abc");
-        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+        System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 
     static String configfile = "config/myconfig/bitspark.json";
@@ -66,14 +49,22 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        MDC.put("session", "session_" + System.currentTimeMillis());
+        if (MainLaunch.isAppActive())
+            System.out.println(Settings.APP_NAME + " is already running");
+        else
+            System.out.println(Settings.APP_NAME + " not running");
+
+        /*
+        Global.sessionLogFolders = "session_" + System.currentTimeMillis();
+
+        MDC.put("session", );
 
         LOG.info("bla");
 
         MDC.put("session", "session_" + System.currentTimeMillis());
-        LOG.info("sssbla");
+        LOG.info("sssbla");*/
 
-        MainLaunch.mainLaunch(configfile, false);
+        //SessionManager.mainLaunch(configfile, false);
 
     }
 

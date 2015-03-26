@@ -18,24 +18,15 @@
 
 package com.nubits.nubot.launch;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 
 
 /**
@@ -48,13 +39,16 @@ public class MainLaunch {
         System.setProperty("logback.configurationFile", Settings.LOGXML);
     }
 
-
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
     private static boolean runui = false;
 
     //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
     private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
+
+    private static File file;
+    private static FileChannel channel;
+    private static FileLock lock;
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -63,85 +57,81 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
+        boolean isActive = isAppActive();
+        if (isActive)
+            System.out.println("NuBot is already running");
+
         if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
 
         String configfile = args[0];
 
-        mainLaunch(configfile, false);
+        SessionManager.mainLaunch(configfile, false);
 
     }
 
-
-    /**
-     * main launch of a bot
-     *
-     * @param configfile
-     * @param runui
-     */
-    public static void mainLaunch(String configfile, boolean runui) {
-
-
-        LOG.debug("main launch. with configfile " + configfile + " " + " runui " + runui);
-
-        NuBotOptions nuopt = null;
-
+    public static boolean isAppActive() {
         try {
-            //Check if NuBot has valid parameters and quit if it doesn't
-            nuopt = ParseOptions.parseOptionsSingle(configfile);
-        } catch (NuBotConfigException e) {
-            exitWithNotice("" + e);
+            String refFolder = System.getProperty("user.home"); //wdir
+
+            file = new File
+                    (refFolder, Settings.APP_NAME+ ".tmp");
+            System.out.println("checking " + refFolder + " " + file.exists());
+            channel = new RandomAccessFile(file, "rw").getChannel();
+
+            try {
+                lock = channel.tryLock();
+            }
+            catch (OverlappingFileLockException e) {
+                // already locked
+                closeLock();
+                return true;
+            }
+
+            if (lock == null) {
+                closeLock();
+                return true;
+            }
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                // destroy the lock when the JVM is closing
+                public void run() {
+                    closeLock();
+                    deleteFile();
+                }
+            });
+            return false;
         }
-
-        LOG.debug("-- new main launched --");
-
-        LOG.debug("** run command line **");
-        executeBot(nuopt);
-
+        catch (Exception e) {
+            closeLock();
+            return true;
+        }
     }
 
+    private static void closeLock() {
+        try { lock.release();  }
+        catch (Exception e) {  }
+        try { channel.close(); }
+        catch (Exception e) {  }
+    }
 
-
+    private static void deleteFile() {
+        try { file.delete(); }
+        catch (Exception e) { }
+    }
 
     /**
      * exit application and notify user
      *
      * @param msg
      */
-    private static void exitWithNotice(String msg) {
+    public static void exitWithNotice(String msg) {
         LOG.error(msg);
         System.exit(0);
     }
 
 
-    /**
-     * execute a NuBot based on valid options. Also make sure only one NuBot is running
-     *
-     * @param opt
-     */
-    public static void executeBot(NuBotOptions opt) {
-
-        Global.mainThread = Thread.currentThread();
-
-        Global.createShutDownHook();
-
-        //exit if already running or show info to user
-        if (Global.running) {
-            exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
-        } else {
-            if (opt.requiresSecondaryPegStrategy()) {
-                LOG.debug("creating secondary bot object");
-                NuBotSecondary bot = new NuBotSecondary();
-                bot.execute(opt);
-            } else {
-                LOG.debug("creating simple bot object");
-                NuBotSimple bot = new NuBotSimple();
-                bot.execute(opt);
-            }
-        }
-
-    }
 
 
 }

@@ -8,11 +8,11 @@
 
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
                 %date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
             </Pattern>
-
         </layout>
 
     </appender>
@@ -27,11 +27,18 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${testlogfolder}/${session}/main.log</file>
+                <file>${testlogfolder}/${session}/main.html</file>
                 <append>false</append>
-                <layout class="ch.qos.logback.classic.PatternLayout">
+
+                <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                    <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                        <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                    </layout>
+                </encoder>
+
+                <!--<layout class="ch.qos.logback.classic.PatternLayout">
                     <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
-                </layout>
+                </layout>-->
             </appender>
         </sift>
     </appender>
