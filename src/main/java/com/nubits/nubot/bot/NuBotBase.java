@@ -267,7 +267,7 @@ public abstract class NuBotBase {
         String exc = Global.options.getExchangeName();
         String p = Global.options.getPair().toStringSep();
         String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc  + " pair (" + p + ")";
-        LOG.info("notify online " + msg);
+        LOG.debug("notify online " + msg);
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
