@@ -177,7 +177,12 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         copy {
             from "config/logging/logback.xml"
-            into "${distdir}/config/logging/logback.xml"
+            into "${distdir}/config/logging/"
+        }
+
+        copy {
+            from "res/currencies.csv"
+            into "${distdir}/res/"
         }
 
         copy {
@@ -189,7 +194,7 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         copy {
             from "${docdir}/license.html"
-            into "${distdir}/sources"
+            into "${distdir}/res/sources"
         }
 
         copy {

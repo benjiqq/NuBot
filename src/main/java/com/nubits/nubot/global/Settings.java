@@ -82,6 +82,8 @@ public class Settings {
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
+    private final static String CURRENCY_FILE = "currencies.csv";
+    public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
 
     public static final String TEST_LOGFOLDER = "testlog"; //same as in test_logback.xml
 
