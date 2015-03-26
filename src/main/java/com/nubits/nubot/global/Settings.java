@@ -18,8 +18,6 @@
 
 package com.nubits.nubot.global;
 
-import com.nubits.nubot.bot.Global;
-
 /**
  * This class contains a list of settings that can be configured by developers
  * Settings are grouped and commented.
@@ -67,7 +65,9 @@ public class Settings {
 
     public final static String LOGS_PATH = "logs/"; //name of the log folder
 
-    public final static String KEYSTORE_PATH = "resources/ssl/nubot_keystore.jks";
+    public final static String RES_PATH = "res/";
+
+    public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
 
     public final static String FROZEN_FUNDS_PATH =   "frozen-funds/"; //folder containing resources needed at runtime
 
