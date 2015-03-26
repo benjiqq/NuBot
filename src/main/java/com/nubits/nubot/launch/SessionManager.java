@@ -2,6 +2,7 @@ package com.nubits.nubot.launch;
 
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -14,9 +15,19 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
+import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
+
 public class SessionManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(SessionManager.class.getName());
+
+    private static File file;
+    private static FileChannel channel;
+    private static FileLock lock;
 
     /**
      * main launch of a bot
@@ -71,6 +82,60 @@ public class SessionManager {
             }
         }
 
+    }
+
+    /**
+     * check whether other sessions are active via a temp file
+     * @return
+     */
+    public static boolean isSessionActive() {
+        try {
+            String refFolder = System.getProperty("user.home"); //wdir
+
+            file = new File
+                    (refFolder, Settings.APP_NAME+ ".tmp");
+            System.out.println("checking " + refFolder + " " + file.exists());
+            channel = new RandomAccessFile(file, "rw").getChannel();
+
+            try {
+                lock = channel.tryLock();
+            }
+            catch (OverlappingFileLockException e) {
+                // already locked
+                closeLock();
+                return true;
+            }
+
+            if (lock == null) {
+                closeLock();
+                return true;
+            }
+
+            Runtime.getRuntime().addShutdownHook(new Thread() {
+                // destroy the lock when the JVM is closing
+                public void run() {
+                    closeLock();
+                    deleteFile();
+                }
+            });
+            return false;
+        }
+        catch (Exception e) {
+            closeLock();
+            return true;
+        }
+    }
+
+    private static void closeLock() {
+        try { lock.release();  }
+        catch (Exception e) {  }
+        try { channel.close(); }
+        catch (Exception e) {  }
+    }
+
+    private static void deleteFile() {
+        try { file.delete(); }
+        catch (Exception e) { }
     }
 
     /**

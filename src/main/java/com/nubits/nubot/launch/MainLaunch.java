@@ -46,9 +46,7 @@ public class MainLaunch {
     //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
     private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
 
-    private static File file;
-    private static FileChannel channel;
-    private static FileLock lock;
+
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -57,7 +55,7 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
-        boolean isActive = isAppActive();
+        boolean isActive = SessionManager.isSessionActive();
         if (isActive)
             System.out.println("NuBot is already running");
 
@@ -71,55 +69,7 @@ public class MainLaunch {
 
     }
 
-    public static boolean isAppActive() {
-        try {
-            String refFolder = System.getProperty("user.home"); //wdir
 
-            file = new File
-                    (refFolder, Settings.APP_NAME+ ".tmp");
-            System.out.println("checking " + refFolder + " " + file.exists());
-            channel = new RandomAccessFile(file, "rw").getChannel();
-
-            try {
-                lock = channel.tryLock();
-            }
-            catch (OverlappingFileLockException e) {
-                // already locked
-                closeLock();
-                return true;
-            }
-
-            if (lock == null) {
-                closeLock();
-                return true;
-            }
-
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                // destroy the lock when the JVM is closing
-                public void run() {
-                    closeLock();
-                    deleteFile();
-                }
-            });
-            return false;
-        }
-        catch (Exception e) {
-            closeLock();
-            return true;
-        }
-    }
-
-    private static void closeLock() {
-        try { lock.release();  }
-        catch (Exception e) {  }
-        try { channel.close(); }
-        catch (Exception e) {  }
-    }
-
-    private static void deleteFile() {
-        try { file.delete(); }
-        catch (Exception e) { }
-    }
 
     /**
      * exit application and notify user
