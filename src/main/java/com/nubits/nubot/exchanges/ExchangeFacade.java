@@ -57,7 +57,7 @@ public class ExchangeFacade {
     public static final String BITCOINCOID = "Bitcoincoid";
 
     //API base url for peatio instances
-    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.186.229/";   //Old
+    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";
     private static ArrayList<String> supportedExchanges, liveExchanges;
     private static HashMap<String, Class> exchangeInterfaces;
     ;
@@ -141,8 +141,18 @@ public class ExchangeFacade {
                 name = capitalizieName(name);
 
                 Class<?> wrapperClazz = exchangeInterfaces.get(name);
-                Constructor<?> constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
-                Object instance = constructor.newInstance(keys, exchange);
+
+                Object instance = null;
+                Constructor<?> constructor;
+                if (name.equalsIgnoreCase(INTERNAL_EXCHANGE_PEATIO)) {
+                    constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class, String.class);
+                    instance = constructor.newInstance(keys, exchange, INTERNAL_EXCHANGE_PEATIO_API_BASE);
+                }
+                else
+                {
+                     constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
+                     instance = constructor.newInstance(keys, exchange);
+                }
                 ti = (TradeInterface) instance;
                 return ti;
             } catch (Exception e) {
