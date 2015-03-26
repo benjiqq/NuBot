@@ -176,6 +176,11 @@ task NuBotDist(dependsOn: NuBotJar) {
         println "finish distribution"
 
         copy {
+            from "config/logging/logback.xml"
+            into "${distdir}/config/loging/logback.xml"
+        }
+
+        copy {
             from "src"
             into "${distdir}/src"
         }
