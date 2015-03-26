@@ -42,6 +42,7 @@ def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
 def docdir = new File("md")
+def resdir = new File("res")
 
 def jarname = "NuBot.jar"
 def sampleconfig = "config/options/sample-options.json"
@@ -174,14 +175,12 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         println "finish distribution"
 
-        /*html_files.each { File file ->
-            println 'copy ' + file.name
-            copy {
-                from "${docdir}/" + file.name
-                into "${distdir}/docs"
-            }
-            delete(file)
-        }*/
+        copy {
+            from "src"
+            into "${distdir}/src"
+        }
+
+        delete "${distdir}/src/main/java/com/nubits/nubot/global/Passwords.java"
 
         copy {
             from "${docdir}/readme.html"
@@ -224,17 +223,12 @@ task NuBotDist(dependsOn: NuBotJar) {
         }
 
         copy {
-            from "resources/ssl/nubot_keystore.jks"
+            from "${resdir}/ssl/nubot_keystore.jks"
             into "${distdir}/res/ssl"
             //exclude 'listCertificates.sh'
         }
 
-        copy {
-            from "src"
-            into "${distdir}/src"
-        }
 
-        //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
     }
 
 }

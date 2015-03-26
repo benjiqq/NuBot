@@ -69,7 +69,7 @@ public class Settings {
 
     public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
 
-    public final static String FROZEN_FUNDS_PATH =   "frozen-funds/"; //folder containing resources needed at runtime
+    public final static String FROZEN_FUNDS_PATH =  RES_PATH + "frozen-funds/"; //folder containing resources needed at runtime
 
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?

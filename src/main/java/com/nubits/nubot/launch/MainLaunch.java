@@ -101,13 +101,6 @@ public class MainLaunch {
 
         sessionLOG.debug("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
 
-        LOG.trace("test logging level: trace");
-        LOG.debug("test logging level: debug");
-        LOG.info("test logging level: info");
-        LOG.error("test logging level: error");
-        LOG.warn("test logging level: warn");
-
-
         LOG.debug("main. with args " + args.length);
 
         if (args.length != 1) {
