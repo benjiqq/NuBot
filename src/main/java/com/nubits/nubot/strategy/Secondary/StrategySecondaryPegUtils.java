@@ -51,7 +51,7 @@ public class StrategySecondaryPegUtils {
 
     public boolean reInitiateOrders(boolean firstTime) {
 
-        LOG.info("reInitiateOrders" + firstTime);
+        LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
         if (strategy.getTotalActiveOrders() != 0) {
