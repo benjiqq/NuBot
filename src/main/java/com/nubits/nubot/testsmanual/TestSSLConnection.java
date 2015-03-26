@@ -18,6 +18,8 @@
 
 package com.nubits.nubot.testsmanual;
 
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.InitTests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +32,11 @@ import java.io.*;
  * http://confluence.atlassian.com/display/JIRA/Connecting+to+SSL+services
  */
 public class TestSSLConnection {
+
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(TestSSLConnection.class);
 
@@ -64,6 +71,7 @@ public class TestSSLConnection {
             System.out.println("Usage: "+ TestSSLConnection.class.getName()+" <host> <port>");
             System.exit(1);
         }
+        InitTests.setLoggingFilename(LOG);
 
         connectionTest(args[0], Integer.parseInt(args[1]));
 

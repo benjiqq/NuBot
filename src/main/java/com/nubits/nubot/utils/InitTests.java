@@ -73,9 +73,11 @@ public class InitTests {
         }
     }
 
-    public static void setLoggingFilename(Class clazz)
+    public static void setLoggingFilename(Logger log)
     {
-        String fileName = clazz.getSimpleName() + "_" + Utils.getTimestampLong();
+        String fullName = log.getName();
+        String fileName = fullName.substring(fullName.lastIndexOf(".")+1) + "_"
+                + Utils.getTimestampLong();
         MDC.put("testFileName", fileName);
         LOG.info("Logging on "+ Settings.TEST_LOGFOLDER+"/"+fileName);
     }

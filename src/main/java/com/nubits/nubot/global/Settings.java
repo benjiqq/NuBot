@@ -35,13 +35,19 @@ public class Settings {
     public static final double FORCED_SPREAD = 0.9 ; //[%] Force the a spread to avoid collisions (multi-custodians)
 
     /**
+     * Test passwords
+     */
+    public static final String NUD_RPC_USER = "nubotTestUser";
+    public static final String NUD_RPC_PASS = "nubotTestPass";
+    public static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
+    /**
      * Timing
      */
 
     public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
-    public static final int EXECUTE_STRATEGY_INTERVAL = 41;  // [seconds)Execute StrategyTask
-    public static final int CHECK_CONNECTION_INTERVAL = 127; //[seconds) Check connection with exchanges API
-    public static final int CHECK_NUD_INTERVAL = 30; //[seconds)Check connection with nudaemon
+    public static final int EXECUTE_STRATEGY_INTERVAL = 41;  // [seconds] Execute StrategyTask
+    public static final int CHECK_CONNECTION_INTERVAL = 127; // [seconds] Check connection with exchanges API
+    public static final int CHECK_NUD_INTERVAL = 30; //[seconds] Check connection with nudaemon
 
     public static final int CHECK_PRICE_INTERVAL = 61; //[seconds]
     public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000 ; //[seconds] ~ 8 hours, used for fiat only
@@ -75,7 +81,7 @@ public class Settings {
     /**
      * testlog directory. also defined in test_logback.xml
      */
-    public static final String TEST_LOGFOLDER = "testlog";
+    public static final String TEST_LOGFOLDER = LOGS_PATH + "tests";
 
     /**
      * the relative path for resources

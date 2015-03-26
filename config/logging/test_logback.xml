@@ -2,7 +2,7 @@
 <configuration>
 
 
-	<property scope="context" name="testlogfolder" value="testlogs" />
+	<property scope="context" name="testlogfolder" value="logs/tests" />
 
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -20,12 +20,12 @@
              desired discriminator type is
              ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
 		<discriminator>
-			<key>testID</key>
+			<key>testFileName</key>
 			<defaultValue>unknown</defaultValue>
 		</discriminator>
 		<sift>
-			<appender name="FILE-${testID}" class="ch.qos.logback.core.FileAppender">
-				<file>${testlogfolder}/${testID}.log</file>
+			<appender name="FILE-${testFileName}" class="ch.qos.logback.core.FileAppender">
+				<file>${testlogfolder}/${testFileName}.log</file>
 				<append>false</append>
 				<layout class="ch.qos.logback.classic.PatternLayout">
 					<pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>

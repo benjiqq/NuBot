@@ -19,13 +19,12 @@
 package testexchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.testsmanual.InitTests;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
 import junit.framework.TestCase;

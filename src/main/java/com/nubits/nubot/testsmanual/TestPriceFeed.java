@@ -19,6 +19,7 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -26,6 +27,7 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
 import com.nubits.nubot.pricefeeds.feedservices.*;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +39,16 @@ import java.util.ArrayList;
 public class TestPriceFeed {
     //refer to FEEDS.md for the list of price feeds
 
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeed.class.getName());
 
     public static void main(String a[]) {
+        InitTests.setLoggingFilename(LOG);
+
         TestPriceFeed test = new TestPriceFeed();
         test.init();
         //test.executeSingle(BitcoinaveragePriceFeed, Constant.BTC_USD); //Uncomment to test a single price feed

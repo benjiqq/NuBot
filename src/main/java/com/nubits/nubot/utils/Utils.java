@@ -59,6 +59,7 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.*;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.MDC;
 
 
 public class Utils {
@@ -535,7 +536,6 @@ public class Utils {
         }
         return toReturn;
     }
-
 
     public static double getHoursFromMillis(long millis)
     {
