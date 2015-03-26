@@ -62,10 +62,24 @@ public class Settings {
       */
     public static final String LOGXML = "config/logging/logback.xml";
 
+    /**
+     * the file for configuring logging during test. uses sift to direct tests to different files
+     */
     public static final String TEST_LOGXML = "config/logging/test_logback.xml";
 
-    public final static String LOGS_PATH = "logs/"; //name of the log folder
+    /**
+     * main logs file. also defined in logback.xml
+     */
+    public final static String LOGS_PATH = "logs/";
 
+    /**
+     * testlog directory. also defined in test_logback.xml
+     */
+    public static final String TEST_LOGFOLDER = "testlog";
+
+    /**
+     * the relative path for resources
+     */
     public final static String RES_PATH = "res/";
 
     public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
@@ -73,19 +87,20 @@ public class Settings {
     public final static String FROZEN_FUNDS_PATH =  RES_PATH + "frozen-funds/"; //folder containing resources needed at runtime
 
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
+
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
 
     public final static String ORDERS_FILENAME  = "orders_history"; //Filename for historical snapshot of active orders
+
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
-    private final static String CURRENCY_FILE = "currencies.csv";
     public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
 
-    public static final String TEST_LOGFOLDER = "testlog"; //same as in test_logback.xml
+
 
 
 }
