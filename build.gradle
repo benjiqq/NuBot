@@ -182,10 +182,10 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         copy {
             from "src"
-            into "${distdir}/src"
+            into "${distdir}/res/sources"
         }
 
-        delete "${distdir}/src/main/java/com/nubits/nubot/global/Passwords.java"
+        delete "${distdir}/res/sources/main/java/com/nubits/nubot/global/Passwords.java"
 
         copy {
             from "${docdir}/readme.html"
