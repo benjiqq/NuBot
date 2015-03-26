@@ -6,6 +6,8 @@
 	<!-- timestamp var used for log session folder -->
 	<timestamp key="bySecond" datePattern="yyyyMMdd'T'HHmmss"/>
 
+	<!-- console output of NuBot -->
+
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
@@ -28,7 +30,19 @@
 			<onMismatch>NEUTRAL</onMismatch>
 		</filter>
 
+		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+			<evaluator>
+				<expression>
+					return logger.contains("hipchat");
+				</expression>
+			</evaluator>
+			<onMatch>DENY</onMatch>
+			<onMismatch>NEUTRAL</onMismatch>
+		</filter>
+
 	</appender>
+
+	<!-- main file output, not verbose -->
 
 	<appender name="mainFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
@@ -55,6 +69,8 @@
 
 
 	</appender>
+
+	<!-- verbose file output -->
 
 	<appender name="allFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
 
@@ -89,17 +105,9 @@
 			<onMismatch>NEUTRAL</onMismatch>
 		</filter>
 
-		<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-			<evaluator>
-				<expression>
-					return logger.contains("hipchat");
-				</expression>
-			</evaluator>
-			<onMatch>DENY</onMatch>
-			<onMismatch>NEUTRAL</onMismatch>
-		</filter>
-
 	</appender>
+
+	<!-- session logger -->
 
 	<appender name="sessionFile" class="ch.qos.logback.core.FileAppender">
 
@@ -126,6 +134,11 @@
 
 	</appender>
 
+	<!--
+	***************
+	definitions of all loggers
+	***************
+	-->
 
 	<root level="debug">
 		<appender-ref ref="sessionFile" />
