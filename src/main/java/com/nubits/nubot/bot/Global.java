@@ -18,26 +18,17 @@
 
 package com.nubits.nubot.bot;
 
-import com.github.mustachejava.DefaultMustacheFactory;
-import com.github.mustachejava.Mustache;
-import com.github.mustachejava.MustacheFactory;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.*;
-import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * Global object for NuBot
@@ -68,43 +59,6 @@ public class Global {
     public static String sessionId;
     public static long sessionStarted, sessionStopped;
 
-    /*public static void moveSessionLogs() {
-
-        LOG.debug("moving session logs");
-
-        String wdir = System.getProperty("user.dir");
-
-        LOG.debug("wdir is: " + wdir);
-
-        File f = new File(wdir + "/" + Settings.LOGS_PATH + Settings.CURRENT_LOGS_FOLDER); // current directory
-
-        File[] files = f.listFiles();
-
-        File past = new File(wdir + "/" + Settings.LOGS_PATH + Settings.PAST_LOGS_FOLDER);
-        if (!past.exists()) {
-            try {
-                past.mkdir();
-            } catch (Exception e) {
-
-            }
-        }
-
-        for (File file : files) {
-            if (file.isDirectory()) {
-                String currentLogfoldername = file.getName();
-                LOG.trace(currentLogfoldername);
-
-                File sessionLogDir = new File(Global.sessionLogFolders = Settings.LOGS_PATH  + Settings.CURRENT_LOGS_FOLDER + currentLogfoldername);
-                File historyDir = new File(Settings.LOGS_PATH + Settings.PAST_LOGS_FOLDER + currentLogfoldername);
-                LOG.debug("move from: " + sessionLogDir + " >> to: " + historyDir);
-                try {
-                    FileUtils.moveDirectory(sessionLogDir, historyDir);
-                } catch (Exception e) {
-
-                }
-            }
-        }
-    }*/
 
     /**
      * shutdown mechanics
@@ -173,6 +127,7 @@ public class Global {
                 sessionLOG.info("session end;" + Global.sessionStopped);
 
                 LOG.info("change session logs");
+                //TODO: any post-processing
                 //moveSessionLogs();
 
 

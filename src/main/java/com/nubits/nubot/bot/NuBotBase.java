@@ -137,20 +137,6 @@ public abstract class NuBotBase {
             }
         }
 
-
-
-
-
-        /*File[] files = f.listFiles();
-        String currentLogfoldername = "";
-        for (File file : files) {
-            if (file.isDirectory()) {
-                currentLogfoldername = file.getName();
-                LOG.debug("directory:" + currentLogfoldername);
-                Global.sessionLogFolders = Settings.LOGS_PATH+Settings.CURRENT_LOGS_FOLDER + currentLogfoldername;
-                LOG.debug("set session log folder: " + Global.sessionLogFolders);
-            }
-        }*/
     }
 
     /**
@@ -239,7 +225,6 @@ public abstract class NuBotBase {
             }
         }
     }
-
 
 
     protected void checkNuConn() throws NuBotConnectionException {
