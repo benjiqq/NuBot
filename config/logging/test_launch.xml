@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Logging setup for launch tests-->
+
+<configuration>
+
+    <property scope="context" name="testlogfolder" value="testlogs" />
+
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
+            </Pattern>
+
+        </layout>
+
+    </appender>
+
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+        <!-- in the absence of the class attribute, it is assumed that the
+             desired discriminator type is
+             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+        <discriminator>
+            <key>session</key>
+            <defaultValue>sessionunknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
+                <file>${testlogfolder}/${session}/main.log</file>
+                <append>false</append>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
+
+
+    <root level="debug">
+        <appender-ref ref="SIFT" />
+        <appender-ref ref="STDOUT" />
+    </root>
+
+
+
+    <!-- to surpress logback startup messages -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+
+</configuration>
