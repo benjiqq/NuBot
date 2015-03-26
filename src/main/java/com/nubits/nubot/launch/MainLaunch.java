@@ -46,6 +46,8 @@ import java.util.List;
  */
 public class MainLaunch {
 
+    static { System.setProperty("logback.configurationFile", Settings.LOGXML);}
+
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
@@ -98,13 +100,6 @@ public class MainLaunch {
         Global.sessionStarted = System.currentTimeMillis();
 
         sessionLOG.debug("session start;" + currentLogfoldername + ";" + Global.sessionStarted);
-
-        LOG.trace("test logging level: trace");
-        LOG.debug("test logging level: debug");
-        LOG.info("test logging level: info");
-        LOG.error("test logging level: error");
-        LOG.warn("test logging level: warn");
-
 
         LOG.debug("main. with args " + args.length);
 

@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -43,6 +44,8 @@ import java.util.List;
  */
 public class TestLaunch {
 
+
+    static { System.setProperty("logback.configurationFile", Settings.LOGXML);}
 
     static String configfile = "config/myconfig/bitspark.json";
 
@@ -92,9 +95,7 @@ public class TestLaunch {
         Global.sessionStarted = System.currentTimeMillis();
 
 
-
         LOG.info("main. with args " + args.length);
-
 
 
         mainLaunch(configfile, false);

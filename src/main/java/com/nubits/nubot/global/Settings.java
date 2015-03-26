@@ -18,8 +18,6 @@
 
 package com.nubits.nubot.global;
 
-import com.nubits.nubot.bot.Global;
-
 /**
  * This class contains a list of settings that can be configured by developers
  * Settings are grouped and commented.
@@ -55,10 +53,23 @@ public class Settings {
     /**
      * Paths and filenames
      */
-    //Logging
+
+    //--- Logging ---
+
+    /**
+     * the main logging file
+      */
+    public static final String LOGXML = "config/logging/logback.xml";
+
+    public static final String TEST_LOGXML = "config/logging/test_logback.xml";
+
     public final static String LOGS_PATH = "logs/"; //name of the log folder
 
-    public final static String FROZEN_FUNDS_PATH =   "frozen-funds/"; //folder containing resources needed at runtime
+    public final static String RES_PATH = "res/";
+
+    public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
+
+    public final static String FROZEN_FUNDS_PATH =  RES_PATH + "frozen-funds/"; //folder containing resources needed at runtime
 
     public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
     public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
@@ -70,7 +81,6 @@ public class Settings {
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
-    public static final String TEST_LOGXML = "/config/allconfig/test_logback.xml";
 
     public static final String TEST_LOGFOLDER = "testlog"; //same as in test_logback.xml
 

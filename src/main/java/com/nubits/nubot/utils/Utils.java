@@ -416,21 +416,10 @@ public class Utils {
 
             //load file depending whether run from inside a Jar or not
 
-            String keystorefile = "nubot_keystore.jks";
-
-            String viaclasspath = filePathClasspathFile(keystorefile);
-            LOG.info("absolute path of keystore " + viaclasspath);
-
             String wdir = System.getProperty("user.dir");
-            String wdirpath = wdir + "/" + keystorefile;
+            String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
-            String path = "";
-            if (insideJar())
-                path = wdirpath;
-            else
-                path = viaclasspath;
-
-            System.setProperty("javax.net.ssl.trustStore", path);
+            System.setProperty("javax.net.ssl.trustStore", wdirpath);
             System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }

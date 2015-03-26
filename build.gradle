@@ -42,14 +42,19 @@ def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
 def docdir = new File("md")
-def testreportdir = new File("testreports") //$buildDir/reports
+def resdir = new File("res")
+
 def jarname = "NuBot.jar"
+def sampleconfig = "config/options/sample-options.json"
+
+def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
-def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
 def includeTestConfig = true
 
+FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
+        "./${docdir}/license.html", "./${docdir}/feeds.html", "./${docdir}/changelog.html", "./${docdir}/gradle.html")
+
 def uiclass = "com.nubits.nubot.webui.UiServer"
-FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
 //Project dependencies
 dependencies {
@@ -170,39 +175,68 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         println "finish distribution"
 
-        if (includeTestConfig) {
-            copy {
-                from "poloniex.json" //"config/myconfig/poloniex.json"
-                into "${distdir}"
-            }
-        }
-
-        html_files.each { File file ->
-            println 'copy ' + file.name
-            copy {
-                from "md/" + file.name
-                into "${distdir}/docs"
-            }
-            delete(file)
-        }
-
         copy {
-            from "config/sampleconfig/sample.json"
-            into "${distdir}"
-        }
-
-        copy {
-            from "res/nubot_keystore.jks"
-            into "${distdir}"
-            //exclude 'listCertificates.sh'
+            from "config/logging/logback.xml"
+            into "${distdir}/config/logging/logback.xml"
         }
 
         copy {
             from "src"
+            into "${distdir}/res/sources"
+        }
+
+        delete "${distdir}/res/sources/main/java/com/nubits/nubot/global/Passwords.java"
+
+        copy {
+            from "${docdir}/license.html"
+            into "${distdir}/sources"
+        }
+
+        copy {
+            from "${docdir}/readme.html"
             into "${distdir}"
         }
 
-        //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"
+        copy {
+            from "${docdir}/setup.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/exchanges.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/feeds.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/changelog.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/gradle.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from sampleconfig
+            into "${distdir}"
+        }
+
+        copy {
+            from "${resdir}/ssl/nubot_keystore.jks"
+            into "${distdir}/res/ssl"
+        }
+
+        copy {
+            from "${resdir}/ssl/updateKeystore.sh"
+            into "${distdir}/res/ssl"
+        }
+
     }
 
 }
@@ -218,9 +252,18 @@ task propfile << {
     def proc = "git rev-parse HEAD".execute()
     def b = new StringBuffer()
     proc.consumeProcessErrorStream(b)
-    def h = proc.text
-    h = h.replace("\n","")
-    prop.put("lastcommit",h);
+    def commit = proc.text
+    commit = commit.replace("\n","")
+
+    proc = "git rev-parse --abbrev-ref HEAD".execute()
+    b = new StringBuffer()
+    proc.consumeProcessErrorStream(b)
+    def branch = proc.text
+    branch = branch.replace("\n","")
+
+    prop.put("lastcommit",commit);
+    prop.put("branch",branch);
+
 
     def propFile = new File("${distdir}/.nubot")
     propFile.createNewFile();
