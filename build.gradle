@@ -219,7 +219,7 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         copy {
             from "${docdir}/license.html"
-            into "${distdir}/src"
+            into "${distdir}/sources"
         }
 
         copy {
