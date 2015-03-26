@@ -72,7 +72,11 @@ public class Global {
 
     public static void moveSessionLogs() {
 
+        LOG.debug("moving session logs");
+
         String wdir = System.getProperty("user.dir");
+
+        LOG.debug("wdir is: " + wdir);
 
         File f = new File(wdir + "/" + Settings.LOGS_PATH + Settings.CURRENT_LOGS_FOLDER); // current directory
 
