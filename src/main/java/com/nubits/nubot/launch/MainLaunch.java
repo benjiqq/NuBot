@@ -49,24 +49,7 @@ import java.util.List;
 public class MainLaunch {
 
     static {
-
-        System.out.println("static block");
-        File f = new File(Settings.LOGXML);
-        System.out.println("f: " + f.getAbsolutePath());
-        System.out.println("f: " + f.exists());
-
-        System.setProperty("logback.configurationFile", f.getAbsolutePath());
-
-        try {
-            JoranConfigurator configurator = new JoranConfigurator();
-            configurator.doConfigure(f.getAbsoluteFile()); // loads logback file
-        } catch (JoranException je) {
-            // StatusPrinter will handle this
-        } catch (Exception ex) {
-
-            ex.printStackTrace(); // Just in case, so we see a stacktrace
-
-        }
+        System.setProperty("logback.configurationFile", Settings.LOGXML);
     }
 
 
