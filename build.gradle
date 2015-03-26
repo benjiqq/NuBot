@@ -42,14 +42,18 @@ def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
 def docdir = new File("md")
-def testreportdir = new File("testreports") //$buildDir/reports
+
 def jarname = "NuBot.jar"
+def sampleconfig = "config/options/sample-options.json"
+
+def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
-def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
 def includeTestConfig = true
 
+FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
+        "./${docdir}/license.html", "./${docdir}/feeds.html", "./${docdir}/changelog.html", "./${docdir}/gradle.html")
+
 def uiclass = "com.nubits.nubot.webui.UiServer"
-FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
 //Project dependencies
 dependencies {
@@ -170,36 +174,64 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         println "finish distribution"
 
-        if (includeTestConfig) {
-            copy {
-                from "poloniex.json" //"config/myconfig/poloniex.json"
-                into "${distdir}"
-            }
-        }
-
-        html_files.each { File file ->
+        /*html_files.each { File file ->
             println 'copy ' + file.name
             copy {
-                from "md/" + file.name
+                from "${docdir}/" + file.name
                 into "${distdir}/docs"
             }
             delete(file)
-        }
+        }*/
 
         copy {
-            from "config/sampleconfig/sample.json"
+            from "${docdir}/readme.html"
             into "${distdir}"
         }
 
         copy {
-            from "res/nubot_keystore.jks"
+            from "${docdir}/setup.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/exchanges.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/feeds.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/changelog.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/gradle.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/license.html"
+            into "${distdir}/src"
+        }
+
+        copy {
+            from sampleconfig
             into "${distdir}"
+        }
+
+        copy {
+            from "resources/ssl/nubot_keystore.jks"
+            into "${distdir}/res/ssl"
             //exclude 'listCertificates.sh'
         }
 
         copy {
             from "src"
-            into "${distdir}"
+            into "${distdir}/src"
         }
 
         //delete "${distdir}/res/sources/src/com/nubits/nubot/global/Passwords.java"

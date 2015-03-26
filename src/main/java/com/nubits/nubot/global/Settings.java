@@ -55,15 +55,19 @@ public class Settings {
     /**
      * Paths and filenames
      */
-    //Logging
+
+    //--- Logging ---
+
     /**
      * the main logging file
       */
-    public static final String LOGXML = "/config/logging/logback.xml";
+    public static final String LOGXML = "config/logging/logback.xml";
 
-    public static final String TEST_LOGXML = "/config/logging/test_logback.xml";
+    public static final String TEST_LOGXML = "config/logging/test_logback.xml";
 
     public final static String LOGS_PATH = "logs/"; //name of the log folder
+
+    public final static String KEYSTORE_PATH = "resources/ssl/nubot_keystore.jks";
 
     public final static String FROZEN_FUNDS_PATH =   "frozen-funds/"; //folder containing resources needed at runtime
 
