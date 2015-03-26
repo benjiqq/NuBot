@@ -252,9 +252,18 @@ task propfile << {
     def proc = "git rev-parse HEAD".execute()
     def b = new StringBuffer()
     proc.consumeProcessErrorStream(b)
-    def h = proc.text
-    h = h.replace("\n","")
-    prop.put("lastcommit",h);
+    def commit = proc.text
+    commit = commit.replace("\n","")
+
+    proc = "git rev-parse --abbrev-ref HEAD".execute()
+    b = new StringBuffer()
+    proc.consumeProcessErrorStream(b)
+    def branch = proc.text
+    branch = branch.replace("\n","")
+
+    prop.put("lastcommit",commit);
+    prop.put("branch",branch);
+
 
     def propFile = new File("${distdir}/.nubot")
     propFile.createNewFile();
