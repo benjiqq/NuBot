@@ -247,7 +247,7 @@ public abstract class NuBotBase {
 
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
-        LOG.info(Global.options.toStringNoKeys());
+        LOG.info("Options loaded : " + Global.options.toStringNoKeys());
 
         // Set the frozen balance manager in the global variable
 
