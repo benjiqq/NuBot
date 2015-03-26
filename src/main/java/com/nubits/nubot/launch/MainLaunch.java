@@ -46,6 +46,8 @@ import java.util.List;
  */
 public class MainLaunch {
 
+    static { System.setProperty("logback.configurationFile", "/path/to/config.xml");}
+
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 

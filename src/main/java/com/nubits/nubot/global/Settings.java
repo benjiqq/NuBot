@@ -56,6 +56,13 @@ public class Settings {
      * Paths and filenames
      */
     //Logging
+    /**
+     * the main logging file
+      */
+    public static final String LOGXML = "/config/logging/logback.xml";
+
+    public static final String TEST_LOGXML = "/config/logging/test_logback.xml";
+
     public final static String LOGS_PATH = "logs/"; //name of the log folder
 
     public final static String FROZEN_FUNDS_PATH =   "frozen-funds/"; //folder containing resources needed at runtime
@@ -70,7 +77,6 @@ public class Settings {
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
-    public static final String TEST_LOGXML = "/config/allconfig/test_logback.xml";
 
     public static final String TEST_LOGFOLDER = "testlog"; //same as in test_logback.xml
 
