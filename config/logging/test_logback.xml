@@ -1,54 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
 
-	<property scope="context" name="logfolder" value="testlogs" />
+
+	<property scope="context" name="testlogfolder" value="testlogs" />
+
 
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
-				>>> %date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
+				%date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
 			</Pattern>
 
 		</layout>
 
 	</appender>
 
-	<appender name="mainFILE" class="ch.qos.logback.core.FileAppender">
-
-		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="ch.qos.logback.classic.html.HTMLLayout">
-				<pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
-			</layout>
-		</encoder>
-		<file>${logfolder}/standard.html</file>
-
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>INFO</level>
-		</filter>
-
-
-	</appender>
-
-	<appender name="allFILE" class="ch.qos.logback.core.FileAppender">
-
-		<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
-			<layout class="ch.qos.logback.classic.html.HTMLLayout">
-				<pattern>%date{HH:mm:ss.SSS}%level%line%logger%msg</pattern>
-			</layout>
-		</encoder>
-		<file>${logfolder}/verbose.html</file>
-
-		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>DEBUG</level>
-		</filter>
-
-
+	<appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<!-- in the absence of the class attribute, it is assumed that the
+             desired discriminator type is
+             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+		<discriminator>
+			<key>testID</key>
+			<defaultValue>unknown</defaultValue>
+		</discriminator>
+		<sift>
+			<appender name="FILE-${testID}" class="ch.qos.logback.core.FileAppender">
+				<file>${testlogfolder}/${testID}.log</file>
+				<append>false</append>
+				<layout class="ch.qos.logback.classic.PatternLayout">
+					<pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+				</layout>
+			</appender>
+		</sift>
 	</appender>
 
 
 	<root level="debug">
-		<appender-ref ref="allFILE" />
-		<appender-ref ref="mainFILE" />
+		<appender-ref ref="SIFT" />
 		<appender-ref ref="STDOUT" />
 	</root>
 
