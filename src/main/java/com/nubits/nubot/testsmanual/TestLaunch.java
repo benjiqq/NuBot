@@ -47,9 +47,7 @@ public class TestLaunch {
 
 
     static {
-        File f = new File(Settings.LOGXML);
-        if (f.exists())
-            System.setProperty("logback.configurationFile", Settings.LOGXML);
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
     static String configfile = "config/myconfig/bitspark.json";
