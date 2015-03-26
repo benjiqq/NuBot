@@ -18,8 +18,6 @@
 
 package com.nubits.nubot.testsmanual;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
@@ -27,22 +25,16 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.utils.InitTests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.URL;
 
 
 public class TestWrappers {
 
     //define Logging by using predefined Settings which points to an XML
     static {
-        String wdir = System.getProperty("user.dir");
-        File f = new File(wdir + Settings.TEST_LOGXML);
-        if (f.exists())
-            System.setProperty("logback.configurationFile", f.getAbsolutePath());
-
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
 
@@ -58,32 +50,9 @@ public class TestWrappers {
 
     public static void main(String[] args) {
 
-        InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
+        InitTests.setLoggingFilename(LOG);
 
-        //Load keystore
-        boolean trustAll = false;
-        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO))
-        {
-            trustAll = true;
-        }
-        InitTests.loadKeystore(trustAll);
-
-        try {
-            LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + Global.options.getExchangeName());
-            WrapperTestUtils.configureExchange(Global.options.getExchangeName());
-            InitTests.startConnectionCheck();
-
-        } catch (NuBotConfigException ex) {
-            LOG.error(ex.toString());
-        }
-
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger)LOG).getLoggerContext();
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
-        LOG.debug("Logback used '{}' as the configuration file.", mainURL);
-
-        Global.sessionLogFolders = Settings.TEST_LOGFOLDER;
-
+        init();
         runTests();
     }
 
@@ -141,6 +110,32 @@ public class TestWrappers {
         LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
         System.exit(0);
+    }
+
+    private static void init()
+    {
+        InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
+
+        //Load keystore
+        boolean trustAll = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO))
+        {
+            trustAll = true;
+        }
+        InitTests.loadKeystore(trustAll);
+
+        try {
+            LOG.info("using key: " + Global.options.getApiKey());
+            LOG.info("config exchange " + Global.options.getExchangeName());
+            WrapperTestUtils.configureExchange(Global.options.getExchangeName());
+            InitTests.startConnectionCheck();
+
+        } catch (NuBotConfigException ex) {
+            LOG.error(ex.toString());
+        }
+
+
+        Global.sessionLogFolders = Settings.TEST_LOGFOLDER;
     }
 
 

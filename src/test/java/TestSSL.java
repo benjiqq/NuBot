@@ -17,12 +17,10 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.nubits.nubot.testsmanual.SSLConnectionTest;
+import com.nubits.nubot.testsmanual.TestSSLConnection;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import java.io.IOException;
 
 
 public class TestSSL extends TestCase {
@@ -36,7 +34,7 @@ public class TestSSL extends TestCase {
 
         String API_BASE_URL = "poloniex.com"; //"https://poloniex.com/tradingApi";
 
-        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        boolean success = TestSSLConnection.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
 
     }
@@ -49,7 +47,7 @@ public class TestSSL extends TestCase {
 
         String API_BASE_URL = "bitspark.io";
 
-        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        boolean success = TestSSLConnection.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
 
     }
@@ -62,7 +60,7 @@ public class TestSSL extends TestCase {
 
             String API_BASE_URL = "alts.trade";
 
-        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        boolean success = TestSSLConnection.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
 
     }
@@ -74,7 +72,7 @@ public class TestSSL extends TestCase {
 
         String API_BASE_URL = "coinbase.com";
 
-        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        boolean success = TestSSLConnection.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
 
     }
@@ -86,7 +84,7 @@ public class TestSSL extends TestCase {
 
         String API_BASE_URL = "hipchat.com";
 
-        boolean success = SSLConnectionTest.connectionTest(API_BASE_URL, 443);
+        boolean success = TestSSLConnection.connectionTest(API_BASE_URL, 443);
         assertTrue(success);
 
     }

@@ -43,13 +43,19 @@ public class Settings {
     // ------ Timing ------
     /**
      * [seconds] Submit liquidity info
+     *
      */
-    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;
+    public static final String NUD_RPC_USER = "nubotTestUser";
+    public static final String NUD_RPC_PASS = "nubotTestPass";
+    public static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
+
 
     /**
      * [seconds)Execute StrategyTask
      */
     public static final int EXECUTE_STRATEGY_INTERVAL = 41;
+
+    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
 
     /**
      * [seconds) Check connection with exchanges API
@@ -104,7 +110,7 @@ public class Settings {
     /**
      * testlog directory. also defined in test_logback.xml
      */
-    public static final String TEST_LOGFOLDER = "testlog";
+    public static final String TEST_LOGFOLDER = LOGS_PATH + "tests";
 
     /**
      * the relative path for resources
@@ -117,10 +123,6 @@ public class Settings {
      * folder containing resources needed at runtime
      */
     public final static String FROZEN_FUNDS_PATH = RES_PATH + "frozen-funds/";
-
-    //public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
-
-    //public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
 
     public final static String SESSION_LOG = "session_";
 

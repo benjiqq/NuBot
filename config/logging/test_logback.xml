@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
+<!-- Logging setup for manual tests-->
+
 <configuration>
 
 
+	<property scope="context" name="testlogfolder" value="logs/tests" />
 
-	<property scope="context" name="testlogfolder" value="testlogs" />
 
-	
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<layout class="ch.qos.logback.classic.PatternLayout">
 			<Pattern>
@@ -17,16 +19,14 @@
 	</appender>
 
 	<appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
-		<!-- in the absence of the class attribute, it is assumed that the
-             desired discriminator type is
-             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+
 		<discriminator>
-			<key>session</key>
-			<defaultValue>sessionunknown</defaultValue>
+			<key>testFileName</key>
+			<defaultValue>unknown</defaultValue>
 		</discriminator>
 		<sift>
-			<appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-				<file>${testlogfolder}/${session}/main.log</file>
+			<appender name="FILE-${testFileName}" class="ch.qos.logback.core.FileAppender">
+				<file>${testlogfolder}/${testFileName}.log</file>
 				<append>false</append>
 				<layout class="ch.qos.logback.classic.PatternLayout">
 					<pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
@@ -40,7 +40,6 @@
 		<appender-ref ref="SIFT" />
 		<appender-ref ref="STDOUT" />
 	</root>
-
 
 
 	<!-- to surpress logback startup messages -->
