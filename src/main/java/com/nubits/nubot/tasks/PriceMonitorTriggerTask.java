@@ -447,7 +447,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         this.lastPrices = priceList ;
 
         LOG.info("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
-                + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode() + "\n");
+                + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode());
         if (isFirstTimeExecution) {
             try {
                 initStrategy(lp.getPrice().getQuantity());
@@ -561,7 +561,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
 
-        LOG.warn(row);
+        LOG.info("New price computed [" + row+"]");
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);

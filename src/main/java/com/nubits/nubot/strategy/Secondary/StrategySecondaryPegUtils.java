@@ -125,12 +125,12 @@ public class StrategySecondaryPegUtils {
 
         boolean buysOrdersOk = true;
         double sellPrice = strategy.getSellPricePEG();
-        LOG.info("init sell orders. price: " + sellPrice);
+        LOG.debug("init sell orders. price: " + sellPrice);
         boolean sellsOrdersOk = initOrders(Constant.SELL, sellPrice);
 
         if (Global.options.isDualSide()) {
             double buyPrice = strategy.getBuyPricePEG();
-            LOG.info("init buy orders. price: " + buyPrice);
+            LOG.debug("init buy orders. price: " + buyPrice);
             buysOrdersOk = initOrders(Constant.BUY, buyPrice);
         }
 
@@ -144,7 +144,7 @@ public class StrategySecondaryPegUtils {
 
     public boolean initOrders(String type, double price) {
 
-        LOG.info("initOrders " + type + ", price " + price);
+        LOG.debug("initOrders " + type + ", price " + price);
 
         boolean success = true;
         Amount balance = null;
