@@ -16,9 +16,7 @@
 	</appender>
 
 	<appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
-		<!-- in the absence of the class attribute, it is assumed that the
-             desired discriminator type is
-             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+
 		<discriminator>
 			<key>testFileName</key>
 			<defaultValue>unknown</defaultValue>
@@ -39,7 +37,6 @@
 		<appender-ref ref="SIFT" />
 		<appender-ref ref="STDOUT" />
 	</root>
-
 
 
 	<!-- to surpress logback startup messages -->
