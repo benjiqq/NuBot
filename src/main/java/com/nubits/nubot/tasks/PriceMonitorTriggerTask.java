@@ -561,7 +561,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
 
-        LOG.warn(row);
+        LOG.info("New price computed [" + row+"]");
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
