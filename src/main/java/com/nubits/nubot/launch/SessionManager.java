@@ -16,18 +16,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.RandomAccessFile;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
-import java.nio.channels.OverlappingFileLockException;
 
 public class SessionManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(SessionManager.class.getName());
 
-    private static File file;
-    private static FileChannel channel;
-    private static FileLock lock;
+    private static File sfile;
+    private static String refFolder;
 
     /**
      * main launch of a bot
@@ -81,62 +76,39 @@ public class SessionManager {
                 bot.execute(opt);
             }
         }
-
     }
 
     /**
      * check whether other sessions are active via a temp file
+     *
      * @return
      */
     public static boolean isSessionActive() {
+
+        refFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER; //wdir
+
+        sfile = new File
+                (refFolder, Settings.APP_NAME + Settings.SESSION_FILE);
+        System.out.println("checking " + sfile.getAbsolutePath() + " " + sfile.exists());
+        return sfile.exists();
+    }
+
+    public static void createSessionFile() {
         try {
-            String refFolder = System.getProperty("user.home"); //wdir
+            File appdir = new File(System.getProperty("user.home") + "/" + Settings.APP_FOLDER);
+            if (!appdir.exists())
+                appdir.mkdir();
 
-            file = new File
-                    (refFolder, Settings.APP_NAME+ ".tmp");
-            System.out.println("checking " + refFolder + " " + file.exists());
-            channel = new RandomAccessFile(file, "rw").getChannel();
+            sfile = new File
+                    (refFolder, Settings.APP_NAME + Settings.SESSION_FILE);
+            sfile.createNewFile();
+        } catch (Exception e) {
 
-            try {
-                lock = channel.tryLock();
-            }
-            catch (OverlappingFileLockException e) {
-                // already locked
-                closeLock();
-                return true;
-            }
-
-            if (lock == null) {
-                closeLock();
-                return true;
-            }
-
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                // destroy the lock when the JVM is closing
-                public void run() {
-                    closeLock();
-                    deleteFile();
-                }
-            });
-            return false;
         }
-        catch (Exception e) {
-            closeLock();
-            return true;
-        }
+        sfile.deleteOnExit();
+
     }
 
-    private static void closeLock() {
-        try { lock.release();  }
-        catch (Exception e) {  }
-        try { channel.close(); }
-        catch (Exception e) {  }
-    }
-
-    private static void deleteFile() {
-        try { file.delete(); }
-        catch (Exception e) { }
-    }
 
     /**
      * shutdown mechanics
@@ -151,9 +123,9 @@ public class SessionManager {
 
                 LOG.info("Bot shutting down..");
 
-                String additionalInfo = "after "+ Utils.getBotUptime()+ " uptime on "
+                String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
                         + Global.options.getExchangeName() + " ["
-                        + Global.options.getPair().toStringSep()+"]";
+                        + Global.options.getPair().toStringSep() + "]";
 
                 HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 

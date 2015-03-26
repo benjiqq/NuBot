@@ -58,6 +58,9 @@ public class MainLaunch {
         boolean isActive = SessionManager.isSessionActive();
         if (isActive)
             System.out.println("NuBot is already running");
+        else {
+            SessionManager.createSessionFile();
+        }
 
         if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);

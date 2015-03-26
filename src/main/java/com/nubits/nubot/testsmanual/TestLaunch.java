@@ -20,6 +20,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
+import com.nubits.nubot.launch.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,10 +50,20 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        if (MainLaunch.isAppActive())
-            System.out.println(Settings.APP_NAME + " is already running");
-        else
-            System.out.println(Settings.APP_NAME + " not running");
+        String tmpdir = System.getProperty("java.io.tmpdir");
+        System.out.println("tmpdir " + tmpdir);
+
+        boolean isActive = SessionManager.isSessionActive();
+        if (isActive)
+            System.out.println("NuBot is already running");
+        else {
+            SessionManager.createSessionFile();
+        }
+        try{
+            Thread.sleep(10000);
+        }catch(Exception e){
+
+        }
 
         /*
         Global.sessionLogFolders = "session_" + System.currentTimeMillis();

@@ -142,4 +142,9 @@ public class Settings {
     public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
 
 
+    public final static String APP_FOLDER = ".nubot";
+
+    public final static String SESSION_FILE = "_session.tmp";
+
+
 }
