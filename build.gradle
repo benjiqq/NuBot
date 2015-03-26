@@ -225,7 +225,11 @@ task NuBotDist(dependsOn: NuBotJar) {
         copy {
             from "${resdir}/ssl/nubot_keystore.jks"
             into "${distdir}/res/ssl"
-            //exclude 'listCertificates.sh'
+        }
+
+        copy {
+            from "${resdir}/ssl/updateKeystore.sh"
+            into "${distdir}/res/ssl"
         }
 
 
