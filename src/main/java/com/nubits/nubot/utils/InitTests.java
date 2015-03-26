@@ -16,17 +16,16 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-package com.nubits.nubot.testsmanual;
+package com.nubits.nubot.utils;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.tasks.TaskManager;
-import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
+import org.slf4j.MDC;
 
 /**
  *
@@ -72,5 +71,12 @@ public class InitTests {
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
         }
+    }
+
+    public static void setLoggingFilename(Class clazz)
+    {
+        String fileName = clazz.getSimpleName() + "_" + Utils.getTimestampLong();
+        MDC.put("testFileName", fileName);
+        LOG.info("Logging on "+ Settings.TEST_LOGFOLDER+"/"+fileName);
     }
 }

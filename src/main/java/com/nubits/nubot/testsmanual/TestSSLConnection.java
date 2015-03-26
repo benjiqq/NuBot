@@ -29,9 +29,9 @@ import java.io.*;
  * prints the response. See
  * http://confluence.atlassian.com/display/JIRA/Connecting+to+SSL+services
  */
-public class SSLConnectionTest {
+public class TestSSLConnection {
 
-    private static final Logger LOG = LoggerFactory.getLogger(SSLConnectionTest.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TestSSLConnection.class);
 
     public static boolean connectionTest(String host, int port){
         try {
@@ -61,7 +61,7 @@ public class SSLConnectionTest {
 
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("Usage: "+ SSLConnectionTest.class.getName()+" <host> <port>");
+            System.out.println("Usage: "+ TestSSLConnection.class.getName()+" <host> <port>");
             System.exit(1);
         }
 
