@@ -19,20 +19,19 @@
 package testexchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.testsmanual.InitTests;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TestExchangePeatio extends TestCase {
 
@@ -43,34 +42,16 @@ public class TestExchangePeatio extends TestCase {
     private static String testconfigFile = "peatio.json";
     private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
+    private CurrencyPair testPair = CurrencyList.NBT_BTC;
+
     @Test
     public void testPing() {
 
-        NuBotOptions opt = null;
-        try {
-            opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+        TradeInterface ti = setupTI();
 
-            assertTrue(opt != null);
+        Global.exchange.getLiveData().setConnected(true);
 
-            assertTrue(opt.getExchangeName().equals("peatio"));
-
-        } catch (NuBotConfigException e) {
-            e.printStackTrace();
-        }
-
-        Global.options = opt;
-
-        CurrencyPair testPair = CurrencyList.NBT_BTC;
-
-        try{
-            WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
-
-        }
-
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(testPair);
-
+        ApiResponse balancesResponse = ti.getAvailableBalances(testPair);
 
         if (balancesResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.getBalance() ");
@@ -86,9 +67,7 @@ public class TestExchangePeatio extends TestCase {
         }
     }
 
-    @Test
-    public void testGetBalance() {
-
+    private TradeInterface setupTI(){
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -102,9 +81,11 @@ public class TestExchangePeatio extends TestCase {
             e.printStackTrace();
         }
 
+        //Load keystore
+        InitTests.loadKeystore(true);
+
         Global.options = opt;
 
-        CurrencyPair testPair = CurrencyList.NBT_BTC;
 
         try{
             WrapperTestUtils.configureExchange(opt.getExchangeName());
@@ -112,16 +93,7 @@ public class TestExchangePeatio extends TestCase {
 
         }
 
-
-
-
-        try{
-            WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
-
-        }
-
-        TradeInterface ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
+        TradeInterface ti;// = ExchangeFacade.exchangeInterfaceSetup(Global.options);
         ti = Global.exchange.getTradeInterface();
         //Bug
         ti.setExchange(Global.exchange);
@@ -130,11 +102,16 @@ public class TestExchangePeatio extends TestCase {
 
         Currency btc = CurrencyList.BTC;
         Global.exchange.getLiveData().setConnected(true);
-        ExchangeLiveData ld = Global.exchange.getLiveData();
+        return ti;
+    }
 
-        assertTrue(ld != null);
+    @Test
+    public void testGetBalance() {
+
+        TradeInterface ti = setupTI();
+
         long start = System.currentTimeMillis();
-        ApiResponse balancesResponse = ti.getAvailableBalance(btc);
+        ApiResponse balancesResponse = ti.getAvailableBalance(CurrencyList.BTC);
         assertTrue(balancesResponse!=null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
