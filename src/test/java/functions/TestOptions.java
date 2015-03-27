@@ -119,7 +119,7 @@ public class TestOptions extends TestCase {
 
             assertTrue(nuo != null);
 
-            assertTrue(nuo.exchangeName.equals("Peatio"));
+            assertTrue(nuo.exchangeName.equals("peatio"));
 
             //assertTrue(nuo.getPair() != null);
 
@@ -186,7 +186,7 @@ public class TestOptions extends TestCase {
 
         assertTrue(!catched);
 
-        assertTrue(opt.getExchangeName().equals("Peatio"));
+        assertTrue(opt.getExchangeName().equals("peatio"));
         assertTrue(opt.getApiKey().equals("testapikey"));
         assertTrue(opt.getApiSecret().equals("testapisecret"));
         assertTrue(opt.getTxFee() == 0.2);

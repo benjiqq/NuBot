@@ -1,6 +1,5 @@
 package com.nubits.nubot.bot;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.options.NuBotConfigException;
@@ -70,13 +69,12 @@ public class SessionManager {
             LOG.info("NuBot is already running");
             //handle different cases later
 
-            //several NuBots running one exchange should be prohibited (?)
+            //TODO: several NuBots running one exchange should be prohibited (?)
         }
 
         //create session file, which auto-deletes itself
         //it increases the counter
         createSessionFile();
-
 
         Global.sessionStarted = System.currentTimeMillis();
 
