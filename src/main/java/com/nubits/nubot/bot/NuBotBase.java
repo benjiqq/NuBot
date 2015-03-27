@@ -108,13 +108,14 @@ public abstract class NuBotBase {
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
 
         //print loggers
-        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+
+        /*List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
 
         Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
         while (it.hasNext()) {
             ch.qos.logback.classic.Logger l = it.next();
             LOG.debug("" + l);
-        }
+        }*/
     }
 
     protected void setupSSL() {

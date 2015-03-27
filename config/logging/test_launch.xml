@@ -4,8 +4,9 @@
 
 <configuration>
 
-    <property scope="context" name="testlogfolder" value="testlogs" />
-
+    <property scope="context" name="testlogfolder" value="testlaunch" />
+    <property scope="context" name="SessionLOG" value="SessionLOG" />
+    <property scope="context" name="sessionlogFile" value=".sessions.log" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
@@ -17,18 +18,19 @@
 
     </appender>
 
-    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
-        <!-- in the absence of the class attribute, it is assumed that the
-             desired discriminator type is
-             ch.qos.logback.classic.sift.MDCBasedDiscriminator -->
+    <appender name="standardHTML" class="ch.qos.logback.classic.sift.SiftingAppender">
+
         <discriminator>
             <key>session</key>
-            <defaultValue>sessionunknown</defaultValue>
+            <defaultValue>session_main</defaultValue>
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${testlogfolder}/${session}/main.html</file>
-                <append>false</append>
+                <file>${session}/standard.html</file>
+
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>INFO</level>
+                </filter>
 
                 <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                     <layout class="ch.qos.logback.classic.html.HTMLLayout">
@@ -36,9 +38,71 @@
                     </layout>
                 </encoder>
 
-                <!--<layout class="ch.qos.logback.classic.PatternLayout">
-                    <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
-                </layout>-->
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("jetty");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("${SessionLOG}");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
+            </appender>
+        </sift>
+    </appender>
+
+    <appender name="verboseHTML" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+        <discriminator>
+            <key>session</key>
+            <defaultValue>session_main</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
+                <file>${session}/verbose.html</file>
+                <!--<append>false</append>-->
+
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>DEBUG</level>
+                </filter>
+
+                <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+                    <layout class="ch.qos.logback.classic.html.HTMLLayout">
+                        <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                    </layout>
+                </encoder>
+
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("jetty");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("${SessionLOG}");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
             </appender>
         </sift>
     </appender>
@@ -50,28 +114,18 @@
             </pattern>
         </encoder>
 
-        <file>${testlogfolder}/session.log</file>
+        <file>${testlogfolder}/${sessionlogFile}</file>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
         </filter>
 
-        <!--
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    return logger.contains("SessionLOG");
-                </expression>
-            </evaluator>
-            <onMatch>NEUTRAL</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>-->
-
     </appender>
 
 
     <root level="debug">
-        <appender-ref ref="SIFT" />
+        <appender-ref ref="standardHTML" />
+        <appender-ref ref="verboseHTML" />
         <appender-ref ref="STDOUT" />
         <appender-ref ref="sessionFile" />
     </root>

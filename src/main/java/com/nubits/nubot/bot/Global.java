@@ -20,6 +20,7 @@ package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotOptions;
@@ -66,7 +67,8 @@ public class Global {
      */
     public static void createShutDownHook() {
 
-        LOG.info("adding shutdown hook");
+        Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
+        sessionLOG.info("adding shutdown hook");
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
@@ -74,7 +76,7 @@ public class Global {
 
                 Global.bot.shutdownBot();
 
-                Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
+                Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
                 Global.sessionStopped = System.currentTimeMillis();
                 sessionLOG.info("session end;" + Global.sessionStopped);
 
