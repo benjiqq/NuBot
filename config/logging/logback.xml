@@ -87,7 +87,7 @@
 				<onMismatch>NEUTRAL</onMismatch>
 				</filter>
 
-				
+
 				<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
 					<evaluator>
 						<expression>
