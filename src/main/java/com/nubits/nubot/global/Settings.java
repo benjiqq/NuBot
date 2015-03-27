@@ -51,19 +51,19 @@ public class Settings {
 
 
     /**
-     * [seconds)Execute StrategyTask
+     * [seconds] Execute StrategyTask
      */
     public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
     public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
 
     /**
-     * [seconds) Check connection with exchanges API
+     * [seconds] Check connection with exchanges API
      */
     public static final int CHECK_CONNECTION_INTERVAL = 127;
 
     /**
-     * [seconds)Check connection with nudaemon
+     * [seconds] Check connection with nudaemon
      */
     public static final int CHECK_NUD_INTERVAL = 30;
 
@@ -134,6 +134,8 @@ public class Settings {
     public final static String ORDERS_FILENAME = "orders_history"; //Filename for historical snapshot of active orders
 
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
+
+    public final static String WALLSHIFTS_FILENAME =  "wall_shifts"; //Filename for recording wallshifts
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 

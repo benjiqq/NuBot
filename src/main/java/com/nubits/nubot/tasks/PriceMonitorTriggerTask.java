@@ -85,8 +85,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private boolean isFirstTimeExecution = true;
 
-    private String wallshiftsFilePath = Global.sessionLogFolder + "/" + "wall_shifts.csv";
-    private String wallshiftsFilePathJson = Global.sessionLogFolder + "/" + "wall_shifts.json";
+    private String wallshiftsFilePathCSV = Global.sessionLogFolder + "/" + Settings.WALLSHIFTS_FILENAME +".csv";
+    private String wallshiftsFilePathJSON = Global.sessionLogFolder + "/" + Settings.WALLSHIFTS_FILENAME +".json";
 
     private String emailHistory = "";
 
@@ -97,7 +97,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private boolean first = true;
 
     public void init(){
-        File c = new File(this.wallshiftsFilePath);
+        File c = new File(this.wallshiftsFilePathCSV);
         if (!c.exists()) {
             try {
                 c.createNewFile();
@@ -106,10 +106,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
             }
         }
 
-        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", wallshiftsFilePath, true);
+        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", wallshiftsFilePathCSV, true);
 
         //create json file if it doesn't already exist
-        File json = new File(this.wallshiftsFilePathJson);
+        File json = new File(this.wallshiftsFilePathJSON);
         if (!json.exists()) {
             try {
                 json.createNewFile();
@@ -119,7 +119,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             JSONObject history = new JSONObject();
             JSONArray wall_shifts = new JSONArray();
             history.put("wall_shifts", wall_shifts);
-            FileSystem.writeToFile(history.toJSONString(), this.wallshiftsFilePathJson, true);
+            FileSystem.writeToFile(history.toJSONString(), this.wallshiftsFilePathJSON, true);
         }
     }
 
@@ -564,7 +564,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
-        logrow(row, wallshiftsFilePath, true);
+        logrow(row, wallshiftsFilePathCSV, true);
 
         //Also update a json version of the output file
         //build the latest data into a JSONObject
@@ -582,7 +582,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         JSONObject wall_shift_info = new JSONObject();
         JSONArray wall_shifts = new JSONArray();
         try { //object already exists in file
-            wall_shift_info = (JSONObject) parser.parse(FileSystem.readFromFile(this.wallshiftsFilePathJson));
+            wall_shift_info = (JSONObject) parser.parse(FileSystem.readFromFile(this.wallshiftsFilePathJSON));
             wall_shifts = (JSONArray) wall_shift_info.get("wall_shifts");
         } catch (ParseException pe) {
             LOG.error("Unable to parse order_history.json");
@@ -760,7 +760,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private void logWallShift(String wall_shift) {
-        FileSystem.writeToFile(wall_shift, this.wallshiftsFilePathJson, false);
+        FileSystem.writeToFile(wall_shift, this.wallshiftsFilePathJSON, false);
     }
     
 }
