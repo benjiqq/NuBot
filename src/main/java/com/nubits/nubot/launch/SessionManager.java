@@ -60,19 +60,7 @@ public class SessionManager {
         //set up session dir
         String wdir = System.getProperty("user.dir");
 
-        /*File ldir = new File(wdir + "/" + Settings.LOGS_PATH);
-        if (!ldir.exists())
-            ldir.mkdir();*/
-
-
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
-        //String sessiondir = wdir + "/" + Settings.LOGS_PATH + Global.sessionLogFolder;
-
-
-
-        //LOG.debug("session launch called from " + caller);
-        //LOG.debug("launch bot session. with configfile " + configfile + " " + " runui " + runui);
-
 
         //TODO!
         // check if other bots are running
@@ -81,9 +69,10 @@ public class SessionManager {
         if (otherSessions) {
             LOG.info("NuBot is already running");
             //handle different cases
-        } else {
-            createSessionFile();
         }
+
+        createSessionFile();
+
 
         Global.sessionStarted = System.currentTimeMillis();
         //sessionLOG.debug("session start;" + Global.sessionLogFolder + ";" + Global.sessionStarted);
@@ -140,22 +129,39 @@ public class SessionManager {
         return sessionFile.exists();
     }
 
+    /**
+     * create a session file in the app folder. increase session counter with each session
+     * Note: session file gets marked as deleted after exit
+     */
     public static void createSessionFile() {
+
         try {
             File appdir = new File(System.getProperty("user.home") + "/" + Settings.APP_FOLDER);
             if (!appdir.exists())
                 appdir.mkdir();
-
-            String sessionFileName = Global.sessionStarted + Settings.SESSION_FILE;
-            sessionFile = new File(appFolder, Settings.APP_NAME + sessionFileName);
-            sessionFile.createNewFile();
-
-            //delete the file on exit
-            sessionFile.deleteOnExit();
-
         } catch (Exception e) {
-
         }
 
+        boolean done = false;
+        int i = 0;
+        while (!done) {
+
+            String sessionFileName = Settings.APP_NAME + "_" + i + Settings.SESSION_FILE;
+            sessionFile = new File(appFolder, sessionFileName);
+            if (!sessionFile.exists()) {
+                try {
+                    sessionFile.createNewFile();
+                    //delete the file on exit
+                    sessionFile.deleteOnExit();
+                    done = true;
+                } catch (Exception e) {
+
+                }
+
+            }
+            i++;
+        }
     }
+
+
 }
