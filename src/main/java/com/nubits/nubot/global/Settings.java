@@ -135,6 +135,8 @@ public class Settings {
 
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
 
+    public final static String WALLSHIFTS_FILENAME =  "wall_shifts"; //Filename for recording wallshifts
+
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
