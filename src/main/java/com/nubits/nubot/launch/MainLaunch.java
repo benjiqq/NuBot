@@ -133,12 +133,13 @@ public class MainLaunch {
 
         File f = new File(wdir + "/" + Settings.LOGS_PATH + Settings.CURRENT_LOGS_FOLDER); // current directory
 
+        Global.sessionLogFolders = f.getAbsolutePath();
+        Global.sessionStarted = System.currentTimeMillis();
+        sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
+
         if (!f.exists()) {
             f.mkdir();
-            Global.sessionLogFolders = f.getAbsolutePath();
-            Global.sessionStarted = System.currentTimeMillis();
-            sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
-        } else {
+              } else {
             //should have been moved
         }
 

@@ -55,9 +55,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private boolean firstOrdersPlaced = false;
     private boolean firstExecution = true;
 
-    private String outputFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME +".csv";
-    private String jsonFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME + ".json";
-    private String jsonFile_balances = Global.sessionLogFolders + "/" + Settings.BALANCES_FILEAME + ".json";
+    private String outputFile_orders;
+    private String jsonFile_orders;
+    private String jsonFile_balances;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
 
@@ -66,6 +66,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     }
 
     private void initFiles() {
+
+         outputFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME +".csv";
+         jsonFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME + ".json";
+         jsonFile_balances = Global.sessionLogFolders + "/" + Settings.BALANCES_FILEAME + ".json";
+
         //create json file if it doesn't already exist
         LOG.debug("init files");
         File jsonF1 = new File(this.jsonFile_orders);
