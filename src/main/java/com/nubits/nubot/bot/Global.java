@@ -44,8 +44,6 @@ public class Global {
     //path of logs in this session
     public static String sessionLogFolders;
 
-    public static boolean running = false;
-
     public static TaskManager taskManager;
 
     public static NuRPCClient rpcClient;
@@ -71,56 +69,7 @@ public class Global {
             @Override
             public void run() {
 
-                LOG.info("Bot shutting down..");
 
-                String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
-                        + Global.options.getExchangeName() + " ["
-                        + Global.options.getPair().toStringSep() + "]";
-
-                HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
-
-                //Try to cancel all orders, if any
-                if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
-                    LOG.info("Clearing out active orders ... ");
-
-                    ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                    if (deleteOrdersResponse.isPositive()) {
-                        boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-
-                        if (deleted) {
-                            LOG.info("Order clear request successful");
-                        } else {
-                            LOG.error("Could not submit request to clear orders");
-                        }
-
-                    } else {
-                        LOG.error(deleteOrdersResponse.getError().toString());
-                    }
-                }
-
-                //reset liquidity info
-                if (Global.options.isSubmitliquidity()) {
-                    if (Global.rpcClient.isConnected()) {
-                        //tier 1
-                        LOG.info("Resetting Liquidity Info before quit");
-
-                        JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0, 1);
-                        if (null == responseObject1) {
-                            LOG.error("Something went wrong while sending liquidityinfo");
-                        } else {
-                            LOG.info(responseObject1.toJSONString());
-                        }
-
-                        JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0, 2);
-                        if (null == responseObject2) {
-                            LOG.error("Something went wrong while sending liquidityinfo");
-                        } else {
-                            LOG.info(responseObject2.toJSONString());
-                        }
-                    }
-                }
 
                 Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
                 Global.sessionStopped = System.currentTimeMillis();

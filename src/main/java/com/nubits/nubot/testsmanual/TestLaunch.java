@@ -18,11 +18,11 @@
 
 package com.nubits.nubot.testsmanual;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.launch.MainLaunch;
-import com.nubits.nubot.launch.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 
 /**
@@ -50,32 +50,18 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        String tmpdir = System.getProperty("java.io.tmpdir");
-        System.out.println("tmpdir " + tmpdir);
 
-        boolean isActive = SessionManager.isSessionActive();
-        if (isActive)
-            System.out.println("NuBot is already running");
-        else {
-            SessionManager.createSessionFile();
-        }
-        try{
-            Thread.sleep(10000);
-        }catch(Exception e){
 
-        }
-
-        /*
         Global.sessionLogFolders = "session_" + System.currentTimeMillis();
 
-        MDC.put("session", );
+        MDC.put("session", "session_" + System.currentTimeMillis());
 
         LOG.info("bla");
 
         MDC.put("session", "session_" + System.currentTimeMillis());
-        LOG.info("sssbla");*/
+        LOG.info("sssbla");
 
-        //SessionManager.mainLaunch(configfile, false);
+        //SessionManager.sessionLaunch(configfile, false);
 
     }
 

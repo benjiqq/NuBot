@@ -53,7 +53,6 @@ public class MainLaunch {
     private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
 
 
-
     /**
      * Start the NuBot. start if config is valid and other instance is running
      *
@@ -61,12 +60,6 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
-        boolean isActive = isSessionActive();
-        if (isActive)
-            System.out.println("NuBot is already running");
-        else {
-            createSessionFile();
-        }
 
         if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
@@ -74,7 +67,7 @@ public class MainLaunch {
 
         String configfile = args[0];
 
-        mainLaunch(configfile, false);
+        sessionLaunch(configfile, false);
 
     }
 
@@ -84,10 +77,9 @@ public class MainLaunch {
      * @param configfile
      * @param runui
      */
-    public static void mainLaunch(String configfile, boolean runui) {
+    public static void sessionLaunch(String configfile, boolean runui) {
 
-
-        LOG.debug("main launch. with configfile " + configfile + " " + " runui " + runui);
+        LOG.debug("launch bot. with configfile " + configfile + " " + " runui " + runui);
 
         NuBotOptions nuopt = null;
 
@@ -98,42 +90,47 @@ public class MainLaunch {
             MainLaunch.exitWithNotice("" + e);
         }
 
-        LOG.debug("-- new main launched --");
-
-        LOG.debug("** run command line **");
-        executeBot(nuopt);
+        launchBot(nuopt);
 
     }
 
 
-
     /**
-     * execute a NuBot based on valid options. Also make sure only one NuBot is running
+     * execute a NuBot based on valid options
      *
      * @param opt
      */
-    public static void executeBot(NuBotOptions opt) {
+    public static void launchBot(NuBotOptions opt) {
 
         Global.mainThread = Thread.currentThread();
 
         Global.createShutDownHook();
 
-        //exit if already running or show info to user
+
         //TODO!
-        // this does not work and multi-bot should be allowed
-        if (Global.running) {
-            MainLaunch.exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
-        } else {
-            if (opt.requiresSecondaryPegStrategy()) {
-                LOG.debug("creating secondary bot object");
-                NuBotSecondary bot = new NuBotSecondary();
-                bot.execute(opt);
-            } else {
-                LOG.debug("creating simple bot object");
-                NuBotSimple bot = new NuBotSimple();
-                bot.execute(opt);
-            }
+        // check if other bots are running
+        boolean otherSessions = isSessionActive();
+
+        if (otherSessions) {
+            LOG.info("NuBot is already running");
+            //handle different cases
         }
+        else {
+            createSessionFile();
+        }
+
+        //execute bot
+
+        if (opt.requiresSecondaryPegStrategy()) {
+            LOG.debug("creating secondary bot object");
+            NuBotSecondary bot = new NuBotSecondary();
+            bot.execute(opt);
+        } else {
+            LOG.debug("creating simple bot object");
+            NuBotSimple bot = new NuBotSimple();
+            bot.execute(opt);
+        }
+
     }
 
 
@@ -148,7 +145,7 @@ public class MainLaunch {
 
         sessionFile = new File
                 (appFolder, Settings.APP_NAME + Settings.SESSION_FILE);
-        System.out.println("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+        LOG.info("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
 
@@ -164,8 +161,9 @@ public class MainLaunch {
         } catch (Exception e) {
 
         }
-        sessionFile.deleteOnExit();
 
+        //delete the file on exit
+        sessionFile.deleteOnExit();
     }
 
 
@@ -178,8 +176,6 @@ public class MainLaunch {
         LOG.error(msg);
         System.exit(0);
     }
-
-
 
 
 }

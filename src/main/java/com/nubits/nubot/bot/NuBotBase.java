@@ -25,6 +25,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Order;
@@ -172,7 +173,7 @@ public abstract class NuBotBase {
         try {
             ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
         } catch (Exception e) {
-            exitWithNotice("exchange unknown");
+            MainLaunch.exitWithNotice("exchange unknown");
         }
 
         //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
@@ -252,8 +253,6 @@ public abstract class NuBotBase {
 
         setupAllConfig();
 
-        Global.running = true;
-
         LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
 
@@ -279,7 +278,7 @@ public abstract class NuBotBase {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
         } else {
-            exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+            MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
 
@@ -291,7 +290,7 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
-                exitWithNotice("can't connect to Nu " + e);
+                MainLaunch.exitWithNotice("can't connect to Nu " + e);
             }
         }
 
@@ -306,7 +305,7 @@ public abstract class NuBotBase {
         try {
             configureStrategy();
         } catch (NuBotConfigException e) {
-            exitWithNotice("can't configure strategy");
+            MainLaunch.exitWithNotice("can't configure strategy");
         }
 
         notifyOnline();
@@ -319,17 +318,6 @@ public abstract class NuBotBase {
         String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc + " pair (" + p + ")";
         LOG.debug("notify online " + msg);
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
-    }
-
-
-    /**
-     * exit application and notify user
-     *
-     * @param msg
-     */
-    protected static void exitWithNotice(String msg) {
-        LOG.error(msg);
-        System.exit(0);
     }
 
 }
