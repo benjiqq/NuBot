@@ -158,7 +158,7 @@ public class ParseOptions {
         options.exchangeName = (String) getIgnoreCase(optionsJSON, "exchangename");
 
         boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
-        LOG.info("exchange supported? " + options.exchangeName + " " + supported);
+        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
         if (!supported)
             throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
 
@@ -201,7 +201,7 @@ public class ParseOptions {
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
 
-        LOG.info("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
+        LOG.trace("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
 
         if (options.requiresSecondaryPegStrategy()) {
             try {
@@ -347,7 +347,7 @@ public class ParseOptions {
 
         JSONArray bfeeds = (JSONArray) optionsJSON.get("backupfeeds");
 
-        LOG.info("bfeeds " + bfeeds);
+        LOG.trace("bfeeds " + bfeeds);
 
         if (bfeeds.size() < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");

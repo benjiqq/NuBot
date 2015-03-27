@@ -536,6 +536,7 @@ public class NuBotOptions {
 
             //Replace sensitive information
             serializedOptionsJSON.replace("apisecret", "hidden");
+            serializedOptionsJSON.replace("apikey", "hidden");
             serializedOptionsJSON.replace("rpcpass","hidden");
 
             toRet = serializedOptionsJSON.toString();

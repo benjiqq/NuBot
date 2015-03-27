@@ -18,26 +18,12 @@
 
 package com.nubits.nubot.testsmanual;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.launch.MainLaunch;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
+import org.slf4j.MDC;
 
 
 /**
@@ -47,12 +33,15 @@ public class TestLaunch {
 
 
     static {
-        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+        System.setProperty("testlogfolder","abc");
+        System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 
-    static String configfile = "config/myconfig/bitspark.json";
+    static String configfile = "config/myconfig/poloniex.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
+
+    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
     private static boolean runui = false;
 
@@ -64,7 +53,16 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        MainLaunch.mainLaunch(configfile, false);
+        //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
+
+        Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        MDC.put("session", Global.sessionPath);
+        LOG.info("defined session path " + Global.sessionPath);
+        sessionLOG.debug("test launch");
+
+        SessionManager.sessionLaunch(configfile, runui);
+
+        //SessionManager.sessionLaunch(configfile, false);
 
     }
 

@@ -1,7 +1,7 @@
 {
   "dualside": true,
   "multiplecustodians":false,
-  "exchangename":"xxx",
+  "exchangename":"poloniex",
   "apikey": "xxx",
   "apisecret": "xxx",
   "txfee": 0.2,

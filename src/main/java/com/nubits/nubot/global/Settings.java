@@ -30,48 +30,82 @@ public class Settings {
      */
     public final static String APP_NAME = "NuBot";
 
-    public static final int DEFAULT_PRECISION = 8 ; //Used to round
-
-    public static final double FORCED_SPREAD = 0.9 ; //[%] Force the a spread to avoid collisions (multi-custodians)
+    /**
+     * the precision used to round
+     */
+    public static final int DEFAULT_PRECISION = 8;
 
     /**
-     * Test passwords
+     * [%] Force the a spread to avoid collisions (multi-custodians)
+     */
+    public static final double FORCED_SPREAD = 0.9;
+
+    // ------ Timing ------
+    /**
+     * [seconds] Submit liquidity info
+     *
      */
     public static final String NUD_RPC_USER = "nubotTestUser";
     public static final String NUD_RPC_PASS = "nubotTestPass";
     public static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
+
+
     /**
-     * Timing
+     * [seconds] Execute StrategyTask
      */
+    public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
     public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
-    public static final int EXECUTE_STRATEGY_INTERVAL = 41;  // [seconds] Execute StrategyTask
-    public static final int CHECK_CONNECTION_INTERVAL = 127; // [seconds] Check connection with exchanges API
-    public static final int CHECK_NUD_INTERVAL = 30; //[seconds] Check connection with nudaemon
-
-    public static final int CHECK_PRICE_INTERVAL = 61; //[seconds]
-    public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000 ; //[seconds] ~ 8 hours, used for fiat only
-
-    public static final int RESET_EVERY_MINUTES = 3; //[minutes] Used in multi-custodian mode
-
-    public static final int NTP_TIMEOUT = 10 * 1000; //Timeout for NTP calls
 
     /**
-     * Paths and filenames
-     * Refer to md/FILES-AND-FOLDERS.md for the convention of where to place files and folders
+     * [seconds] Check connection with exchanges API
      */
+    public static final int CHECK_CONNECTION_INTERVAL = 127;
+
+    /**
+     * [seconds] Check connection with nudaemon
+     */
+    public static final int CHECK_NUD_INTERVAL = 30;
+
+    /**
+     * [seconds]
+     */
+    public static final int CHECK_PRICE_INTERVAL = 61;
+
+    /**
+     * [seconds] ~ 8 hours, used for fiat only
+     */
+    public static final int CHECK_PRICE_INTERVAL_FIAT = 8 * 60 * 59 * 1000;
+
+    /**
+     * [minutes] Used in multi-custodian mode
+     */
+    public static final int RESET_EVERY_MINUTES = 3;
+
+    /**
+     * Timeout for NTP calls
+     */
+    public static final int NTP_TIMEOUT = 10 * 1000;
+
+    // ------ Paths and filenames
+    // Refer to md/FILES-AND-FOLDERS.md for the convention of where to place files and folders
 
     //--- Logging ---
 
     /**
      * the main logging file
-      */
+     */
     public static final String LOGXML = "config/logging/logback.xml";
 
     /**
      * the file for configuring logging during test. uses sift to direct tests to different files
      */
     public static final String TEST_LOGXML = "config/logging/test_logback.xml";
+
+    /**
+     * configuration file for test launches
+     */
+    public static final String TEST_LAUNCH_XML = "config/logging/test_launch.xml";
 
     /**
      * main logs file. also defined in logback.xml
@@ -90,15 +124,18 @@ public class Settings {
 
     public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
 
-    public final static String FROZEN_FUNDS_PATH =  RES_PATH + "frozen-funds/"; //folder containing resources needed at runtime
+    /**
+     * folder containing resources needed at runtime
+     */
+    public final static String FROZEN_FUNDS_PATH = RES_PATH + "frozen-funds/";
 
-    public final static String PAST_LOGS_FOLDER = "pastsession/"; //!!!Change this? Update the logback.xml //TODO load value from xml?
+    public final static String SESSION_LOG = "session_";
 
-    public final static String CURRENT_LOGS_FOLDER = "current/"; ///!!!Change this? Update the logback.xml //TODO load value from xml?
-
-    public final static String ORDERS_FILENAME  = "orders_history"; //Filename for historical snapshot of active orders
+    public final static String ORDERS_FILENAME = "orders_history"; //Filename for historical snapshot of active orders
 
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
+
+    public final static String WALLSHIFTS_FILENAME =  "wall_shifts"; //Filename for recording wallshifts
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
@@ -107,6 +144,11 @@ public class Settings {
     public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
 
 
+    public final static String APP_FOLDER = ".nubot";
+
+    public final static String SESSION_FILE = "_session.txt";
+
+    public final static String SESSION_LOGGER_NAME = "SessionLOG";
 
 
 }
