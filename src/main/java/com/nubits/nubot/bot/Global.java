@@ -21,13 +21,9 @@ package com.nubits.nubot.bot;
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
-import com.nubits.nubot.utils.Utils;
-import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +66,7 @@ public class Global {
      */
     public static void createShutDownHook() {
 
-        Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
+        Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
         sessionLOG.info("adding shutdown hook");
 
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
@@ -80,7 +76,7 @@ public class Global {
                 //shutdown logic of the bot handled in the bot related to the global thread
                 Global.bot.shutdownBot();
 
-                Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
+                Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
                 Global.sessionStopped = System.currentTimeMillis();
                 sessionLOG.info("session end;" + Global.sessionStopped);
 

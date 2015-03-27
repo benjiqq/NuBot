@@ -20,7 +20,7 @@ public class SessionManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
 
-    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
+    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
     private static File sessionFile;
 
