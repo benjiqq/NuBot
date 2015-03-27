@@ -792,9 +792,9 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         private String createNonce() {
-            //FIX: add some time to the nonce, since time sync has issues
-            long fixtime = 1000;
-            long toRet = fixtime * System.currentTimeMillis(); // + fixtime;
+            //potential FIX: add some time to the nonce, since time sync has issues
+            //long fixtime = 1000;
+            long toRet = System.currentTimeMillis(); // + fixtime;
             return Long.toString(toRet);
         }
     }
