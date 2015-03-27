@@ -239,7 +239,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //Send email notification
         String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price tracking started";
-        String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price trackin started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
+        String tldr = pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " price tracking started at " + peg_price + " " + pfm.getPair().getPaymentCurrency().getCode().toUpperCase() + ".\n"
                 + "Will send a new mail notification everytime the price of " + pfm.getPair().getOrderCurrency().getCode().toUpperCase() + " changes more than " + Global.options.getWallchangeThreshold() + "%.";
         MailNotifications.send(Global.options.getMailRecipient(), title, tldr);
 

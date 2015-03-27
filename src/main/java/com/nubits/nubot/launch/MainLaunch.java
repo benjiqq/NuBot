@@ -68,7 +68,7 @@ public class MainLaunch {
 
         String configfile = args[0];
 
-        sessionLaunch(configfile, false, MainLaunch.class);
+        sessionLaunch(configfile, false);
 
     }
 
@@ -78,14 +78,7 @@ public class MainLaunch {
      * @param configfile
      * @param runui
      */
-    public static void sessionLaunch(String configfile, boolean runui, Class caller) {
-
-        Global.sessionLogFolders = "session_" + System.currentTimeMillis();
-
-        MDC.put("session", Global.sessionLogFolders);
-
-        LOG.debug("session launch called from " + caller);
-        LOG.debug("launch bot session. with configfile " + configfile + " " + " runui " + runui);
+    public static void sessionLaunch(String configfile, boolean runui) {
 
         NuBotOptions nuopt = null;
 
@@ -112,6 +105,13 @@ public class MainLaunch {
 
         Global.createShutDownHook();
 
+        Global.sessionLogFolders = "session_" + System.currentTimeMillis();
+
+        MDC.put("session", Global.sessionLogFolders);
+
+        //LOG.debug("session launch called from " + caller);
+        //LOG.debug("launch bot session. with configfile " + configfile + " " + " runui " + runui);
+
 
         //TODO!
         // check if other bots are running
@@ -135,6 +135,8 @@ public class MainLaunch {
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
             Global.bot.execute(opt);
+
+
         }
 
     }

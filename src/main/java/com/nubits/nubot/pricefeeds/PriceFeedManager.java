@@ -68,8 +68,7 @@ public class PriceFeedManager {
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (lastPrice != null && !lastPrice.isError()) {
-                LOG.debug("feed: " + tempFeed.getClass());
-                LOG.debug("got price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getClass());
+                LOG.debug("Obtained price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getClass().getSimpleName());
                 prices.add(lastPrice);
                 if (i == 0) {
                     isMainFeedValid = true;

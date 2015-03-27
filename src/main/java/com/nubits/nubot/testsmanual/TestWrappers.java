@@ -63,13 +63,13 @@ public class TestWrappers {
         //-------------
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
         //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
-        //WrapperTestUtils.testBuy(0.003, 0.0000120, testPair);  //ok
+        WrapperTestUtils.testBuy(0.003, 0.0000120, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("123199680", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
