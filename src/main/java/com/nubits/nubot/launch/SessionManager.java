@@ -62,20 +62,22 @@ public class SessionManager {
 
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
 
-        //TODO!
         // check if other bots are running
         boolean otherSessions = isSessionActive();
 
         if (otherSessions) {
             LOG.info("NuBot is already running");
-            //handle different cases
+            //handle different cases later
+
+            //several NuBots running one exchange should be prohibited (?)
         }
 
+        //create session file, which auto-deletes itself
+        //it increases the counter
         createSessionFile();
 
 
         Global.sessionStarted = System.currentTimeMillis();
-        //sessionLOG.debug("session start;" + Global.sessionLogFolder + ";" + Global.sessionStarted);
 
         String timestamp =
                 new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());

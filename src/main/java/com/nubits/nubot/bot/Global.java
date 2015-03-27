@@ -59,6 +59,9 @@ public class Global {
     public static String sessionPath;
     public static long sessionStarted, sessionStopped;
 
+    /**
+     * the bot connected to the global thread
+     */
     public static NuBotBase bot;
 
 
@@ -74,15 +77,12 @@ public class Global {
             @Override
             public void run() {
 
+                //shutdown logic of the bot handled in the bot related to the global thread
                 Global.bot.shutdownBot();
 
                 Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
                 Global.sessionStopped = System.currentTimeMillis();
                 sessionLOG.info("session end;" + Global.sessionStopped);
-
-                LOG.info("change session logs");
-                //TODO: any post-processing
-
 
                 LOG.info("Exit. ");
 

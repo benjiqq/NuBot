@@ -62,7 +62,7 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
-        Global.sessionPath= "logs" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        Global.sessionPath = "logs" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
         LOG.info("defined session path " + Global.sessionPath);
 
@@ -77,8 +77,6 @@ public class MainLaunch {
         SessionManager.sessionLaunch(configfile, false);
 
     }
-
-
 
 
     /**
