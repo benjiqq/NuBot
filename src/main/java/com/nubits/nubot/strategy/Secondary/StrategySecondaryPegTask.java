@@ -87,14 +87,14 @@ public class StrategySecondaryPegTask extends TimerTask {
                     mightNeedInit = false;
                 }
             } else {
-                LOG.info("No need to init new orders since current orders are correct");
+                LOG.debug("No need to init new orders since current orders are correct");
             }
             strategyUtils.recount();
         }
 
         //Make sure the orders and balances are ok or try to aggregate
         if (!ordersAndBalancesOK) {
-            LOG.info("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+            LOG.warn("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true;
         } else {
             if (Global.options.getKeepProceeds() > 0 && Global.options.getPair().getPaymentCurrency().isFiat()) {
