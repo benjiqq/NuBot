@@ -68,7 +68,7 @@ public class PeatioWrapper implements TradeInterface {
     private final String API_GET_INFO = "/api/v2/members/me"; //GET
     private final String API_TRADE = "/api/v2/orders"; //POST
     private final String API_ACTIVE_ORDERS = "/api/v2/orders"; //GET
-    private final String API_ORDER = "/api/v2/order"; //POST
+    private final String API_ORDER = "/api/v2/order"; //GET
     private final String API_CANCEL_ORDER = "/api/v2/order/delete"; //POST
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     private final String API_GET_TRADES = "/api/v2/trades/my.json"; //GET
