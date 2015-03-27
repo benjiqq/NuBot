@@ -45,10 +45,12 @@ def docdir = new File("md")
 def resdir = new File("res")
 
 def jarname = "NuBot.jar"
+def jarnamelasttrades="NuGetLastTrades.jar"
 def sampleconfig = "config/options/sample-options.json"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
+def getlasttradeclass =  "com.nubits.nubot.launch.toolkit.NuLastTrades"
 def includeTestConfig = true
 
 FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
@@ -151,6 +153,27 @@ task NuBotJar(type: Jar) {
 
 NuBotJar.dependsOn distInit
 
+//create a single Jar with all dependencies - Copied for NuGetLastTrades
+task NuGetLastTradesJar(type: Jar) {
+    archiveName jarnamelasttrades
+    destinationDir = distdir
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes 'Main-Class': getlasttradeclass
+    }
+    with jar
+}
+
+NuGetLastTradesJar.dependsOn distInit
+
+
+
+
 
 task NuBotDist(dependsOn: NuBotJar) {
     //description 'make NuBot distribution folder'
@@ -246,6 +269,48 @@ task NuBotDist(dependsOn: NuBotJar) {
 
 }
 
+task NuLastTradesDist(dependsOn: NuGetLastTradesJar) {
+    //description 'make NuBotGetLastTrade distribution folder'
+
+    doFirst {
+        println 'start making distribution'
+
+        //copy jar
+        copy {
+            "build/libs/${jarname}"
+            into "${distdir}"
+        }
+    }
+
+
+    doLast {
+        println 'dist do last'
+
+        println "finish distribution"
+
+        copy {
+            from "config/logging/logback.xml"
+            into "${distdir}/config/logging/"
+        }
+
+        copy {
+            from "res/currencies.csv"
+            into "${distdir}/res/"
+        }
+
+        copy {
+            from "${resdir}/ssl/nubot_keystore.jks"
+            into "${distdir}/res/ssl"
+        }
+
+        copy {
+            from "${resdir}/ssl/updateKeystore.sh"
+            into "${distdir}/res/ssl"
+        }
+
+    }
+
+}
 
 //produce the ".nubot" file in distribution folder
 //when run as jar NuBot will look for this file
