@@ -27,6 +27,7 @@ import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.File;
 
@@ -67,7 +68,7 @@ public class MainLaunch {
 
         String configfile = args[0];
 
-        sessionLaunch(configfile, false);
+        sessionLaunch(configfile, false, MainLaunch.class);
 
     }
 
@@ -77,9 +78,14 @@ public class MainLaunch {
      * @param configfile
      * @param runui
      */
-    public static void sessionLaunch(String configfile, boolean runui) {
+    public static void sessionLaunch(String configfile, boolean runui, Class caller) {
 
-        LOG.debug("launch bot. with configfile " + configfile + " " + " runui " + runui);
+        Global.sessionLogFolders = "session_" + System.currentTimeMillis();
+
+        MDC.put("session", Global.sessionLogFolders);
+
+        LOG.debug("session launch called from " + caller);
+        LOG.debug("launch bot session. with configfile " + configfile + " " + " runui " + runui);
 
         NuBotOptions nuopt = null;
 

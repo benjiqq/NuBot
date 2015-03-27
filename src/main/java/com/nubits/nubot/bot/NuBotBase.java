@@ -28,7 +28,6 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -45,7 +44,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -88,7 +86,7 @@ public abstract class NuBotBase {
 
         setupLog();
 
-        setupSessionLog();
+        setupSession();
 
         setupSSL();
 
@@ -99,21 +97,7 @@ public abstract class NuBotBase {
     /**
      * setup all the logging and storage for one session
      */
-    private static void setupSessionLog() {
-
-        //log info
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
-
-        LOG.info("Logback used '{}' as the configuration file.", mainURL);
-
-        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
-
-        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
-        while (it.hasNext()) {
-            ch.qos.logback.classic.Logger l = it.next();
-            LOG.debug("" + l);
-        }
+    private static void setupSession() {
 
         //set up session dir
         String wdir = System.getProperty("user.dir");
@@ -146,6 +130,15 @@ public abstract class NuBotBase {
 
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+
+        //print loggers
+        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+
+        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
+        while (it.hasNext()) {
+            ch.qos.logback.classic.Logger l = it.next();
+            LOG.debug("" + l);
+        }
     }
 
     protected void setupSSL() {
@@ -238,7 +231,11 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-        LOG.debug("----- new session -----");
+        String timestamp =
+                new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());
+
+        LOG.info("----- new session -----");
+        LOG.info("starting at " + timestamp);
 
         LOG.info("Setting up NuBot version : " + Utils.versionName());
 

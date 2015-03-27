@@ -20,6 +20,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.MainLaunch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -36,7 +37,7 @@ public class TestLaunch {
         System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 
-    static String configfile = "config/myconfig/bitspark.json";
+    static String configfile = "config/myconfig/poloniex.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
 
@@ -51,15 +52,7 @@ public class TestLaunch {
     public static void main(String args[]) {
 
 
-
-        Global.sessionLogFolders = "session_" + System.currentTimeMillis();
-
-        MDC.put("session", "session_" + System.currentTimeMillis());
-
-        LOG.info("bla");
-
-        MDC.put("session", "session_" + System.currentTimeMillis());
-        LOG.info("sssbla");
+        MainLaunch.sessionLaunch(configfile, runui, TestLaunch.class);
 
         //SessionManager.sessionLaunch(configfile, false);
 
