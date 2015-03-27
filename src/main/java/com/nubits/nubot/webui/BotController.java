@@ -2,6 +2,7 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.launch.MainLaunch;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -25,7 +26,9 @@ public class BotController {
 
             Map opmap = new HashMap();
 
-            opmap.put("running", Global.running);
+            //TODO: query session (in appfolder)
+            boolean running = false;
+            opmap.put("running", running);
 
             String json = new Gson().toJson(opmap);
 
@@ -59,7 +62,7 @@ public class BotController {
                 LOG.info("bot start >> " + startstop);
 
                 try {
-                    MainLaunch.executeBot(Global.options);
+                    SessionManager.launchBot(Global.options);
                 } catch (Exception e) {
                     success = true;
                 }
@@ -79,7 +82,7 @@ public class BotController {
                     success = false;
                 }
 
-                MainLaunch.executeBot(Global.options);
+                SessionManager.launchBot(Global.options);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);

@@ -31,9 +31,8 @@ public class SessionManager {
      * main launch of a bot
      *
      * @param configfile
-     * @param runui
      */
-    public static void sessionLaunch(String configfile, boolean runui) {
+    public static void sessionLaunch(String configfile) {
 
         NuBotOptions nuopt = null;
 

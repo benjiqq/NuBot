@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.launch.UILaunch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -43,7 +44,7 @@ public class TestLaunch {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    private static boolean runui = false;
+    private static boolean runui = true;
 
 
     /**
@@ -60,7 +61,12 @@ public class TestLaunch {
         LOG.info("defined session path " + Global.sessionPath);
         sessionLOG.debug("test launch");
 
-        SessionManager.sessionLaunch(configfile, runui);
+        if (runui){
+            String workingdir = ".";
+            UILaunch.UIlauncher(workingdir, configfile);
+        }
+
+        //SessionManager.sessionLaunch(configfile);
 
         //SessionManager.sessionLaunch(configfile, false);
 

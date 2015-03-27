@@ -46,7 +46,8 @@
 
               var host = "localhost";
               var port = 4567;
-              var baseurl = "http://" + host + ":" + port
+              var baseurl = "http://" + host + ":" + port;
+              var updateTime = 2000;
 
 $(document).ready(function() {
 
@@ -153,14 +154,17 @@ $(document).ready(function() {
                 })
                 .done(function( data ) {
                   $('#logarea').val(data["log"]);
+
+                  $('#logdiv').html(data["log"]);
                 });
 
                 var psconsole = $('#logarea');
                 if(psconsole.length)
                   psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+
                 //bottom = $("#logarea")[0].scrollHeight - $("#logarea").height()
 
-                setTimeout(loadlog,500);
+                setTimeout(loadlog,updateTime);
             }
 
             function load_status() {
@@ -189,7 +193,7 @@ $(document).ready(function() {
 
 
 
-                setTimeout(load_status,1000);
+                setTimeout(load_status,updateTime);
             }
 
             function loadbot() {
