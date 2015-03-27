@@ -17,7 +17,6 @@ releases/
 res/frozen-funds
 
 #Specific files to ignore
-ssl_readme.txt
 *.html
 
 #Prevent test passwords to be pushed
