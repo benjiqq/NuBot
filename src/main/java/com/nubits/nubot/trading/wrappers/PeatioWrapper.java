@@ -68,7 +68,7 @@ public class PeatioWrapper implements TradeInterface {
     private final String API_GET_INFO = "/api/v2/members/me"; //GET
     private final String API_TRADE = "/api/v2/orders"; //POST
     private final String API_ACTIVE_ORDERS = "/api/v2/orders"; //GET
-    private final String API_ORDER = "/api/v2/order"; //GET
+    private final String API_ORDER = "/api/v2/order"; //POST
     private final String API_CANCEL_ORDER = "/api/v2/order/delete"; //POST
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     private final String API_GET_TRADES = "/api/v2/trades/my.json"; //GET
@@ -82,7 +82,6 @@ public class PeatioWrapper implements TradeInterface {
 
     public PeatioWrapper() {
         setupErrors();
-
     }
 
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
@@ -831,13 +830,13 @@ public class PeatioWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.debug("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
                 String url = apiBaseUrl + canonical_uri;
-                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
+                LOG.debug(canonical_verb.toUpperCase()+ " - Calling " + url + " with params:" + args);
 
+                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
                 connection.ignoreHttpErrors(true);
                 if ("post".equalsIgnoreCase(canonical_verb)) {

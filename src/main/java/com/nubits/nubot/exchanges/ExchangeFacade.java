@@ -57,7 +57,7 @@ public class ExchangeFacade {
     public static final String BITCOINCOID = "Bitcoincoid";
 
     //API base url for peatio instances
-    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";
+    public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "https://178.62.140.24";
     private static ArrayList<String> supportedExchanges, liveExchanges;
     private static HashMap<String, Class> exchangeInterfaces;
     ;
