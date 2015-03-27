@@ -70,7 +70,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         if (shiftingWalls) {
-            LOG.info("already shifting walls . orders will not be chage at present");
+            LOG.info("Already shifting walls.");
             return;
         }
 
@@ -151,7 +151,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             currencyTracked = Global.options.getPair().getPaymentCurrency().getCode().toUpperCase();
         }
 
-        String message = "Shift needed on " + Global.exchange.getName() + "\nReason : ";
+        String message = "Shift needed on " + Global.exchange.getName() + " Reason : ";
         if (!Global.options.isMultipleCustodians()) {
             message += currencyTracked + " price went " + getPriceDirection() + " more than " + Global.options.getWallchangeThreshold() + " %";
         } else {

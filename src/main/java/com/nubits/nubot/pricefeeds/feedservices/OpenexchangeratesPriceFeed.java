@@ -51,7 +51,7 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
             String url = getUrl(pair);
             String htmlString;
             try {
-                LOG.info("feed fetching from URL: " + url);
+                LOG.trace("feed fetching from URL: " + url);
                 htmlString = Utils.getHTML(url, true);
             } catch (IOException ex) {
                 LOG.error(ex.toString());
@@ -67,7 +67,7 @@ public class OpenexchangeratesPriceFeed extends AbstractPriceFeed {
                 lastRequest = System.currentTimeMillis();
                 if (rates.containsKey(lookingfor)) {
                     double last = (Double) rates.get(lookingfor);
-                    LOG.info("last " + last);
+                    LOG.trace("last " + last);
                     last = Utils.round(1 / last, 8);
                     lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
                     return lastPrice;

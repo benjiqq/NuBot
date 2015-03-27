@@ -37,14 +37,12 @@ public class FeedFacade {
     public static final String BlockchainPriceFeed = "blockchain";
     public static final String BterPriceFeed = "bter";
     public static final String CcedkPriceFeed = "ccedk";
-
     public static final String CoinmarketcapnexuistPriceFeed = "coinmarketcap_no";
     public static final String CoinmarketcapnorthpolePriceFeed = "coinmarketcap_ne";
     public static final String BitstampPriceFeed = "bitstamp";
     public static final String YahooPriceFeed = "yahoo";
     public static final String BitfinexPriceFeed = "bitfinex";
     public static final String BtcePriceFeed = "btce";
-
     public static final String BitstampEURPriceFeed = "BitstampEUR";
     public static final String ExchangeratelabPriceFeed = "Exchangeratelab";
     public static final String GoogleUnofficialPriceFeed = "GoogleUnofficialPrice";
@@ -55,7 +53,7 @@ public class FeedFacade {
         FEED_NAMES_MAP = new HashMap<>();
         FEED_NAMES_MAP.put(BitcoinaveragePriceFeed, new BitcoinaveragePriceFeed());
         FEED_NAMES_MAP.put(CoinbasePriceFeed, new CoinbasePriceFeed());
-        FEED_NAMES_MAP.put(BlockchainPriceFeed, new BitcoinaveragePriceFeed());
+        FEED_NAMES_MAP.put(BlockchainPriceFeed, new BlockchainPriceFeed());
         FEED_NAMES_MAP.put(BterPriceFeed, new BterPriceFeed());
         FEED_NAMES_MAP.put(CcedkPriceFeed, new CcedkPriceFeed());
         FEED_NAMES_MAP.put(BtcePriceFeed, new BtcePriceFeed());
@@ -64,6 +62,11 @@ public class FeedFacade {
         FEED_NAMES_MAP.put(BitstampPriceFeed, new BitstampPriceFeed());
         FEED_NAMES_MAP.put(YahooPriceFeed, new YahooPriceFeed());
         FEED_NAMES_MAP.put(BitfinexPriceFeed, new BitfinexPriceFeed());
+        FEED_NAMES_MAP.put(BitstampEURPriceFeed, new BitstampEURPriceFeed());
+        FEED_NAMES_MAP.put(ExchangeratelabPriceFeed, new ExchangeratelabPriceFeed());
+        FEED_NAMES_MAP.put(GoogleUnofficialPriceFeed, new GoogleUnofficialPriceFeed());
+        FEED_NAMES_MAP.put(OpenexchangeratesPriceFeed, new OpenexchangeratesPriceFeed());
+
     }
 
     public static AbstractPriceFeed getFeed(String feedname) throws NuBotConfigException {

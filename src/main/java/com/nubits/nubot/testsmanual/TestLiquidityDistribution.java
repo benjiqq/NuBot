@@ -76,14 +76,9 @@ public class TestLiquidityDistribution {
 
     private void init(String exchangeName) {
 
-        //feed = new BitcoinaveragePriceFeed();
-        String folderName = "tests_" + System.currentTimeMillis() + "/";
-
-
         execOrders = false;
         if (!exchangeName.equals("")) {
             //Setup the exchange
-            execOrders = true;
             pair = CurrencyList.NBT_BTC;
             try {
                 WrapperTestUtils.configureExchange(exchangeName);
