@@ -67,9 +67,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void initFiles() {
 
-         outputFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME +".csv";
-         jsonFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME + ".json";
-         jsonFile_balances = Global.sessionLogFolders + "/" + Settings.BALANCES_FILEAME + ".json";
+         outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME +".csv";
+         jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
+         jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
 
         //create json file if it doesn't already exist
         LOG.debug("init files");

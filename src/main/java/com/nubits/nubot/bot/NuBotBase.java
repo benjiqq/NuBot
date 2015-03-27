@@ -86,37 +86,13 @@ public abstract class NuBotBase {
 
         setupLog();
 
-        setupSession();
-
         setupSSL();
 
         setupExchange();
 
     }
 
-    /**
-     * setup all the logging and storage for one session
-     */
-    private static void setupSession() {
 
-        //set up session dir
-        String wdir = System.getProperty("user.dir");
-
-        String timeStamp = "" + System.currentTimeMillis();
-        File ldir = new File(wdir + "/" + Settings.LOGS_PATH);
-        if (!ldir.exists())
-            ldir.mkdir();
-
-        String sessiondir = wdir + "/" + Settings.LOGS_PATH + Settings.SESSION_LOG + timeStamp;
-        File f = new File(sessiondir); // current directory
-
-        f.mkdir();
-        Global.sessionLogFolders = f.getAbsolutePath();
-        Global.sessionStarted = System.currentTimeMillis();
-        sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
-
-
-    }
 
     /**
      * setup logging
@@ -230,12 +206,6 @@ public abstract class NuBotBase {
      * execute the NuBot based on a configuration
      */
     public void execute(NuBotOptions opt) {
-
-        String timestamp =
-                new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());
-
-        LOG.info("----- new session -----");
-        LOG.info("starting at " + timestamp);
 
         LOG.info("Setting up NuBot version : " + Utils.versionName());
 

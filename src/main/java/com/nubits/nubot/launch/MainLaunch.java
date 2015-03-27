@@ -30,6 +30,8 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 import java.io.File;
+import java.util.Date;
+import java.util.Set;
 
 
 /**
@@ -43,6 +45,8 @@ public class MainLaunch {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
+
+    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
 
     private static boolean runui = false;
 
@@ -61,6 +65,7 @@ public class MainLaunch {
      */
     public static void main(String args[]) {
 
+        MDC.put("session", Settings.GLOBAL_SESSION_NAME);
 
         if (args.length != 1) {
             exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
@@ -82,6 +87,8 @@ public class MainLaunch {
 
         NuBotOptions nuopt = null;
 
+        sessionLOG.debug("parsing options from " + configfile);
+
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
             nuopt = ParseOptions.parseOptionsSingle(configfile);
@@ -89,25 +96,29 @@ public class MainLaunch {
             MainLaunch.exitWithNotice("" + e);
         }
 
+        sessionLOG.debug("launch bot");
+
         launchBot(nuopt);
 
     }
 
-
     /**
-     * execute a NuBot based on valid options
-     *
-     * @param opt
+     * setup all the logging and storage for one session
      */
-    public static void launchBot(NuBotOptions opt) {
+    private static void setupSession() {
 
-        Global.mainThread = Thread.currentThread();
+        //set up session dir
+        String wdir = System.getProperty("user.dir");
 
-        Global.createShutDownHook();
+        /*File ldir = new File(wdir + "/" + Settings.LOGS_PATH);
+        if (!ldir.exists())
+            ldir.mkdir();*/
 
-        Global.sessionLogFolders = "session_" + System.currentTimeMillis();
+        Global.sessionPath= Settings.SESSION_LOG + System.currentTimeMillis();
+        Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
+        //String sessiondir = wdir + "/" + Settings.LOGS_PATH + Global.sessionLogFolder;
 
-        MDC.put("session", Global.sessionLogFolders);
+        MDC.put("session", Global.sessionPath);
 
         //LOG.debug("session launch called from " + caller);
         //LOG.debug("launch bot session. with configfile " + configfile + " " + " runui " + runui);
@@ -120,12 +131,34 @@ public class MainLaunch {
         if (otherSessions) {
             LOG.info("NuBot is already running");
             //handle different cases
-        }
-        else {
+        } else {
             createSessionFile();
         }
 
-        //execute bot
+        Global.sessionStarted = System.currentTimeMillis();
+        //sessionLOG.debug("session start;" + Global.sessionLogFolder + ";" + Global.sessionStarted);
+
+        String timestamp =
+                new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());
+
+        LOG.info("*** session *** starting at " + timestamp);
+
+    }
+
+    /**
+     * execute a NuBot based on valid options
+     *
+     * @param opt
+     */
+    public static void launchBot(NuBotOptions opt) {
+
+        Global.mainThread = Thread.currentThread();
+
+        Global.createShutDownHook();
+
+        setupSession();
+
+        LOG.debug("execute bot depending on defined strategy");
 
         if (opt.requiresSecondaryPegStrategy()) {
             LOG.debug("creating secondary bot object");
@@ -163,15 +196,17 @@ public class MainLaunch {
             if (!appdir.exists())
                 appdir.mkdir();
 
-            sessionFile = new File
-                    (appFolder, Settings.APP_NAME + Settings.SESSION_FILE);
+            String sessionFileName = Global.sessionStarted + Settings.SESSION_FILE;
+            sessionFile = new File(appFolder, Settings.APP_NAME + sessionFileName);
             sessionFile.createNewFile();
+
+            //delete the file on exit
+            sessionFile.deleteOnExit();
+
         } catch (Exception e) {
 
         }
 
-        //delete the file on exit
-        sessionFile.deleteOnExit();
     }
 
 
@@ -181,7 +216,7 @@ public class MainLaunch {
      * @param msg
      */
     public static void exitWithNotice(String msg) {
-        LOG.error(msg);
+        sessionLOG.error(msg);
         System.exit(0);
     }
 

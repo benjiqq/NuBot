@@ -42,7 +42,7 @@ public class Global {
     public static NuBotOptions options;
 
     //path of logs in this session
-    public static String sessionLogFolders;
+    public static String sessionLogFolder;
 
     public static TaskManager taskManager;
 
@@ -55,6 +55,7 @@ public class Global {
     public static Exchange exchange;
 
     public static String sessionId;
+    public static String sessionPath;
     public static long sessionStarted, sessionStopped;
 
     public static NuBotBase bot;

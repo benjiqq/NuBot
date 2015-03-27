@@ -135,7 +135,7 @@ public class TestWrappers {
         }
 
 
-        Global.sessionLogFolders = Settings.TEST_LOGFOLDER;
+        Global.sessionLogFolder = Settings.TEST_LOGFOLDER;
     }
 
 

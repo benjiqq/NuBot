@@ -22,3 +22,4 @@
 | UI templates                | nubot/UI                         | dist/res/UI                | operation.mustache          | TODO       |
 | Readme assets               | nubot/res/readme-assets          | //                         |                             | done       |
 | Scripts                     | nubot/resources/scripts          | dist/res/scripts  (?)      | runNubot.sh                 | not in use |
+| App Folder                  | $HOME/.nubot/                    | $HOME/.nubot               | 145667_session.txt          |            |

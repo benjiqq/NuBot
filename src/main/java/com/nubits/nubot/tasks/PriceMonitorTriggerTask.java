@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.*;
 
 /**
@@ -86,8 +85,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     private boolean isFirstTimeExecution = true;
 
-    private String wallshiftsFilePath = Global.sessionLogFolders + "/" + "wall_shifts.csv";
-    private String wallshiftsFilePathJson = Global.sessionLogFolders + "/" + "wall_shifts.json";
+    private String wallshiftsFilePath = Global.sessionLogFolder + "/" + "wall_shifts.csv";
+    private String wallshiftsFilePathJson = Global.sessionLogFolder + "/" + "wall_shifts.json";
 
     private String emailHistory = "";
 

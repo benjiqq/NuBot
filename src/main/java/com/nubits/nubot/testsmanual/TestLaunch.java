@@ -41,6 +41,8 @@ public class TestLaunch {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
 
+    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.Session_LOGGER_NAME);
+
     private static boolean runui = false;
 
 
@@ -51,6 +53,9 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
+        MDC.put("session", Settings.GLOBAL_SESSION_NAME);
+
+        sessionLOG.debug("test launch");
 
         MainLaunch.sessionLaunch(configfile, runui);
 

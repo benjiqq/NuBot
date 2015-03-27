@@ -43,10 +43,37 @@
         </sift>
     </appender>
 
+    <appender name="sessionFile" class="ch.qos.logback.core.FileAppender">
+
+        <encoder>
+            <pattern>%msg%n
+            </pattern>
+        </encoder>
+
+        <file>${testlogfolder}/session.log</file>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>TRACE</level>
+        </filter>
+
+        <!--
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    return logger.contains("SessionLOG");
+                </expression>
+            </evaluator>
+            <onMatch>NEUTRAL</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>-->
+
+    </appender>
+
 
     <root level="debug">
         <appender-ref ref="SIFT" />
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="sessionFile" />
     </root>
 
 
