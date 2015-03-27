@@ -24,4 +24,4 @@
 | Scripts                     | nubot/resources/scripts          | dist/res/scripts  (?)      | runNubot.sh                 | not in use |
 | App Folder                  | $HOME/.nubot/ (*)                | $HOME/.nubot               | NuBot_0_session.txt         | done       |
 
-(*) $HOME refers to the home directory, depending on the Operating System
+(*) $HOME refers to the user's home directory, depending on the Operating System
