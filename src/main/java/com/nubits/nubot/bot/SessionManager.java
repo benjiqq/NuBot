@@ -1,7 +1,8 @@
-package com.nubits.nubot.launch;
+package com.nubits.nubot.bot;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;

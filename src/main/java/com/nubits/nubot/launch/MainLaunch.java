@@ -19,19 +19,11 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
-import java.io.File;
-import java.util.Date;
-import java.util.Set;
 
 
 /**

@@ -20,8 +20,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.launch.MainLaunch;
-import com.nubits.nubot.launch.SessionManager;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;

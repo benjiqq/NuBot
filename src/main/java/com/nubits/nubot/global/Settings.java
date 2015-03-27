@@ -146,8 +146,6 @@ public class Settings {
 
     public final static String SESSION_FILE = "_session.txt";
 
-    public final static String GLOBAL_SESSION_NAME = "global";
-
     public final static String Session_LOGGER_NAME = "SessionLOG";
 
 
