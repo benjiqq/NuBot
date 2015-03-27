@@ -107,8 +107,6 @@ public class SessionManager {
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
             Global.bot.execute(opt);
-
-
         }
 
     }

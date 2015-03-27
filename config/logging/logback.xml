@@ -4,7 +4,7 @@
 
 <configuration>
 
-	<property scope="context" name="logfolder" value="testlaunch" />
+	<property scope="context" name="logfolder" value="logs" />
 	<property scope="context" name="SessionLOG" value="SessionLOG" />
 	<property scope="context" name="sessionlogFile" value=".sessions.log" />
 
