@@ -113,29 +113,22 @@ public abstract class NuBotBase {
             LOG.debug("" + l);
         }
 
-
         //set up session dir
         String wdir = System.getProperty("user.dir");
 
-        //loop over timestamps in the unlikely case of a duplicate
-        boolean done = false;
-        while (!done) {
-            String timeStamp = new SimpleDateFormat("MMdd_HHmmss").format(new Date());
-            File ldir = new File(wdir + "/" + Settings.LOGS_PATH);
-            if (!ldir.exists())
-                ldir.mkdir();
+        String timeStamp = "" + System.currentTimeMillis();
+        File ldir = new File(wdir + "/" + Settings.LOGS_PATH);
+        if (!ldir.exists())
+            ldir.mkdir();
 
-            String sessiondir = wdir + "/" + Settings.LOGS_PATH + Settings.SESSION_LOG + timeStamp;
-            File f = new File(sessiondir); // current directory
-            if (!f.exists()) {
+        String sessiondir = wdir + "/" + Settings.LOGS_PATH + Settings.SESSION_LOG + timeStamp;
+        File f = new File(sessiondir); // current directory
 
-                f.mkdir();
-                done = true;
-                Global.sessionLogFolders = f.getAbsolutePath();
-                Global.sessionStarted = System.currentTimeMillis();
-                sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
-            }
-        }
+        f.mkdir();
+        Global.sessionLogFolders = f.getAbsolutePath();
+        Global.sessionStarted = System.currentTimeMillis();
+        sessionLOG.debug("session start;" + Global.sessionLogFolders + ";" + Global.sessionStarted);
+
 
     }
 
@@ -145,7 +138,7 @@ public abstract class NuBotBase {
     protected void setupLog() {
 
         //for debug purposes: determine the logback.xml file used
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger)LOG).getLoggerContext();
+        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
         LOG.debug("Logback used '{}' as the configuration file.", mainURL);
 
@@ -176,9 +169,9 @@ public abstract class NuBotBase {
         Global.exchange.setLiveData(liveData);
 
         TradeInterface ti = null;
-        try{
+        try {
             ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
-        }catch(Exception e){
+        } catch (Exception e) {
             exitWithNotice("exchange unknown");
         }
 
@@ -285,8 +278,8 @@ public abstract class NuBotBase {
         //test setup exchange
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
-        } else{
-            exitWithNotice("could not query exchange. exchange setup went wrong [ " +  activeOrdersResponse.getError() + " ]");
+        } else {
+            exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
 
@@ -310,9 +303,9 @@ public abstract class NuBotBase {
 
         Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
 
-        try{
+        try {
             configureStrategy();
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             exitWithNotice("can't configure strategy");
         }
 
@@ -323,7 +316,7 @@ public abstract class NuBotBase {
     protected void notifyOnline() {
         String exc = Global.options.getExchangeName();
         String p = Global.options.getPair().toStringSep();
-        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc  + " pair (" + p + ")";
+        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc + " pair (" + p + ")";
         LOG.debug("notify online " + msg);
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
