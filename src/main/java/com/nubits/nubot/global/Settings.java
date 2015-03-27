@@ -51,19 +51,19 @@ public class Settings {
 
 
     /**
-     * [seconds)Execute StrategyTask
+     * [seconds] Execute StrategyTask
      */
     public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
     public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
 
     /**
-     * [seconds) Check connection with exchanges API
+     * [seconds] Check connection with exchanges API
      */
     public static final int CHECK_CONNECTION_INTERVAL = 127;
 
     /**
-     * [seconds)Check connection with nudaemon
+     * [seconds] Check connection with nudaemon
      */
     public static final int CHECK_NUD_INTERVAL = 30;
 
