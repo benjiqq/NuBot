@@ -52,7 +52,7 @@ public class TestLaunch {
     public static void main(String args[]) {
 
 
-        MainLaunch.sessionLaunch(configfile, runui, TestLaunch.class);
+        MainLaunch.sessionLaunch(configfile, runui);
 
         //SessionManager.sessionLaunch(configfile, false);
 
