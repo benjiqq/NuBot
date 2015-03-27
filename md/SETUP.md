@@ -208,12 +208,32 @@ The bot will start and write output in the */logs* folder.
 
 To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders.
 
-##Logging on HTML and csv
-
-TODO
+##Logging files
 
 The bot produces different output log files, all stored in a special folder created for each session under *logs/*.  
-The bot creates a csv and html log for each session. 
-*info* are logged to file if we set`"verbose"=true`. 
+On startup, NuBot prints out the name of the folder it is using to log:
 
-Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
+example: 
+```
+INFO  - defined session path logs/session_1427479041022
+```
+
+Log files: 
+
+| filename    |  Description  | 
+| ------------- |:-------------:| 
+| standard.html    | Standard output of the bot  | 
+| verbose.html    | Verbose output of the bot with additional messages | 
+| orders_history.(csv;json) | snapshots of active orders (taken every minute) |
+| balance_history.json    | snapshots of balances (taken every minute)   | 
+| wall_shifts.(csv;json) | list of wall shifts | 
+
+
+NOTE: to avoid huge files, html files gets rotated at 50MB.
+
+Additional messages are logged to console if the option `"verbose"=true` is set. Useful for debug
+
+Additionally there are two other logs that trace the history of wall shifts and a history of.
+
+For additional control over logging, the user can also manually edit the *config/logging/logback.xml* configuration file.
+
