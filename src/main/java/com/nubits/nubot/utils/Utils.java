@@ -59,13 +59,14 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.*;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.MDC;
 
 
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
-    private static String  nubotconfigfile= ".nubot";
+    private static String nubotconfigfile = ".nubot";
 
     /**
      * @param originalString
@@ -269,10 +270,9 @@ public class Utils {
     }
     */
 
-    public static String generateLogPath(String className)
-    {
-        String toReturn= Settings.TESTS_LOG_PREFIX+"_"+className+"_"+getTimestampLong()+"/";
-        LOG.info("Logging folder :  "+toReturn);
+    public static String generateLogPath(String className) {
+        String toReturn = Settings.TESTS_LOG_PREFIX + "_" + className + "_" + getTimestampLong() + "/";
+        LOG.info("Logging folder :  " + toReturn);
         return toReturn;
     }
 
@@ -416,25 +416,19 @@ public class Utils {
 
             //load file depending whether run from inside a Jar or not
 
-            String keystorefile = "nubot_keystore.jks";
-
-            String viaclasspath = filePathClasspathFile(keystorefile);
-            LOG.info("absolute path of keystore " + viaclasspath);
-
             String wdir = System.getProperty("user.dir");
-            String wdirpath = wdir + "/" + keystorefile;
+            String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
-            String path = "";
-            if (insideJar())
-                path = wdirpath;
-            else
-                path = viaclasspath;
-
-            System.setProperty("javax.net.ssl.trustStore", path);
+            System.setProperty("javax.net.ssl.trustStore", wdirpath);
             System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }
 
+    /**
+     * get version from ".nubot file"
+     *
+     * @return
+     */
     public static String versionName() {
         if (insideJar()) {
             String wdir = System.getProperty("user.dir");
@@ -445,12 +439,12 @@ public class Utils {
             try {
                 List lines = FileUtils.readLines(file, "UTF-8");
                 HashMap km = new HashMap();
-                for (Object o : lines){
-                    String l = "" +o;
-                    try{
+                for (Object o : lines) {
+                    String l = "" + o;
+                    try {
                         String[] a = l.split("=");
-                        km.put(a[0],a[1]);
-                    }catch(Exception e){
+                        km.put(a[0], a[1]);
+                    } catch (Exception e) {
                         //ignore line with "="
                     }
 
@@ -466,6 +460,22 @@ public class Utils {
             return "load version error";
 
         } else {
+
+            //get current git branch
+            try {
+                String fp = System.getProperty("user.dir") + "/" + ".git" + "/" + "HEAD";
+                File f = new File(fp);
+                if (f.exists()) {
+                    String s = FileUtils.readFileToString(f);
+                    s = s.replace("ref: refs/heads/","");
+                    s = s.replace("\n","");
+                    return "develop:branch-" + s;
+                }
+
+            } catch (Exception e) {
+                ;
+            }
+
             return "develop";
         }
     }
@@ -531,36 +541,29 @@ public class Utils {
     }
 
     //Return the uptime of the bot [hours]
-    public static String getBotUptime()
-    {
-        long upTimeMs = System.currentTimeMillis() - Global.sessionStarted ;
+    public static String getBotUptime() {
+        long upTimeMs = System.currentTimeMillis() - Global.sessionStarted;
         String toReturn = "";
-        if(getDaysFromMillis(upTimeMs)>2) {
+        if (getDaysFromMillis(upTimeMs) > 2) {
             toReturn = getDaysFromMillis(upTimeMs) + " days";
-        }
-        else if (getHoursFromMillis(upTimeMs)>2) {
+        } else if (getHoursFromMillis(upTimeMs) > 2) {
             toReturn = getHoursFromMillis(upTimeMs) + " hours";
-        }
-        else {
+        } else {
             toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
         }
         return toReturn;
     }
 
-
-    public static double getHoursFromMillis(long millis)
-    {
-        return round( (getMinutesFromMillis(millis))/60,2);
+    public static double getHoursFromMillis(long millis) {
+        return round((getMinutesFromMillis(millis)) / 60, 2);
     }
 
-    public static double getMinutesFromMillis(long millis)
-    {
-        return round( ((millis/1000)/60),2);
+    public static double getMinutesFromMillis(long millis) {
+        return round(((millis / 1000) / 60), 2);
     }
 
-    public static double getDaysFromMillis(long millis)
-    {
-        return round( (getHoursFromMillis(millis))/24,2);
+    public static double getDaysFromMillis(long millis) {
+        return round((getHoursFromMillis(millis)) / 24, 2);
     }
 
 }

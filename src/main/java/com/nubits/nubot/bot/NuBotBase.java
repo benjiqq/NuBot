@@ -24,9 +24,10 @@ import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.Order;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
@@ -37,10 +38,15 @@ import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.net.URL;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract NuBot. implements all primitives without the strategy itself
@@ -53,6 +59,11 @@ public abstract class NuBotBase {
     abstract public void configureStrategy() throws NuBotConfigException;
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
+
+    /**
+     * Logger for session data. called only once per session
+     */
+    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
 
     protected String mode;
 
@@ -81,18 +92,30 @@ public abstract class NuBotBase {
 
     }
 
+
+
     /**
      * setup logging
      */
     protected void setupLog() {
 
         //for debug purposes: determine the logback.xml file used
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger)LOG).getLoggerContext();
+        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
         LOG.debug("Logback used '{}' as the configuration file.", mainURL);
 
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
+
+        //print loggers
+
+        /*List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+
+        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
+        while (it.hasNext()) {
+            ch.qos.logback.classic.Logger l = it.next();
+            LOG.debug("" + l);
+        }*/
     }
 
     protected void setupSSL() {
@@ -118,10 +141,10 @@ public abstract class NuBotBase {
         Global.exchange.setLiveData(liveData);
 
         TradeInterface ti = null;
-        try{
+        try {
             ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName(), keys, Global.exchange);
-        }catch(Exception e){
-            exitWithNotice("exchange unknown");
+        } catch (Exception e) {
+            MainLaunch.exitWithNotice("exchange unknown");
         }
 
         //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
@@ -169,7 +192,6 @@ public abstract class NuBotBase {
     }
 
 
-
     protected void checkNuConn() throws NuBotConnectionException {
 
         LOG.info("Check connection with nud");
@@ -186,8 +208,6 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-        LOG.debug("----- new session -----");
-
         LOG.info("Setting up NuBot version : " + Utils.versionName());
 
         //DANGER ZONE : This variable set to true will cause orders to execute
@@ -202,8 +222,6 @@ public abstract class NuBotBase {
 
         setupAllConfig();
 
-        Global.running = true;
-
         LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
 
@@ -213,7 +231,7 @@ public abstract class NuBotBase {
         }
 
 
-        LOG.info("Starting task : Check connection with exchange");
+        LOG.debug("Starting task : Check connection with exchange");
         int conn_delay = 1;
         Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
@@ -228,8 +246,8 @@ public abstract class NuBotBase {
         //test setup exchange
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
-        } else{
-            exitWithNotice("could not query exchange. exchange setup went wrong [ " +  activeOrdersResponse.getError() + " ]");
+        } else {
+            MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
 
@@ -241,24 +259,22 @@ public abstract class NuBotBase {
             try {
                 checkNuConn();
             } catch (NuBotConnectionException e) {
-                exitWithNotice("can't connect to Nu " + e);
+                MainLaunch.exitWithNotice("can't connect to Nu " + e);
             }
         }
 
-        LOG.info("Checking bot working mode");
-
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
-        LOG.info(Global.options.toStringNoKeys());
+        LOG.info("Options loaded : " + Global.options.toStringNoKeys());
 
         // Set the frozen balance manager in the global variable
 
         Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
 
-        try{
+        try {
             configureStrategy();
-        }catch(NuBotConfigException e){
-            exitWithNotice("can't configure strategy");
+        } catch (NuBotConfigException e) {
+            MainLaunch.exitWithNotice("can't configure strategy");
         }
 
         notifyOnline();
@@ -268,20 +284,63 @@ public abstract class NuBotBase {
     protected void notifyOnline() {
         String exc = Global.options.getExchangeName();
         String p = Global.options.getPair().toStringSep();
-        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc  + " pair (" + p + ")";
-        LOG.info("notify online " + msg);
+        String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc + " pair (" + p + ")";
+        LOG.debug("notify online " + msg);
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
+    public void shutdownBot(){
 
-    /**
-     * exit application and notify user
-     *
-     * @param msg
-     */
-    protected static void exitWithNotice(String msg) {
-        LOG.error(msg);
-        System.exit(0);
+        LOG.info("Bot shutting down..");
+
+        String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
+                + Global.options.getExchangeName() + " ["
+                + Global.options.getPair().toStringSep() + "]";
+
+        HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+
+        //Try to cancel all orders, if any
+        if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+            LOG.info("Clearing out active orders ... ");
+
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                if (deleted) {
+                    LOG.info("Order clear request successful");
+                } else {
+                    LOG.error("Could not submit request to clear orders");
+                }
+
+            } else {
+                LOG.error(deleteOrdersResponse.getError().toString());
+            }
+        }
+
+        //reset liquidity info
+        if (Global.options.isSubmitliquidity()) {
+            if (Global.rpcClient.isConnected()) {
+                //tier 1
+                LOG.info("Resetting Liquidity Info before quit");
+
+                JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                        0, 0, 1);
+                if (null == responseObject1) {
+                    LOG.error("Something went wrong while sending liquidityinfo");
+                } else {
+                    LOG.info(responseObject1.toJSONString());
+                }
+
+                JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                        0, 0, 2);
+                if (null == responseObject2) {
+                    LOG.error("Something went wrong while sending liquidityinfo");
+                } else {
+                    LOG.info(responseObject2.toJSONString());
+                }
+            }
+        }
     }
 
 }

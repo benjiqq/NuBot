@@ -1,7 +1,7 @@
 {
   "dualside": true,
   "multiplecustodians":false,
-  "exchangename":"",
+  "exchangename":"poloniex",
   "apikey": "xxx",
   "apisecret": "xxx",
   "txfee": 0.2,
@@ -25,5 +25,5 @@
   "verbose":false,
   "keepproceeds":0,
   "emergencytimeout":60,
-  "executeorders":true,
+  "executeorders":true
 }

@@ -18,24 +18,12 @@
 
 package com.nubits.nubot.testsmanual;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.strategy.Primary.NuBotSimple;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
+import org.slf4j.MDC;
 
 
 /**
@@ -44,9 +32,16 @@ import java.util.List;
 public class TestLaunch {
 
 
-    static String configfile = "config/myconfig/bitspark.json";
+    static {
+        System.setProperty("testlogfolder","abc");
+        System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
+    }
+
+    static String configfile = "config/myconfig/poloniex.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
+
+    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
     private static boolean runui = false;
 
@@ -58,114 +53,20 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        //TestWrappers.runTests();
+        //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
 
-        //log info
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
+        Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        MDC.put("session", Global.sessionPath);
+        LOG.info("defined session path " + Global.sessionPath);
+        sessionLOG.debug("test launch");
 
-        LOG.info("Logback used '{}' as the configuration file.", mainURL);
+        SessionManager.sessionLaunch(configfile, runui);
 
-        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
-
-        Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
-        while (it.hasNext()){
-            ch.qos.logback.classic.Logger l = it.next();
-            LOG.info("" + l);
-        }
-
-        String wdir = System.getProperty("user.dir");
-
-        File f = new File(wdir + "/" + "logs/current"); // current directory
-
-        File[] files = f.listFiles();
-        String currentLogfoldername = "";
-        for (File file : files) {
-            if (file.isDirectory()) {
-                LOG.info("directory:");
-                currentLogfoldername = file.getName();
-                LOG.info(currentLogfoldername);
-                Global.sessionLogFolders = "logs" + "/" + "current" + "/" + currentLogfoldername;
-            }
-        }
-
-        Global.sessionStarted = System.currentTimeMillis();
-
-
-
-        LOG.info("main. with args " + args.length);
-
-
-
-        mainLaunch(configfile, false);
-
-    }
-
-    /**
-     * main launch of a bot
-     *
-     * @param configfile
-     * @param runui
-     */
-    public static void mainLaunch(String configfile, boolean runui) {
-        LOG.info("main launch. with configfile " + configfile + " " + runui);
-
-        NuBotOptions nuopt = null;
-
-        try {
-            //Check if NuBot has valid parameters and quit if it doesn't
-            nuopt = ParseOptions.parseOptionsSingle(configfile);
-        } catch (NuBotConfigException e) {
-            exitWithNotice("" + e);
-        }
-
-
-        LOG.info("-- new main launched --");
-
-        LOG.info("** run command line **");
-        executeBot(nuopt);
+        //SessionManager.sessionLaunch(configfile, false);
 
     }
 
 
-    /**
-     * exit application and notify user
-     *
-     * @param msg
-     */
-    private static void exitWithNotice(String msg) {
-        LOG.error(msg);
-        System.exit(0);
-    }
-
-
-    /**
-     * execute a NuBot based on valid options. Also make sure only one NuBot is running
-     *
-     * @param opt
-     */
-    public static void executeBot(NuBotOptions opt) {
-
-        Global.mainThread = Thread.currentThread();
-
-        Global.createShutDownHook();
-
-        //exit if already running or show info to user
-        if (Global.running) {
-            exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
-        } else {
-            if (opt.requiresSecondaryPegStrategy()) {
-                LOG.info("creating secondary bot");
-                NuBotSecondary bot = new NuBotSecondary();
-                bot.execute(opt);
-            } else {
-                LOG.info("creating simple bot");
-                NuBotSimple bot = new NuBotSimple();
-                bot.execute(opt);
-            }
-        }
-
-    }
 
 
 }

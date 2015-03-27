@@ -61,6 +61,15 @@ public class TaskManager {
         setTasks();
     }
 
+    public TaskManager(boolean iniTasks) {
+        this.running = false;
+        taskList = new ArrayList<BotTask>();
+        if(iniTasks)
+        {
+            setTasks();
+        }
+    }
+
     public void setNudTask() {
         this.checkNudTask = new BotTask(
                 new CheckNudTask(), Settings.CHECK_NUD_INTERVAL, "checkNud");
@@ -122,13 +131,13 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        LOG.info("\nStopping all tasks : -- ");
+        LOG.info("Stopping all tasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
             BotTask bt = taskList.get(i);
 
-            LOG.info("Shutting down " + bt.getName());
+            LOG.debug("Shutting down " + bt.getName());
             try {
                 bt.getTimer().cancel();
                 bt.getTimer().purge();

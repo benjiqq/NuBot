@@ -51,7 +51,7 @@ public class StrategySecondaryPegUtils {
 
     public boolean reInitiateOrders(boolean firstTime) {
 
-        LOG.info("reInitiateOrders" + firstTime);
+        LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
         if (strategy.getTotalActiveOrders() != 0) {
@@ -125,12 +125,12 @@ public class StrategySecondaryPegUtils {
 
         boolean buysOrdersOk = true;
         double sellPrice = strategy.getSellPricePEG();
-        LOG.info("init sell orders. price: " + sellPrice);
+        LOG.debug("init sell orders. price: " + sellPrice);
         boolean sellsOrdersOk = initOrders(Constant.SELL, sellPrice);
 
         if (Global.options.isDualSide()) {
             double buyPrice = strategy.getBuyPricePEG();
-            LOG.info("init buy orders. price: " + buyPrice);
+            LOG.debug("init buy orders. price: " + buyPrice);
             buysOrdersOk = initOrders(Constant.BUY, buyPrice);
         }
 
@@ -144,7 +144,7 @@ public class StrategySecondaryPegUtils {
 
     public boolean initOrders(String type, double price) {
 
-        LOG.info("initOrders " + type + " " + price);
+        LOG.debug("initOrders " + type + ", price " + price);
 
         boolean success = true;
         Amount balance = null;
@@ -180,7 +180,7 @@ public class StrategySecondaryPegUtils {
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
-            LOG.trace(type + " available balance < 1 NBT, no need to execute orders");
+            LOG.info("no need to execute " +type + "orders : available balance < 1 NBT");
             return false;
         }
 
@@ -499,12 +499,9 @@ public class StrategySecondaryPegUtils {
 
     public boolean shiftWalls() {
 
-        LOG.info("shiftWalls");
+        LOG.debug("Executing shiftWalls()");
 
         boolean success = true;
-
-        // Fix 156 -- reduce this value as excoin API get more responsive
-        int WAIT_TIME_FIX_156_EXCOIN = 3500; //ms
 
         //Communicate to the priceMonitorTask that a wall shift is in place
         strategy.getPriceMonitorTask().setWallsBeingShifted(true);
@@ -514,136 +511,84 @@ public class StrategySecondaryPegUtils {
         double sellPrice = strategy.getSellPricePEG();
         double buyPrice = strategy.getBuyPricePEG();
 
-        String shiftImmediatelyOrderType;
-        String waitAndShiftOrderType;
-        double priceImmediatelyType;
-        double priceWaitType;
-
-        if (strategy.getPriceDirection().equals(Constant.UP)) {
-            shiftImmediatelyOrderType = Constant.SELL;
-            waitAndShiftOrderType = Constant.BUY;
-            if (!Global.swappedPair) {
-                priceImmediatelyType = sellPrice;
-                priceWaitType = buyPrice;
-            } else {
-                priceImmediatelyType = buyPrice;
-                priceWaitType = sellPrice;
-            }
-        } else {
-            shiftImmediatelyOrderType = Constant.BUY;
-            waitAndShiftOrderType = Constant.SELL;
-            if (!Global.swappedPair) {
-                priceImmediatelyType = buyPrice;
-                priceWaitType = sellPrice;
-            } else {
-                priceImmediatelyType = sellPrice;
-                priceWaitType = buyPrice;
-            }
+        //Swap prices
+        if (Global.swappedPair) {
+            sellPrice = strategy.getBuyPricePEG();
+            buyPrice = strategy.getSellPricePEG();
         }
 
-        if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.SELL))
-                || Global.options.isDualSide()) {
-            LOG.info("Immediately try to cancel all orders");
 
-            //immediately try to : cancel all active orders
-            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+        LOG.info("Immediately try to cancel all orders");
 
+        //immediately try to : cancel all active orders
+        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
 
-            if (deleteOrdersResponse.isPositive()) {
-                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+        if (deleteOrdersResponse.isPositive()) {
+            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
-                if (deleted) {
+            if (deleted) {
 
-                    if (Global.options.isMultipleCustodians()) {
-                        //Introuce an aleatory sleep time to desync bots at the time of placing orders.
-                        //This will favour competition in markets with multiple custodians
-                        try {
-                            Thread.sleep(SHORT_WAIT_SECONDS + Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000); //SHORT_WAIT_SECONDS gives the time to other bots to take down their order
-                        } catch (InterruptedException ex) {
-                            LOG.error(ex.toString());
-                        }
-                    }
-
-                    if (shiftImmediatelyOrderType.equals(Constant.BUY)
-                            && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
-                    {
-                        // update the initial balance of the secondary peg
-                        Global.frozenBalances.freezeNewFunds();
-                    }
-
-                    boolean init1;
-                    if (!Global.swappedPair) {
-                        init1 = initOrders(shiftImmediatelyOrderType, priceImmediatelyType);
-                    } else {
-                        //fix 256
-                        try {
-                            Thread.sleep(WAIT_TIME_FIX_156_EXCOIN);
-                        } catch (InterruptedException ex) {
-                            LOG.error(ex.toString());
-                        }
-                        init1 = initOrders(waitAndShiftOrderType, priceImmediatelyType);
-                    }
-                    if (!init1) {
-                        success = false;
-                    }
-
-                    if (success) { //Only move the second type of order if sure that the first have been taken down
-                        if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.BUY))
-                                || Global.options.isDualSide()) {
-                            if (waitAndShiftOrderType.equals(Constant.BUY)
-                                    && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)) // update the initial balance of the secondary peg
-                            {
-                                Global.frozenBalances.freezeNewFunds();
-                            }
-
-                            boolean init2;
-
-
-                            if (!Global.swappedPair) {
-                                init2 = initOrders(waitAndShiftOrderType, priceWaitType);
-                            } else {
-                                //fix 256
-                                try {
-                                    Thread.sleep(WAIT_TIME_FIX_156_EXCOIN);
-                                } catch (InterruptedException ex) {
-                                    LOG.error(ex.toString());
-                                }
-                                init2 = initOrders(shiftImmediatelyOrderType, priceWaitType);
-                            }
-                            if (!init2) {
-                                success = false;
-                            }
-                        }
-                    } else { //success false with the first part of the shift
-                        if ((!Global.options.isDualSide() && shiftImmediatelyOrderType.equals(Constant.SELL)) //sellside
-                                || Global.options.isDualSide()) { //dualside
-                            LOG.error("NuBot has not been able to shift " + shiftImmediatelyOrderType + " orders");
-                        }
-                    }
-
-                    //Here I wait until the two orders are correctly displaied. It can take some seconds
+                if (Global.options.isMultipleCustodians()) {
+                    //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+                    //This will favour competition in markets with multiple custodians
                     try {
-                        Thread.sleep(SHORT_WAIT_SECONDS * 1000);
+                        Thread.sleep(SHORT_WAIT_SECONDS + Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000); //SHORT_WAIT_SECONDS gives the time to other bots to take down their order
                     } catch (InterruptedException ex) {
                         LOG.error(ex.toString());
                     }
+                }
 
-                    //Communicate to the priceMonitorTask that the wall shift is over
-                    strategy.getPriceMonitorTask().setWallsBeingShifted(false);
-                    strategy.getSendLiquidityTask().setWallsBeingShifted(false);
+                //Update frozen balances
+                if (!Global.options.isDualSide() //Do not do this for sell side custodians
+                        && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
+                {
+                    // update the initial balance of the secondary peg
+                    Global.frozenBalances.freezeNewFunds();
+                }
 
-                } else {
-                    LOG.info("Could not submit request to clear orders");
+                //Reset sell side orders
+
+
+                boolean initSells = initOrders(Constant.SELL, sellPrice); //Force init sell orders
+
+                if (!initSells) {
                     success = false;
                 }
+
+                if (initSells) { //Only move the buy orders if sure that the sell have been taken down
+                    if(Global.options.isDualSide()) {
+                        boolean initBuys;
+                        initBuys = initOrders(Constant.BUY, buyPrice);
+                        if (!initBuys) {
+                            success = false;
+                            LOG.error("NuBot has not been able to shift buy orders");
+                        }
+                    }
+                } else { //success false with the first part of the shift
+                        LOG.error("NuBot has not been able to shift sell orders");
+                    }
+                }
+
+                //Here I wait until the two orders are correctly displaied. It can take some seconds
+                try {
+                    Thread.sleep(SHORT_WAIT_SECONDS * 1000);
+                } catch (InterruptedException ex) {
+                    LOG.error(ex.toString());
+                }
+
+                //Communicate to the priceMonitorTask that the wall shift is over
+                strategy.getPriceMonitorTask().setWallsBeingShifted(false);
+                strategy.getSendLiquidityTask().setWallsBeingShifted(false);
+
             } else {
+                LOG.info("Could not submit request to clear orders");
                 success = false;
                 //Communicate to the priceMonitorTask that the wall shift is over
                 strategy.getPriceMonitorTask().setWallsBeingShifted(false);
                 strategy.getSendLiquidityTask().setWallsBeingShifted(false);
                 LOG.error(deleteOrdersResponse.getError().toString());
             }
-        }
+
         return success;
     }
 }

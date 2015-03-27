@@ -18,10 +18,7 @@
 
 package com.nubits.nubot.options;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,6 +27,8 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import com.nubits.nubot.notifications.MailNotifications;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -520,16 +519,33 @@ public class NuBotOptions {
 
     @Override
     public String toString() {
-        return "NuBotOptions{" + "spread=" + spread + ", dualside=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apikey=" + apiKey + ", apisecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangename=" + exchangeName + ", pair=" + pair  + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity + '}';
+        return toStringNoKeys(); //removes sensitive information
     }
 
-    //Same as above, without printing api secret key and RCP password (for logging purposes)
-
-    /**
-     * @return
-     */
     public String toStringNoKeys() {
-        return "Options : {<br>" + "spread=" + spread + ", " + "<br> dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangename=" + exchangeName + "<br> pair=" + pair + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity + '}';
+        String toRet = "";
+
+        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        Gson parser = gson.create();
+
+        String serializedOptions = parser.toJson(this);
+        org.json.simple.parser.JSONParser p = new org.json.simple.parser.JSONParser();
+        try {
+            JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptions));
+
+            //Replace sensitive information
+            serializedOptionsJSON.replace("apisecret", "hidden");
+            serializedOptionsJSON.replace("apikey", "hidden");
+            serializedOptionsJSON.replace("rpcpass","hidden");
+
+            toRet = serializedOptionsJSON.toString();
+        }
+        catch(org.json.simple.parser.ParseException e) {
+                LOG.error(e.toString());
+            }
+
+        return toRet;
     }
 }
 

@@ -23,27 +23,32 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 public class TestLiquidityDistribution {
+
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLiquidityDistribution.class.getName());
     private static final String TEST_OPTIONS_PATH = "config/myconfig/poloniex.json";
@@ -58,6 +63,8 @@ public class TestLiquidityDistribution {
     double pegPrice;
 
     public static void main(String a[]) {
+        InitTests.setLoggingFilename(LOG);
+
         TestLiquidityDistribution test = new TestLiquidityDistribution();
 
         InitTests.loadConfig(TEST_OPTIONS_PATH);
@@ -69,14 +76,9 @@ public class TestLiquidityDistribution {
 
     private void init(String exchangeName) {
 
-        //feed = new BitcoinaveragePriceFeed();
-        String folderName = "tests_" + System.currentTimeMillis() + "/";
-
-
         execOrders = false;
         if (!exchangeName.equals("")) {
             //Setup the exchange
-            execOrders = true;
             pair = CurrencyList.NBT_BTC;
             try {
                 WrapperTestUtils.configureExchange(exchangeName);

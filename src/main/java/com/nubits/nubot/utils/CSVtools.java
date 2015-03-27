@@ -34,7 +34,7 @@ public class CSVtools {
      * @param filename
      * @return
      */
-    public static ArrayList<String[]> parseCsvFromClassPath(String filename) {
+    /*public static ArrayList<String[]> parseCsvFromClassPath(String filename) {
         InputStream is = CSVtools.class.getClassLoader().getResourceAsStream(filename);
 
         BufferedReader br = null;
@@ -68,14 +68,15 @@ public class CSVtools {
         }
 
         return toReturn;
-    }
+    }*/
 
     /**
      * parse a csv file. used by parseCsvFromClassPath to load from classhpath
      * @param file
      * @return
      */
-    public static ArrayList<String[]> parseCsvFromFile(File file) {
+    public static ArrayList<String[]> parseCsvFromFile(String filepath) {
+        File file = new File(filepath);
         BufferedReader br = null;
         String line = "";
         String cvsSplitBy = ",";

@@ -45,6 +45,6 @@ public class TestAll extends TestCase {
 
         opt.executeOrders = false;
 
-        MainLaunch.executeBot(opt);*/
+        MainLaunch.launchBot(opt);*/
     }
 }

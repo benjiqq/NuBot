@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
 
 
 import com.nubits.nubot.NTP.NTPClient;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -28,13 +29,18 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.feedservices.*;
+import com.nubits.nubot.utils.InitTests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TestSync extends TimerTask {
+
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(TestSync.class.getName());
     private static final int TASK_INTERVAL = 61;
@@ -45,10 +51,11 @@ public class TestSync extends TimerTask {
     private static AbstractPriceFeed feed;
 
     public static void main(String[] args) throws InterruptedException {
+        InitTests.setLoggingFilename(LOG);
+
         //Run multiple instance of this test to see if they read the same price.
         //It sends a notification on hipchat after syncing with a remote time server
         //Change parameters above
-
 
         startTime = (int) (System.currentTimeMillis() / 1000);
         System.out.println("Start-time = " + startTime);

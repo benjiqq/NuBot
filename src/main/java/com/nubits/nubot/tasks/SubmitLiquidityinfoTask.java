@@ -55,9 +55,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private boolean firstOrdersPlaced = false;
     private boolean firstExecution = true;
 
-    private String outputFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME +".csv";
-    private String jsonFile_orders = Global.sessionLogFolders + "/" + Settings.ORDERS_FILENAME + ".json";
-    private String jsonFile_balances = Global.sessionLogFolders + "/" + Settings.BALANCES_FILEAME + ".json";
+    private String outputFile_orders;
+    private String jsonFile_orders;
+    private String jsonFile_balances;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
 
@@ -66,6 +66,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     }
 
     private void initFiles() {
+
+         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME +".csv";
+         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
+         this.jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
+
         //create json file if it doesn't already exist
         LOG.debug("init files");
         File jsonF1 = new File(this.jsonFile_orders);
@@ -138,7 +143,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             }
         } else {
-            LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            if (Global.options.isSubmitliquidity()) {
+                LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            }
         }
     }
 

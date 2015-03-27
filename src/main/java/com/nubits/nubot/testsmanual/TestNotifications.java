@@ -19,31 +19,30 @@
 package com.nubits.nubot.testsmanual;
 
 
-import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.utils.InitTests;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
-import java.io.IOException;
 
 public class TestNotifications {
 
 
     private static final String TEST_OPTIONS_PATH = "config/myconfig/poloniex.json";
 
+    //define Logging by using predefined Settings which points to an XML
     static {
-        System.setProperty("logback.configurationFile", "allconfig/testlog.xml");
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
 
     private static final Logger LOG = LoggerFactory.getLogger(TestNotifications.class.getName());
 
     public static void main(String[] a) {
+
+        InitTests.setLoggingFilename(LOG);
 
         InitTests.loadConfig(TEST_OPTIONS_PATH);
         InitTests.loadKeystore(false);

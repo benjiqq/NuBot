@@ -35,9 +35,9 @@ import java.nio.file.Paths;
 
 public class TestOptionsSample extends TestCase {
 
-    private static String testconfigFile = "sample-config.json";
-    private static String testconfigdir = "config/sampleconfig";
-    private static String testconfig = testconfigdir + "/" + testconfigFile;
+    private static String testconfigFile = "sample-options.json";
+    private static String testconfigdir = "config/options/";
+    private static String testconfig = testconfigdir + testconfigFile;
 
     @Override
     public void setUp() {
@@ -84,7 +84,7 @@ public class TestOptionsSample extends TestCase {
 
             assertTrue(nuo != null);
 
-            assertTrue(nuo.exchangeName.equals("Poloniex"));
+            assertTrue(nuo.exchangeName.equals("poloniex"));
 
             //assertTrue(nuo.getPair() != null);
 

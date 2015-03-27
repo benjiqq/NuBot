@@ -82,7 +82,6 @@ public class PeatioWrapper implements TradeInterface {
 
     public PeatioWrapper() {
         setupErrors();
-
     }
 
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
@@ -831,13 +830,13 @@ public class PeatioWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
                 String url = apiBaseUrl + canonical_uri;
-                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
+                LOG.debug(canonical_verb.toUpperCase()+ " - Calling " + url + " with params:" + args);
 
+                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
                 connection.ignoreHttpErrors(true);
                 if ("post".equalsIgnoreCase(canonical_verb)) {
@@ -852,7 +851,7 @@ public class PeatioWrapper implements TradeInterface {
                 LOG.error(e.toString());
                 return null;
             } finally {
-                LOG.info("result:{}" + response);
+                LOG.debug("result:{}" + response);
             }
         }
 

@@ -18,30 +18,23 @@
 
 package com.nubits.nubot.testsmanual;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.utils.InitTests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.File;
-import java.net.URL;
 
 
 public class TestWrappers {
 
     //define Logging by using predefined Settings which points to an XML
     static {
-        String wdir = System.getProperty("user.dir");
-        File f = new File(wdir + Settings.TEST_LOGXML);
-        if (f.exists())
-            System.setProperty("logback.configurationFile", f.getAbsolutePath());
-
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
 
@@ -50,32 +43,13 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/bitspark.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/peatio.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
-
-        //Load settings
-        InitTests.loadKeystore(false);
-        InitTests.loadConfig(TEST_OPTIONS_PATH);
-        try {
-            LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + Global.options.getExchangeName());
-            WrapperTestUtils.configureExchange(Global.options.getExchangeName());
-            InitTests.startConnectionCheck();
-
-        } catch (NuBotConfigException ex) {
-            LOG.error(ex.toString());
-        }
-
-        LoggerContext loggerContext = ((ch.qos.logback.classic.Logger)LOG).getLoggerContext();
-        URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
-        LOG.debug("Logback used '{}' as the configuration file.", mainURL);
-
-        Global.sessionLogFolders = Settings.TEST_LOGFOLDER;
-
+        init();
         runTests();
     }
 
@@ -86,13 +60,13 @@ public class TestWrappers {
         //-------------
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
         //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
-        //WrapperTestUtils.testBuy(0.003, 0.0000120, testPair);  //ok
+        WrapperTestUtils.testBuy(0.003, 0.00100, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("123199680", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
@@ -133,6 +107,33 @@ public class TestWrappers {
         LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
         System.exit(0);
+    }
+
+    private static void init()
+    {
+        InitTests.setLoggingFilename(LOG);
+        InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
+
+        //Load keystore
+        boolean trustAll = false;
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO))
+        {
+            trustAll = true;
+        }
+        InitTests.loadKeystore(trustAll);
+
+        try {
+            LOG.info("using key: " + Global.options.getApiKey());
+            LOG.info("config exchange " + Global.options.getExchangeName());
+            WrapperTestUtils.configureExchange(Global.options.getExchangeName());
+            InitTests.startConnectionCheck();
+
+        } catch (NuBotConfigException ex) {
+            LOG.error(ex.toString());
+        }
+
+
+        Global.sessionLogFolder = Settings.TEST_LOGFOLDER;
     }
 
 
