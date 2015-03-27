@@ -58,7 +58,15 @@ public class TaskManager {
         //assign default values just for testing without Global.options loaded
         //TODO naming mixed
 
-        setTasks();
+    }
+
+    public TaskManager(boolean iniTasks) {
+        this.running = false;
+        taskList = new ArrayList<BotTask>();
+        if(iniTasks)
+        {
+            setTasks();
+        }
     }
 
     public void setNudTask() {
