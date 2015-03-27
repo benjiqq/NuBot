@@ -8,15 +8,20 @@
     <property scope="context" name="SessionLOG" value="SessionLOG" />
     <property scope="context" name="sessionlogFile" value=".sessions.log" />
 
+
+    <!-- console output of NuBot -->
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
+                >> %date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
             </Pattern>
         </layout>
 
     </appender>
+
+    <!-- main file output, not verbose -->
 
     <appender name="standardHTML" class="ch.qos.logback.classic.sift.SiftingAppender">
 
@@ -61,6 +66,8 @@
             </appender>
         </sift>
     </appender>
+
+    <!-- verbose file output -->
 
     <appender name="verboseHTML" class="ch.qos.logback.classic.sift.SiftingAppender">
 
@@ -107,6 +114,8 @@
         </sift>
     </appender>
 
+    <!-- session logger -->
+
     <appender name="sessionFile" class="ch.qos.logback.core.FileAppender">
 
         <encoder>
@@ -122,6 +131,9 @@
 
     </appender>
 
+    <!--
+	definition of all loggers
+	-->
 
     <root level="debug">
         <appender-ref ref="standardHTML" />
@@ -129,7 +141,6 @@
         <appender-ref ref="STDOUT" />
         <appender-ref ref="sessionFile" />
     </root>
-
 
 
     <!-- to surpress logback startup messages -->
