@@ -123,12 +123,12 @@ public class MainLaunch {
 
         if (opt.requiresSecondaryPegStrategy()) {
             LOG.debug("creating secondary bot object");
-            NuBotSecondary bot = new NuBotSecondary();
-            bot.execute(opt);
+            Global.bot = new NuBotSecondary();
+            Global.bot.execute(opt);
         } else {
             LOG.debug("creating simple bot object");
-            NuBotSimple bot = new NuBotSimple();
-            bot.execute(opt);
+            Global.bot = new NuBotSimple();
+            Global.bot.execute(opt);
         }
 
     }

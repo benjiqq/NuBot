@@ -39,6 +39,7 @@ import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -318,6 +319,60 @@ public abstract class NuBotBase {
         String msg = "A new <strong>" + mode + "</strong> bot just came online on " + exc + " pair (" + p + ")";
         LOG.debug("notify online " + msg);
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
+    }
+
+    public void shutdownBot(){
+
+        LOG.info("Bot shutting down..");
+
+        String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
+                + Global.options.getExchangeName() + " ["
+                + Global.options.getPair().toStringSep() + "]";
+
+        HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+
+        //Try to cancel all orders, if any
+        if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+            LOG.info("Clearing out active orders ... ");
+
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                if (deleted) {
+                    LOG.info("Order clear request successful");
+                } else {
+                    LOG.error("Could not submit request to clear orders");
+                }
+
+            } else {
+                LOG.error(deleteOrdersResponse.getError().toString());
+            }
+        }
+
+        //reset liquidity info
+        if (Global.options.isSubmitliquidity()) {
+            if (Global.rpcClient.isConnected()) {
+                //tier 1
+                LOG.info("Resetting Liquidity Info before quit");
+
+                JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                        0, 0, 1);
+                if (null == responseObject1) {
+                    LOG.error("Something went wrong while sending liquidityinfo");
+                } else {
+                    LOG.info(responseObject1.toJSONString());
+                }
+
+                JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
+                        0, 0, 2);
+                if (null == responseObject2) {
+                    LOG.error("Something went wrong while sending liquidityinfo");
+                } else {
+                    LOG.info(responseObject2.toJSONString());
+                }
+            }
+        }
     }
 
 }

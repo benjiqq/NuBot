@@ -57,6 +57,8 @@ public class Global {
     public static String sessionId;
     public static long sessionStarted, sessionStopped;
 
+    public static NuBotBase bot;
+
 
     /**
      * shutdown mechanics
@@ -69,7 +71,7 @@ public class Global {
             @Override
             public void run() {
 
-
+                Global.bot.shutdownBot();
 
                 Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
                 Global.sessionStopped = System.currentTimeMillis();
