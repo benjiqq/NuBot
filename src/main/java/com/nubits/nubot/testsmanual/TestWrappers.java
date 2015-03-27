@@ -49,9 +49,6 @@ public class TestWrappers {
     public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
-
-        InitTests.setLoggingFilename(LOG);
-
         init();
         runTests();
     }
@@ -114,6 +111,7 @@ public class TestWrappers {
 
     private static void init()
     {
+        InitTests.setLoggingFilename(LOG);
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Load keystore
