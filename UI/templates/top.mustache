@@ -40,8 +40,6 @@
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
 
-
-
       <script>
 
               var host = "localhost";
@@ -49,7 +47,7 @@
               var baseurl = "http://" + host + ":" + port;
               var updateTime = 2000;
 
-$(document).ready(function() {
+        $(document).ready(function() {
 
           $('#startbot').click(function(){
 
@@ -70,20 +68,6 @@ $(document).ready(function() {
                     }
                });
 
-                /*
-                $.ajax({
-                  type: "GET",
-                  dataType: "json",
-                  url: baseurl + "/startstop",
-                })
-                .fail(function() {
-                  console.log("error start");
-                  //alert( "error loading log" );
-                })
-                .done(function( data ) {
-                  $('#logarea2').val("running: " + data["running"]);
-                });
-                */
 
             });
 
@@ -108,33 +92,9 @@ $(document).ready(function() {
                     }
                });
 
-                /*
-                $.ajax({
-                  type: "GET",
-                  dataType: "json",
-                  url: baseurl + "/startstop",
-                })
-                .fail(function() {
-                  console.log("error start");
-                  //alert( "error loading log" );
-                })
-                .done(function( data ) {
-                  $('#logarea2').val("running: " + data["running"]);
-                });
-                */
 
             });
-});
-
-
-
-            /*function doPoll(){
-            $.get('ajax/test.html', function(data) {
-                  alert(data);
-                setTimeout(doPoll,1000);
-              });
-            }*/
-
+    });
 
             function loadlog() {
 
@@ -154,8 +114,6 @@ $(document).ready(function() {
                 })
                 .done(function( data ) {
                   $('#logarea').val(data["log"]);
-
-                  $('#logdiv').html(data["log"]);
                 });
 
                 var psconsole = $('#logarea');

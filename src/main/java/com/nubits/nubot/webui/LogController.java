@@ -20,7 +20,7 @@ public class LogController {
     /**
      * the log file to send to client
      */
-    String logfile = Global.sessionPath  + "/verbose.html";
+    String logfile = Global.sessionPath  + "/ui_standard.log";
 
     final static Logger LOG = LoggerFactory.getLogger(LogController.class);
 

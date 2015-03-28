@@ -75,6 +75,7 @@ public class SessionManager {
         //it increases the counter
         createSessionFile();
 
+        Global.sessionRunning = true;
         Global.sessionStarted = System.currentTimeMillis();
 
         String timestamp =

@@ -23,10 +23,16 @@ public class DataController {
 
     final static Logger LOG = LoggerFactory.getLogger(DataController.class);
 
+
+
     public DataController(String endpoint) {
 
 
         get(endpoint, "application/json", (request, response) -> {
+
+            //TODO
+            //1. check if session is running
+            //2. use general dictionaries, not BTC, NBT
 
             Map opmap = new HashMap();
 
