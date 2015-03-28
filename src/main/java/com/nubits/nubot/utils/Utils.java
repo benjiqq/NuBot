@@ -241,36 +241,6 @@ public class Utils {
         return toRet;
     }
 
-    /*
-    public static void loadProperties(String filename) throws IOException {
-        Global.settings = new Properties();
-        InputStream input = null;
-
-        try {
-            input = NuBotSecondary.class.getClassLoader().getResourceAsStream(filename);
-
-            //load a properties file from class path, inside static method
-            Global.settings.load(input);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-            throw new IOException("Sorry, unable to find " + filename);
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    LOG.error(e.toString());
-                }
-            }
-        }
-    }
-    */
-
-    public static String generateLogPath(String className) {
-        String toReturn = Settings.TESTS_LOG_PREFIX + "_" + className + "_" + getTimestampLong() + "/";
-        LOG.info("Logging folder :  " + toReturn);
-        return toReturn;
-    }
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
@@ -286,10 +256,6 @@ public class Utils {
         return delay;
     }
 
-    public static void exitWithMessage(String msg) {
-        LOG.error(msg);
-        System.exit(0);
-    }
 
     /**
      * Returns a pseudo-random number between min and max, inclusive. The
