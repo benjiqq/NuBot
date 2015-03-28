@@ -20,6 +20,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ServiceInterface;
@@ -27,7 +28,7 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
@@ -174,7 +175,7 @@ public class ComkortWrapper implements TradeInterface {
                 JSONObject nbtBalances = (JSONObject) httpAnswerJson.get(pair.getOrderCurrency().getCode().toUpperCase());
                 Amount NBTAvail = new Amount(Utils.getDouble(nbtBalances.get("balance")), pair.getOrderCurrency());
                 Amount NBTonOrder = new Amount(Utils.getDouble(nbtBalances.get("reserve")), pair.getOrderCurrency());
-                Balance balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
             }
         } else {
@@ -609,7 +610,7 @@ public class ComkortWrapper implements TradeInterface {
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
 
                 if (needAuth) {
                     connection.setRequestProperty("apikey", keys.getApiKey());

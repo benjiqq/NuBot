@@ -43,7 +43,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/peatio.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/comkort.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;

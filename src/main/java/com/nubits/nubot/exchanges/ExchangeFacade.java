@@ -19,14 +19,10 @@
 package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +51,7 @@ public class ExchangeFacade {
     public static final String ALLCOIN = "Allcoin";
     public static final String EXCOIN = "Excoin";
     public static final String BITCOINCOID = "Bitcoincoid";
+    public static final String COMKORT = "Comkort";
 
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "https://178.62.140.24";
@@ -77,6 +74,7 @@ public class ExchangeFacade {
         supportedExchanges.add(BTER);
         supportedExchanges.add(CCEDK);
         supportedExchanges.add(EXCOIN);
+        supportedExchanges.add(COMKORT);
 
         exchangeInterfaces.put(ALTSTRADE,AltsTradeWrapper.class);
         exchangeInterfaces.put(POLONIEX,PoloniexWrapper.class);
@@ -87,6 +85,7 @@ public class ExchangeFacade {
         exchangeInterfaces.put(INTERNAL_EXCHANGE_PEATIO,PeatioWrapper.class);
         exchangeInterfaces.put(BTCE,BtceWrapper.class);
         exchangeInterfaces.put(EXCOIN,ExcoinWrapper.class);
+        exchangeInterfaces.put(COMKORT,ComkortWrapper.class);
 
     }
 
