@@ -121,13 +121,7 @@ See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5
 
 
 #License
-NuBot is released under 
-
-[GNU GPL v2.0](src/master/md/LICENSE.md)
-[GNU GPL v2.0](md/LICENSE.md?at=develop)
-[GNU GPL v2.0](md/LICENSE.md?at=master)
-
-md/LICENSE.md?at=develop
+NuBot is released under [GNU GPL v2.0](src/master/md/LICENSE.md)
 
 TMP:
 (https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
