@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.utils;
 
 import com.google.gson.Gson;
@@ -22,12 +23,14 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -36,6 +39,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import org.apache.commons.io.FileUtils;
@@ -53,10 +57,12 @@ public class FrozenBalancesManager {
     private Amount amountAlreadyThere;
     private Currency toFreezeCurrency;
 
+    public final static String frozenfolder = Settings.FROZEN_FUNDS_PATH;
+
     //Call this on bot startup
-    public FrozenBalancesManager(String exchangName, CurrencyPair pair, String folder) {
+    public FrozenBalancesManager(String exchangName, CurrencyPair pair) {
         String fileName = pair.toStringSep() + "-" + exchangName + "-frozen.json";
-        this.pathToFrozenBalancesFiles = folder + fileName;
+        this.pathToFrozenBalancesFiles = frozenfolder + "/" + fileName;
         if (Global.swappedPair) {
             toFreezeCurrency = pair.getOrderCurrency();
         } else {
@@ -176,11 +182,11 @@ public class FrozenBalancesManager {
         this.frozenAmount = new FrozenAmount(newAmount);
         DecimalFormat df = new DecimalFormat("#");
         df.setMaximumFractionDigits(8);
-        if (Global.options != null) {
-            if (Global.options.getKeepProceeds() != 0) {
-                LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
-            }
+
+        if (Global.options.getKeepProceeds() != 0) {
+            LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
         }
+
         if (writeToFile) {
             updateFrozenFilesystem();
         }

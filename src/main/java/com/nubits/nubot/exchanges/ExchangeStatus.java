@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014-2015 Nu Development Team
+/*
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,17 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.exchanges;
 
 
 public class ExchangeStatus {
 
-//Class Variables
+
     public static final String STOPPED = "Bot Stopped";
     public static final String RUNNING = "Bot Running";
     private String botStatusString;
 
-//Constructor
+
     public ExchangeStatus(String botStatusString) throws WrongBotStatusException {
         if (botStatusString.equals(STOPPED) || botStatusString.equals(RUNNING)) {
             this.botStatusString = botStatusString;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,14 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBotSecondary;
+import com.nubits.nubot.global.Passwords;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
+
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
 import static com.nubits.nubot.utils.LiquidityPlot.plot;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -31,47 +35,36 @@ import java.io.InputStreamReader;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Properties;
-import java.util.Random;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.*;
+
 import org.apache.commons.io.FileUtils;
 
-/**
- *
- * @author desrever < desrever@nubits.com >
- */
+
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
     /**
-     *
      * @param originalString
      * @param passphrase
      * @param pathToOutput
@@ -107,7 +100,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param pathToFile
      * @param passphrase
      * @return
@@ -146,7 +138,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static boolean isWindowsPlatform() {
@@ -159,7 +150,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static boolean isMacPlatform() {
@@ -172,7 +162,6 @@ public class Utils {
     }
 
     /**
-     *
      * @param arg
      * @return
      */
@@ -181,7 +170,6 @@ public class Utils {
     }
 
     /**
-     *
      * @return
      */
     public static String getTimestampString() {
@@ -253,29 +241,6 @@ public class Utils {
         return toRet;
     }
 
-    public static void loadProperties(String filename) throws IOException {
-        Global.settings = new Properties();
-        InputStream input = null;
-
-        try {
-            input = NuBotSecondary.class.getClassLoader().getResourceAsStream(filename);
-
-            //load a properties file from class path, inside static method
-            Global.settings.load(input);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-            throw new IOException("Sorry, unable to find " + filename);
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    LOG.error(e.toString());
-                }
-            }
-        }
-
-    }
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
@@ -291,10 +256,6 @@ public class Utils {
         return delay;
     }
 
-    public static void exitWithMessage(String msg) {
-        LOG.error(msg);
-        System.exit(0);
-    }
 
     /**
      * Returns a pseudo-random number between min and max, inclusive. The
@@ -358,19 +319,17 @@ public class Utils {
         //Generate a random alfanumeric id of 6 chars
         String uid = UUID.randomUUID().toString().substring(0, 6);
         //Get nubot version
-        String version = Utils.getVersion();
+        String version = VersionInfo.getVersionName();
         //Get timestamp
         String timest = "" + getTimestampLong();
         //conatenate
         return version + sep + timest + sep + uid;
     }
 
-    public static String getVersion() {
-        return Global.settings.getProperty("version");
-    }
 
     /**
      * Install a trust manager that does not validate certificate chains for https calls
+     *
      * @throws Exception
      */
     private static void installTrustAllManager() throws Exception {
@@ -378,16 +337,16 @@ public class Utils {
 
         // Create a trust manager that does not validate certificate chains
         TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                    return null;
-                }
-
-                public void checkClientTrusted(X509Certificate[] certs, String authType) {
-                }
-
-                public void checkServerTrusted(X509Certificate[] certs, String authType) {
-                }
+            public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                return null;
             }
+
+            public void checkClientTrusted(X509Certificate[] certs, String authType) {
+            }
+
+            public void checkServerTrusted(X509Certificate[] certs, String authType) {
+            }
+        }
         };
 
         // Install the all-trusting trust manager
@@ -406,6 +365,8 @@ public class Utils {
     }
 
     public static void installKeystore(boolean trustAll) {
+
+        LOG.info("installKeystore. trustall: " + trustAll);
         if (trustAll) {
             try {
                 Utils.installTrustAllManager();
@@ -414,14 +375,54 @@ public class Utils {
             }
 
         } else {
-            String kpath = Global.settings.getProperty("keystore_path");
-            LOG.info("keypath " + kpath);
-            String kpass = Global.settings.getProperty("keystore_pass");
-            LOG.info("kpassword " + kpass);
-            System.setProperty("javax.net.ssl.trustStore", kpath);
-            System.setProperty("javax.net.ssl.trustStorePassword", kpass);
+
+            //load file depending whether run from inside a Jar or not
+
+            String wdir = System.getProperty("user.dir");
+            String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
+
+            System.setProperty("javax.net.ssl.trustStore", wdirpath);
+            System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }
+
+    /**
+     * Determine whether the current thread runs inside a jar
+     * @return
+     */
+    public static boolean insideJar() {
+        String c = "" + Utils.class.getResource("Utils.class");
+        String path = "";
+        if (c.startsWith("jar:"))
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * get filepath from a file in the resources folder
+     *
+     * @param filename
+     * @return
+     */
+    public static String filePathClasspathFile(String filename) {
+        LOG.debug("filename " + filename);
+        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
+        URL resource = Utils.class.getClassLoader().getResource(filename);
+        File f = null;
+        try {
+            URI u = resource.toURI();
+            LOG.debug("u: " + u);
+            f = Paths.get(u).toFile();
+            LOG.debug("f exists " + f.exists());
+            return f.getAbsolutePath();
+        } catch (Exception e) {
+
+        }
+
+        return "";
+    }
+
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];
@@ -448,4 +449,31 @@ public class Utils {
         addPlot(xBuy, yBuy); // create a second plot on top of first
 
     }
+
+    //Return the uptime of the bot [hours]
+    public static String getBotUptime() {
+        long upTimeMs = System.currentTimeMillis() - Global.sessionStarted;
+        String toReturn = "";
+        if (getDaysFromMillis(upTimeMs) > 2) {
+            toReturn = getDaysFromMillis(upTimeMs) + " days";
+        } else if (getHoursFromMillis(upTimeMs) > 2) {
+            toReturn = getHoursFromMillis(upTimeMs) + " hours";
+        } else {
+            toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
+        }
+        return toReturn;
+    }
+
+    public static double getHoursFromMillis(long millis) {
+        return round((getMinutesFromMillis(millis)) / 60, 2);
+    }
+
+    public static double getMinutesFromMillis(long millis) {
+        return round(((millis / 1000) / 60), 2);
+    }
+
+    public static double getDaysFromMillis(long millis) {
+        return round((getHoursFromMillis(millis)) / 24, 2);
+    }
+
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.utils;
 
 import com.nubits.nubot.utils.FileSystem;
@@ -23,10 +24,6 @@ import java.util.ArrayList;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
-/**
- *
- * @author desrever
- */
 public class FileSystem {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileSystem.class.getName());

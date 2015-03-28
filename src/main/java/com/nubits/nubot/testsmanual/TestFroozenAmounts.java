@@ -1,6 +1,5 @@
-package com.nubits.nubot.testsmanual;
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -17,13 +16,17 @@ package com.nubits.nubot.testsmanual;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+package com.nubits.nubot.testsmanual;
+
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FrozenBalancesManager;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -32,21 +35,21 @@ import java.io.IOException;
 
 public class TestFroozenAmounts {
 
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(TestFroozenAmounts.class.getName());
 
     public static void main(String[] args) {
-        //Load settings that contains the path
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
+        InitTests.setLoggingFilename(LOG);
 
         CurrencyPair pair = CurrencyList.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();
         String exchangeName = ExchangeFacade.BTER;
 
-        FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair, Global.settings.getProperty("frozen_folder"));
+        FrozenBalancesManager fbm = new FrozenBalancesManager(exchangeName, pair);
 
         fbm.updateFrozenBalance(new Amount(0.000000091, currency));
         fbm.updateFrozenBalance(new Amount(5032, currency));

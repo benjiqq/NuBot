@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,16 +15,18 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -33,7 +35,7 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -152,7 +154,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -174,7 +176,7 @@ public class BtceWrapper implements TradeInterface {
             Amount PEGTotal = new Amount(Double.parseDouble(funds.get(pegCode).toString()), CurrencyList.USD);
             Amount NBTTotal = new Amount(Double.parseDouble(funds.get(nbtCode).toString()), CurrencyList.NBT);
 
-            balance = new Balance(NBTTotal, PEGTotal);
+            PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
 
             //Pack it into the ApiResponse
             apiResponse.setResponseObject(balance);
@@ -188,7 +190,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getAvailableBalance(Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -316,9 +318,10 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        if (Global.options != null) {
+
             return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
+
+        /* else {
             ApiResponse apiResponse = new ApiResponse();
 
             String strDelimiterStart = "the fee for transactions is ";
@@ -340,7 +343,7 @@ public class BtceWrapper implements TradeInterface {
             }
 
             return apiResponse;
-        }
+        }*/
     }
 
     @Override
@@ -739,7 +742,7 @@ public class BtceWrapper implements TradeInterface {
                 // create and setup a HTTP connection
 
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());

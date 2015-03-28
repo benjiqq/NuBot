@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,12 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -32,7 +32,7 @@ import java.util.TreeMap;
  * This interface can be used to trade Please refer to readme to best practice
  * for the implementation
  *
- * @see Balance
+ * @see com.nubits.nubot.models.PairBalance
  * @see ApiResponse
  * @see Order
  * @see ApiError

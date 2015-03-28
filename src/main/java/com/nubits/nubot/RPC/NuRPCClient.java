@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.RPC;
 
 import com.nubits.nubot.global.Constant;
@@ -41,6 +42,9 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 
+/**
+ * RPC Client for Nu Wallet
+ */
 public class NuRPCClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuRPCClient.class.getName());
@@ -59,7 +63,7 @@ public class NuRPCClient {
     private String exchangeName;
     private CurrencyPair pair;
 
-    //Constructor
+
     public NuRPCClient(String ip, int port, String rpcUser, String rpcPass, boolean verbose, boolean useIdentifier, String custodianPublicAddress, CurrencyPair pair, String exchangeName) {
         this.ip = ip;
         this.port = port;

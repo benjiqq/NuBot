@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,9 +15,11 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package functions;
 
 
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.CSVtools;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -31,7 +33,6 @@ public class TestReadCsv  extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestReadCsv.class
             .getName());
-    private static final String TEST_FILE = "currencies.csv";
 
     @Test
     public void testReadCSV() {
@@ -39,7 +40,7 @@ public class TestReadCsv  extends TestCase {
 
         //File f = new File(getClass().getClassLoader().getResource(TEST_FILE).getFile());
         //assertTrue(f!=null);
-        ArrayList<String[]> parsedCsv  = CSVtools.parseCsvFromClassPath(TEST_FILE);
+        ArrayList<String[]> parsedCsv  = CSVtools.parseCsvFromFile(Settings.CURRENCY_FILE_PATH);
         assertTrue(parsedCsv.size() > 5);
         //InputStream is = TestReadCsv.class.getResourceAsStream(TEST_FILE);
 

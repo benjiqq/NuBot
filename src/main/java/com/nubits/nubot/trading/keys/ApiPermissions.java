@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014-2015 Nu Development Team
+/*
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,15 +15,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.keys;
 
-/**
- *
- * @author desrever < desrever@nubits.com >
- */
+
 public class ApiPermissions {
 
-//Class Variables
     private boolean valid_keys;
     private boolean deposit;
     private boolean get_info;
@@ -31,7 +28,7 @@ public class ApiPermissions {
     private boolean trade;
     private boolean withdraw;
 
-//Constructor
+
     public ApiPermissions() {
     }
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,23 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.options.NuBotAdminSettings;
-import com.nubits.nubot.tasks.strategy.NuPriceMonitorTask;
-import com.nubits.nubot.tasks.strategy.PriceMonitorTriggerTask;
-import com.nubits.nubot.tasks.strategy.StrategyPrimaryPegTask;
-import com.nubits.nubot.tasks.strategy.StrategySecondaryPegTask;
-import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
+import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-/**
- *
- * @author desrever < desrever@nubits.com >
- */
+import java.util.ArrayList;
+
+
 public class TaskManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(TaskManager.class.getName());
@@ -61,43 +58,65 @@ public class TaskManager {
         //assign default values just for testing without Global.options loaded
         //TODO naming mixed
 
-        //setTasks();
+        setTasks();
     }
 
-    public void setNudTask(){
-        checkNudTask = new BotTask(
-                new CheckNudTask(), 30, "checkNud");
+    public TaskManager(boolean iniTasks) {
+        this.running = false;
+        taskList = new ArrayList<BotTask>();
+        if(iniTasks)
+        {
+            setTasks();
+        }
+    }
+
+    public void setNudTask() {
+        this.checkNudTask = new BotTask(
+                new CheckNudTask(), Settings.CHECK_NUD_INTERVAL, "checkNud");
         taskList.add(checkNudTask);
 
     }
 
-    private void setTasks(){
+    private void setTasks() {
         //connectivity tasks
 
+        LOG.info("setting up tasks");
+
         checkConnectionTask = new BotTask(
-                new CheckConnectionTask(), 127, "checkConnection");
+                new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
         taskList.add(checkConnectionTask);
+        LOG.debug("checkConnectionTask : " + checkConnectionTask);
 
         sendLiquidityTask = new BotTask(
-                new SubmitLiquidityinfoTask(Global.options.verbose), NuBotAdminSettings.submit_liquidity_seconds, "sendLiquidity");
+                new SubmitLiquidityinfoTask(Global.options.verbose), Settings.SUBMIT_LIQUIDITY_SECONDS, "sendLiquidity");
         taskList.add(sendLiquidityTask);
+        LOG.debug("sendLiquidityTask : " + sendLiquidityTask);
 
 
         strategyFiatTask = new BotTask(
-                new StrategyPrimaryPegTask(), NuBotAdminSettings.executeStrategyInterval, STRATEGY_FIAT);
+                new StrategyPrimaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_FIAT);
         taskList.add(strategyFiatTask);
+        LOG.debug("strategyFiatTask : " + strategyFiatTask);
 
         secondaryPegTask = new BotTask(
-                new StrategySecondaryPegTask(), NuBotAdminSettings.executeStrategyInterval, STRATEGY_CRYPTO);
+                new StrategySecondaryPegTask(), Settings.EXECUTE_STRATEGY_INTERVAL, STRATEGY_CRYPTO);
         taskList.add(secondaryPegTask);
+        LOG.debug("secondaryPegTask : " + secondaryPegTask);
 
+        //Select the correct interval
+        int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
+        if (Global.options.pair.getPaymentCurrency().isFiat() && !Global.swappedPair
+                || Global.options.pair.getOrderCurrency().isFiat() && Global.swappedPair) {
+            checkPriceInterval = Settings.CHECK_PRICE_INTERVAL_FIAT;
+        }
         priceTriggerTask = new BotTask(
-                new PriceMonitorTriggerTask(), NuBotAdminSettings.checkPriceInterval, "priceTriggerTask");
-        taskList.add(secondaryPegTask);
+                new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
+        taskList.add(priceTriggerTask);
+        LOG.debug("priceTriggerTask : " + priceTriggerTask);
 
-        priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), NuBotAdminSettings.checkPriceInterval, STRATEGY_CRYPTO);
-        taskList.add(priceMonitorTask);
+        /*priceMonitorTask = new BotTask(
+                new NuPriceMonitorTask(), Settings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
+        taskList.add(priceMonitorTask);*/
 
         initialized = true;
     }
@@ -112,23 +131,13 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        LOG.info("\nStopping all tasks : -- ");
+        LOG.info("Stopping all tasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
             BotTask bt = taskList.get(i);
-            if (bt.getName().equals(STRATEGY_FIAT) || bt.getName().equals(STRATEGY_CRYPTO)) {
-                if (!sentNotification) {
-                    String additionalInfo = "";
-                    if (Global.options != null) {
-                        additionalInfo = Global.options.getExchangeName() + " " + Global.options.getPair().toStringSep();
-                    }
-                    //dpn't send mail here for now
-                    HipChatNotifications.sendMessageCritical("Bot shut-down ( " + additionalInfo + " )");
-                    sentNotification = true;
-                }
-            }
-            LOG.info("Shutting down " + bt.getName());
+
+            LOG.debug("Shutting down " + bt.getName());
             try {
                 bt.getTimer().cancel();
                 bt.getTimer().purge();
@@ -176,7 +185,7 @@ public class TaskManager {
     }
 
     public BotTask getCheckConnectionTask() {
-        return checkConnectionTask;
+        return this.checkConnectionTask;
     }
 
     public void setCheckConnectionTask(BotTask checkConnectionTask) {

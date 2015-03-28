@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,11 +15,10 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.wrappers;
 
-//import com.alibaba.fastjson.JSON;
-//import com.alibaba.fastjson.JSONArray;
-//import com.alibaba.fastjson.JSONObject;
+
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
@@ -30,16 +29,20 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
+
 import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -79,7 +82,6 @@ public class PeatioWrapper implements TradeInterface {
 
     public PeatioWrapper() {
         setupErrors();
-
     }
 
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
@@ -97,11 +99,11 @@ public class PeatioWrapper implements TradeInterface {
             toReturn = getNonceInternal(requester);
         } else {
             try {
-                if (Global.options != null) {
-                    if (Global.options.isVerbose()) {
-                        LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-                    }
+
+                if (Global.options.isVerbose()) {
+                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
                 }
+
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
                 createNonce(requester);
             } catch (InterruptedException e) {
@@ -184,7 +186,7 @@ public class PeatioWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = null;
+        PairBalance balance = null;
         String url = apiBaseUrl;
         String method = API_GET_INFO;
         boolean isGet = true;
@@ -223,7 +225,7 @@ public class PeatioWrapper implements TradeInterface {
                 }
                 if (NBTAvail != null && NBTonOrder != null
                         && PEGAvail != null && PEGonOrder != null) {
-                    balance = new Balance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
+                    balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                     //Pack it into the ApiResponse
                     apiResponse.setResponseObject(balance);
                 } else {
@@ -500,13 +502,9 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     private ApiResponse getTxFeeImpl() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override
@@ -639,11 +637,10 @@ public class PeatioWrapper implements TradeInterface {
         }
 
 
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info(currentTime + " Now apiBusy! req : " + requester);
-            }
+        if (Global.options.isVerbose()) {
+            LOG.info(currentTime + " Now apiBusy! req : " + requester);
         }
+
 
         long timeElapsedSinceLastCall = currentTime - lastSentTonce;
         if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
@@ -715,7 +712,7 @@ public class PeatioWrapper implements TradeInterface {
         if (response.isPositive()) {
             LOG.info("A maximum of 1000 trades can be returned from the Peatio API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
-            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
                 if (thisTrade.getDate().getTime() < startTime) {
                     continue;
@@ -833,13 +830,13 @@ public class PeatioWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
                 String url = apiBaseUrl + canonical_uri;
-                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
+                LOG.debug(canonical_verb.toUpperCase()+ " - Calling " + url + " with params:" + args);
 
+                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
                 connection.ignoreHttpErrors(true);
                 if ("post".equalsIgnoreCase(canonical_verb)) {
@@ -854,7 +851,7 @@ public class PeatioWrapper implements TradeInterface {
                 LOG.error(e.toString());
                 return null;
             } finally {
-                LOG.info("result:{}" + response);
+                LOG.debug("result:{}" + response);
             }
         }
 

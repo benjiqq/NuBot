@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -24,9 +24,11 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = '0.15'
+version = '0.20-rc1' //will be used for logging
+
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
+
 
 //Get dependencies from Maven central repository
 repositories {
@@ -39,11 +41,22 @@ def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
 def logdir = new File("logs")
-def jarname = "NuBot.jar"
-def mainclass = "com.nubits.nubot.launch.MainLaunch"
-def maintestclass = "com.nubits.nubot.utils.LogLaunchUtil"
-def uiclass = "com.nubits.nubot.webui.UiServer"
+def docdir = new File("md")
+def resdir = new File("res")
 
+def jarname = "NuBot.jar"
+def jarnamelasttrades="NuGetLastTrades.jar"
+def sampleconfig = "config/options/sample-options.json"
+
+def testreportdir = new File("testreports") //$buildDir/reports
+def mainclass = "com.nubits.nubot.launch.MainLaunch"
+def getlasttradeclass =  "com.nubits.nubot.launch.toolkit.NuLastTrades"
+def includeTestConfig = true
+
+FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
+        "./${docdir}/license.html", "./${docdir}/feeds.html", "./${docdir}/changelog.html", "./${docdir}/gradle.html")
+
+def uiclass = "com.nubits.nubot.webui.UiServer"
 
 //Project dependencies
 dependencies {
@@ -54,16 +67,14 @@ dependencies {
     compile 'ch.qos.logback:logback-classic:1.1.2'
     compile 'org.codehaus.janino:janino:2.7.8' //for filtering
 
-    compile 'com.alibaba:fastjson:1.1.36'
-    compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
+    compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
 
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'org.codeartisans:org.json:20131017'
 
-    //compile 'commons-logging:commons-logging:1.2'
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-net:commons-net:3.3'
@@ -77,14 +88,13 @@ dependencies {
     compile "javax.servlet:servlet-api:2.5"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
 
-    //logging problem
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
     compile 'com.github.spullara.mustache.java:compiler:0.9.0'
 
     //static. no maven available
     compile files('lib/spark-core-2.2-SNAPSHOT.jar')
     compile files('lib/EasyJccKit.jar')
-    compile files('lib/bitcoinapi-0.1.jar')
+    //compile files('lib/bitcoinapi-0.11.jar')
 
     //dependencies for testing
     testCompile group: 'org.testng', name: 'testng', version: '6.8.8'
@@ -93,42 +103,42 @@ dependencies {
     //compile 'org.zeromq:jeromq:0.3.4'
 }
 
-
-//use standard sourcesets, otherwise they can be defined like this
-/*sourceSets {
-    main {
-        java {
-            srcDir 'NuBot/src'
-        }
-        resources {
-            srcDir 'NuBot/res'
+task compiledocs(type: Exec) {
+    //copy from root into md first
+    doFirst {
+        copy {
+            from "README.md"
+            into "${docdir}"
         }
     }
 
-    test {
-        java {
-            srcDir 'NuBot/tests'
-        }
-        resources {
-            srcDir 'NuBot/res'
-        }
-    }
-}*/
+    description 'compile the HTML documents'
+    executable "sh"
 
-test {
-    reports {
-        junitXml.enabled = false
-        html.enabled = true
+    args "-c", "cd " + "${docdir}" + " && /bin/bash compileAll.sh"
+
+    doLast {
+        delete "${docdir}/README.md"
+
     }
+}
+
+task distInit << {
+    if (distdir.exists()) {
+        println("folder " + distdir + " exists. delete it")
+        delete distdir
+        //delete "${distdir}"
+    }
+
+    println("creating distdir")
+    distdir.mkdirs()
 }
 
 
 //create a single Jar with all dependencies
-task NubotJar(type: Jar) {
-    //baseName = project.name
-    archiveName "NuBot.jar"
-    destinationDir = distdir //file('${distdir}')
-
+task NuBotJar(type: Jar) {
+    archiveName jarname
+    destinationDir = distdir
     from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
         exclude 'META-INF/MANIFEST.MF'
         exclude 'META-INF/*.SF'
@@ -136,41 +146,203 @@ task NubotJar(type: Jar) {
         exclude 'META-INF/*.RSA'
     }
     manifest {
-        attributes 'Main-Class': maintestclass
+        attributes 'Main-Class': mainclass
     }
     with jar
 }
 
+NuBotJar.dependsOn distInit
 
-task compiledocs(type: Exec) {
-    description 'compile the HTML documents'
-    executable "sh"
-    args "-c", "cd md && /bin/bash compileall.sh"
+//create a single Jar with all dependencies - Copied for NuGetLastTrades
+task NuGetLastTradesJar(type: Jar) {
+    archiveName jarnamelasttrades
+    destinationDir = distdir
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes 'Main-Class': getlasttradeclass
+    }
+    with jar
 }
 
-task runUI(type: JavaExec) {
-    description 'run the WebUI'
-    main = "com.nubits.nubot.webui.UiServer"
-    classpath = sourceSets.main.runtimeClasspath
+NuGetLastTradesJar.dependsOn distInit
 
-    //store the output instead of printing to the console:
-    /*standardOutput = new ByteArrayOutputStream()
-    //obtain the output:
-    ext.output = {
-        return standardOutput.toStringSep()
-    }*/
+
+
+
+
+task NuBotDist(dependsOn: NuBotJar) {
+    //description 'make NuBot distribution folder'
+
+    doFirst {
+        println 'start making distribution'
+
+        //copy jar
+        copy {
+            "build/libs/${jarname}"
+            into "${distdir}"
+        }
+
+        tasks.compiledocs.execute()
+    }
+
+
+    doLast {
+        println 'dist do last'
+
+        tasks.propfile.execute()
+
+        println "finish distribution"
+
+        copy {
+            from "config/logging/logback.xml"
+            into "${distdir}/config/logging/"
+        }
+
+        copy {
+            from "res/currencies.csv"
+            into "${distdir}/res/"
+        }
+
+        copy {
+            from "src"
+            into "${distdir}/res/sources"
+        }
+
+        delete "${distdir}/res/sources/main/java/com/nubits/nubot/global/Passwords.java"
+
+        copy {
+            from "${docdir}/license.html"
+            into "${distdir}/res/sources"
+        }
+
+        copy {
+            from "${docdir}/readme.html"
+            into "${distdir}"
+        }
+
+        copy {
+            from "${docdir}/setup.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/exchanges.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/feeds.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/changelog.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from "${docdir}/gradle.html"
+            into "${distdir}/docs"
+        }
+
+        copy {
+            from sampleconfig
+            into "${distdir}"
+        }
+
+        copy {
+            from "${resdir}/ssl/nubot_keystore.jks"
+            into "${distdir}/res/ssl"
+        }
+
+        copy {
+            from "${resdir}/ssl/updateKeystore.sh"
+            into "${distdir}/res/ssl"
+        }
+
+    }
+
 }
 
-//TODO: copy html output to UI templates
-/*task copyhtmltoui(type: copy){
-    //<!DOCTYPE html><html lang="en"><head><meta charset="utf-8" /><title>README.md - Grip</title>
+task NuLastTradesDist(dependsOn: NuGetLastTradesJar) {
+    //description 'make NuBotGetLastTrade distribution folder'
 
-    //</body>
-    //</html>
-}*/
+    doFirst {
+        println 'start making distribution'
+
+        //copy jar
+        copy {
+            "build/libs/${jarname}"
+            into "${distdir}"
+        }
+    }
+
+
+    doLast {
+        println 'dist do last'
+
+        println "finish distribution"
+
+        copy {
+            from "config/logging/logback.xml"
+            into "${distdir}/config/logging/"
+        }
+
+        copy {
+            from "res/currencies.csv"
+            into "${distdir}/res/"
+        }
+
+        copy {
+            from "${resdir}/ssl/nubot_keystore.jks"
+            into "${distdir}/res/ssl"
+        }
+
+        copy {
+            from "${resdir}/ssl/updateKeystore.sh"
+            into "${distdir}/res/ssl"
+        }
+
+    }
+
+}
+
+//produce the ".nubot" file in distribution folder
+//when run as jar NuBot will look for this file
+task propfile << {
+    def prop = new Properties()
+    prop.put("version",project.version)
+
+    //determine hash of current branch
+    def proc = "git rev-parse HEAD".execute()
+    def b = new StringBuffer()
+    proc.consumeProcessErrorStream(b)
+    def commit = proc.text
+    commit = commit.replace("\n","")
+
+    proc = "git rev-parse --abbrev-ref HEAD".execute()
+    b = new StringBuffer()
+    proc.consumeProcessErrorStream(b)
+    def branch = proc.text
+    branch = branch.replace("\n","")
+
+    prop.put("lastcommit",commit);
+    prop.put("branch",branch);
+
+
+    def propFile = new File("${distdir}/.nubot")
+    propFile.createNewFile();
+    prop.store(propFile.newWriter(), null);
+
+    println 'this project is version ' + project.version
+}
 
 task cleanhtml << {
-    FileCollection html_files = files('./md/readme.html', './md/setup.html', './md/feeds.html', './md/changelog.html', './md/gradle.html')
 
     html_files.each { File file ->
         println 'delete ' + file.name
@@ -187,4 +359,35 @@ task cleanall << {
     tasks.cleanhtml.execute()
 }
 
+/* ----- utils ------- */
 
+task runpoloniex(type: JavaExec) {
+    description 'run bot with poloniex'
+    main = "com.nubits.nubot.testsmanual.TestLaunch"
+    classpath = sourceSets.main.runtimeClasspath
+}
+
+task testall(type: Test) {
+    description 'test all'
+    include '*/**'
+    testall.reports.html.destination = file("${testreportdir}/alltests")
+}
+
+task testfunctions(type: Test) {
+    description 'test functions'
+    include 'functions/**'
+    testfunctions.reports.html.destination = file("${testreportdir}/functions")
+}
+
+task testexchanges(type: Test) {
+    description 'test all exchanges, includes ordering'
+    include 'testexchanges/*'
+    testexchanges.reports.html.destination = file("${testreportdir}/exchangetests")
+}
+
+
+/*task runUI(type: JavaExec) {
+    description 'run the WebUI'
+    main = "com.nubits.nubot.webui.UiServer"
+    classpath = sourceSets.main.runtimeClasspath
+}*/

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.bot.Global;
@@ -27,12 +28,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 
-/**
- * @author desrever < desrever@nubits.com >
- */
+
 public class Exchange {
 
-    //Class Variables
+
     //Persisted
     private static final Logger LOG = LoggerFactory.getLogger(Exchange.class.getName());
     private String name; //Name of the exchange
@@ -45,13 +44,6 @@ public class Exchange {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
     }
-
-    /*public Exchange(NuBotOptions opt) {
-        this.name = name;
-        this.exchangeLiveData = new ExchangeLiveData();
-        ApiKeys keys = new ApiKeys(opt.getApiSecret(), opt.getApiKey());
-    }*/
-
 
     public String getName() {
         return name;

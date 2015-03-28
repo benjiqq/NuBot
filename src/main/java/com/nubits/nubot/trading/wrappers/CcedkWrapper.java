@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.wrappers;
 
 
@@ -22,10 +23,11 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Balance;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
@@ -33,10 +35,10 @@ import com.nubits.nubot.models.Trade;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
-import com.nubits.nubot.trading.TradeUtilsCCEDK;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -48,11 +50,14 @@ import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -216,7 +221,7 @@ public class CcedkWrapper implements TradeInterface {
 
     private ApiResponse getBalanceImpl(Currency currency, CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
-        Balance balance = new Balance();
+
         String url = API_BASE_URL;
         String method = API_GET_INFO;
         boolean isGet = false;
@@ -251,7 +256,7 @@ public class CcedkWrapper implements TradeInterface {
                 }
                 if (foundNBT && foundPEG) {
                     //Pack it into the ApiResponse
-                    balance = new Balance(NBTTotal, PEGTotal);
+                    PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
                     apiResponse.setResponseObject(balance);
                 } else {
                     ApiError err = errors.genericError;
@@ -451,13 +456,9 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        double defaultFee = 0.2;
 
-        if (Global.options != null) {
-            return new ApiResponse(true, Global.options.getTxFee(), null);
-        } else {
-            return new ApiResponse(true, defaultFee, null);
-        }
+        return new ApiResponse(true, Global.options.getTxFee(), null);
+
     }
 
     @Override
@@ -818,7 +819,7 @@ public class CcedkWrapper implements TradeInterface {
                 // create and setup a HTTP connection
 
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; CCEDK PHP client; " + Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; CCEDK PHP client; " + Settings.APP_NAME);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());

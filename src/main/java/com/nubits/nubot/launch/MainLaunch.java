@@ -1,57 +1,73 @@
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.NuBotSecondary;
-import com.nubits.nubot.bot.NuBotSimple;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
-import org.json.simple.JSONObject;
+import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.global.Settings;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
-
-import java.io.IOException;
 
 /**
- * the main launcher class. starts bot based on configuration, not through UI
+ * the main launcher class. either start bot through commandline
+ * or a GUI is launched where user starts the Bot himself
  */
 public class MainLaunch {
 
-    private static Thread mainThread;
+    static {
+        System.setProperty("logback.configurationFile", Settings.LOGXML);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(MainLaunch.class.getName());
+
+    private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
+
+    private static boolean runui = false;
+
+
+    //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
     private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
+
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
      *
      * @param args a list of valid arguments
-     *
      */
     public static void main(String args[]) {
 
-        NuBotOptions opt = null;
+        Global.sessionPath = "logs" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        MDC.put("session", Global.sessionPath);
+        LOG.info("defined session path " + Global.sessionPath);
 
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-            LOG.error("could not load settings");
-            System.exit(0);
-        }
-        LOG.info("settings loaded");
+        //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
 
-
-
-        try {
-            //Check if NuBot has valid parameters and quit if it doesn't
-            opt = parseOptionsArgs(args);
-        } catch (NuBotConfigException e) {
-            exitWithNotice("" + e);
+        if (args.length != 1) {
+            exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
         }
 
-        executeBot(opt);
+        String configfile = args[0];
+
+        SessionManager.sessionLaunch(configfile, false);
+
     }
 
 
@@ -60,144 +76,11 @@ public class MainLaunch {
      *
      * @param msg
      */
-    private static void exitWithNotice(String msg) {
-        LOG.error(msg);
+    public static void exitWithNotice(String msg) {
+        sessionLOG.error(msg);
         System.exit(0);
     }
 
 
-    /**
-     * execute a NuBot based on valid options. Also make sure only one NuBot is running
-     * @param opt
-     */
-    public static void executeBot(NuBotOptions opt) {
-
-        mainThread = Thread.currentThread();
-
-        createShutDownHook();
-
-        //exit if already running or show info to user
-        if (Global.running) {
-            exitWithNotice("NuBot is already running. Make sure to terminate other instances.");
-        } else {
-            if (opt.secondarypeg){
-                LOG.info("creating secondary bot");
-                NuBotSecondary bot = new NuBotSecondary();
-                bot.execute(opt);
-            }else{
-                LOG.info("creating simple bot");
-                NuBotSimple bot = new NuBotSimple ();
-                bot.execute(opt);
-            }
-        }
-
-    }
-
-    /**
-     * shutdown mechanics
-     * TODO: some of the logic can be handled by NuBot in an async way
-     */
-    private static void createShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                LOG.info("Bot shutting down..");
-
-                if (Global.options != null) {
-                    //Try to cancel all orders, if any
-                    if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
-                        LOG.info("Clearing out active orders ... ");
-
-                        ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
-                        if (deleteOrdersResponse.isPositive()) {
-                            boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-
-                            if (deleted) {
-                                LOG.info("Order clear request succesfully");
-                            } else {
-                                LOG.error("Could not submit request to clear orders");
-                            }
-
-                        } else {
-                            LOG.error(deleteOrdersResponse.getError().toString());
-                        }
-                    }
-
-                    //reset liquidity info
-                    if (Global.rpcClient.isConnected() && Global.options.isSubmitliquidity()) {
-                        //tier 1
-                        LOG.info("Resetting Liquidity Info before quit");
-
-                        JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0, 1);
-                        if (null == responseObject1) {
-                            LOG.error("Something went wrong while sending liquidityinfo");
-                        } else {
-                            LOG.info(responseObject1.toJSONString());
-                        }
-
-                        JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
-                                0, 0, 2);
-                        if (null == responseObject2) {
-                            LOG.error("Something went wrong while sending liquidityinfo");
-                        } else {
-                            LOG.info(responseObject2.toJSONString());
-                        }
-                    }
-
-                    LOG.info("Exit. ");
-                    mainThread.interrupt();
-                    if (Global.taskManager != null) {
-                        if (Global.taskManager.isInitialized()) {
-                            try{
-                                Global.taskManager.stopAll();
-                            }catch(IllegalStateException e){
-
-                            }
-                        }
-                    }
-                }
-
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
-    }
-
-
-
-
-    /**
-     * parse the command line arguments
-     *
-     * @param args
-     * @return
-     * @throws NuBotConfigException
-     */
-    private static NuBotOptions parseOptionsArgs(String args[]) throws NuBotConfigException {
-
-        if (args.length != 1) {
-            throw new NuBotConfigException("wrong argument number : run nubot with \n" + USAGE_STRING);
-        }
-
-        NuBotOptions opt = null;
-        //Load Options and test for critical configuration errors
-        if (args.length > 1) {
-            //more than one file path given
-            throw new NuBotConfigException("more than one argument");
-
-        } else {
-            try {
-                opt = ParseOptions.parseOptionsSingle(args[0]);
-            } catch (NuBotConfigException ex) {
-                throw new NuBotConfigException("NuBot wrongly configured");
-            }
-        }
-        if (opt == null)
-            throw new NuBotConfigException("");
-
-        return opt;
-    }
-
 }
+

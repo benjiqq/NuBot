@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.notifications;
 
 
@@ -39,17 +40,17 @@ public class HipChatNotifications {
     }
 
     private static void sendMessageImpl(String message, MessageColor color,
-            boolean critical) {
+                                        boolean critical) {
 
         String publicAddress = "";
 
-        if (Global.options != null) {
-            publicAddress = Global.options.getNubitsAddress();
-            boolean send = Global.options.isSendHipchat();
-            if (!send) {
-                return;
-            }
+
+        publicAddress = Global.options.getNubitsAddress();
+        boolean send = Global.options.isSendHipchat();
+        if (!send) {
+            return;
         }
+
         String sessionId = "";
         if (Global.sessionId != null) {
             sessionId = Global.sessionId;

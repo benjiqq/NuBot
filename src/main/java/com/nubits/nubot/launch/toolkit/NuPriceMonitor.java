@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,14 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.launch.toolkit;
 
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.strategy.NuPriceMonitorTask;
+import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
@@ -52,15 +54,9 @@ public class NuPriceMonitor {
 
     public static void main(String[] args) {
         mainThread = Thread.currentThread();
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
 
         String folderName = "NuPriceMonitor_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        String logsFolder = Settings.LOGS_PATH + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
 

@@ -33,7 +33,6 @@ $ sudo add-apt-repository ppa:webupd8team/java
 $ sudo apt-get update
 $ sudo apt-get install oracle-java8-installer
 ```
-In the future we will make available a docker container pre-prepared. 
 
 ###1) Prepare the NuBits client 
 
@@ -69,17 +68,53 @@ The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years
 
 *Download and unzip the latest stable build from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).*
 
-The bot reads configuration options from one or multiple *.json* files.  Below you can find a list of all the available options parameter along a brief description. 
+The bot reads configuration options from one *.json* file.  Below you can find a list of all the available options parameter along a brief description. 
 Please make sure you fully understand in which way changing a setting will affect the bot before doing anything that can lead to losses. 
 
-Its good practice separating configuration parameters in different files. In this tutorial we will use the following grouping : 
+In this tutorial we will use the following grouping : 
 * market options: exchange keys and market-related settings ;  
 * misc options: miscellaneous configuration parameters ;
 * liquidity-info options: define nubits client communication ;
 * price-tracking options: for non-USD pairs, define price feeds ;
 
-The same structure is used in the `config-sample` files provided with the bot. You can edit the provided sample file or create new configuration files.
+Refer to the `sample-config.json` file provided with the bot. You can edit the provided sample file or create a new configuration file.
 
+Sample options:
+```json
+{
+  "exchangename":"poloniex",
+  "apikey": "xxx",
+  "apisecret": "xxx",
+  "txfee": 0.2,
+  "pair":"nbt_btc",
+
+  "dualside": true,
+  "multiplecustodians":false,
+  "executeorders":true,
+  "verbose":false,
+  "hipchat":true,
+  "mailnotifications":"severe",
+  "mailrecipient":"xxx@xxx.xxx",
+  "emergencytimeout":60,
+  "keepproceeds":0,
+  "maxsellordervolume" : 0.0,
+  "maxbuyordervolume" : 0.0,
+  "priceincrement": 0.1,
+
+  "submitliquidity":true,
+  "nubitaddress": "xxx",
+  "nudip": "127.0.0.1",
+  "nudport": 9091,
+  "rpcpass": "xxx",
+  "rpcuser": "xxx",
+
+  "wallchangeThreshold": 0.1,
+  "spread":0.0,
+  "mainfeed":"blockchain",
+  "backupfeeds": ["coinbase", "btce"]
+}
+
+```
 ---
 #### Market options 
 
@@ -87,27 +122,13 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| exchangename     | / | Name of the exchange where the bots operates |  see list of accepted exchange names* |
+| exchangename     | / | Name of the exchange where the bots operates |  **see list of accepted exchange names |
 | apikey      |  / | Custodian's public key to access the exchange . *this param is optional for ccex*     |  String |
 | apisecret |  / |  Custodian's secret key to access the exchange    | String |
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | pair |  The currency pair where the bot operates     |   valid currency pair for the specified  eg. "nbt_usd" |
 
-** List of accepted names : "bter" ; "ccedk" ; "btce" ; "peatio" ; "poloniex" ;  "ccex" ; "excoin" ;  "bitcoinid" 
-
-Sample file : *markets.json*: 
-```json
-{"options": 
-    {
-    "exchangename":"bter",
-    "apikey": "xxx",
-    "apisecret": "xxx",
-    "txfee": 0.2,
-    "pair":"nbt_btc"
- }
-}
-  
-```
+See EXCHANGES.md for an updated list of valid exchange names.
 
 ---
 
@@ -118,39 +139,18 @@ Parameters :
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
 | dualside | / |  If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.     | true,false |
-| multiple-custodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
+| multiplecustodians    | false |  if set to true, will sync with remote NPT and reset orders often  | boolean |
 | executeorders    | true |  if set to false the bot will print a warning instead of executing orders  | boolean |
 | verbose    | false |  if set to true, will print on screen additional debug messages  | boolean |
 | hipchat    | true |  if set to false will disable hipchat notifications | boolean |
-| mail-notifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
-| mail-recipient | / |  the email to which emergency email are sent  |  String  |
-| emergency-timeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
-| keep-proceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| max-sell-order-volume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT . 0=no limit; |
-| max-buy-order-volume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
+| mailnotifications    | severe |  set notification level: none at all, all: including non-critical, severe: only critical | String ("none", "all", "severe") |
+| mailrecipient | / |  the email to which emergency email are sent  |  String  |
+| emergencytimeout    | 60 | max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts |  int (minutes) |
+| keepproceeds    | 0 |  Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy . |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
+| maxsellordervolume | 0 | maximum volume to put on sell walls.  |  double , expressed in NBT . 0=no limit; |
+| maxbuyordervolume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD |
 
-Sample file : *misc.json*: 
-```json
-{"options": 
-    {
-    "dualside": true,  
-    "multiple-custodians":false,
-    "submit-liquidity":true,
-    "executeorders":false,
-    "verbose":false,
-    "hipchat":true,
-    "mail-notifications":false,
-    "mail-recipient":"xxx@xxx.xxx",
-    "emergency-timeout":60,
-    "keep-proceeds":0,
-    "max-sell-order-volume" : 0,
-    "max-buy-order-volume" : 0,
-    "priceincrement": 0.1,
- }
-}
-  
-```
 
 ---
 
@@ -160,27 +160,13 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| submit-liquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
+| submitliquidity    | true  |  if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of *nubitaddress* ,  *nudport* , *rpcuser* and *rpcpass*  | boolean |
 | nubitaddress | / | The public address where the custodial grant has been received    |   valid custodian NBT addresses (String) |
 | nudip    | "127.0.0.1"  |  The IP address of the machine that hosts the Nu Client |  IP address (String) |
 | nudport | / |The RPC port of the Nu daemon |   1024...65535 |
 | rpcpass | / |  The RPC password of the Nu daemon    |  String |
 | rpcuser | / |  The RPC username  of the Nu daemon    |    String |
 
-Sample file : *liquidity-info.json*: 
-```json
-{"options": 
-    {
-    "submit-liquidity":true,
-    "nubitaddress": "xxx",
-    "nudip": "127.0.0.1",
-    "nudport": 9091,
-    "rpcpass": "xxx",
-    "rpcuser": "xxx"
- }
-}
-  
-```
 
 ---
 
@@ -193,37 +179,15 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| wallshift-threshold | / | how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
+| wallchangeThreshold | / | how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 | spread  | / | the spread between buy and sell walls | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
-| main-feed  | / | the name of the main price feed that has priority over the others | **see following table |
-| backup-feeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
+| mainfeed  | / | the name of the main price feed that has priority over the others | **see following table |
+| backupfeeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 
 See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master) for an updated list of valid feed names.
 
-
-Sample file : *price-tracking.json*: 
-```json
-{"options": 
-    {
-     "secondary-peg-options":
-    {
-            "wallshift-threshold": 0.3,
-            "spread": 0,
-            "main-feed": "bitfinex",
-            "backup-feeds": {
-                "backup1" : { "name" : "blockchain"},
-                "backup2" : { "name" : "coinbase"},
-                "backup3" : { "name" : "bitstamp"}
-                }
-    }
- }
-}
-  
-```
-
 ---
 
-You can also merge all the configuration parameter under a unique .json file, although we do not recommend it.
 
 ###3) Run NuBot
 
@@ -231,27 +195,45 @@ You can also merge all the configuration parameter under a unique .json file, al
 Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
 This is the syntax : 
 ```
-java -jar NuBot.jar <path/to/options.json> [path/to/options-part2.json] ... [path/to/options-partN.json]
+java -jar NuBot.jar sample-config.json
 ```
 
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-nohup java -jar NuBot.jar market.json misc.json liquidity-info.json price-tracking.json  &
+nohup java -jar NuBot.jar sample-config.json
 ```
 
 The bot will start and write output in the */logs* folder. 
 
-To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders. 
+To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders.
 
-
-##Logging on HTML and csv
+##Logging files
 
 The bot produces different output log files, all stored in a special folder created for each session under *logs/*.  
-The bot creates a csv and html log for each session. There 4 levels of log messages : *severe*, *warning*, *info* and *fine*. 
-*fine* are never logged to file (only to console).
-*info* are logged to file if we set`"verbose"=true`. 
-*warning* are used for logging trading-related messages.
-*severe* are used for errors.
+On startup, NuBot prints out the name of the folder it is using to log:
 
-Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
+example: 
+```
+INFO  - defined session path logs/session_1427479041022
+```
+
+Log files: 
+
+| filename    |  Description  | 
+| ------------- |:-------------:| 
+| standard.html    | Standard output of the bot  | 
+| verbose.html    | Verbose output of the bot with additional messages | 
+| orders_history.(csv;json) | snapshots of active orders (taken every minute) |
+| balance_history.json    | snapshots of balances (taken every minute)   | 
+| wall_shifts.(csv;json) | list of wall shifts | 
+
+
+NOTE: to avoid huge files, html files gets rotated at 50MB.
+
+Additional messages are logged to console if the option `"verbose"=true` is set. Useful for debug
+
+Additionally there are two other logs that trace the history of wall shifts and a history of.
+
+For additional control over logging, the user can also manually edit the *config/logging/logback.xml* configuration file.
+

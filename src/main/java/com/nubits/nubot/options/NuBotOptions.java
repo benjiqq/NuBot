@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,19 +15,20 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.options;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import com.nubits.nubot.notifications.MailNotifications;
+import jdk.nashorn.internal.parser.JSONParser;
+import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -178,15 +179,10 @@ public class NuBotOptions {
      */
     //public int sendLiquidityInterval; //disabled
 
-    // ------- secondary peg ----------
-
-    public boolean secondarypeg;
 
     public double wallchangeThreshold;
 
     public double spread;
-
-    public double distanceThreshold;
 
     // feeds
 
@@ -197,7 +193,7 @@ public class NuBotOptions {
      * empty constructor. assumes safe creation of valid options
      */
     public NuBotOptions() {
-
+        backupFeedNames = new ArrayList<>();
     }
 
 
@@ -210,8 +206,8 @@ public class NuBotOptions {
                         boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity, boolean secondarypeg,
-                        double wallchangeThreshold, double spread, double distanceThreshold) {
+                        boolean distributeLiquidity,
+                        double wallchangeThreshold, double spread) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -237,11 +233,8 @@ public class NuBotOptions {
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
-
-        this.secondarypeg = secondarypeg;
         this.wallchangeThreshold = wallchangeThreshold;
         this.spread = spread;
-        this.distanceThreshold = distanceThreshold;
 
     }
 
@@ -254,7 +247,7 @@ public class NuBotOptions {
                         int executeStrategyInterval, boolean sendHipchat,
                         String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity, boolean secondarypeg) {
+                        boolean distributeLiquidity) {
         this.dualSide = dualSide;
         this.apiKey = apiKey;
         this.apiSecret = apiSecret;
@@ -281,7 +274,7 @@ public class NuBotOptions {
         this.maxBuyVolume = maxBuyVolume;
         this.distributeLiquidity = distributeLiquidity;
 
-        this.secondarypeg = secondarypeg;
+        backupFeedNames = new ArrayList<>();
 
     }
 
@@ -294,12 +287,13 @@ public class NuBotOptions {
         this.dualSide = dualSide;
     }
 
-    public boolean isSecondarypeg() {
-        return this.secondarypeg;
-    }
-
-    public void setSecondary(boolean secondary) {
-        this.secondarypeg= secondarypeg;
+    public boolean requiresSecondaryPegStrategy() {
+        //Return TRUE when it requires a dedicated NBT peg to something that is not USD
+        if (this.pair.equals(CurrencyList.NBT_USD)) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public boolean isSubmitliquidity() {
@@ -331,24 +325,10 @@ public class NuBotOptions {
     }
 
     /**
-     * @param apiKey
-     */
-    public void setApiKey(String apiKey) {
-        this.apiKey = apiKey;
-    }
-
-    /**
      * @return
      */
     public String getApiSecret() {
         return apiSecret;
-    }
-
-    /**
-     * @param apiSecret
-     */
-    public void setApiSecret(String apiSecret) {
-        this.apiSecret = apiSecret;
     }
 
     /**
@@ -359,24 +339,10 @@ public class NuBotOptions {
     }
 
     /**
-     * @param nubitAddress
-     */
-    public void setNubitsAddress(String nubitAddress) {
-        this.nubitAddress = nubitAddress;
-    }
-
-    /**
      * @return
      */
     public String getRpcUser() {
         return rpcUser;
-    }
-
-    /**
-     * @param rpcUser
-     */
-    public void setRpcUser(String rpcUser) {
-        this.rpcUser = rpcUser;
     }
 
     /**
@@ -401,13 +367,6 @@ public class NuBotOptions {
     }
 
     /**
-     * @param nudIp
-     */
-    public void setNudIp(String nudIp) {
-        this.nudIp = nudIp;
-    }
-
-    /**
      * @return
      */
     public int getNudPort() {
@@ -426,13 +385,6 @@ public class NuBotOptions {
      */
     public double getPriceIncrement() {
         return priceIncrement;
-    }
-
-    /**
-     * @param priceIncrement
-     */
-    public void setPriceIncrement(double priceIncrement) {
-        this.priceIncrement = priceIncrement;
     }
 
     /**
@@ -486,13 +438,6 @@ public class NuBotOptions {
     }
 
     /**
-     * @param sendHipchat
-     */
-    public void setSendHipchat(boolean sendHipchat) {
-        this.sendHipchat = sendHipchat;
-    }
-
-    /**
      * @return
      */
     public String sendMailsLevel() {
@@ -508,102 +453,51 @@ public class NuBotOptions {
     }
 
     /**
-     * @param sendMails
-     */
-    public void setSendMailsLevel(String sendMails) {
-        this.sendMails = sendMails;
-    }
-
-    /**
      * @return
      */
     public String getMailRecipient() {
         return mailRecipient;
     }
 
-    /**
-     * @param mailRecipient
-     */
-    public void setMailRecipient(String mailRecipient) {
-        this.mailRecipient = mailRecipient;
-    }
-
     public boolean isMultipleCustodians() {
         return multipleCustodians;
-    }
-
-    public void setMultipleCustodians(boolean multipleCustodians) {
-        this.multipleCustodians = multipleCustodians;
     }
 
     public double getMaxSellVolume() {
         return maxSellVolume;
     }
 
-    public void setMaxSellVolume(double maxSellVolume) {
-        this.maxSellVolume = maxSellVolume;
-    }
-
     public double getMaxBuyVolume() {
         return maxBuyVolume;
-    }
-
-    public void setMaxBuyVolume(double maxBuyVolume) {
-        this.maxBuyVolume = maxBuyVolume;
     }
 
     public int getEmergencyTimeout() {
         return emergencyTimeout;
     }
 
-    public void setEmergencyTimeoutMinutes(int emergencyTimeoutMinutes) {
-        this.emergencyTimeout = emergencyTimeoutMinutes;
-    }
 
     public double getKeepProceeds() {
         return keepProceeds;
     }
 
-    public void setKeepProceeds(double keepProceeds) {
-        this.keepProceeds = keepProceeds;
-    }
-
-    public String getNubitAddress() {
+      public String getNubitAddress() {
         return nubitAddress;
-    }
-
-    public void setNubitAddress(String nubitAddress) {
-        this.nubitAddress = nubitAddress;
     }
 
     public boolean isAggregate() {
         return aggregate;
     }
 
-    public void setAggregate(boolean aggregate) {
-        this.aggregate = aggregate;
-    }
-
     public boolean isDistributeLiquidity() {
         return distributeLiquidity;
-    }
-
-    public void setDistributeLiquidity(boolean distributeLiquidity) {
-        this.distributeLiquidity = distributeLiquidity;
     }
 
     public double getSpread() {
         return this.spread;
     }
 
-
     public String getMainFeed() {
         return mainFeed;
-    }
-
-
-    public void setMainFeed(String mainFeed) {
-        this.mainFeed = mainFeed;
     }
 
 
@@ -623,36 +517,35 @@ public class NuBotOptions {
         return backupFeedNames;
     }
 
-    public void setBackupFeedNames(ArrayList<String> backupFeedNames) {
-        this.backupFeedNames = backupFeedNames;
-    }
-
-    /**
-     * @return
-     */
-    public double getDistanceThreshold() {
-        return distanceThreshold;
-    }
-
-    /**
-     * @param distanceThreshold
-     */
-    public void setDistanceThreshold(double distanceThreshold) {
-        this.distanceThreshold = distanceThreshold;
-    }
-
     @Override
     public String toString() {
-        return "NuBotOptions{" + "dualside=" + dualSide + ", submitLiquidity=" + submitLiquidity + ", executeOrders=" + executeOrders + ", verbose=" + verbose + ", sendHipchat=" + sendHipchat + ", apikey=" + apiKey + ", apisecret=" + apiSecret + ", nubitAddress=" + nubitAddress + ", rpcUser=" + rpcUser + ", rpcPass=" + rpcPass + ", nudIp=" + nudIp + ", nudPort=" + nudPort + ", priceIncrement=" + priceIncrement + ", txFee=" + txFee + ", exchangename=" + exchangeName + ", pair=" + pair  + ", sendMails=" + sendMails + ", mailRecipient=" + mailRecipient + "emergencyTimeoutMinutes " + emergencyTimeout + "keepProceeds=" + keepProceeds + "aggregate=" + aggregate + " , waitBeforeShift=" + multipleCustodians + " , distributeLiquidity=" + distributeLiquidity + '}';
+        return toStringNoKeys(); //removes sensitive information
     }
 
-    //Same as above, without printing api secret key and RCP password (for logging purposes)
-
-    /**
-     * @return
-     */
     public String toStringNoKeys() {
-        return "Options : {<br>" + "dualSide=" + dualSide + "<br> submitLiquidity=" + submitLiquidity + "<br> executeOrders=" + executeOrders + "<br> verbose=" + verbose + "<br> sendHipchat=" + sendHipchat + "<br> apiKey=" + apiKey + "<br> nubitAddress=" + nubitAddress + "<br> rpcUser=" + rpcUser + "<br> nudIp=" + nudIp + "<br> nudPort=" + nudPort + "<br> priceIncrement=" + priceIncrement + "<br> txFee=" + txFee + "<br> exchangename=" + exchangeName + "<br> pair=" + pair + "<br> sendMails=" + sendMails + "<br> mailRecipient=" + mailRecipient + "<br> emergencyTimeoutMinutes " + emergencyTimeout + "<br> keepProceeds=" + keepProceeds + "<br> aggregate=" + aggregate + "<br> distributeLiquidity=" + distributeLiquidity + '}';
+        String toRet = "";
+
+        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        Gson parser = gson.create();
+
+        String serializedOptions = parser.toJson(this);
+        org.json.simple.parser.JSONParser p = new org.json.simple.parser.JSONParser();
+        try {
+            JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptions));
+
+            //Replace sensitive information
+            serializedOptionsJSON.replace("apisecret", "hidden");
+            serializedOptionsJSON.replace("apikey", "hidden");
+            serializedOptionsJSON.replace("rpcpass","hidden");
+
+            toRet = serializedOptionsJSON.toString();
+        }
+        catch(org.json.simple.parser.ParseException e) {
+                LOG.error(e.toString());
+            }
+
+        return toRet;
     }
 }
 

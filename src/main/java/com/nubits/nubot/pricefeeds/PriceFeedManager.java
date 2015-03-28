@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,17 +15,16 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -42,14 +41,14 @@ public class PriceFeedManager {
 
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
-        Feeds.initValidFeeds();
+
         this.pair = pair;
 
-        feedList.add(Feeds.getFeed(mainFeed)); //add the main feed at index 0
+        feedList.add(FeedFacade.getFeed(mainFeed)); //add the main feed at index 0
         //this.mainfeed = getFeed(mainFeed);
 
         for (int i = 0; i < backupFeedList.size(); i++) {
-            feedList.add(Feeds.getFeed(backupFeedList.get(i)));
+            feedList.add(FeedFacade.getFeed(backupFeedList.get(i)));
         }
     }
 
@@ -57,7 +56,10 @@ public class PriceFeedManager {
      * trigger fetches from all feeds
      * @return
      */
-    public LastPriceResponse getLastPrices() {
+    public LastPriceResponse fetchLastPrices() {
+
+        LOG.debug("fetch last prices");
+
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;
         ArrayList<LastPrice> prices = new ArrayList<>();
@@ -66,13 +68,14 @@ public class PriceFeedManager {
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (lastPrice != null && !lastPrice.isError()) {
+                LOG.debug("Obtained price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getClass().getSimpleName());
                 prices.add(lastPrice);
                 if (i == 0) {
                     isMainFeedValid = true;
                 }
             } else {
                 LOG.warn("Error (null) while updating " + pair.getOrderCurrency().getCode() + ""
-                        + " price from " + tempFeed.name);
+                        + " price from " + tempFeed.getClass());
             }
         }
         response.setMainFeedValid(isMainFeedValid);
@@ -96,7 +99,7 @@ public class PriceFeedManager {
     }
 
     /**
-     * class to wrap results from getLastPrices
+     * class to wrap results from fetchLastPrices
      */
     public class LastPriceResponse {
 

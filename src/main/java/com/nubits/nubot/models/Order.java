@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.models;
 
 import com.nubits.nubot.utils.Utils;
@@ -23,7 +24,7 @@ import java.util.Date;
 
 public class Order {
 
-    //Class Variables
+
     private String id; // A String containing a unique identifier for this order
     private Date insertedDate; //the time at which this trade was inserted place.
     private Date executedDate; //the time at which this trade was filled.
@@ -34,7 +35,7 @@ public class Order {
     private Amount amountPlusFee; //Object representing the total costs/proceeds of this trade. Expressed in pair.OrderCurrency
     private boolean completed; // true if the order is filled completely
 
-    //Constructor
+
     /**
      *
      * @param id

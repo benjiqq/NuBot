@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.launch.toolkit;
 
 import com.nubits.nubot.exchanges.Exchange;
@@ -22,14 +23,21 @@ import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.tasks.BotTask;
+import com.nubits.nubot.tasks.CheckConnectionTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
 import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,17 +59,12 @@ public class NuLastTrades {
     private ApiKeys keys;
 
     public static void main(String[] args) {
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
 
         NuLastTrades app = new NuLastTrades();
 
         String folderName = "NuLastTrades_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        String logsFolder = Settings.LOGS_PATH + folderName;
 
         //Create log dir
         FileSystem.mkdir(logsFolder);
@@ -79,6 +82,9 @@ public class NuLastTrades {
     }
 
     private void prepareForExecution() {
+
+        InitTests.loadConfig("sample-config.json");  //Load settings
+
         //Wrap the keys into a new ApiKeys object
         keys = new ApiKeys(secret, api);
 
@@ -88,36 +94,22 @@ public class NuLastTrades {
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
-
-        if (exchangename.equals(ExchangeFacade.BTCE)) {
-            Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangename.equals(ExchangeFacade.CCEDK)) {
-            Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.BTER)) {
-            Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.ALLCOIN)) {
-            Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.BITSPARK_PEATIO)) {
-            Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.POLONIEX)) {
-            Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.CCEX)) {
-            Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangename.equals(ExchangeFacade.EXCOIN)) {
-            Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
+        if (ExchangeFacade.supportedExchange(exchangename)) {
+            Global.exchange.setTrade(ExchangeFacade.getInterfaceByName(exchangename, keys, Global.exchange));
         } else {
             LOG.error("Exchange " + exchangename + " not supported");
             System.exit(0);
         }
 
+
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
 
         //Create a TaskManager and
-        Global.taskManager = new TaskManager();
+        Global.taskManager = new TaskManager(false);
         //Start checking for connection
+        Global.taskManager.setCheckConnectionTask(new BotTask(
+                new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection"));
         Global.taskManager.getCheckConnectionTask().start();
 
         //Wait a couple of seconds for the connectionThread to get live

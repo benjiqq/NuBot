@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,35 +15,31 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
-import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FrozenBalancesManager;
-import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Global object for NuBot
- *
  */
 public class Global {
 
+    final static Logger LOG = LoggerFactory.getLogger(Global.class);
+
+    public static Thread mainThread;
+
     public static NuBotOptions options;
 
-    /**
-     * storage layer
-     */
-    public static Store store;
-
-
-    public static Properties settings;
-    public static String sessionId;
-    public static boolean running = false;
+    //path of logs in this session
+    public static String sessionLogFolder;
 
     public static TaskManager taskManager;
 
@@ -55,7 +51,52 @@ public class Global {
 
     public static Exchange exchange;
 
-    public static String publicAddress;
+    public static String sessionId;
+    public static String sessionPath;
+    public static long sessionStarted, sessionStopped;
+
+    /**
+     * the bot connected to the global thread
+     */
+    public static NuBotBase bot;
 
 
+    /**
+     * shutdown mechanics
+     */
+    public static void createShutDownHook() {
+
+        Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
+        sessionLOG.info("adding shutdown hook");
+
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                //shutdown logic of the bot handled in the bot related to the global thread
+                Global.bot.shutdownBot();
+
+                Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
+                Global.sessionStopped = System.currentTimeMillis();
+                sessionLOG.info("session end;" + Global.sessionStopped);
+
+                LOG.info("Exit. ");
+
+                Global.mainThread.interrupt();
+                if (Global.taskManager != null) {
+                    if (Global.taskManager.isInitialized()) {
+                        try {
+                            Global.taskManager.stopAll();
+                        } catch (IllegalStateException e) {
+
+                        }
+                    }
+                }
+
+                //TODO! this shuts down UI as well
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }));
+    }
 }
