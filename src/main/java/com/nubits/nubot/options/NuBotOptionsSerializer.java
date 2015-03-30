@@ -59,10 +59,6 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("wallchangeThreshold", opt.wallchangeThreshold);
         root.addProperty("txFee", opt.txFee);
         root.addProperty("emergencyTimeout", opt.emergencyTimeout);
-        root.addProperty("spread", opt.spread);
-        root.addProperty("priceIncrement", opt.priceIncrement);
-
-        //root.addProperty("backupFeedNames",opt.backupFeedNames);
 
         root.addProperty("pair", opt.pair.toStringSep());
 
