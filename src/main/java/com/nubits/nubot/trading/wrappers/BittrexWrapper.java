@@ -1,16 +1,16 @@
 package com.nubits.nubot.trading.wrappers;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -47,8 +47,8 @@ public class BittrexWrapper implements TradeInterface {
     private String checkConnectionUrl;
     //API Paths
     private final String API_BASE_URL = "https://bittrex.com/api/v1.1";
-    private final String API_BALANCE = "/account/getbalance";
-    private final String API_BALANCES = "/account/getbalances";
+    private final String API_BALANCE = "account/getbalance";
+    private final String API_BALANCES = "account/getbalances";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -84,6 +84,12 @@ public class BittrexWrapper implements TradeInterface {
 
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
+            if ((boolean) httpAnswerJson.get("success") == false) {
+                ApiError error = errors.apiReturnError;
+                error.setDescription(httpAnswerJson.get("message").toString());
+                apiResponse.setError(error);
+                return apiResponse;
+            }
             apiResponse.setResponseObject(httpAnswerJson);
         } catch (ClassCastException cce) {
             //if casting to a JSON object failed, try a JSON Array
@@ -124,11 +130,19 @@ public class BittrexWrapper implements TradeInterface {
         } else {
             method = API_BALANCES;
         }
-        boolean isGet = false;
+        boolean isGet = true;
 
         ApiResponse response = getQuery(url, method, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            if (httpAnswerJson.get("result") == null) {
+                ApiError error = errors.nullReturnError;
+                if (pair == null) {
+                    error.setDescription("No Wallet Enabled for " + currency.getExtendedName());
+                }
+                apiResponse.setError(error);
+                return apiResponse;
+            }
             System.out.println(httpAnswerJson.toJSONString());
         } else {
             apiResponse = response;
@@ -230,7 +244,7 @@ public class BittrexWrapper implements TradeInterface {
         String queryResult;
         BittrexService query = new BittrexService(base, method, args, keys);
         if (isGet) {
-            queryResult = query.executeQuery(false, isGet);
+            queryResult = query.executeQuery(true, isGet);
         } else {
             queryResult = query.executeQuery(true, isGet);
         }
@@ -296,7 +310,7 @@ public class BittrexWrapper implements TradeInterface {
             if (needAuth) {
                 args.put("apikey", keys.getApiKey());
             }
-            args.put("nonce", System.currentTimeMillis());
+            args.put("nonce", Long.toString(System.currentTimeMillis()));
 
             try {
                 post_data = TradeUtils.buildQueryString(args, ENCODING);
@@ -308,7 +322,7 @@ public class BittrexWrapper implements TradeInterface {
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.settings.getProperty("app_name"));
+                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
                 connection.setRequestProperty("Accept", "*/*");
                 if (needAuth) {
                     connection.setRequestProperty("apisign", signRequest(keys.getPrivateKey(), queryUrl.toString()));

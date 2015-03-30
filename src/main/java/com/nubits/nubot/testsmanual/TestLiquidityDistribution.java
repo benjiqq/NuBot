@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.testsmanual;
 
 
@@ -22,21 +23,21 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 import org.slf4j.LoggerFactory;
@@ -44,8 +45,13 @@ import org.slf4j.Logger;
 
 public class TestLiquidityDistribution {
 
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
+
     private static final Logger LOG = LoggerFactory.getLogger(TestLiquidityDistribution.class.getName());
-    private static final String TEST_OPTIONS_PATH = "res/options/private/old/options-full.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/poloniex.json";
     private LiquidityDistributionModel ldm;
     private ModelParameters sellParams;
     private ModelParameters buyParams;
@@ -57,37 +63,25 @@ public class TestLiquidityDistribution {
     double pegPrice;
 
     public static void main(String a[]) {
+        InitTests.setLoggingFilename(LOG);
+
         TestLiquidityDistribution test = new TestLiquidityDistribution();
 
-        try {
-            Global.options = ParseOptions.parseOptionsSingle(TEST_OPTIONS_PATH);
-        } catch (NuBotConfigException ex) {
-            LOG.error(ex.toString());
-        }
+        InitTests.loadConfig(TEST_OPTIONS_PATH);
+
         test.init(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO); //Pass an empty string to avoid placing the orders
         test.configureTest();
         test.exec();
-
     }
 
     private void init(String exchangeName) {
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
-        //feed = new BitcoinaveragePriceFeed();
-        String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
-
 
         execOrders = false;
         if (!exchangeName.equals("")) {
             //Setup the exchange
-            execOrders = true;
             pair = CurrencyList.NBT_BTC;
             try {
-                WrapperTestUtils.configExchange(exchangeName);
+                WrapperTestUtils.configureExchange(exchangeName);
             } catch (NuBotConfigException e) {
 
             }

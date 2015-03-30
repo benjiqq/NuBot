@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,12 +15,14 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.pricefeeds.feedservices;
 
 
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.Utils;
 import java.io.IOException;
 import org.slf4j.LoggerFactory;
@@ -31,7 +33,8 @@ import org.json.simple.parser.JSONParser;
 public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(GoogleUnofficialPriceFeed.class.getName());
-    public static final String name = "google-unofficial";
+
+    public static final String name = FeedFacade.GoogleUnofficialPriceFeed;
 
     public GoogleUnofficialPriceFeed() {
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
@@ -64,7 +67,7 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
         } else {
-            LOG.info("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
+            LOG.warn("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }

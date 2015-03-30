@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.strategy.Primary;
 
 import com.nubits.nubot.bot.Global;
@@ -36,6 +37,9 @@ public class NuBotSimple extends NuBotBase {
 
     @Override
     public void configureStrategy() {
+
+        LOG.info("configuring strategy NuBotSimple");
+
         // set liquidityinfo task to the strategy
         ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
                 .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));

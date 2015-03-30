@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.notifications;
 
 import com.nubits.nubot.bot.Global;
@@ -126,7 +127,7 @@ public class MailNotifications {
             sessionId = Global.sessionId;
         }
         String footer = "\n --- \n Message generated at " + now;
-        footer += "from bot with custodial address "
+        footer += " from bot with custodial address "
                 + Global.options.getNubitsAddress() + " , "
                 + "session id = " + sessionId + " "
                 + "on " + Global.options.getExchangeName();

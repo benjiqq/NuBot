@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,14 +15,17 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
+import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
@@ -39,12 +42,19 @@ public class TestRPCLiquidityInfo {
     private static boolean verbose = false;
     private static boolean useIdentifier = false;
 
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
+
     public static void main(String[] args) {
 
+        InitTests.setLoggingFilename(LOG);
+
         //Default values
-        String custodian = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
-        String user = PasswordsTest.NUD_RPC_USER;
-        String pass = PasswordsTest.NUD_RPC_PASS;
+        String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
+        String user = Settings.NUD_RPC_USER;
+        String pass = Settings.NUD_RPC_PASS;
         double sell = 0;
         double buy = 0;
         //java -jar testRPC user pass custodian sell buy
@@ -56,13 +66,6 @@ public class TestRPCLiquidityInfo {
             sell = Double.parseDouble(args[3]);
             buy = Double.parseDouble(args[4]);
         }
-
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
-
 
         Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
                 user, pass, true, true,
@@ -132,12 +135,10 @@ public class TestRPCLiquidityInfo {
 
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
-
 
         Utils.installKeystore(true);
 
-        String custodian = PasswordsTest.CUSTODIAN_PUBLIC_ADDRESS;
+        String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
 
         //Create the client
         Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodian, pair, exchangeName);

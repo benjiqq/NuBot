@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,19 +15,21 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.launch.toolkit;
 
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
-import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
@@ -50,15 +52,10 @@ public class NuCMC {
 
     public static void main(String[] args) {
         mainThread = Thread.currentThread();
-        //Load settings
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
 
-        }
 
         String folderName = "NuCMC_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
+        String logsFolder = Settings.LOGS_PATH + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
 

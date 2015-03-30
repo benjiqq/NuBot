@@ -1,0 +1,172 @@
+{
+  "exchanges": [
+    {
+      "code": "ccedk",
+      "name": "Danish Crypto Currency Exchange CCEDK",
+      "website": "https://www.ccedk.com/",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        },
+        {
+          "code": "NBT_PPC",
+          "url": ""
+        },
+        {
+          "code": "NBT_USD",
+          "url": ""
+        },
+        {
+          "code": "NBT_EUR",
+          "url": ""
+        },
+        {
+          "code": "NBT_USD",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true
+    },
+    {
+      "code": "btce",
+      "name": "Btc-e",
+      "website": "https://btc-e.com",
+      "type": "public",
+      "pairs": [],
+      "notes": "",
+      "hasNBT": false
+    },
+    {
+      "code": "bter",
+      "name": "Bter",
+      "website": "https://bter.com/",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true
+    },
+    {
+      "code": "allcoin",
+      "name": "AllCoin cryptocurrency exchange",
+      "website": "https://www.allcoin.com",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true
+    },
+    {
+      "code": "excoin",
+      "name": "Innovative Cryptocurrency Exchange",
+      "website": "https://exco.in",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "BTC_NBT",
+          "url": ""
+        },
+        {
+          "code": "BLK_NBT",
+          "url": ""
+        },
+        {
+          "code": "LTC_NBT",
+          "url": ""
+        },
+        {
+          "code": "NSR_NBT",
+          "url": ""
+        },
+        {
+          "code": "PPC_NBT",
+          "url": ""
+        }
+      ],
+      "notes": "First with NBT-centered market",
+      "hasNBT": true
+    },
+    {
+      "code": "bitcoincoid",
+      "name": "Bitcoin indonesia",
+      "website": "https://www.bitcoin.co.id",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true
+    },
+    {
+      "code": "bitspark",
+      "name": "Bitspark",
+      "website": "https://bitspark.io/",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true
+    },
+    {
+      "code": "poloniex",
+      "name": "Poloniex",
+      "website": "https://poloniex.com",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true
+    },
+    {
+      "code": "ccex",
+      "name": "c-cex",
+      "website": "https://c-cex.com",
+      "type": "public",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": false
+    },
+    {
+      "code": "peatio",
+      "name": "Peatio internal exchange",
+      "website": "http://178.62.186.229/",
+      "type": "internal",
+      "pairs": [
+        {
+          "code": "NBT_BTC",
+          "url": ""
+        }
+      ],
+      "notes": "",
+      "hasNBT": true,
+      "api-base": "http://178.62.186.229/"
+    }
+  ]
+}

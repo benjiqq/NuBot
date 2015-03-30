@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
+import com.nubits.nubot.global.Passwords;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
 
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
@@ -61,8 +63,6 @@ import org.apache.commons.io.FileUtils;
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
-
-    private static String  nubotconfigfile= ".nubot";
 
     /**
      * @param originalString
@@ -241,29 +241,6 @@ public class Utils {
         return toRet;
     }
 
-    public static void loadProperties(String filename) throws IOException {
-        Global.settings = new Properties();
-        InputStream input = null;
-
-        try {
-            input = NuBotSecondary.class.getClassLoader().getResourceAsStream(filename);
-
-            //load a properties file from class path, inside static method
-            Global.settings.load(input);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-            throw new IOException("Sorry, unable to find " + filename);
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    LOG.error(e.toString());
-                }
-            }
-        }
-
-    }
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
@@ -279,10 +256,6 @@ public class Utils {
         return delay;
     }
 
-    public static void exitWithMessage(String msg) {
-        LOG.error(msg);
-        System.exit(0);
-    }
 
     /**
      * Returns a pseudo-random number between min and max, inclusive. The
@@ -346,7 +319,7 @@ public class Utils {
         //Generate a random alfanumeric id of 6 chars
         String uid = UUID.randomUUID().toString().substring(0, 6);
         //Get nubot version
-        String version = Utils.versionName();
+        String version = VersionInfo.getVersionName();
         //Get timestamp
         String timest = "" + getTimestampLong();
         //conatenate
@@ -405,63 +378,18 @@ public class Utils {
 
             //load file depending whether run from inside a Jar or not
 
-            String keystorefile = "nubot_keystore.jks";
-
-            String viaclasspath = filePathClasspathFile(keystorefile);
-            LOG.info("### absolute filepath of keystore " + viaclasspath);
-
-            String kpass = Global.settings.getProperty("keystore_pass");
-            LOG.info("password " + kpass);
-
             String wdir = System.getProperty("user.dir");
-            String wdirpath = wdir + "/" + keystorefile;
+            String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
-            String path = "";
-            if (insideJar())
-                path = wdirpath;
-            else
-                path = viaclasspath;
-
-            System.setProperty("javax.net.ssl.trustStore", path);
-            System.setProperty("javax.net.ssl.trustStorePassword", kpass);
+            System.setProperty("javax.net.ssl.trustStore", wdirpath);
+            System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }
 
-    public static String versionName() {
-        if (insideJar()) {
-            String wdir = System.getProperty("user.dir");
-
-            String fp = wdir + "/" + nubotconfigfile;
-
-            File file = new File(fp);
-            try {
-                List lines = FileUtils.readLines(file, "UTF-8");
-                HashMap km = new HashMap();
-                for (Object o : lines){
-                    String l = "" +o;
-                    try{
-                        String[] a = l.split("=");
-                        km.put(a[0],a[1]);
-                    }catch(Exception e){
-                        //ignore line with "="
-                    }
-
-                }
-
-                if (km.containsKey("version"))
-                    return "" + km.get("version");
-
-            } catch (Exception e) {
-                //throw e;
-            }
-
-            return "load version error";
-
-        } else {
-            return "develop";
-        }
-    }
-
+    /**
+     * Determine whether the current thread runs inside a jar
+     * @return
+     */
     public static boolean insideJar() {
         String c = "" + Utils.class.getResource("Utils.class");
         String path = "";
@@ -478,15 +406,15 @@ public class Utils {
      * @return
      */
     public static String filePathClasspathFile(String filename) {
-        LOG.info("filename " + filename);
+        LOG.debug("filename " + filename);
         //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
         URL resource = Utils.class.getClassLoader().getResource(filename);
         File f = null;
         try {
             URI u = resource.toURI();
-            LOG.info("u: " + u);
+            LOG.debug("u: " + u);
             f = Paths.get(u).toFile();
-            LOG.info("f exists " + f.exists());
+            LOG.debug("f exists " + f.exists());
             return f.getAbsolutePath();
         } catch (Exception e) {
 
@@ -495,60 +423,6 @@ public class Utils {
         return "";
     }
 
-
-
-   /* private static void setSSLFactories(String ksfile, String keyStorePassword) throws Exception
-    {
-        LOG.info("set ssl" + ksfile + " " + keyStorePassword);
-
-        InputStream keyStream = Thread.currentThread().getContextClassLoader().getResourceAsStream(ksfile);
-        //InputStream truststoreInput = Thread.currentThread().getContextClassLoader().getResourceAsStream(tspath);
-
-        //keystoreInput.close();
-        //truststoreInput.close();
-
-        // Get keyStore
-        KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        // if your store is password protected then declare it (it can be null however)
-        char[] keyPassword = keyStorePassword.toCharArray();
-
-        // load the stream to your store
-        keyStore.load(keyStream, keyPassword);
-
-        // initialize a trust manager factory with the trusted store
-        KeyManagerFactory keyFactory =
-                KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
-        keyFactory.init(keyStore, keyPassword);
-
-        // get the trust managers from the factory
-        KeyManager[] keyManagers = keyFactory.getKeyManagers();
-
-        // Now get trustStore
-        KeyStore trustStore = KeyStore.getInstance(KeyStore.getDefaultType());
-
-        // if your store is password protected then declare it (it can be null however)
-        //char[] trustPassword = password.toCharArray();
-
-        // load the stream to your store
-        //trustStore.load(trustStream, null);
-
-        // initialize a trust manager factory with the trusted store
-        TrustManagerFactory trustFactory =
-                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        trustFactory.init(trustStore);
-
-        // get the trust managers from the factory
-        TrustManager[] trustManagers = trustFactory.getTrustManagers();
-
-        // initialize an ssl context to use these managers and set as default
-        SSLContext currentsslContext = SSLContext.getInstance("SSL");
-        currentsslContext.init(keyManagers, trustManagers, null);
-
-        SSLContext.setDefault(currentsslContext);
-
-        keyStream.close();
-    }*/
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];
@@ -574,6 +448,32 @@ public class Utils {
         plot(xSell, ySell); // create a plot using xaxis and yvalues
         addPlot(xBuy, yBuy); // create a second plot on top of first
 
+    }
+
+    //Return the uptime of the bot [hours]
+    public static String getBotUptime() {
+        long upTimeMs = System.currentTimeMillis() - Global.sessionStarted;
+        String toReturn = "";
+        if (getDaysFromMillis(upTimeMs) > 2) {
+            toReturn = getDaysFromMillis(upTimeMs) + " days";
+        } else if (getHoursFromMillis(upTimeMs) > 2) {
+            toReturn = getHoursFromMillis(upTimeMs) + " hours";
+        } else {
+            toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
+        }
+        return toReturn;
+    }
+
+    public static double getHoursFromMillis(long millis) {
+        return round((getMinutesFromMillis(millis)) / 60, 2);
+    }
+
+    public static double getMinutesFromMillis(long millis) {
+        return round(((millis / 1000) / 60), 2);
+    }
+
+    public static double getDaysFromMillis(long millis) {
+        return round((getHoursFromMillis(millis)) / 24, 2);
     }
 
 }

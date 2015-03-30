@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.tasks;
 
 import java.util.Timer;
@@ -56,11 +57,9 @@ public class BotTask {
     }
 
     public void start(int delay) {
-        LOG.info("Starting BotTask " + delay + " interval " + interval);
+        LOG.info("BotTask [" + this.name + "] will start in " + delay + "s, and run it every " + interval + "s");
         timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);
-        LOG.info("Started BotTask " + this.name);
-
     }
 
     public void stop() {

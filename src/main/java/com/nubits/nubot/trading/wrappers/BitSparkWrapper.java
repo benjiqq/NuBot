@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.wrappers;
 
 
@@ -27,7 +28,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
 
 import java.math.BigInteger;
@@ -73,6 +74,7 @@ public class BitSparkWrapper implements TradeInterface {
     private final String API_CANCEL_ORDER = "/api/v2/order/delete"; //POST
     private final String API_CLEAR_ORDERS = "/api/v2/orders/clear"; //POST
     private final String API_GET_TRADES = "/api/v2/trades/my.json"; //GET
+    private final String TICKER_BASE = "/api/v2/tickers/";
     //For the ticker entry point, use getTicketPath(CurrencyPair pair)
     // Errors
     ErrorManager errors = new ErrorManager();
@@ -101,7 +103,7 @@ public class BitSparkWrapper implements TradeInterface {
             try {
 
                 if (Global.options.isVerbose()) {
-                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
+                    LOG.debug(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
                 }
 
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
@@ -120,7 +122,7 @@ public class BitSparkWrapper implements TradeInterface {
     }
 
     private String getTickerPath(CurrencyPair pair) {
-        return "api/v2/tickers/" + pair.toString();
+        return TICKER_BASE + pair.toString();
     }
 
     private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
@@ -262,7 +264,13 @@ public class BitSparkWrapper implements TradeInterface {
         double bid = -1;
 
         String ticker_url = API_BASE_URL + getTickerPath(pair);
-        String queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
+        LOG.trace("get content from url " + ticker_url);
+        String queryResult = null;
+        try{
+            queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
+        }catch(Exception e){
+            LOG.error("error getting content from " + ticker_url + " " + e);
+        }
 
         /*Sample result
          * {"at":1398410899,
@@ -281,9 +289,9 @@ public class BitSparkWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) parser.parse(queryResult);
             JSONObject tickerOBJ = (JSONObject) httpAnswerJson.get("ticker");
 
-            last = (Double) tickerOBJ.get("last");
-            ask = (Double) tickerOBJ.get("buy");
-            bid = (Double) tickerOBJ.get("sell");
+            last = new Double((String) tickerOBJ.get("last"));
+            ask = new Double((String) tickerOBJ.get("buy"));
+            bid = new Double((String) tickerOBJ.get("sell"));
 
             ticker.setAsk(ask);
             ticker.setBid(bid);
@@ -622,7 +630,7 @@ public class BitSparkWrapper implements TradeInterface {
         long currentTime = System.currentTimeMillis();
 
         if (Global.options.isVerbose()) {
-            LOG.info(currentTime + " Now apiBusy! req : " + requester);
+            LOG.debug(currentTime + " Now apiBusy! req : " + requester);
         }
 
         long timeElapsedSinceLastCall = currentTime - lastSentTonce;
@@ -633,7 +641,7 @@ public class BitSparkWrapper implements TradeInterface {
                 currentTime = System.currentTimeMillis();
                 if (Global.options != null) {
                     if (Global.options.isVerbose()) {
-                        LOG.info("Just slept " + sleepTime + "; req : " + requester);
+                        LOG.debug("Just slept " + sleepTime + "; req : " + requester);
                     }
                 }
             } catch (InterruptedException e) {
@@ -644,7 +652,7 @@ public class BitSparkWrapper implements TradeInterface {
         lastSentTonce = currentTime;
 
         if (Global.options.isVerbose()) {
-            LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
+            LOG.debug("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
         }
 
         apiBusy = false;
@@ -693,7 +701,7 @@ public class BitSparkWrapper implements TradeInterface {
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
-            LOG.info("A maximum of 1000 trades can be returned from the BitSpark API");
+            LOG.debug("A maximum of 1000 trades can be returned from the BitSpark API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
@@ -787,12 +795,12 @@ public class BitSparkWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            //LOG.info("Calling " + canonical_uri + " with params:" + args);
+            //LOG.debug("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
                 String url = base + canonical_uri;
-                //LOG.info("url = " + url);
+                //LOG.debug("url = " + url);
                 Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
 
@@ -804,12 +812,14 @@ public class BitSparkWrapper implements TradeInterface {
                 }
                 response = doc.body().text();
 
+                //possible errors
+                // {"error":{"code":2002,"message":"Failed to create order. Reason: invalid price"}}
                 return response;
             } catch (Exception e) {
                 LOG.error(e.toString());
                 return null;
             } finally {
-                LOG.info("result:{}" + response);
+                LOG.debug("result:{}" + response);
             }
         }
 

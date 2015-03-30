@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,11 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.PairBalance;
@@ -40,40 +42,110 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-
+/**
+ * Submit info via NuWalletRPC
+ *
+ */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(SubmitLiquidityinfoTask.class.getName());
     private boolean verbose;
+
+    private boolean wallsBeingShifted = false;
+    private boolean firstOrdersPlaced = false;
+    private boolean firstExecution = true;
+
     private String outputFile_orders;
     private String jsonFile_orders;
     private String jsonFile_balances;
-    private boolean wallsBeingShifted = false;
-    private boolean firstOrdersPlaced = false;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
+
         this.verbose = verbose;
+
+    }
+
+    private void initFiles() {
+
+         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME +".csv";
+         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
+         this.jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
+
+        //create json file if it doesn't already exist
+        LOG.debug("init files");
+        File jsonF1 = new File(this.jsonFile_orders);
+        if (!jsonF1.exists()) {
+            try{
+                jsonF1.createNewFile();
+                LOG.debug("created " + jsonF1);
+            }catch(Exception e){
+                LOG.error("error creating file " + jsonF1 + " " + e);
+            }
+
+            JSONObject history = new JSONObject();
+            JSONArray orders = new JSONArray();
+            history.put("orders", orders);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
+        }
+
+        //create json file if it doesn't already exist
+        File jsonF2 = new File(this.jsonFile_balances);
+        if (!jsonF2.exists()) {
+            try{
+                jsonF2.createNewFile();
+                LOG.debug("created " + jsonF2);
+            }catch(Exception e){
+                LOG.error("error creating file " + jsonF1 + " " + e);
+            }
+
+            JSONObject history = new JSONObject();
+            JSONArray balances = new JSONArray();
+            history.put("balances", balances);
+            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
+        }
+
+        File of = new File(this.outputFile_orders);
+        if (!of.exists()){
+            try{
+                of.createNewFile();
+                LOG.debug("created " + of);
+            }catch(Exception e){
+                LOG.error("error creating file " + of + "  " + e);
+            }
+        }
+
+        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);
+
     }
 
     @Override
     public void run() {
-        LOG.info("Executing task : CheckOrdersTask ");
+        LOG.debug("Executing task : CheckOrdersTask ");
+        if(firstExecution)
+        {
+            initFiles();
+            firstExecution = false;
+        }
         checkOrders();
+
     }
-    //Taken the input exchange, updates it and returns it.
 
     private void checkOrders() {
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
             if (isFirstOrdersPlaced()) {
                 String response1 = reportTier1(); //active orders
                 String response2 = reportTier2(); //balance
-                LOG.info(response1 + "\n" + response2);
+                if(Global.options.isSubmitliquidity()) {
+                    LOG.info("RPC Response : " + response1 + "\n" + response2);
+                }
             } else {
                 LOG.warn("Liquidity is not being sent : orders are not yet initialized");
 
             }
         } else {
-            LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            if (Global.options.isSubmitliquidity()) {
+                LOG.warn("Liquidity is not being sent, a wall shift is happening. Will send on next execution.");
+            }
         }
     }
 
@@ -89,7 +161,13 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
         ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
-        LOG.info("Active orders : " + orderList.size());
+        LOG.debug("Active orders : " + orderList.size());
+
+        Iterator<Order> it = orderList.iterator();
+        while (it.hasNext()){
+            Order o = it.next();
+            LOG.debug("order: " + o.getDigest());
+        }
 
         if (verbose) {
             LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
@@ -212,18 +290,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         return toReturn;
     }
 
-    private void logOrderCSV(String toWrite) {
-        FileSystem.writeToFile(toWrite, outputFile_orders, true);
-    }
-
-    private void logOrderJSON(JSONObject orderHistory) {
-        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
-    }
-
-    private void logBalanceJSON(JSONObject balanceHistory) {
-        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
-    }
-
     private JSONObject getBalanceHistory() throws ParseException {
         JSONParser parser = new JSONParser();
         JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
@@ -325,32 +391,6 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         return toReturn;
     }
 
-    public void setOutputFiles(String outputFileOrders, String outputFileBalances) {
-        this.outputFile_orders = outputFileOrders;
-        this.jsonFile_orders = this.outputFile_orders.replace(".csv", ".json");
-
-
-        //create json file if it doesn't already exist
-        File jsonF1 = new File(this.jsonFile_orders);
-        if (!jsonF1.exists()) {
-            JSONObject history = new JSONObject();
-            JSONArray orders = new JSONArray();
-            history.put("orders", orders);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
-        }
-
-        this.jsonFile_balances = outputFileBalances;
-
-        //create json file if it doesn't already exist
-        File jsonF2 = new File(this.jsonFile_balances);
-        if (!jsonF2.exists()) {
-            JSONObject history = new JSONObject();
-            JSONArray balances = new JSONArray();
-            history.put("balances", balances);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
-        }
-    }
-
     public boolean isVerbose() {
         return verbose;
     }
@@ -374,4 +414,20 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     public void setFirstOrdersPlaced(boolean firstOrdersPlaced) {
         this.firstOrdersPlaced = firstOrdersPlaced;
     }
+
+    //---------------- storage related -----------------
+
+    private void logOrderCSV(String toWrite) {
+        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+    }
+
+    private void logOrderJSON(JSONObject orderHistory) {
+        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+    }
+
+    private void logBalanceJSON(JSONObject balanceHistory) {
+        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+    }
+
+
 }

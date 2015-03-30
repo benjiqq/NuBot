@@ -1,7 +1,5 @@
-package com.nubits.nubot.NTP;
-
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -18,10 +16,14 @@ package com.nubits.nubot.NTP;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+package com.nubits.nubot.NTP;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
+
+import com.nubits.nubot.global.Settings;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.commons.net.time.TimeUDPClient;
 
@@ -29,7 +31,6 @@ public final class NTPClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(NTPClient.class.getName());
     private ArrayList<String> hostnames;
-    private static final int TIMEOUT = 10 * 1000; //10 seconds timeout
 
     public NTPClient() {
     }
@@ -81,7 +82,7 @@ public final class NTPClient {
         Date toRet;
         TimeUDPClient client = new TimeUDPClient();
         // We want to timeout if a response takes longer than TIMEOUT seconds
-        client.setDefaultTimeout(TIMEOUT);
+        client.setDefaultTimeout(Settings.NTP_TIMEOUT);
         client.open();
         toRet = client.getDate(InetAddress.getByName(host));
         client.close();

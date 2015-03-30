@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.utils;
 
 import com.google.gson.Gson;
@@ -22,6 +23,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonParser;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
@@ -55,7 +57,7 @@ public class FrozenBalancesManager {
     private Amount amountAlreadyThere;
     private Currency toFreezeCurrency;
 
-    public final static String frozenfolder = "frozen";
+    public final static String frozenfolder = Settings.FROZEN_FUNDS_PATH;
 
     //Call this on bot startup
     public FrozenBalancesManager(String exchangName, CurrencyPair pair) {

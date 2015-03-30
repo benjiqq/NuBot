@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,24 +15,23 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading;
 
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.OrderToPlace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class TradeUtils {
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,12 +15,13 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.testsmanual;
 
 
 
 import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
@@ -28,14 +29,18 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.pricefeeds.feedservices.*;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.utils.InitTests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.*;
 
 public class TestSync extends TimerTask {
+
+    //define Logging by using predefined Settings which points to an XML
+    static {
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
+    }
 
     private static final Logger LOG = LoggerFactory.getLogger(TestSync.class.getName());
     private static final int TASK_INTERVAL = 61;
@@ -46,10 +51,11 @@ public class TestSync extends TimerTask {
     private static AbstractPriceFeed feed;
 
     public static void main(String[] args) throws InterruptedException {
+        InitTests.setLoggingFilename(LOG);
+
         //Run multiple instance of this test to see if they read the same price.
         //It sends a notification on hipchat after syncing with a remote time server
         //Change parameters above
-
 
         startTime = (int) (System.currentTimeMillis() / 1000);
         System.out.println("Start-time = " + startTime);
@@ -94,21 +100,11 @@ public class TestSync extends TimerTask {
     }
 
     private static void init() {
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
-        }
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
-        String logsFolder = Global.settings.getProperty("log_path") + folderName;
 
-        LOG.info("Set up SSL certificates");
-        try {
-            Utils.installKeystore(true);
-        } catch (Exception ex) {
-            LOG.error(ex.toString());
-        }
+        InitTests.loadKeystore(true);
+
     }
 
     @Override
@@ -136,10 +132,10 @@ public class TestSync extends TimerTask {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         try{
-            mainFeed = BtcePriceFeed.name;
-            String  f1 = BitcoinaveragePriceFeed.name;
-            String f2 = BlockchainPriceFeed.name;
-            String f3 = CoinbasePriceFeed.name;
+            mainFeed = FeedFacade.BtcePriceFeed;
+            String  f1 = FeedFacade.BitcoinaveragePriceFeed;
+            String f2 = FeedFacade.BlockchainPriceFeed;
+            String f3 = FeedFacade.CoinbasePriceFeed;
             backupFeedList.add(f1);
             backupFeedList.add(f2);
             backupFeedList.add(f3);

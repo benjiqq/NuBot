@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.wrappers;
 
 
@@ -28,7 +29,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
 
 import java.math.BigInteger;
@@ -81,7 +82,6 @@ public class PeatioWrapper implements TradeInterface {
 
     public PeatioWrapper() {
         setupErrors();
-
     }
 
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
@@ -830,13 +830,13 @@ public class PeatioWrapper implements TradeInterface {
             args.remove("canonical_verb");
             String canonical_uri = (String) args.get("canonical_uri");
             args.remove("canonical_uri");
-            LOG.info("Calling " + canonical_uri + " with params:" + args);
             Document doc;
             String response = null;
             try {
                 String url = apiBaseUrl + canonical_uri;
-                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
+                LOG.debug(canonical_verb.toUpperCase()+ " - Calling " + url + " with params:" + args);
 
+                Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
                 connection.ignoreHttpErrors(true);
                 if ("post".equalsIgnoreCase(canonical_verb)) {
@@ -851,7 +851,7 @@ public class PeatioWrapper implements TradeInterface {
                 LOG.error(e.toString());
                 return null;
             } finally {
-                LOG.info("result:{}" + response);
+                LOG.debug("result:{}" + response);
             }
         }
 

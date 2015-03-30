@@ -1,11 +1,29 @@
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package com.nubits.nubot.testsmanual;
 
 
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.PairBalance;
@@ -21,15 +39,14 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
-import com.nubits.nubot.trading.wrappers.unused.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
-
+import com.nubits.nubot.trading.wrappers.BterWrapper;
+import com.nubits.nubot.trading.wrappers.CcedkWrapper;
+import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
+import org.slf4j.LoggerFactory;
+import org.slf4j.Logger;
 
 public class WrapperTestUtils {
 
@@ -309,85 +326,30 @@ public class WrapperTestUtils {
         testClearAllOrders(pair);
     }
 
-    public static void configExchange(String exchangeName) throws NuBotConfigException {
-
-        configExchangeWrapper(exchangeName);
-
-        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
-
-        //Create a TaskManager
-        Global.taskManager = new TaskManager();
-        //Start checking for connection
-        Global.taskManager.setNudTask();
-        Global.taskManager.getCheckNudTask().start();
 
 
-        //Wait a couple of seconds for the connectionThread to get live
-        try {
-            Thread.sleep(2000);
-        } catch (InterruptedException ex) {
-            LOG.error(ex.toString());
-        }
+    public static void configureExchange(String exchangeName) throws NuBotConfigException {
 
-    }
-
-    private static void configExchangeWrapper(String exchangeName) throws NuBotConfigException {
-        //config exchange in 3 steps
-
-        //1. create exchange object
+        //Create exchange object
         Global.exchange = new Exchange(exchangeName);
 
-        //2. Create e ExchangeLiveData object to accomodate liveData from the Global.exchange
+        //Create e ExchangeLiveData object to accomodate liveData from the Global.exchange
         ExchangeLiveData liveData = new ExchangeLiveData();
         Global.exchange.setLiveData(liveData);
 
-        //3.
+        //Create the ApiKeys object reading from option files
+        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
+
         //Create a new TradeInterface object using the custom implementation
-        //Assign the TradeInterface to the exchange
-        //Wrap the keys into a new ApiKeys object
+        TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName, keys, Global.exchange);
 
-        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-
-        if (exchangeName.equals(ExchangeFacade.BTCE)) {
-            Global.exchange.setTrade(new BtceWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
-            Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, ExchangeFacade.INTERNAL_EXCHANGE_PEATIO_API_BASE));
-        } else if (exchangeName.equals(ExchangeFacade.CCEDK)) {
-            Global.exchange.setTrade(new CcedkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BTER)) {
-            Global.exchange.setTrade(new BterWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.POLONIEX)) {
-            Global.exchange.setTrade(new PoloniexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.CCEX)) {
-            Global.exchange.setTrade(new CcexWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.ALLCOIN)) {
-            Global.exchange.setTrade(new AllCoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BITSPARK_PEATIO)) {
-            Global.exchange.setTrade(new BitSparkWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.EXCOIN)) {
-            Global.exchange.setTrade(new ExcoinWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BITCOINCOID)) {
-            Global.exchange.setTrade(new BitcoinCoIDWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.ALTSTRADE)) {
-            Global.exchange.setTrade(new AltsTradeWrapper(keys, Global.exchange));
-        } else if (exchangeName.equals(ExchangeFacade.BITTREX)) {
-            Global.exchange.setTrade(new BittrexWrapper(keys, Global.exchange));
-        } else {
-            throw new NuBotConfigException("Exchange " + exchangeName + " not supported");
-        }
-
-    }
-
-    public static void configExchangeSimple(String exchangeName) throws NuBotConfigException {
-
-        Global.exchange = new Exchange(exchangeName);
-        ExchangeLiveData liveData = new ExchangeLiveData();
-        Global.exchange.setLiveData(liveData);
-        ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
-        TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName);
+        //Assign the keys to the TradeInterface
         ti.setKeys(keys);
-        Global.exchange.setTrade(ti);
-        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
+        //Assign the TradeInterface to the exchange
+        Global.exchange.setTrade(ti);
+
+        //Set the connection check url
+        Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
     }
 }

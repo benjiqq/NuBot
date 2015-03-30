@@ -1,3 +1,43 @@
+## v0.2.0 (2015-03-26)
+
+
+#### New Features:
+  - Added a unique session id for each instance of the bot
+  - Liquidityinfo identifier contains multi-tier informaiton
+  - Added script to retrieve updated keystore from bitbucket repository
+  - Added an option to set level of incoming email notification (severe, all, none)
+  - Added price tracker for HKD and PHP
+  - Added price feeds for bitfinex
+  - GetLastTrades overall report
+
+
+#### Improvements:
+  - Ported the project to Gradle (dependencies management and build process)
+  - Upgraded to java 8
+  - Major refactoring across the codebase
+  - Resources files organized and documented
+  - Improved logging: changed logger, keeps track of multiple sessions, filters, tests..
+  - HipChat API v2
+  - Improved HipChat notifications  (added uptime on shutdown)
+  - Options.toStringNoKeys
+  - Options serialization and naming
+  - Unit tests inception
+  - Automatically write branch name in '.nubot' file
+  - Removed settings.properties
+  - Added Settings.java to allow dev to configure variables
+  - Added Parsing custom exception
+  - Reafactored strategy and launch
+  - Extracted ExchangeFacade and FeedFacade
+  - Improved ShutDownHook
+  - Simplified Strategy code
+  - Added a simple way to trust all SSL certificates
+  - Contribute.md improved
+  - Changed copyright to Nu Development Team
+
+
+#### Bug fixes:
+  -
+
 ## v0.1.5b (2015-02-18)
 #### Bug fixes:
   - Bitcoin.co.id buy order amounts

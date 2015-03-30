@@ -1,19 +1,36 @@
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package testexchanges;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -27,14 +44,12 @@ public class TestExchangePoloniex extends TestCase {
             .getName());
 
     private static String testconfigFile = "poloniex.json";
-    private static String testconfigdir = "config/testconfig";
-    private static String testconfig = testconfigdir + "/" + testconfigFile;
+    private static String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
     private TradeInterface ti;
 
     @Test
     public void testLoadConfig() {
-        System.out.println("test load config");
 
         boolean catched = false;
 
@@ -44,7 +59,7 @@ public class TestExchangePoloniex extends TestCase {
                     .parseOptionsSingle(testconfig);
 
             assertTrue(opt != null);
-            assertTrue(opt.getExchangeName().equals("poloniex"));
+            assertTrue(opt.getExchangeName().equals("Poloniex"));
 
         } catch (NuBotConfigException e) {
             catched = true;
@@ -56,7 +71,6 @@ public class TestExchangePoloniex extends TestCase {
 
     @Test
     public void testGetBalance() {
-        System.out.println("get balance");
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
@@ -64,11 +78,6 @@ public class TestExchangePoloniex extends TestCase {
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
-        }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
         }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
@@ -80,7 +89,7 @@ public class TestExchangePoloniex extends TestCase {
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
-        assertTrue(delta < 5000);
+        assertTrue(delta < 10000);
 
         if (balancesResponse.isPositive()) {
             LOG.info("Positive response  from TradeInterface.getBalance() ");
@@ -92,17 +101,44 @@ public class TestExchangePoloniex extends TestCase {
             } catch (Exception e) {
                 assertTrue(false);
             }
-            //Balance balance = (Balance) o;
-
-            //LOG.info(balance.toStringSep());
-
-            //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
-            //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);
 
         } else {
             assertTrue(false);
         }
     }
+
+    @Test
+    public void testGetPrices() {
+        NuBotOptions opt = null;
+        try {
+            opt = ParseOptions
+                    .parseOptionsSingle(testconfig);
+            Global.options = opt;
+        } catch (NuBotConfigException e) {
+            e.printStackTrace();
+        }
+
+        ti = ExchangeFacade.exchangeInterfaceSetup(Global.options);
+
+        CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
+        ApiResponse priceResponse = ti.getLastPrice(pair);
+
+        if (priceResponse.isPositive()) {
+            LOG.info("Positive response  from TradeInterface.priceResponse() ");
+            Object o = priceResponse.getResponseObject();
+            LOG.info("response " + o);
+            try {
+                Amount a = (Amount) o;
+                assertTrue(a.getQuantity() >= 0);
+            } catch (Exception e) {
+                assertTrue(false);
+            }
+
+        } else {
+            assertTrue(false);
+        }
+    }
+
 
     @Test
     public void testMakeOrder() {
@@ -113,11 +149,6 @@ public class TestExchangePoloniex extends TestCase {
 
         } catch (NuBotConfigException e) {
             e.printStackTrace();
-        }
-        try{
-            Utils.loadProperties("settings.properties");
-        }catch(IOException e){
-
         }
 
         ti = ExchangeFacade.exchangeInterfaceSetup(opt);
@@ -183,5 +214,7 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(orderList2.size() == 0);
 
     }
+
+
 }
 

@@ -1,7 +1,25 @@
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package com.nubits.nubot.trading.wrappers;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Currency;
@@ -10,8 +28,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.unused.ExcoinWrapper;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -302,7 +319,7 @@ public class AltsTradeWrapper implements TradeInterface {
             try {
                 connection = (HttpsURLConnection) queryUrl.openConnection();
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.app_name);
+                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
 
                 if (needAuth) {
                     connection.setRequestProperty("Rest-Key", keys.getApiKey());

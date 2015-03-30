@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,10 +15,9 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.global;
 
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.CurrencyPair;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -26,12 +25,8 @@ import org.slf4j.Logger;
 public class Constant {
 
     private static final Logger LOG = LoggerFactory.getLogger(Constant.class.getName());
-    //public functions final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "http://178.62.140.24/";  //Casa di nu
     public static final String BUY = "BUY";
     public static final String SELL = "SELL";
-
-
-
 
     //Direction of price
     public static final String UP = "up";

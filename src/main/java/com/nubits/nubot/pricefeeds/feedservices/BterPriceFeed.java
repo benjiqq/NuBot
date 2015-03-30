@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.pricefeeds.feedservices;
 
 
@@ -25,19 +26,20 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.unused.BterWrapper;
+import com.nubits.nubot.trading.wrappers.BterWrapper;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
 public class BterPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BterPriceFeed.class.getName());
-    public static final String name = "bter";
+
+    public static final String name = FeedFacade.BterPriceFeed;
 
     public BterPriceFeed() {
-
         refreshMinTime = 50 * 1000; //one minutee
     }
 
@@ -73,7 +75,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
                 return new LastPrice(true, name, pair.getOrderCurrency(), null);
             }
         } else {
-            LOG.info("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
+            LOG.warn("Wait " + (refreshMinTime - (System.currentTimeMillis() - lastRequest)) + " ms "
                     + "before making a new request. Now returning the last saved price\n\n");
             return lastPrice;
         }

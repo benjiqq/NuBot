@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014-2015 Nu Development Team
+ * Copyright (C) 2015 Nu Development Team
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,6 +15,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
+
 package com.nubits.nubot.trading.wrappers;
 
 
@@ -22,6 +23,7 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -34,7 +36,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.ErrorManager;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 
 import java.io.BufferedReader;
@@ -89,11 +91,6 @@ public class PoloniexWrapper implements TradeInterface {
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
-
-    public PoloniexWrapper() {
-        setupErrors();
-
-    }
 
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
@@ -177,7 +174,7 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-        LOG.debug("balance answer " + httpAnswerJson);
+        LOG.trace("balance answer " + httpAnswerJson);
 
         if (currency != null) {
             //looking for a specific currency
@@ -185,7 +182,7 @@ public class PoloniexWrapper implements TradeInterface {
             if (httpAnswerJson.containsKey(lookingFor)) {
                 JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                 double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                LOG.info("balance double : " + balanceD);
+                LOG.debug("balance double : " + balanceD);
                 apiResponse.setResponseObject(new Amount(balanceD, currency));
             } else {
                 String errorMessage = "Cannot find a balance for currency " + lookingFor;
@@ -401,7 +398,7 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.info("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
+        LOG.debug("Poloniex uses global TX fee, currency pair not supprted. \n" + "now calling getTxFee()");
         return getTxFee();
     }
 
@@ -675,7 +672,9 @@ public class PoloniexWrapper implements TradeInterface {
             try {
                 // add nonce and build arg list
                 if (needAuth) {
-                    args.put("nonce", createNonce());
+                    String nonce = createNonce();
+                    LOG.debug("nonce used " + nonce);
+                    args.put("nonce", nonce);
                     args.put("command", method);
 
                     post_data = TradeUtils.buildQueryString(args, ENCODING);
@@ -690,7 +689,7 @@ public class PoloniexWrapper implements TradeInterface {
                 // create and setup a HTTP connection
 
                 connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Global.app_name);
+                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());
@@ -793,9 +792,9 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
         private String createNonce() {
-            //FIX: add some time to the nonce, since time sync has issues
-            long fixtime = 500;
-            long toRet = System.currentTimeMillis() + fixtime;
+            //potential FIX: add some time to the nonce, since time sync has issues
+            //long fixtime = 1000;
+            long toRet = System.currentTimeMillis(); // + fixtime;
             return Long.toString(toRet);
         }
     }
