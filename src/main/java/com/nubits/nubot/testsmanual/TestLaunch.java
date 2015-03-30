@@ -35,7 +35,6 @@ public class TestLaunch {
 
 
     static {
-        System.setProperty("testlogfolder","abc");
         System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 

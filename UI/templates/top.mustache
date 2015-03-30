@@ -145,8 +145,7 @@
                 .done(function( data ) {
 
                     //string values
-               console.log(data);
-               console.log( data["wallchangethreshold"]);
+               console.log("data: " + data);
 
                     $("#exchangename").attr("placeholder", data["exchangename"]);
                     $("#apikey").attr("placeholder", data["apikey"]);
@@ -157,18 +156,11 @@
 
                     $("#wallchangethreshold").attr("placeholder", data["wallchangeThreshold"]);
 
-                    /*if (data["submitliquidity"]){*/
-                      $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
-                      $("#nudport").attr("placeholder", data["nudport"]);
-                      $("#rpcpass").attr("placeholder", data["rpcpass"]);
-                      $("#rpcuser").attr("placeholder", data["rpcuser"]);
-
-                    /*} else {
-                      $("#nubitaddress").attr("placeholder", "-");
-                      $("#nudport").attr("placeholder", "-");
-                      $("#rpcpass").attr("placeholder", "-");
-                      $("#rpcuser").attr("placeholder", "-");
-                    }*/
+                    $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
+                    $("#nudport").attr("placeholder", data["nudport"]);
+                    $("#rpcpass").attr("placeholder", data["rpcpass"]);
+                    $("#rpcuser").attr("placeholder", data["rpcuser"]);
+                    $('#mailrecipient').attr("placeholder", data["mailrecipient"]);
 
                     //booleans
 
@@ -179,6 +171,8 @@
                     $('#verbose').attr('checked',data["verbose"]);
                     $('#hipchat').attr('checked',data["hipchat"]);
                     $('#secondarypeg').attr('checked',data["secondarypeg"]);
+
+
 
                  });
 
@@ -210,6 +204,7 @@
                 var verbose = $('#verbose').prop('checked');
                 var hipchat = $('#hipchat').prop('checked');
                 var secondarypeg = $('#secondarypeg').prop('checked');
+                var mailrecipient =$('#mailrecipient').attr("placeholder");
 
 
                 var jsondata = JSON.stringify({
