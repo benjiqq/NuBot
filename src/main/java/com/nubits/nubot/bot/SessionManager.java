@@ -38,7 +38,10 @@ public class SessionManager {
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            Global.options = ParseOptions.parseOptionsSingle(configfile);
+
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile);
+            LOG.debug("loading opt: " + opt);
+            Global.options = opt;
         } catch (NuBotConfigException e) {
             MainLaunch.exitWithNotice("" + e);
         }

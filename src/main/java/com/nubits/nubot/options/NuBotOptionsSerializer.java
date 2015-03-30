@@ -61,8 +61,19 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("mailnotifications", opt.sendMails);
         root.addProperty("txFee", opt.txFee);
         root.addProperty("emergencyTimeout", opt.emergencyTimeout);
+        root.addProperty("spread", opt.spread);
 
         root.addProperty("pair", opt.pair.toStringSep());
+
+        //public ArrayList<String> backupFeedNames;
+        //    public double priceIncrement;
+        // public String sendMails;
+
+
+        //public int executeStrategyInterval; //disabled
+        //public int sendLiquidityInterval; //disabled
+        //public boolean distributeLiquidity;
+        //public boolean aggregate;
 
         return root;
     }

@@ -32,24 +32,25 @@ public class UiServer {
 
 
         //binds GET and POST
+        LayoutTemplateEngine tmpl = new LayoutTemplateEngine(htmlFolder);
+
         new ConfigController("/config", configdir, configFile);
 
         new LogController("/logdump");
 
-        LayoutTemplateEngine tmpl = new LayoutTemplateEngine(htmlFolder);
-
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
 
-        Map opmap = new HashMap();
 
+        Map opmap = new HashMap();
         get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), tmpl);
 
 
         get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), tmpl);
 
-        get("/about", (request, response) -> new ModelAndView(configmap, htmlFolder + "about.mustache"), tmpl);
-
+        //controller wants some map (?)
+        Map empty = new HashMap();
+        get("/about", (request, response) -> new ModelAndView(empty, htmlFolder + "about.mustache"), tmpl);
 
         new BotController("/startstop");
 

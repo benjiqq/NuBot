@@ -145,14 +145,17 @@
                 .done(function( data ) {
 
                     //string values
-               console.log(data);console.log(data["pair"]);
+               console.log(data);
+               console.log( data["wallchangethreshold"]);
 
                     $("#exchangename").attr("placeholder", data["exchangename"]);
                     $("#apikey").attr("placeholder", data["apikey"]);
                     $("#apisecret").attr("placeholder", data["apisecret"]);
-                    $("#maxbuyvolume").attr("placeholder", data["maxbuyordervolume"]);
-                    $("#maxsellvolume").attr("placeholder", data["maxsellordervolume"]);
+                    $("#maxbuyordervolume").attr("placeholder", data["maxbuyordervolume"]);
+                    $("#maxsellordervolume").attr("placeholder", data["maxsellordervolume"]);
                     $("#pair").attr("placeholder", data["pair"]);
+
+                    $("#wallchangethreshold").attr("placeholder", data["wallchangeThreshold"]);
 
                     /*if (data["submitliquidity"]){*/
                       $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
