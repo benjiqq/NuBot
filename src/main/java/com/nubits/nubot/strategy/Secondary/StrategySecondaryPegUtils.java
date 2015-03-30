@@ -341,7 +341,7 @@ public class StrategySecondaryPegUtils {
                     if (order2Response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
-                        LOG.warn("Strategy : " + type + " Response2 = " + response2String);
+                        LOG.warn("Strategy - " + type + " Response2 = " + response2String);
                     } else {
                         LOG.error(order2Response.getError().toString());
                         success = false;
