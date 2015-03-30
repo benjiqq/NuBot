@@ -10,6 +10,9 @@ import java.util.Map;
 
 import static spark.Spark.get;
 
+/**
+ * the main UI framework
+ */
 public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
