@@ -48,7 +48,7 @@ public class TestNotifications {
         InitTests.loadKeystore(false);
 
         //Send email notifications
-        String email = "benjamin.l.cordes@gmail.com";
+        String email = "desrever.nu@gmail.com";
         MailNotifications.send(email, "Test Title", "Test Message");
         MailNotifications.sendCritical(email, "Test Critical Title", "Test critical message");
 

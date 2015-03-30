@@ -202,6 +202,7 @@ public class MailNotifications {
             t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME,
                     Passwords.SMTP_PASSWORD);
             t.sendMessage(msg, msg.getAllRecipients());
+            LOG.debug("Email message sent to " + recipientEmail + ". title = " + title + ";Message : " + message);
             t.close();
         }catch(Exception e){
             LOG.error("can't send mail " + e);
