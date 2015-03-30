@@ -18,39 +18,37 @@
 
 package com.nubits.nubot.strategy.Primary;
 
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
-import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.TimerTask;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class StrategyPrimaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategyPrimaryPegTask.class.getName());
-    
+    private final int RESET_AFTER_CYCLES = 50;
+    private final int MAX_RANDOM_WAIT_SECONDS = 5;
+    private final int SHORT_WAIT_SECONDS = 5;
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
     private boolean isFirstTime = true;
     private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean proceedsInBalance = false;
-    private final int RESET_AFTER_CYCLES = 50;
-    private final int MAX_RANDOM_WAIT_SECONDS = 5;
-    private final int SHORT_WAIT_SECONDS = 5;
     private int cycles = 0;
 
 
