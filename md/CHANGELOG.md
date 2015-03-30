@@ -1,6 +1,5 @@
 ## v0.2.0 (2015-03-26)
 
-
 #### New Features:
   - Added Comkort exchange API support
   - Added a unique session id for each instance of the bot
@@ -33,7 +32,6 @@
   - Added a simple way to trust all SSL certificates
   - Contribute.md improved
   - Changed copyright to Nu Development Team
-
 
 #### Bug fixes:
   - Bitcoin.co.id Wrapper Fix
