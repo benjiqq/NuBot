@@ -27,8 +27,8 @@
             margin-bottom: 20px;
           }
 
-          #logarea, #logarea2 {
-            width:500px;
+          #logarea {
+            width:800px;
             height:200px;
             resize:none
           }
@@ -125,38 +125,10 @@
                 setTimeout(loadlog,updateTime);
             }
 
-            function load_status() {
-
-                var url = baseurl + "/status";
-
-                console.log("get status from url  " + url);
-
-                $.ajax({
-                  type: "GET",
-                  dataType: "json",
-                  url: url,
-                })
-                .fail(function() {
-                    /*alert( "error loading status" );*/
-                })
-                .done(function( data ) {
-                    console.log(data["btc_balance"]);
-
-                    $('#btc_balance').html(data["btc_balance"]);
-                    $('#nbt_balance').html(data["nbt_balance"]);
-
-                /*  $('#btce_last').html(data["btce_lastprice"]);
-                  $('#bci_last').html(data["bci_lastprice"]);*/
-                });
-
-
-
-                setTimeout(load_status,updateTime);
-            }
 
             function loadbot() {
                 loadlog();
-                load_status();
+
             }
 
 
