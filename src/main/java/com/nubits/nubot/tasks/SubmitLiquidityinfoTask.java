@@ -19,15 +19,21 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.RPC.NuRPCClient;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.DecimalFormat;
@@ -35,13 +41,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  * Submit info via NuWalletRPC
@@ -172,7 +171,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
         if (verbose) {
             DecimalFormat nf = new DecimalFormat("0");
-            nf.setMinimumFractionDigits(4);
+            nf.setMinimumFractionDigits(8);
             LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + nf.format(Global.exchange.getLiveData().getNBTonbuy()));
             LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + nf.format(Global.exchange.getLiveData().getNBTonsell()));
         }
@@ -271,7 +270,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
         if (verbose) {
             DecimalFormat nf = new DecimalFormat("0");
-            nf.setMinimumFractionDigits(4);
+            nf.setMinimumFractionDigits(8);
             LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nf.format(nbt_onbuy));
             LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nf.format(nbt_onsell));
         }
