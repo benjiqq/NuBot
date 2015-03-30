@@ -24,6 +24,7 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 
+import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,18 +78,20 @@ public class MainLaunch {
             }
         }
 
-        String configfile = args[0];
-
-
+        String configFile = args[0];
 
         if (runui) {
             LOG.info("* run with ui *");
             String workingdir = ".";
-            UILaunch.UIlauncher(workingdir, configfile);
+            try{
+                UiServer.startUIserver(workingdir, configFile);
+            }catch(Exception e){
+                LOG.error("error setting up UI server " + e);
+            }
 
         } else {
             LOG.info("** run command line **");
-            SessionManager.sessionLaunch(configfile);
+            SessionManager.sessionLaunch(configFile);
         }
 
 
