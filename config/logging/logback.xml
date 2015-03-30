@@ -78,6 +78,17 @@
 				</filter>
 
 				<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+				<evaluator>
+					<expression>
+						return logger.contains("hipchat");
+					</expression>
+				</evaluator>
+				<onMatch>DENY</onMatch>
+				<onMismatch>NEUTRAL</onMismatch>
+				</filter>
+
+
+				<filter class="ch.qos.logback.core.filter.EvaluatorFilter">
 					<evaluator>
 						<expression>
 							return logger.contains("${SessionLOG}");

@@ -68,17 +68,53 @@ The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years
 
 *Download and unzip the latest stable build from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).*
 
-The bot reads configuration options from one or multiple *.json* files.  Below you can find a list of all the available options parameter along a brief description. 
+The bot reads configuration options from one *.json* file.  Below you can find a list of all the available options parameter along a brief description. 
 Please make sure you fully understand in which way changing a setting will affect the bot before doing anything that can lead to losses. 
 
-Its good practice separating configuration parameters in different files. In this tutorial we will use the following grouping : 
+In this tutorial we will use the following grouping : 
 * market options: exchange keys and market-related settings ;  
 * misc options: miscellaneous configuration parameters ;
 * liquidity-info options: define nubits client communication ;
 * price-tracking options: for non-USD pairs, define price feeds ;
 
-The same structure is used in the `sample-config.json` file provided with the bot. You can edit the provided sample file or create a new configuration file.
+Refer to the `sample-config.json` file provided with the bot. You can edit the provided sample file or create a new configuration file.
 
+Sample options:
+```json
+{
+  "exchangename":"poloniex",
+  "apikey": "xxx",
+  "apisecret": "xxx",
+  "txfee": 0.2,
+  "pair":"nbt_btc",
+
+  "dualside": true,
+  "multiplecustodians":false,
+  "executeorders":true,
+  "verbose":false,
+  "hipchat":true,
+  "mailnotifications":"severe",
+  "mailrecipient":"xxx@xxx.xxx",
+  "emergencytimeout":60,
+  "keepproceeds":0,
+  "maxsellordervolume" : 0.0,
+  "maxbuyordervolume" : 0.0,
+  "priceincrement": 0.1,
+
+  "submitliquidity":true,
+  "nubitaddress": "xxx",
+  "nudip": "127.0.0.1",
+  "nudport": 9091,
+  "rpcpass": "xxx",
+  "rpcuser": "xxx",
+
+  "wallchangeThreshold": 0.1,
+  "spread":0.0,
+  "mainfeed":"blockchain",
+  "backupfeeds": ["coinbase", "btce"]
+}
+
+```
 ---
 #### Market options 
 
@@ -92,19 +128,7 @@ Parameters :
 | txfee    | 0.2  |  If transaction fee not available from the exchange via api, this value will be used  |  double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5% |
 | pair |  The currency pair where the bot operates     |   valid currency pair for the specified  eg. "nbt_usd" |
 
-See exchanges.md for an updated list of valid exchange names.
-
-Sample options:
-```json
-{
-  "exchangename":"bter",
-  "apikey": "xxx",
-  "apisecret": "xxx",
-  "txfee": 0.2,
-  "pair":"nbt_btc"
-}
-  
-```
+See EXCHANGES.md for an updated list of valid exchange names.
 
 ---
 
@@ -127,25 +151,6 @@ Parameters :
 | maxbuyordervolume | 0 | maximum volume to put on buy walls.  |  double , expressed NBT. 0=no limit;  |
 | priceincrement    | 0.0003 |  if working in sell-side mode, this value (considered USD) will be added to the sell price | double , price increment in expressed USD |
 
-Sample options:
-```json
-{
-    "dualside": true,  
-    "multiplecustodians":false,
-    "submitliquidity":true,
-    "executeorders":false,
-    "verbose":false,
-    "hipchat":true,
-    "mailnotifications":false,
-    "mailrecipient":"xxx@xxx.xxx",
-    "emergencytimeout":60,
-    "keepproceeds":0,
-    "maxsellordervolume" : 0,
-    "maxbuyordervolume" : 0,
-    "priceincrement": 0.1
-}
-  
-```
 
 ---
 
@@ -162,17 +167,6 @@ Parameters :
 | rpcpass | / |  The RPC password of the Nu daemon    |  String |
 | rpcuser | / |  The RPC username  of the Nu daemon    |    String |
 
-Sample options : 
-```json
-{
-    "submitliquidity":true,
-    "nubitaddress": "xxx",
-    "nudip": "127.0.0.1",
-    "nudport": 9091,
-    "rpcpass": "xxx",
-    "rpcuser": "xxx"
-}  
-```
 
 ---
 
@@ -185,23 +179,12 @@ Parameters :
 
 | Parameter      |  Default value  |  Description  |   Admitted values  | 
 | ------------- |:-------------:| -------------:| -------------:| 
-| wallshiftthreshold | / | how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
+| wallchangeThreshold | / | how much the price need to change to trigger a wall-shift.    | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%   |
 | spread  | / | the spread between buy and sell walls | double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%|
 | mainfeed  | / | the name of the main price feed that has priority over the others | **see following table |
 | backupfeeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 
 See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master) for an updated list of valid feed names.
-
-
-Sample options:
-```json
-{
- "wallshiftthreshold": 0.3,
- "spread": 0,
- "mainfeed": "bitfinex",
- "backupfeeds": ["blockchain", "coinbase", "bitstamp"]
-}
-```
 
 ---
 
@@ -225,14 +208,32 @@ The bot will start and write output in the */logs* folder.
 
 To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders.
 
-**You can only run ONE instance of nubot at the time. To run multiple instances simoultaneusly, you can create one separate nubot folder for each instance. FIX coming soon **
-
-##Logging on HTML and csv
-
-TODO
+##Logging files
 
 The bot produces different output log files, all stored in a special folder created for each session under *logs/*.  
-The bot creates a csv and html log for each session. 
-*info* are logged to file if we set`"verbose"=true`. 
+On startup, NuBot prints out the name of the folder it is using to log:
 
-Additionally there are two other logs that trace the history of wall shifts and a history of snapshots of active orders. 
+example: 
+```
+INFO  - defined session path logs/session_1427479041022
+```
+
+Log files: 
+
+| filename    |  Description  | 
+| ------------- |:-------------:| 
+| standard.html    | Standard output of the bot  | 
+| verbose.html    | Verbose output of the bot with additional messages | 
+| orders_history.(csv;json) | snapshots of active orders (taken every minute) |
+| balance_history.json    | snapshots of balances (taken every minute)   | 
+| wall_shifts.(csv;json) | list of wall shifts | 
+
+
+NOTE: to avoid huge files, html files gets rotated at 50MB.
+
+Additional messages are logged to console if the option `"verbose"=true` is set. Useful for debug
+
+Additionally there are two other logs that trace the history of wall shifts and a history of.
+
+For additional control over logging, the user can also manually edit the *config/logging/logback.xml* configuration file.
+

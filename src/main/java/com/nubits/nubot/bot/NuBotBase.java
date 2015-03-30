@@ -24,7 +24,6 @@ import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
@@ -37,16 +36,13 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.utils.VersionInfo;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.net.URL;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Abstract NuBot. implements all primitives without the strategy itself
@@ -63,7 +59,7 @@ public abstract class NuBotBase {
     /**
      * Logger for session data. called only once per session
      */
-    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
+    // private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG"); //TODO remove if never used
 
     protected String mode;
 
@@ -85,7 +81,7 @@ public abstract class NuBotBase {
         }
 
         setupLog();
-
+        
         setupSSL();
 
         setupExchange();
@@ -208,7 +204,7 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) {
 
-        LOG.info("Setting up NuBot version : " + Utils.versionName());
+        LOG.info("Setting up NuBot version : " + VersionInfo.getVersionName());
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {

@@ -22,7 +22,6 @@ import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.models.OrderToPlace;
 
 import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
@@ -59,14 +58,11 @@ import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.*;
 
 import org.apache.commons.io.FileUtils;
-import org.slf4j.MDC;
 
 
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
-
-    private static String nubotconfigfile = ".nubot";
 
     /**
      * @param originalString
@@ -245,36 +241,6 @@ public class Utils {
         return toRet;
     }
 
-    /*
-    public static void loadProperties(String filename) throws IOException {
-        Global.settings = new Properties();
-        InputStream input = null;
-
-        try {
-            input = NuBotSecondary.class.getClassLoader().getResourceAsStream(filename);
-
-            //load a properties file from class path, inside static method
-            Global.settings.load(input);
-        } catch (IOException ex) {
-            LOG.error(ex.toString());
-            throw new IOException("Sorry, unable to find " + filename);
-        } finally {
-            if (input != null) {
-                try {
-                    input.close();
-                } catch (IOException e) {
-                    LOG.error(e.toString());
-                }
-            }
-        }
-    }
-    */
-
-    public static String generateLogPath(String className) {
-        String toReturn = Settings.TESTS_LOG_PREFIX + "_" + className + "_" + getTimestampLong() + "/";
-        LOG.info("Logging folder :  " + toReturn);
-        return toReturn;
-    }
 
     public static long getOneDayInMillis() {
         return 1000 * 60 * 60 * 24;
@@ -290,10 +256,6 @@ public class Utils {
         return delay;
     }
 
-    public static void exitWithMessage(String msg) {
-        LOG.error(msg);
-        System.exit(0);
-    }
 
     /**
      * Returns a pseudo-random number between min and max, inclusive. The
@@ -357,7 +319,7 @@ public class Utils {
         //Generate a random alfanumeric id of 6 chars
         String uid = UUID.randomUUID().toString().substring(0, 6);
         //Get nubot version
-        String version = Utils.versionName();
+        String version = VersionInfo.getVersionName();
         //Get timestamp
         String timest = "" + getTimestampLong();
         //conatenate
@@ -425,61 +387,9 @@ public class Utils {
     }
 
     /**
-     * get version from ".nubot file"
-     *
+     * Determine whether the current thread runs inside a jar
      * @return
      */
-    public static String versionName() {
-        if (insideJar()) {
-            String wdir = System.getProperty("user.dir");
-
-            String fp = wdir + "/" + nubotconfigfile;
-
-            File file = new File(fp);
-            try {
-                List lines = FileUtils.readLines(file, "UTF-8");
-                HashMap km = new HashMap();
-                for (Object o : lines) {
-                    String l = "" + o;
-                    try {
-                        String[] a = l.split("=");
-                        km.put(a[0], a[1]);
-                    } catch (Exception e) {
-                        //ignore line with "="
-                    }
-
-                }
-
-                if (km.containsKey("version"))
-                    return "" + km.get("version");
-
-            } catch (Exception e) {
-                //throw e;
-            }
-
-            return "load version error";
-
-        } else {
-
-            //get current git branch
-            try {
-                String fp = System.getProperty("user.dir") + "/" + ".git" + "/" + "HEAD";
-                File f = new File(fp);
-                if (f.exists()) {
-                    String s = FileUtils.readFileToString(f);
-                    s = s.replace("ref: refs/heads/","");
-                    s = s.replace("\n","");
-                    return "develop:branch-" + s;
-                }
-
-            } catch (Exception e) {
-                ;
-            }
-
-            return "develop";
-        }
-    }
-
     public static boolean insideJar() {
         String c = "" + Utils.class.getResource("Utils.class");
         String path = "";
