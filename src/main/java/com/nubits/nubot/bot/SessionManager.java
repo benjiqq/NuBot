@@ -32,22 +32,16 @@ public class SessionManager {
      *
      * @param configfile
      */
-    public static void sessionLaunch(String configfile) {
-
-        NuBotOptions nuopt = null;
+    public static void setConfig(String configfile) {
 
         sessionLOG.debug("parsing options from " + configfile);
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            nuopt = ParseOptions.parseOptionsSingle(configfile);
+            Global.options = ParseOptions.parseOptionsSingle(configfile);
         } catch (NuBotConfigException e) {
             MainLaunch.exitWithNotice("" + e);
         }
-
-        sessionLOG.debug("launch bot");
-
-        launchBot(nuopt);
 
     }
 

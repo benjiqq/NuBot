@@ -40,8 +40,11 @@ public class UiServer {
         LayoutTemplateEngine tmpl = new LayoutTemplateEngine(htmlFolder);
 
         Map feedsmap = new HashMap();
-        //TODO: pegging price
-        feedsmap.put("watchcurrency", Global.options.pair.toString());
+
+        // /TODO: pegging price
+        //
+        //feedsmap.put("watchcurrency", Global.options.pair.toString());
+
         get("/feeds", (request, response) -> new ModelAndView(feedsmap, htmlFolder + "feeds.mustache"), tmpl);
 
         Map configmap = new HashMap();
@@ -51,7 +54,8 @@ public class UiServer {
         //ti = Global.exchange.getTradeInterface();
 
         Map opmap = new HashMap();
-        opmap.put("exchange", Global.options.getExchangeName());
+        //opmap.put("exchange", Global.options.getExchangeName());
+        opmap.put("exchange", "");
         opmap.put("btc_balance", 0);
         opmap.put("nbt_balance", 0);
 
@@ -69,7 +73,7 @@ public class UiServer {
 
 
 
-        new BotController("/startstop");
+        //new BotController("/startstop");
 
         //get("/tools", (request, response) -> new ModelAndView(configmap, htmlFolder + "tools.mustache"), new LayoutTemplateEngine(htmlFolder));
 

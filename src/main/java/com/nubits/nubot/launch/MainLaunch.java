@@ -18,8 +18,6 @@
 
 package com.nubits.nubot.launch;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
@@ -28,11 +26,9 @@ import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.net.URL;
-import java.util.Iterator;
-import java.util.List;
 import org.slf4j.MDC;
+
+import javax.mail.Session;
 
 
 /**
@@ -91,7 +87,10 @@ public class MainLaunch {
 
         } else {
             LOG.info("** run command line **");
-            SessionManager.sessionLaunch(configFile);
+            //set global config
+            SessionManager.setConfig(configFile);
+            sessionLOG.debug("launch bot");
+            SessionManager.launchBot(Global.options);
         }
 
 

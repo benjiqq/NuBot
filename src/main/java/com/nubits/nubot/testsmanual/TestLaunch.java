@@ -19,9 +19,10 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.launch.UILaunch;
 import com.nubits.nubot.utils.VersionInfo;
+import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -38,7 +39,7 @@ public class TestLaunch {
         System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 
-    static String configfile = "config/myconfig/poloniex.json";
+    static String configFile = "config/myconfig/poloniex.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
 
@@ -64,14 +65,24 @@ public class TestLaunch {
 
         sessionLOG.debug("test launch");
 
+        LOG.info("set global config");
+        SessionManager.setConfig(configFile);
+        //sessionLOG.debug("launch bot");
+        //SessionManager.launchBot(Global.options);
+
         if (runui){
             String workingdir = ".";
-            UILaunch.UIlauncher(workingdir, configfile);
+
+            try{
+                UiServer.startUIserver(workingdir, configFile);
+            }catch(Exception e){
+                LOG.error("error setting up UI server " + e);
+            }
         }
 
-        //SessionManager.sessionLaunch(configfile);
+        //SessionManager.setConfig(configfile);
 
-        //SessionManager.sessionLaunch(configfile, false);
+        //SessionManager.setConfig(configfile, false);
 
     }
 
