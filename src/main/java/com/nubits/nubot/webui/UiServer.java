@@ -1,6 +1,6 @@
 package com.nubits.nubot.webui;
 
-import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.global.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
@@ -17,11 +17,6 @@ public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
-    //TODO via settings
-    private static String htmlFolder = "./UI/templates/";
-
-    private static TradeInterface ti;
-
     private static int port = 4567; //standard port, can't change
 
     /**
@@ -35,7 +30,7 @@ public class UiServer {
 
 
         //binds GET and POST
-        LayoutTemplateEngine tmpl = new LayoutTemplateEngine(htmlFolder);
+        LayoutTemplateEngine tmpl = new LayoutTemplateEngine(Settings.HTML_FOLDER);
 
         new ConfigController("/config", configdir, configFile);
 
@@ -46,14 +41,14 @@ public class UiServer {
 
 
         Map opmap = new HashMap();
-        get("/", (request, response) -> new ModelAndView(opmap, htmlFolder + "operation.mustache"), tmpl);
+        get("/", (request, response) -> new ModelAndView(opmap, Settings.HTML_FOLDER + "operation.mustache"), tmpl);
 
 
-        get("/configui", (request, response) -> new ModelAndView(configmap, htmlFolder + "config.mustache"), tmpl);
+        get("/configui", (request, response) -> new ModelAndView(configmap, Settings.HTML_FOLDER + "config.mustache"), tmpl);
 
         //controller wants some map (?)
         Map empty = new HashMap();
-        get("/about", (request, response) -> new ModelAndView(empty, htmlFolder + "about.mustache"), tmpl);
+        get("/about", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "about.mustache"), tmpl);
 
         new BotController("/startstop");
 
