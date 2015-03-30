@@ -19,34 +19,20 @@
 package com.nubits.nubot.testsmanual;
 
 
-
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.PairBalance;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
-import com.nubits.nubot.models.OrderToPlace;
-import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class WrapperTestUtils {
 
@@ -70,7 +56,7 @@ public class WrapperTestUtils {
         //Get the USD balance associated with the account
         ApiResponse balanceResponse = Global.exchange.getTrade().getAvailableBalance(cur);
         if (balanceResponse.isPositive()) {
-            LOG.info("Positive response from TradeInterface.getBalance(CurrencyPair pair) ");
+            LOG.info("Positive response from TradeInterface.getBalance(Currency cur) ");
             Amount balance = (Amount) balanceResponse.getResponseObject();
 
             LOG.info(balance.toString());
@@ -325,7 +311,6 @@ public class WrapperTestUtils {
         //try to clear orders
         testClearAllOrders(pair);
     }
-
 
 
     public static void configureExchange(String exchangeName) throws NuBotConfigException {
