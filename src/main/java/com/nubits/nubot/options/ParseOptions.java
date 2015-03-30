@@ -307,7 +307,7 @@ public class ParseOptions {
             if (tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
                     || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
                     || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
-                options.sendMails = tmpsendMails.toUpperCase(); //Convert to upper case
+                options.mailnotifications = tmpsendMails.toUpperCase(); //Convert to upper case
             } else {
                 String error = "Value not accepted for \"mail-notifications\" : " + tmpsendMails + " . Admitted values  : "
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
@@ -434,8 +434,8 @@ public class ParseOptions {
             newopt.nudIp = "" + getIgnoreCase(postJson, "nudIp");
         }
 
-        if (containsIgnoreCase(postJson, "sendMails")) {
-            newopt.sendMails = "" + getIgnoreCase(postJson, "sendMails");
+        if (containsIgnoreCase(postJson, "mailnotifications")) {
+            newopt.mailnotifications = "" + getIgnoreCase(postJson, "sendMails");
         }
 
 

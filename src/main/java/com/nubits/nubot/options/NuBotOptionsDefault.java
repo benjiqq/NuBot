@@ -47,7 +47,7 @@ public class NuBotOptionsDefault {
         opt.submitLiquidity = false;
         opt.executeOrders = false;
         opt.sendHipchat = true;
-        opt.sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
+        opt.mailnotifications = MailNotifications.MAIL_LEVEL_SEVERE;
         opt.mailRecipient = "";
         opt.emergencyTimeout = 30;
         opt.keepProceeds = 0.0;

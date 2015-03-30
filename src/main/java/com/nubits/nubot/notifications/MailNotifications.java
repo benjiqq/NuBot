@@ -59,7 +59,7 @@ public class MailNotifications {
         boolean any = true; //Default to severe
 
 
-        any = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL);
+        any = Global.options.getMailnotifications().equals(MAIL_LEVEL_ALL);
 
         if (any) {
             sendImpl(address, title, message);
@@ -77,8 +77,8 @@ public class MailNotifications {
         boolean isCritical = true;
 
 
-        isCritical = Global.options.sendMailsLevel().equals(MAIL_LEVEL_ALL)
-                || Global.options.sendMailsLevel().equals(MAIL_LEVEL_SEVERE);
+        isCritical = Global.options.getMailnotifications().equals(MAIL_LEVEL_ALL)
+                || Global.options.getMailnotifications().equals(MAIL_LEVEL_SEVERE);
 
         if (isCritical) {
             sendImpl(address, title, message);
@@ -192,10 +192,15 @@ public class MailNotifications {
 
         SMTPTransport t = (SMTPTransport) session.getTransport("smtps");
 
-        t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME,
-                Passwords.SMTP_PASSWORD);
-        t.sendMessage(msg, msg.getAllRecipients());
-        LOG.debug("Email message sent to " + recipientEmail + ". title = " + title + ";Message : " + message);
-        t.close();
+        try {
+            t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME,
+                    Passwords.SMTP_PASSWORD);
+            t.sendMessage(msg, msg.getAllRecipients());
+            LOG.debug("Email message sent to " + recipientEmail + ". title = " + title + ";Message : " + message);
+            t.close();
+        } catch (Exception e) {
+            LOG.error("can't send mail " + e);
+        }
+
     }
 }

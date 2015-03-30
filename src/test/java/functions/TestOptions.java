@@ -201,7 +201,7 @@ public class TestOptions extends TestCase {
         assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
         assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
         assertTrue(opt.wallchangeThreshold==0.1);
-        assertTrue(opt.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_ALL));
+        assertTrue(opt.getMailnotifications().equals(MailNotifications.MAIL_LEVEL_ALL));
         assertTrue(opt.sendMails()==true);
         assertTrue(opt.isDualSide()==true);
         assertTrue(opt.isSubmitliquidity()==false);
