@@ -30,6 +30,7 @@ import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -170,8 +171,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
 
         if (verbose) {
-            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
-            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
+            DecimalFormat nf = new DecimalFormat("0");
+            nf.setMinimumFractionDigits(4);
+            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + nf.format(Global.exchange.getLiveData().getNBTonbuy()));
+            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + nf.format(Global.exchange.getLiveData().getNBTonsell()));
         }
 
         double nbt_onsell = 0;
@@ -267,8 +270,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         logOrderJSON(orderHistory);
 
         if (verbose) {
-            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
-            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
+            DecimalFormat nf = new DecimalFormat("0");
+            nf.setMinimumFractionDigits(4);
+            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nf.format(nbt_onbuy));
+            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nf.format(nbt_onsell));
         }
 
         if (Global.options.isSubmitliquidity()) {
