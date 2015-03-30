@@ -203,7 +203,6 @@
                 var executeorders = $('#executeorders').prop('checked');
                 var verbose = $('#verbose').prop('checked');
                 var hipchat = $('#hipchat').prop('checked');
-                var secondarypeg = $('#secondarypeg').prop('checked');
                 var mailrecipient =$('#mailrecipient').attr("placeholder");
 
 
@@ -214,6 +213,7 @@
                     "maxbuyordervolume": maxbuyordervolume,
                     "maxsellordervolume": maxsellordervolume,
                     "pair": pair,
+                    "mailrecipient": mailrecipient,
                     "nubitaddress": nubitaddress,
                     "nudport": nudport,
                     "rpcpass": rpcpass,
@@ -224,9 +224,7 @@
                     "multiplecustodians": multiplecustodians,
                     "executeorders": executeorders,
                     "verbose": verbose,
-                    "hipchat": hipchat,
-                    "secondarypeg": secondarypeg
-
+                    "hipchat": hipchat
                 });
 
 
