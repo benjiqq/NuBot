@@ -96,9 +96,9 @@ public class NuBotOptions {
 
     /**
      * if set to false will disable email notifications
-     * TODO: rename mailnotifications
+     *
      */
-    public String sendMails;
+    public String mailnotifications;
 
     /**
      * if set to false, the bot will not try to submit liquidity info.
@@ -196,7 +196,7 @@ public class NuBotOptions {
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
                         double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
                         boolean sendHipchat,
-                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds,
+                        String mailnotifications, String mailRecipient, int emergencyTimeout, double keepProceeds,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity,
                         double wallchangeThreshold, double spread) {
@@ -216,7 +216,7 @@ public class NuBotOptions {
         this.executeOrders = executeOrders;
         this.pair = pair;
         this.sendHipchat = sendHipchat;
-        this.sendMails = sendMails;
+        this.mailnotifications = mailnotifications;
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
@@ -236,7 +236,7 @@ public class NuBotOptions {
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
                         double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
                         int executeStrategyInterval, boolean sendHipchat,
-                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds,
+                        String mailnotifications, String mailRecipient, int emergencyTimeout, double keepProceeds,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity) {
         this.dualSide = dualSide;
@@ -255,7 +255,7 @@ public class NuBotOptions {
         this.executeOrders = executeOrders;
         this.pair = pair;
         this.sendHipchat = sendHipchat;
-        this.sendMails = sendMails;
+        this.mailnotifications = mailnotifications;
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
@@ -430,15 +430,15 @@ public class NuBotOptions {
     /**
      * @return
      */
-    public String sendMailsLevel() {
-        return sendMails;
+    public String getMailnotifications() {
+        return mailnotifications;
     }
 
     /**
      * @return
      */
     public boolean sendMails() {
-        boolean not_none = !(this.sendMails.equals(MailNotifications.MAIL_LEVEL_NONE));
+        boolean not_none = !(this.mailnotifications.equals(MailNotifications.MAIL_LEVEL_NONE));
         return not_none;
     }
 

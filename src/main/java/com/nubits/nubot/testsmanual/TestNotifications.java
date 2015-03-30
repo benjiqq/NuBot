@@ -48,13 +48,13 @@ public class TestNotifications {
         InitTests.loadKeystore(false);
 
         //Send email notifications
-        String email = "desrever.nu@gmail.com";
+        String email = "benjamin.l.cordes@gmail.com";
         MailNotifications.send(email, "Test Title", "Test Message");
         MailNotifications.sendCritical(email, "Test Critical Title", "Test critical message");
 
         //Send hipchat notifications
-        HipChatNotifications.sendMessageCritical("Critical notification test"); //will result in red
-        HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN); //chose color at will
+        //HipChatNotifications.sendMessageCritical("Critical notification test"); //will result in red
+        //HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN); //chose color at will
 
     }
 }

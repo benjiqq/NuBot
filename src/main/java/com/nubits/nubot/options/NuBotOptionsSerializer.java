@@ -43,8 +43,7 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("executeorders", opt.executeOrders);
         root.addProperty("verbose", opt.verbose);
         root.addProperty("hipchat", opt.sendHipchat);
-
-        root.addProperty("mailnotifications", opt.sendMails);
+        root.addProperty("mailnotifications", opt.mailnotifications);
         root.addProperty("mailrecipient", opt.mailRecipient);
         root.addProperty("emergencytimeout", opt.emergencyTimeout);
         root.addProperty("keepproceeds", opt.keepProceeds);
@@ -58,9 +57,12 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("rpcuser", opt.rpcUser);
         root.addProperty("mainFeed", opt.mainFeed);
         root.addProperty("wallchangeThreshold", opt.wallchangeThreshold);
-        root.addProperty("mailnotifications", opt.sendMails);
         root.addProperty("txFee", opt.txFee);
         root.addProperty("emergencyTimeout", opt.emergencyTimeout);
+        root.addProperty("spread", opt.spread);
+        root.addProperty("priceIncrement", opt.priceIncrement);
+
+        //root.addProperty("backupFeedNames",opt.backupFeedNames);
 
         root.addProperty("pair", opt.pair.toStringSep());
 
