@@ -59,7 +59,7 @@ public abstract class NuBotBase {
     /**
      * Logger for session data. called only once per session
      */
-    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
+    // private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG"); //TODO remove if never used
 
     protected String mode;
 
@@ -81,7 +81,7 @@ public abstract class NuBotBase {
         }
 
         setupLog();
-
+        
         setupSSL();
 
         setupExchange();
