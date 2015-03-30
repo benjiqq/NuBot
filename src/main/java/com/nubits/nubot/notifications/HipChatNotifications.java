@@ -56,7 +56,7 @@ public class HipChatNotifications {
             sessionId = Global.sessionId;
         }
 
-        String toSend = message + " ( " + sessionId + " - " + publicAddress + ")";
+        String toSend = message + " <em>[" + sessionId + " - " + publicAddress + "] </em>";
 
         try {
             if (critical) {

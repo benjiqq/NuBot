@@ -258,7 +258,7 @@ public class StrategySecondaryPegUtils {
                     }
                 }
                 if (order1Response.isPositive()) {
-                    HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, MessageColor.YELLOW);
+                    HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
                     String response1String = (String) order1Response.getResponseObject();
                     LOG.warn("Strategy - " + type + " Response1 = " + response1String);
                 } else {
@@ -339,7 +339,7 @@ public class StrategySecondaryPegUtils {
                         }
                     }
                     if (order2Response.isPositive()) {
-                        HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
+                        HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
                         LOG.warn("Strategy - " + type + " Response2 = " + response2String);
                     } else {

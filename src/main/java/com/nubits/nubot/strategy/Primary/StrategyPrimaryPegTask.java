@@ -345,7 +345,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
             if (sellResponse.isPositive()) {
-                HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, MessageColor.YELLOW);
+                HipChatNotifications.sendMessage("New sell wall is up on <strong>" + Global.options.getExchangeName() + " </strong>: " + orderString, MessageColor.YELLOW);
                 String sellResponseString = (String) sellResponse.getResponseObject();
                 LOG.warn("Strategy : Sell Response = " + sellResponseString);
             } else {
@@ -699,7 +699,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     }
 
                     if (order1Response.isPositive()) {
-                        HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, MessageColor.YELLOW);
+                        HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
                         String response1String = (String) order1Response.getResponseObject();
                         LOG.warn("Strategy - " + type + " Response1 = " + response1String);
                     } else {
@@ -718,7 +718,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
                     if (order2Response.isPositive()) {
-                        HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
+                        HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
                         LOG.warn("Strategy : " + type + " Response2 = " + response2String);
                     } else {
