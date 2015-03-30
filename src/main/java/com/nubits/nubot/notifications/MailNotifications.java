@@ -21,13 +21,8 @@ package com.nubits.nubot.notifications;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import com.sun.mail.smtp.SMTPTransport;
-
-import java.security.Security;
-import java.util.Date;
-import java.util.Properties;
-
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.mail.Message;
 import javax.mail.MessagingException;
@@ -35,6 +30,9 @@ import javax.mail.Session;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import java.security.Security;
+import java.util.Date;
+import java.util.Properties;
 
 /**
  * @author doraemon
@@ -46,6 +44,9 @@ public class MailNotifications {
     public static final String MAIL_LEVEL_SEVERE = "SEVERE";
     private static final Logger LOG = LoggerFactory.getLogger(MailNotifications.class
             .getName());
+
+    private MailNotifications() {
+    }
 
     /**
      * send to recipient if level is set to all
@@ -103,14 +104,9 @@ public class MailNotifications {
 
     }
 
-    private MailNotifications() {
-    }
-
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username       GMail username
-     * @param password       GMail password
      * @param recipientEmail TO recipient
      * @param title          title of the message
      * @param message        message to be sent
@@ -139,8 +135,6 @@ public class MailNotifications {
     /**
      * Send email using GMail SMTP server.
      *
-     * @param username       username
-     * @param password       password
      * @param recipientEmail TO recipient
      * @param ccEmail        CC recipient. Can be empty if there is no CC recipient
      * @param title          title of the message
@@ -201,6 +195,7 @@ public class MailNotifications {
         t.connect(Passwords.SMTP_HOST, Passwords.SMTP_USERNAME,
                 Passwords.SMTP_PASSWORD);
         t.sendMessage(msg, msg.getAllRecipients());
+        LOG.debug("Email message sent to " + recipientEmail + ". title = " + title + "/nmessage : " + message);
         t.close();
     }
 }
