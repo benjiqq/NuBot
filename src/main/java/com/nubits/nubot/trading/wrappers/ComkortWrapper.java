@@ -17,18 +17,14 @@
  */
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
@@ -55,14 +51,8 @@ import java.util.*;
  */
 public class ComkortWrapper implements TradeInterface {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ComkortWrapper.class.getName());
-    //Class fields
-    private ApiKeys keys;
-    private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
     private final String ENCODING = "UTF-8";
-    private String apiBaseUrl;
-    private String checkConnectionUrl;
-    private int lastNonce = 0;
     //API Paths
     private final String API_BASE_URL = "https://api.comkort.com/v1/private";
     private final String API_BASE_URL_PUBLIC = "https://api.comkort.com/v1/public";
@@ -77,11 +67,17 @@ public class ComkortWrapper implements TradeInterface {
     private final String API_LIST_ALL = "list_all";
     private final String API_CANCEL = "cancel";
     private final String API_TRADES = "trades";
-    //Errors
-    private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_CODE = "Code";
+    //Class fields
+    private ApiKeys keys;
+    private Exchange exchange;
+    private String apiBaseUrl;
+    private String checkConnectionUrl;
+    private int lastNonce = 0;
+    //Errors
+    private ErrorManager errors = new ErrorManager();
 
 
     public ComkortWrapper() {
@@ -191,33 +187,33 @@ public class ComkortWrapper implements TradeInterface {
         String url = API_BASE_URL_PUBLIC + "/" + API_MARKET + "/" + API_SUMMARY;
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = true;
-        
+
         args.put("market_alias", pair.toStringSepSpecial("_"));
-        
+
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
-            
+
             Ticker ticker = new Ticker();
             double last = -1;
             double ask = -1;
             double bid = -1;
-            
+
             JSONObject markets = (JSONObject) httpAnswerJson.get("markets");
             JSONObject market = (JSONObject) markets.get(pair.getOrderCurrency().getCode().toUpperCase() + "/" + pair.getPaymentCurrency().getCode().toUpperCase());
             last = Utils.getDouble(market.get("last_price"));
             ask = Utils.getDouble(market.get("low"));
             bid = Utils.getDouble(market.get("high"));
-            
+
             ticker.setAsk(ask);
             ticker.setBid(bid);
             ticker.setLast(last);
-            
+
             apiResponse.setResponseObject(ticker);
         } else {
             apiResponse = response;
         }
-        
+
         return apiResponse;
     }
 
@@ -230,7 +226,7 @@ public class ComkortWrapper implements TradeInterface {
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
         return enterOrder(Constant.BUY, pair, amount, rate);
     }
-    
+
     private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
         String url = API_BASE_URL + "/" + API_ORDER + "/";
@@ -249,7 +245,7 @@ public class ComkortWrapper implements TradeInterface {
         args.put("price", nf.format(rate));
 
         ApiResponse response = getQuery(url, args, isGet);
-        if (response.isPositive()){
+        if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             String order_id = httpAnswerJson.get("order_id").toString();
             apiResponse.setResponseObject(order_id);
@@ -279,11 +275,11 @@ public class ComkortWrapper implements TradeInterface {
                 return apiResponse;
             }
             Set<String> keys = orders.keySet();
-            for (Iterator<String> key = keys.iterator(); key.hasNext();) {
+            for (Iterator<String> key = keys.iterator(); key.hasNext(); ) {
                 String thisKey = key.next();
                 CurrencyPair thisPair = CurrencyPair.getCurrencyPairFromString(thisKey, "_");
                 JSONArray pairOrders = (JSONArray) orders.get(thisKey);
-                for (Iterator<JSONObject> order = pairOrders.iterator(); order.hasNext();) {
+                for (Iterator<JSONObject> order = pairOrders.iterator(); order.hasNext(); ) {
                     orderList.add(parseOrder(order.next(), thisPair));
                 }
             }
@@ -304,12 +300,12 @@ public class ComkortWrapper implements TradeInterface {
         ArrayList<Order> orderList = new ArrayList<>();
 
         args.put("market_alias", pair.toStringSepSpecial("_"));
-        
+
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
-            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
                 orderList.add(parseOrder(order.next(), pair));
             }
             apiResponse.setResponseObject(orderList);
@@ -319,12 +315,13 @@ public class ComkortWrapper implements TradeInterface {
 
         return apiResponse;
     }
-    
+
     private Order parseOrder(JSONObject in, CurrencyPair pair) {
         Order out = new Order();
 
         out.setId(in.get("id").toString());
-        out.setType(in.get("type") == "sell" ? Constant.SELL : Constant.BUY);
+        String type = (String) in.get("type");
+        out.setType(type.equalsIgnoreCase("sell") ? Constant.SELL : Constant.BUY);
         Amount amount = new Amount(Utils.getDouble(in.get("amount").toString()), pair.getOrderCurrency());
         out.setAmount(amount);
         Amount price = new Amount(Utils.getDouble(in.get("price").toString()), pair.getPaymentCurrency());
@@ -336,18 +333,18 @@ public class ComkortWrapper implements TradeInterface {
             out.setInsertedDate(insertDate);
         }
 
-        return out;        
+        return out;
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
-        
+
         ApiResponse activeOrders = getActiveOrders();
         if (activeOrders.isPositive()) {
             apiResponse.setResponseObject(new Order());
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrders.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
@@ -365,9 +362,9 @@ public class ComkortWrapper implements TradeInterface {
         String url = API_BASE_URL + "/" + API_ORDER + "/" + API_CANCEL;
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
-        
+
         args.put("order_id", orderID);
-        
+
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
@@ -403,7 +400,7 @@ public class ComkortWrapper implements TradeInterface {
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
         return getLastTradesImpl(pair, startTime);
     }
-    
+
     private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
         ApiResponse apiResponse = new ApiResponse();
         //https://api.comkort.com/v1/private/user/trades
@@ -418,9 +415,9 @@ public class ComkortWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("trades");
-            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
-                if ( thisTrade.getDate().getTime() < (startTime * 1000L)) {
+                if (thisTrade.getDate().getTime() < (startTime * 1000L)) {
                     continue;
                 }
                 tradeList.add(thisTrade);
@@ -429,7 +426,7 @@ public class ComkortWrapper implements TradeInterface {
         } else {
             apiResponse = response;
         }
-        return apiResponse;        
+        return apiResponse;
     }
 
     private Trade parseTrade(JSONObject in) {
@@ -462,7 +459,7 @@ public class ComkortWrapper implements TradeInterface {
         }
         Amount price = new Amount(Utils.getDouble(in.get("price")), pair.getPaymentCurrency());
         out.setPrice(price);
-        
+
         return out;
     }
 
@@ -473,7 +470,7 @@ public class ComkortWrapper implements TradeInterface {
         if (activeOrders.isPositive()) {
             ArrayList<Order> orderList = (ArrayList) activeOrders.getResponseObject();
             apiRespone.setResponseObject(false);
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(id)) {
                     apiRespone.setResponseObject(true);
@@ -497,14 +494,14 @@ public class ComkortWrapper implements TradeInterface {
         if (openOrders.isPositive()) {
             apiResponse.setResponseObject(true);
             ArrayList<Order> orderList = (ArrayList) openOrders.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 ApiResponse cancel = cancelOrder(thisOrder.getId(), thisOrder.getPair());
                 if (cancel.getResponseObject().equals(false)) {
                     apiResponse.setResponseObject(false);
                 }
             }
-        } else { 
+        } else {
             apiResponse = openOrders;
         }
         return apiResponse;
@@ -563,8 +560,8 @@ public class ComkortWrapper implements TradeInterface {
 
     @Override
     public void setApiBaseUrl(String apiBaseUrl) {
-        
-        
+
+
     }
 
     private class ComkortService implements ServiceInterface {
@@ -595,7 +592,7 @@ public class ComkortWrapper implements TradeInterface {
             int response = 200;
             String answer = null;
             post_data = TradeUtils.buildQueryString(args, ENCODING);
-            
+
             try {
                 if (isGet) {
                     queryUrl = new URL(url + "?" + post_data);
