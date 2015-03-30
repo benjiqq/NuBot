@@ -18,7 +18,6 @@
 package com.nubits.nubot.strategy.Secondary;
 
 /**
- *
  * @author desrever <desrever at nubits.com>
  */
 
@@ -40,10 +39,9 @@ public class StrategySecondaryPegUtils {
 
 
     final static Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegUtils.class);
-
-    private StrategySecondaryPegTask strategy;
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
     private final int SHORT_WAIT_SECONDS = 6;
+    private StrategySecondaryPegTask strategy;
 
     public StrategySecondaryPegUtils(StrategySecondaryPegTask strategy) {
         this.strategy = strategy;
@@ -180,7 +178,7 @@ public class StrategySecondaryPegUtils {
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
-            LOG.info("no need to execute " +type + "orders : available balance < 1 NBT");
+            LOG.info("no need to execute " + type + "orders : available balance < 1 NBT");
             return false;
         }
 
@@ -419,11 +417,7 @@ public class StrategySecondaryPegUtils {
                     strategy.setProceedsInBalance(false);
                 }
             } else {
-                if (Global.options.isAggregate()) {
-                    strategy.setOrdersAndBalancesOK(activeSellOrders == 2 && activeBuyOrders == 0 && balanceNBT < 1);
-                } else {
-                    strategy.setOrdersAndBalancesOK(activeSellOrders == 2 && activeBuyOrders == 0); // Ignore the balance
-                }
+                strategy.setOrdersAndBalancesOK(activeSellOrders == 2 && activeBuyOrders == 0); // Ignore the balance
             }
         } else {
             LOG.error(balancesResponse.getError().toString());
@@ -556,7 +550,7 @@ public class StrategySecondaryPegUtils {
                 }
 
                 if (initSells) { //Only move the buy orders if sure that the sell have been taken down
-                    if(Global.options.isDualSide()) {
+                    if (Global.options.isDualSide()) {
                         boolean initBuys;
                         initBuys = initOrders(Constant.BUY, buyPrice);
                         if (!initBuys) {
@@ -565,29 +559,29 @@ public class StrategySecondaryPegUtils {
                         }
                     }
                 } else { //success false with the first part of the shift
-                        LOG.error("NuBot has not been able to shift sell orders");
-                    }
+                    LOG.error("NuBot has not been able to shift sell orders");
                 }
-
-                //Here I wait until the two orders are correctly displaied. It can take some seconds
-                try {
-                    Thread.sleep(SHORT_WAIT_SECONDS * 1000);
-                } catch (InterruptedException ex) {
-                    LOG.error(ex.toString());
-                }
-
-                //Communicate to the priceMonitorTask that the wall shift is over
-                strategy.getPriceMonitorTask().setWallsBeingShifted(false);
-                strategy.getSendLiquidityTask().setWallsBeingShifted(false);
-
-            } else {
-                LOG.info("Could not submit request to clear orders");
-                success = false;
-                //Communicate to the priceMonitorTask that the wall shift is over
-                strategy.getPriceMonitorTask().setWallsBeingShifted(false);
-                strategy.getSendLiquidityTask().setWallsBeingShifted(false);
-                LOG.error(deleteOrdersResponse.getError().toString());
             }
+
+            //Here I wait until the two orders are correctly displaied. It can take some seconds
+            try {
+                Thread.sleep(SHORT_WAIT_SECONDS * 1000);
+            } catch (InterruptedException ex) {
+                LOG.error(ex.toString());
+            }
+
+            //Communicate to the priceMonitorTask that the wall shift is over
+            strategy.getPriceMonitorTask().setWallsBeingShifted(false);
+            strategy.getSendLiquidityTask().setWallsBeingShifted(false);
+
+        } else {
+            LOG.info("Could not submit request to clear orders");
+            success = false;
+            //Communicate to the priceMonitorTask that the wall shift is over
+            strategy.getPriceMonitorTask().setWallsBeingShifted(false);
+            strategy.getSendLiquidityTask().setWallsBeingShifted(false);
+            LOG.error(deleteOrdersResponse.getError().toString());
+        }
 
         return success;
     }

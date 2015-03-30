@@ -18,19 +18,16 @@
 
 package com.nubits.nubot.options;
 
-import com.google.gson.*;
-import com.nubits.nubot.bot.Global;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-
 import com.nubits.nubot.notifications.MailNotifications;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.simple.JSONObject;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class NuBotOptions {
 
@@ -125,11 +122,6 @@ public class NuBotOptions {
     public boolean sendHipchat;
 
     /**
-     * TODO: describe this
-     */
-    public boolean aggregate;
-
-    /**
      * if set to true, will sync with remote NPT and reset orders often
      */
     public boolean multipleCustodians;
@@ -204,7 +196,7 @@ public class NuBotOptions {
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
                         double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
                         boolean sendHipchat,
-                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
+                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity,
                         double wallchangeThreshold, double spread) {
@@ -228,7 +220,6 @@ public class NuBotOptions {
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
-        this.aggregate = aggregate;
         this.multipleCustodians = multipleCustodians;
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
@@ -245,7 +236,7 @@ public class NuBotOptions {
                         String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
                         double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
                         int executeStrategyInterval, boolean sendHipchat,
-                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds, boolean aggregate,
+                        String sendMails, String mailRecipient, int emergencyTimeout, double keepProceeds,
                         boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
                         boolean distributeLiquidity) {
         this.dualSide = dualSide;
@@ -268,7 +259,6 @@ public class NuBotOptions {
         this.mailRecipient = mailRecipient;
         this.emergencyTimeout = emergencyTimeout;
         this.keepProceeds = keepProceeds;
-        this.aggregate = aggregate;
         this.multipleCustodians = multipleCustodians;
         this.maxSellVolume = maxSellVolume;
         this.maxBuyVolume = maxBuyVolume;
@@ -480,12 +470,8 @@ public class NuBotOptions {
         return keepProceeds;
     }
 
-      public String getNubitAddress() {
+    public String getNubitAddress() {
         return nubitAddress;
-    }
-
-    public boolean isAggregate() {
-        return aggregate;
     }
 
     public boolean isDistributeLiquidity() {
@@ -496,21 +482,20 @@ public class NuBotOptions {
         return this.spread;
     }
 
-    public String getMainFeed() {
-        return mainFeed;
+    public void setSpread(double spread) {
+        this.spread = spread;
     }
 
-
-    public void setWallchangeThreshold(double wallchangeThreshold) {
-        this.wallchangeThreshold = wallchangeThreshold;
+    public String getMainFeed() {
+        return mainFeed;
     }
 
     public double getWallchangeThreshold() {
         return this.wallchangeThreshold;
     }
 
-    public void setSpread(double spread) {
-        this.spread = spread;
+    public void setWallchangeThreshold(double wallchangeThreshold) {
+        this.wallchangeThreshold = wallchangeThreshold;
     }
 
     public ArrayList<String> getBackupFeedNames() {
@@ -537,13 +522,12 @@ public class NuBotOptions {
             //Replace sensitive information
             serializedOptionsJSON.replace("apisecret", "hidden");
             serializedOptionsJSON.replace("apikey", "hidden");
-            serializedOptionsJSON.replace("rpcpass","hidden");
+            serializedOptionsJSON.replace("rpcpass", "hidden");
 
             toRet = serializedOptionsJSON.toString();
+        } catch (org.json.simple.parser.ParseException e) {
+            LOG.error(e.toString());
         }
-        catch(org.json.simple.parser.ParseException e) {
-                LOG.error(e.toString());
-            }
 
         return toRet;
     }
