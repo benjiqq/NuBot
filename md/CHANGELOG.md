@@ -2,6 +2,7 @@
 
 
 #### New Features:
+  - Added Comkort exchange API support
   - Added a unique session id for each instance of the bot
   - Liquidityinfo identifier contains multi-tier informaiton
   - Added script to retrieve updated keystore from bitbucket repository
@@ -9,7 +10,6 @@
   - Added price tracker for HKD and PHP
   - Added price feeds for bitfinex
   - GetLastTrades overall report
-
 
 #### Improvements:
   - Ported the project to Gradle (dependencies management and build process)
@@ -36,7 +36,7 @@
 
 
 #### Bug fixes:
-  -
+  - Bitcoin.co.id Wrapper Fix
 
 ## v0.1.5b (2015-02-18)
 #### Bug fixes:

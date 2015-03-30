@@ -6,7 +6,7 @@
 | [BitcoinCoID](https://vip.bitcoin.co.id)    | live  |  https://vip.bitcoin.co.id |
 | [Bitspark](https://www.bitspark.io)    | live  |  https://www.bitspark.io |
 | [Poloniex](https://poloniex.com)    | live  |  https://poloniex.com |
-| [Comkort](https://comkort.com)    | in progress  |  https://comkort.com |
+| [Comkort](https://comkort.com)    | live  |  https://comkort.com |
 | [AltsTrade](https://alts.trade)    | in progress  |  https://alts.trade |
 | [Peatio]    | test exchange  |  live | https://178.62.140.24/ |
 
