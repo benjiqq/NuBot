@@ -341,7 +341,7 @@ public class ParseOptions {
         if (!containsIgnoreCase(optionsJSON, "backupfeeds"))
             throw new NuBotConfigException("backupfeed necessary parameter");
 
-        ArrayList<String> backupFeedNames = new ArrayList<>();
+        options.backupFeedNames = new ArrayList<>();
 
         //Iterate on backupFeeds
 
