@@ -21,12 +21,12 @@ package com.nubits.nubot.tasks;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotConnectionException;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.BidAskPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import com.nubits.nubot.utils.FileSystem;
@@ -47,56 +47,39 @@ import java.util.*;
  */
 public class PriceMonitorTriggerTask extends TimerTask {
 
-    private double wallchangeThreshold;
-
-    private double sellPriceUSD, buyPriceUSD;
-    private String pegPriceDirection;
-    private LastPrice currentWallPEGPrice;
-
-    private boolean wallsBeingShifted = false;
-
-    private BidAskPair bidask;
-
-    protected PriceFeedManager pfm = null;
-
-    //set up a Queue to hold the prices used to calculate the moving average of prices
-    protected Queue<Double> queueMA = new LinkedList<>();
-
+    private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
+    private static final int PRICE_PERCENTAGE = 10; //this is the percentage at which refresh action is taken
+    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
+    private static int SLEEP_COUNT = 0;
     private final int MOVING_AVERAGE_SIZE = 30; //this is how many elements the Moving average queue holds
-
-
     /**
      * threshold for signaling a deviation of prices
      */
     private final double DISTANCE_TRESHHOLD = 10;
-
+    private final int MAX_ATTEMPTS = 5;
+    protected PriceFeedManager pfm = null;
+    //set up a Queue to hold the prices used to calculate the moving average of prices
+    protected Queue<Double> queueMA = new LinkedList<>();
     protected LastPrice lastPrice;
     protected ArrayList<LastPrice> lastPrices;
+    private double wallchangeThreshold;
 
     //options
-
-    private static final int REFRESH_OFFSET = 1000; //this is how close to the refresh interval is considered a fail (millisecond)
-    private static final int PRICE_PERCENTAGE = 10; //this is the percentage at which refresh action is taken
-    private static int SLEEP_COUNT = 0;
+    private double sellPriceUSD, buyPriceUSD;
+    private String pegPriceDirection;
+    private LastPrice currentWallPEGPrice;
+    private boolean wallsBeingShifted = false;
+    private BidAskPair bidask;
     private StrategySecondaryPegTask strategy = null;
-    private final int MAX_ATTEMPTS = 5;
-
     private int count;
-
     private boolean isFirstTimeExecution = true;
-
-    private String wallshiftsFilePathCSV = Global.sessionLogFolder + "/" + Settings.WALLSHIFTS_FILENAME +".csv";
-    private String wallshiftsFilePathJSON = Global.sessionLogFolder + "/" + Settings.WALLSHIFTS_FILENAME +".json";
-
+    private String wallshiftsFilePathCSV = Global.sessionLogFolder + "/" + Settings.WALLSHIFTS_FILENAME + ".csv";
+    private String wallshiftsFilePathJSON = Global.sessionLogFolder + "/" + Settings.WALLSHIFTS_FILENAME + ".json";
     private String emailHistory = "";
-
     private Long currentTime = null;
-
-    private static final Logger LOG = LoggerFactory.getLogger(PriceMonitorTriggerTask.class.getName());
-
     private boolean first = true;
 
-    public void init(){
+    public void init() {
         File c = new File(this.wallshiftsFilePathCSV);
         if (!c.exists()) {
             try {
@@ -257,7 +240,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 // I am assuming that mainPrice is the first element of the list
                 if (sanityCheck(priceList, 0)) {
                     //mainPrice is reliable compared to the others
-                    this.updateLastPrice(priceList.get(0),priceList);
+                    this.updateLastPrice(priceList.get(0), priceList);
 
                 } else {
                     //mainPrice is not reliable compared to the others
@@ -275,7 +258,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
 
-                        this.updateLastPrice(goodPrice,priceList);
+                        this.updateLastPrice(goodPrice, priceList);
                     } else {
                         //None of the source are in accord with others.
                         //Try to send a notification
@@ -290,7 +273,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     double p2 = priceList.get(1).getPrice().getQuantity();
                     if (closeEnough(this.DISTANCE_TRESHHOLD, p1, p2)) {
 
-                        this.updateLastPrice(priceList.get(0),priceList);
+                        this.updateLastPrice(priceList.get(0), priceList);
                     } else {
                         //The two values are too unreliable
                         unableToUpdatePrice(priceList);
@@ -309,7 +292,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
 
-                        this.updateLastPrice(goodPrice,priceList);
+                        this.updateLastPrice(goodPrice, priceList);
                     } else {
                         //None of the source are in accord with others.
                         //Try to send a notification
@@ -398,7 +381,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         currentTime = System.currentTimeMillis();
     }
 
-    public void updateLastPrice(LastPrice lp,ArrayList<LastPrice> priceList) {
+    public void updateLastPrice(LastPrice lp, ArrayList<LastPrice> priceList) {
 
         //We need to fill up the moving average queue so that 30 data points exist.
         if (queueMA.size() < MOVING_AVERAGE_SIZE) {
@@ -443,7 +426,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //carry on with updating the wall price shift
         this.lastPrice = lp;
-        this.lastPrices = priceList ;
+        this.lastPrices = priceList;
 
         LOG.info("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode());
@@ -560,7 +543,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
 
-        LOG.info("New price computed [" + row+"]");
+        LOG.info("New price computed [" + row + "]");
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
@@ -610,7 +593,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     + "For each row the bot should have shifted the sell/buy walls.\n\n";
 
 
-            if(!Global.options.isMultipleCustodians()) {
+            if (!Global.options.isMultipleCustodians()) {
                 MailNotifications.send(Global.options.getMailRecipient(), title, tldr + emailHistory);
             }
         }
@@ -638,7 +621,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private void sendErrorNotification() {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
         String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
-                + " price. Please restart the bot and get in touch with Nu Dev team";
+                + " price. Please restart the bot and get in touch with Nu Dev team ";
+        message += "[<strong>" + Global.sessionId + "</strong>]";
         MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
         HipChatNotifications.sendMessageCritical(title + message);
         LOG.error(title + message);
@@ -741,6 +725,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
     protected void notifyDeviation(ArrayList<LastPrice> priceList) {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
         String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
+        message += "[<strong>" + Global.sessionId + "</strong>]";
+
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
             message += (tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
@@ -762,5 +748,5 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private void logWallShift(String wall_shift) {
         FileSystem.writeToFile(wall_shift, this.wallshiftsFilePathJSON, false);
     }
-    
+
 }
