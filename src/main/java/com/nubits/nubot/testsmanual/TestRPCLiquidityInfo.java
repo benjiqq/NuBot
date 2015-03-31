@@ -20,6 +20,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
@@ -33,27 +34,33 @@ import org.slf4j.LoggerFactory;
 
 public class TestRPCLiquidityInfo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
-    private static String ipTest = "127.0.0.1";
-    private static int portTest = 9091;
-    private static boolean verbose = false;
-    private static boolean useIdentifier = false;
-
     //define Logging by using predefined Settings which points to an XML
     static {
         System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
+    /**
+     * Configure tests
+     */
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/comkort.json";
+    private static String ipTest = "127.0.0.1";
+    private static int portTest = 9091;
+    private static boolean verbose = false;
+    private static boolean useIdentifier = false;
+
+
     public static void main(String[] args) {
 
         InitTests.setLoggingFilename(LOG);
+        InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Default values
         String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
         String user = Settings.NUD_RPC_USER;
         String pass = Settings.NUD_RPC_PASS;
-        double sell = 0;
-        double buy = 0;
+        double sell = 13.1;
+        double buy = 11.0;
         //java -jar testRPC user pass custodian sell buy
         if (args.length == 5) {
             LOG.info("Reading input parameters");
@@ -69,17 +76,10 @@ public class TestRPCLiquidityInfo {
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
-
         test.testCheckNudTask();
 
-        /*test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, CurrencyList.NBT_BTC, user, pass);
+        test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, CurrencyList.NBT_BTC, user, pass);
 
-        try {
-            Thread.sleep(2000);
-
-        } catch (InterruptedException ex) {
-            LOG.error("" +  ex);
-        }
         //test.testGetInfo();
         //test.testIsConnected();
 
@@ -88,7 +88,6 @@ public class TestRPCLiquidityInfo {
         //test.testGetLiquidityInfo();
         //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
         //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
-        */
 
 
     }
@@ -142,14 +141,17 @@ public class TestRPCLiquidityInfo {
 
     private void testCheckNudTask() {
         //Create a TaskManager and
-        Global.taskManager = new TaskManager();
+        Global.taskManager = new TaskManager(false);
         Global.taskManager.setNudTask();
         //Start checking for connection
         Global.taskManager.getCheckNudTask().start();
 
-
         //Wait a couple of seconds for the connectionThread to get live
-
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            LOG.error("" + ex);
+        }
     }
 
     private void testGetLiquidityInfo() {
