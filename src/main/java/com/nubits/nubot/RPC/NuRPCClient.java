@@ -93,14 +93,14 @@ public class NuRPCClient {
         }
 
 
-        LOG.info("RPC parameters " + params.toString());
+        LOG.debug("RPC parameters " + params.toString());
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
 
             if (json.get("null") == null) {
                 //Correct answer, try to getliquidityinfo
-                LOG.info("RPC : Liquidity info submitted correctly.");
+                LOG.debug("RPC : Liquidity info submitted correctly.");
                 JSONObject jo = new JSONObject();
                 jo.put("submitted", true);
                 return jo;
@@ -290,7 +290,7 @@ public class NuRPCClient {
             }
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
-            LOG.info("Entity = " + entityString);
+            LOG.debug("Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
             LOG.error(e.toString());

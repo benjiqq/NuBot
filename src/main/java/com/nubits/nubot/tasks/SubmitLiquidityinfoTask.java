@@ -44,7 +44,6 @@ import java.util.TimerTask;
 
 /**
  * Submit info via NuWalletRPC
- *
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
@@ -67,18 +66,18 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void initFiles() {
 
-         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME +".csv";
-         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
-         this.jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
+        this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".csv";
+        this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
+        this.jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
 
         //create json file if it doesn't already exist
         LOG.debug("init files");
         File jsonF1 = new File(this.jsonFile_orders);
         if (!jsonF1.exists()) {
-            try{
+            try {
                 jsonF1.createNewFile();
                 LOG.debug("created " + jsonF1);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error creating file " + jsonF1 + " " + e);
             }
 
@@ -91,10 +90,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         //create json file if it doesn't already exist
         File jsonF2 = new File(this.jsonFile_balances);
         if (!jsonF2.exists()) {
-            try{
+            try {
                 jsonF2.createNewFile();
                 LOG.debug("created " + jsonF2);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error creating file " + jsonF1 + " " + e);
             }
 
@@ -105,11 +104,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
 
         File of = new File(this.outputFile_orders);
-        if (!of.exists()){
-            try{
+        if (!of.exists()) {
+            try {
                 of.createNewFile();
                 LOG.debug("created " + of);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error creating file " + of + "  " + e);
             }
         }
@@ -121,8 +120,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     @Override
     public void run() {
         LOG.debug("Executing task : CheckOrdersTask ");
-        if(firstExecution)
-        {
+        if (firstExecution) {
             initFiles();
             firstExecution = false;
         }
@@ -135,8 +133,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             if (isFirstOrdersPlaced()) {
                 String response1 = reportTier1(); //active orders
                 String response2 = reportTier2(); //balance
-                if(Global.options.isSubmitliquidity()) {
-                    LOG.info("RPC Response : " + response1 + "\n" + response2);
+                if (Global.options.isSubmitliquidity()) {
+                    LOG.info("Liquidity info submitted:\n" + response1 + "\n" + response2);
                 }
             } else {
                 LOG.warn("Liquidity is not being sent : orders are not yet initialized");
@@ -164,7 +162,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         LOG.debug("Active orders : " + orderList.size());
 
         Iterator<Order> it = orderList.iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             Order o = it.next();
             LOG.debug("order: " + o.getDigest());
         }
@@ -377,11 +375,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             if (null == responseObject) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.info(responseObject.toJSONString());
+                LOG.debug(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
-                    LOG.info("RPC Liquidityinfo sent : "
-                            + "\nbuyside : " + buySide
-                            + "\nsellside : " + sellSide);
+                    LOG.debug("RPC Liquidityinfo sent : "
+                            + " buyside : " + buySide
+                            + " sellside : " + sellSide);
                     if (verbose) {
                         JSONObject infoObject = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar);
                         LOG.info("getliquidityinfo result : ");
