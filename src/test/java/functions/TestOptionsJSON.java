@@ -20,9 +20,8 @@ package functions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsDefault;
-import com.nubits.nubot.options.NuBotOptionsSerializer;
+import com.nubits.nubot.options.*;
+import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.utils.FileSystem;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
@@ -92,6 +91,18 @@ public class TestOptionsJSON extends TestCase {
             System.out.println(f);
             assertTrue(optionJson.containsKey(f));
         }
+
+
+        //this will throw a configexcpetion
+        /*NuBotOptions opt2 = null;
+        try{
+            opt2 = ParseOptions.parseOptionsFromJson(optionJson);
+        }catch (Exception e){
+            assertTrue(false);
+        }
+
+        assertTrue(opt2.getBackupFeedNames().get(0).equals(FeedFacade.CoinbasePriceFeed));*/
+
 
 
     }
