@@ -196,6 +196,8 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         tasks.propfile.execute()
 
+        tasks.cleanhtml.execute()
+
         println "finish distribution"
 
         copy {

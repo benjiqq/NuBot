@@ -20,28 +20,90 @@ package functions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsDefault;
-import com.nubits.nubot.options.NuBotOptionsSerializer;
+import com.nubits.nubot.options.*;
+import com.nubits.nubot.pricefeeds.FeedFacade;
+import com.nubits.nubot.utils.FileSystem;
 import junit.framework.TestCase;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.junit.Test;
 
 public class TestOptionsJSON extends TestCase {
 
     @Test
-    public void testGson(){
+    public void testToJson() {
         NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
         assertTrue(opt != null);
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
         gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
         assertTrue(parser != null);
-        try{
-            String js = parser.toJson(opt);
-        } catch(Exception e){
+
+        String jsonString = "";
+        try {
+            jsonString = parser.toJson(opt);
+        } catch (Exception e) {
             System.out.println(e);
             e.printStackTrace();
         }
+
+        assertTrue(jsonString.length() > 0);
+
+        JSONParser jsonparser = new JSONParser();
+        JSONObject optionJson = null;
+        try {
+            optionJson = (JSONObject) (jsonparser.parse(jsonString));
+        } catch (Exception e) {
+
+        }
+
+        String[] fields = {
+                "exchangename",
+                "apikey",
+                "apisecret",
+                "txfee",
+                "pair",
+                "dualside",
+                "multiplecustodians",
+                "executeorders",
+                "verbose",
+                "hipchat",
+                "mailnotifications",
+                "mailrecipient",
+                "emergencytimeout",
+                "keepproceeds",
+                "maxsellordervolume",
+                "maxbuyordervolume",
+                "priceincrement",
+                "submitliquidity",
+                "nubitaddress",
+                "nudip",
+                "nudport",
+                "rpcpass",
+                "rpcuser",
+                "wallchangethreshold",
+                "spread",
+                "mainfeed",
+                "backupfeeds"};
+
+        for (int i = 0; i < fields.length; i++){
+            String f = fields[i];
+            System.out.println(f);
+            assertTrue(optionJson.containsKey(f));
+        }
+
+
+        //this will throw a configexcpetion
+        /*NuBotOptions opt2 = null;
+        try{
+            opt2 = ParseOptions.parseOptionsFromJson(optionJson);
+        }catch (Exception e){
+            assertTrue(false);
+        }
+
+        assertTrue(opt2.getBackupFeedNames().get(0).equals(FeedFacade.CoinbasePriceFeed));*/
+
+
 
     }
 }
