@@ -29,7 +29,7 @@
 
           #logarea {
             width:800px;
-            height:200px;
+            height:400px;
             resize:none
           }
 
@@ -154,7 +154,9 @@
                     $("#maxsellordervolume").attr("value", data["maxsellordervolume"]);
                     $("#pair").attr("value", data["pair"]);
 
-                    $("#wallchangethreshold").attr("value", data["wallchangeThreshold"]);
+                    $("#wallchangethreshold").attr("value", data["wallchangethreshold"]);
+                    $("#spread").attr("value", data["spread"]);
+                    $("#mainfeed").attr("value", data["mainfeed"]);
 
                     $("#nubitaddress").attr("value", data["nubitaddress"]);
                     $("#nudport").attr("value", data["nudport"]);
@@ -170,7 +172,6 @@
                     $('#executeorders').attr('checked',data["executeorders"]);
                     $('#verbose').attr('checked',data["verbose"]);
                     $('#hipchat').attr('checked',data["hipchat"]);
-                    $('#secondarypeg').attr('checked',data["secondarypeg"]);
 
 
 
@@ -195,6 +196,8 @@
                 var nudport = $("#nudport").attr("value");
                 var rpcpass = $("#rpcpass").attr("value");
                 var rpcuser = $("#rpcuser").attr("value");
+
+                //var mainfeed = $("#mainfeed").attr("value");
 
                 //booleans
                 var submitliquidity = $('#submitliquidity').prop('checked');
