@@ -147,20 +147,20 @@
                     //string values
                console.log("data: " + data);
 
-                    $("#exchangename").attr("placeholder", data["exchangename"]);
-                    $("#apikey").attr("placeholder", data["apikey"]);
-                    $("#apisecret").attr("placeholder", data["apisecret"]);
-                    $("#maxbuyordervolume").attr("placeholder", data["maxbuyordervolume"]);
-                    $("#maxsellordervolume").attr("placeholder", data["maxsellordervolume"]);
-                    $("#pair").attr("placeholder", data["pair"]);
+                    $("#exchangename").attr("value", data["exchangename"]);
+                    $("#apikey").attr("value", data["apikey"]);
+                    $("#apisecret").attr("value", data["apisecret"]);
+                    $("#maxbuyordervolume").attr("value", data["maxbuyordervolume"]);
+                    $("#maxsellordervolume").attr("value", data["maxsellordervolume"]);
+                    $("#pair").attr("value", data["pair"]);
 
-                    $("#wallchangethreshold").attr("placeholder", data["wallchangeThreshold"]);
+                    $("#wallchangethreshold").attr("value", data["wallchangeThreshold"]);
 
-                    $("#nubitaddress").attr("placeholder", data["nubitaddress"]);
-                    $("#nudport").attr("placeholder", data["nudport"]);
-                    $("#rpcpass").attr("placeholder", data["rpcpass"]);
-                    $("#rpcuser").attr("placeholder", data["rpcuser"]);
-                    $('#mailrecipient').attr("placeholder", data["mailrecipient"]);
+                    $("#nubitaddress").attr("value", data["nubitaddress"]);
+                    $("#nudport").attr("value", data["nudport"]);
+                    $("#rpcpass").attr("value", data["rpcpass"]);
+                    $("#rpcuser").attr("value", data["rpcuser"]);
+                    $('#mailrecipient').attr("value", data["mailrecipient"]);
 
                     //booleans
 
@@ -185,16 +185,16 @@
 
                 //string values
 
-                var exchangename = $('#exchangename').attr('placeholder');
-                var apikey = $('#apikey').attr('placeholder');
-                var apisecret = $('#apisecret').attr('placeholder');
-                var maxbuyordervolume = $('#maxbuyordervolume').attr('placeholder');
-                var maxsellordervolume = $('#maxsellordervolume').attr('placeholder');
-                var pair = $("#pair").attr("placeholder");
-                var nubitaddress = $("#nubitaddress").attr("placeholder");
-                var nudport = $("#nudport").attr("placeholder");
-                var rpcpass = $("#rpcpass").attr("placeholder");
-                var rpcuser = $("#rpcuser").attr("placeholder");
+                var exchangename = $('#exchangename').attr('value');
+                var apikey = $('#apikey').attr('value');
+                var apisecret = $('#apisecret').attr('value');
+                var maxbuyordervolume = $('#maxbuyordervolume').attr('value');
+                var maxsellordervolume = $('#maxsellordervolume').attr('value');
+                var pair = $("#pair").attr("value");
+                var nubitaddress = $("#nubitaddress").attr("value");
+                var nudport = $("#nudport").attr("value");
+                var rpcpass = $("#rpcpass").attr("value");
+                var rpcuser = $("#rpcuser").attr("value");
 
                 //booleans
                 var submitliquidity = $('#submitliquidity').prop('checked');
@@ -203,7 +203,7 @@
                 var executeorders = $('#executeorders').prop('checked');
                 var verbose = $('#verbose').prop('checked');
                 var hipchat = $('#hipchat').prop('checked');
-                var mailrecipient =$('#mailrecipient').attr("placeholder");
+                var mailrecipient =$('#mailrecipient').attr("value");
 
 
                 var jsondata = JSON.stringify({

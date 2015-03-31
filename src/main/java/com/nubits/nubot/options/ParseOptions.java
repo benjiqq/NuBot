@@ -18,7 +18,9 @@
 
 package com.nubits.nubot.options;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -382,88 +384,21 @@ public class ParseOptions {
 
     }
 
-    //TODO: redundant. this handles webUI json parsing
     public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
 
-        String variableset = "none";
+
         NuBotOptions newopt = new NuBotOptions();
 
-        if (containsIgnoreCase(postJson, "exchangename")) {
-            newopt.exchangeName = "" + getIgnoreCase(postJson, "exchangename");
+        try {
+            //Check if NuBot has valid parameters and quit if it doesn't
+
+            newopt = ParseOptions.parseOptionsFromJson(postJson);
+            LOG.debug("pasre post opt: " + newopt);
+
+        } catch (NuBotConfigException e) {
+            //show error to user
+
         }
-
-        if (containsIgnoreCase(postJson, "apikey")) {
-            newopt.apiKey = "" + getIgnoreCase(postJson, "apikey");
-        }
-
-        if (containsIgnoreCase(postJson, "apisecret")) {
-            newopt.apiSecret = "" + getIgnoreCase(postJson, "apisecret");
-        }
-
-        if (containsIgnoreCase(postJson, "mailRecipient")) {
-            newopt.mailRecipient = "" + getIgnoreCase(postJson, "mailRecipient");
-        }
-
-        if (containsIgnoreCase(postJson, "dualside")) {
-            newopt.dualSide = (boolean) getIgnoreCase(postJson, "dualside");
-        }
-
-        if (containsIgnoreCase(postJson, "multiplecustodians")) {
-            newopt.multipleCustodians = (boolean) getIgnoreCase(postJson, "multiplecustodians");
-        }
-
-        if (containsIgnoreCase(postJson, "submitliquidity")) {
-            newopt.submitLiquidity = (boolean) getIgnoreCase(postJson, "submitliquidity");
-        }
-
-        if (containsIgnoreCase(postJson, "executeorders")) {
-            newopt.executeOrders = (boolean) getIgnoreCase(postJson, "executeorders");
-        }
-
-        if (containsIgnoreCase(postJson, "verbose")) {
-            newopt.verbose = (boolean) getIgnoreCase(postJson, "verbose");
-        }
-
-        if (containsIgnoreCase(postJson, "hipchat")) {
-            newopt.sendHipchat = (boolean) getIgnoreCase(postJson, "hipchat");
-        }
-
-        if (containsIgnoreCase(postJson, "nubitaddress")) {
-            newopt.nubitAddress = "" + getIgnoreCase(postJson, "nubitaddress");
-        }
-
-        if (containsIgnoreCase(postJson, "rpcUser")) {
-            newopt.rpcUser = "" + getIgnoreCase(postJson, "rpcUser");
-        }
-
-        if (containsIgnoreCase(postJson, "rpcPass")) {
-            newopt.rpcPass = "" + getIgnoreCase(postJson, "rpcPass");
-        }
-
-        if (containsIgnoreCase(postJson, "nudIp")) {
-            newopt.nudIp = "" + getIgnoreCase(postJson, "nudIp");
-        }
-
-        if (containsIgnoreCase(postJson, "sendMails")) {
-            newopt.sendMails = "" + getIgnoreCase(postJson, "sendMails");
-        }
-
-
-        if (postJson.containsKey("nudport")) {
-            try {
-                int newv = (new Integer("" + getIgnoreCase(postJson, "nudport"))).intValue();
-                newopt.setNudPort(newv);
-            } catch (Exception e) {
-                //TODO
-            }
-        }
-
-        if (postJson.containsKey("pair")) {
-            String p = "" + getIgnoreCase(postJson, "pair");
-            CurrencyPair newpair = CurrencyPair.getCurrencyPairFromString(p, "_");
-            newopt.setPair(newpair);
-        }
-
 
         return newopt;
     }
