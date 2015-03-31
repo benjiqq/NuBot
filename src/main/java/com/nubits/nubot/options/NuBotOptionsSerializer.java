@@ -20,9 +20,11 @@ package com.nubits.nubot.options;
 
 
 import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 
 public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
@@ -57,7 +59,9 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("wallchangethreshold", opt.wallchangeThreshold);
         root.addProperty("spread", opt.spread);
         root.addProperty("mainfeed", opt.mainFeed);
-        root.addProperty("backupfeeds", new Gson().toJson(opt.backupFeedNames));
+
+        String bfs = new Gson().toJson(opt.backupFeedNames,new TypeToken<ArrayList<String>>(){}.getType());
+        root.addProperty("backupfeeds", bfs);
 
         return root;
     }
