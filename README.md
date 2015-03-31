@@ -72,8 +72,10 @@ Alternative strategies  :
 
 #Under the hood
 
-##Adding support for an exchange
-*coming soon*
+##Supported exchanges 
+
+See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/EXCHANGES.md?at=master)
+
 ##Design and diagrams
 
 ###Sell-side logic
@@ -118,7 +120,6 @@ See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ea
 
 #Contribute
 See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CONTRIBUTE.md?at=master)
-
 
 #License
 NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
