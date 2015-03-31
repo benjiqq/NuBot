@@ -92,18 +92,11 @@ public class TestOptionsJSON extends TestCase {
             assertTrue(optionJson.containsKey(f));
         }
 
-
-        //this will throw a configexcpetion
-        /*NuBotOptions opt2 = null;
-        try{
-            opt2 = ParseOptions.parseOptionsFromJson(optionJson);
-        }catch (Exception e){
-            assertTrue(false);
-        }
-
-        assertTrue(opt2.getBackupFeedNames().get(0).equals(FeedFacade.CoinbasePriceFeed));*/
-
-
+        Object o = optionJson.get("backupfeeds");
+        String s = "" + o;
+        assertTrue(s.contains("btce"));
+        assertTrue(s.contains("blockchain"));
+        assertTrue(s.contains("coinmarketcap_no"));
 
     }
 }
