@@ -34,8 +34,9 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("exchangename", opt.exchangeName);
         root.addProperty("apikey", opt.apiKey);
         root.addProperty("apisecret", opt.apiSecret);
+        root.addProperty("txfee", opt.txFee);
+        root.addProperty("pair", opt.pair.toStringSep());
         root.addProperty("dualside", opt.dualSide);
-        root.addProperty("submitliquidity", opt.submitLiquidity);
         root.addProperty("multiplecustodians", opt.multipleCustodians);
         root.addProperty("executeorders", opt.executeOrders);
         root.addProperty("verbose", opt.verbose);
@@ -48,20 +49,16 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("maxsellordervolume", opt.maxSellVolume);
         root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
         root.addProperty("priceincrement", opt.priceIncrement);
+        root.addProperty("submitliquidity", opt.submitLiquidity);
         root.addProperty("nubitaddress", opt.nubitAddress);
-        root.addProperty("nudport", opt.nudPort);
         root.addProperty("nudip", opt.nudIp);
+        root.addProperty("nudport", opt.nudPort);
         root.addProperty("rpcpass", opt.rpcPass);
         root.addProperty("rpcuser", opt.rpcUser);
-        root.addProperty("mainFeed", opt.mainFeed);
         root.addProperty("wallchangethreshold", opt.wallchangeThreshold);
-        root.addProperty("txfee", opt.txFee);
-        root.addProperty("emergencytimeout", opt.emergencyTimeout);
         root.addProperty("spread", opt.spread);
         root.addProperty("mainfeed", opt.mainFeed);
         root.addProperty("backupfeeds", new Gson().toJson(opt.backupFeedNames));
-
-        root.addProperty("pair", opt.pair.toStringSep());
 
         return root;
     }
