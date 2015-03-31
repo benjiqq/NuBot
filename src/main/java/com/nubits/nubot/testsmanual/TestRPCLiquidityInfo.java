@@ -20,10 +20,8 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
@@ -53,6 +51,7 @@ public class TestRPCLiquidityInfo {
     public static void main(String[] args) {
 
         InitTests.setLoggingFilename(LOG);
+
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Default values
@@ -78,7 +77,7 @@ public class TestRPCLiquidityInfo {
 
         test.testCheckNudTask();
 
-        test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, CurrencyList.NBT_BTC, user, pass);
+        Utils.installKeystore(true);
 
         //test.testGetInfo();
         //test.testIsConnected();
@@ -128,17 +127,6 @@ public class TestRPCLiquidityInfo {
         LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
     }
 
-    private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
-        String folderName = "tests_" + System.currentTimeMillis() + "/";
-
-        Utils.installKeystore(true);
-
-        String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
-
-        //Create the client
-        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, useIdentifier, custodian, pair, exchangeName);
-    }
-
     private void testCheckNudTask() {
         //Create a TaskManager and
         Global.taskManager = new TaskManager(false);
@@ -148,7 +136,7 @@ public class TestRPCLiquidityInfo {
 
         //Wait a couple of seconds for the connectionThread to get live
         try {
-            Thread.sleep(2000);
+            Thread.sleep(4000);
         } catch (InterruptedException ex) {
             LOG.error("" + ex);
         }

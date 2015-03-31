@@ -192,7 +192,7 @@ public class NuRPCClient {
 
     public void checkConnection() {
         boolean conn = false;
-        JSONObject responseObject = Global.rpcClient.getInfo();
+        JSONObject responseObject = this.getInfo();
         if (responseObject.get("blocks") != null) {
             conn = true;
         }
@@ -205,7 +205,6 @@ public class NuRPCClient {
             }
         }
         this.setConnected(conn);
-
     }
 
     public boolean isConnected() {
