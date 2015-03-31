@@ -179,6 +179,7 @@ public class NuRPCClient {
      return (String)json.get("result");
      }
      */
+
     public JSONObject getInfo() {
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GET_INFO, null);
         if (json != null) {
@@ -309,7 +310,7 @@ public class NuRPCClient {
 
     private String generateIdentifier(int tier) {
         //tier:pair:exchange:sessionid
-        //Example : 2_BTCNBT_ccedk_0.1.5|1424193501841|788606
+        //Example : 2:BTCNBT:ccedk:0.1.5|1424193501841|788606
 
         String separator = ":";
 
