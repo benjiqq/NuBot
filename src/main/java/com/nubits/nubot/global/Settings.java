@@ -116,14 +116,14 @@ public class Settings {
     /**
      * the relative path for resources
      */
-    public final static String RES_PATH = "res/";
+    public final static String RES_PATH = "res";
 
-    public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
+    public final static String KEYSTORE_PATH = RES_PATH + "/" + "ssl/nubot_keystore.jks";
 
     /**
      * folder containing resources needed at runtime
      */
-    public final static String FROZEN_FUNDS_PATH = RES_PATH + "frozen-funds/";
+    public final static String FROZEN_FUNDS_PATH = RES_PATH + "/" + "frozen-funds/";
 
     public final static String SESSION_LOG = "session_";
 
@@ -137,7 +137,7 @@ public class Settings {
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
-    public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
+    public final static String CURRENCY_FILE_PATH = RES_PATH + "/" + "currencies.csv";
 
 
     public final static String APP_FOLDER = ".nubot";
