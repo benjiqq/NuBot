@@ -518,7 +518,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                             Thread.sleep(wait);
                             areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
-                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
+                            if (areAllOrdersCanceled) {
+                                LOG.warn("All orders canceled succefully");
+                            } else {
+                                LOG.error("There was a problem cancelling the orders");
+                            }
                             count += wait;
                             timedOut = count > timeout;
 
