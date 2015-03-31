@@ -309,13 +309,14 @@ public class NuRPCClient {
 
     private String generateIdentifier(int tier) {
         //tier:pair:exchange:sessionid
-        //Example : 2:BTCNBT:ccedk:0.1.5|1424193501841|788606
+        //Example : 2:BTCNBT:ccedk:0.1.5|1424193501841|d5ef77
 
         String separator = ":";
-
-        return tier + separator
+        String identifier = tier + separator
                 + pair.toString().toUpperCase() + separator
                 + exchangeName + separator
                 + Global.sessionId;
+        LOG.debug("liquidity identifier = " + identifier);
+        return identifier;
     }
 }
