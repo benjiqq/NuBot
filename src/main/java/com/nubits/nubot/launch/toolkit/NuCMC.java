@@ -55,7 +55,7 @@ public class NuCMC {
 
 
         String folderName = "NuCMC_" + System.currentTimeMillis() + "/";
-        String logsFolder = Settings.LOGS_PATH + folderName;
+        String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
 

@@ -58,7 +58,7 @@ public class NuLastTrades {
         NuLastTrades app = new NuLastTrades();
 
         String folderName = "NuLastTrades_" + System.currentTimeMillis() + "/";
-        String logsFolder = Settings.LOGS_PATH + folderName;
+        String logsFolder = Settings.LOGS_PATH + "/" + folderName;
 
         //Create log dir
         FileSystem.mkdir(logsFolder);

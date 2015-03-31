@@ -45,10 +45,6 @@ public class Settings {
      * [seconds] Submit liquidity info
      *
      */
-    public static final String NUD_RPC_USER = "nubotTestUser";
-    public static final String NUD_RPC_PASS = "nubotTestPass";
-    public static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
-
 
     /**
      * [seconds] Execute StrategyTask
@@ -89,7 +85,7 @@ public class Settings {
 
     // ------ Paths and filenames
     // Refer to md/FILES-AND-FOLDERS.md for the convention of where to place files and folders
-
+    // In defining folder names, omit the "/" at the end
     //--- Logging ---
 
     /**
@@ -110,24 +106,24 @@ public class Settings {
     /**
      * main logs file. also defined in logback.xml
      */
-    public final static String LOGS_PATH = "logs/";
+    public final static String LOGS_PATH = "logs";
 
     /**
      * testlog directory. also defined in test_logback.xml
      */
-    public static final String TEST_LOGFOLDER = LOGS_PATH + "tests";
+    public static final String TEST_LOGFOLDER = LOGS_PATH + "/" + "tests";
 
     /**
      * the relative path for resources
      */
-    public final static String RES_PATH = "res/";
+    public final static String RES_PATH = "res";
 
-    public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
+    public final static String KEYSTORE_PATH = RES_PATH + "/" + "ssl/nubot_keystore.jks";
 
     /**
      * folder containing resources needed at runtime
      */
-    public final static String FROZEN_FUNDS_PATH = RES_PATH + "frozen-funds/";
+    public final static String FROZEN_FUNDS_PATH = RES_PATH + "/" + "frozen-funds/";
 
     public final static String SESSION_LOG = "session_";
 
@@ -135,13 +131,13 @@ public class Settings {
 
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
 
-    public final static String WALLSHIFTS_FILENAME =  "wall_shifts"; //Filename for recording wallshifts
+    public final static String WALLSHIFTS_FILENAME = "wall_shifts"; //Filename for recording wallshifts
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
-    public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
+    public final static String CURRENCY_FILE_PATH = RES_PATH + "/" + "currencies.csv";
 
 
     public final static String APP_FOLDER = ".nubot";
