@@ -19,10 +19,7 @@
 package com.nubits.nubot.options;
 
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
@@ -53,14 +50,16 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("priceincrement", opt.priceIncrement);
         root.addProperty("nubitaddress", opt.nubitAddress);
         root.addProperty("nudport", opt.nudPort);
-        root.addProperty("nudIp", opt.nudIp);
+        root.addProperty("nudip", opt.nudIp);
         root.addProperty("rpcpass", opt.rpcPass);
         root.addProperty("rpcuser", opt.rpcUser);
         root.addProperty("mainFeed", opt.mainFeed);
-        root.addProperty("wallchangeThreshold", opt.wallchangeThreshold);
-        root.addProperty("mailnotifications", opt.sendMails);
-        root.addProperty("txFee", opt.txFee);
-        root.addProperty("emergencyTimeout", opt.emergencyTimeout);
+        root.addProperty("wallchangethreshold", opt.wallchangeThreshold);
+        root.addProperty("txfee", opt.txFee);
+        root.addProperty("emergencytimeout", opt.emergencyTimeout);
+        root.addProperty("spread", opt.spread);
+        root.addProperty("mainfeed", opt.mainFeed);
+        root.addProperty("backupfeeds", new Gson().toJson(opt.backupFeedNames));
 
         root.addProperty("pair", opt.pair.toStringSep());
 
