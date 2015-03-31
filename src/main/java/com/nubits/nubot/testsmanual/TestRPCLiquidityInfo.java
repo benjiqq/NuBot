@@ -20,7 +20,6 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,8 +29,6 @@ import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 
 public class TestRPCLiquidityInfo {
@@ -68,8 +65,7 @@ public class TestRPCLiquidityInfo {
         }
 
         Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
-                user, pass, true, true,
-                custodian, CurrencyList.NBT_BTC , "");
+                user, pass, true, custodian, CurrencyList.NBT_BTC, "");
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
@@ -141,7 +137,7 @@ public class TestRPCLiquidityInfo {
         String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
 
         //Create the client
-        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodian, pair, exchangeName);
+        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, useIdentifier, custodian, pair, exchangeName);
     }
 
     private void testCheckNudTask() {
