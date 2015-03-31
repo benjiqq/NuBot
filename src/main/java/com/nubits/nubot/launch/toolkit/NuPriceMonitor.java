@@ -28,19 +28,18 @@ import com.nubits.nubot.tasks.NuPriceMonitorTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.Utils;
-
-import java.io.IOException;
-import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class NuPriceMonitor {
 
+    public static final String HEADER = "timestamp,source,crypto,price,currency,sellprice,sellpricedoubleside,buyprice,otherfeeds\n";
     private static final Logger LOG = LoggerFactory.getLogger(NuPriceMonitor.class.getName());
     private static final String USAGE_STRING = "java  -jar NuPriceMonitor <path/to/options.json>";
-    public static final String HEADER = "timestamp,source,crypto,price,currency,sellprice,sellpricedoubleside,buyprice,otherfeeds\n";
     private static Thread mainThread;
     //Options from json
     int refreshTime;
@@ -56,7 +55,7 @@ public class NuPriceMonitor {
         mainThread = Thread.currentThread();
 
         String folderName = "NuPriceMonitor_" + System.currentTimeMillis() + "/";
-        String logsFolder = Settings.LOGS_PATH + folderName;
+        String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
         FileSystem.mkdir(logsFolder);
 
@@ -71,15 +70,33 @@ public class NuPriceMonitor {
         }
     }
 
+    private static void createShutDownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Exiting...");
+                mainThread.interrupt();
+                try {
+                    Global.taskManager.stopAll();
+                } catch (IllegalStateException e) {
+
+                }
+
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }));
+    }
+
     private void exec() {
         //Creating options
         if (readOptions()) {
             init();
 
             PriceFeedManager pfm = null;
-            try{
+            try {
                 pfm = new PriceFeedManager(mainFeed, backupFeedNames, pair);
-            }catch(Exception e){
+            } catch (Exception e) {
 
             }
 
@@ -135,7 +152,6 @@ public class NuPriceMonitor {
             LOG.error("Problem while reading options from " + optionsPath);
             System.exit(0);
         }
-
 
 
     }
@@ -210,24 +226,6 @@ public class NuPriceMonitor {
 
         ok = true;
         return ok;
-    }
-
-    private static void createShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("Exiting...");
-                mainThread.interrupt();
-                try{
-                    Global.taskManager.stopAll();
-                }catch(IllegalStateException e){
-
-                }
-
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
     }
 
     private void init() {

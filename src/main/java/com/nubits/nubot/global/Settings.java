@@ -85,7 +85,7 @@ public class Settings {
 
     // ------ Paths and filenames
     // Refer to md/FILES-AND-FOLDERS.md for the convention of where to place files and folders
-
+    // In defining folder names, omit the "/" at the end
     //--- Logging ---
 
     /**
@@ -106,12 +106,12 @@ public class Settings {
     /**
      * main logs file. also defined in logback.xml
      */
-    public final static String LOGS_PATH = "logs/";
+    public final static String LOGS_PATH = "logs";
 
     /**
      * testlog directory. also defined in test_logback.xml
      */
-    public static final String TEST_LOGFOLDER = LOGS_PATH + "tests";
+    public static final String TEST_LOGFOLDER = LOGS_PATH + "/" + "tests";
 
     /**
      * the relative path for resources
