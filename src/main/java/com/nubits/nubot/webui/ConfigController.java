@@ -16,6 +16,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static spark.Spark.get;
 import static spark.Spark.post;
@@ -29,6 +31,29 @@ public class ConfigController {
     private String configfile;
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
+
+    private void saveConfig(NuBotOptions newopt){
+
+        LOG.info("parsed: new opt: " + newopt);
+
+        try {
+            SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
+        } catch(IOException e){
+            LOG.info("error with backup " + e);
+        }
+
+        Global.options = newopt;
+
+        String saveTo = this.configDir + File.separator + this.configfile;
+        String js = SaveOptions.jsonPretty(Global.options);
+        LOG.info("new opt: " + js);
+
+        try {
+            SaveOptions.saveOptionsPretty(Global.options, saveTo);
+        }catch(Exception e){
+            LOG.info("error saving " + e);
+        }
+    }
 
     public ConfigController(String endpoint, String configDir, String configfile) {
 
@@ -63,42 +88,31 @@ public class ConfigController {
 
             LOG.info("the JSON of the post " + postJson);
 
-            //TODO: test validity of posted options
-            boolean valid = true;
+            boolean success = true;
 
             NuBotOptions newopt = null;
+            Map opmap = new HashMap();
             try{
                 newopt = ParseOptions.parsePost(postJson);
             }catch(Exception e){
                 //handle errors
+                success = false;
+                opmap.put("error", e);
+            }
+
+            opmap.put("success", success);
+
+            if (success) {
+                saveConfig(newopt);
+                opmap.put("error", "none");
             }
 
             //TODO: if bot is running needs to handled safely
 
-            LOG.info("parsed: new opt: " + newopt);
+            String json = new Gson().toJson(opmap);
 
-            try {
-                SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
-            } catch(IOException e){
-                LOG.info("error with backup " + e);
-            }
+            return json;
 
-            Global.options = newopt;
-
-            String saveTo = this.configDir + File.separator + this.configfile;
-            String js = SaveOptions.jsonPretty(Global.options);
-            LOG.info("new opt: " + js);
-
-            try {
-                SaveOptions.saveOptionsPretty(Global.options, saveTo);
-            }catch(Exception e){
-                LOG.info("error saving " + e);
-            }
-
-            //TODO: return as json for Frontend
-            boolean success = true;
-            LOG.info("success " + success);
-            return "success: " + success;
         });
 
     }

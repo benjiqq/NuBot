@@ -39,7 +39,6 @@
 <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
 <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
-
       <script>
 
               var host = "localhost";
@@ -189,45 +188,61 @@
                 var exchangename = $('#exchangename').attr('value');
                 var apikey = $('#apikey').attr('value');
                 var apisecret = $('#apisecret').attr('value');
-                var maxbuyordervolume = $('#maxbuyordervolume').attr('value');
-                var maxsellordervolume = $('#maxsellordervolume').attr('value');
+                //txfee
                 var pair = $("#pair").attr("value");
-                var nubitaddress = $("#nubitaddress").attr("value");
-                var nudport = $("#nudport").attr("value");
-                var rpcpass = $("#rpcpass").attr("value");
-                var rpcuser = $("#rpcuser").attr("value");
-
-                //var mainfeed = $("#mainfeed").attr("value");
-
-                //booleans
-                var submitliquidity = $('#submitliquidity').prop('checked');
                 var dualside = $('#dualside').prop('checked');
                 var multiplecustodians = $('#multiplecustodians').prop('checked');
                 var executeorders = $('#executeorders').prop('checked');
                 var verbose = $('#verbose').prop('checked');
                 var hipchat = $('#hipchat').prop('checked');
                 var mailrecipient =$('#mailrecipient').attr("value");
+                //("emergencytimeout", opt.emergencyTimeout);
+                //("keepproceeds", opt.keepProceeds);
+                var maxsellordervolume = $('#maxsellordervolume').attr('value');
+                var maxbuyordervolume = $('#maxbuyordervolume').attr('value');
+                //priceincrement
+                var submitliquidity = $('#submitliquidity').prop('checked');
+                var nubitaddress = $("#nubitaddress").attr("value");
+                //root.addProperty("nudip", opt.nudIp);
+                var nudport = $("#nudport").attr("value");
+                var rpcpass = $("#rpcpass").attr("value");
+                var rpcuser = $("#rpcuser").attr("value");
+                var wallchangethreshold = $("#wallchangethreshold).attr("value");
+                  //root.addProperty("spread", opt.spread);
+                var mainfeed = $("#mainfeed").attr("value");
+                //root.addProperty("backupfeeds", bfs);
+
+                //valid post?
 
 
                 var jsondata = JSON.stringify({
                     "exchangename": exchangename,
                     "apikey": apikey,
                     "apisecret": apisecret,
-                    "maxbuyordervolume": maxbuyordervolume,
-                    "maxsellordervolume": maxsellordervolume,
+                    //txfee
                     "pair": pair,
-                    "mailrecipient": mailrecipient,
-                    "nubitaddress": nubitaddress,
-                    "nudport": nudport,
-                    "rpcpass": rpcpass,
-                    "rpcuser": rpcuser,
-
-                    "submitliquidity": submitliquidity,
                     "dualside": dualside,
                     "multiplecustodians": multiplecustodians,
                     "executeorders": executeorders,
                     "verbose": verbose,
-                    "hipchat": hipchat
+                    "hipchat": hipchat,
+                    "mailrecipient": mailrecipient,
+                    //emergencytimeout
+                    //keepproceeds
+                    "maxsellordervolume": maxsellordervolume,
+                    "maxbuyordervolume": maxbuyordervolume,
+                    //priceincrement
+                    "submitliquidity": submitliquidity,
+                    "nubitaddress": nubitaddress,
+                    //nudip
+                    "nudport": nudport,
+                    "rpcpass": rpcpass,
+                    "rpcuser": rpcuser,
+                    "wallchangethreshold": wallchangethreshold,
+                    //spread
+                    "mainfeed": mainfeed
+                    //backupfeeds
+
                 });
 
 

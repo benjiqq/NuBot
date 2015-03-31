@@ -28,7 +28,6 @@ public class UiServer {
 
         LOG.info("launching on http://localhost:" + port);
 
-
         //binds GET and POST
         LayoutTemplateEngine tmpl = new LayoutTemplateEngine(Settings.HTML_FOLDER);
 
