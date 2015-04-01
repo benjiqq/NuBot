@@ -31,12 +31,6 @@ import java.util.concurrent.DelayQueue;
 
 /**
  * Demonstration of a simple FIFO queue to execute orders
- * <p>
- * The java.util.Queue interface is a subtype of the java.util.Collection interface.
- * It represents an ordered list of objects just like a List, but its intended use is slightly different.
- * <p>
- * A queue is designed to have elements inserted at the end of the queue,
- * and elements removed from the beginning of the queue. Just like a queue in a supermarket.
  */
 public class TestQueue {
     //define Logging by using predefined Settings which points to an XML
