@@ -45,6 +45,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Created by woolly_sammoth on 21/10/14.
@@ -59,6 +60,7 @@ public class AllCoinWrapper implements TradeInterface {
     private String checkConnectionUrl = "https://www.allcoin.com/";
     private final String SIGN_HASH_FUNCTION = "MD5";
     private final String ENCODING = "UTF-8";
+
     //Entry Points
     private final String API_BASE_URL = "https://www.allcoin.com/api2/";
     private final String API_AUTH_URL = "https://www.allcoin.com/api2/auth_api/";
@@ -76,6 +78,10 @@ public class AllCoinWrapper implements TradeInterface {
     private final String TOKEN_BAL_AVAIL = "balances_available";
     private final String TOKEN_BAL_HOLD = "balance_hold";
     private final String TOKEN_ORDER_ID = "order_id";
+
+    //Pool queue
+    protected long lastRequest = 0;
+    protected final long MIN_SPACING = 500;
     //Errors
     ErrorManager errors = new ErrorManager();
 
@@ -95,18 +101,27 @@ public class AllCoinWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
+
         String queryResult = query(url, method, query_args, isGet);
-        if (queryResult == null) {
+        if (queryResult == null)
+
+        {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+
+        if (queryResult.equals(TOKEN_BAD_RETURN))
+
+        {
             apiResponse.setError(errors.noConnectionError);
             return apiResponse;
         }
+
         JSONParser parser = new JSONParser();
 
-        try {
+        try
+
+        {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
             int code = 0;
             try {
@@ -133,11 +148,16 @@ public class AllCoinWrapper implements TradeInterface {
                 LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
-        } catch (ParseException pe) {
+        } catch (
+                ParseException pe
+                )
+
+        {
             LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
+
         return apiResponse;
     }
 
@@ -305,14 +325,29 @@ public class AllCoinWrapper implements TradeInterface {
     @Override
     public String query(String url, String method, TreeMap<String, String> args, boolean isGet) {
         AllCoinService query = new AllCoinService(url, method, args, keys);
-        String queryResult;
+        long now = System.currentTimeMillis();
+        long sleeptime = 0;
+        if (now - lastRequest < MIN_SPACING) {
+            sleeptime = MIN_SPACING - (now - lastRequest);
+        }
+        lastRequest = System.currentTimeMillis();
+
+        Future<String> queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            queryResult = query.executeQueryAsync(true, isGet, sleeptime);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to AllCoin");
-            queryResult = TOKEN_BAD_RETURN;
+            return TOKEN_BAD_RETURN;
         }
-        return queryResult;
+        try {
+            return queryResult.get();
+        } catch (InterruptedException e) {
+            LOG.error(e.toString());
+            return TOKEN_BAD_RETURN;
+        } catch (ExecutionException e) {
+            LOG.error(e.toString());
+            return TOKEN_BAD_RETURN;
+        }
     }
 
     @Override
@@ -694,6 +729,8 @@ public class AllCoinWrapper implements TradeInterface {
         protected ApiKeys keys;
         protected String method;
 
+        private final ExecutorService pool = Executors.newFixedThreadPool(10);
+
         public AllCoinService(String url, String method, TreeMap<String, String> args, ApiKeys keys) {
             this.url = url;
             this.args = args;
@@ -707,118 +744,139 @@ public class AllCoinWrapper implements TradeInterface {
             this.args = args;
         }
 
+        public Future<String> executeQueryAsync(boolean needAuth, boolean isGet, final long sleeptime) {
+
+            LOG.debug("sleeptime = " + sleeptime);
+
+            final long finalSleeptime = sleeptime;
+            return pool.submit(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    Thread.sleep(sleeptime);
+
+                    HttpsURLConnection connection = null;
+                    URL queryUrl = null;
+                    String post_data = "";
+                    boolean httpError = false;
+                    String output;
+                    int response = 200;
+                    String answer = null;
+
+                    try {
+                        queryUrl = new URL(url);
+                    } catch (MalformedURLException mal) {
+                        LOG.error(mal.toString());
+                        return null;
+                    }
+
+                    if (needAuth) {
+                        //add the access key, secret key, timestamp, method and sign to the args
+                        args.put("access_key", keys.getApiKey());
+                        args.put("secret_key", keys.getPrivateKey());
+                        args.put("created", Objects.toString(System.currentTimeMillis() / 1000L));
+                        args.put("method", method);
+                        //the sign is the MD5 hash of all arguments so far in alphabetical order
+                        args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
+
+                        post_data = TradeUtils.buildQueryString(args, ENCODING);
+                    } else {
+                        post_data = TradeUtils.buildQueryString(args, ENCODING);
+                        try {
+                            queryUrl = new URL(queryUrl + "?" + post_data);
+                        } catch (MalformedURLException mal) {
+                            LOG.error(mal.toString());
+                            return null;
+                        }
+                    }
+
+                    try {
+                        connection = (HttpsURLConnection) queryUrl.openConnection();
+                        connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                        connection.setRequestProperty("User-Agent", Settings.APP_NAME);
+
+                        connection.setDoOutput(true);
+                        connection.setDoInput(true);
+
+                        if (isGet) {
+                            connection.setRequestMethod("GET");
+                        } else {
+                            connection.setRequestMethod("POST");
+                            DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+                            os.writeBytes(post_data);
+                            os.flush();
+                            os.close();
+                        }
+                    } catch (ProtocolException pe) {
+                        LOG.error(pe.toString());
+                        return null;
+                    } catch (IOException io) {
+                        LOG.error((io.toString()));
+                        return null;
+                    }
+
+
+                    BufferedReader br = null;
+                    try {
+                        if (connection.getResponseCode() >= 400) {
+                            httpError = true;
+                            response = connection.getResponseCode();
+                            br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                        } else {
+                            answer = "";
+                            br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        }
+                    } catch (IOException io) {
+                        LOG.error(io.toString());
+                        return null;
+                    }
+
+                    if (httpError) {
+                        LOG.error("Query to : " + url + " (method = " + method + " )"
+                                + "\nData : \" + post_data"
+                                + "\nHTTP Response : " + Objects.toString(response));
+                    }
+
+                    try {
+                        while ((output = br.readLine()) != null) {
+                            answer += output;
+                        }
+                    } catch (IOException io) {
+                        LOG.error(io.toString());
+                        return null;
+                    }
+
+                    /*
+
+                     if (httpError) {
+                     JSONParser parser = new JSONParser();
+                     try {
+                     JSONObject obj = (JSONObject) (parser.parse(answer));
+                     answer = (String) obj.get(TOKEN_ERR);
+                     } catch (ParseException pe) {
+                     LOG.error(pe.toStringSep());
+                     }
+                     }
+                     */
+
+                    connection.disconnect();
+                    connection = null;
+
+                    return answer;
+                }
+            });
+        }
+
         @Override
         public String executeQuery(boolean needAuth, boolean isGet) {
-
-            HttpsURLConnection connection = null;
-            URL queryUrl = null;
-            String post_data = "";
-            boolean httpError = false;
-            String output;
-            int response = 200;
-            String answer = null;
-
+            String toRet = "";
             try {
-                queryUrl = new URL(url);
-            } catch (MalformedURLException mal) {
-                LOG.error(mal.toString());
-                return null;
+                toRet = executeQueryAsync(needAuth, isGet, 0).get(); //call sync
+            } catch (InterruptedException e) {
+                LOG.error(e.toString());
+            } catch (ExecutionException e) {
+                LOG.error(e.toString());
             }
-
-            if (needAuth) {
-                //add the access key, secret key, timestamp, method and sign to the args
-                args.put("access_key", keys.getApiKey());
-                args.put("secret_key", keys.getPrivateKey());
-                args.put("created", Objects.toString(System.currentTimeMillis() / 1000L));
-                args.put("method", method);
-                //the sign is the MD5 hash of all arguments so far in alphabetical order
-                args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
-
-                post_data = TradeUtils.buildQueryString(args, ENCODING);
-            } else {
-                post_data = TradeUtils.buildQueryString(args, ENCODING);
-                try {
-                    queryUrl = new URL(queryUrl + "?" + post_data);
-                } catch (MalformedURLException mal) {
-                    LOG.error(mal.toString());
-                    return null;
-                }
-            }
-
-            try {
-                connection = (HttpsURLConnection) queryUrl.openConnection();
-                connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
-
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-
-                if (isGet) {
-                    connection.setRequestMethod("GET");
-                } else {
-                    connection.setRequestMethod("POST");
-                    DataOutputStream os = new DataOutputStream(connection.getOutputStream());
-                    os.writeBytes(post_data);
-                    os.flush();
-                    os.close();
-                }
-            } catch (ProtocolException pe) {
-                LOG.error(pe.toString());
-                return null;
-            } catch (IOException io) {
-                LOG.error((io.toString()));
-                return null;
-            }
-
-
-            BufferedReader br = null;
-            try {
-                if (connection.getResponseCode() >= 400) {
-                    httpError = true;
-                    response = connection.getResponseCode();
-                    br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                } else {
-                    answer = "";
-                    br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                }
-            } catch (IOException io) {
-                LOG.error(io.toString());
-                return null;
-            }
-
-            if (httpError) {
-                LOG.error("Query to : " + url + " (method = " + method + " )"
-                        + "\nData : \" + post_data"
-                        + "\nHTTP Response : " + Objects.toString(response));
-            }
-
-            try {
-                while ((output = br.readLine()) != null) {
-                    answer += output;
-                }
-            } catch (IOException io) {
-                LOG.error(io.toString());
-                return null;
-            }
-
-            /*
-
-             if (httpError) {
-             JSONParser parser = new JSONParser();
-             try {
-             JSONObject obj = (JSONObject) (parser.parse(answer));
-             answer = (String) obj.get(TOKEN_ERR);
-             } catch (ParseException pe) {
-             LOG.error(pe.toStringSep());
-             }
-             }
-             */
-
-
-            connection.disconnect();
-            connection = null;
-
-            return answer;
+            return toRet;
         }
 
         @Override

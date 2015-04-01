@@ -43,7 +43,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/comkort.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/allcoin.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -66,7 +66,7 @@ public class TestWrappers {
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
         //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
-        WrapperTestUtils.testBuy(0.003, 0.00100, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.003, 0.00100, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("123199680", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
@@ -81,6 +81,36 @@ public class TestWrappers {
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
 
         //WrapperTestUtils.testClearAllOrders(testPair);
+
+
+        //-------- Stress test start ---------
+        /*
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    WrapperTestUtils.testGetActiveOrders();
+                }
+            }
+        });
+
+        Thread t2 = new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    WrapperTestUtils.testClearAllOrders(testPair);
+                }
+            }
+        });
+
+
+        t.start();
+        t2.start();
+
+        for (int i = 0; i < 100; i++) {
+            WrapperTestUtils.testGetAvailableBalance(testCurrency);
+        }
+
+        //-------- Stress test end ---------
+        */
 
 
         //Create multiple orders for testing
@@ -109,15 +139,13 @@ public class TestWrappers {
         System.exit(0);
     }
 
-    private static void init()
-    {
+    private static void init() {
         InitTests.setLoggingFilename(LOG);
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Load keystore
         boolean trustAll = false;
-        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO))
-        {
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             trustAll = true;
         }
         InitTests.loadKeystore(trustAll);
