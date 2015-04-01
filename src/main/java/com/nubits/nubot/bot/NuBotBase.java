@@ -344,6 +344,8 @@ public abstract class NuBotBase {
                 }
             }
         }
+
+        LOG.info("Logs of this session saved in " + Global.sessionPath);
     }
 
 }
