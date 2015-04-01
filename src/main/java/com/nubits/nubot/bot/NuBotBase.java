@@ -81,13 +81,12 @@ public abstract class NuBotBase {
         }
 
         setupLog();
-        
+
         setupSSL();
 
         setupExchange();
 
     }
-
 
 
     /**
@@ -285,7 +284,7 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
-    public void shutdownBot(){
+    public void shutdownBot() {
 
         LOG.info("Bot shutting down..");
 
@@ -325,7 +324,7 @@ public abstract class NuBotBase {
                 if (null == responseObject1) {
                     LOG.error("Something went wrong while sending liquidityinfo");
                 } else {
-                    LOG.info(responseObject1.toJSONString());
+                    LOG.debug(responseObject1.toJSONString());
                 }
 
                 JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,

@@ -293,11 +293,14 @@ public class NuRPCClient {
             LOG.debug("Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
-            LOG.error(e.toString());
+            LOG.error("Nud RPC Connection problem:" + e.toString());
+            this.connected = false;
         } catch (IOException e) {
-            LOG.error(e.toString());
+            LOG.error("Nud RPC Connection problem:" + e.toString());
+            this.connected = false;
         } catch (ParseException ex) {
-            LOG.error("" + ex);
+            LOG.error("Nud RPC Connection problem:" + ex.toString());
+            this.connected = false;
         } finally {
             // When HttpClient instance is no longer needed,
             // shut down the connection manager to ensure

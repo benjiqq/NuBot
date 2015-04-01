@@ -388,7 +388,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 }
             }
         } else {
-            LOG.error("Client offline. ");
+            LOG.error("Can't reach Nud client. ");
         }
         return toReturn;
     }
