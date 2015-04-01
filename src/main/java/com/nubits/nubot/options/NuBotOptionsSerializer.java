@@ -48,8 +48,8 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("mailrecipient", opt.mailRecipient);
         root.addProperty("emergencytimeout", opt.emergencyTimeout);
         root.addProperty("keepproceeds", opt.keepProceeds);
-        root.addProperty("maxsellordervolume", opt.maxSellVolume);
-        root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
+        root.addProperty("maxsellvolume", opt.maxSellVolume);
+        root.addProperty("maxbuyvolume", opt.maxBuyVolume);
         root.addProperty("priceincrement", opt.priceIncrement);
         root.addProperty("submitliquidity", opt.submitLiquidity);
         root.addProperty("nubitaddress", opt.nubitAddress);

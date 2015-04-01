@@ -236,12 +236,12 @@ public class ParseOptions {
             }
         }
 
-        if (containsIgnoreCase(optionsJSON, "maxsellordervolume")) {
-            options.maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxsellordervolume"));
+        if (containsIgnoreCase(optionsJSON, "maxsellvolume")) {
+            options.maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxsellvolume"));
         }
 
-        if (containsIgnoreCase(optionsJSON, "maxbuyordervolume")) {
-            options.maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxbuyordervolume"));
+        if (containsIgnoreCase(optionsJSON, "maxbuyvolume")) {
+            options.maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, "maxbuyvolume"));
         }
 
         if (containsIgnoreCase(optionsJSON, "executeorders")) {

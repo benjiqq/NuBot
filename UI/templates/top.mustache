@@ -149,14 +149,14 @@
                     $("#exchangename").attr("value", data["exchangename"]);
                     $("#apikey").attr("value", data["apikey"]);
                     $("#apisecret").attr("value", data["apisecret"]);
+                    $("#txfee").attr("value", data["txfee"]);
+                    $("#pair").attr("value", data["pair"]);
                     $("#maxbuyordervolume").attr("value", data["maxbuyordervolume"]);
                     $("#maxsellordervolume").attr("value", data["maxsellordervolume"]);
-                    $("#pair").attr("value", data["pair"]);
 
                     $("#wallchangethreshold").attr("value", data["wallchangethreshold"]);
                     $("#spread").attr("value", data["spread"]);
                     $("#mainfeed").attr("value", data["mainfeed"]);
-
                     $("#nubitaddress").attr("value", data["nubitaddress"]);
                     $("#nudport").attr("value", data["nudport"]);
                     $("#rpcpass").attr("value", data["rpcpass"]);
@@ -164,7 +164,6 @@
                     $('#mailrecipient').attr("value", data["mailrecipient"]);
 
                     //booleans
-
                     $('#submitliquidity').attr('checked',data["submitliquidity"]);
                     $('#dualside').attr('checked',data["dualside"]);
                     $('#multiplecustodians').attr('checked',data["multiplecustodians"]);
@@ -210,7 +209,7 @@
                 var wallchangethreshold = $("#wallchangethreshold").attr("value");
                 var spread = $("#spread").attr("value");
                 var mainfeed = $("#mainfeed").attr("value");
-                var backupfeeds = $("#backupfeeds".attr("value");
+                var backupfeeds = $("#backupfeeds").attr("value");
 
                 //valid post?
 
