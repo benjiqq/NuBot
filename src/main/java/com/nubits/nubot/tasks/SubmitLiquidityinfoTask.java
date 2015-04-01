@@ -134,7 +134,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 String response1 = reportTier1(); //active orders
                 String response2 = reportTier2(); //balance
                 if (Global.options.isSubmitliquidity()) {
-                    LOG.info("Liquidity info submitted:\n" + response1 + "\n" + response2);
+                    LOG.info("Liquidity info submitted:\n\t" + response1 + "\n\t" + response2);
                 }
             } else {
                 LOG.warn("Liquidity is not being sent : orders are not yet initialized");
@@ -371,7 +371,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                     buySide, sellSide, tier);
 
-            toReturn = "buy : " + buySide + " sell : " + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString();
+            toReturn = "tier=" + tier
+                    + " buy=" + buySide
+                    + " sell=" + sellSide
+                    + " identifier=" + Global.rpcClient.generateIdentifier(tier)
+                    + " response=" + responseObject.toJSONString();
             if (null == responseObject) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {

@@ -186,7 +186,6 @@ public abstract class NuBotBase {
         }
     }
 
-
     protected void checkNuConn() throws NuBotConnectionException {
         if (Global.rpcClient.isConnected()) {
             LOG.info("Nud RPC connection ok.");
