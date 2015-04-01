@@ -148,7 +148,8 @@ public class ParseOptions {
 
         //default values for optional settings
 
-        NuBotOptions options = NuBotOptionsDefault.defaultFactory();
+        //NuBotOptions options = NuBotOptionsDefault.defaultFactory();
+        NuBotOptions options = new NuBotOptions();
 
         try {
             isValidJSON(optionsJSON);
@@ -387,13 +388,13 @@ public class ParseOptions {
     public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
 
 
-        NuBotOptions newopt = new NuBotOptions();
+        NuBotOptions newopt = null;
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
 
             newopt = ParseOptions.parseOptionsFromJson(postJson);
-            LOG.debug("pasre post opt: " + newopt);
+            LOG.debug("parse post opt: " + newopt);
 
         } catch (NuBotConfigException e) {
             //show error to user

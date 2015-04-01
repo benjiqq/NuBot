@@ -11,20 +11,20 @@ import java.util.Map;
 import static spark.Spark.get;
 
 /**
- * the main UI framework
+ * the main UI server
  */
 public class UiServer {
 
     final static Logger LOG = LoggerFactory.getLogger(UiServer.class);
 
-    private static int port = 4567; //standard port, can't change
+    private static int port = 4567; //standard port, can't be changed
 
     /**
      * start the UI server
      */
     public static void startUIserver(String configdir, String configFile) {
 
-        //set up all endpoints. currently not very pretty code.
+        //set up all endpoints
 
         LOG.info("launching on http://localhost:" + port);
 

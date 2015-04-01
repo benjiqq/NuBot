@@ -42,8 +42,6 @@ public class ConfigController {
             LOG.info("error with backup " + e);
         }
 
-        Global.options = newopt;
-
         String saveTo = this.configDir + File.separator + this.configfile;
         String js = SaveOptions.jsonPretty(Global.options);
         LOG.info("new opt: " + js);
@@ -63,6 +61,10 @@ public class ConfigController {
         //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
 
         get(endpoint, "application/json", (request, response) -> {
+
+
+
+
             GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
             gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
             Gson parser = gson.create();
@@ -73,8 +75,10 @@ public class ConfigController {
 
         post(endpoint, "application/json", (request, response) -> {
 
-            //not working. put is in request body
-            //request.queryParams("apikey");
+            //TODO: check if bot is running
+            //TODO: if bot is running needs to handled safely
+
+
             LOG.info("config received post" + request);
             String json_body = request.body();
 
@@ -100,14 +104,13 @@ public class ConfigController {
                 opmap.put("error", e);
             }
 
+
             opmap.put("success", success);
 
             if (success) {
                 saveConfig(newopt);
                 opmap.put("error", "none");
             }
-
-            //TODO: if bot is running needs to handled safely
 
             String json = new Gson().toJson(opmap);
 

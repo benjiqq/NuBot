@@ -185,32 +185,32 @@
 
                 //string values
 
-                var exchangename = $('#exchangename').attr('value');
-                var apikey = $('#apikey').attr('value');
-                var apisecret = $('#apisecret').attr('value');
-                //txfee
+                var exchangename = $("#exchangename").attr("value");
+                var apikey = $("#apikey").attr("value");
+                var apisecret = $("#apisecret").attr("value");
+                var txfee =$("#txfee").attr("value");
                 var pair = $("#pair").attr("value");
-                var dualside = $('#dualside').prop('checked');
-                var multiplecustodians = $('#multiplecustodians').prop('checked');
-                var executeorders = $('#executeorders').prop('checked');
-                var verbose = $('#verbose').prop('checked');
-                var hipchat = $('#hipchat').prop('checked');
-                var mailrecipient =$('#mailrecipient').attr("value");
-                //("emergencytimeout", opt.emergencyTimeout);
-                //("keepproceeds", opt.keepProceeds);
-                var maxsellordervolume = $('#maxsellordervolume').attr('value');
-                var maxbuyordervolume = $('#maxbuyordervolume').attr('value');
-                //priceincrement
-                var submitliquidity = $('#submitliquidity').prop('checked');
+                var dualside = $("#dualside").prop("checked");
+                var multiplecustodians = $("#multiplecustodians").prop("checked");
+                var executeorders = $("#executeorders").prop("checked");
+                var verbose = $("#verbose").prop("checked");
+                var hipchat = $("#hipchat").prop("checked");
+                var mailrecipient =$("#mailrecipient").attr("value");
+                var emergencytimeout =$("#emergencytimeout").attr("value");
+                var keepproceeds = $("#keepproceeds").attr("value");
+                var maxsellordervolume = $("#maxsellordervolume").attr("value");
+                var maxbuyordervolume = $("#maxbuyordervolume").attr("value");
+                var priceincrement = $("priceincrement").attr("value");
+                var submitliquidity = $("#submitliquidity").prop("checked");
                 var nubitaddress = $("#nubitaddress").attr("value");
-                //root.addProperty("nudip", opt.nudIp);
+                var nudip = $("#nudIP").attr("value");
                 var nudport = $("#nudport").attr("value");
                 var rpcpass = $("#rpcpass").attr("value");
                 var rpcuser = $("#rpcuser").attr("value");
-                var wallchangethreshold = $("#wallchangethreshold).attr("value");
-                  //root.addProperty("spread", opt.spread);
+                var wallchangethreshold = $("#wallchangethreshold").attr("value");
+                var spread = $("#spread").attr("value");
                 var mainfeed = $("#mainfeed").attr("value");
-                //root.addProperty("backupfeeds", bfs);
+                var backupfeeds = $("#backupfeeds".attr("value");
 
                 //valid post?
 
@@ -219,7 +219,7 @@
                     "exchangename": exchangename,
                     "apikey": apikey,
                     "apisecret": apisecret,
-                    //txfee
+                    "txfee" : txfee,
                     "pair": pair,
                     "dualside": dualside,
                     "multiplecustodians": multiplecustodians,
@@ -227,21 +227,21 @@
                     "verbose": verbose,
                     "hipchat": hipchat,
                     "mailrecipient": mailrecipient,
-                    //emergencytimeout
-                    //keepproceeds
+                    "emergencytimeout" : emergencytimeout,
+                    "keepproceeds" : keepproceeds,
                     "maxsellordervolume": maxsellordervolume,
                     "maxbuyordervolume": maxbuyordervolume,
-                    //priceincrement
+                    "priceincrement": priceincrement,
                     "submitliquidity": submitliquidity,
                     "nubitaddress": nubitaddress,
-                    //nudip
+                    "nudip": nudip,
                     "nudport": nudport,
                     "rpcpass": rpcpass,
                     "rpcuser": rpcuser,
                     "wallchangethreshold": wallchangethreshold,
-                    //spread
-                    "mainfeed": mainfeed
-                    //backupfeeds
+                    "spread" : spread,
+                    "mainfeed": mainfeed,
+                    "backupfeeds" : backupfeeds
 
                 });
 
