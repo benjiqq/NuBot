@@ -329,7 +329,7 @@ public abstract class NuBotBase {
                 if (null == responseObject2) {
                     LOG.error("Something went wrong while sending liquidityinfo");
                 } else {
-                    LOG.info(responseObject2.toJSONString());
+                    LOG.debug(responseObject2.toJSONString());
                 }
             }
         }
