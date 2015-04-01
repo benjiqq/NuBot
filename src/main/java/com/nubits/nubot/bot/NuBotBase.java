@@ -283,13 +283,25 @@ public abstract class NuBotBase {
 
     public void shutdownBot() {
 
-        LOG.info("Bot shutting down..");
+        LOG.info("Bot shutting down sequence started.");
 
         String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
                 + Global.options.getExchangeName() + " ["
                 + Global.options.getPair().toStringSep() + "]";
 
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+
+        //Interrupt all BotTasks
+
+        if (Global.taskManager != null) {
+            if (Global.taskManager.isInitialized()) {
+                try {
+                    Global.taskManager.stopAll();
+                } catch (IllegalStateException e) {
+
+                }
+            }
+        }
 
         //Try to cancel all orders, if any
         if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
@@ -304,7 +316,6 @@ public abstract class NuBotBase {
                 } else {
                     LOG.error("Could not submit request to clear orders");
                 }
-
             } else {
                 LOG.error(deleteOrdersResponse.getError().toString());
             }
