@@ -23,24 +23,28 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.text.*;
-import java.util.*;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by woolly_sammoth on 21/10/14.
@@ -357,7 +361,7 @@ public class AllCoinWrapper implements TradeInterface {
                 ApiError apiError = errors.nullReturnError;
                 apiResponse.setError(apiError);
             } else {
-                for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
+                for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext(); ) {
                     Order order = parseOrder(data.next());
                     if (pair != null && !order.getPair().equals(pair)) {
                         LOG.info("|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
@@ -437,7 +441,7 @@ public class AllCoinWrapper implements TradeInterface {
         ApiResponse activeOrders = getActiveOrders();
         if (activeOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) activeOrders.getResponseObject();
-            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
@@ -509,7 +513,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warn("AllCoin uses global TX fee, currency pair not supported. \n"
+        LOG.debug("AllCoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -540,7 +544,7 @@ public class AllCoinWrapper implements TradeInterface {
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
             if (trades != null) {
                 //LOG.info(trades.toJSONString());
-                for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext(); ) {
                     Trade thisTrade = parseTrade(trade.next());
                     if (!thisTrade.getPair().equals(pair)) {
                         continue;
@@ -623,7 +627,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(id)) {
                     apiResponse.setResponseObject(true);

@@ -188,13 +188,11 @@ public abstract class NuBotBase {
 
 
     protected void checkNuConn() throws NuBotConnectionException {
-
-        LOG.info("Check connection with nud");
         if (Global.rpcClient.isConnected()) {
-            LOG.info("RPC connection OK!");
+            LOG.info("Nud RPC connection ok.");
         } else {
             //TODO: recover?
-            throw new NuBotConnectionException("problem with nu connectivity");
+            throw new NuBotConnectionException("Problem with nud connectivity");
         }
     }
 
