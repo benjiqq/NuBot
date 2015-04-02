@@ -131,7 +131,6 @@
             }
 
 
-
             function loadconfig() {
 
                 var url = "http://" + host + ":" + port + "/config";
@@ -174,7 +173,6 @@
                     $("#mainfeed").attr("value", data["mainfeed"]);
                     $("#backupfeeds").attr("value", data["backupfeeds"]);
 
-
                  });
 
             }
@@ -182,11 +180,7 @@
             function postall(){
                 var posturl = "http://" + host + ":" + port + "/config";
 
-                //get all vars and post them. smarter would be to figure out which ones changed
-
-                //string values
-
-
+                //get all vars and post them
 
                 var exchangename = $("#exchangename").attr("value");
                 var apikey = $("#apikey").attr("value");
@@ -198,7 +192,7 @@
                 var executeorders = $("#executeorders").prop("checked");
                 var verbose = $("#verbose").prop("checked");
                 var hipchat = $("#hipchat").prop("checked");
-                //mailnotifications
+                var mailnotifications = $("#mailnotifications").attr("value");
                 var mailrecipient =$("#mailrecipient").attr("value");
                 var emergencytimeout =$("#emergencytimeout").attr("value");
                 var keepproceeds = $("#keepproceeds").attr("value");
@@ -216,8 +210,7 @@
                 var mainfeed = $("#mainfeed").attr("value");
                 var backupfeeds = $("#backupfeeds").attr("value");
 
-                //valid post?
-
+                //could check on the client side if valid post
 
                 var jsondata = JSON.stringify({
                     "exchangename": exchangename,
