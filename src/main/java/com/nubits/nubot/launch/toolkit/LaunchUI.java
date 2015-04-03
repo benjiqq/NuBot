@@ -22,55 +22,81 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
 /**
- *
+ * This should be packed into a Binary jar that launched nubot with the UI.
+ * Associated gradle task LaunchUIjar
  */
 public class LaunchUI {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchUI.class.getName());
 
-    final static String JAR_FILE = "NuBot.jar"; //Name of jar file
-    final static String ARGS = "runui"; //Arguments to pass to CLI
-    final static String EXECUTE_JAR = "java -jar"; //Command to launch the jar
+    private final String JAR_FILE = "NuBot.jar"; //Name of jar file
+    private String ARGS = "--ui=true"; //Arguments to pass to CLI
+    private String EXECUTE_JAR = "java -jar"; //Command to launch the jar
 
-    //Compose the launch command
-    static String LAUNCH_COMMAND = EXECUTE_JAR + " " + JAR_FILE + " " + ARGS;
+    private String command = "";
 
     public static void main(String[] args) {
         if (args.length == 0) {
-            Runtime rt = Runtime.getRuntime();
-            try {
-                LOG.info("Launching UI from CLI : $ " + LAUNCH_COMMAND);
-                if (SystemUtils.IS_OS_WINDOWS) {
-                    //for windows the launch command requires a different syntax
-                    LAUNCH_COMMAND = "cmd /c " + LAUNCH_COMMAND;
-                }
-
-                Process pr = rt.exec(LAUNCH_COMMAND); //Run
-                
-                //capture output
-                BufferedReader stdInput = new BufferedReader(new
-                        InputStreamReader(pr.getInputStream()));
-
-                BufferedReader stdError = new BufferedReader(new
-                        InputStreamReader(pr.getErrorStream()));
-
-                // readn&print the output from the command
-                String s = null;
-                while ((s = stdInput.readLine()) != null) {
-                    System.out.println(s);
-                }
-
-                // readn&print any errors from the attempted command
-                while ((s = stdError.readLine()) != null) {
-                    System.err.println(s);
-                }
-            } catch (IOException e) {
-                LOG.error(e.toString());
-            }
+            LaunchUI launch = new LaunchUI();
+            launch.start();
         }
+    }
+
+    private void start() {
+        String configPath = askUser(); //Ask user for path;
+
+        command = EXECUTE_JAR + " " + JAR_FILE + " ";
+        if (!configPath.equals("")) {
+            command += configPath + " ";
+        }
+        command += ARGS;
+
+        Runtime rt = Runtime.getRuntime();
+        try {
+            if (SystemUtils.IS_OS_WINDOWS) {
+                //for windows the launch command requires a different syntax
+                command = "cmd /c " + command;
+            }
+
+            LOG.info("Launching UI from CLI : $ " + command);
+            Process pr = rt.exec(command); //Run
+
+            //capture output
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(pr.getInputStream()));
+
+            BufferedReader stdError = new BufferedReader(new
+                    InputStreamReader(pr.getErrorStream()));
+
+            // readn&print the output from the command
+            String output = "";
+            String s = null;
+            while ((s = stdInput.readLine()) != null) {
+                System.out.println(s);
+                output += s + "\n";
+            }
+        } catch (IOException e) {
+            LOG.error(e.toString());
+        }
+    }
+
+    private String askUser() {
+        //Prompt user for a file. Default return ""
+        String path = "";
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
+        int result = fileChooser.showOpenDialog(new JFrame());
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File selectedFile = fileChooser.getSelectedFile();
+            path = selectedFile.getAbsolutePath();
+            LOG.info("Option file selected : " + path);
+        }
+        return path;
     }
 }
