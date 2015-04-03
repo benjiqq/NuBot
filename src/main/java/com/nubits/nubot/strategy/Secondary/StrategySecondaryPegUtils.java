@@ -184,7 +184,7 @@ public class StrategySecondaryPegUtils {
 
         if (balance.getQuantity() < oneNBT * 2) {
             LOG.info("no need to execute " + type + "orders : available balance < 1 NBT");
-            return false;
+            return true;
         }
 
         //Update TX fee :
@@ -516,7 +516,6 @@ public class StrategySecondaryPegUtils {
             buyPrice = strategy.getSellPricePEG();
         }
 
-
         LOG.info("Immediately try to cancel all orders");
 
         //immediately try to : cancel all active orders
@@ -524,9 +523,8 @@ public class StrategySecondaryPegUtils {
 
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
-
             if (deleted) {
-
+                LOG.info("Orders deleted");
                 if (Global.options.isMultipleCustodians()) {
                     //Introuce an aleatory sleep time to desync bots at the time of placing orders.
                     //This will favour competition in markets with multiple custodians
@@ -538,16 +536,14 @@ public class StrategySecondaryPegUtils {
                 }
 
                 //Update frozen balances
-                if (!Global.options.isDualSide() //Do not do this for sell side custodians
-                        && !Global.options.getPair().getPaymentCurrency().isFiat()) //Do not do this for stable secondary pegs (e.g EUR)
+                if (!Global.options.isDualSide() //Do not do this for sell side custodians or...
+                        || !Global.options.getPair().getPaymentCurrency().isFiat()) //...do not do this for stable secondary pegs (e.g EUR)
                 {
                     // update the initial balance of the secondary peg
                     Global.frozenBalances.freezeNewFunds();
                 }
 
                 //Reset sell side orders
-
-
                 boolean initSells = initOrders(Constant.SELL, sellPrice); //Force init sell orders
 
                 if (!initSells) {
@@ -566,6 +562,8 @@ public class StrategySecondaryPegUtils {
                 } else { //success false with the first part of the shift
                     LOG.error("NuBot has not been able to shift sell orders");
                 }
+            } else {
+                LOG.error("Coudn't delete orders ");
             }
 
             //Here I wait until the two orders are correctly displaied. It can take some seconds
