@@ -19,6 +19,7 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.global.Settings;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +30,7 @@ import org.slf4j.LoggerFactory;
 public class CLIOptions {
     private static final Logger LOG = LoggerFactory.getLogger(CLIOptions.class.getName());
 
-    private static final String GUI = "gui";
+    private static final String GUI = "GUI";
     private static final String CFG = "cfg";
 
     private static final String USAGE_STRING = "java - jar NuBot -" + CFG + "=<path/to/options.json> [-" + GUI + "]";
@@ -42,7 +43,7 @@ public class CLIOptions {
     public static Options constructGnuOptions() {
         final Options gnuOptions = new Options();
 
-        Option UIOption = new Option(GUI, "user interface", false, "Run with UI");
+        Option UIOption = new Option(GUI, "graphic user interface", false, "Run with GUI");
         gnuOptions.addOption(UIOption);
 
         Option CfgFileOption = new Option(CFG, "configuration file", true, "Specify Configuration file");
@@ -69,7 +70,9 @@ public class CLIOptions {
             String configFile;
             if (commandLine.hasOption(GUI)) {
                 runGUI = true;
+                LOG.info("Running " + Settings.APP_NAME + " with GUI");
             }
+
             if (commandLine.hasOption(CFG)) {
                 configFile = commandLine.getOptionValue(CFG);
                 SessionManager.sessionLaunch(configFile, runGUI);
