@@ -35,7 +35,7 @@ public class LaunchUI {
     final static String EXECUTE_JAR = "java -jar"; //Command to launch the jar
 
     //Compose the launch command
-    final static String LAUNCH_COMMAND = EXECUTE_JAR + " " + JAR_FILE + " " + ARGS;
+    static String LAUNCH_COMMAND = EXECUTE_JAR + " " + JAR_FILE + " " + ARGS;
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -44,8 +44,10 @@ public class LaunchUI {
                 LOG.info("Launching UI from CLI : $ " + LAUNCH_COMMAND);
                 if (SystemUtils.IS_OS_WINDOWS) {
                     //for windows the launch command requires a different syntax
+                    LAUNCH_COMMAND = "cmd /c " + LAUNCH_COMMAND;
                 }
                 Process pr = rt.exec(LAUNCH_COMMAND);
+
             } catch (IOException e) {
                 LOG.error(e.toString());
             }
