@@ -24,6 +24,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
+import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -40,7 +42,7 @@ public class LaunchUI {
     private String ARGS = "--ui=true"; //Arguments to pass to CLI
     private String EXECUTE_JAR = "java -jar"; //Command to launch the jar
 
-    private final String ICON_PATH = Settings.IMAGE_FOLDER + "/nu-logo-64.png";
+    private final String ICON_PATH = Settings.IMAGE_FOLDER + "/nubot-logo.png";
     private String command = "";
     private String local_path;
 
@@ -103,10 +105,11 @@ public class LaunchUI {
             final ImageIcon icon = new ImageIcon(local_path + "/" + ICON_PATH);
 
             //Ask the user to ask for scratch
-            Object[] options = {"Load existing option file",
-                    "Launch a fresh instance"};
+            Object[] options = {"Import existing JSON option file",
+                    "Configure the bot from scratch"};
+            
             int n = JOptionPane.showOptionDialog(new JFrame(),
-                    "Start NuBot UI",
+                    "Chose one of the following options:",
                     "NuBot UI Launcher",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE,
@@ -115,10 +118,10 @@ public class LaunchUI {
                     options[0]); //default button title
 
             if (n == JOptionPane.YES_OPTION) {
-                //Prompt user for a file. Default return ""
 
-                JFileChooser fileChooser = new JFileChooser();
-                fileChooser.setCurrentDirectory(new File(local_path));
+                //Prompt user to chose a file.
+                JFileChooser fileChooser = createFileChoser();
+
                 int result = fileChooser.showOpenDialog(new JFrame());
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
@@ -126,16 +129,26 @@ public class LaunchUI {
                     LOG.info("Option file selected : " + path);
                 }
             }
-        } catch (ClassNotFoundException e) {
-            LOG.error(e.toString());
-        } catch (InstantiationException e) {
-            LOG.error(e.toString());
-        } catch (IllegalAccessException e) {
-            LOG.error(e.toString());
-        } catch (UnsupportedLookAndFeelException e) {
+        } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
             LOG.error(e.toString());
         }
 
         return path;
+    }
+
+    private JFileChooser createFileChoser() {
+        JFileChooser fileChooser = new JFileChooser();
+
+        // Set the text
+        fileChooser.setApproveButtonText("Import");
+        // Set the tool tip
+        fileChooser.setApproveButtonToolTipText("Import configuration file");
+
+        //Filter .json files
+        FileFilter filter = new FileNameExtensionFilter(".json files", "json");
+        fileChooser.setFileFilter(filter);
+
+        fileChooser.setCurrentDirectory(new File(local_path));
+        return fileChooser;
     }
 }
