@@ -19,7 +19,6 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,10 +42,6 @@ public class MainLaunch {
     private static boolean runui = false;
 
 
-    //private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json> [runui]";
-    private static final String USAGE_STRING = "java - jar NuBot <path/to/options.json>";
-
-
     /**
      * Start the NuBot. start if config is valid and other instance is running
      *
@@ -58,16 +53,7 @@ public class MainLaunch {
         MDC.put("session", Global.sessionPath);
         LOG.info("defined session path " + Global.sessionPath);
 
-        //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
-
-        if (args.length != 1) {
-            exitWithNotice("wrong argument number : run nubot with \n" + USAGE_STRING);
-        }
-
-        String configfile = args[0];
-
-        SessionManager.sessionLaunch(configfile, false);
-
+        CLIOptions.parseCommandLineArguments(args);
     }
 
 

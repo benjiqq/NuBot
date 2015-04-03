@@ -77,6 +77,7 @@ dependencies {
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-net:commons-net:3.3'
+    compile 'commons-cli:commons-cli:1.2'
 
     compile 'com.sun.mail:mailapi:1.5.2'
     compile 'javax.mail:mail:1.4.4' //replaces mail.jar
