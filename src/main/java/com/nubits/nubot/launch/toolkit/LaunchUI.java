@@ -22,7 +22,9 @@ import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
 /**
  *
@@ -46,12 +48,29 @@ public class LaunchUI {
                     //for windows the launch command requires a different syntax
                     LAUNCH_COMMAND = "cmd /c " + LAUNCH_COMMAND;
                 }
-                Process pr = rt.exec(LAUNCH_COMMAND);
 
+                Process pr = rt.exec(LAUNCH_COMMAND); //Run
+                
+                //capture output
+                BufferedReader stdInput = new BufferedReader(new
+                        InputStreamReader(pr.getInputStream()));
+
+                BufferedReader stdError = new BufferedReader(new
+                        InputStreamReader(pr.getErrorStream()));
+
+                // readn&print the output from the command
+                String s = null;
+                while ((s = stdInput.readLine()) != null) {
+                    System.out.println(s);
+                }
+
+                // readn&print any errors from the attempted command
+                while ((s = stdError.readLine()) != null) {
+                    System.err.println(s);
+                }
             } catch (IOException e) {
                 LOG.error(e.toString());
             }
-            System.exit(0); //ignore the output
         }
     }
 }
