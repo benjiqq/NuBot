@@ -81,13 +81,12 @@ public abstract class NuBotBase {
         }
 
         setupLog();
-        
+
         setupSSL();
 
         setupExchange();
 
     }
-
 
 
     /**
@@ -285,12 +284,12 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
-    public void shutdownBot(){
+    public void shutdownBot() {
 
         LOG.info("Bot shutting down..");
 
         String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
-                + Global.options.getExchangeName() + " ["
+                + "<strong>" + Global.options.getExchangeName() + "</strong> ["
                 + Global.options.getPair().toStringSep() + "]";
 
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
