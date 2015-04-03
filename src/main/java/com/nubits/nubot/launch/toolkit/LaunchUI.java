@@ -18,6 +18,7 @@
 
 package com.nubits.nubot.launch.toolkit;
 
+import com.nubits.nubot.global.Settings;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +40,9 @@ public class LaunchUI {
     private String ARGS = "--ui=true"; //Arguments to pass to CLI
     private String EXECUTE_JAR = "java -jar"; //Command to launch the jar
 
+    private final String ICON_PATH = Settings.IMAGE_FOLDER + "/nu-logo-64.png";
     private String command = "";
+    private String local_path;
 
     public static void main(String[] args) {
         if (args.length == 0) {
@@ -49,6 +52,7 @@ public class LaunchUI {
     }
 
     private void start() {
+        local_path = System.getProperty("user.dir");
         String configPath = askUser(); //Ask user for path;
 
         command = EXECUTE_JAR + " " + JAR_FILE + " ";
@@ -84,19 +88,54 @@ public class LaunchUI {
         } catch (IOException e) {
             LOG.error(e.toString());
         }
+
+        System.exit(0);
     }
 
     private String askUser() {
-        //Prompt user for a file. Default return ""
+        //Create Options for option dialog
         String path = "";
-        JFileChooser fileChooser = new JFileChooser();
-        fileChooser.setCurrentDirectory(new File(System.getProperty("user.dir")));
-        int result = fileChooser.showOpenDialog(new JFrame());
-        if (result == JFileChooser.APPROVE_OPTION) {
-            File selectedFile = fileChooser.getSelectedFile();
-            path = selectedFile.getAbsolutePath();
-            LOG.info("Option file selected : " + path);
+
+        // Set cross-platform Java L&F (also called "Metal")
+        try {
+            UIManager.setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+
+            final ImageIcon icon = new ImageIcon(local_path + "/" + ICON_PATH);
+
+            //Ask the user to ask for scratch
+            Object[] options = {"Load existing option file",
+                    "Launch a fresh instance"};
+            int n = JOptionPane.showOptionDialog(new JFrame(),
+                    "Start NuBot UI",
+                    "NuBot UI Launcher",
+                    JOptionPane.YES_NO_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    icon,     //do not use a custom Icon
+                    options,  //the titles of buttons
+                    options[0]); //default button title
+
+            if (n == JOptionPane.YES_OPTION) {
+                //Prompt user for a file. Default return ""
+
+                JFileChooser fileChooser = new JFileChooser();
+                fileChooser.setCurrentDirectory(new File(local_path));
+                int result = fileChooser.showOpenDialog(new JFrame());
+                if (result == JFileChooser.APPROVE_OPTION) {
+                    File selectedFile = fileChooser.getSelectedFile();
+                    path = selectedFile.getAbsolutePath();
+                    LOG.info("Option file selected : " + path);
+                }
+            }
+        } catch (ClassNotFoundException e) {
+            LOG.error(e.toString());
+        } catch (InstantiationException e) {
+            LOG.error(e.toString());
+        } catch (IllegalAccessException e) {
+            LOG.error(e.toString());
+        } catch (UnsupportedLookAndFeelException e) {
+            LOG.error(e.toString());
         }
+
         return path;
     }
 }

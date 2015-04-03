@@ -125,6 +125,8 @@ public class Settings {
      */
     public final static String FROZEN_FUNDS_PATH = RES_PATH + "/" + "frozen-funds/";
 
+    public final static String IMAGE_FOLDER = RES_PATH + "/images";
+
     public final static String SESSION_LOG = "session_";
 
     public final static String ORDERS_FILENAME = "orders_history"; //Filename for historical snapshot of active orders
@@ -138,7 +140,6 @@ public class Settings {
     public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
 
     public final static String CURRENCY_FILE_PATH = RES_PATH + "/" + "currencies.csv";
-
 
     public final static String APP_FOLDER = ".nubot";
 
