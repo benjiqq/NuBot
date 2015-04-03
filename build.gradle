@@ -29,7 +29,6 @@ version = '0.20-rc1' //will be used for logging
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
 
-
 //Get dependencies from Maven central repository
 repositories {
     mavenCentral()
@@ -45,12 +44,14 @@ def docdir = new File("md")
 def resdir = new File("res")
 
 def jarname = "NuBot.jar"
-def jarnamelasttrades="NuGetLastTrades.jar"
+def jarnamelasttrades = "NuGetLastTrades.jar"
+def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
 def sampleconfig = "config/options/sample-options.json"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
-def getlasttradeclass =  "com.nubits.nubot.launch.toolkit.NuLastTrades"
+def getlasttradeclass = "com.nubits.nubot.launch.toolkit.NuLastTrades"
+def launchuiclass = "com.nubits.nubot.launch.toolkit.LaunchUI" //mainclass of the utils that runs the UI
 def includeTestConfig = true
 
 FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
@@ -83,6 +84,7 @@ dependencies {
     compile 'javax.mail:mail:1.4.4' //replaces mail.jar
     compile 'com.sun.mail:smtp:1.5.2'
     compile 'io.evanwong.oss:hipchat-java:0.3.0'
+    compile 'org.apache.commons:commons-lang3:3.3.2'
 
     //webUI
     compile "javax.servlet:servlet-api:2.5"
@@ -133,7 +135,23 @@ task distInit << {
     println("creating distdir")
     distdir.mkdirs()
 }
+//create an executable Jar to launch the UI
+task LaunchUIjar(type: Jar) {
+    archiveName jarnameuilauncher
+    destinationDir = distdir
+    from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+        exclude 'META-INF/MANIFEST.MF'
+        exclude 'META-INF/*.SF'
+        exclude 'META-INF/*.DSA'
+        exclude 'META-INF/*.RSA'
+    }
+    manifest {
+        attributes 'Main-Class': launchuiclass
+    }
+    with jar
+}
 
+LaunchUIjar.dependsOn distInit
 
 //create a single Jar with all dependencies
 task NuBotJar(type: Jar) {
@@ -318,23 +336,23 @@ task NuLastTradesDist(dependsOn: NuGetLastTradesJar) {
 //when run as jar NuBot will look for this file
 task propfile << {
     def prop = new Properties()
-    prop.put("version",project.version)
+    prop.put("version", project.version)
 
     //determine hash of current branch
     def proc = "git rev-parse HEAD".execute()
     def b = new StringBuffer()
     proc.consumeProcessErrorStream(b)
     def commit = proc.text
-    commit = commit.replace("\n","")
+    commit = commit.replace("\n", "")
 
     proc = "git rev-parse --abbrev-ref HEAD".execute()
     b = new StringBuffer()
     proc.consumeProcessErrorStream(b)
     def branch = proc.text
-    branch = branch.replace("\n","")
+    branch = branch.replace("\n", "")
 
-    prop.put("lastcommit",commit);
-    prop.put("branch",branch);
+    prop.put("lastcommit", commit);
+    prop.put("branch", branch);
 
 
     def propFile = new File("${distdir}/.nubot")
@@ -386,7 +404,6 @@ task testexchanges(type: Test) {
     include 'testexchanges/*'
     testexchanges.reports.html.destination = file("${testreportdir}/exchangetests")
 }
-
 
 /*task runUI(type: JavaExec) {
     description 'run the WebUI'
