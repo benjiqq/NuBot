@@ -23,5 +23,6 @@
 | Readme assets               | nubot/res/readme-assets          | //                         |                             | done       |
 | Scripts                     | nubot/resources/scripts          | dist/res/scripts  (?)      | runNubot.sh                 | not in use |
 | App Folder                  | $HOME/.nubot/ (*)                | $HOME/.nubot               | NuBot_0_session.txt         | done       |
+| Images                      | nubot/res/images                 | dist/res/images            | nu-logo-64.png              | done       |
 
 (*) $HOME refers to the user's home directory, depending on the Operating System
