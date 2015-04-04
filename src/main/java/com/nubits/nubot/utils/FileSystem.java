@@ -18,11 +18,11 @@
 
 package com.nubits.nubot.utils;
 
-import com.nubits.nubot.utils.FileSystem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class FileSystem {
 
@@ -32,7 +32,7 @@ public class FileSystem {
         try {
             File file = new File(path);
             if (file.delete()) {
-                LOG.info("file " + file.getName() + " deleted!");
+                NuLog.info(LOG, "file " + file.getName() + " deleted!");
             } else {
                 LOG.error("Delete operation is failed for : " + path);
             }
@@ -46,16 +46,16 @@ public class FileSystem {
             File file = new File(path);
             if (file.delete()) {
                 if (verbose) {
-                    LOG.info("file " + file.getName() + " deleted!");
+                    NuLog.info(LOG, "file " + file.getName() + " deleted!");
                 }
             } else {
                 if (verbose) {
-                    LOG.info("Delete operation is failed for : " + path);
+                    NuLog.info(LOG, "Delete operation is failed for : " + path);
                 }
             }
         } catch (Exception e) {
             if (verbose) {
-                LOG.info(e.toString());
+                NuLog.info(LOG, e.toString());
             }
         }
     }

@@ -29,6 +29,7 @@ import com.nubits.nubot.options.*;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -44,9 +45,9 @@ public class NuBotSecondary extends NuBotBase {
     public void configureStrategy() throws NuBotConfigException {
 
         if (Global.options.isDualSide()) {
-            LOG.info("Configuring NuBot for Dual-Side strategy");
+            NuLog.info(LOG, "Configuring NuBot for Dual-Side strategy");
         } else {
-            LOG.info("Configuring NuBot for Sell-Side strategy");
+            NuLog.info(LOG, "Configuring NuBot for Sell-Side strategy");
         }
 
 
@@ -115,17 +116,17 @@ public class NuBotSecondary extends NuBotBase {
             double forcedSpread = Settings.FORCED_SPREAD;
             if (Global.options.getSpread() < forcedSpread) {
                 Global.options.setSpread(forcedSpread);
-                LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
+                NuLog.info(LOG, "Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
             }
         }
 
         int delaySeconds = 0;
 
-        LOG.info("multiple custodians: " + Global.options.isMultipleCustodians());
+        NuLog.info(LOG, "multiple custodians: " + Global.options.isMultipleCustodians());
 
         if (Global.options.isMultipleCustodians()) {
             delaySeconds = Utils.getSecondsToNextwindow(reset_every);
-            LOG.info("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
+            NuLog.info(LOG, "NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
         } else {
 
             LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");

@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
 import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
 import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 
 import java.util.ArrayList;
@@ -92,7 +93,7 @@ public class TestLiquidityDistribution {
     }
 
     private void configureTest() {
-        LOG.info("Configuring test");
+        NuLog.info(LOG, "Configuring test");
 
         //Custodian balance simulation
         balanceNBT = new Amount(27100.0, CurrencyList.NBT);
@@ -139,7 +140,7 @@ public class TestLiquidityDistribution {
         config += "\ntxFee : " + txFee;
         config += "\n\n -------------------";
 
-        LOG.info(config);
+        NuLog.info(LOG, config);
 
     }
 
@@ -162,7 +163,7 @@ public class TestLiquidityDistribution {
         String sellOrdersString = printOrderBook(sellOrders, Constant.SELL);
         String buyOrdersString = printOrderBook(buyOrders, Constant.BUY);
 
-        LOG.info(sellOrdersString + "\n" + buyOrdersString);
+        NuLog.info(LOG, sellOrdersString + "\n" + buyOrdersString);
 
     }
 
@@ -201,13 +202,13 @@ public class TestLiquidityDistribution {
 
         long startTime = System.nanoTime(); //TIC
 
-        LOG.info("Placing sell orders on " + Global.exchange.getName());
+        NuLog.info(LOG, "Placing sell orders on " + Global.exchange.getName());
         WrapperTestUtils.testMultipleOrders(sellOrders, pair);
 
-        LOG.info("Placing buy orders on " + Global.exchange.getName());
+        NuLog.info(LOG, "Placing buy orders on " + Global.exchange.getName());
         WrapperTestUtils.testMultipleOrders(buyOrders, pair);
 
-        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
+        NuLog.info(LOG, "Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
     }
 
@@ -216,7 +217,7 @@ public class TestLiquidityDistribution {
         ApiResponse balanceNBTResponse = Global.exchange.getTrade().getAvailableBalance(CurrencyList.NBT);
         if (balanceNBTResponse.isPositive()) {
             Amount balance = (Amount) balanceNBTResponse.getResponseObject();
-            LOG.info("NBT Balance : " + balance.toString());
+            NuLog.info(LOG, "NBT Balance : " + balance.toString());
             balanceNBT = balance;
         } else {
             LOG.error(balanceNBTResponse.getError().toString());
@@ -226,7 +227,7 @@ public class TestLiquidityDistribution {
         ApiResponse balancePEGResponse = Global.exchange.getTrade().getAvailableBalance(pair.getPaymentCurrency());
         if (balancePEGResponse.isPositive()) {
             Amount balance = (Amount) balancePEGResponse.getResponseObject();
-            LOG.info(pair.getPaymentCurrency().getCode() + " Balance : " + balance.toString());
+            NuLog.info(LOG, pair.getPaymentCurrency().getCode() + " Balance : " + balance.toString());
             balancePEG = balance;
         } else {
             LOG.error(balancePEGResponse.getError().toString());

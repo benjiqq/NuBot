@@ -35,6 +35,7 @@ import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.ErrorManager;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -237,7 +238,7 @@ public class BterWrapper implements TradeInterface {
                 PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
                 apiResponse.setResponseObject(balance);
                 if (!foundNBTavail || !foundPEGavail) {
-                    LOG.info("Cannot find a balance for currency with code "
+                    NuLog.info(LOG, "Cannot find a balance for currency with code "
                             + "" + NBTcode + " or " + PEGcode + " in your balance. "
                             + "NuBot assumes that balance is 0");
                 }
@@ -922,12 +923,12 @@ public class BterWrapper implements TradeInterface {
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.info("\nSending request to URL : " + url + " ; get = " + isGet);
+                NuLog.info(LOG, "\nSending request to URL : " + url + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
-                LOG.info("Response Code : " + response.getStatusLine().getStatusCode());
-                LOG.info("Response :" + response);
+                NuLog.info(LOG, "Response Code : " + response.getStatusLine().getStatusCode());
+                NuLog.info(LOG, "Response :" + response);
 
             }
             return answer;

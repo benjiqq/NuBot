@@ -24,6 +24,7 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
+import com.nubits.nubot.utils.NuLog;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,13 +71,13 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         if (shiftingWalls) {
-            LOG.info("Already shifting walls.");
+            NuLog.info(LOG, "Already shifting walls.");
             return;
         }
 
         strategyUtils.recount(); //Count number of active sells and buys
         if (mightNeedInit) {
-            LOG.info("might need init");
+            NuLog.info(LOG, "might need init");
             boolean reset = mightNeedInit && !(ordersAndBalancesOK);
             if (reset) {
                 String message = "Order reset needed on " + Global.exchange.getName();
@@ -109,7 +110,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void initStrategy() {
         //First execution : reset orders and init strategy
-        LOG.info("Initializing strategy");
+        NuLog.info(LOG, "Initializing strategy");
         isFirstTime = false;
         strategyUtils.recount();
         boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
@@ -129,7 +130,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         shiftingWalls = true;
 
-        LOG.info("Strategy received a price change notification.");
+        NuLog.info(LOG, "Strategy received a price change notification.");
         needWallShift = true;
 
         if (!Global.swappedPair) {
@@ -164,7 +165,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (shiftSuccess) {
             mightNeedInit = false;
             needWallShift = false;
-            LOG.info("Wall shift successful");
+            NuLog.info(LOG, "Wall shift successful");
         } else {
             LOG.error("Wall shift failed");
         }
@@ -177,7 +178,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void setSellPricePEG(double sellPricePEG) {
-        LOG.info("set setSellPricePEG : " + sellPricePEG);
+        NuLog.info(LOG, "set setSellPricePEG : " + sellPricePEG);
         this.sellPricePEG = sellPricePEG;
     }
 
@@ -186,7 +187,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void setBuyPricePEG(double buyPricePEG) {
-        LOG.info("setBuyPricePEG : " + buyPricePEG);
+        NuLog.info(LOG, "setBuyPricePEG : " + buyPricePEG);
         this.buyPricePEG = buyPricePEG;
     }
 

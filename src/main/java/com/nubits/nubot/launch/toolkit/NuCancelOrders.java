@@ -18,10 +18,10 @@
 
 package com.nubits.nubot.launch.toolkit;
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -29,11 +29,9 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.FileSystem;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 
 public class NuCancelOrders {
@@ -56,10 +54,10 @@ public class NuCancelOrders {
         FileSystem.mkdir(logsFolder);
         if (app.readParams(args)) {
 
-            LOG.info("Launching CancellAllOrders ");
+            NuLog.info(LOG, "Launching CancellAllOrders ");
             app.prepareForExecution();
             app.cancelAllOrders(app.pair);
-            LOG.info("Done");
+            NuLog.info(LOG, "Done");
             System.exit(0);
 
         } else {
@@ -74,9 +72,9 @@ public class NuCancelOrders {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                LOG.info("Clear request succesfully");
+                NuLog.info(LOG, "Clear request succesfully");
             } else {
-                LOG.info("Could not submit request to clear orders");
+                NuLog.info(LOG, "Could not submit request to clear orders");
             }
 
         } else {
@@ -120,7 +118,7 @@ public class NuCancelOrders {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.info("Exchange setup complete. Now checking connection ...");
+        NuLog.info(LOG, "Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {

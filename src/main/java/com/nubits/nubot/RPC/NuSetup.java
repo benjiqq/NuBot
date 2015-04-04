@@ -19,6 +19,7 @@
 package com.nubits.nubot.RPC;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,7 +32,7 @@ public class NuSetup {
      * setup the task for checking Nu RPC
      */
     public static void setupNuRPCTask() {
-        LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
+        NuLog.info(LOG, "Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
 
         Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
                 Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
@@ -39,7 +40,7 @@ public class NuSetup {
     }
 
     public static void startTask(){
-        LOG.info("Starting task : Check connection with Nud");
+        NuLog.info(LOG, "Starting task : Check connection with Nud");
         Global.taskManager.getCheckNudTask().start();
     }
 }

@@ -28,6 +28,7 @@ import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 
@@ -57,7 +58,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     @Override
     public void run() {
 
-        LOG.info("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
+        NuLog.info(LOG, "Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
 
         cycles++;
 
@@ -126,7 +127,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             Amount balanceNBT = balance.getNBTAvailable();
 
             Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-            LOG.info("Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
+            NuLog.info(LOG, "Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
                     + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
 
             //Execute sellSide strategy
@@ -143,7 +144,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     private void init() {
 
-        LOG.info("Initializing strategy");
+        NuLog.info(LOG, "Initializing strategy");
 
         checkBalancesAndOrders();
         isFirstTime = false;
@@ -153,7 +154,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             LOG.error("There was a problem while trying to reinitiating orders on first execution. Trying again on next execution");
             isFirstTime = true;
         } else {
-            LOG.info("Initial walls placed");
+            NuLog.info(LOG, "Initial walls placed");
         }
         getSendLiquidityTask().setFirstOrdersPlaced(true);
     }
@@ -188,7 +189,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
             Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
-            LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
+            NuLog.info(LOG, "Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                     + balanceFIAT.getQuantity() + " USD");
 
             //Execute sellSide strategy
@@ -219,7 +220,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     private void placeInitialWalls() {
 
-        LOG.info("place initial walls");
+        NuLog.info(LOG, "place initial walls");
 
         ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
         if (txFeeNTBFIATResponse.isPositive()) {
@@ -227,20 +228,20 @@ public class StrategyPrimaryPegTask extends TimerTask {
             double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
             boolean buysOrdersOk = true;
             double sellprice = TradeUtils.getSellPrice(txFeeFIATNTB);
-            LOG.info("init sell orders. price " + sellprice);
+            NuLog.info(LOG, "init sell orders. price " + sellprice);
             boolean sellsOrdersOk = initOrders(Constant.SELL, sellprice);
 
-            LOG.info("txFeeFIATNTB " + txFeeFIATNTB);
-            LOG.info("sellsOrdersOk " + sellsOrdersOk);
+            NuLog.info(LOG, "txFeeFIATNTB " + txFeeFIATNTB);
+            NuLog.info(LOG, "sellsOrdersOk " + sellsOrdersOk);
 
             if (Global.options.isDualSide()) {
 
                 double buyprice = TradeUtils.getBuyPrice(txFeeFIATNTB);
-                LOG.info("init buy orders. price " + buyprice);
+                NuLog.info(LOG, "init buy orders. price " + buyprice);
                 buysOrdersOk = initOrders(Constant.BUY, buyprice);
             }
 
-            LOG.info("buysOrdersOk " + buysOrdersOk);
+            NuLog.info(LOG, "buysOrdersOk " + buysOrdersOk);
 
             if (buysOrdersOk && sellsOrdersOk) {
                 mightNeedInit = false;
@@ -248,7 +249,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 mightNeedInit = true;
             }
 
-            LOG.info("mightNeedInit " + mightNeedInit);
+            NuLog.info(LOG, "mightNeedInit " + mightNeedInit);
 
         } else {
             LOG.error("An error occurred while attempting to update tx fee.");
@@ -273,7 +274,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         double nbttreshhold = 1;
         if (balanceNBT.getQuantity() < nbttreshhold) {
             //NBT balance = 0
-            LOG.info("NBT balance < 1, no orders to execute");
+            NuLog.info(LOG, "NBT balance < 1, no orders to execute");
             return;
         }
 
@@ -309,7 +310,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
 
-        LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
+        NuLog.info(LOG, "Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                 + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
 
         //Update TX fee :
@@ -322,7 +323,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
 
         double txFeeUSDNTB = (Double) txFeeNTBUSDResponse.getResponseObject();
-        LOG.info("Updated Trasaction fee = " + txFeeUSDNTB + "%");
+        NuLog.info(LOG, "Updated Trasaction fee = " + txFeeUSDNTB + "%");
 
         //Prepare the sell order
         double sellPrice = TradeUtils.getSellPrice(txFeeUSDNTB);
@@ -336,7 +337,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
 
         double amountToSell = balanceNBT.getQuantity();
-        LOG.info("amount to sell " + amountToSell);
+        NuLog.info(LOG, "amount to sell " + amountToSell);
         if (Global.options.isExecuteOrders()) {
             //execute the order
             String orderString = "sell " + Utils.round(amountToSell, 2) + " " + Global.options.getPair().getOrderCurrency().getCode()
@@ -374,7 +375,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             if (txFeeNTBFIATResponse.isPositive()) {
                 double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
                 double buyprice = TradeUtils.getBuyPrice(txFeeFIATNTB);
-                LOG.info("buy side. price: " + buyprice);
+                NuLog.info(LOG, "buy side. price: " + buyprice);
                 initOrders(Constant.BUY, buyprice);
 
             } else {
@@ -436,16 +437,16 @@ public class StrategyPrimaryPegTask extends TimerTask {
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
 
-        LOG.info("balance NBT " + balanceNBT);
-        LOG.info("balance FIAT " + balanceFIAT);
+        NuLog.info(LOG, "balance NBT " + balanceNBT);
+        NuLog.info(LOG, "balance FIAT " + balanceFIAT);
 
         activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
         activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-        LOG.info("activeSellOrders " + activeSellOrders);
-        LOG.info("activeBuyOrders " + activeBuyOrders);
-        LOG.info("totalActiveOrders" + totalActiveOrders);
+        NuLog.info(LOG, "activeSellOrders " + activeSellOrders);
+        NuLog.info(LOG, "activeBuyOrders " + activeBuyOrders);
+        NuLog.info(LOG, "totalActiveOrders" + totalActiveOrders);
 
         ordersAndBalancesOk = false;
 
@@ -456,15 +457,15 @@ public class StrategyPrimaryPegTask extends TimerTask {
         int numOrdersBuy = 2;
 
         if (Global.options.isDualSide()) {
-            LOG.info("checking balance and orders for dualside");
+            NuLog.info(LOG, "checking balance and orders for dualside");
 
             boolean bothSides = activeSellOrders == numOrdersBoth && activeBuyOrders == numOrdersBoth;
             boolean sellinplace = activeSellOrders == numOrdersSell && activeBuyOrders == 0 && balanceFIAT < treshholdFIAT;
             boolean buyinplace = activeSellOrders == 0 && activeBuyOrders == numOrdersBuy && balanceNBT < treshholdNBT;
 
-            LOG.info("bothSides " + bothSides);
-            LOG.info("sellneeded " + sellinplace);
-            LOG.info("buyneeded " + buyinplace);
+            NuLog.info(LOG, "bothSides " + bothSides);
+            NuLog.info(LOG, "sellneeded " + sellinplace);
+            NuLog.info(LOG, "buyneeded " + buyinplace);
 
             ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
 
@@ -477,14 +478,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
 
         } else {
-            LOG.info("checking balance and orders for one side");
+            NuLog.info(LOG, "checking balance and orders for one side");
 
             boolean nobuyorders = activeBuyOrders == 0;
             boolean twosellorders = activeSellOrders == 2;
             boolean nonbt = balanceNBT < 0.01;
-            LOG.info("nobuyorders " + nobuyorders);
-            LOG.info("twosellorders " + twosellorders);
-            LOG.info("nonbt " + nonbt);
+            NuLog.info(LOG, "nobuyorders " + nobuyorders);
+            NuLog.info(LOG, "twosellorders " + twosellorders);
+            NuLog.info(LOG, "nonbt " + nonbt);
 
             ordersAndBalancesOk = twosellorders && nobuyorders && nonbt;
         }
@@ -497,7 +498,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         if (totalActiveOrders != 0) {
 
-            LOG.info("totalActiveOrders " + totalActiveOrders);
+            NuLog.info(LOG, "totalActiveOrders " + totalActiveOrders);
 
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
@@ -520,7 +521,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                             Thread.sleep(wait);
                             areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
-                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
+                            NuLog.info(LOG, "Are all orders canceled? " + areAllOrdersCanceled);
                             count += wait;
                             timedOut = count > timeout;
 
@@ -602,7 +603,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
         if (amount.getQuantity() < oneNBT) {
-            LOG.info(type + " available balance (" + amount.getQuantity() + "," + currency + ") < " + oneNBT + " " + currency + ", no need to execute orders");
+            NuLog.info(LOG, type + " available balance (" + amount.getQuantity() + "," + currency + ") < " + oneNBT + " " + currency + ", no need to execute orders");
         } else {
             // Divide the  balance 50% 50% in balance1 and balance2
 
@@ -611,18 +612,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
             ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBPEGResponse.isPositive()) {
                 double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                NuLog.info(LOG, "Updated Trasaction fee = " + txFeePEGNTB + "%");
 
                 double amount1 = Utils.round(amount.getQuantity() / 2, Settings.DEFAULT_PRECISION);
 
                 double maxBuy = Global.options.getMaxBuyVolume();
                 double maxSell = Global.options.getMaxSellVolume();
 
-                LOG.info("check the calculated amount against the set maximum sell amount");
+                NuLog.info(LOG, "check the calculated amount against the set maximum sell amount");
 
                 //check the calculated amount against the set maximum sell amount set in the options.json file
 
-                LOG.info("max sell volume " + maxSell);
+                NuLog.info(LOG, "max sell volume " + maxSell);
 
                 if (maxSell > 0 && type.equals(Constant.SELL)) {
                     double most = (maxSell / 2);
@@ -636,14 +637,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
                     amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
                     //check the calculated amount against the max buy amount option, if any.
-                    LOG.info("check the calculated amount against the max buy amount option, if any.");
-                    LOG.info("max buy volume " + maxBuy);
+                    NuLog.info(LOG, "check the calculated amount against the max buy amount option, if any.");
+                    NuLog.info(LOG, "max buy volume " + maxBuy);
                     if (maxBuy > 0) {
 
                         double most = maxBuy / 2;
                         if (amount1 > most) {
                             amount1 = most;
-                            LOG.info("cap buy amount at " + most);
+                            NuLog.info(LOG, "cap buy amount at " + most);
                         }
                     }
                 }
@@ -655,7 +656,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                     if (amount2 > most) {
                         amount2 = most;
-                        LOG.info("cap sell amount at " + most);
+                        NuLog.info(LOG, "cap sell amount at " + most);
                     }
                 }
 
@@ -671,7 +672,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         double most = maxBuy / 2;
                         if (amount2 > most) {
                             amount2 = most;
-                            LOG.info("cap buy at " + most);
+                            NuLog.info(LOG, "cap buy at " + most);
                         }
                     }
 

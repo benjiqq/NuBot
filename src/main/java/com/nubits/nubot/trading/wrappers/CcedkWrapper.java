@@ -37,6 +37,7 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.ErrorManager;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 
 import java.io.BufferedReader;
@@ -487,7 +488,7 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 boolean valid = (boolean) dataJson.get("entity");
                 String message = "The order " + orderID + " does not exist";
-                LOG.info(message);
+                NuLog.info(LOG, message);
 
                 apiResponse.setResponseObject(false);
                 return apiResponse;
@@ -787,7 +788,7 @@ public class CcedkWrapper implements TradeInterface {
                     if (wrongNonceCounter == 0) {
                         nonce = createNonce("");
                     } else {
-                        LOG.info("Re executing query for the " + wrongNonceCounter + " time. "
+                        NuLog.info(LOG, "Re executing query for the " + wrongNonceCounter + " time. "
                                 + "New nonce = " + adjustedNonce
                                 + " while calling : " + method);
                         nonce = adjustedNonce;
@@ -848,9 +849,9 @@ public class CcedkWrapper implements TradeInterface {
                 if (httpError) {
                     LOG.error("Http error - Post Data: " + post_data);
                 }
-                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                NuLog.info(LOG, "Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.info(output);
+                    NuLog.info(LOG, output);
                     answer += output;
                 }
 

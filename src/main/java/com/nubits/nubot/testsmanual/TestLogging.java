@@ -2,6 +2,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,7 @@ public class TestLogging {
     public static void main(String[] args) {
 
         InitTests.setLoggingFilename(LOG);
-        LOG.info("abcd" + LOG.getName());
+        NuLog.info(LOG, "abcd" + LOG.getName());
     }
 
 }

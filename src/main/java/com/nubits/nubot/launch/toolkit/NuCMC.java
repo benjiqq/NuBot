@@ -31,6 +31,7 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
@@ -63,7 +64,7 @@ public class NuCMC {
         if (app.readParams(args)) {
             createShutDownHook();
 
-            LOG.info("Launching NuCheckPrice ");
+            NuLog.info(LOG, "Launching NuCheckPrice ");
             app.exec();
         } else {
             System.exit(0);
@@ -150,7 +151,7 @@ public class NuCMC {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                LOG.info("Exiting...");
+                NuLog.info(LOG, "Exiting...");
                 mainThread.interrupt();
                 try{
                     Global.taskManager.stopAll();
@@ -181,9 +182,9 @@ public class NuCMC {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                LOG.info("Order clear request succesfully");
+                NuLog.info(LOG, "Order clear request succesfully");
             } else {
-                LOG.info("Could not submit request to clear orders");
+                NuLog.info(LOG, "Could not submit request to clear orders");
             }
 
         } else {

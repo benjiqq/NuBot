@@ -29,6 +29,7 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.ErrorManager;
+import com.nubits.nubot.utils.NuLog;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -127,7 +128,7 @@ public class AltsTradeWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        LOG.info("requesting balance" + pair + " url " + url);
+        NuLog.info(LOG, "requesting balance" + pair + " url " + url);
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();

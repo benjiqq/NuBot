@@ -35,6 +35,7 @@ import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.ErrorManager;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 
 import java.io.BufferedReader;
@@ -484,7 +485,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.info("CCex uses global TX fee, currency pair not supprted. \n"
+        NuLog.info(LOG, "CCex uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -828,12 +829,12 @@ public class CcexWrapper implements TradeInterface {
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.info("\nSending request to URL : " + url + " ; get = " + isGet);
+                NuLog.info(LOG, "\nSending request to URL : " + url + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
-                LOG.info("Response Code : " + response.getStatusLine().getStatusCode());
-                LOG.info("Response :" + response);
+                NuLog.info(LOG, "Response Code : " + response.getStatusLine().getStatusCode());
+                NuLog.info(LOG, "Response :" + response);
 
             }
             return answer;

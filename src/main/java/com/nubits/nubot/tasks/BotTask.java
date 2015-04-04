@@ -20,6 +20,8 @@ package com.nubits.nubot.tasks;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -53,11 +55,11 @@ public class BotTask {
     public void start() {
         timer.scheduleAtFixedRate(task, 0, interval * 1000);
         setRunning(true);
-        LOG.info("Started BotTask " + this.name);
+        NuLog.info(LOG, "Started BotTask " + this.name);
     }
 
     public void start(int delay) {
-        LOG.info("BotTask [" + this.name + "] will start in " + delay + "s, and run it every " + interval + "s");
+        NuLog.info(LOG, "BotTask [" + this.name + "] will start in " + delay + "s, and run it every " + interval + "s");
         timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);
     }
@@ -65,7 +67,7 @@ public class BotTask {
     public void stop() {
         timer.cancel();
         setRunning(false);
-        LOG.info("Stopped BotTask " + this.name);
+        NuLog.info(LOG, "Stopped BotTask " + this.name);
     }
 
     public boolean isRunning() {

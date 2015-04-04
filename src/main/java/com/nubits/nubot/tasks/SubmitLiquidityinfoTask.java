@@ -27,6 +27,7 @@ import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 
 import java.io.File;
@@ -136,7 +137,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 String response1 = reportTier1(); //active orders
                 String response2 = reportTier2(); //balance
                 if(Global.options.isSubmitliquidity()) {
-                    LOG.info("RPC Response : " + response1 + "\n" + response2);
+                    NuLog.info(LOG, "RPC Response : " + response1 + "\n" + response2);
                 }
             } else {
                 LOG.warn("Liquidity is not being sent : orders are not yet initialized");
@@ -170,8 +171,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
 
         if (verbose) {
-            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
-            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
+            NuLog.info(LOG, Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
+            NuLog.info(LOG, Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
         }
 
         double nbt_onsell = 0;
@@ -184,7 +185,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             digest = digest + tempOrder.getDigest();
             double toAdd = tempOrder.getAmount().getQuantity();
             if (verbose) {
-                LOG.info(tempOrder.toString());
+                NuLog.info(LOG, tempOrder.toString());
             }
 
             if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
@@ -267,8 +268,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         logOrderJSON(orderHistory);
 
         if (verbose) {
-            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
-            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
+            NuLog.info(LOG, Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
+            NuLog.info(LOG, Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
         }
 
         if (Global.options.isSubmitliquidity()) {
@@ -373,15 +374,15 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             if (null == responseObject) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.info(responseObject.toJSONString());
+                NuLog.info(LOG, responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
-                    LOG.info("RPC Liquidityinfo sent : "
+                    NuLog.info(LOG, "RPC Liquidityinfo sent : "
                             + "\nbuyside : " + buySide
                             + "\nsellside : " + sellSide);
                     if (verbose) {
                         JSONObject infoObject = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar);
-                        LOG.info("getliquidityinfo result : ");
-                        LOG.info(infoObject.toJSONString());
+                        NuLog.info(LOG, "getliquidityinfo result : ");
+                        NuLog.info(LOG, infoObject.toJSONString());
                     }
                 }
             }

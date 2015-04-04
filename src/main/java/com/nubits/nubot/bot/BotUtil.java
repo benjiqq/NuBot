@@ -25,6 +25,7 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.utils.NuLog;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -100,7 +101,7 @@ public class BotUtil {
         for (int i = 0; i < orderList.size(); i++) {
             Order tempOrder = orderList.get(i);
             if (tempOrder.getType().equalsIgnoreCase(type)) {
-                LOG.info("active order: " + tempOrder);
+                NuLog.info(LOG, "active order: " + tempOrder);
                 toRet++;
             }
         }

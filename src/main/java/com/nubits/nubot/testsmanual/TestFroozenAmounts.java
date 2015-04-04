@@ -27,6 +27,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -62,11 +63,11 @@ public class TestFroozenAmounts {
         fbm.updateFrozenBalance(new Amount(30.3, currency));
         fbm.updateFrozenBalance(new Amount(1, currency));
 
-        LOG.info("Loaded Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
+        NuLog.info(LOG, "Loaded Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
 
         fbm.updateFrozenBalance(new Amount(231.2, currency));
 
-        LOG.info("then Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
+        NuLog.info(LOG, "then Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
 
 
     }

@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.VersionInfo;
 import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;
@@ -54,13 +55,15 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
+        NuLog.info(LOG, "test");
+
         //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
 
         Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
-        LOG.info("defined session path " + Global.sessionPath);
+        NuLog.info(LOG, "defined session path " + Global.sessionPath);
 
-        LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
+        NuLog.info(LOG, "commit info " + VersionInfo.getBranchCommitInfo());
 
         sessionLOG.debug("test launch");
 

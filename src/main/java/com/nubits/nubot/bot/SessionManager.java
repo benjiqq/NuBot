@@ -7,6 +7,7 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,7 @@ public class SessionManager {
         boolean otherSessions = isSessionActive();
 
         if (otherSessions) {
-            LOG.info("NuBot is already running");
+            NuLog.info(LOG, "NuBot is already running");
             //handle different cases later
 
             //TODO: several NuBots running one exchange should be prohibited (?)
@@ -78,7 +79,7 @@ public class SessionManager {
         String timestamp =
                 new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());
 
-        LOG.info("*** session *** starting at " + timestamp);
+        NuLog.info(LOG, "*** session *** starting at " + timestamp);
 
     }
 
@@ -121,7 +122,7 @@ public class SessionManager {
 
         sessionFile = new File
                 (appFolder, Settings.APP_NAME + Settings.SESSION_FILE);
-        LOG.info("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+        NuLog.info(LOG, "checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
 

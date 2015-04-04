@@ -18,21 +18,20 @@
 
 package com.nubits.nubot.testsmanual;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.*;
-import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
+import com.nubits.nubot.pricefeeds.FeedFacade;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.feedservices.*;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -63,15 +62,15 @@ public class TestPriceFeed {
     }
 
     private void init() {
-        LOG.info("Set up SSL certificates");
+        NuLog.info(LOG, "Set up SSL certificates");
         Utils.installKeystore(false);
     }
 
     private void executeSingle(AbstractPriceFeed feed, CurrencyPair pair) {
-        LOG.info("Testing feed :  " + feed.getClass() + " , pair : " + pair.toString());
+        NuLog.info(LOG, "Testing feed :  " + feed.getClass() + " , pair : " + pair.toString());
         LastPrice lastPrice = feed.getLastPrice(pair);
         if (!lastPrice.isError()) {
-            LOG.info(lastPrice.toString());
+            NuLog.info(LOG, lastPrice.toString());
         } else {
             //handle error
             LOG.error("There was a problem while updating the price");
@@ -165,11 +164,11 @@ public class TestPriceFeed {
 
         ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
-        LOG.info("\n\n\n ---------------------- Testing results for: " + pair.toStringSepSpecial("/"));
-        LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
+        NuLog.info(LOG, "\n\n\n ---------------------- Testing results for: " + pair.toStringSepSpecial("/"));
+        NuLog.info(LOG, "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-            LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+            NuLog.info(LOG, tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
                     + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }

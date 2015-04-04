@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.commons.net.time.TimeUDPClient;
 
@@ -65,7 +66,7 @@ public final class NTPClient {
                 LOG.warn("Problem with timeserver " + hostnames.get(i) + ""
                         + "\n" + ex.toString());
                 if (i != hostnames.size() - 1) {
-                    LOG.info("Trying next server");
+                    NuLog.info(LOG, "Trying next server");
                 }
             }
         }
