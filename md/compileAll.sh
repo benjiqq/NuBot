@@ -6,3 +6,4 @@
 /usr/local/bin/grip EXCHANGES.md --export exchanges.html
 /usr/local/bin/grip CHANGELOG.md --export changelog.html
 /usr/local/bin/grip GRADLE.md --export gradle.html
+/usr/local/bin/grip DISCLAIMER.md --export disclaimer.html

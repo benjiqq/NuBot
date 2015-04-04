@@ -5,44 +5,44 @@
 <configuration>
 
 
-	<property scope="context" name="testlogfolder" value="logs/tests" />
+    <property scope="context" name="testlogfolder" value="logs/tests"/>
 
 
-	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-		<layout class="ch.qos.logback.classic.PatternLayout">
-			<Pattern>
-				%date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
-			</Pattern>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n
+            </Pattern>
 
-		</layout>
+        </layout>
 
-	</appender>
+    </appender>
 
-	<appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
 
-		<discriminator>
-			<key>testFileName</key>
-			<defaultValue>unknown</defaultValue>
-		</discriminator>
-		<sift>
-			<appender name="FILE-${testFileName}" class="ch.qos.logback.core.FileAppender">
-				<file>${testlogfolder}/${testFileName}.log</file>
-				<append>false</append>
-				<layout class="ch.qos.logback.classic.PatternLayout">
-					<pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
-				</layout>
-			</appender>
-		</sift>
-	</appender>
-
-
-	<root level="debug">
-		<appender-ref ref="SIFT" />
-		<appender-ref ref="STDOUT" />
-	</root>
+        <discriminator>
+            <key>testFileName</key>
+            <defaultValue>unknown</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${testFileName}" class="ch.qos.logback.core.FileAppender">
+                <file>${testlogfolder}/${testFileName}.log</file>
+                <append>false</append>
+                <layout class="ch.qos.logback.classic.PatternLayout">
+                    <pattern>%d [%thread] %level %mdc %logger{35} - %msg%n</pattern>
+                </layout>
+            </appender>
+        </sift>
+    </appender>
 
 
-	<!-- to surpress logback startup messages -->
-	<statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <root level="debug">
+        <appender-ref ref="SIFT"/>
+        <appender-ref ref="STDOUT"/>
+    </root>
+
+
+    <!-- to surpress logback startup messages -->
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
 </configuration>

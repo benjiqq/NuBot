@@ -1,11 +1,11 @@
 # Setting up NuBot
-A tutorial for custodians
+A tutorial for custodians and users of NuBot.
 
 ##Disclaimer . Use NuBot at your own risk
 
 *PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL. ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS. NONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF NUBOT*
 
-By using NuBot you declare to have accepted the afore-mentioned risks.
+By using NuBot you declare to have accepted the afore-mentioned risks. See the DISCLAIMER.md for detailed terms.
 
 ##Requirements for a correct functioning 
 

@@ -92,7 +92,7 @@ public class Global {
                         try {
                             Global.taskManager.stopAll();
                         } catch (IllegalStateException e) {
-
+                            LOG.error(e.toString());
                         }
                     }
                 }

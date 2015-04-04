@@ -15,6 +15,11 @@ As explained in the [white paper](https://nubits.com/about/white-paper), a custo
 #Changelog
 See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
 
+##Disclaimer . Use NuBot at your own risk
+
+*PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL. ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS. NONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF NUBOT*
+
+By using NuBot you declare to have accepted the afore-mentioned risks. See the DISCLAIMER.md for detailed terms.
 
 #How does it work?
 

@@ -20,7 +20,6 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
@@ -31,12 +30,13 @@ import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-
 
 public class TestRPCLiquidityInfo {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
+    private static final String NUD_RPC_USER = "nubotTestUser";
+    private static final String NUD_RPC_PASS = "nubotTestPass";
+    private static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
     private static boolean verbose = false;
@@ -52,9 +52,9 @@ public class TestRPCLiquidityInfo {
         InitTests.setLoggingFilename(LOG);
 
         //Default values
-        String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
-        String user = Settings.NUD_RPC_USER;
-        String pass = Settings.NUD_RPC_PASS;
+        String custodian = CUSTODIAN_PUBLIC_ADDRESS;
+        String user = NUD_RPC_USER;
+        String pass = NUD_RPC_PASS;
         double sell = 0;
         double buy = 0;
         //java -jar testRPC user pass custodian sell buy
@@ -69,7 +69,7 @@ public class TestRPCLiquidityInfo {
 
         Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
                 user, pass, true, true,
-                custodian, CurrencyList.NBT_BTC , "");
+                custodian, CurrencyList.NBT_BTC, "");
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
@@ -138,7 +138,7 @@ public class TestRPCLiquidityInfo {
 
         Utils.installKeystore(true);
 
-        String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
+        String custodian = CUSTODIAN_PUBLIC_ADDRESS;
 
         //Create the client
         Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodian, pair, exchangeName);
