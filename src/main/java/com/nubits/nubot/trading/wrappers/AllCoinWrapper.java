@@ -34,6 +34,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.text.*;
 import java.util.*;
+
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 import javax.net.ssl.HttpsURLConnection;
@@ -360,7 +362,7 @@ public class AllCoinWrapper implements TradeInterface {
                 for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
                     Order order = parseOrder(data.next());
                     if (pair != null && !order.getPair().equals(pair)) {
-                        LOG.info("|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
+                        NuLog.info(LOG, "|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
                         //we are only looking for orders with the specified pair.
                         //the current order doesn't fill that need
                         continue;
@@ -539,7 +541,7 @@ public class AllCoinWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
             if (trades != null) {
-                //LOG.info(trades.toJSONString());
+                //NuLog.info(LOG, trades.toJSONString());
                 for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
                     Trade thisTrade = parseTrade(trade.next());
                     if (!thisTrade.getPair().equals(pair)) {

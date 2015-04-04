@@ -39,6 +39,7 @@ import java.security.NoSuchAlgorithmException;
 import java.text.*;
 import java.util.*;
 
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -121,7 +122,7 @@ public class ExcoinWrapper implements TradeInterface {
                 LOG.error("Exco.in API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
-                //LOG.info("httpAnswerJSON = \n" + httpAnswerJson.toJSONString());
+                //NuLog.info(LOG, "httpAnswerJSON = \n" + httpAnswerJson.toJSONString());
                 apiResponse.setResponseObject(httpAnswerJson);
             }
         } catch (ClassCastException cce) {
@@ -448,7 +449,7 @@ public class ExcoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.info("Excoin uses global TX fee, currency pair not supported. \n"
+        NuLog.info(LOG, "Excoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -470,7 +471,7 @@ public class ExcoinWrapper implements TradeInterface {
 
         String url;
         if (startTime == 0) { //https://api.exco.in/v1/account/trades(/{COUNT})
-            LOG.info("A maximum of " + API_MAX_TRADES + " trades can be returned from the API");
+            NuLog.info(LOG, "A maximum of " + API_MAX_TRADES + " trades can be returned from the API");
             url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_MAX_TRADES;
         } else { //https://api.exco.in/v1/account/timestamp/{TIMESTAMP}
             url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_TIMESTAMP + "/" + startTime;

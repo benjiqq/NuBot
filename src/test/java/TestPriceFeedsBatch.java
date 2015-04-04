@@ -24,6 +24,7 @@ import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.*;
 import com.nubits.nubot.testsmanual.TestPriceFeed;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -49,7 +50,7 @@ public class TestPriceFeedsBatch extends TestCase {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
 
-        LOG.info("Set up SSL certificates");
+        NuLog.info(LOG, "Set up SSL certificates");
         Utils.installKeystore(false);
     }
 
@@ -80,7 +81,7 @@ public class TestPriceFeedsBatch extends TestCase {
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-          //  LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+          //  NuLog.info(LOG, tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
             //        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }

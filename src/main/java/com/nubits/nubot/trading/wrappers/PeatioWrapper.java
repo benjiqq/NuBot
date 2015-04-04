@@ -37,6 +37,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -101,7 +102,7 @@ public class PeatioWrapper implements TradeInterface {
             try {
 
                 if (Global.options.isVerbose()) {
-                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
+                    NuLog.info(LOG, System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
                 }
 
                 Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
@@ -638,7 +639,7 @@ public class PeatioWrapper implements TradeInterface {
 
 
         if (Global.options.isVerbose()) {
-            LOG.info(currentTime + " Now apiBusy! req : " + requester);
+            NuLog.info(LOG, currentTime + " Now apiBusy! req : " + requester);
         }
 
 
@@ -650,7 +651,7 @@ public class PeatioWrapper implements TradeInterface {
                 currentTime = System.currentTimeMillis();
                 if (Global.options != null) {
                     if (Global.options.isVerbose()) {
-                        LOG.info("Just slept " + sleepTime + "; req : " + requester);
+                        NuLog.info(LOG, "Just slept " + sleepTime + "; req : " + requester);
                     }
                 }
             } catch (InterruptedException e) {
@@ -661,7 +662,7 @@ public class PeatioWrapper implements TradeInterface {
         lastSentTonce = currentTime += timeDiffMs;
         if (Global.options != null) {
             if (Global.options.isVerbose()) {
-                LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
+                NuLog.info(LOG, "Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
             }
         }
         apiBusy = false;
@@ -710,7 +711,7 @@ public class PeatioWrapper implements TradeInterface {
 
         ApiResponse response = getQuery(url, method, query_args, isGet);
         if (response.isPositive()) {
-            LOG.info("A maximum of 1000 trades can be returned from the Peatio API");
+            NuLog.info(LOG, "A maximum of 1000 trades can be returned from the Peatio API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Iterator<JSONObject> trade = httpAnswerJson.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
@@ -784,7 +785,7 @@ public class PeatioWrapper implements TradeInterface {
                 int stopIndex = errString.lastIndexOf(stopStr);
                 remoteTime = Long.parseLong(errString.substring(startIndex, stopIndex));
             } catch (Exception ex) {
-                LOG.info("Local timestamp and Peatio timestamp are equal");
+                NuLog.info(LOG, "Local timestamp and Peatio timestamp are equal");
             }
             diff = remoteTime - localtime;
             //LOG.warn("\n\n\n diff=" + diff + "  \n\n");

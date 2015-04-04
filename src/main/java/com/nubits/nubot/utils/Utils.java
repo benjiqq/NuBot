@@ -214,7 +214,7 @@ public class Utils {
     }
 
     public static void printSeparator() {
-        LOG.info("\n----------- -----------  -----------\n");
+        NuLog.info(LOG, "\n----------- -----------  -----------\n");
     }
 
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
@@ -366,7 +366,7 @@ public class Utils {
 
     public static void installKeystore(boolean trustAll) {
 
-        LOG.info("installKeystore. trustall: " + trustAll);
+        NuLog.info(LOG, "installKeystore. trustall: " + trustAll);
         if (trustAll) {
             try {
                 Utils.installTrustAllManager();

@@ -18,15 +18,10 @@
 
 package com.nubits.nubot.exchanges;
 
-import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 
 
 public class Exchange {

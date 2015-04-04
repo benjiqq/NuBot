@@ -29,6 +29,7 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
@@ -76,7 +77,7 @@ public class StrategySecondaryPegUtils {
 
                             Thread.sleep(wait);
                             areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
-                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
+                            NuLog.info(LOG, "Are all orders canceled? " + areAllOrdersCanceled);
                             count += wait;
                             timedOut = count > timeout;
 
@@ -136,7 +137,7 @@ public class StrategySecondaryPegUtils {
 
         if (buysOrdersOk && sellsOrdersOk) {
             strategy.setMightNeedInit(false);
-            LOG.info("Initial walls placed");
+            NuLog.info(LOG, "Initial walls placed");
         } else {
             strategy.setMightNeedInit(true);
         }
@@ -180,7 +181,7 @@ public class StrategySecondaryPegUtils {
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
-            LOG.info("no need to execute " +type + "orders : available balance < 1 NBT");
+            NuLog.info(LOG, "no need to execute " +type + "orders : available balance < 1 NBT");
             return false;
         }
 
@@ -432,7 +433,7 @@ public class StrategySecondaryPegUtils {
 
     public void aggregateAndKeepProceeds() {
 
-        LOG.info("aggregateAndKeepProceeds");
+        NuLog.info(LOG, "aggregateAndKeepProceeds");
 
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
@@ -450,7 +451,7 @@ public class StrategySecondaryPegUtils {
             }
 
             double buyPrice = strategy.getBuyPricePEG();
-            LOG.info("init buy orders. price " + buyPrice);
+            NuLog.info(LOG, "init buy orders. price " + buyPrice);
             initOrders(Constant.BUY, buyPrice);
 
         } else {
@@ -518,7 +519,7 @@ public class StrategySecondaryPegUtils {
         }
 
 
-        LOG.info("Immediately try to cancel all orders");
+        NuLog.info(LOG, "Immediately try to cancel all orders");
 
         //immediately try to : cancel all active orders
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -581,7 +582,7 @@ public class StrategySecondaryPegUtils {
                 strategy.getSendLiquidityTask().setWallsBeingShifted(false);
 
             } else {
-                LOG.info("Could not submit request to clear orders");
+                NuLog.info(LOG, "Could not submit request to clear orders");
                 success = false;
                 //Communicate to the priceMonitorTask that the wall shift is over
                 strategy.getPriceMonitorTask().setWallsBeingShifted(false);

@@ -34,6 +34,7 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.FileSystem;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,10 +65,10 @@ public class NuLastTrades {
         FileSystem.mkdir(logsFolder);
         if (app.readParams(args)) {
 
-            LOG.info("Launching NuLastTrades on " + app.exchangename);
+            NuLog.info(LOG, "Launching NuLastTrades on " + app.exchangename);
             app.prepareForExecution();
             app.execute();
-            LOG.info("Done");
+            NuLog.info(LOG, "Done");
             System.exit(0);
 
         } else {
@@ -107,7 +108,7 @@ public class NuLastTrades {
         Global.taskManager.getCheckConnectionTask().start();
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.info("Exchange setup complete. Now checking connection ...");
+        NuLog.info(LOG, "Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -161,7 +162,7 @@ public class NuLastTrades {
             FileSystem.writeToFile("{\n", output, false);
             //FileSystem.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
             //FileSystem.writeToFile("\"pair\":\"" + pair.toStringSep("_") + "\",\n", output, true);
-            LOG.info("Last trades : " + tradeList.size());
+            NuLog.info(LOG, "Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
 
@@ -192,7 +193,7 @@ public class NuLastTrades {
                 }
 
                 paidInFees += tempTrade.getFee().getQuantity();
-                LOG.info(tempTrade.toString());
+                NuLog.info(LOG, tempTrade.toString());
                 String comma = ",\n";
                 if (i == tradeList.size() - 1) {
                     comma = "";
@@ -216,7 +217,7 @@ public class NuLastTrades {
                 + "\nTotal volume transacted : " + totalAmountPEG + " BTC ; " + totalAmountNBT + " NBT )"
                 + "\nOrders > " + threshold + " NBT : " + countLargeOrders
                 + "\nPaid in fees : " + paidInFees;
-        LOG.info(report);
+        NuLog.info(LOG, report);
         FileSystem.writeToFile(report, output + "_report.txt", false);
     }
 }

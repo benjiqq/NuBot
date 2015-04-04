@@ -29,6 +29,7 @@ import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.utils.NuLog;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -83,9 +84,9 @@ public class TestExchangeBitspark extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-            LOG.info("using opt " + opt);
-            LOG.info("key: " + opt.apiKey);
-            LOG.info("secret: " + opt.apiSecret);
+            NuLog.info(LOG, "using opt " + opt);
+            NuLog.info(LOG, "key: " + opt.apiKey);
+            NuLog.info(LOG, "secret: " + opt.apiSecret);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -116,9 +117,9 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(delta < 5000);
 
         if (balancesResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -127,7 +128,7 @@ public class TestExchangeBitspark extends TestCase {
             }
             //Balance balance = (Balance) o;
 
-            //LOG.info(balance.toStringSep());
+            //NuLog.info(LOG, balance.toStringSep());
 
             //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
             //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);
@@ -143,9 +144,9 @@ public class TestExchangeBitspark extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-            LOG.info("using opt " + opt);
-            LOG.info("key: " + opt.apiKey);
-            LOG.info("secret: " + opt.apiSecret);
+            NuLog.info(LOG, "using opt " + opt);
+            NuLog.info(LOG, "key: " + opt.apiKey);
+            NuLog.info(LOG, "secret: " + opt.apiSecret);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -172,9 +173,9 @@ public class TestExchangeBitspark extends TestCase {
         ApiResponse priceResponse = ti.getLastPrice(pair);
 
         if (priceResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getLastPrice() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.getLastPrice() ");
             Object o = priceResponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
             try {
                 Ticker t = (Ticker) o;
                 //bitspark bug: prices are 0.0
@@ -194,9 +195,9 @@ public class TestExchangeBitspark extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-            LOG.info("using opt " + opt);
-            LOG.info("key: " + opt.apiKey);
-            LOG.info("secret: " + opt.apiSecret);
+            NuLog.info(LOG, "using opt " + opt);
+            NuLog.info(LOG, "key: " + opt.apiKey);
+            NuLog.info(LOG, "secret: " + opt.apiSecret);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -237,9 +238,9 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(orderresponse2.isPositive());
 
         if (orderresponse2.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
             Object o = orderresponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
 
         } else {
             assertTrue(false);

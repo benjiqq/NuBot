@@ -52,7 +52,7 @@ public class InitTests {
     {
         //Load keystore
         try {
-            LOG.info("install keystore, trust all certificate : "+ trustAll);
+            NuLog.info(LOG, "install keystore, trust all certificate : "+ trustAll);
             Utils.installKeystore(trustAll);
         } catch (Exception ex) {
             LOG.error(ex.toString());
@@ -79,6 +79,6 @@ public class InitTests {
         String fileName = fullName.substring(fullName.lastIndexOf(".")+1) + "_"
                 + Utils.getTimestampLong();
         MDC.put("testFileName", fileName);
-        LOG.info("Logging on "+ Settings.TEST_LOGFOLDER+"/"+fileName);
+        NuLog.info(LOG, "Logging on "+ Settings.TEST_LOGFOLDER+"/"+fileName);
     }
 }

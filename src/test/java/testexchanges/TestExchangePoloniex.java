@@ -26,6 +26,7 @@ import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.utils.NuLog;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -92,9 +93,9 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(delta < 10000);
 
         if (balancesResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -124,9 +125,9 @@ public class TestExchangePoloniex extends TestCase {
         ApiResponse priceResponse = ti.getLastPrice(pair);
 
         if (priceResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.priceResponse() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.priceResponse() ");
             Object o = priceResponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -170,9 +171,9 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(orderresponse2.isPositive());
 
         if (orderresponse2.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
             Object o = orderresponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
 
         } else {
             assertTrue(false);

@@ -24,6 +24,8 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
+
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +82,7 @@ public class Global {
                 Global.sessionStopped = System.currentTimeMillis();
                 sessionLOG.info("session end;" + Global.sessionStopped);
 
-                LOG.info("Exit. ");
+                NuLog.info(LOG, "Exit. ");
 
                 Global.mainThread.interrupt();
                 if (Global.taskManager != null) {

@@ -27,6 +27,7 @@ import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.utils.NuLog;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -53,10 +54,10 @@ public class TestExchangePeatio extends TestCase {
         ApiResponse balancesResponse = ti.getAvailableBalances(testPair);
 
         if (balancesResponse.isPositive()) {
-            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
+            NuLog.info(LOG, "\nPositive response  from TradeInterface.getBalance() ");
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
-            LOG.info(balance.toString());
+            NuLog.info(LOG, balance.toString());
 
             //assertTrue(balance.getNubitsBalance().getQuantity()==0.0);
             //assertTrue(balance.getPEGBalance().getQuantity()==1000.0);
@@ -117,9 +118,9 @@ public class TestExchangePeatio extends TestCase {
         assertTrue(delta < 5000);
 
         if (balancesResponse.isPositive()) {
-            LOG.info("Positive response  from TradeInterface.getBalance() ");
+            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
-            LOG.info("response " + o);
+            NuLog.info(LOG, "response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -128,7 +129,7 @@ public class TestExchangePeatio extends TestCase {
             }
             //Balance balance = (Balance) o;
 
-            //LOG.info(balance.toStringSep());
+            //NuLog.info(LOG, balance.toStringSep());
 
             //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
             //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);

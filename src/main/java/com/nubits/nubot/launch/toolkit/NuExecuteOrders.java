@@ -30,6 +30,7 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
 import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -66,11 +67,11 @@ public class NuExecuteOrders {
         NuExecuteOrders app = new NuExecuteOrders();
         if (app.readParams(args)) {
             createShutDownHook();
-            LOG.info("Launching NuOrderExecutor ");
+            NuLog.info(LOG, "Launching NuOrderExecutor ");
             app.orderList = app.readOrdersFromFile();
             app.prepareForExecution();
             app.executeOrders();
-            LOG.info("Done");
+            NuLog.info(LOG, "Done");
             System.exit(0);
 
         } else {
@@ -82,7 +83,7 @@ public class NuExecuteOrders {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                LOG.info("Exiting...");
+                NuLog.info(LOG, "Exiting...");
                 NuExecuteOrders.mainThread.interrupt();
                 try {
                     Global.taskManager.stopAll();
@@ -145,7 +146,7 @@ public class NuExecuteOrders {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        LOG.info("Exchange setup complete. Now checking connection ...");
+        NuLog.info(LOG, "Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
@@ -184,7 +185,7 @@ public class NuExecuteOrders {
                 String[] order = line.split(cvsSplitBy);
                 CsvLine csvline = new CsvLine(order[0], Double.valueOf(order[1]), Double.valueOf(order[2]), Long.valueOf(order[3]));
                 list.add(csvline);
-                LOG.info("Order " + list.size() + " loaded from file : " + csvline.toString());
+                NuLog.info(LOG, "Order " + list.size() + " loaded from file : " + csvline.toString());
             }
 
         } catch (FileNotFoundException e) {

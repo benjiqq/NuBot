@@ -26,6 +26,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,7 +105,7 @@ public class TestWrappers {
         //WrapperTestUtils.testGetLastTrades(testPair);
 
 
-        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
+        NuLog.info(LOG, "Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
         System.exit(0);
     }
@@ -123,8 +124,8 @@ public class TestWrappers {
         InitTests.loadKeystore(trustAll);
 
         try {
-            LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + Global.options.getExchangeName());
+            NuLog.info(LOG, "using key: " + Global.options.getApiKey());
+            NuLog.info(LOG, "config exchange " + Global.options.getExchangeName());
             WrapperTestUtils.configureExchange(Global.options.getExchangeName());
             InitTests.startConnectionCheck();
 

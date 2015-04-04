@@ -36,6 +36,7 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.ErrorManager;
+import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -348,7 +349,7 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.info("Btc-e uses global TX fee, currency pair not supprted. \n"
+        NuLog.info(LOG, "Btc-e uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -773,9 +774,9 @@ public class BtceWrapper implements TradeInterface {
                 if (httpError) {
                     LOG.error("Post Data: " + post_data);
                 }
-                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                NuLog.info(LOG, "Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    LOG.info(output);
+                    NuLog.info(LOG, output);
                     answer += output;
                 }
                 /*

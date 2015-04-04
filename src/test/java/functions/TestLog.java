@@ -21,6 +21,7 @@ package functions;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
+import com.nubits.nubot.utils.NuLog;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,16 +29,17 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 
-public class TestLog extends TestCase{
+public class TestLog extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLog.class.getName());
 
     @Test
-    public void testXML(){
+    public void testXML() {
         LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
 
-        LOG.info("Logback used '{}' as the configuration file.", mainURL);
+        NuLog.info(LOG, "Logback used '{}' as the configuration file."
+                + mainURL);
 
     }
 }

@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -94,14 +95,14 @@ public class NuRPCClient {
         }
 
 
-        LOG.info("RPC parameters " + params.toString());
+        NuLog.info(LOG, "RPC parameters " + params.toString());
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
 
             if (json.get("null") == null) {
                 //Correct answer, try to getliquidityinfo
-                LOG.info("RPC : Liquidity info submitted correctly.");
+                NuLog.info(LOG, "RPC : Liquidity info submitted correctly.");
                 JSONObject jo = new JSONObject();
                 jo.put("submitted", true);
                 return jo;
@@ -278,28 +279,28 @@ public class NuRPCClient {
                     new UsernamePasswordCredentials(this.rpcUsername, this.rpcPassword));
             StringEntity myEntity = new StringEntity(json.toJSONString());
             if (this.verbose) {
-                LOG.info("RPC : " + json.toString());
+                NuLog.info(LOG, "RPC : " + json.toString());
             }
             HttpPost httppost = new HttpPost("http://" + this.ip + ":" + this.port);
             httppost.setEntity(myEntity);
 
             if (this.verbose) {
-                LOG.info("RPC executing request :" + httppost.getRequestLine());
+                NuLog.info(LOG, "RPC executing request :" + httppost.getRequestLine());
             }
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
 
             if (this.verbose) {
-                LOG.info("RPC----------------------------------------");
-                LOG.info("" + response.getStatusLine());
+                NuLog.info(LOG, "RPC----------------------------------------");
+                NuLog.info(LOG, "" + response.getStatusLine());
 
                 if (entity != null) {
-                    LOG.info("RPC : Response content length: " + entity.getContentLength());
+                    NuLog.info(LOG, "RPC : Response content length: " + entity.getContentLength());
                 }
             }
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
-            LOG.info("Entity = " + entityString);
+            NuLog.info(LOG, "Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
             LOG.error(e.toString());

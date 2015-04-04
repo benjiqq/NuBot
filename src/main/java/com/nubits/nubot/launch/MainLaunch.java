@@ -21,6 +21,7 @@ package com.nubits.nubot.launch;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -56,7 +57,7 @@ public class MainLaunch {
 
         Global.sessionPath = "logs" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
-        LOG.info("defined session path " + Global.sessionPath);
+        NuLog.info(LOG, "defined session path " + Global.sessionPath);
 
         //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
 

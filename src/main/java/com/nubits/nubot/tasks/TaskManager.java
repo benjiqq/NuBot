@@ -23,6 +23,7 @@ import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +81,7 @@ public class TaskManager {
     private void setTasks() {
         //connectivity tasks
 
-        LOG.info("setting up tasks");
+        NuLog.info(LOG, "setting up tasks");
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
@@ -131,7 +132,7 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        LOG.info("Stopping all tasks. ");
+        NuLog.info(LOG, "Stopping all tasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
@@ -151,7 +152,7 @@ public class TaskManager {
     public void printTasksStatus() {
         for (int i = 0; i < taskList.size(); i++) {
             BotTask task = taskList.get(i);
-            LOG.info("Task name : " + task.getName() + ""
+            NuLog.info(LOG, "Task name : " + task.getName() + ""
                     + " running : " + task.isRunning());
         }
     }

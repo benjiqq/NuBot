@@ -20,6 +20,7 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.InitTests;
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ public class TestSSLConnection {
             while (in.available() > 0) {
                 s += in.read();
             }
-            LOG.info("SSLTest. Successfully connected. Read string: " + s);
+            NuLog.info(LOG, "SSLTest. Successfully connected. Read string: " + s);
 
             return true;
 

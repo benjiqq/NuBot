@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
 
+import com.nubits.nubot.utils.NuLog;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
 
@@ -58,17 +59,17 @@ public class TradeUtils {
         if (orderList.size() == 0) {
             toRet = true;
         } else {
-            LOG.info("There are still : " + orderList.size() + " active orders");
+            NuLog.info(LOG, "There are still : " + orderList.size() + " active orders");
             //Retry to cancel them to fix issue #14
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                 if (deleted) {
-                    LOG.info("Order clear request succesful");
+                    NuLog.info(LOG, "Order clear request succesful");
                 } else {
                     toRet = false;
-                    LOG.info("Could not submit request to clear orders");
+                    NuLog.info(LOG, "Could not submit request to clear orders");
                 }
             } else {
                 toRet = false;
@@ -135,7 +136,7 @@ public class TradeUtils {
                 ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderID);
                 if (orderDetailResponse.isPositive()) {
                     deleted = !((boolean) orderDetailResponse.getResponseObject());
-                    LOG.info("Does order " + orderID + "  still exist?" + !deleted);
+                    NuLog.info(LOG, "Does order " + orderID + "  still exist?" + !deleted);
                 } else {
                     LOG.error(orderDetailResponse.getError().toString());
                     return false;
@@ -226,7 +227,7 @@ public class TradeUtils {
         //Observation : it can take between 15 and 20 seconds to place 10 orders
         boolean success = true;
 
-        LOG.info(orders.size() + "need to be placed ");
+        NuLog.info(LOG, orders.size() + "need to be placed ");
 
         int countSuccess = 0;
         String failureString = "";
@@ -235,7 +236,7 @@ public class TradeUtils {
 
             if (tempResponse.isPositive()) {
                 String buyResponseString = (String) tempResponse.getResponseObject();
-                LOG.info("Order " + i + "/" + orders.size() + " response = " + buyResponseString);
+                NuLog.info(LOG, "Order " + i + "/" + orders.size() + " response = " + buyResponseString);
                 countSuccess++;
             } else {
                 success = false;
@@ -250,7 +251,7 @@ public class TradeUtils {
 
         }
         if (success) {
-            LOG.info(orders.size() + " orders placed succesfully");
+            NuLog.info(LOG, orders.size() + " orders placed succesfully");
         } else {
             LOG.warn(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
                     + "\nDetails : \n" + failureString);
@@ -263,7 +264,7 @@ public class TradeUtils {
     private static ApiResponse placeOrder(OrderToPlace order) {
         //TODO move into the trade interface when tested and ready
 
-        LOG.info(": Submit order : "
+        NuLog.info(LOG, ": Submit order : "
                 + order.getType() + " " + order.getSize() + " " + order.getPair().getOrderCurrency().getCode()
                 + " @ " + order.getPrice() + " " + order.getPair().getPaymentCurrency().getCode());
 
