@@ -28,20 +28,11 @@
 
     <div class="container">
 
-<div class="row">
 
-    <button type="button" class="btn btn-primary" onclick="postall()">
-    Save changes
-    </button>
-    <br>file: {{configfile}}
-
-</div>
 
 <div class="row">
+
   <div class="col-xs-12 col-md-6">
-    <h3>Exchange Config</h3>
-
-</h3>
 
 
 
@@ -97,40 +88,36 @@
 
 
 
-
+<table class="table table-bordered" width="500">
 
 <tr>
-    <td class="col-md-2">Maximum Buy Volume</td>
 
-<td class="col-md-8">
+<td class="col-md-4">Maximum Buy Volume</td>
+
+<td class="col-md-2">
     <div class="input-group">
-      <input id="maxbuyvolume" size="100" type="text" class="form-control" placeholder="0.0">
+      <input id="maxbuyvolume" size="200" type="text" class="form-control" placeholder="0.0">
     </td>
 
-</tr>
+<td class="col-md-4" >Maximum Sell Volume</td>
 
-
-<tr>
-    <td class="col-md-2">Maximum Sell Volume</td>
-<td class="col-md-8">
+<td class="col-md-2">
     <div class="input-group">
-      <input id="maxsellvolume" size="100" type="text" class="form-control" placeholder="0.0">
+      <input id="maxsellvolume" size="200" type="text" class="form-control" placeholder="0.0">
     </div>
     </td>
 </tr>
 
 <tr>
-    <td class="col-md-2">wallchangeThreshold</td>
-<td class="col-md-8">
+    <td>wallchangeThreshold</td>
+<td >
     <div class="input-group">
       <input id="wallchangethreshold" size="100" type="text" class="form-control" placeholder="0.0">
     </div>
     </td>
-</tr>
 
-<tr>
-    <td class="col-md-2">spread</td>
-<td class="col-md-8">
+    <td >spread</td>
+<td >
     <div class="input-group">
       <input id="spread" size="100" type="text" class="form-control" placeholder="0.0">
     </div>
@@ -138,17 +125,15 @@
 </tr>
 
 <tr>
-    <td class="col-md-2">emergencytimeout</td>
-<td class="col-md-8">
+    <td >emergencytimeout</td>
+<td >
     <div class="input-group">
       <input id="emergencytimeout" size="100" type="text" class="form-control" placeholder="0.0">
     </div>
     </td>
-</tr>
 
-<tr>
-    <td class="col-md-2">keepproceeds</td>
-<td class="col-md-8">
+    <td >keepproceeds</td>
+<td >
     <div class="input-group">
       <input id="keepproceeds" size="100" type="text" class="form-control" placeholder="0.0">
     </div>
@@ -156,21 +141,40 @@
 </tr>
 
 <tr>
-    <td class="col-md-2">priceincrement</td>
-<td class="col-md-8">
+    <td >priceincrement</td>
+<td >
     <div class="input-group">
       <input id="priceincrement" size="100" type="text" class="form-control" placeholder="0.0">
     </div>
     </td>
+
+
+<td class="col-md-2">txfee</td>
+
+<td class="col-md-8">
+
+    <div class="input-group">
+      <input id="txfee" size="100" type="text" class="form-control" placeholder="txfee">
+    </div>
+
+</td>
 </tr>
-
-
-
-
 
 
 </table>
 
+<div class="col-xs-12 col-md-8">
+
+<!--<div class="row">-->
+
+    <button type="button" class="btn btn-primary" onclick="postall()">
+    Save changes
+    </button>
+
+    <br>
+    <p>file: {{configfile}}</p>
+
+</div>
 
 
 
@@ -244,22 +248,23 @@
 
 
 </tr>
+</table>
+
+
+<table class="table table-bordered" width="500">
 
 
 <tr>
-    <td class="col-md-2">nudIP</td>
+    <td class="col-md-3">nudIP</td>
 
-<td class="col-md-8">
+<td class="col-md-3">
     <div class="input-group">
       <input id="nudip" size="100" type="text" class="form-control" placeholder="nudIP">
     </td>
 
-</tr>
+    <td class="col-md-3">nudport</td>
 
-<tr>
-    <td class="col-md-2">nudport</td>
-
-<td class="col-md-8">
+<td class="col-md-3">
     <div class="input-group">
       <input id="nudport" size="100" type="text" class="form-control" placeholder="nudport">
     </td>
@@ -268,23 +273,19 @@
 
 
 <tr>
-    <td class="col-md-2">rpcuser</td>
+    <td class="col-md-3">rpcuser</td>
 
-<td class="col-md-8">
+<td class="col-md-3">
     <div class="input-group">
       <input id="rpcuser" size="100" type="text" class="form-control" placeholder="rpcuser">
     </div>
     </td>
 
 
-</tr>
 
+<td class="col-md-3">rpcpass</td>
 
-<tr>
-
-<td class="col-md-2">rpcpass</td>
-
-<td class="col-md-8">
+<td class="col-md-3">
 
     <div class="input-group">
       <input id="rpcpass" size="100" type="text" class="form-control" placeholder="rpcpass">
@@ -297,15 +298,6 @@
 
 <tr>
 
-<td class="col-md-2">txfee</td>
-
-<td class="col-md-8">
-
-    <div class="input-group">
-      <input id="txfee" size="100" type="text" class="form-control" placeholder="txfee">
-    </div>
-
-</td>
 
 </tr>
 

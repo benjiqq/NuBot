@@ -142,27 +142,26 @@
                 })
                 .done(function( data ) {
 
-                    //string values
-               console.log("data: " + data);
+                    //console.log("data: " + data);
 
                     $("#exchangename").attr("value", data["exchangename"]);
                     $("#apikey").attr("value", data["apikey"]);
                     $("#apisecret").attr("value", data["apisecret"]);
                     $("#txfee").attr("value", data["txfee"]);
                     $("#pair").attr("value", data["pair"]);
-                    $('#dualside').attr('checked',data["dualside"]);
-                    $('#multiplecustodians').attr('checked',data["multiplecustodians"]);
-                    $('#executeorders').attr('checked',data["executeorders"]);
-                    $('#verbose').attr('checked',data["verbose"]);
-                    $('#hipchat').attr('checked',data["hipchat"]);
-                    $('#mailnotifications').attr('checked',data["mailnotifications"]);
-                    $('#mailrecipient').attr("value", data["mailrecipient"]);
+                    $("#dualside").attr("checked",data["dualside"]);
+                    $("#multiplecustodians").attr("checked",data["multiplecustodians"]);
+                    $("#executeorders").attr("checked",data["executeorders"]);
+                    $("#verbose").attr("checked",data["verbose"]);
+                    $("#hipchat").attr("checked",data["hipchat"]);
+                    $("#mailnotifications").attr("value",data["mailnotifications"]);
+                    $("#mailrecipient").attr("value", data["mailrecipient"]);
                     $("#emergencytimeout").attr("value", data["emergencytimeout"]);
-                    $("#keepproceeds").attr("value", data["keepproceeds"]););
+                    $("#keepproceeds").attr("value", data["keepproceeds"]);
                     $("#maxsellvolume").attr("value", data["maxsellvolume"]);
                     $("#maxbuyvolume").attr("value", data["maxbuyvolume"]);
-                    $("#priceincrement").attr("value", data["priceincrement"]););
-                    $('#submitliquidity').attr('checked',data["submitliquidity"]);
+                    $("#priceincrement").attr("value", data["priceincrement"]);
+                    $("#submitliquidity").attr("checked",data["submitliquidity"]);
                     $("#nubitaddress").attr("value", data["nubitaddress"]);
                     $("#nudip").attr("value", data["nudip"]);
                     $("#nudport").attr("value", data["nudport"]);
