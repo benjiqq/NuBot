@@ -72,7 +72,7 @@ public class ParseOptions {
     public static String mailnotifications = "mailnotifications";
     public static String mainfeed = "mainfeed";
     public static String backupfeeds = "backupfeeds";
-    public static String wallchangeThreshold = "wallchangeThreshold";
+    public static String wallchangethreshold = "wallchangeThreshold";
     public static String spread = "spread";
 
     private static String[] comp = {exchangename, apisecret, mailrecipient, dualside, pair};
@@ -397,10 +397,10 @@ public class ParseOptions {
             }
         }
 
-        if (!containsIgnoreCase(optionsJSON, wallchangeThreshold))
+        if (!containsIgnoreCase(optionsJSON, wallchangethreshold))
             throw new NuBotConfigException("wallchangeThreshold needed if secondary peg defined");
         else
-            options.wallchangeThreshold = Utils.getDouble(getIgnoreCase(optionsJSON, wallchangeThreshold));
+            options.wallchangeThreshold = Utils.getDouble(getIgnoreCase(optionsJSON, wallchangethreshold));
 
 
         if (!containsIgnoreCase(optionsJSON, spread))
@@ -411,7 +411,6 @@ public class ParseOptions {
         if (options.spread != 0) {
             LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
-
 
     }
 

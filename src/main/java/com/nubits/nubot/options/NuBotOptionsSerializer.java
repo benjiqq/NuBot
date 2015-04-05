@@ -33,36 +33,36 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
     public JsonElement serialize(NuBotOptions opt, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject root = new JsonObject();
 
-        root.addProperty("exchangename", opt.exchangeName);
-        root.addProperty("apikey", opt.apiKey);
-        root.addProperty("apisecret", opt.apiSecret);
-        root.addProperty("txfee", opt.txFee);
-        root.addProperty("pair", opt.pair.toStringSep());
-        root.addProperty("dualside", opt.dualSide);
-        root.addProperty("multiplecustodians", opt.multipleCustodians);
-        root.addProperty("executeorders", opt.executeOrders);
-        root.addProperty("verbose", opt.verbose);
-        root.addProperty("hipchat", opt.sendHipchat);
+        root.addProperty(ParseOptions.exchangename, opt.exchangeName);
+        root.addProperty(ParseOptions.apikey, opt.apiKey);
+        root.addProperty(ParseOptions.apisecret, opt.apiSecret);
+        root.addProperty(ParseOptions.txfee, opt.txFee);
+        root.addProperty(ParseOptions.pair, opt.pair.toStringSep());
+        root.addProperty(ParseOptions.dualside, opt.dualSide);
+        root.addProperty(ParseOptions.multiplecustodians, opt.multipleCustodians);
+        root.addProperty(ParseOptions.executeorders, opt.executeOrders);
+        root.addProperty(ParseOptions.verbose, opt.verbose);
+        root.addProperty(ParseOptions.hipchat, opt.sendHipchat);
 
-        root.addProperty("mailnotifications", opt.sendMails);
-        root.addProperty("mailrecipient", opt.mailRecipient);
-        root.addProperty("emergencytimeout", opt.emergencyTimeout);
-        root.addProperty("keepproceeds", opt.keepProceeds);
-        root.addProperty("maxsellvolume", opt.maxSellVolume);
-        root.addProperty("maxbuyvolume", opt.maxBuyVolume);
-        root.addProperty("priceincrement", opt.priceIncrement);
-        root.addProperty("submitliquidity", opt.submitLiquidity);
-        root.addProperty("nubitaddress", opt.nubitAddress);
-        root.addProperty("nudip", opt.nudIp);
-        root.addProperty("nudport", opt.nudPort);
-        root.addProperty("rpcpass", opt.rpcPass);
-        root.addProperty("rpcuser", opt.rpcUser);
-        root.addProperty("wallchangethreshold", opt.wallchangeThreshold);
-        root.addProperty("spread", opt.spread);
-        root.addProperty("mainfeed", opt.mainFeed);
+        root.addProperty(ParseOptions.mailnotifications, opt.sendMails);
+        root.addProperty(ParseOptions.mailrecipient, opt.mailRecipient);
+        root.addProperty(ParseOptions.emergencytimeout, opt.emergencyTimeout);
+        root.addProperty(ParseOptions.keepproceeds, opt.keepProceeds);
+        root.addProperty(ParseOptions.maxsellvolume, opt.maxSellVolume);
+        root.addProperty(ParseOptions.maxbuyvolume, opt.maxBuyVolume);
+        root.addProperty(ParseOptions.priceincrement, opt.priceIncrement);
+        root.addProperty(ParseOptions.submitliquidity, opt.submitLiquidity);
+        root.addProperty(ParseOptions.nubitaddress, opt.nubitAddress);
+        root.addProperty(ParseOptions.nudip, opt.nudIp);
+        root.addProperty(ParseOptions.nudport, opt.nudPort);
+        root.addProperty(ParseOptions.rpcpass, opt.rpcPass);
+        root.addProperty(ParseOptions.rpcuser, opt.rpcUser);
+        root.addProperty(ParseOptions.wallchangethreshold, opt.wallchangeThreshold);
+        root.addProperty(ParseOptions.spread, opt.spread);
+        root.addProperty(ParseOptions.mainfeed, opt.mainFeed);
 
         String bfs = new Gson().toJson(opt.backupFeedNames,new TypeToken<ArrayList<String>>(){}.getType());
-        root.addProperty("backupfeeds", bfs);
+        root.addProperty(ParseOptions.backupfeeds, bfs);
 
         return root;
     }
