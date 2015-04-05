@@ -169,17 +169,6 @@ public class NuBotOptions {
      */
     public boolean distributeLiquidity;
 
-    /**
-     * TODO
-     */
-    //public int executeStrategyInterval; //disabled
-
-    /**
-     * TODO
-     */
-    //public int sendLiquidityInterval; //disabled
-
-
     public double wallchangeThreshold;
 
     public double spread;
