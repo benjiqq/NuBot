@@ -348,9 +348,10 @@ public class ParseOptions {
 
         //Iterate on backupFeeds
 
+
         JSONArray bfeeds = (JSONArray) optionsJSON.get("backupfeeds");
 
-        LOG.trace("bfeeds " + bfeeds);
+        LOG.info("bfeeds " + bfeeds);
 
         if (bfeeds.size() < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");

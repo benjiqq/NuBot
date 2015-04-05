@@ -63,8 +63,6 @@ public class ConfigController {
         get(endpoint, "application/json", (request, response) -> {
 
 
-
-
             GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
             gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
             Gson parser = gson.create();
