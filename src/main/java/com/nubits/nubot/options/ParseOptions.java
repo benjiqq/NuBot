@@ -18,9 +18,7 @@
 
 package com.nubits.nubot.options;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
@@ -32,12 +30,11 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.*;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 /**
  * ParseOptions from one or several JSON files
@@ -58,7 +55,7 @@ public class ParseOptions {
     public static String maxsellvolume = "maxsellvolume";
     public static String maxbuyvolume = "maxbuyvolume";
     public static String executeorders = "executeorders";
-    public static String dualside = "dualSide";
+    public static String dualside = "dualside";
     public static String verbose = "verbose";
     public static String hipchat = "hipchat";
     public static String emergencytimeout = "emergencytimeout";
@@ -72,7 +69,7 @@ public class ParseOptions {
     public static String mailnotifications = "mailnotifications";
     public static String mainfeed = "mainfeed";
     public static String backupfeeds = "backupfeeds";
-    public static String wallchangethreshold = "wallchangeThreshold";
+    public static String wallchangethreshold = "wallchangethreshold";
     public static String spread = "spread";
 
     private static String[] comp = {exchangename, apisecret, mailrecipient, dualside, pair};
