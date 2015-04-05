@@ -20,10 +20,7 @@ package functions;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsDefault;
-import com.nubits.nubot.options.NuBotOptionsSerializer;
-import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.options.*;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -175,7 +172,23 @@ public class TestOptionsJSON extends TestCase {
         assertTrue(opt.getPriceIncrement()==0.1);
         assertTrue(opt.getSpread()==0.0);
         assertTrue(opt.getWallchangeThreshold()==0.1);
+        assertTrue(opt.getBackupFeedNames().get(0).equals("coinbase"));
+        assertTrue(opt.getBackupFeedNames().get(1).equals("btce"));
 
+
+        String jsonString = SerializeOptions.optionsToJson(opt);
+
+        NuBotOptions reopt = null;
+
+        boolean ncatch = true;
+        try {
+            reopt = ParseOptions.parseOptionsFromJson(json);
+        } catch (Exception e) {
+            //handle errors
+            ncatch = false;
+        }
+
+        assertTrue(ncatch);
 
         // String arrayListToJson = gson.toJson(navigation);
 

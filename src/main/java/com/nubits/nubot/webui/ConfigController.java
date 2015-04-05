@@ -4,10 +4,7 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsSerializer;
-import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.options.SaveOptions;
+import com.nubits.nubot.options.*;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -62,12 +59,8 @@ public class ConfigController {
 
         get(endpoint, "application/json", (request, response) -> {
 
-
-            GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-            gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
-            Gson parser = gson.create();
-            String js = parser.toJson(Global.options);
-            return js;
+            String jsonString = SerializeOptions.optionsToJson(Global.options);
+            return jsonString;
         });
 
 
