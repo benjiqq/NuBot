@@ -44,8 +44,6 @@ import org.slf4j.Logger;
  */
 public class ParseOptions {
 
-    private static String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
-
     private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
 
     public static String exchangename = "exchangename";
@@ -60,6 +58,7 @@ public class ParseOptions {
     public static String maxsellvolume = "maxsellvolume";
     public static String maxbuyvolume = "maxbuyvolume";
     public static String executeorders = "executeorders";
+    public static String dualside = "dualSide";
     public static String verbose = "verbose";
     public static String hipchat = "hipchat";
     public static String emergencytimeout = "emergencytimeout";
@@ -75,6 +74,9 @@ public class ParseOptions {
     public static String backupfeeds = "backupfeeds";
     public static String wallchangeThreshold = "wallchangeThreshold";
     public static String spread = "spread";
+
+    private static String[] comp = {exchangename, apisecret, mailrecipient, dualside, pair};
+
 
     /**
      * parse single JSON file to NuBoptions
@@ -144,11 +146,11 @@ public class ParseOptions {
                 throw new NuBotConfigException("necessary key: " + comp[i]);
         }
 
-        boolean submitLiquidity = (boolean) getIgnoreCase(optionsJSON, "submitliquidity");
+        boolean submitLiquidity = (boolean) getIgnoreCase(optionsJSON, submitliquidity);
 
         if (submitLiquidity) {
 
-            String[] sneeded = {"nubitaddress", "rpcpass", "rpcuser", "nudport"};
+            String[] sneeded = {nubitaddress, rpcpass, rpcuser, nudport};
 
             for (int i = 0; i < sneeded.length; i++) {
                 String s = sneeded[i];
@@ -193,7 +195,7 @@ public class ParseOptions {
             throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
 
         try {
-            options.dualSide = (boolean) getIgnoreCase(optionsJSON, "dualSide");
+            options.dualSide = (boolean) getIgnoreCase(optionsJSON, dualside);
         } catch (Exception e) {
             throw new NuBotConfigException("can not cast dualSide to boolean " + e);
         }
