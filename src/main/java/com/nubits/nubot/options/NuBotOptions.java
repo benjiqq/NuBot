@@ -231,137 +231,79 @@ public class NuBotOptions {
         return apiKey;
     }
 
-    /**
-     * @return
-     */
     public String getApiSecret() {
         return apiSecret;
     }
 
-    /**
-     * @return
-     */
     public String getNubitsAddress() {
         return nubitAddress;
     }
 
-    /**
-     * @return
-     */
     public String getRpcUser() {
         return rpcUser;
     }
 
-    /**
-     * @return
-     */
     public String getRpcPass() {
         return rpcPass;
     }
 
-    /**
-     * @param rpcPass
-     */
     public void setRpcPass(String rpcPass) {
         this.rpcPass = rpcPass;
     }
 
-    /**
-     * @return
-     */
     public String getNudIp() {
         return nudIp;
     }
 
-    /**
-     * @return
-     */
     public int getNudPort() {
         return nudPort;
     }
 
-    /**
-     * @param nudPort
-     */
     public void setNudPort(int nudPort) {
         this.nudPort = nudPort;
     }
 
-    /**
-     * @return
-     */
     public double getPriceIncrement() {
         return priceIncrement;
     }
 
-    /**
-     * @return
-     */
     public double getTxFee() {
         return txFee;
     }
 
-    /**
-     * @param txFee
-     */
     public void setTxFee(double txFee) {
         this.txFee = txFee;
     }
 
-    /**
-     * @return
-     */
     public String getExchangeName() {
         return exchangeName;
     }
 
-    /**
-     * @param exchangeName
-     */
     public void setExchangeName(String exchangeName) {
         this.exchangeName = exchangeName;
     }
 
-    /**
-     * @return
-     */
     public CurrencyPair getPair() {
         return pair;
     }
 
-    /**
-     * @param pair
-     */
     public void setPair(CurrencyPair pair) {
         this.pair = pair;
     }
 
-
-    /**
-     * @return
-     */
     public boolean isSendHipchat() {
         return sendHipchat;
     }
 
-    /**
-     * @return
-     */
     public String sendMailsLevel() {
         return sendMails;
     }
 
-    /**
-     * @return
-     */
     public boolean sendMails() {
         boolean not_none = !(this.sendMails.equals(MailNotifications.MAIL_LEVEL_NONE));
         return not_none;
     }
 
-    /**
-     * @return
-     */
     public String getMailRecipient() {
         return mailRecipient;
     }
