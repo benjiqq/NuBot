@@ -119,7 +119,7 @@ public class TestWriteOptions extends TestCase {
 
         try {
             JSONObject inputJSON = ParseOptions.parseSingleJsonFile(testout);
-            assertTrue(inputJSON.containsKey("exchangename"));
+            assertTrue(inputJSON.containsKey(ParseOptions.exchangename));
         } catch (Exception e) {
             assertTrue(false);
         }
