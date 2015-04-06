@@ -37,7 +37,7 @@ import java.io.File;
 import java.util.*;
 
 /**
- * ParseOptions from one or several JSON files
+ * ParseOptions from one JSON files
  */
 public class ParseOptions {
 

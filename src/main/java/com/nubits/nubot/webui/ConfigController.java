@@ -90,6 +90,7 @@ public class ConfigController {
             try{
                 newopt = ParseOptions.parsePost(postJson);
             }catch(Exception e){
+                LOG.error("error parsing " + postJson + "\n" + e);
                 //handle errors
                 success = false;
                 opmap.put("error", e);
