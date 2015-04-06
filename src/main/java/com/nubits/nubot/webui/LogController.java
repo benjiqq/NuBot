@@ -1,11 +1,7 @@
 package com.nubits.nubot.webui;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -19,15 +19,12 @@
 package com.nubits.nubot.options;
 
 import com.google.gson.*;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import com.nubits.nubot.notifications.MailNotifications;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.simple.JSONObject;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
@@ -99,9 +96,9 @@ public class NuBotOptions {
 
     /**
      * if set to false will disable email notifications
-     * TODO: rename mailnotifications
+     *
      */
-    public String sendMails;
+    public String mailnotifications;
 
     /**
      * if set to false, the bot will not try to submit liquidity info.
@@ -122,7 +119,7 @@ public class NuBotOptions {
     /**
      * if set to false will disable hipchat notifications
      */
-    public boolean sendHipchat;
+    public boolean hipchat;
 
     /**
      * TODO: describe this
@@ -176,13 +173,13 @@ public class NuBotOptions {
     // feeds
 
     public String mainFeed;
-    public ArrayList<String> backupFeedNames;
+    public ArrayList<String> backupFeeds;
 
     /**
      * empty constructor. assumes safe creation of valid options
      */
     public NuBotOptions() {
-        backupFeedNames = new ArrayList<>();
+        backupFeeds = new ArrayList<>();
     }
 
 
@@ -292,16 +289,16 @@ public class NuBotOptions {
         this.pair = pair.toStringSep();
     }
 
-    public boolean isSendHipchat() {
-        return sendHipchat;
+    public boolean isHipchat() {
+        return hipchat;
     }
 
     public String sendMailsLevel() {
-        return sendMails;
+        return mailnotifications;
     }
 
     public boolean sendMails() {
-        boolean not_none = !(this.sendMails.equals(MailNotifications.MAIL_LEVEL_NONE));
+        boolean not_none = !(this.mailnotifications.equals(MailNotifications.MAIL_LEVEL_NONE));
         return not_none;
     }
 
@@ -363,8 +360,8 @@ public class NuBotOptions {
         this.spread = spread;
     }
 
-    public ArrayList<String> getBackupFeedNames() {
-        return backupFeedNames;
+    public ArrayList<String> getBackupFeeds() {
+        return backupFeeds;
     }
 
     @Override
@@ -376,7 +373,7 @@ public class NuBotOptions {
         String toRet = "";
 
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
 
         String serializedOptions = parser.toJson(this);

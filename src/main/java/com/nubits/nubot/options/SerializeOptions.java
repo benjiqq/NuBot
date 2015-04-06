@@ -11,7 +11,7 @@ public class SerializeOptions {
 
     public static String optionsToJson(NuBotOptions opt){
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
         String js = parser.toJson(opt);
         return js;

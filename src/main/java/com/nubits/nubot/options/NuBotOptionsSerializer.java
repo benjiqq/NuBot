@@ -27,7 +27,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 
-public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
+/*public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
 
     @Override
     public JsonElement serialize(NuBotOptions opt, Type typeOfSrc, JsonSerializationContext context) {
@@ -42,9 +42,9 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty(ParseOptions.multiplecustodians, opt.multipleCustodians);
         root.addProperty(ParseOptions.executeorders, opt.executeOrders);
         root.addProperty(ParseOptions.verbose, opt.verbose);
-        root.addProperty(ParseOptions.hipchat, opt.sendHipchat);
+        root.addProperty(ParseOptions.hipchat, opt.hipchat);
 
-        root.addProperty(ParseOptions.mailnotifications, opt.sendMails);
+        root.addProperty(ParseOptions.mailnotifications, opt.mailnotifications);
         root.addProperty(ParseOptions.mailrecipient, opt.mailRecipient);
         root.addProperty(ParseOptions.emergencytimeout, opt.emergencyTimeout);
         root.addProperty(ParseOptions.keepproceeds, opt.keepProceeds);
@@ -61,9 +61,9 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty(ParseOptions.spread, opt.spread);
         root.addProperty(ParseOptions.mainfeed, opt.mainFeed);
 
-        String bfs = new Gson().toJson(opt.backupFeedNames,new TypeToken<ArrayList<String>>(){}.getType());
+        String bfs = new Gson().toJson(opt.backupFeeds,new TypeToken<ArrayList<String>>(){}.getType());
         root.addProperty(ParseOptions.backupfeeds, bfs);
 
         return root;
     }
-}
+}*/

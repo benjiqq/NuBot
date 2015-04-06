@@ -287,7 +287,7 @@ public class ParseOptions {
             throw new NuBotConfigException("can not cast executeOrders to boolean " + e);
         }
         options.verbose = (boolean) getIgnoreCase(optionsJSON, verbose);
-        options.sendHipchat = (boolean) getIgnoreCase(optionsJSON, hipchat);
+        options.hipchat = (boolean) getIgnoreCase(optionsJSON, hipchat);
 
         try {
 
@@ -329,7 +329,7 @@ public class ParseOptions {
         if (tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
                 || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
                 || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
-            options.sendMails = tmpsendMails.toUpperCase(); //Convert to upper case
+            options.mailnotifications = tmpsendMails.toUpperCase(); //Convert to upper case
         } else {
             String error = "Value not accepted for \"mail-notifications\" : " + tmpsendMails + " . Admitted values  : "
                     + MailNotifications.MAIL_LEVEL_ALL + " , "
@@ -346,7 +346,7 @@ public class ParseOptions {
 
         options.mainFeed = (String) optionsJSON.get(mainfeed);
 
-        options.backupFeedNames = new ArrayList<>();
+        options.backupFeeds = new ArrayList<>();
 
         //Iterate on backupFeeds
 
@@ -361,7 +361,7 @@ public class ParseOptions {
                 if (!FeedFacade.isValidFeed(feedname))
                     throw new NuBotConfigException("invalid feed configured");
                 else
-                    options.backupFeedNames.add(feedname);
+                    options.backupFeeds.add(feedname);
             } catch (JSONException ex) {
                 throw new NuBotConfigException("parse feeds json error" + ex);
             }

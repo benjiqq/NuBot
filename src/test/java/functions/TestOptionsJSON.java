@@ -18,6 +18,9 @@
 
 package functions;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
@@ -37,7 +40,6 @@ public class TestOptionsJSON extends TestCase {
         assertTrue(opt != null);
 
         String jsonString = SerializeOptions.optionsToJson(opt);
-        System.out.println(">> " + jsonString);
 
         assertTrue(jsonString.length() > 0);
 
@@ -51,8 +53,6 @@ public class TestOptionsJSON extends TestCase {
 
         System.out.println(optionJson);
 
-
-
         for (int i = 0; i < ParseOptions.allkeys.length; i++) {
             String f = ParseOptions.allkeys[i];
             System.out.println(f);
@@ -60,19 +60,14 @@ public class TestOptionsJSON extends TestCase {
             assertTrue(ParseOptions.containsIgnoreCase(optionJson, f));
         }
 
-        Object o = optionJson.get("backupfeeds");
-        String s = "" + o;
-        assertTrue(s.contains("btce"));
-        assertTrue(s.contains("blockchain"));
-        assertTrue(s.contains("coinmarketcap_no"));
 
     }
 
     @Test
     public void testRoundTrip() {
 
-        /*
-        String configString = "{\n" +
+
+        String jsonString = "{\n" +
                 "  \"exchangename\":\"Poloniex\",\n" +
                 "  \"apiKey\": \"def\",\n" +
                 "  \"apiSecret\": \"abc\",\n" +
@@ -103,24 +98,19 @@ public class TestOptionsJSON extends TestCase {
                 "  \"wallchangeThreshold\": 0.1\n" +
                 "}\n";
 
-
-        NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
-        assertTrue(opt != null);
-        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
-        Gson parser = gson.create();
-        assertTrue(parser != null);
-
-        String jsonString = "";
+        JSONParser jsonparser = new JSONParser();
+        JSONObject optionJson = null;
         try {
-            jsonString = parser.toJson(opt);
+            optionJson = (JSONObject) (jsonparser.parse(jsonString));
         } catch (Exception e) {
-            System.out.println(e);
-            e.printStackTrace();
+
         }
+        NuBotOptions opt = null;
+        try{
+            opt = ParseOptions.parseOptionsFromJson(optionJson);
+        }catch(Exception e){
 
-        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
-
+        }
 
         assertTrue(opt.getExchangeName().equals("Poloniex"));
         assertTrue(opt.getApiKey().equals("def"));
@@ -133,19 +123,33 @@ public class TestOptionsJSON extends TestCase {
         assertTrue(opt.mainFeed.equals("blockchain"));
         assertTrue(opt.isDualSide() == true);
         assertTrue(opt.isVerbose() == true);
-        assertTrue(opt.isSendHipchat() == true);
+        assertTrue(opt.isHipchat() == true);
         assertTrue(opt.sendMailsLevel().equals("ALL"));
         assertTrue(opt.getMailRecipient().equals("test@gmail.com"));
         assertTrue(opt.getEmergencyTimeout() == 60);
         assertTrue(opt.getMaxBuyVolume() == 10.0);
         assertTrue(opt.getMaxSellVolume() == 10.0);
-        assertTrue(opt.getPriceIncrement()==0.1);
-        assertTrue(opt.getSpread()==0.0);
-        assertTrue(opt.getWallchangeThreshold()==0.1);
-        assertTrue(opt.getBackupFeedNames().get(0).equals("coinbase"));
-        assertTrue(opt.getBackupFeedNames().get(1).equals("btce"));
-        */
+        assertTrue(opt.getPriceIncrement() == 0.1);
+        assertTrue(opt.getSpread() == 0.0);
+        assertTrue(opt.getWallchangeThreshold() == 0.1);
+        assertTrue(opt.getBackupFeeds().get(0).equals("coinbase"));
+        assertTrue(opt.getBackupFeeds().get(1).equals("btce"));
 
 
+    }
+
+    @Test
+    public void testFromFile() {
+
+        String configFile = "config/myconfig/poloniex.json";
+
+        NuBotOptions newopt = null;
+        try {
+            newopt = ParseOptions.parseOptionsSingle(configFile);
+        } catch (Exception e) {
+
+        }
+
+        assertTrue(newopt.getExchangeName().equals(ExchangeFacade.POLONIEX));
     }
 }

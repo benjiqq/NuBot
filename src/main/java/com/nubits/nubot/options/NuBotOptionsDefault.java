@@ -19,7 +19,6 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.pricefeeds.FeedFacade;
 
@@ -42,8 +41,8 @@ public class NuBotOptionsDefault {
         opt.multipleCustodians = false;
         opt.executeOrders = false;
         opt.verbose = false;
-        opt.sendHipchat = true;
-        opt.sendMails = MailNotifications.MAIL_LEVEL_SEVERE;
+        opt.hipchat = true;
+        opt.mailnotifications = MailNotifications.MAIL_LEVEL_SEVERE;
         opt.mailRecipient = "";
         opt.emergencyTimeout = 30;
         opt.keepProceeds = 0.0;
@@ -60,7 +59,7 @@ public class NuBotOptionsDefault {
         opt.wallchangeThreshold = 0;
         opt.spread = 0;
         opt.mainFeed = FeedFacade.CoinbasePriceFeed;
-        opt.backupFeedNames = new ArrayList<String>() {{
+        opt.backupFeeds = new ArrayList<String>() {{
             add(FeedFacade.BtcePriceFeed);
             add(FeedFacade.BlockchainPriceFeed);
             add(FeedFacade.CoinmarketcapnexuistPriceFeed);
