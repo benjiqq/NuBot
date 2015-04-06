@@ -197,7 +197,7 @@
                 var keepproceeds = $("#keepproceeds").attr("value");
                 var maxsellvolume = $("#maxsellvolume").attr("value");
                 var maxbuyvolume = $("#maxbuyvolume").attr("value");
-                var priceincrement = $("priceincrement").attr("value");
+                var priceincrement = $("#priceincrement").attr("value");
                 var submitliquidity = $("#submitliquidity").prop("checked");
                 var nubitaddress = $("#nubitaddress").attr("value");
                 var nudip = $("#nudip").attr("value");
@@ -224,10 +224,11 @@
                     "verbose": verbose,
                     "hipchat": hipchat,
                     "mailrecipient": mailrecipient,
+                    "mailnotifications": mailnotifications,
                     "emergencytimeout" : emergencytimeout,
                     "keepproceeds" : keepproceeds,
-                    "maxsellvolume": maxsellordervolume,
-                    "maxbuyvolume": maxbuyordervolume,
+                    "maxsellvolume": maxsellvolume,
+                    "maxbuyvolume": maxbuyvolume,
                     "priceincrement": priceincrement,
                     "submitliquidity": submitliquidity,
                     "nubitaddress": nubitaddress,
@@ -253,10 +254,11 @@
                     contentType : 'application/json',
                     type : 'POST',
                     success: function(data){
+                        //TODO show success in UI
                       console.log("ok " + data);
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
-                        alert("error posting to server " + textStatus + " " + errorThrown);
+                        alert("error posting to server " + textStatus);
                     }
                });
             }

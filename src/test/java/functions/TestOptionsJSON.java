@@ -21,6 +21,7 @@ package functions;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.nubits.nubot.options.*;
+import com.nubits.nubot.utils.FileSystem;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -177,13 +178,21 @@ public class TestOptionsJSON extends TestCase {
 
 
         String jsonString = SerializeOptions.optionsToJson(opt);
+        JSONParser parser2 = new JSONParser();
+        JSONObject jsonRe = null;
+        try{
+            jsonRe = (JSONObject) (parser2.parse(jsonString));
+        }catch(Exception e){
+
+        }
 
         NuBotOptions reopt = null;
 
         boolean ncatch = true;
         try {
-            reopt = ParseOptions.parseOptionsFromJson(json);
+            reopt = ParseOptions.parseOptionsFromJson(jsonRe);
         } catch (Exception e) {
+            System.out.println(">> " + e);
             //handle errors
             ncatch = false;
         }

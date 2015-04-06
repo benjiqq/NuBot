@@ -217,6 +217,7 @@ public class Utils {
         NuLog.info(LOG, "\n----------- -----------  -----------\n");
     }
 
+
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
     //not needed if using alibaba json parser
     public static double getDouble(Object obj) {

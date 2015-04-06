@@ -291,10 +291,13 @@ public class ParseOptions {
         options.sendHipchat = (boolean) getIgnoreCase(optionsJSON, hipchat);
 
         try {
-            long emergencyTimeoutLong = (long) getIgnoreCase(optionsJSON, emergencytimeout);
-            options.emergencyTimeout = (int) emergencyTimeoutLong;
+
+            String lstr = "" + getIgnoreCase(optionsJSON, emergencytimeout);
+            LOG.debug("lstr " + lstr);
+            int emergencyTimeoutLong = new Integer(lstr).intValue();
+            options.emergencyTimeout = emergencyTimeoutLong;
         } catch (Exception e) {
-            throw new NuBotConfigException("can not cast emergencytimeout to long " + e);
+            throw new NuBotConfigException("can not cast emergencytimeout to int " + e);
         }
 
         options.keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, keepproceeds)));
@@ -316,8 +319,9 @@ public class ParseOptions {
         options.rpcPass = (String) getIgnoreCase(optionsJSON, rpcpass);
         options.rpcUser = (String) getIgnoreCase(optionsJSON, rpcuser);
         try {
-            long nudPortlong = (long) getIgnoreCase(optionsJSON, nudport);
-            options.nudPort = (int) nudPortlong;
+            String pstr = "" + getIgnoreCase(optionsJSON, nudport);
+            int nudPortlong = new Integer(pstr).intValue();
+            options.nudPort = nudPortlong;
         } catch (Exception e) {
             throw new NuBotConfigException("can not cast nudPortlong to long " + e);
         }
