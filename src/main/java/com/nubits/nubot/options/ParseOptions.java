@@ -349,8 +349,6 @@ public class ParseOptions {
 
         JSONArray bfeeds = (JSONArray) optionsJSON.get(backupfeeds);
 
-        LOG.info("bfeeds " + bfeeds);
-
         if (bfeeds.size() < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
         }
@@ -378,17 +376,16 @@ public class ParseOptions {
 
     public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
 
-
         NuBotOptions newopt = null;
 
         try {
-            //Check if NuBot has valid parameters and quit if it doesn't
+            //Check if NuBot has valid parameters
 
             newopt = ParseOptions.parseOptionsFromJson(postJson);
             LOG.debug("parse post opt: " + newopt);
 
         } catch (NuBotConfigException e) {
-            //show error to user
+            throw e;
 
         }
 
@@ -408,52 +405,6 @@ public class ParseOptions {
         JSONParser parser = new JSONParser();
         JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filepath)));
         return fileJSON;
-    }
-
-    /**
-     * get options value in dictionary
-     *
-     * @param fileJSON
-     * @return
-     */
-    public static JSONObject getOptionsKey(JSONObject fileJSON) {
-        JSONObject tempOptions = (JSONObject) fileJSON.get("options");
-        return tempOptions;
-    }
-
-    /**
-     * Concatenate a list of of files into a JSONObject
-     *
-     * @param filePaths
-     * @return
-     * @throws NuBotConfigException
-     */
-    public static JSONObject parseFiles(ArrayList<String> filePaths) throws NuBotConfigException {
-        JSONObject optionsObject = new JSONObject();
-        Map setMap = new HashMap();
-
-        for (int i = 0; i < filePaths.size(); i++) {
-            try {
-
-                String filepath = filePaths.get(i);
-
-                JSONObject fileJSON = parseSingleJsonFile(filepath);
-                //JSONObject tempOptions = getOptionsKey(fileJSON);
-
-                Set tempSet = fileJSON.entrySet();
-                for (Object o : tempSet) {
-                    Map.Entry entry = (Map.Entry) o;
-                    setMap.put(entry.getKey(), entry.getValue());
-                }
-
-            } catch (ParseException ex) {
-                throw new NuBotConfigException("Parse exception \n" + ex.toString());
-            }
-        }
-
-        JSONObject content = new JSONObject(setMap);
-        optionsObject.put("options", content);
-        return optionsObject;
     }
 
 
