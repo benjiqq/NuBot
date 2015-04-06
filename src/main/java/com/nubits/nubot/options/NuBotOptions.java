@@ -66,7 +66,7 @@ public class NuBotOptions {
     /**
      * valid currency pair for the specified eg. "nbt_usd"
      */
-    public CurrencyPair pair;
+    public String pair;
 
     //Conditional settings with a default value
 
@@ -284,11 +284,12 @@ public class NuBotOptions {
     }
 
     public CurrencyPair getPair() {
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(this.pair);
         return pair;
     }
 
     public void setPair(CurrencyPair pair) {
-        this.pair = pair;
+        this.pair = pair.toStringSep();
     }
 
     public boolean isSendHipchat() {

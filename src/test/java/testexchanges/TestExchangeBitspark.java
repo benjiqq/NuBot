@@ -19,7 +19,6 @@
 package testexchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
@@ -34,9 +33,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * test bitspark

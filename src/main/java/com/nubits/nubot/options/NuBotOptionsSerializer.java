@@ -37,7 +37,7 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty(ParseOptions.apikey, opt.apiKey);
         root.addProperty(ParseOptions.apisecret, opt.apiSecret);
         root.addProperty(ParseOptions.txfee, opt.txFee);
-        root.addProperty(ParseOptions.pair, opt.pair.toStringSep());
+        root.addProperty(ParseOptions.pair, opt.pair);
         root.addProperty(ParseOptions.dualside, opt.dualSide);
         root.addProperty(ParseOptions.multiplecustodians, opt.multipleCustodians);
         root.addProperty(ParseOptions.executeorders, opt.executeOrders);

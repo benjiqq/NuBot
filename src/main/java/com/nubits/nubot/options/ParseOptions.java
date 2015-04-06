@@ -72,7 +72,7 @@ public class ParseOptions {
     public static String spread = "spread";
     //public static String distributeliquidity = "distributeliquidity";
 
-    private static String[] allkeys = {
+    public static String[] allkeys = {
             exchangename,
             apikey,
             apisecret,
@@ -242,8 +242,7 @@ public class ParseOptions {
 
         options.mailRecipient = (String) getIgnoreCase(optionsJSON, mailrecipient);
 
-        String pairStr = (String) getIgnoreCase(optionsJSON, pair);
-        options.pair = CurrencyPair.getCurrencyPairFromString(pairStr);
+        options.pair = (String) getIgnoreCase(optionsJSON, pair);
 
         //test if configuration is supported
         if (!isSupportedPair(options.getPair())) {
@@ -251,7 +250,7 @@ public class ParseOptions {
         }
 
         boolean aggregate = true; //true only for USD
-        if (!options.pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
+        if (!options.getPair().getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
             options.aggregate = false; //default to false
         }
 

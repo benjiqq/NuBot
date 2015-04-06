@@ -19,6 +19,7 @@
 package com.nubits.nubot.options;
 
 import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.pricefeeds.FeedFacade;
 
@@ -36,7 +37,7 @@ public class NuBotOptionsDefault {
         opt.exchangeName = "";
         opt.apiSecret = "";
         opt.txFee = 0.2;
-        opt.pair = CurrencyList.NBT_BTC;
+        opt.pair = CurrencyList.NBT_BTC.toStringSep();
         opt.dualSide = true;
         opt.multipleCustodians = false;
         opt.executeOrders = false;

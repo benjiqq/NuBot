@@ -112,7 +112,7 @@ public class TestOptionsSample extends TestCase {
         assertTrue(!catched);
 
         assertTrue(inputJSON.containsKey("exchangename"));
-        assertTrue(inputJSON.containsKey("apikey"));
+        assertTrue(inputJSON.containsKey("apiKey"));
         assertTrue(inputJSON.containsKey("spread"));
         assertTrue(inputJSON.containsKey("hipchat"));
         assertTrue(inputJSON.containsKey("pair"));
