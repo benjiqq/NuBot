@@ -181,6 +181,7 @@ public class TestOptions extends TestCase {
              opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 
@@ -257,8 +258,8 @@ public class TestOptions extends TestCase {
             assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
 
         } catch (NuBotConfigException e) {
-
             catched = true;
+            System.out.println("error parsing " + e);
         }
 
         assertTrue(!catched);

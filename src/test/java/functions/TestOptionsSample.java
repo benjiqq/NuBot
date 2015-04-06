@@ -128,6 +128,7 @@ public class TestOptionsSample extends TestCase {
             opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 
@@ -168,6 +169,7 @@ public class TestOptionsSample extends TestCase {
             assertTrue(opt.backupFeedNames.get(1).equals("btce"));
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 

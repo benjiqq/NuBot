@@ -140,7 +140,7 @@ public class TestOptionsJSON extends TestCase {
         try {
             json = (JSONObject) (parser.parse(configString));
         } catch (Exception e) {
-
+            System.out.println("error " + e);
         }
 
         NuBotOptions opt = null;
