@@ -29,7 +29,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
@@ -61,7 +61,7 @@ public class NuExecuteOrders {
         String folderName = "NuExecuteOrders_" + System.currentTimeMillis() + "/";
         String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
 
 
         NuExecuteOrders app = new NuExecuteOrders();

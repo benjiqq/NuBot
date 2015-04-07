@@ -29,9 +29,9 @@ import java.net.URLDecoder;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 
-public class FileSystem {
+public class FilesystemUtils {
 
-    private static final Logger LOG = LoggerFactory.getLogger(FileSystem.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(FilesystemUtils.class.getName());
 
     public static void deleteFile(String path) {
         try {
@@ -130,7 +130,7 @@ public class FileSystem {
         String cvsSplitBy = ",";
         ArrayList<String[]> toReturn = new ArrayList<>();
         try {
-            InputStream is = FileSystem.class.getClass().getResourceAsStream(file);
+            InputStream is = FilesystemUtils.class.getClass().getResourceAsStream(file);
             Reader reader = new InputStreamReader(is);
             br = new BufferedReader(reader);
             while ((line = br.readLine()) != null) {

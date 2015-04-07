@@ -37,7 +37,7 @@ public class VersionInfo {
     }
 
     public static String getBranchCommitInfo() {
-        if (FileSystem.insideJar()) {
+        if (FilesystemUtils.insideJar()) {
 
             HashMap km = getInfoFile();
 
@@ -82,7 +82,7 @@ public class VersionInfo {
      */
     public static String getVersionName() {
 
-        if (FileSystem.insideJar()) {
+        if (FilesystemUtils.insideJar()) {
 
             HashMap km = getInfoFile();
 

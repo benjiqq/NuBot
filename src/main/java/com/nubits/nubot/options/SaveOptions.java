@@ -21,7 +21,7 @@ package com.nubits.nubot.options;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -43,7 +43,7 @@ public class SaveOptions {
 
     public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
         String js = jsonPretty(opt);
-        FileSystem.writeToFile(js, filepath, false);
+        FilesystemUtils.writeToFile(js, filepath, false);
         return true;
     }
     /**
@@ -57,7 +57,7 @@ public class SaveOptions {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         String jsonOpt = gson.toJson(opt);
-        FileSystem.writeToFile(jsonOpt, filepath, false);
+        FilesystemUtils.writeToFile(jsonOpt, filepath, false);
         //TODO: success?
         return true;
     }

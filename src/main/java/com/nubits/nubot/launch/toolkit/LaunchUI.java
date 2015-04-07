@@ -19,7 +19,7 @@
 package com.nubits.nubot.launch.toolkit;
 
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import org.apache.commons.lang3.SystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +59,7 @@ public class LaunchUI {
 
     private void start() {
 
-        local_path = FileSystem.getBotAbsolutePath();
+        local_path = FilesystemUtils.getBotAbsolutePath();
 
         String configPath = askUser(); //Ask user for path; returns "" if nothing selected
 
