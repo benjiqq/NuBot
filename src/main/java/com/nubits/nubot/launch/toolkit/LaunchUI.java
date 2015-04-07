@@ -39,8 +39,9 @@ public class LaunchUI {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchUI.class.getName());
 
     private final String JAR_FILE = "NuBot.jar"; //Name of jar file
-    private String ARGS = "--ui=true"; //Arguments to pass to CLI
-    private String EXECUTE_JAR = "java -jar"; //Command to launch the jar
+    private final String ARGS = "-GUI"; //Arguments to pass to CLI to run : java - jar NuBot -cfg=<pathTo/options.json> -GUI
+    private final String CFG_PREFIX = "-cfg=";
+    private final String EXECUTE_JAR = "java -jar"; //Command to launch the jar
 
     private final String ICON_PATH = Settings.IMAGE_FOLDER + "/nubot-logo.png";
     private String command = "";
@@ -55,11 +56,13 @@ public class LaunchUI {
 
     private void start() {
         local_path = System.getProperty("user.dir");
-        String configPath = askUser(); //Ask user for path;
+        String configPath = askUser(); //Ask user for path; returns "" if nothing selected
 
         command = EXECUTE_JAR + " " + JAR_FILE + " ";
-        if (!configPath.equals("")) {
-            command += configPath + " ";
+        if (!configPath.equals("")) {//User indicated a file
+            command += CFG_PREFIX + configPath + " ";
+        } else {
+            command += CFG_PREFIX + Settings.DEFAULT_CONFIG_FILENAME + " "; //Default config
         }
         command += ARGS;
 
@@ -107,7 +110,7 @@ public class LaunchUI {
             //Ask the user to ask for scratch
             Object[] options = {"Import existing JSON option file",
                     "Configure the bot from scratch"};
-            
+
             int n = JOptionPane.showOptionDialog(new JFrame(),
                     "Chose one of the following options:",
                     "NuBot UI Launcher",
