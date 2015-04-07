@@ -19,7 +19,9 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
+import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,14 +56,28 @@ public class MainLaunch {
         MDC.put("session", Global.sessionPath);
         LOG.info("defined session path " + Global.sessionPath);
 
-        parseArgs(args);
+        CommandLine cli = parseArgs(args);
+
+        boolean runGUI = false;
+        String configFile;
+        if (cli.hasOption(CLIOptions.GUI)) {
+            runGUI = true;
+            LOG.info("Running " + Settings.APP_NAME + " with GUI");
+        }
+
+        if (cli.hasOption(CLIOptions.CFG)) {
+            configFile = cli.getOptionValue(CLIOptions.CFG);
+            SessionManager.sessionLaunch(configFile, runGUI);
+        } else {
+            exitWithNotice("Missing " + CLIOptions.CFG + ". run nubot with \n" + CLIOptions.USAGE_STRING);
+        }
 
     }
 
-    public static void parseArgs(String args[]) {
+    public static CommandLine parseArgs(String args[]) {
         CLIOptions argsParser = new CLIOptions();
         Options options = argsParser.constructGnuOptions();
-        argsParser.parseCommandLineArguments(args, options);
+        return argsParser.parseCommandLineArguments(args, options);
     }
 
 

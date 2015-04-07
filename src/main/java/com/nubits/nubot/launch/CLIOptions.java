@@ -18,8 +18,6 @@
 
 package com.nubits.nubot.launch;
 
-import com.nubits.nubot.bot.SessionManager;
-import com.nubits.nubot.global.Settings;
 import org.apache.commons.cli.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,10 +28,10 @@ import org.slf4j.LoggerFactory;
 public class CLIOptions {
     private static final Logger LOG = LoggerFactory.getLogger(CLIOptions.class.getName());
 
-    private static final String GUI = "GUI";
-    private static final String CFG = "cfg";
+    public static final String GUI = "GUI";
+    public static final String CFG = "cfg";
 
-    private static final String USAGE_STRING = "java - jar NuBot -" + CFG + "=<path/to/options.json> [-" + GUI + "]";
+    public static final String USAGE_STRING = "java - jar NuBot -" + CFG + "=<path/to/options.json> [-" + GUI + "]";
 
     /**
      * Construct and provide GNU-compatible Options.
@@ -59,32 +57,18 @@ public class CLIOptions {
      * @param commandLineArguments Command-line arguments to be processed with
      *                             Gnu-style parser.
      */
-    public void parseCommandLineArguments(final String[] commandLineArguments, Options gnuOptions) {
+    public CommandLine parseCommandLineArguments(final String[] commandLineArguments, Options gnuOptions) {
         final CommandLineParser cmdLineGnuParser = new GnuParser();
 
-        CommandLine commandLine;
+        CommandLine commandLine = null;
         try {
             commandLine = cmdLineGnuParser.parse(gnuOptions, commandLineArguments);
-            boolean runGUI = false;
-            String configFile;
-            if (commandLine.hasOption(GUI)) {
-                runGUI = true;
-                LOG.info("Running " + Settings.APP_NAME + " with GUI");
-            }
-
-            if (commandLine.hasOption(CFG)) {
-                configFile = commandLine.getOptionValue(CFG);
-                SessionManager.sessionLaunch(configFile, runGUI);
-            } else {
-                MainLaunch.exitWithNotice("Missing " + CFG + ". run nubot with \n" + USAGE_STRING);
-            }
-
-
         } catch (ParseException parseException)  // checked exception
         {
             LOG.error("Encountered exception while parsing using GnuParser:\n"
                     + parseException.getMessage());
             MainLaunch.exitWithNotice("run nubot with \n" + USAGE_STRING);
         }
+        return commandLine;
     }
 }
