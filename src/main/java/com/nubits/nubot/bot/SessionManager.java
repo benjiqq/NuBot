@@ -7,6 +7,7 @@ import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,7 @@ public class SessionManager {
     private static void setupSession() {
 
         //set up session dir
-        String wdir = System.getProperty("user.dir");
+        String wdir = FilesystemUtils.getBotAbsolutePath();
 
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
 
