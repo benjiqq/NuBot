@@ -200,7 +200,7 @@ public class FileSystem {
         String toRet = "";
         if (!insideJar()) { //IDE
             toRet = System.getProperty("user.dir");
-        } else {
+        } else { //INSIDE JAR
             String path = NuBotBase.class.getProtectionDomain().getCodeSource().getLocation().getPath();
             String decodedPath = "";
 
@@ -210,7 +210,7 @@ public class FileSystem {
                 LOG.error(e.toString());
             }
 
-            decodedPath = decodedPath.substring(0, decodedPath.lastIndexOf("/")); //TODO adapt to win
+            decodedPath = decodedPath.substring(0, decodedPath.lastIndexOf("/"));
 
             toRet = decodedPath;
         }
@@ -239,7 +239,6 @@ public class FileSystem {
      */
     public static String filePathClasspathFile(String filename) {
         LOG.debug("filename " + filename);
-        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
         URL resource = Utils.class.getClassLoader().getResource(filename);
         File f = null;
         try {
