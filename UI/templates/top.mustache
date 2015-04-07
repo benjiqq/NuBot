@@ -197,18 +197,19 @@
                 var keepproceeds = $("#keepproceeds").attr("value");
                 var maxsellvolume = $("#maxsellvolume").attr("value");
                 var maxbuyvolume = $("#maxbuyvolume").attr("value");
-                var priceincrement = $("priceincrement").attr("value");
+                var priceincrement = $("#priceincrement").attr("value");
                 var submitliquidity = $("#submitliquidity").prop("checked");
                 var nubitaddress = $("#nubitaddress").attr("value");
-                var nudip = $("#nudIP").attr("value");
+                var nudip = $("#nudip").attr("value");
                 var nudport = $("#nudport").attr("value");
                 var rpcpass = $("#rpcpass").attr("value");
                 var rpcuser = $("#rpcuser").attr("value");
                 var wallchangethreshold = $("#wallchangethreshold").attr("value");
                 var spread = $("#spread").attr("value");
                 var mainfeed = $("#mainfeed").attr("value");
+
                 var backupfeedsString = $("#backupfeeds").attr("value");
-                var backupfeeds = JSON.parse(backupfeedsString);
+                var backupfeedsarray = backupfeedsString.split(',');
 
 
                 //could check on the client side if valid post
@@ -225,6 +226,7 @@
                     "verbose": verbose,
                     "hipchat": hipchat,
                     "mailrecipient": mailrecipient,
+                    "mailnotifications": mailnotifications,
                     "emergencytimeout" : emergencytimeout,
                     "keepproceeds" : keepproceeds,
                     "maxsellvolume": maxsellvolume,
@@ -239,7 +241,7 @@
                     "wallchangethreshold": wallchangethreshold,
                     "spread" : spread,
                     "mainfeed": mainfeed,
-                    "backupfeeds" : backupfeeds
+                    "backupfeeds" : backupfeedsarray
 
                 });
 
