@@ -155,9 +155,6 @@ task LaunchUIjar(type: Jar) {
     with jar
 }
 
-
-LaunchUIjar.dependsOn distInit
-
 //create a single Jar with all dependencies
 task NuBotJar(type: Jar) {
     archiveName jarname
@@ -194,10 +191,6 @@ task NuGetLastTradesJar(type: Jar) {
 
 NuGetLastTradesJar.dependsOn distInit
 
-
-
-
-
 task NuBotDist(dependsOn: NuBotJar) {
     //description 'make NuBot distribution folder'
 
@@ -221,6 +214,8 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         tasks.cleanhtml.execute()
 
+        tasks.LaunchUIjar.execute()
+
         println "finish distribution"
 
         copy {
@@ -230,7 +225,7 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         copy {
             from "${resdir}/images"
-            into "${distdir}/images"
+            into "${distdir}/res/images"
         }
 
         copy {
