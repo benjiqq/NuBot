@@ -34,12 +34,14 @@ import java.io.InputStreamReader;
 /**
  * This should be packed into a Binary jar that launched nubot with the UI.
  * Associated gradle task LaunchUIjar
+ * Assuming this binary is in the same folder of NuBot.jar, it will launch the command
+ * java - jar NuBot -cfg=<pathTo/options.json> -GUI
  */
 public class LaunchUI {
     private static final Logger LOG = LoggerFactory.getLogger(LaunchUI.class.getName());
 
     private final String JAR_FILE = "NuBot.jar"; //Name of jar file
-    private final String ARGS = "-GUI"; //Arguments to pass to CLI to run : java - jar NuBot -cfg=<pathTo/options.json> -GUI
+    private final String ARGS = "-GUI"; //Arguments to pass to CLI to run
     private final String CFG_PREFIX = "-cfg=";
     private final String EXECUTE_JAR = "java -jar"; //Command to launch the jar
 
