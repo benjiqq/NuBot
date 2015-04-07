@@ -195,7 +195,7 @@ See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ea
 Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
 This is the syntax : 
 ```
-java -jar NuBot.jar sample-config.json
+java -jar NuBot.jar -cfg=sample-config.json [-GUI]
 ```
 
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
@@ -203,6 +203,8 @@ You can also use nohup in *nix system to redirect the output, and run it in back
 ```
 nohup java -jar NuBot.jar sample-config.json
 ```
+
+The [optional] flug -GUI will spin up the UI. 
 
 The bot will start and write output in the */logs* folder. 
 
