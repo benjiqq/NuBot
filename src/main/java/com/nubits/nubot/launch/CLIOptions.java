@@ -40,7 +40,7 @@ public class CLIOptions {
      *
      * @return Options expected from command-line of GNU form.
      */
-    public static Options constructGnuOptions() {
+    public Options constructGnuOptions() {
         final Options gnuOptions = new Options();
 
         Option UIOption = new Option(GUI, "graphic user interface", false, "Run with GUI");
@@ -59,10 +59,9 @@ public class CLIOptions {
      * @param commandLineArguments Command-line arguments to be processed with
      *                             Gnu-style parser.
      */
-    public static void parseCommandLineArguments(final String[] commandLineArguments) {
+    public void parseCommandLineArguments(final String[] commandLineArguments, Options gnuOptions) {
         final CommandLineParser cmdLineGnuParser = new GnuParser();
 
-        final Options gnuOptions = constructGnuOptions();
         CommandLine commandLine;
         try {
             commandLine = cmdLineGnuParser.parse(gnuOptions, commandLineArguments);

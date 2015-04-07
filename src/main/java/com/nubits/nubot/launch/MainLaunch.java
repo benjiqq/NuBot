@@ -20,6 +20,7 @@ package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
+import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -53,7 +54,14 @@ public class MainLaunch {
         MDC.put("session", Global.sessionPath);
         LOG.info("defined session path " + Global.sessionPath);
 
-        CLIOptions.parseCommandLineArguments(args);
+        parseArgs(args);
+
+    }
+
+    public static void parseArgs(String args[]) {
+        CLIOptions argsParser = new CLIOptions();
+        Options options = argsParser.constructGnuOptions();
+        argsParser.parseCommandLineArguments(args, options);
     }
 
 
