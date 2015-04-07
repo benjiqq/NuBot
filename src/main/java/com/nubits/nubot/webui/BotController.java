@@ -56,7 +56,7 @@ public class BotController {
             String json = new Gson().toJson(opmap);
 
             if (startstop.equals("start")) {
-                boolean success = false;
+                boolean success = true;
 
                 opmap.put("success", "" + false);
                 LOG.info("bot start >> " + startstop);
@@ -64,7 +64,7 @@ public class BotController {
                 try {
                     SessionManager.launchBot(Global.options);
                 } catch (Exception e) {
-                    success = true;
+                    success = false;
                 }
                 opmap.put("success", success);
 

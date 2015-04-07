@@ -101,11 +101,19 @@ public class SessionManager {
         if (opt.requiresSecondaryPegStrategy()) {
             LOG.debug("creating secondary bot object");
             Global.bot = new NuBotSecondary();
-            Global.bot.execute(opt);
+            try {
+                Global.bot.execute(opt);
+            } catch (Exception e) {
+
+            }
         } else {
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
-            Global.bot.execute(opt);
+            try {
+                Global.bot.execute(opt);
+            } catch (Exception e) {
+
+            }
         }
 
     }

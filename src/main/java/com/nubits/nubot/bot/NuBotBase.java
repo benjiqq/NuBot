@@ -202,7 +202,7 @@ public abstract class NuBotBase {
     /**
      * execute the NuBot based on a configuration
      */
-    public void execute(NuBotOptions opt) {
+    public void execute(NuBotOptions opt) throws Exception {
 
         NuLog.info(LOG, "Setting up NuBot version : " + VersionInfo.getVersionName());
 
@@ -232,7 +232,7 @@ public abstract class NuBotBase {
         Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
 
-        NuLog.info(LOG, "Waiting  a for the connectionThreads to detect connection");
+        NuLog.info(LOG, "Waiting a for the connectionThreads to detect connection");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -243,7 +243,8 @@ public abstract class NuBotBase {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
         } else {
-            MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+            //MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+            throw new Exception("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
 
@@ -270,7 +271,7 @@ public abstract class NuBotBase {
         try {
             configureStrategy();
         } catch (NuBotConfigException e) {
-            MainLaunch.exitWithNotice("can't configure strategy");
+            throw new Exception("can't configure strategy");
         }
 
         notifyOnline();
