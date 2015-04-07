@@ -18,10 +18,15 @@
 
 package com.nubits.nubot.utils;
 
+import com.nubits.nubot.bot.NuBotBase;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 public class FileSystem {
@@ -182,7 +187,71 @@ public class FileSystem {
                 }
             }
         }
-
         return toReturn;
+    }
+
+    /**
+     * @return a String with the absolute path of the folder.
+     * If used inside the IDE will use System.getProperty("user.dir")
+     * If used from the jar will return the absolute path of the jar
+     */
+
+    public static String getBotAbsolutePath() {
+        String toRet = "";
+        if (!insideJar()) { //IDE
+            toRet = System.getProperty("user.dir");
+        } else {
+            String path = NuBotBase.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            String decodedPath = "";
+
+            try {
+                decodedPath = URLDecoder.decode(path, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+                LOG.error(e.toString());
+            }
+
+            decodedPath = decodedPath.substring(0, decodedPath.lastIndexOf("/")); //TODO adapt to win
+
+            toRet = decodedPath;
+        }
+
+        return toRet;
+    }
+
+    /**
+     * Determine whether the current thread runs inside a jar
+     *
+     * @return
+     */
+    public static boolean insideJar() {
+        String c = "" + Utils.class.getResource("Utils.class");
+        if (c.startsWith("jar:"))
+            return true;
+        else
+            return false;
+    }
+
+    /**
+     * get filepath from a file in the resources folder
+     *
+     * @param filename
+     * @return
+     */
+    public static String filePathClasspathFile(String filename) {
+        LOG.debug("filename " + filename);
+        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
+        URL resource = Utils.class.getClassLoader().getResource(filename);
+        File f = null;
+        try {
+            URI u = resource.toURI();
+            LOG.debug("u: " + u);
+            f = Paths.get(u).toFile();
+            LOG.debug("f exists " + f.exists());
+            return f.getAbsolutePath();
+        } catch (Exception e) {
+
+        }
+
+        return "";
     }
 }

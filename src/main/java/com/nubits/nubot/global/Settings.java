@@ -43,15 +43,14 @@ public class Settings {
     // ------ Timing ------
     /**
      * [seconds] Submit liquidity info
-     *
      */
-
+    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;
+    
     /**
      * [seconds] Execute StrategyTask
      */
     public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
-    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
 
     /**
      * [seconds] Check connection with exchanges API

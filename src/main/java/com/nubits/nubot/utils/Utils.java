@@ -386,42 +386,7 @@ public class Utils {
         }
     }
 
-    /**
-     * Determine whether the current thread runs inside a jar
-     * @return
-     */
-    public static boolean insideJar() {
-        String c = "" + Utils.class.getResource("Utils.class");
-        String path = "";
-        if (c.startsWith("jar:"))
-            return true;
-        else
-            return false;
-    }
 
-    /**
-     * get filepath from a file in the resources folder
-     *
-     * @param filename
-     * @return
-     */
-    public static String filePathClasspathFile(String filename) {
-        LOG.debug("filename " + filename);
-        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
-        URL resource = Utils.class.getClassLoader().getResource(filename);
-        File f = null;
-        try {
-            URI u = resource.toURI();
-            LOG.debug("u: " + u);
-            f = Paths.get(u).toFile();
-            LOG.debug("f exists " + f.exists());
-            return f.getAbsolutePath();
-        } catch (Exception e) {
-
-        }
-
-        return "";
-    }
 
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {

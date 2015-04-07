@@ -37,7 +37,7 @@ public class VersionInfo {
     }
 
     public static String getBranchCommitInfo() {
-        if (Utils.insideJar()) {
+        if (FileSystem.insideJar()) {
 
             HashMap km = getInfoFile();
 
@@ -47,16 +47,17 @@ public class VersionInfo {
 
             return "load version error";
 
-        } else{
+        } else {
             return getCurrentgitBranch();
         }
     }
 
     /**
      * read current git branch within a git repository
+     *
      * @return
      */
-    private static String getCurrentgitBranch(){
+    private static String getCurrentgitBranch() {
         //get current git branch
         try {
             String fp = System.getProperty("user.dir") + "/" + ".git" + "/" + "HEAD";
@@ -81,7 +82,7 @@ public class VersionInfo {
      */
     public static String getVersionName() {
 
-        if (Utils.insideJar()) {
+        if (FileSystem.insideJar()) {
 
             HashMap km = getInfoFile();
 
