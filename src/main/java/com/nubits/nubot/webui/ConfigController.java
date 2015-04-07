@@ -47,7 +47,7 @@ public class ConfigController {
 
         boolean savesuccess = true;
         try {
-            SaveOptions.saveOptionsPretty(Global.options, saveTo);
+            SaveOptions.saveOptionsPretty(newopt, saveTo);
         }catch(Exception e){
             LOG.info("error saving " + e);
             savesuccess = false;
@@ -67,6 +67,7 @@ public class ConfigController {
 
         get(endpoint, "application/json", (request, response) -> {
 
+            //TODO
             String jsonString = SerializeOptions.optionsToJson(Global.options);
             return jsonString;
         });
