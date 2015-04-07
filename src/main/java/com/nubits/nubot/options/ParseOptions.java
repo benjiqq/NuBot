@@ -347,7 +347,7 @@ public class ParseOptions {
 
     public static void parseSecondary(NuBotOptions options, JSONObject optionsJSON) throws NuBotConfigException {
 
-        options.mainFeed = (String) optionsJSON.get(mainfeed);
+        options.mainFeed = (String) getIgnoreCase(optionsJSON, mainfeed);
 
         options.backupFeeds = new ArrayList<>();
 
