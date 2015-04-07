@@ -11,7 +11,7 @@ import java.util.List;
 public class VersionInfo {
 
     private static HashMap getInfoFile() {
-        String wdir = System.getProperty("user.dir");
+        String wdir = FilesystemUtils.getBotAbsolutePath();
 
         String fp = wdir + "/" + Settings.INFO_FILE;
 
@@ -37,7 +37,7 @@ public class VersionInfo {
     }
 
     public static String getBranchCommitInfo() {
-        if (Utils.insideJar()) {
+        if (FilesystemUtils.insideJar()) {
 
             HashMap km = getInfoFile();
 
@@ -47,19 +47,20 @@ public class VersionInfo {
 
             return "load version error";
 
-        } else{
+        } else {
             return getCurrentgitBranch();
         }
     }
 
     /**
      * read current git branch within a git repository
+     *
      * @return
      */
-    private static String getCurrentgitBranch(){
+    private static String getCurrentgitBranch() {
         //get current git branch
         try {
-            String fp = System.getProperty("user.dir") + "/" + ".git" + "/" + "HEAD";
+            String fp = FilesystemUtils.getBotAbsolutePath() + "/" + ".git" + "/" + "HEAD";
             File f = new File(fp);
             if (f.exists()) {
                 String s = FileUtils.readFileToString(f);
@@ -81,7 +82,7 @@ public class VersionInfo {
      */
     public static String getVersionName() {
 
-        if (Utils.insideJar()) {
+        if (FilesystemUtils.insideJar()) {
 
             HashMap km = getInfoFile();
 

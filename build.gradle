@@ -147,6 +147,8 @@ task LaunchUIjar(type: Jar) {
         include 'com/nubits/nubot/launch/toolkit/LaunchUI*'
         include 'com/nubits/nubot/global/Settings*'
         include 'org/apache/commons/lang3/*'
+        include 'org/slf4j/**'
+        include 'ch/qos/logback/**'
     }
 
     manifest {

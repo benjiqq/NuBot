@@ -30,14 +30,12 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
-
-import java.io.IOException;
 
 public class NuCMC {
 
@@ -58,7 +56,7 @@ public class NuCMC {
         String folderName = "NuCMC_" + System.currentTimeMillis() + "/";
         String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
 
         NuCMC app = new NuCMC();
         if (app.readParams(args)) {
@@ -93,7 +91,7 @@ public class NuCMC {
         boolean ok = false;
         NuBotOptions options = null;
         JSONParser parser = new JSONParser();
-        String optionsString = FileSystem.readFromFile(optionsPath);
+        String optionsString = FilesystemUtils.readFromFile(optionsPath);
         try {
             org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
             org.json.JSONObject optionsJSON = (org.json.JSONObject) jsonString.get("options");

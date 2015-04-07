@@ -19,13 +19,16 @@
 package com.nubits.nubot.launch.toolkit;
 
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.FilesystemUtils;
 import org.apache.commons.lang3.SystemUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.*;
-import java.net.URLDecoder;
+import java.io.File;
+import java.io.IOException;
 
 /**
  * This should be packed into a Binary jar that launched nubot with the UI.
@@ -33,7 +36,10 @@ import java.net.URLDecoder;
  * Assuming this binary is in the same folder of NuBot.jar, it will launch the command
  * java - jar NuBot -cfg=<pathTo/options.json> -GUI
  */
+
 public class LaunchUI {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LaunchUI.class.getName());
 
     private final String JAR_FILE = "NuBot.jar"; //Name of jar file
     private final String ARGS = "-GUI"; //Arguments to pass to CLI to run
@@ -52,16 +58,8 @@ public class LaunchUI {
     }
 
     private void start() {
-        String path = LaunchUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-        String decodedPath = "";
-        try {
-            decodedPath = URLDecoder.decode(path, "UTF-8");
-            decodedPath = decodedPath.substring(0, decodedPath.lastIndexOf("/"));
-        } catch (UnsupportedEncodingException e) {
-            System.err.println(e.toString());
-            System.exit(0);
-        }
-        local_path = decodedPath;
+
+        local_path = FilesystemUtils.getBotAbsolutePath();
 
         String configPath = askUser(); //Ask user for path; returns "" if nothing selected
 
@@ -83,22 +81,9 @@ public class LaunchUI {
             System.out.println("Launching UI from CLI : $ " + command);
             Process pr = rt.exec(command); //Run
 
-            //capture output
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(pr.getInputStream()));
 
-            BufferedReader stdError = new BufferedReader(new
-                    InputStreamReader(pr.getErrorStream()));
-
-            // readn&print the output from the command
-            String output = "";
-            String s = null;
-            while ((s = stdInput.readLine()) != null) {
-                System.out.println(s);
-                output += s + "\n";
-            }
         } catch (IOException e) {
-            System.out.println(e.toString());
+            LOG.error(e.toString());
         }
 
         System.exit(0);
@@ -136,14 +121,14 @@ public class LaunchUI {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     path = selectedFile.getAbsolutePath();
-                    System.out.println("Option file selected : " + path);
+                    LOG.info("Option file selected : " + path);
                 } else {
-                    System.out.println("Closing utility.");
+                    LOG.info("Closing Launch UI utility.");
                     System.exit(0);
                 }
             }
         } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-            System.out.println(e.toString());
+            LOG.error(e.toString());
         }
 
         return path;
@@ -152,7 +137,7 @@ public class LaunchUI {
     private JFileChooser createFileChoser() {
         JFileChooser fileChooser = new JFileChooser();
 
-        // Set the text
+        // Set the text of the button
         fileChooser.setApproveButtonText("Import");
         // Set the tool tip
         fileChooser.setApproveButtonToolTipText("Import configuration file");

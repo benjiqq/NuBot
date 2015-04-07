@@ -29,7 +29,7 @@ import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -107,7 +107,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             }
         }
 
-        FileSystem.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", wallshiftsFilePathCSV, true);
+        FilesystemUtils.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", wallshiftsFilePathCSV, true);
 
         //create json file if it doesn't already exist
         File json = new File(this.wallshiftsFilePathJSON);
@@ -120,7 +120,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             JSONObject history = new JSONObject();
             JSONArray wall_shifts = new JSONArray();
             history.put("wall_shifts", wall_shifts);
-            FileSystem.writeToFile(history.toJSONString(), this.wallshiftsFilePathJSON, true);
+            FilesystemUtils.writeToFile(history.toJSONString(), this.wallshiftsFilePathJSON, true);
         }
     }
 
@@ -583,7 +583,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         JSONObject wall_shift_info = new JSONObject();
         JSONArray wall_shifts = new JSONArray();
         try { //object already exists in file
-            wall_shift_info = (JSONObject) parser.parse(FileSystem.readFromFile(this.wallshiftsFilePathJSON));
+            wall_shift_info = (JSONObject) parser.parse(FilesystemUtils.readFromFile(this.wallshiftsFilePathJSON));
             wall_shifts = (JSONArray) wall_shift_info.get("wall_shifts");
         } catch (ParseException pe) {
             LOG.error("Unable to parse order_history.json");
@@ -757,11 +757,11 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
 
     private void logrow(String row, String outputPath, boolean append) {
-        FileSystem.writeToFile(row, outputPath, append);
+        FilesystemUtils.writeToFile(row, outputPath, append);
     }
 
     private void logWallShift(String wall_shift) {
-        FileSystem.writeToFile(wall_shift, this.wallshiftsFilePathJSON, false);
+        FilesystemUtils.writeToFile(wall_shift, this.wallshiftsFilePathJSON, false);
     }
     
 }

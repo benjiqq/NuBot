@@ -32,7 +32,7 @@ import com.nubits.nubot.tasks.BotTask;
 import com.nubits.nubot.tasks.CheckConnectionTask;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public class NuLastTrades {
         String logsFolder = Settings.LOGS_PATH + "/" + folderName;
 
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
         if (app.readParams(args)) {
 
             NuLog.info(LOG, "Launching NuLastTrades on " + app.exchangename);
@@ -140,7 +140,7 @@ public class NuLastTrades {
     }
 
     private void execute() {
-        //FileSystem.writeToFile(HEADER, output, false); //uncomment for csv outputs
+        //FilesystemUtils.writeToFile(HEADER, output, false); //uncomment for csv outputs
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getLastTrades(pair, dateFrom);
 
         if (pair.getPaymentCurrency().equals(CurrencyList.NBT)) {
@@ -159,9 +159,9 @@ public class NuLastTrades {
 
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Trade> tradeList = (ArrayList<Trade>) activeOrdersResponse.getResponseObject();
-            FileSystem.writeToFile("{\n", output, false);
-            //FileSystem.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
-            //FileSystem.writeToFile("\"pair\":\"" + pair.toStringSep("_") + "\",\n", output, true);
+            FilesystemUtils.writeToFile("{\n", output, false);
+            //FilesystemUtils.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
+            //FilesystemUtils.writeToFile("\"pair\":\"" + pair.toStringSep("_") + "\",\n", output, true);
             NuLog.info(LOG, "Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
@@ -198,9 +198,9 @@ public class NuLastTrades {
                 if (i == tradeList.size() - 1) {
                     comma = "";
                 }
-                FileSystem.writeToFile(tempTrade.toJSONString() + comma, output, true);
+                FilesystemUtils.writeToFile(tempTrade.toJSONString() + comma, output, true);
             }
-            FileSystem.writeToFile("}", output, true);
+            FilesystemUtils.writeToFile("}", output, true);
         } else {
             LOG.error(activeOrdersResponse.getError().toString());
         }
@@ -218,6 +218,6 @@ public class NuLastTrades {
                 + "\nOrders > " + threshold + " NBT : " + countLargeOrders
                 + "\nPaid in fees : " + paidInFees;
         NuLog.info(LOG, report);
-        FileSystem.writeToFile(report, output + "_report.txt", false);
+        FilesystemUtils.writeToFile(report, output + "_report.txt", false);
     }
 }

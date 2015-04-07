@@ -26,7 +26,7 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 
@@ -86,7 +86,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             JSONObject history = new JSONObject();
             JSONArray orders = new JSONArray();
             history.put("orders", orders);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
+            FilesystemUtils.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
         }
 
         //create json file if it doesn't already exist
@@ -102,7 +102,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             JSONObject history = new JSONObject();
             JSONArray balances = new JSONArray();
             history.put("balances", balances);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
+            FilesystemUtils.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
         }
 
         File of = new File(this.outputFile_orders);
@@ -115,7 +115,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             }
         }
 
-        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);
+        FilesystemUtils.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);
 
     }
 
@@ -257,7 +257,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         JSONObject orderHistory = new JSONObject();
         JSONArray orders = new JSONArray();
         try { //object already exists in file
-            orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_orders));
+            orderHistory = (JSONObject) parser.parse(FilesystemUtils.readFromFile(this.jsonFile_orders));
             orders = (JSONArray) orderHistory.get("orders");
         } catch (ParseException pe) {
             LOG.error("Unable to parse " + this.jsonFile_orders);
@@ -293,7 +293,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private JSONObject getBalanceHistory() throws ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
+        JSONObject balanceHistory = (JSONObject) parser.parse(FilesystemUtils.readFromFile(this.jsonFile_balances));
         return balanceHistory;
     }
 
@@ -419,15 +419,15 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     //---------------- storage related -----------------
 
     private void logOrderCSV(String toWrite) {
-        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+        FilesystemUtils.writeToFile(toWrite, outputFile_orders, true);
     }
 
     private void logOrderJSON(JSONObject orderHistory) {
-        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+        FilesystemUtils.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
     }
 
     private void logBalanceJSON(JSONObject balanceHistory) {
-        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+        FilesystemUtils.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
     }
 
 

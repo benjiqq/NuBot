@@ -23,6 +23,7 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.utils.FilesystemUtils;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -44,7 +45,7 @@ public class TestOptionsStandard extends TestCase {
     public void testConfigExists() {
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
-        final String wdir = System.getProperty("user.dir");
+        final String wdir = FilesystemUtils.getBotAbsolutePath();
 
         File f = new File(testconfig);
         assertTrue(f.exists());
@@ -52,13 +53,13 @@ public class TestOptionsStandard extends TestCase {
 
 
     @Test
-    public void testLoadOptionsAll(){
+    public void testLoadOptionsAll() {
 
 
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-             opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
             System.out.println("error " + e);
@@ -83,16 +84,13 @@ public class TestOptionsStandard extends TestCase {
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;*/
 
-        assertTrue(opt.getPair()!=null);
-        assertTrue(opt.getExchangeName()!=null);
+        assertTrue(opt.getPair() != null);
+        assertTrue(opt.getExchangeName() != null);
 
-        assertTrue(opt.getSpread()==0.0);
-
+        assertTrue(opt.getSpread() == 0.0);
 
 
     }
-
-
 
 
 }

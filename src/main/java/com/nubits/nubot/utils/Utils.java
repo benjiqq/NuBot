@@ -23,22 +23,22 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
-import static com.nubits.nubot.utils.LiquidityPlot.plot;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.*;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -47,17 +47,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.*;
-
-import org.apache.commons.io.FileUtils;
+import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
+import static com.nubits.nubot.utils.LiquidityPlot.plot;
 
 
 public class Utils {
@@ -379,7 +370,7 @@ public class Utils {
 
             //load file depending whether run from inside a Jar or not
 
-            String wdir = System.getProperty("user.dir");
+            String wdir = FilesystemUtils.getBotAbsolutePath();
             String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
             System.setProperty("javax.net.ssl.trustStore", wdirpath);
@@ -387,42 +378,7 @@ public class Utils {
         }
     }
 
-    /**
-     * Determine whether the current thread runs inside a jar
-     * @return
-     */
-    public static boolean insideJar() {
-        String c = "" + Utils.class.getResource("Utils.class");
-        String path = "";
-        if (c.startsWith("jar:"))
-            return true;
-        else
-            return false;
-    }
 
-    /**
-     * get filepath from a file in the resources folder
-     *
-     * @param filename
-     * @return
-     */
-    public static String filePathClasspathFile(String filename) {
-        LOG.debug("filename " + filename);
-        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
-        URL resource = Utils.class.getClassLoader().getResource(filename);
-        File f = null;
-        try {
-            URI u = resource.toURI();
-            LOG.debug("u: " + u);
-            f = Paths.get(u).toFile();
-            LOG.debug("f exists " + f.exists());
-            return f.getAbsolutePath();
-        } catch (Exception e) {
-
-        }
-
-        return "";
-    }
 
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {

@@ -28,7 +28,7 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class NuCancelOrders {
         String folderName = "NuCancelOrders_" + System.currentTimeMillis() + "/";
         String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
         if (app.readParams(args)) {
 
             NuLog.info(LOG, "Launching CancellAllOrders ");

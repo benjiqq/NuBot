@@ -218,7 +218,7 @@ public class FrozenBalancesManager {
 
     private void parseFrozenBalancesFile() {
         JSONParser parser = new JSONParser();
-        String FrozenBalancesManagerString = FileSystem.readFromFile(this.pathToFrozenBalancesFiles);
+        String FrozenBalancesManagerString = FilesystemUtils.readFromFile(this.pathToFrozenBalancesFiles);
         try {
             JSONObject frozenBalancesJSON = (JSONObject) (parser.parse(FrozenBalancesManagerString));
             double quantity = Double.parseDouble((String) frozenBalancesJSON.get("frozen-quantity-total"));

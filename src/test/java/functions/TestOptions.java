@@ -25,6 +25,7 @@ import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.utils.FilesystemUtils;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -48,7 +49,7 @@ public class TestOptions extends TestCase {
     public void testConfigExists() {
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
-        final String wdir = System.getProperty("user.dir");
+        final String wdir = FilesystemUtils.getBotAbsolutePath();
 
         File f = new File(testconfig);
         assertTrue(f.exists());
@@ -149,7 +150,7 @@ public class TestOptions extends TestCase {
     }
 
     @Test
-    public void testLoadOptions(){
+    public void testLoadOptions() {
 
         String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
@@ -157,7 +158,7 @@ public class TestOptions extends TestCase {
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
 
-            assertTrue(opt.isSubmitliquidity()==false);
+            assertTrue(opt.isSubmitliquidity() == false);
 
         } catch (NuBotConfigException e) {
             System.out.println("could not parse config");
@@ -171,14 +172,14 @@ public class TestOptions extends TestCase {
     }
 
     @Test
-    public void testLoadOptionsAll(){
+    public void testLoadOptionsAll() {
 
         String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
 
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-             opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
             System.out.println("error " + e);
@@ -199,26 +200,25 @@ public class TestOptions extends TestCase {
         assertTrue(opt.rpcPass.equals("xxx"));
         assertTrue(opt.rpcUser.equals("xxx"));
         assertTrue(opt.mainFeed.equals("btce"));
+
         assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
         assertTrue(opt.backupFeeds.get(1).equals("blockchain"));
-        assertTrue(opt.wallchangeThreshold==0.1);
+        assertTrue(opt.wallchangeThreshold == 0.1);
         assertTrue(opt.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_ALL));
-        assertTrue(opt.sendMails()==true);
-        assertTrue(opt.isDualSide()==true);
-        assertTrue(opt.isSubmitliquidity()==false);
-        assertTrue(opt.isMultipleCustodians()==false);
-        assertTrue(opt.isExecuteOrders()==false);
-        assertTrue(opt.isVerbose()==false);
-        assertTrue(opt.isHipchat()==true);
-        assertTrue(opt.emergencyTimeout==60);
-        assertTrue(opt.keepProceeds==0);
-        assertTrue(opt.maxBuyVolume==0.0);
-        assertTrue(opt.maxSellVolume==0.0);
-        assertTrue(opt.priceIncrement==0.1);
-        assertTrue(opt.spread==0.0);
-        assertTrue(opt.wallchangeThreshold==0.1);
-
-
+        assertTrue(opt.sendMails() == true);
+        assertTrue(opt.isDualSide() == true);
+        assertTrue(opt.isSubmitliquidity() == false);
+        assertTrue(opt.isMultipleCustodians() == false);
+        assertTrue(opt.isExecuteOrders() == false);
+        assertTrue(opt.isVerbose() == false);
+        assertTrue(opt.isHipchat() == true);
+        assertTrue(opt.emergencyTimeout == 60);
+        assertTrue(opt.keepProceeds == 0);
+        assertTrue(opt.maxBuyVolume == 0.0);
+        assertTrue(opt.maxSellVolume == 0.0);
+        assertTrue(opt.priceIncrement == 0.1);
+        assertTrue(opt.spread == 0.0);
+        assertTrue(opt.wallchangeThreshold == 0.1);
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
         String mailnotifications = NuBotOptionsDefault.mailnotifications;
@@ -236,26 +236,25 @@ public class TestOptions extends TestCase {
         int emergencyTimeout = NuBotOptionsDefault.emergencyTimeout;
         boolean distributeLiquidity = NuBotOptionsDefault.distributeLiquidity;*/
 
-        assertTrue(opt.getPair()!=null);
+        assertTrue(opt.getPair() != null);
         //assertTrue(opt.getPair().equals("nbt_btc"));
-
 
 
     }
 
     @Test
-    public void testParseFeeds(){
+    public void testParseFeeds() {
 
         String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
         boolean catched = false;
         try {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
-            assertTrue(opt.mainFeed!=null);
+            assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("btce"));
-
-            assertTrue(opt.backupFeeds.size()==2);
+            assertTrue(opt.backupFeeds.size() == 2);
             assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
             assertTrue(opt.backupFeeds.get(1).equals("blockchain"));
+
 
         } catch (NuBotConfigException e) {
             catched = true;

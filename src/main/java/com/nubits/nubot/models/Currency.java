@@ -20,8 +20,6 @@ package com.nubits.nubot.models;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.CSVtools;
-import com.nubits.nubot.utils.FileSystem;
-import org.apache.commons.io.FileUtils;
 
 import java.util.ArrayList;
 import java.util.Objects;

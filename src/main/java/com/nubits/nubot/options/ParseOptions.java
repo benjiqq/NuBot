@@ -23,7 +23,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.pricefeeds.FeedFacade;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.Utils;
 import org.json.JSONException;
 import org.json.simple.JSONArray;
@@ -413,7 +413,7 @@ public class ParseOptions {
 
     public static JSONObject parseSingleJsonFile(String filepath) throws ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject fileJSON = (JSONObject) (parser.parse(FileSystem.readFromFile(filepath)));
+        JSONObject fileJSON = (JSONObject) (parser.parse(FilesystemUtils.readFromFile(filepath)));
         return fileJSON;
     }
 
