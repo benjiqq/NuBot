@@ -42,7 +42,7 @@ public class ConfigController {
         }
 
         String saveTo = this.configDir + File.separator + this.configfile;
-        String js = SaveOptions.jsonPretty(Global.options);
+        String js = SaveOptions.jsonPretty(newopt);
         LOG.info("new opt: " + js);
 
         try {

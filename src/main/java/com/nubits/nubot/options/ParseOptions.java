@@ -272,6 +272,7 @@ public class ParseOptions {
         options.nudIp = (String) getIgnoreCase(optionsJSON, nudip);
 
         options.priceIncrement = Utils.getDouble(getIgnoreCase(optionsJSON, priceincrement));
+
         options.txFee = Utils.getDouble(getIgnoreCase(optionsJSON, txfee));
 
         try {
@@ -305,6 +306,8 @@ public class ParseOptions {
         } catch (Exception e) {
             throw new NuBotConfigException("can not cast multipleCustodians to boolean " + e);
         }
+
+
 
         //TOOO distributeLiquidity not implemented
         /*try {
@@ -349,8 +352,12 @@ public class ParseOptions {
         options.backupFeeds = new ArrayList<>();
 
         //Iterate on backupFeeds
-
-        JSONArray bfeeds = (JSONArray) optionsJSON.get(backupfeeds);
+        JSONArray bfeeds = null;
+        try{
+            bfeeds = (JSONArray) getIgnoreCase(optionsJSON, backupfeeds);
+        }catch (Exception e){
+            throw new NuBotConfigException("can't parse array " + e);
+        }
 
         if (bfeeds.size() < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
