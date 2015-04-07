@@ -181,6 +181,7 @@ public class TestOptions extends TestCase {
              opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 
@@ -198,8 +199,8 @@ public class TestOptions extends TestCase {
         assertTrue(opt.rpcPass.equals("xxx"));
         assertTrue(opt.rpcUser.equals("xxx"));
         assertTrue(opt.mainFeed.equals("btce"));
-        assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
-        assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
+        assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
+        assertTrue(opt.backupFeeds.get(1).equals("blockchain"));
         assertTrue(opt.wallchangeThreshold==0.1);
         assertTrue(opt.sendMailsLevel().equals(MailNotifications.MAIL_LEVEL_ALL));
         assertTrue(opt.sendMails()==true);
@@ -208,7 +209,7 @@ public class TestOptions extends TestCase {
         assertTrue(opt.isMultipleCustodians()==false);
         assertTrue(opt.isExecuteOrders()==false);
         assertTrue(opt.isVerbose()==false);
-        assertTrue(opt.isSendHipchat()==true);
+        assertTrue(opt.isHipchat()==true);
         assertTrue(opt.emergencyTimeout==60);
         assertTrue(opt.keepProceeds==0);
         assertTrue(opt.maxBuyVolume==0.0);
@@ -220,11 +221,11 @@ public class TestOptions extends TestCase {
 
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
-        String sendMails = NuBotOptionsDefault.sendMails;
+        String mailnotifications = NuBotOptionsDefault.mailnotifications;
         boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
         boolean executeOrders = NuBotOptionsDefault.executeOrders;
         boolean verbose = NuBotOptionsDefault.verbose;
-        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean hipchat = NuBotOptionsDefault.hipchat;
         boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
         int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
         double txFee = NuBotOptionsDefault.txFee;
@@ -252,13 +253,13 @@ public class TestOptions extends TestCase {
             assertTrue(opt.mainFeed!=null);
             assertTrue(opt.mainFeed.equals("btce"));
 
-            assertTrue(opt.backupFeedNames.size()==2);
-            assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
-            assertTrue(opt.backupFeedNames.get(1).equals("blockchain"));
+            assertTrue(opt.backupFeeds.size()==2);
+            assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
+            assertTrue(opt.backupFeeds.get(1).equals("blockchain"));
 
         } catch (NuBotConfigException e) {
-
             catched = true;
+            System.out.println("error parsing " + e);
         }
 
         assertTrue(!catched);

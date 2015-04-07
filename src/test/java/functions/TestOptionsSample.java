@@ -22,14 +22,12 @@ package functions;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -105,17 +103,17 @@ public class TestOptionsSample extends TestCase {
             inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
             //assertTrue(inputJSON.containsKey("options"));
             //JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
-            assertTrue(inputJSON.containsKey("exchangename"));
+            assertTrue(inputJSON.containsKey(ParseOptions.exchangename));
         } catch (Exception e) {
 
         }
         assertTrue(!catched);
 
-        assertTrue(inputJSON.containsKey("exchangename"));
-        assertTrue(inputJSON.containsKey("apikey"));
-        assertTrue(inputJSON.containsKey("spread"));
-        assertTrue(inputJSON.containsKey("hipchat"));
-        assertTrue(inputJSON.containsKey("pair"));
+        assertTrue(inputJSON.containsKey(ParseOptions.exchangename));
+        assertTrue(inputJSON.containsKey(ParseOptions.apikey));
+        assertTrue(inputJSON.containsKey(ParseOptions.spread));
+        assertTrue(inputJSON.containsKey(ParseOptions.hipchat));
+        assertTrue(inputJSON.containsKey(ParseOptions.pair));
     }
 
     @Test
@@ -128,17 +126,18 @@ public class TestOptionsSample extends TestCase {
             opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 
         assertTrue(!catched);
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
-        String sendMails = NuBotOptionsDefault.sendMails;
+        String mailnotifications = NuBotOptionsDefault.mailnotifications;
         boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
         boolean executeOrders = NuBotOptionsDefault.executeOrders;
         boolean verbose = NuBotOptionsDefault.verbose;
-        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean hipchat = NuBotOptionsDefault.hipchat;
         boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
         int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
         double txFee = NuBotOptionsDefault.txFee;
@@ -163,11 +162,12 @@ public class TestOptionsSample extends TestCase {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
             assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("blockchain"));
-            assertTrue(opt.backupFeedNames.size() == 2);
-            assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
-            assertTrue(opt.backupFeedNames.get(1).equals("btce"));
+            assertTrue(opt.backupFeeds.size() == 2);
+            assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
+            assertTrue(opt.backupFeeds.get(1).equals("btce"));
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 

@@ -19,51 +19,51 @@
 package com.nubits.nubot.options;
 
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 
-public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
+/*public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
 
     @Override
     public JsonElement serialize(NuBotOptions opt, Type typeOfSrc, JsonSerializationContext context) {
         JsonObject root = new JsonObject();
 
-        root.addProperty("exchangename", opt.exchangeName);
-        root.addProperty("apikey", opt.apiKey);
-        root.addProperty("apisecret", opt.apiSecret);
-        root.addProperty("dualside", opt.dualSide);
-        root.addProperty("submitliquidity", opt.submitLiquidity);
-        root.addProperty("multiplecustodians", opt.multipleCustodians);
-        root.addProperty("executeorders", opt.executeOrders);
-        root.addProperty("verbose", opt.verbose);
-        root.addProperty("hipchat", opt.sendHipchat);
+        root.addProperty(ParseOptions.exchangename, opt.exchangeName);
+        root.addProperty(ParseOptions.apikey, opt.apiKey);
+        root.addProperty(ParseOptions.apisecret, opt.apiSecret);
+        root.addProperty(ParseOptions.txfee, opt.txFee);
+        root.addProperty(ParseOptions.pair, opt.pair);
+        root.addProperty(ParseOptions.dualside, opt.dualSide);
+        root.addProperty(ParseOptions.multiplecustodians, opt.multipleCustodians);
+        root.addProperty(ParseOptions.executeorders, opt.executeOrders);
+        root.addProperty(ParseOptions.verbose, opt.verbose);
+        root.addProperty(ParseOptions.hipchat, opt.hipchat);
 
-        root.addProperty("mailnotifications", opt.sendMails);
-        root.addProperty("mailrecipient", opt.mailRecipient);
-        root.addProperty("emergencytimeout", opt.emergencyTimeout);
-        root.addProperty("keepproceeds", opt.keepProceeds);
-        root.addProperty("maxsellordervolume", opt.maxSellVolume);
-        root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
-        root.addProperty("priceincrement", opt.priceIncrement);
-        root.addProperty("nubitaddress", opt.nubitAddress);
-        root.addProperty("nudport", opt.nudPort);
-        root.addProperty("nudIp", opt.nudIp);
-        root.addProperty("rpcpass", opt.rpcPass);
-        root.addProperty("rpcuser", opt.rpcUser);
-        root.addProperty("mainFeed", opt.mainFeed);
-        root.addProperty("wallchangeThreshold", opt.wallchangeThreshold);
-        root.addProperty("mailnotifications", opt.sendMails);
-        root.addProperty("txFee", opt.txFee);
-        root.addProperty("emergencyTimeout", opt.emergencyTimeout);
+        root.addProperty(ParseOptions.mailnotifications, opt.mailnotifications);
+        root.addProperty(ParseOptions.mailrecipient, opt.mailRecipient);
+        root.addProperty(ParseOptions.emergencytimeout, opt.emergencyTimeout);
+        root.addProperty(ParseOptions.keepproceeds, opt.keepProceeds);
+        root.addProperty(ParseOptions.maxsellvolume, opt.maxSellVolume);
+        root.addProperty(ParseOptions.maxbuyvolume, opt.maxBuyVolume);
+        root.addProperty(ParseOptions.priceincrement, opt.priceIncrement);
+        root.addProperty(ParseOptions.submitliquidity, opt.submitLiquidity);
+        root.addProperty(ParseOptions.nubitaddress, opt.nubitAddress);
+        root.addProperty(ParseOptions.nudip, opt.nudIp);
+        root.addProperty(ParseOptions.nudport, opt.nudPort);
+        root.addProperty(ParseOptions.rpcpass, opt.rpcPass);
+        root.addProperty(ParseOptions.rpcuser, opt.rpcUser);
+        root.addProperty(ParseOptions.wallchangethreshold, opt.wallchangeThreshold);
+        root.addProperty(ParseOptions.spread, opt.spread);
+        root.addProperty(ParseOptions.mainfeed, opt.mainFeed);
 
-        root.addProperty("pair", opt.pair.toStringSep());
+        String bfs = new Gson().toJson(opt.backupFeeds,new TypeToken<ArrayList<String>>(){}.getType());
+        root.addProperty(ParseOptions.backupfeeds, bfs);
 
         return root;
     }
-}
+}*/

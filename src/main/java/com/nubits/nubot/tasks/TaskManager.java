@@ -106,8 +106,8 @@ public class TaskManager {
 
         //Select the correct interval
         int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
-        if (Global.options.pair.getPaymentCurrency().isFiat() && !Global.swappedPair
-                || Global.options.pair.getOrderCurrency().isFiat() && Global.swappedPair) {
+        if (Global.options.getPair().getPaymentCurrency().isFiat() && !Global.swappedPair
+                || Global.options.getPair().getOrderCurrency().isFiat() && Global.swappedPair) {
             checkPriceInterval = Settings.CHECK_PRICE_INTERVAL_FIAT;
         }
         priceTriggerTask = new BotTask(

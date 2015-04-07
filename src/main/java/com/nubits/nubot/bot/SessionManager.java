@@ -32,24 +32,20 @@ public class SessionManager {
      * main launch of a bot
      *
      * @param configfile
-     * @param runui
      */
-    public static void sessionLaunch(String configfile, boolean runui) {
-
-        NuBotOptions nuopt = null;
+    public static void setConfig(String configfile) {
 
         sessionLOG.debug("parsing options from " + configfile);
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            nuopt = ParseOptions.parseOptionsSingle(configfile);
+
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile);
+            LOG.debug("loading opt: " + opt);
+            Global.options = opt;
         } catch (NuBotConfigException e) {
             MainLaunch.exitWithNotice("" + e);
         }
-
-        sessionLOG.debug("launch bot");
-
-        launchBot(nuopt);
 
     }
 
@@ -77,6 +73,7 @@ public class SessionManager {
         //it increases the counter
         createSessionFile();
 
+        Global.sessionRunning = true;
         Global.sessionStarted = System.currentTimeMillis();
 
         String timestamp =

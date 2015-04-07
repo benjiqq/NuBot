@@ -61,17 +61,18 @@ public class TestOptionsStandard extends TestCase {
              opt = ParseOptions.parseOptionsSingle(testconfig);
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 
         assertTrue(!catched);
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
-        String sendMails = NuBotOptionsDefault.sendMails;
+        String mailnotifications = NuBotOptionsDefault.mailnotifications;
         boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
         boolean executeOrders = NuBotOptionsDefault.executeOrders;
         boolean verbose = NuBotOptionsDefault.verbose;
-        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean hipchat = NuBotOptionsDefault.hipchat;
         boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
         int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
         double txFee = NuBotOptionsDefault.txFee;

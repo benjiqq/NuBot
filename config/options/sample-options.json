@@ -15,11 +15,10 @@
   "mailrecipient":"xxx@xxx.xxx",
   "emergencytimeout":60,
   "keepproceeds":0,
-  "maxsellordervolume" : 0.0,
-  "maxbuyordervolume" : 0.0,
+  "maxsellvolume" : 0.0,
+  "maxbuyvolume" : 0.0,
   "priceincrement": 0.1,
   
-
   "submitliquidity":true,
   "nubitaddress": "xxx",
   "nudip": "127.0.0.1",

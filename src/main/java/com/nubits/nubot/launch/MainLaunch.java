@@ -22,6 +22,7 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.NuLog;
+import com.nubits.nubot.webui.UiServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
@@ -65,10 +66,27 @@ public class MainLaunch {
             runGUI = true;
             LOG.info("Running " + Settings.APP_NAME + " with GUI");
         }
-
         if (cli.hasOption(CLIOptions.CFG)) {
             configFile = cli.getOptionValue(CLIOptions.CFG);
-            SessionManager.sessionLaunch(configFile, runGUI);
+
+            if (runGUI) {
+                LOG.info("Running NuBot GUI");
+                String workingdir = ".";
+                try {
+                    UiServer.startUIserver(workingdir, configFile);
+                } catch (Exception e) {
+                    LOG.error("error setting up UI server " + e);
+                }
+
+            } else {
+                LOG.info("Run NuBot from CLI");
+                //set global config
+                SessionManager.setConfig(configFile);
+                sessionLOG.debug("launch bot");
+                SessionManager.launchBot(Global.options);
+            }
+
+
         } else {
             exitWithNotice("Missing " + CLIOptions.CFG + ". run nubot with \n" + CLIOptions.USAGE_STRING);
         }

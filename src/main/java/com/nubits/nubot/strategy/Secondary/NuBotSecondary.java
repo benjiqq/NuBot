@@ -21,7 +21,6 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
@@ -81,7 +80,7 @@ public class NuBotSecondary extends NuBotBase {
 
         PriceFeedManager pfm = null;
         try {
-            pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeedNames(), toTrackCurrencyPair);
+            pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeeds(), toTrackCurrencyPair);
         } catch (NuBotConfigException e) {
             throw new NuBotConfigException("can't configure price feeds");
         } catch(Exception e){

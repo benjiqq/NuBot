@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+
+            body {
+                font-family: Helvetica;
+                padding-top: 70px;
+            }
+
+          .row {
+            margin-bottom: 20px;
+          }
+          .row .row {
+            margin-top: -20px;
+            margin-bottom: 0;
+          }
+          [class*="col-"] {
+            padding-top: 2px;
+            padding-bottom: 2px;
+            border: 0px solid #ddd;
+            border: 0px solid rgba(86,61,124,.2);
+          }
+
+          hr {
+            margin-top: 20px;
+            margin-bottom: 20px;
+          }
+
+          #logarea {
+            width:800px;
+            height:400px;
+            resize:none
+          }
+
+        </style>
+
+
+<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+      <script>
+
+              var host = "localhost";
+              var port = 4567;
+              var baseurl = "http://" + host + ":" + port;
+              var updateTime = 2000;
+
+        $(document).ready(function() {
+
+          $('#startbot').click(function(){
+
+                console.log("calling start on server");
+
+                var jsondata = JSON.stringify({
+                    "operation": "start"});
+
+              $.ajax(baseurl + "/startstop", {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                        console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                    }
+               });
+
+
+            });
+
+
+
+          $('#stopbot').click(function(){
+
+                console.log("calling stop on server");
+
+                var jsondata = JSON.stringify({
+                    "operation": "stop"});
+
+              $.ajax(baseurl + "/startstop", {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                        console.log("ok " + data);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                    }
+               });
+
+
+            });
+    });
+
+            function loadlog() {
+
+                //console.log("load log");
+
+                var url = baseurl + "/logdump";
+
+                console.log("url  " + url);
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+                })
+                .fail(function() {
+                  console.log("error loading log");
+                  //alert( "error loading log" );
+                })
+                .done(function( data ) {
+                  $('#logarea').val(data["log"]);
+                });
+
+                var psconsole = $('#logarea');
+                if(psconsole.length)
+                  psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+
+                //bottom = $("#logarea")[0].scrollHeight - $("#logarea").height()
+
+                setTimeout(loadlog,updateTime);
+            }
+
+
+            function loadbot() {
+                loadlog();
+
+            }
+
+
+            function loadconfig() {
+
+                var url = "http://" + host + ":" + port + "/config";
+
+                $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+                })
+                .done(function( data ) {
+
+                    //console.log("data: " + data);
+
+                    $("#exchangename").attr("value", data["exchangeName"]);
+                    $("#apikey").attr("value", data["apiKey"]);
+                    $("#apisecret").attr("value", data["apiSecret"]);
+                    $("#txfee").attr("value", data["txFee"]);
+                    $("#pair").attr("value", data["pair"]);
+                    $("#dualside").attr("checked", data["dualSide"]);
+                    $("#multiplecustodians").attr("checked", data["multipleCustodians"]);
+                    $("#executeorders").attr("checked", data["executeOrders"]);
+                    $("#verbose").attr("checked", data["verbose"]);
+                    $("#hipchat").attr("checked", data["hipchat"]);
+                    $("#mailnotifications").attr("value", data["mailnotifications"]);
+                    $("#mailrecipient").attr("value", data["mailRecipient"]);
+                    $("#emergencytimeout").attr("value", data["emergencyTimeout"]);
+                    $("#keepproceeds").attr("value", data["keepProceeds"]);
+                    $("#maxsellvolume").attr("value", data["maxSellVolume"]);
+                    $("#maxbuyvolume").attr("value", data["maxBuyVolume"]);
+                    $("#priceincrement").attr("value", data["priceIncrement"]);
+                    $("#submitliquidity").attr("checked", data["submitliquidity"]);
+                    $("#nubitaddress").attr("value", data["nubitAddress"]);
+                    $("#nudip").attr("value", data["nudIp"]);
+                    $("#nudport").attr("value", data["nudPort"]);
+                    $("#rpcpass").attr("value", data["rpcPass"]);
+                    $("#rpcuser").attr("value", data["rpcUser"]);
+                    $("#wallchangethreshold").attr("value", data["wallchangeThreshold"]);
+                    $("#spread").attr("value", data["spread"]);
+                    $("#mainfeed").attr("value", data["mainFeed"]);
+                    $("#backupfeeds").attr("value", data["backupFeeds"]);
+
+                 });
+
+            }
+
+            function postall(){
+                var posturl = "http://" + host + ":" + port + "/config";
+
+                //get all vars and post them
+
+                var exchangename = $("#exchangename").attr("value");
+                var apikey = $("#apikey").attr("value");
+                var apisecret = $("#apisecret").attr("value");
+                var txfee =$("#txfee").attr("value");
+                var pair = $("#pair").attr("value");
+                var dualside = $("#dualside").prop("checked");
+                var multiplecustodians = $("#multiplecustodians").prop("checked");
+                var executeorders = $("#executeorders").prop("checked");
+                var verbose = $("#verbose").prop("checked");
+                var hipchat = $("#hipchat").prop("checked");
+                var mailnotifications = $("#mailnotifications").attr("value");
+                var mailrecipient =$("#mailrecipient").attr("value");
+                var emergencytimeout =$("#emergencytimeout").attr("value");
+                var keepproceeds = $("#keepproceeds").attr("value");
+                var maxsellvolume = $("#maxsellvolume").attr("value");
+                var maxbuyvolume = $("#maxbuyvolume").attr("value");
+                var priceincrement = $("#priceincrement").attr("value");
+                var submitliquidity = $("#submitliquidity").prop("checked");
+                var nubitaddress = $("#nubitaddress").attr("value");
+                var nudip = $("#nudip").attr("value");
+                var nudport = $("#nudport").attr("value");
+                var rpcpass = $("#rpcpass").attr("value");
+                var rpcuser = $("#rpcuser").attr("value");
+                var wallchangethreshold = $("#wallchangethreshold").attr("value");
+                var spread = $("#spread").attr("value");
+                var mainfeed = $("#mainfeed").attr("value");
+
+                var backupfeedsString = $("#backupfeeds").attr("value");
+                var backupfeedsarray = backupfeedsString.split(',');
+
+
+                //could check on the client side if valid post
+
+                var jsondata = JSON.stringify({
+                    "exchangename": exchangename,
+                    "apikey": apikey,
+                    "apisecret": apisecret,
+                    "txfee" : txfee,
+                    "pair": pair,
+                    "dualside": dualside,
+                    "multiplecustodians": multiplecustodians,
+                    "executeorders": executeorders,
+                    "verbose": verbose,
+                    "hipchat": hipchat,
+                    "mailrecipient": mailrecipient,
+                    "mailnotifications": mailnotifications,
+                    "emergencytimeout" : emergencytimeout,
+                    "keepproceeds" : keepproceeds,
+                    "maxsellvolume": maxsellvolume,
+                    "maxbuyvolume": maxbuyvolume,
+                    "priceincrement": priceincrement,
+                    "submitliquidity": submitliquidity,
+                    "nubitaddress": nubitaddress,
+                    "nudip": nudip,
+                    "nudport": nudport,
+                    "rpcpass": rpcpass,
+                    "rpcuser": rpcuser,
+                    "wallchangethreshold": wallchangethreshold,
+                    "spread" : spread,
+                    "mainfeed": mainfeed,
+                    "backupfeeds" : backupfeedsarray
+
+                });
+
+
+                makePost(posturl, jsondata);
+            }
+
+            function makePost(url, jsondata){
+                //make HTTP post to server
+                $.ajax(url, {
+                    data : jsondata,
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+                      console.log("ok " + data);
+                    },
+                    /*fail:  function(xhr, textStatus, errorThrown) {
+
+                        }*/
+                    error: function(xhr, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                        alert(xhr.responseText);
+                    }
+               });
+            }
+
+
+        </script>
+
+
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+<!-- Optional theme -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+<!-- Latest compiled and minified JavaScript -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+
+    </head>
+
+
