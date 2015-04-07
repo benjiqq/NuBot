@@ -224,6 +224,11 @@ task NuBotDist(dependsOn: NuBotJar) {
         }
 
         copy {
+            from "${resdir}/images"
+            into "${distdir}/images"
+        }
+
+        copy {
             from "res/currencies.csv"
             into "${distdir}/res/"
         }
