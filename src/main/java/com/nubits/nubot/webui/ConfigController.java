@@ -2,9 +2,11 @@ package com.nubits.nubot.webui;
 
 
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.options.*;
+import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.options.SaveOptions;
+import com.nubits.nubot.options.SerializeOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -87,22 +89,23 @@ public class ConfigController {
 
             NuBotOptions newopt = null;
             Map opmap = new HashMap();
+            String error = "none";
             try{
                 newopt = ParseOptions.parsePost(postJson);
             }catch(Exception e){
                 LOG.error("error parsing " + postJson + "\n" + e);
                 //handle errors
                 success = false;
-                opmap.put("error", e);
+                error = "" + e;
             }
-
 
             opmap.put("success", success);
 
             if (success) {
                 saveConfig(newopt);
-                opmap.put("error", "none");
             }
+
+            opmap.put("error", error);
 
             String json = new Gson().toJson(opmap);
 

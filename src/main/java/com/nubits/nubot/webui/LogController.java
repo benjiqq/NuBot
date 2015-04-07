@@ -34,7 +34,7 @@ public class LogController {
                 object.addProperty("log", l);
                 return object;
 
-            }catch(Exception e){
+            } catch(Exception e){
 
             }
 
