@@ -3,6 +3,7 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
@@ -63,11 +64,10 @@ public class ConfigController {
         this.configDir = configDir;
         this.configfile = configfile;
 
-        //Msg keyMsg = new Msg(opt.getApiKey(), opt.getApiSecret());
-
         get(endpoint, "application/json", (request, response) -> {
 
-            //TODO
+            //get from memory
+            //any change in the file is reflected in the global options
             String jsonString = SerializeOptions.optionsToJson(Global.options);
             return jsonString;
         });
@@ -75,8 +75,18 @@ public class ConfigController {
 
         post(endpoint, "application/json", (request, response) -> {
 
-            //TODO: check if bot is running
-            //TODO: if bot is running needs to handled safely
+            //check if bot is running
+            boolean active = SessionManager.isSessionActive();
+            LOG.info("session currently active " + active);
+
+            if (active){
+                //if bot is running needs show an error
+                Map opmap = new HashMap();
+                opmap.put("success", false);
+                opmap.put("error", "Session running: can't save config");
+                String json = new Gson().toJson(opmap);
+                return json;
+            }
 
 
             LOG.info("config received post" + request);
