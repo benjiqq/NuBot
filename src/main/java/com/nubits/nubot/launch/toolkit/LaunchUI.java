@@ -20,16 +20,12 @@ package com.nubits.nubot.launch.toolkit;
 
 import com.nubits.nubot.global.Settings;
 import org.apache.commons.lang3.SystemUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
+import java.net.URLDecoder;
 
 /**
  * This should be packed into a Binary jar that launched nubot with the UI.
@@ -38,7 +34,6 @@ import java.io.InputStreamReader;
  * java - jar NuBot -cfg=<pathTo/options.json> -GUI
  */
 public class LaunchUI {
-    private static final Logger LOG = LoggerFactory.getLogger(LaunchUI.class.getName());
 
     private final String JAR_FILE = "NuBot.jar"; //Name of jar file
     private final String ARGS = "-GUI"; //Arguments to pass to CLI to run
@@ -57,7 +52,17 @@ public class LaunchUI {
     }
 
     private void start() {
-        local_path = System.getProperty("user.dir");
+        String path = LaunchUI.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        String decodedPath = "";
+        try {
+            decodedPath = URLDecoder.decode(path, "UTF-8");
+            decodedPath = decodedPath.substring(0, decodedPath.lastIndexOf("/"));
+        } catch (UnsupportedEncodingException e) {
+            System.err.println(e.toString());
+            System.exit(0);
+        }
+        local_path = decodedPath;
+
         String configPath = askUser(); //Ask user for path; returns "" if nothing selected
 
         command = EXECUTE_JAR + " " + JAR_FILE + " ";
@@ -75,7 +80,7 @@ public class LaunchUI {
                 command = "cmd /c " + command;
             }
 
-            LOG.info("Launching UI from CLI : $ " + command);
+            System.out.println("Launching UI from CLI : $ " + command);
             Process pr = rt.exec(command); //Run
 
             //capture output
@@ -93,7 +98,7 @@ public class LaunchUI {
                 output += s + "\n";
             }
         } catch (IOException e) {
-            LOG.error(e.toString());
+            System.out.println(e.toString());
         }
 
         System.exit(0);
@@ -131,11 +136,14 @@ public class LaunchUI {
                 if (result == JFileChooser.APPROVE_OPTION) {
                     File selectedFile = fileChooser.getSelectedFile();
                     path = selectedFile.getAbsolutePath();
-                    LOG.info("Option file selected : " + path);
+                    System.out.println("Option file selected : " + path);
+                } else {
+                    System.out.println("Closing utility.");
+                    System.exit(0);
                 }
             }
         } catch (ClassNotFoundException | UnsupportedLookAndFeelException | IllegalAccessException | InstantiationException e) {
-            LOG.error(e.toString());
+            System.out.println(e.toString());
         }
 
         return path;

@@ -39,7 +39,6 @@ repositories {
 def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
-def logdir = new File("logs")
 def docdir = new File("md")
 def resdir = new File("res")
 
@@ -53,7 +52,6 @@ def mainclass = "com.nubits.nubot.launch.MainLaunch"
 def getlasttradeclass = "com.nubits.nubot.launch.toolkit.NuLastTrades"
 
 def launchuiclass = "com.nubits.nubot.launch.toolkit.LaunchUI" //mainclass of the utils that runs the UI
-def includeTestConfig = true
 
 FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
         "./${docdir}/license.html", "./${docdir}/feeds.html", "./${docdir}/changelog.html", "./${docdir}/disclaimer.html", "./${docdir}/gradle.html")
@@ -146,7 +144,11 @@ task LaunchUIjar(type: Jar) {
         exclude 'META-INF/*.SF'
         exclude 'META-INF/*.DSA'
         exclude 'META-INF/*.RSA'
+        include 'com/nubits/nubot/launch/toolkit/LaunchUI*'
+        include 'com/nubits/nubot/global/Settings*'
+        include 'org/apache/commons/lang3/*'
     }
+
     manifest {
         attributes 'Main-Class': launchuiclass
     }
