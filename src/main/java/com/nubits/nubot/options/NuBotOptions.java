@@ -18,16 +18,16 @@
 
 package com.nubits.nubot.options;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-
-import java.util.ArrayList;
-
 import com.nubits.nubot.notifications.MailNotifications;
 import org.json.simple.JSONObject;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class NuBotOptions {
 
@@ -96,7 +96,6 @@ public class NuBotOptions {
 
     /**
      * if set to false will disable email notifications
-     *
      */
     public String mailnotifications;
 
@@ -327,7 +326,7 @@ public class NuBotOptions {
         return keepProceeds;
     }
 
-      public String getNubitAddress() {
+    public String getNubitAddress() {
         return nubitAddress;
     }
 
@@ -384,13 +383,12 @@ public class NuBotOptions {
             //Replace sensitive information
             serializedOptionsJSON.replace("apisecret", "hidden");
             serializedOptionsJSON.replace("apikey", "hidden");
-            serializedOptionsJSON.replace("rpcpass","hidden");
+            serializedOptionsJSON.replace("rpcpass", "hidden");
 
             toRet = serializedOptionsJSON.toString();
+        } catch (org.json.simple.parser.ParseException e) {
+            LOG.error(e.toString());
         }
-        catch(org.json.simple.parser.ParseException e) {
-                LOG.error(e.toString());
-            }
 
         return toRet;
     }
