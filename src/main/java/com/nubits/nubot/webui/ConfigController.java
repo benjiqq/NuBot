@@ -45,11 +45,17 @@ public class ConfigController {
         String js = SaveOptions.jsonPretty(newopt);
         LOG.info("new opt: " + js);
 
+        boolean savesuccess = true;
         try {
             SaveOptions.saveOptionsPretty(Global.options, saveTo);
         }catch(Exception e){
             LOG.info("error saving " + e);
+            savesuccess = false;
         }
+
+        if (savesuccess)
+            Global.options = newopt;
+
     }
 
     public ConfigController(String endpoint, String configDir, String configfile) {

@@ -257,6 +257,18 @@
                     type : 'POST',
                     success: function(data){
                       console.log("ok " + data);
+                      //btn btn-success
+                      var cbtn = $('#saveconfigbutton');
+                      if (cbtn.hasClass("btn-primary")) {
+                           cbtn.removeClass("btn-primary");
+                           cbtn.addClass("btn-success");
+                           setTimeout(function() {
+                                 cbtn.removeClass("btn-success");
+                                 cbtn.addClass("btn-primary");
+                           }, 2000);
+                      }
+
+
                     },
                     /*fail:  function(xhr, textStatus, errorThrown) {
 
