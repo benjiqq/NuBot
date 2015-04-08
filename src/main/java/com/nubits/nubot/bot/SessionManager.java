@@ -2,10 +2,7 @@ package com.nubits.nubot.bot;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
-import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.options.NuBotOptions;
-import com.nubits.nubot.options.NuBotOptionsDefault;
-import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.options.*;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.utils.FilesystemUtils;
@@ -56,9 +53,8 @@ public class SessionManager {
     public static void setConfigDefault() {
 
         NuBotOptions defaultOpt = NuBotOptionsDefault.defaultFactory();
-
-        /*Settings.DEFAULT_CONFIG_FILENAME;
-        */
+        Global.options = defaultOpt;
+        SaveOptions.saveOptionsPretty(defaultOpt,Settings.DEFAULT_CONFIG_FILE_PATH);
 
     }
 

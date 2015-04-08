@@ -87,7 +87,7 @@ public class TestLaunch {
         sessionLOG.debug("test launch");
 
         LOG.info("set global config");
-        SessionManager.setConfig(configFile);
+        SessionManager.setConfigDefault();
 
         if (runui){
             String workingdir = ".";
@@ -107,7 +107,8 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        testlaunchWithFile();
+        //testlaunchWithFile();
+        testlaunchNoFile();
 
     }
 
