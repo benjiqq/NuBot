@@ -121,7 +121,7 @@ public class FrozenBalancesManager {
                             + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), MessageColor.PURPLE);
                 }
             } else {
-                NuLog.info(LOG, "Nothing to freeze. The funds initially set apart (" + initialFunds.toString() + ") "
+                LOG.info("Nothing to freeze. The funds initially set apart (" + initialFunds.toString() + ") "
                         + "are greater than the amount found in balance(" + amountFoundInBalance.toString() + ").");
             }
         }
@@ -162,14 +162,14 @@ public class FrozenBalancesManager {
                 if (balance.getQuantity() > getAmountAlreadyThere().getQuantity()) {
                     setAmountAlreadyThere(balance);
                 } else {
-                    NuLog.info(LOG, "Did not update the balanceAlreadyThere, since its would be smaller(" + balance.toString() + ") than the former value(" + getAmountAlreadyThere().toString() + ") .");
+                    LOG.info("Did not update the balanceAlreadyThere, since its would be smaller(" + balance.toString() + ") than the former value(" + getAmountAlreadyThere().toString() + ") .");
                 }
             } else {
                 success = false;
             }
         }
         if (success) {
-            NuLog.info(LOG, "Frozen funds already in balance (not proceeds) updated : "
+            LOG.info("Frozen funds already in balance (not proceeds) updated : "
                     + Global.frozenBalances.getAmountAlreadyThere().getQuantity()
                     + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency());
         } else {
@@ -184,7 +184,7 @@ public class FrozenBalancesManager {
         df.setMaximumFractionDigits(8);
 
         if (Global.options.getKeepProceeds() != 0) {
-            NuLog.info(LOG, "Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
+            LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
         }
 
         if (writeToFile) {
@@ -281,7 +281,7 @@ public class FrozenBalancesManager {
 
         try {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
-            NuLog.info(LOG, "Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
+            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
         } catch (IOException ex) {
             LOG.error(ex.toString());
         }

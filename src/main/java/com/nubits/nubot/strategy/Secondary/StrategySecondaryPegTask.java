@@ -71,13 +71,13 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         if (shiftingWalls) {
-            NuLog.info(LOG, "Already shifting walls.");
+            LOG.info("Already shifting walls.");
             return;
         }
 
         strategyUtils.recount(); //Count number of active sells and buys
         if (mightNeedInit) {
-            NuLog.info(LOG, "might need init");
+            LOG.info("might need init");
             boolean reset = mightNeedInit && !(ordersAndBalancesOK);
             if (reset) {
                 String message = "Order reset needed on " + Global.exchange.getName();
@@ -110,7 +110,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void initStrategy() {
         //First execution : reset orders and init strategy
-        NuLog.info(LOG, "Initializing strategy");
+        LOG.info("Initializing strategy");
         isFirstTime = false;
         strategyUtils.recount();
         boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
@@ -130,7 +130,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         shiftingWalls = true;
 
-        NuLog.info(LOG, "Strategy received a price change notification.");
+        LOG.info("Strategy received a price change notification.");
         needWallShift = true;
 
         if (!Global.swappedPair) {
@@ -165,7 +165,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         if (shiftSuccess) {
             mightNeedInit = false;
             needWallShift = false;
-            NuLog.info(LOG, "Wall shift successful");
+            LOG.info("Wall shift successful");
         } else {
             LOG.error("Wall shift failed");
         }
@@ -178,7 +178,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void setSellPricePEG(double sellPricePEG) {
-        NuLog.info(LOG, "set setSellPricePEG : " + sellPricePEG);
+        LOG.info("set setSellPricePEG : " + sellPricePEG);
         this.sellPricePEG = sellPricePEG;
     }
 
@@ -187,7 +187,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void setBuyPricePEG(double buyPricePEG) {
-        NuLog.info(LOG, "setBuyPricePEG : " + buyPricePEG);
+        LOG.info("setBuyPricePEG : " + buyPricePEG);
         this.buyPricePEG = buyPricePEG;
     }
 

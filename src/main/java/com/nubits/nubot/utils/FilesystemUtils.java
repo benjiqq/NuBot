@@ -37,7 +37,7 @@ public class FilesystemUtils {
         try {
             File file = new File(path);
             if (file.delete()) {
-                NuLog.info(LOG, "file " + file.getName() + " deleted!");
+                LOG.info("file " + file.getName() + " deleted!");
             } else {
                 LOG.error("Delete operation is failed for : " + path);
             }
@@ -51,16 +51,16 @@ public class FilesystemUtils {
             File file = new File(path);
             if (file.delete()) {
                 if (verbose) {
-                    NuLog.info(LOG, "file " + file.getName() + " deleted!");
+                    LOG.info("file " + file.getName() + " deleted!");
                 }
             } else {
                 if (verbose) {
-                    NuLog.info(LOG, "Delete operation is failed for : " + path);
+                    LOG.info("Delete operation is failed for : " + path);
                 }
             }
         } catch (Exception e) {
             if (verbose) {
-                NuLog.info(LOG, e.toString());
+                LOG.info(e.toString());
             }
         }
     }

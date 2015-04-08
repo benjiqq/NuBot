@@ -63,11 +63,11 @@ public class TestFroozenAmounts {
         fbm.updateFrozenBalance(new Amount(30.3, currency));
         fbm.updateFrozenBalance(new Amount(1, currency));
 
-        NuLog.info(LOG, "Loaded Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
+        LOG.info("Loaded Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
 
         fbm.updateFrozenBalance(new Amount(231.2, currency));
 
-        NuLog.info(LOG, "then Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
+        LOG.info("then Froozen balance : " + fbm.getFrozenAmount().getAmount().getQuantity());
 
 
     }

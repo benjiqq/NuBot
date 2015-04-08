@@ -105,7 +105,7 @@ public class TestWrappers {
         //WrapperTestUtils.testGetLastTrades(testPair);
 
 
-        NuLog.info(LOG, "Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
+        LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
 
         System.exit(0);
     }
@@ -124,8 +124,8 @@ public class TestWrappers {
         InitTests.loadKeystore(trustAll);
 
         try {
-            NuLog.info(LOG, "using key: " + Global.options.getApiKey());
-            NuLog.info(LOG, "config exchange " + Global.options.getExchangeName());
+            LOG.info("using key: " + Global.options.getApiKey());
+            LOG.info("config exchange " + Global.options.getExchangeName());
             WrapperTestUtils.configureExchange(Global.options.getExchangeName());
             InitTests.startConnectionCheck();
 

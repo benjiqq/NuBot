@@ -60,7 +60,7 @@ public class TestRPCLiquidityInfo {
         double buy = 0;
         //java -jar testRPC user pass custodian sell buy
         if (args.length == 5) {
-            NuLog.info(LOG, "Reading input parameters");
+            LOG.info("Reading input parameters");
             user = args[0];
             pass = args[1];
             custodian = args[2];
@@ -104,11 +104,11 @@ public class TestRPCLiquidityInfo {
             if (null == responseObject) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                NuLog.info(LOG, responseObject.toJSONString());
+                LOG.info(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
-                    NuLog.info(LOG, "Now calling getliquidityinfo");
+                    LOG.info("Now calling getliquidityinfo");
                     JSONObject infoObject = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar);
-                    NuLog.info(LOG, infoObject.toJSONString());
+                    LOG.info(infoObject.toJSONString());
                 }
             }
         } else {
@@ -120,7 +120,7 @@ public class TestRPCLiquidityInfo {
     private void testGetInfo() {
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject = Global.rpcClient.getInfo();
-            NuLog.info(LOG, responseObject.toJSONString());
+            LOG.info(responseObject.toJSONString());
         } else {
             LOG.error("Nu Client offline. ");
         }
@@ -131,7 +131,7 @@ public class TestRPCLiquidityInfo {
         if (Global.rpcClient.isConnected()) {
             connectedString = "online";
         }
-        NuLog.info(LOG, "Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
+        LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
     }
 
     private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
@@ -163,7 +163,7 @@ public class TestRPCLiquidityInfo {
             if (null == responseObject) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                NuLog.info(LOG, responseObject.toJSONString());
+                LOG.info(responseObject.toJSONString());
             }
         } else {
             LOG.error("Nu Client offline. ");
@@ -176,7 +176,7 @@ public class TestRPCLiquidityInfo {
             if (response == -1) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                NuLog.info(LOG, "Total " + type + " liquidity : " + response + " " + CurrencyList.NBT.getCode());
+                LOG.info("Total " + type + " liquidity : " + response + " " + CurrencyList.NBT.getCode());
             }
         } else {
             LOG.error("Nu Client offline. ");

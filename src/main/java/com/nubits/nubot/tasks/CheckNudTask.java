@@ -32,7 +32,7 @@ public class CheckNudTask extends TimerTask {
 
     @Override
     public void run() {
-        NuLog.info(LOG, "Executing task : CheckNudTask ");
+        LOG.info("Executing task : CheckNudTask ");
         if (Global.rpcClient != null) {
             Global.rpcClient.checkConnection();
 
@@ -41,7 +41,7 @@ public class CheckNudTask extends TimerTask {
                 if (Global.rpcClient.isConnected()) {
                     connectedString = "online";
                 }
-                NuLog.info(LOG, "Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
+                LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
             }
         }
     }

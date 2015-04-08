@@ -32,7 +32,7 @@ public class NuSetup {
      * setup the task for checking Nu RPC
      */
     public static void setupNuRPCTask() {
-        NuLog.info(LOG, "Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
+        LOG.info("Setting up (verbose) RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
 
         Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
                 Global.options.getRpcUser(), Global.options.getRpcPass(), Global.options.isVerbose(), true,
@@ -40,7 +40,7 @@ public class NuSetup {
     }
 
     public static void startTask(){
-        NuLog.info(LOG, "Starting task : Check connection with Nud");
+        LOG.info("Starting task : Check connection with Nud");
         Global.taskManager.getCheckNudTask().start();
     }
 }

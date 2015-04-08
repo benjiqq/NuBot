@@ -71,7 +71,7 @@ public abstract class NuBotBase {
 
         //Generate Bot Session unique id
         Global.sessionId = Utils.generateSessionID();
-        NuLog.info(LOG, "Session ID = " + Global.sessionId);
+        LOG.info("Session ID = " + Global.sessionId);
 
         this.mode = "sell-side";
         if (Global.options.isDualSide()) {
@@ -110,7 +110,7 @@ public abstract class NuBotBase {
     }
 
     protected void setupSSL() {
-        NuLog.info(LOG, "Set up SSL certificates");
+        LOG.info("Set up SSL certificates");
         boolean trustAllCertificates = false;
         if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             trustAllCertificates = true;
@@ -121,7 +121,7 @@ public abstract class NuBotBase {
 
     protected void setupExchange() {
 
-        NuLog.info(LOG, "setup Exchange object");
+        LOG.info("setup Exchange object");
 
         LOG.debug("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
@@ -156,7 +156,7 @@ public abstract class NuBotBase {
             Global.swappedPair = false;
         }
 
-        NuLog.info(LOG, "Swapped pair mode : " + Global.swappedPair);
+        LOG.info("Swapped pair mode : " + Global.swappedPair);
 
         String apibase = "";
         //TODO handle on exchange level, not bot level
@@ -186,9 +186,9 @@ public abstract class NuBotBase {
 
     protected void checkNuConn() throws NuBotConnectionException {
 
-        NuLog.info(LOG, "Check connection with nud");
+        LOG.info("Check connection with nud");
         if (Global.rpcClient.isConnected()) {
-            NuLog.info(LOG, "RPC connection OK!");
+            LOG.info("RPC connection OK!");
         } else {
             //TODO: recover?
             throw new NuBotConnectionException("problem with nu connectivity");
@@ -200,14 +200,14 @@ public abstract class NuBotBase {
      */
     public void execute(NuBotOptions opt) throws Exception {
 
-        NuLog.info(LOG, "Setting up NuBot version : " + VersionInfo.getVersionName());
+        LOG.info("Setting up NuBot version : " + VersionInfo.getVersionName());
 
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
             NuLog.warn(LOG, "Trades will be executed");
         } else {
-            NuLog.info(LOG, "Trades will not be executed [executetrade:false]");
+            LOG.info("Trades will not be executed [executetrade:false]");
             liveTrading = false;
         }
 
@@ -229,7 +229,7 @@ public abstract class NuBotBase {
         Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
 
-        NuLog.info(LOG, "Waiting a for the connectionThreads to detect connection");
+        LOG.info("Waiting a for the connectionThreads to detect connection");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -257,9 +257,9 @@ public abstract class NuBotBase {
             }
         }
 
-        NuLog.info(LOG, "Start trading Strategy specific for " + Global.options.getPair().toString());
+        LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
-        NuLog.info(LOG, "Options loaded : " + Global.options.toStringNoKeys());
+        LOG.info("Options loaded : " + Global.options.toStringNoKeys());
 
         // Set the frozen balance manager in the global variable
 
@@ -285,7 +285,7 @@ public abstract class NuBotBase {
 
     public void shutdownBot() {
 
-        NuLog.info(LOG, "Bot shutting down..");
+        LOG.info("Bot shutting down..");
 
         String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
                 + "<strong>" + Global.options.getExchangeName() + "</strong> ["
@@ -296,14 +296,14 @@ public abstract class NuBotBase {
         //Try to cancel all orders, if any
         if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
 
-            NuLog.info(LOG, "Clearing out active orders ... ");
+            LOG.info("Clearing out active orders ... ");
 
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                 if (deleted) {
-                    NuLog.info(LOG, "Order clear request successful");
+                    LOG.info("Order clear request successful");
                 } else {
                     LOG.error("Could not submit request to clear orders");
                 }
@@ -317,14 +317,14 @@ public abstract class NuBotBase {
         if (Global.options.isSubmitliquidity()) {
             if (Global.rpcClient.isConnected()) {
                 //tier 1
-                NuLog.info(LOG, "Resetting Liquidity Info before quit");
+                LOG.info("Resetting Liquidity Info before quit");
 
                 JSONObject responseObject1 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                         0, 0, 1);
                 if (null == responseObject1) {
                     LOG.error("Something went wrong while sending liquidityinfo");
                 } else {
-                    NuLog.info(LOG, responseObject1.toJSONString());
+                    LOG.info(responseObject1.toJSONString());
                 }
 
                 JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
@@ -332,7 +332,7 @@ public abstract class NuBotBase {
                 if (null == responseObject2) {
                     LOG.error("Something went wrong while sending liquidityinfo");
                 } else {
-                    NuLog.info(LOG, responseObject2.toJSONString());
+                    LOG.info(responseObject2.toJSONString());
                 }
             }
         }

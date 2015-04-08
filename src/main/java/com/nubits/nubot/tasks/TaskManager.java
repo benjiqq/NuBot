@@ -81,7 +81,7 @@ public class TaskManager {
     private void setTasks() {
         //connectivity tasks
 
-        NuLog.info(LOG, "setting up tasks");
+        LOG.info("setting up tasks");
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
@@ -132,7 +132,7 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        NuLog.info(LOG, "Stopping all tasks. ");
+        LOG.info("Stopping all tasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
@@ -152,7 +152,7 @@ public class TaskManager {
     public void printTasksStatus() {
         for (int i = 0; i < taskList.size(); i++) {
             BotTask task = taskList.get(i);
-            NuLog.info(LOG, "Task name : " + task.getName() + ""
+            LOG.info("Task name : " + task.getName() + ""
                     + " running : " + task.isRunning());
         }
     }

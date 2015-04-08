@@ -88,7 +88,7 @@ public class Global {
                 Global.sessionStopped = System.currentTimeMillis();
                 sessionLOG.info("session end;" + Global.sessionStopped);
 
-                NuLog.info(LOG, "Exit. ");
+                LOG.info("Exit. ");
 
                 Global.mainThread.interrupt();
                 if (Global.taskManager != null) {

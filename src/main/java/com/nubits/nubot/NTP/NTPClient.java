@@ -66,7 +66,7 @@ public final class NTPClient {
                 LOG.warn("Problem with timeserver " + hostnames.get(i) + ""
                         + "\n" + ex.toString());
                 if (i != hostnames.size() - 1) {
-                    NuLog.info(LOG, "Trying next server");
+                    LOG.info("Trying next server");
                 }
             }
         }

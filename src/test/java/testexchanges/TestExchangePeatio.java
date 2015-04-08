@@ -54,10 +54,10 @@ public class TestExchangePeatio extends TestCase {
         ApiResponse balancesResponse = ti.getAvailableBalances(testPair);
 
         if (balancesResponse.isPositive()) {
-            NuLog.info(LOG, "\nPositive response  from TradeInterface.getBalance() ");
+            LOG.info("\nPositive response  from TradeInterface.getBalance() ");
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
 
-            NuLog.info(LOG, balance.toString());
+            LOG.info(balance.toString());
 
             //assertTrue(balance.getNubitsBalance().getQuantity()==0.0);
             //assertTrue(balance.getPEGBalance().getQuantity()==1000.0);
@@ -118,9 +118,9 @@ public class TestExchangePeatio extends TestCase {
         assertTrue(delta < 5000);
 
         if (balancesResponse.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
+            LOG.info("Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -129,7 +129,7 @@ public class TestExchangePeatio extends TestCase {
             }
             //Balance balance = (Balance) o;
 
-            //NuLog.info(LOG, balance.toStringSep());
+            //LOG.info(balance.toStringSep());
 
             //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
             //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);

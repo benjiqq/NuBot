@@ -21,7 +21,7 @@ public class TestLogging {
     public static void main(String[] args) {
 
         InitTests.setLoggingFilename(LOG);
-        NuLog.info(LOG, "abcd" + LOG.getName());
+        LOG.info("abcd" + LOG.getName());
     }
 
 }

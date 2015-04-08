@@ -54,10 +54,10 @@ public class NuCancelOrders {
         FilesystemUtils.mkdir(logsFolder);
         if (app.readParams(args)) {
 
-            NuLog.info(LOG, "Launching CancellAllOrders ");
+            LOG.info("Launching CancellAllOrders ");
             app.prepareForExecution();
             app.cancelAllOrders(app.pair);
-            NuLog.info(LOG, "Done");
+            LOG.info("Done");
             System.exit(0);
 
         } else {
@@ -72,9 +72,9 @@ public class NuCancelOrders {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                NuLog.info(LOG, "Clear request succesfully");
+                LOG.info("Clear request succesfully");
             } else {
-                NuLog.info(LOG, "Could not submit request to clear orders");
+                LOG.info("Could not submit request to clear orders");
             }
 
         } else {
@@ -118,7 +118,7 @@ public class NuCancelOrders {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        NuLog.info(LOG, "Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {

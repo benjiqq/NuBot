@@ -77,7 +77,7 @@ public class StrategySecondaryPegUtils {
 
                             Thread.sleep(wait);
                             areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
-                            NuLog.info(LOG, "Are all orders canceled? " + areAllOrdersCanceled);
+                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
                             count += wait;
                             timedOut = count > timeout;
 
@@ -137,7 +137,7 @@ public class StrategySecondaryPegUtils {
 
         if (buysOrdersOk && sellsOrdersOk) {
             strategy.setMightNeedInit(false);
-            NuLog.info(LOG, "Initial walls placed");
+            LOG.info("Initial walls placed");
         } else {
             strategy.setMightNeedInit(true);
         }
@@ -181,7 +181,7 @@ public class StrategySecondaryPegUtils {
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
-            NuLog.info(LOG, "no need to execute " +type + "orders : available balance < 1 NBT");
+            LOG.info("no need to execute " +type + "orders : available balance < 1 NBT");
             return false;
         }
 
@@ -433,7 +433,7 @@ public class StrategySecondaryPegUtils {
 
     public void aggregateAndKeepProceeds() {
 
-        NuLog.info(LOG, "aggregateAndKeepProceeds");
+        LOG.info("aggregateAndKeepProceeds");
 
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
@@ -451,7 +451,7 @@ public class StrategySecondaryPegUtils {
             }
 
             double buyPrice = strategy.getBuyPricePEG();
-            NuLog.info(LOG, "init buy orders. price " + buyPrice);
+            LOG.info("init buy orders. price " + buyPrice);
             initOrders(Constant.BUY, buyPrice);
 
         } else {
@@ -519,7 +519,7 @@ public class StrategySecondaryPegUtils {
         }
 
 
-        NuLog.info(LOG, "Immediately try to cancel all orders");
+        LOG.info("Immediately try to cancel all orders");
 
         //immediately try to : cancel all active orders
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -582,7 +582,7 @@ public class StrategySecondaryPegUtils {
                 strategy.getSendLiquidityTask().setWallsBeingShifted(false);
 
             } else {
-                NuLog.info(LOG, "Could not submit request to clear orders");
+                LOG.info("Could not submit request to clear orders");
                 success = false;
                 //Communicate to the priceMonitorTask that the wall shift is over
                 strategy.getPriceMonitorTask().setWallsBeingShifted(false);

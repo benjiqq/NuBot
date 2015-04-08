@@ -67,11 +67,11 @@ public class NuExecuteOrders {
         NuExecuteOrders app = new NuExecuteOrders();
         if (app.readParams(args)) {
             createShutDownHook();
-            NuLog.info(LOG, "Launching NuOrderExecutor ");
+            LOG.info("Launching NuOrderExecutor ");
             app.orderList = app.readOrdersFromFile();
             app.prepareForExecution();
             app.executeOrders();
-            NuLog.info(LOG, "Done");
+            LOG.info("Done");
             System.exit(0);
 
         } else {
@@ -83,7 +83,7 @@ public class NuExecuteOrders {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                NuLog.info(LOG, "Exiting...");
+                LOG.info("Exiting...");
                 NuExecuteOrders.mainThread.interrupt();
                 try {
                     Global.taskManager.stopAll();
@@ -146,7 +146,7 @@ public class NuExecuteOrders {
 
 
         //Wait a couple of seconds for the connectionThread to get live
-        NuLog.info(LOG, "Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(4000);
         } catch (InterruptedException ex) {
@@ -185,7 +185,7 @@ public class NuExecuteOrders {
                 String[] order = line.split(cvsSplitBy);
                 CsvLine csvline = new CsvLine(order[0], Double.valueOf(order[1]), Double.valueOf(order[2]), Long.valueOf(order[3]));
                 list.add(csvline);
-                NuLog.info(LOG, "Order " + list.size() + " loaded from file : " + csvline.toString());
+                LOG.info("Order " + list.size() + " loaded from file : " + csvline.toString());
             }
 
         } catch (FileNotFoundException e) {

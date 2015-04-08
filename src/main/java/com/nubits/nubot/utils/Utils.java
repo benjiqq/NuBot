@@ -205,7 +205,7 @@ public class Utils {
     }
 
     public static void printSeparator() {
-        NuLog.info(LOG, "\n----------- -----------  -----------\n");
+        LOG.info("\n----------- -----------  -----------\n");
     }
 
 
@@ -358,7 +358,7 @@ public class Utils {
 
     public static void installKeystore(boolean trustAll) {
 
-        NuLog.info(LOG, "installKeystore. trustall: " + trustAll);
+        LOG.info("installKeystore. trustall: " + trustAll);
         if (trustAll) {
             try {
                 Utils.installTrustAllManager();

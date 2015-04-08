@@ -44,9 +44,9 @@ public class NuBotSecondary extends NuBotBase {
     public void configureStrategy() throws NuBotConfigException {
 
         if (Global.options.isDualSide()) {
-            NuLog.info(LOG, "Configuring NuBot for Dual-Side strategy");
+            LOG.info("Configuring NuBot for Dual-Side strategy");
         } else {
-            NuLog.info(LOG, "Configuring NuBot for Sell-Side strategy");
+            LOG.info("Configuring NuBot for Sell-Side strategy");
         }
 
 
@@ -115,17 +115,17 @@ public class NuBotSecondary extends NuBotBase {
             double forcedSpread = Settings.FORCED_SPREAD;
             if (Global.options.getSpread() < forcedSpread) {
                 Global.options.setSpread(forcedSpread);
-                NuLog.info(LOG, "Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
+                LOG.info("Forcing a " + forcedSpread + "% minimum spread to protect from collisions");
             }
         }
 
         int delaySeconds = 0;
 
-        NuLog.info(LOG, "multiple custodians: " + Global.options.isMultipleCustodians());
+        LOG.info("multiple custodians: " + Global.options.isMultipleCustodians());
 
         if (Global.options.isMultipleCustodians()) {
             delaySeconds = Utils.getSecondsToNextwindow(reset_every);
-            NuLog.info(LOG, "NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
+            LOG.info("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
         } else {
 
             LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");

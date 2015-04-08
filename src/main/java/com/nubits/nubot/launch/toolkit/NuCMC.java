@@ -62,7 +62,7 @@ public class NuCMC {
         if (app.readParams(args)) {
             createShutDownHook();
 
-            NuLog.info(LOG, "Launching NuCheckPrice ");
+            LOG.info("Launching NuCheckPrice ");
             app.exec();
         } else {
             System.exit(0);
@@ -149,7 +149,7 @@ public class NuCMC {
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
-                NuLog.info(LOG, "Exiting...");
+                LOG.info("Exiting...");
                 mainThread.interrupt();
                 try{
                     Global.taskManager.stopAll();
@@ -180,9 +180,9 @@ public class NuCMC {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                NuLog.info(LOG, "Order clear request succesfully");
+                LOG.info("Order clear request succesfully");
             } else {
-                NuLog.info(LOG, "Could not submit request to clear orders");
+                LOG.info("Could not submit request to clear orders");
             }
 
         } else {

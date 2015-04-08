@@ -40,18 +40,18 @@ public class TradeUtilsCCEDK {
         //It tries to send a wrong nonce, get the allowed window, and use it for the actual call
         String wrongNonce = "1234567891";
         String lastdigits;
-        //NuLog.info(LOG, "Offset = " + Objects.toStringSep(offset));
+        //LOG.info("Offset = " + Objects.toStringSep(offset));
         String validNonce;
         if (TradeUtils.offset == 0) {
             try {
                 String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, false);
-                //NuLog.info(LOG, htmlString);
-                //NuLog.info(LOG, Objects.toStringSep(System.currentTimeMillis() / 1000L));
+                //LOG.info(htmlString);
+                //LOG.info(Objects.toStringSep(System.currentTimeMillis() / 1000L));
                 validNonce = getCCDKEvalidNonce(htmlString);
                 TradeUtils.offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
-                //NuLog.info(LOG, "Offset = " + Objects.toStringSep(offset));
+                //LOG.info("Offset = " + Objects.toStringSep(offset));
             } catch (IOException io) {
-                //NuLog.info(LOG, io.toStringSep());
+                //LOG.info(io.toStringSep());
                 validNonce = "";
             }
         } else {
@@ -67,7 +67,7 @@ public class TradeUtilsCCEDK {
             TradeUtils.offset = 0;
             validNonce = getCCDKEvalidNonce();
         }
-        //NuLog.info(LOG, "Last digits = " + lastdigits + "\nvalidNonce = " + validNonce);
+        //LOG.info("Last digits = " + lastdigits + "\nvalidNonce = " + validNonce);
         return validNonce;
     }
 
@@ -91,7 +91,7 @@ public class TradeUtilsCCEDK {
             String to = nonceError.substring(indexStart2, indexStart2 + 10);
 
             //if (to.equals(from)) {
-            //    NuLog.info(LOG, "Detected ! " + to + " = " + from);
+            //    LOG.info("Detected ! " + to + " = " + from);
             //    return "retry";
             //}
 

@@ -50,7 +50,7 @@ public class TestPriceFeedsBatch extends TestCase {
         //feed = new BitcoinaveragePriceFeed();
         String folderName = "tests_" + System.currentTimeMillis() + "/";
 
-        NuLog.info(LOG, "Set up SSL certificates");
+        LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);
     }
 
@@ -81,7 +81,7 @@ public class TestPriceFeedsBatch extends TestCase {
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-          //  NuLog.info(LOG, tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+          //  LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
             //        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }

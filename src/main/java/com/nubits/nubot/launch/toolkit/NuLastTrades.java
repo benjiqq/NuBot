@@ -65,10 +65,10 @@ public class NuLastTrades {
         FilesystemUtils.mkdir(logsFolder);
         if (app.readParams(args)) {
 
-            NuLog.info(LOG, "Launching NuLastTrades on " + app.exchangename);
+            LOG.info("Launching NuLastTrades on " + app.exchangename);
             app.prepareForExecution();
             app.execute();
-            NuLog.info(LOG, "Done");
+            LOG.info("Done");
             System.exit(0);
 
         } else {
@@ -108,7 +108,7 @@ public class NuLastTrades {
         Global.taskManager.getCheckConnectionTask().start();
 
         //Wait a couple of seconds for the connectionThread to get live
-        NuLog.info(LOG, "Exchange setup complete. Now checking connection ...");
+        LOG.info("Exchange setup complete. Now checking connection ...");
         try {
             Thread.sleep(3000);
         } catch (InterruptedException ex) {
@@ -162,7 +162,7 @@ public class NuLastTrades {
             FilesystemUtils.writeToFile("{\n", output, false);
             //FilesystemUtils.writeToFile("\"exchange\":\"" + exchangename + "\",\n", output, true);
             //FilesystemUtils.writeToFile("\"pair\":\"" + pair.toStringSep("_") + "\",\n", output, true);
-            NuLog.info(LOG, "Last trades : " + tradeList.size());
+            LOG.info("Last trades : " + tradeList.size());
             for (int i = 0; i < tradeList.size(); i++) {
                 Trade tempTrade = tradeList.get(i);
 
@@ -193,7 +193,7 @@ public class NuLastTrades {
                 }
 
                 paidInFees += tempTrade.getFee().getQuantity();
-                NuLog.info(LOG, tempTrade.toString());
+                LOG.info(tempTrade.toString());
                 String comma = ",\n";
                 if (i == tradeList.size() - 1) {
                     comma = "";
@@ -217,7 +217,7 @@ public class NuLastTrades {
                 + "\nTotal volume transacted : " + totalAmountPEG + " BTC ; " + totalAmountNBT + " NBT )"
                 + "\nOrders > " + threshold + " NBT : " + countLargeOrders
                 + "\nPaid in fees : " + paidInFees;
-        NuLog.info(LOG, report);
+        LOG.info(report);
         FilesystemUtils.writeToFile(report, output + "_report.txt", false);
     }
 }

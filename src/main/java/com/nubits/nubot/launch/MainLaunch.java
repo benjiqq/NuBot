@@ -54,7 +54,7 @@ public class MainLaunch {
 
         Global.sessionPath = "logs" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
-        NuLog.info(LOG, "defined session path " + Global.sessionPath);
+        LOG.info("defined session path " + Global.sessionPath);
 
         CommandLine cli = parseArgs(args);
 

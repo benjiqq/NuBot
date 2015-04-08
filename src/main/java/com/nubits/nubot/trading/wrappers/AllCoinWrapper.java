@@ -362,7 +362,7 @@ public class AllCoinWrapper implements TradeInterface {
                 for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
                     Order order = parseOrder(data.next());
                     if (pair != null && !order.getPair().equals(pair)) {
-                        NuLog.info(LOG, "|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
+                        LOG.info("|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
                         //we are only looking for orders with the specified pair.
                         //the current order doesn't fill that need
                         continue;
@@ -541,7 +541,7 @@ public class AllCoinWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
             if (trades != null) {
-                //NuLog.info(LOG, trades.toJSONString());
+                //LOG.info(trades.toJSONString());
                 for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
                     Trade thisTrade = parseTrade(trade.next());
                     if (!thisTrade.getPair().equals(pair)) {

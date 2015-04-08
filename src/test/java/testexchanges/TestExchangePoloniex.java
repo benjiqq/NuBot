@@ -93,9 +93,9 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(delta < 10000);
 
         if (balancesResponse.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
+            LOG.info("Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -125,9 +125,9 @@ public class TestExchangePoloniex extends TestCase {
         ApiResponse priceResponse = ti.getLastPrice(pair);
 
         if (priceResponse.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.priceResponse() ");
+            LOG.info("Positive response  from TradeInterface.priceResponse() ");
             Object o = priceResponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -171,9 +171,9 @@ public class TestExchangePoloniex extends TestCase {
         assertTrue(orderresponse2.isPositive());
 
         if (orderresponse2.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
+            LOG.info("Positive response  from TradeInterface.getBalance() ");
             Object o = orderresponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
 
         } else {
             assertTrue(false);

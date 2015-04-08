@@ -55,11 +55,11 @@ public class BotTask {
     public void start() {
         timer.scheduleAtFixedRate(task, 0, interval * 1000);
         setRunning(true);
-        NuLog.info(LOG, "Started BotTask " + this.name);
+        LOG.info("Started BotTask " + this.name);
     }
 
     public void start(int delay) {
-        NuLog.info(LOG, "BotTask [" + this.name + "] will start in " + delay + "s, and run it every " + interval + "s");
+        LOG.info("BotTask [" + this.name + "] will start in " + delay + "s, and run it every " + interval + "s");
         timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);
     }
@@ -67,7 +67,7 @@ public class BotTask {
     public void stop() {
         timer.cancel();
         setRunning(false);
-        NuLog.info(LOG, "Stopped BotTask " + this.name);
+        LOG.info("Stopped BotTask " + this.name);
     }
 
     public boolean isRunning() {

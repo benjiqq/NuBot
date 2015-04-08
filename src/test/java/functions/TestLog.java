@@ -38,7 +38,7 @@ public class TestLog extends TestCase {
         LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
 
-        NuLog.info(LOG, "Logback used '{}' as the configuration file."
+        LOG.info("Logback used '{}' as the configuration file."
                 + mainURL);
 
     }

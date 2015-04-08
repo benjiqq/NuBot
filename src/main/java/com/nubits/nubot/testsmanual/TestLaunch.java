@@ -50,14 +50,14 @@ public class TestLaunch {
 
     public static void testlaunchWithFile(){
 
-        NuLog.info(LOG, "test");
+        LOG.info("test");
 
         Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
 
-        NuLog.info(LOG, "defined session path " + Global.sessionPath);
+        LOG.info("defined session path " + Global.sessionPath);
 
-        NuLog.info(LOG, "commit info " + VersionInfo.getBranchCommitInfo());
+        LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
 
         sessionLOG.debug("test launch");
 
@@ -76,12 +76,12 @@ public class TestLaunch {
 
     public static void testlaunchNoFile(){
 
-        NuLog.info(LOG, "test");
+        LOG.info("test");
 
         Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
-        NuLog.info(LOG, "defined session path " + Global.sessionPath);
-        NuLog.info(LOG, "commit info " + VersionInfo.getBranchCommitInfo());
+        LOG.info("defined session path " + Global.sessionPath);
+        LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
 
         sessionLOG.debug("test launch");
 

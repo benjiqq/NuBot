@@ -62,15 +62,15 @@ public class TestPriceFeed {
     }
 
     private void init() {
-        NuLog.info(LOG, "Set up SSL certificates");
+        LOG.info("Set up SSL certificates");
         Utils.installKeystore(false);
     }
 
     private void executeSingle(AbstractPriceFeed feed, CurrencyPair pair) {
-        NuLog.info(LOG, "Testing feed :  " + feed.getClass() + " , pair : " + pair.toString());
+        LOG.info("Testing feed :  " + feed.getClass() + " , pair : " + pair.toString());
         LastPrice lastPrice = feed.getLastPrice(pair);
         if (!lastPrice.isError()) {
-            NuLog.info(LOG, lastPrice.toString());
+            LOG.info(lastPrice.toString());
         } else {
             //handle error
             LOG.error("There was a problem while updating the price");
@@ -164,11 +164,11 @@ public class TestPriceFeed {
 
         ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
 
-        NuLog.info(LOG, "\n\n\n ---------------------- Testing results for: " + pair.toStringSepSpecial("/"));
-        NuLog.info(LOG, "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
+        LOG.info("\n\n\n ---------------------- Testing results for: " + pair.toStringSepSpecial("/"));
+        LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-            NuLog.info(LOG, tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+            LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
                     + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }

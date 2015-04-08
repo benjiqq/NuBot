@@ -488,7 +488,7 @@ public class CcedkWrapper implements TradeInterface {
             try {
                 boolean valid = (boolean) dataJson.get("entity");
                 String message = "The order " + orderID + " does not exist";
-                NuLog.info(LOG, message);
+                LOG.info(message);
 
                 apiResponse.setResponseObject(false);
                 return apiResponse;
@@ -788,7 +788,7 @@ public class CcedkWrapper implements TradeInterface {
                     if (wrongNonceCounter == 0) {
                         nonce = createNonce("");
                     } else {
-                        NuLog.info(LOG, "Re executing query for the " + wrongNonceCounter + " time. "
+                        LOG.info("Re executing query for the " + wrongNonceCounter + " time. "
                                 + "New nonce = " + adjustedNonce
                                 + " while calling : " + method);
                         nonce = adjustedNonce;
@@ -849,9 +849,9 @@ public class CcedkWrapper implements TradeInterface {
                 if (httpError) {
                     LOG.error("Http error - Post Data: " + post_data);
                 }
-                NuLog.info(LOG, "Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    NuLog.info(LOG, output);
+                    LOG.info(output);
                     answer += output;
                 }
 

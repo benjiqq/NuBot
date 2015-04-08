@@ -95,14 +95,14 @@ public class NuRPCClient {
         }
 
 
-        NuLog.info(LOG, "RPC parameters " + params.toString());
+        LOG.info("RPC parameters " + params.toString());
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
 
             if (json.get("null") == null) {
                 //Correct answer, try to getliquidityinfo
-                NuLog.info(LOG, "RPC : Liquidity info submitted correctly.");
+                LOG.info("RPC : Liquidity info submitted correctly.");
                 JSONObject jo = new JSONObject();
                 jo.put("submitted", true);
                 return jo;
@@ -279,28 +279,28 @@ public class NuRPCClient {
                     new UsernamePasswordCredentials(this.rpcUsername, this.rpcPassword));
             StringEntity myEntity = new StringEntity(json.toJSONString());
             if (this.verbose) {
-                NuLog.info(LOG, "RPC : " + json.toString());
+                LOG.info("RPC : " + json.toString());
             }
             HttpPost httppost = new HttpPost("http://" + this.ip + ":" + this.port);
             httppost.setEntity(myEntity);
 
             if (this.verbose) {
-                NuLog.info(LOG, "RPC executing request :" + httppost.getRequestLine());
+                LOG.info("RPC executing request :" + httppost.getRequestLine());
             }
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
 
             if (this.verbose) {
-                NuLog.info(LOG, "RPC----------------------------------------");
-                NuLog.info(LOG, "" + response.getStatusLine());
+                LOG.info("RPC----------------------------------------");
+                LOG.info("" + response.getStatusLine());
 
                 if (entity != null) {
-                    NuLog.info(LOG, "RPC : Response content length: " + entity.getContentLength());
+                    LOG.info("RPC : Response content length: " + entity.getContentLength());
                 }
             }
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
-            NuLog.info(LOG, "Entity = " + entityString);
+            LOG.info("Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
             LOG.error(e.toString());

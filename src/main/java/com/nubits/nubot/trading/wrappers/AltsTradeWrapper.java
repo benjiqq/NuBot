@@ -128,7 +128,7 @@ public class AltsTradeWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        NuLog.info(LOG, "requesting balance" + pair + " url " + url);
+        LOG.info("requesting balance" + pair + " url " + url);
         ApiResponse response = getQuery(url, args, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();

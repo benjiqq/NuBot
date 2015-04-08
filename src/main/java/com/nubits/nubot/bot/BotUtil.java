@@ -101,7 +101,7 @@ public class BotUtil {
         for (int i = 0; i < orderList.size(); i++) {
             Order tempOrder = orderList.get(i);
             if (tempOrder.getType().equalsIgnoreCase(type)) {
-                NuLog.info(LOG, "active order: " + tempOrder);
+                LOG.info("active order: " + tempOrder);
                 toRet++;
             }
         }

@@ -122,7 +122,7 @@ public class ExcoinWrapper implements TradeInterface {
                 LOG.error("Exco.in API returned an error: " + errorMessage);
                 apiResponse.setError(apiErr);
             } else {
-                //NuLog.info(LOG, "httpAnswerJSON = \n" + httpAnswerJson.toJSONString());
+                //LOG.info("httpAnswerJSON = \n" + httpAnswerJson.toJSONString());
                 apiResponse.setResponseObject(httpAnswerJson);
             }
         } catch (ClassCastException cce) {
@@ -449,7 +449,7 @@ public class ExcoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        NuLog.info(LOG, "Excoin uses global TX fee, currency pair not supported. \n"
+        LOG.info("Excoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -471,7 +471,7 @@ public class ExcoinWrapper implements TradeInterface {
 
         String url;
         if (startTime == 0) { //https://api.exco.in/v1/account/trades(/{COUNT})
-            NuLog.info(LOG, "A maximum of " + API_MAX_TRADES + " trades can be returned from the API");
+            LOG.info("A maximum of " + API_MAX_TRADES + " trades can be returned from the API");
             url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_MAX_TRADES;
         } else { //https://api.exco.in/v1/account/timestamp/{TIMESTAMP}
             url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_TRADES + "/" + API_TIMESTAMP + "/" + startTime;

@@ -80,9 +80,9 @@ public class TestExchangeBitspark extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-            NuLog.info(LOG, "using opt " + opt);
-            NuLog.info(LOG, "key: " + opt.apiKey);
-            NuLog.info(LOG, "secret: " + opt.apiSecret);
+            LOG.info("using opt " + opt);
+            LOG.info("key: " + opt.apiKey);
+            LOG.info("secret: " + opt.apiSecret);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -113,9 +113,9 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(delta < 5000);
 
         if (balancesResponse.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
+            LOG.info("Positive response  from TradeInterface.getBalance() ");
             Object o = balancesResponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
             try {
                 Amount a = (Amount) o;
                 assertTrue(a.getQuantity() >= 0);
@@ -124,7 +124,7 @@ public class TestExchangeBitspark extends TestCase {
             }
             //Balance balance = (Balance) o;
 
-            //NuLog.info(LOG, balance.toStringSep());
+            //LOG.info(balance.toStringSep());
 
             //assertTrue(balance.getNubitsBalance().getQuantity() == 0.0);
             //assertTrue(balance.getPEGBalance().getQuantity() == 1000.0);
@@ -140,9 +140,9 @@ public class TestExchangeBitspark extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-            NuLog.info(LOG, "using opt " + opt);
-            NuLog.info(LOG, "key: " + opt.apiKey);
-            NuLog.info(LOG, "secret: " + opt.apiSecret);
+            LOG.info("using opt " + opt);
+            LOG.info("key: " + opt.apiKey);
+            LOG.info("secret: " + opt.apiSecret);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -169,9 +169,9 @@ public class TestExchangeBitspark extends TestCase {
         ApiResponse priceResponse = ti.getLastPrice(pair);
 
         if (priceResponse.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.getLastPrice() ");
+            LOG.info("Positive response  from TradeInterface.getLastPrice() ");
             Object o = priceResponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
             try {
                 Ticker t = (Ticker) o;
                 //bitspark bug: prices are 0.0
@@ -191,9 +191,9 @@ public class TestExchangeBitspark extends TestCase {
         try {
             opt = ParseOptions
                     .parseOptionsSingle(testconfig);
-            NuLog.info(LOG, "using opt " + opt);
-            NuLog.info(LOG, "key: " + opt.apiKey);
-            NuLog.info(LOG, "secret: " + opt.apiSecret);
+            LOG.info("using opt " + opt);
+            LOG.info("key: " + opt.apiKey);
+            LOG.info("secret: " + opt.apiSecret);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -234,9 +234,9 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(orderresponse2.isPositive());
 
         if (orderresponse2.isPositive()) {
-            NuLog.info(LOG, "Positive response  from TradeInterface.getBalance() ");
+            LOG.info("Positive response  from TradeInterface.getBalance() ");
             Object o = orderresponse.getResponseObject();
-            NuLog.info(LOG, "response " + o);
+            LOG.info("response " + o);
 
         } else {
             assertTrue(false);

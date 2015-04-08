@@ -56,7 +56,7 @@ public class TestSSLConnection {
             while (in.available() > 0) {
                 s += in.read();
             }
-            NuLog.info(LOG, "SSLTest. Successfully connected. Read string: " + s);
+            LOG.info("SSLTest. Successfully connected. Read string: " + s);
 
             return true;
 

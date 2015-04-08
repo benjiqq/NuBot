@@ -132,7 +132,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     public void run() {
 
         if (first) {
-            NuLog.info(LOG, "running PriceMonitorTrigger for first time");
+            LOG.info("running PriceMonitorTrigger for first time");
             init();
             first = false;
         }
@@ -201,7 +201,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (Global.options.isDualSide()) {
             message += " buy @ " + buyPriceUSD;
         }
-        NuLog.info(LOG, message);
+        LOG.info(message);
 
         //convert sell price to PEG
 
@@ -224,7 +224,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         if (Global.options.isDualSide()) {
             message2 += "; buy @ " + buyPricePEGInitial + " " + Global.options.getPair().getPaymentCurrency().getCode();
         }
-        NuLog.info(LOG, message2);
+        LOG.info(message2);
 
         //Assign prices
         if (!Global.swappedPair) {
@@ -446,7 +446,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         this.lastPrice = lp;
         this.lastPrices = priceList ;
 
-        NuLog.info(LOG, "Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
+        LOG.info("Price Updated. " + lp.getSource() + ":1 " + lp.getCurrencyMeasured().getCode() + " = "
                 + "" + lp.getPrice().getQuantity() + " " + lp.getPrice().getCurrency().getCode());
         if (isFirstTimeExecution) {
             try {
@@ -471,7 +471,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
 
         if (needToShift && !isWallsBeingShifted()) { //prevent a wall shift trigger if the strategy is already shifting walls.
-            NuLog.info(LOG, "Walls needs to be shifted");
+            LOG.info("Walls needs to be shifted");
             //Compute price for walls
             currentWallPEGPrice = lastPrice;
             computeNewPrices();
@@ -526,7 +526,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Store new value
         this.bidask = newPrice;
 
-        NuLog.info(LOG, "Sell Price " + sellPricePEG_new + "  | "
+        LOG.info("Sell Price " + sellPricePEG_new + "  | "
                 + "Buy Price  " + buyPricePEG_new);
 
         //------------ here for output csv
@@ -561,7 +561,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             otherPricesAtThisTime.put("price", tempPrice.getPrice().getQuantity());
         }
 
-        NuLog.info(LOG, "New price computed [" + row+"]");
+        LOG.info("New price computed [" + row+"]");
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);

@@ -485,7 +485,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        NuLog.info(LOG, "CCex uses global TX fee, currency pair not supprted. \n"
+        LOG.info("CCex uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -829,12 +829,12 @@ public class CcexWrapper implements TradeInterface {
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                NuLog.info(LOG, "\nSending request to URL : " + url + " ; get = " + isGet);
+                LOG.info("\nSending request to URL : " + url + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
-                NuLog.info(LOG, "Response Code : " + response.getStatusLine().getStatusCode());
-                NuLog.info(LOG, "Response :" + response);
+                LOG.info("Response Code : " + response.getStatusLine().getStatusCode());
+                LOG.info("Response :" + response);
 
             }
             return answer;

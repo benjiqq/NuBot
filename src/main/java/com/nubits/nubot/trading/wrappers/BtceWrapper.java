@@ -349,7 +349,7 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        NuLog.info(LOG, "Btc-e uses global TX fee, currency pair not supprted. \n"
+        LOG.info("Btc-e uses global TX fee, currency pair not supprted. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -774,9 +774,9 @@ public class BtceWrapper implements TradeInterface {
                 if (httpError) {
                     LOG.error("Post Data: " + post_data);
                 }
-                NuLog.info(LOG, "Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
+                LOG.info("Query to :" + base + "(method=" + method + ")" + " , HTTP response : \n"); //do not log unless is error > 400
                 while ((output = br.readLine()) != null) {
-                    NuLog.info(LOG, output);
+                    LOG.info(output);
                     answer += output;
                 }
                 /*
