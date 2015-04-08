@@ -57,11 +57,6 @@ public abstract class NuBotBase {
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
 
-    /**
-     * Logger for session data. called only once per session
-     */
-    // private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG"); //TODO remove if never used
-
     protected String mode;
 
     protected boolean liveTrading;
