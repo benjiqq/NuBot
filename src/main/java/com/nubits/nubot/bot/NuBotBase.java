@@ -44,6 +44,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract NuBot. implements all primitives without the strategy itself
@@ -98,15 +100,13 @@ public abstract class NuBotBase {
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
 
-        //print loggers
-
-        /*List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
 
         Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
         while (it.hasNext()) {
             ch.qos.logback.classic.Logger l = it.next();
             LOG.debug("" + l);
-        }*/
+        }
     }
 
     protected void setupSSL() {
@@ -120,6 +120,7 @@ public abstract class NuBotBase {
 
 
     protected void setupExchange() {
+
         NuLog.info(LOG, "setup Exchange object");
 
         LOG.debug("Wrap the keys into a new ApiKeys object");

@@ -4,6 +4,7 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
@@ -30,7 +31,7 @@ public class SessionManager {
 
 
     /**
-     * main launch of a bot
+     * set config in global
      *
      * @param configfile
      */
@@ -46,6 +47,18 @@ public class SessionManager {
         } catch (NuBotConfigException e) {
             MainLaunch.exitWithNotice("" + e);
         }
+
+    }
+
+    /**
+     * set config in global
+     */
+    public static void setConfigDefault() {
+
+        NuBotOptions defaultOpt = NuBotOptionsDefault.defaultFactory();
+
+        /*Settings.DEFAULT_CONFIG_FILENAME;
+        */
 
     }
 

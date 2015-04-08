@@ -7,7 +7,6 @@ import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
-import com.nubits.nubot.options.SerializeOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -69,7 +68,7 @@ public class ConfigController {
         get(endpoint, "application/json", (request, response) -> {
 
             //get from memory. any change in the file is reflected in the global options
-            String jsonString = SerializeOptions.optionsToJson(Global.options);
+            String jsonString = NuBotOptions.optionsToJson(Global.options);
             return jsonString;
         });
 

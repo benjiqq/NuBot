@@ -48,17 +48,13 @@ public class TestLaunch {
     private static boolean runui = true;
 
 
-    /**
-     * Start the NuBot. start if config is valid and other instance is running
-     *
-     * @param args a list of valid arguments
-     */
-    public static void main(String args[]) {
+    public static void testlaunchWithFile(){
 
         NuLog.info(LOG, "test");
 
         Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
+
         NuLog.info(LOG, "defined session path " + Global.sessionPath);
 
         NuLog.info(LOG, "commit info " + VersionInfo.getBranchCommitInfo());
@@ -77,6 +73,41 @@ public class TestLaunch {
                 LOG.error("error setting up UI server " + e);
             }
         }
+    }
+
+    public static void testlaunchNoFile(){
+
+        NuLog.info(LOG, "test");
+
+        Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        MDC.put("session", Global.sessionPath);
+        NuLog.info(LOG, "defined session path " + Global.sessionPath);
+        NuLog.info(LOG, "commit info " + VersionInfo.getBranchCommitInfo());
+
+        sessionLOG.debug("test launch");
+
+        LOG.info("set global config");
+        SessionManager.setConfig(configFile);
+
+        if (runui){
+            String workingdir = ".";
+
+            try{
+                UiServer.startUIserver(workingdir, configFile);
+            }catch(Exception e){
+                LOG.error("error setting up UI server " + e);
+            }
+        }
+    }
+
+    /**
+     * Start the NuBot. start if config is valid and other instance is running
+     *
+     * @param args a list of valid arguments
+     */
+    public static void main(String args[]) {
+
+        testlaunchWithFile();
 
     }
 

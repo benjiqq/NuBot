@@ -18,13 +18,10 @@
 
 package functions;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.options.SerializeOptions;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -39,7 +36,7 @@ public class TestOptionsJSON extends TestCase {
         NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
         assertTrue(opt != null);
 
-        String jsonString = SerializeOptions.optionsToJson(opt);
+        String jsonString = NuBotOptions.optionsToJson(opt);
 
         assertTrue(jsonString.length() > 0);
 

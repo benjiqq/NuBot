@@ -148,6 +148,7 @@ public class Settings {
 
     public final static String SESSION_LOGGER_NAME = "SessionLOG";
 
+
     /**
      * a utility file which gets created in the distribution folder
      */
