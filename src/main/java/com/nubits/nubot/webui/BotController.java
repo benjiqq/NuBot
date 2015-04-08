@@ -59,14 +59,17 @@ public class BotController {
                 boolean success = true;
 
                 opmap.put("success", "" + false);
-                LOG.info("bot start >> " + startstop);
+                LOG.info("trying to start bot");
 
                 try {
                     SessionManager.launchBot(Global.options);
                 } catch (Exception e) {
                     success = false;
+                    LOG.error("could not start bot " + e);
                     opmap.put("error", "" + e);
                 }
+
+                LOG.info("satrt bot success? " + success);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);

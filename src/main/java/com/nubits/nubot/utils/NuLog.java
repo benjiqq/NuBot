@@ -26,4 +26,8 @@ public class NuLog {
         }
     }
 
+    public static void warn(Logger LOG, String msg){
+        LOG.warn(msg);
+    }
+
 }

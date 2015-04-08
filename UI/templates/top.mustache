@@ -45,12 +45,13 @@
               var port = 4567;
               var baseurl = "http://" + host + ":" + port;
               var updateTime = 2000;
+              var debug = true;
 
         $(document).ready(function() {
 
           $('#startbot').click(function(){
 
-                console.log("calling start on server");
+                if (debug) console.log("calling start on server");
 
                 var jsondata = JSON.stringify({
                     "operation": "start"});
@@ -60,7 +61,7 @@
                     contentType : 'application/json',
                     type : 'POST',
                     success: function(data){
-                        console.log("ok " + data);
+                        console.log("starting bot ok " + data);
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert("error posting to server " + textStatus + " " + errorThrown);
@@ -74,7 +75,7 @@
 
           $('#stopbot').click(function(){
 
-                console.log("calling stop on server");
+                if (debug) console.log("calling stop on server");
 
                 var jsondata = JSON.stringify({
                     "operation": "stop"});

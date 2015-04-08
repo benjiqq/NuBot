@@ -209,6 +209,7 @@ public abstract class NuBotBase {
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
+            NuLog.warn(LOG, "Trades will be executed");
         } else {
             NuLog.info(LOG, "Trades will not be executed [executetrade:false]");
             liveTrading = false;
@@ -298,6 +299,7 @@ public abstract class NuBotBase {
 
         //Try to cancel all orders, if any
         if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+
             NuLog.info(LOG, "Clearing out active orders ... ");
 
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -311,7 +313,7 @@ public abstract class NuBotBase {
                 }
 
             } else {
-                LOG.error(deleteOrdersResponse.getError().toString());
+                LOG.error("error canceling orders: " + deleteOrdersResponse.getError().toString());
             }
         }
 
