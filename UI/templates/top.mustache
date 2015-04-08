@@ -140,6 +140,7 @@
 
             }
 
+
             function loadconfig() {
 
                 var url = "http://" + host + ":" + port + "/config";
@@ -261,26 +262,36 @@
 
                 $.ajax(url, {
                     data : jsondata,
-                    contentType : 'application/json',
+                    dataType: "json",
                     type : 'POST',
-                    success: function(data){
+                    success: function(data) {
 
-                     // console.log("ok " + data);
+                     console.log("got data " + data);
 
-                     //on success of post change the color of the button
-                      var cbtn = $('#saveconfigbutton');
+                     // server returns custom error message
+                     var success = data["success"];
+                     console.log("success " + success );
+                     var errormsg = data["error"];
+                     console.log("error " + errormsg);
 
-                      if (cbtn.hasClass("btn-primary")) {
-                           cbtn.removeClass("btn-primary");
-                           cbtn.addClass("btn-success");
+                     if (success){
 
-                           //change color back after 2000 msec
-                           setTimeout(function() {
-                                 cbtn.removeClass("btn-success");
-                                 cbtn.addClass("btn-primary");
-                           }, 2000);
+                         //on success of post change the color of the button
+                          var cbtn = $('#saveconfigbutton');
+
+                          if (cbtn.hasClass("btn-primary")) {
+                               cbtn.removeClass("btn-primary");
+                               cbtn.addClass("btn-success");
+
+                               //change color back after 2000 msec
+                               setTimeout(function() {
+                                     cbtn.removeClass("btn-success");
+                                     cbtn.addClass("btn-primary");
+                               }, 2000);
+                          }
+                      } else{
+                          alert(errormsg);
                       }
-
 
                     },
 
@@ -301,7 +312,7 @@
                     type : 'POST',
                     success: function(data){
 
-                     //on success of post change the color of the button
+                      //on success of post change the color of the button
                       var rbtn = $('#resetbutton');
 
                       if (rbtn.hasClass("btn-primary")) {
@@ -314,6 +325,9 @@
                                  rbtn.addClass("btn-primary");
                            }, 2000);
                       }
+
+                      //reset values from server
+                      loadconfig();
 
                     },
 

@@ -63,11 +63,18 @@ public class SaveOptions {
     }
 
     public static boolean optionsReset(String filepath) {
-        NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
-        Global.options = opt;
-        Global.currentOptionsFile = filepath;
-        saveOptions(opt,filepath);
-        return true;
+
+        try{
+            NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
+            Global.options = opt;
+            Global.currentOptionsFile = filepath;
+            saveOptions(opt,filepath);
+            return true;
+
+        }catch(Exception e){
+            return false;
+        }
+
     }
 
 

@@ -68,11 +68,11 @@ public class ConfigController {
 
         post("/configreset", (request, response) -> {
 
-            SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
+            boolean result = SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
             //return jsonString;
 
             Map opmap = new HashMap();
-            opmap.put("success",false);
+            opmap.put("success",result);
             String json = new Gson().toJson(opmap);
             return json;
         });
