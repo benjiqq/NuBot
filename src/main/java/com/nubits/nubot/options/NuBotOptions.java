@@ -296,7 +296,7 @@ public class NuBotOptions {
         return hipchat;
     }
 
-    public String sendMailsLevel() {
+    public String getSendMailsLevel() {
         return mailnotifications;
     }
 

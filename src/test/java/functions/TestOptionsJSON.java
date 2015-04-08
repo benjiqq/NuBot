@@ -122,7 +122,7 @@ public class TestOptionsJSON extends TestCase {
         assertTrue(opt.isDualSide() == true);
         assertTrue(opt.isVerbose() == true);
         assertTrue(opt.isHipchat() == true);
-        assertTrue(opt.sendMailsLevel().equals("ALL"));
+        assertTrue(opt.getSendMailsLevel().equals("ALL"));
         assertTrue(opt.getMailRecipient().equals("test@gmail.com"));
         assertTrue(opt.getEmergencyTimeout() == 60);
         assertTrue(opt.getMaxBuyVolume() == 10.0);

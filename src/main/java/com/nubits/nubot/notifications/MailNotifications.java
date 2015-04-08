@@ -59,7 +59,7 @@ public class MailNotifications {
         boolean any = true; //Default to severe
 
 
-        any = Global.options.getMailnotifications().equals(MAIL_LEVEL_ALL);
+        any = Global.options.getSendMailsLevel().equals(MAIL_LEVEL_ALL);
 
         if (any) {
             sendImpl(address, title, message);
@@ -77,8 +77,8 @@ public class MailNotifications {
         boolean isCritical = true;
 
 
-        isCritical = Global.options.getMailnotifications().equals(MAIL_LEVEL_ALL)
-                || Global.options.getMailnotifications().equals(MAIL_LEVEL_SEVERE);
+        isCritical = Global.options.getSendMailsLevel().equals(MAIL_LEVEL_ALL)
+                || Global.options.getSendMailsLevel().equals(MAIL_LEVEL_SEVERE);
 
         if (isCritical) {
             sendImpl(address, title, message);
