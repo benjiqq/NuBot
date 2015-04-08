@@ -158,6 +158,6 @@ public class Settings {
      * a utility file which gets created in the distribution folder
      */
     public static String INFO_FILE = ".nubot";
-    //TODO via settings
-    public static String HTML_FOLDER = "./UI/templates/";
+
+    public static String HTML_FOLDER = "." + "/res" + "/" + "UI" + "/" + "templates/";
 }

@@ -47,6 +47,8 @@ public class UiServer {
 
         get("/about", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "about.mustache"), tmpl);
 
+        get("/setup", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "setup.mustache"), tmpl);
+
         new BotController("/startstop");
 
 
