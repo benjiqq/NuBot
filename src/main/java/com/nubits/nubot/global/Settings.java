@@ -126,9 +126,11 @@ public class Settings {
 
     public final static String DEFAULT_CONFIG_FILENAME = "nubot-config.json";//Used by UI in case file not explicitly declared
 
-    public final static String DEFAULT_CONFIG_FILE_PATH =LOGS_PATH + "/" + DEFAULT_CONFIG_FILENAME;
+    public final static String CONFIG_DIR = "config";
 
-    public final static String IMAGE_FOLDER = RES_PATH + "/images";
+    public final static String DEFAULT_CONFIG_FILE_PATH = CONFIG_DIR + "/" + DEFAULT_CONFIG_FILENAME;
+
+    public final static String IMAGE_FOLDER = RES_PATH + "/" + "images";
 
     public final static String SESSION_LOG = "session_";
 
@@ -140,7 +142,7 @@ public class Settings {
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
-    public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
+    public static final String TESTS_CONFIG_PATH = CONFIG_DIR + "/" + "myconfig"; //Directory containing configuration files used in tests
 
     public final static String CURRENCY_FILE_PATH = RES_PATH + "/" + "currencies.csv";
 

@@ -72,7 +72,6 @@ public class ConfigController {
             return jsonString;
         });
 
-
         post(endpoint, "application/json", (request, response) -> {
 
             //check if bot is running

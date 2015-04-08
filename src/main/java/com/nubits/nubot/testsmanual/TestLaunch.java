@@ -93,7 +93,7 @@ public class TestLaunch {
             String workingdir = ".";
 
             try{
-                UiServer.startUIserver(workingdir, configFile);
+                UiServer.startUIserver(workingdir, Settings.DEFAULT_CONFIG_FILE_PATH);
             }catch(Exception e){
                 LOG.error("error setting up UI server " + e);
             }
