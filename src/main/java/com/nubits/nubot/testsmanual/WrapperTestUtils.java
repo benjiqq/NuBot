@@ -56,7 +56,7 @@ public class WrapperTestUtils {
         //Get the USD balance associated with the account
         ApiResponse balanceResponse = Global.exchange.getTrade().getAvailableBalance(cur);
         if (balanceResponse.isPositive()) {
-            LOG.info("Positive response from TradeInterface.getBalance(CurrencyPair pair) ");
+            LOG.info("Positive response from TradeInterface.getBalance(Currency cur) ");
             Amount balance = (Amount) balanceResponse.getResponseObject();
 
             LOG.info(balance.toString());
@@ -311,7 +311,6 @@ public class WrapperTestUtils {
         //try to clear orders
         testClearAllOrders(pair);
     }
-
 
 
     public static void configureExchange(String exchangeName) throws NuBotConfigException {

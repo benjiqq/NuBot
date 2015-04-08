@@ -53,8 +53,8 @@ public class TestNotifications {
         MailNotifications.sendCritical(email, "Test Critical Title", "Test critical message");
 
         //Send hipchat notifications
-        HipChatNotifications.sendMessageCritical("Critical notification test"); //will result in red
-        HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN); //chose color at will
+        //HipChatNotifications.sendMessageCritical("Critical notification test"); //will result in red
+        //HipChatNotifications.sendMessage("Standard notification test", MessageColor.GREEN); //chose color at will
 
     }
 }

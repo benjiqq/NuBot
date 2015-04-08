@@ -169,9 +169,14 @@ public class FrozenBalancesManager {
             }
         }
         if (success) {
-            LOG.info("Frozen funds already in balance (not proceeds) updated : "
+            String message = "Frozen funds already in balance (not proceeds) updated : "
                     + Global.frozenBalances.getAmountAlreadyThere().getQuantity()
-                    + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency());
+                    + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency();
+            if(Global.options.getKeepProceeds()>0) {
+                LOG.info(message);
+            }
+            else
+                LOG.debug(message);
         } else {
             LOG.error("An error occurred while trying to set the balance already there (not proceeds)");
         }

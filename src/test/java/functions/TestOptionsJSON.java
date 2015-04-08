@@ -18,6 +18,7 @@
 
 package functions;
 
+
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.NuBotOptionsDefault;
@@ -103,9 +104,9 @@ public class TestOptionsJSON extends TestCase {
 
         }
         NuBotOptions opt = null;
-        try{
+        try {
             opt = ParseOptions.parseOptionsFromJson(optionJson);
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 
@@ -148,5 +149,6 @@ public class TestOptionsJSON extends TestCase {
         }
 
         assertTrue(newopt.getExchangeName().equals(ExchangeFacade.POLONIEX));
+
     }
 }

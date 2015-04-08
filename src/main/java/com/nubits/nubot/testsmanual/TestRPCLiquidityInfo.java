@@ -22,7 +22,6 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
@@ -33,30 +32,42 @@ import org.slf4j.LoggerFactory;
 
 public class TestRPCLiquidityInfo {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
-    private static final String NUD_RPC_USER = "nubotTestUser";
-    private static final String NUD_RPC_PASS = "nubotTestPass";
-    private static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
-    private static String ipTest = "127.0.0.1";
-    private static int portTest = 9091;
-    private static boolean verbose = false;
-    private static boolean useIdentifier = false;
-
     //define Logging by using predefined Settings which points to an XML
     static {
         System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
+    private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
+
+    private static final String NUD_RPC_USER = "nubotTestUser";
+    private static final String NUD_RPC_PASS = "nubotTestPass";
+    private static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
+
+    /**
+     * Configure tests
+     */
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/comkort.json";
+
+    private static String ipTest = "127.0.0.1";
+    private static int portTest = 9091;
+    private static boolean verbose = false;
+    private static boolean useIdentifier = false;
+
+
     public static void main(String[] args) {
 
         InitTests.setLoggingFilename(LOG);
 
+        InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
+
         //Default values
+
         String custodian = CUSTODIAN_PUBLIC_ADDRESS;
         String user = NUD_RPC_USER;
         String pass = NUD_RPC_PASS;
         double sell = 0;
         double buy = 0;
+
         //java -jar testRPC user pass custodian sell buy
         if (args.length == 5) {
             LOG.info("Reading input parameters");
@@ -67,23 +78,14 @@ public class TestRPCLiquidityInfo {
             buy = Double.parseDouble(args[4]);
         }
 
-        Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
-                user, pass, true, true,
-                custodian, CurrencyList.NBT_BTC, "");
+        Global.rpcClient = new NuRPCClient("127.0.0.1", 9091, user, pass, true, custodian, CurrencyList.NBT_BTC, "");
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
-
         test.testCheckNudTask();
 
-        /*test.setup(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO, custodian, CurrencyList.NBT_BTC, user, pass);
+        Utils.installKeystore(true);
 
-        try {
-            Thread.sleep(2000);
-
-        } catch (InterruptedException ex) {
-            LOG.error("" +  ex);
-        }
         //test.testGetInfo();
         //test.testIsConnected();
 
@@ -92,7 +94,6 @@ public class TestRPCLiquidityInfo {
         //test.testGetLiquidityInfo();
         //test.testGetLiquidityInfo(Constant.SELL, Passwords.CUSTODIA_PUBLIC_ADDRESS);
         //test.testGetLiquidityInfo(Constant.BUY, Passwords.CUSTODIA_PUBLIC_ADDRESS);
-        */
 
 
     }
@@ -133,27 +134,19 @@ public class TestRPCLiquidityInfo {
         LOG.info("Nud is " + connectedString + " @ " + Global.rpcClient.getIp() + ":" + Global.rpcClient.getPort());
     }
 
-    private void setup(String exchangeName, String custodianAddress, CurrencyPair pair, String user, String pass) {
-        String folderName = "tests_" + System.currentTimeMillis() + "/";
-
-        Utils.installKeystore(true);
-
-        String custodian = CUSTODIAN_PUBLIC_ADDRESS;
-
-        //Create the client
-        Global.rpcClient = new NuRPCClient(ipTest, portTest, user, pass, verbose, useIdentifier, custodian, pair, exchangeName);
-    }
-
     private void testCheckNudTask() {
         //Create a TaskManager and
-        Global.taskManager = new TaskManager();
+        Global.taskManager = new TaskManager(false);
         Global.taskManager.setNudTask();
         //Start checking for connection
         Global.taskManager.getCheckNudTask().start();
 
-
         //Wait a couple of seconds for the connectionThread to get live
-
+        try {
+            Thread.sleep(4000);
+        } catch (InterruptedException ex) {
+            LOG.error("" + ex);
+        }
     }
 
     private void testGetLiquidityInfo() {

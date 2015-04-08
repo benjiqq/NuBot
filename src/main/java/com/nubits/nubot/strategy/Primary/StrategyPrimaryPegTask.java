@@ -40,16 +40,15 @@ import java.util.TimerTask;
 public class StrategyPrimaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategyPrimaryPegTask.class.getName());
-    
+    private final int RESET_AFTER_CYCLES = 50;
+    private final int MAX_RANDOM_WAIT_SECONDS = 5;
+    private final int SHORT_WAIT_SECONDS = 5;
     private boolean mightNeedInit = true;
     private int activeSellOrders, activeBuyOrders, totalActiveOrders;
     private boolean ordersAndBalancesOk;
     private boolean isFirstTime = true;
     private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean proceedsInBalance = false;
-    private final int RESET_AFTER_CYCLES = 50;
-    private final int MAX_RANDOM_WAIT_SECONDS = 5;
-    private final int SHORT_WAIT_SECONDS = 5;
     private int cycles = 0;
 
 
@@ -344,7 +343,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             ApiResponse sellResponse = Global.exchange.getTrade().sell(Global.options.getPair(), amountToSell, sellPrice);
             if (sellResponse.isPositive()) {
-                HipChatNotifications.sendMessage("New sell wall is up on " + Global.options.getExchangeName() + " : " + orderString, MessageColor.YELLOW);
+                HipChatNotifications.sendMessage("New sell wall is up on <strong>" + Global.options.getExchangeName() + " </strong>: " + orderString, MessageColor.YELLOW);
                 String sellResponseString = (String) sellResponse.getResponseObject();
                 LOG.warn("Strategy : Sell Response = " + sellResponseString);
             } else {
@@ -519,7 +518,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                             Thread.sleep(wait);
                             areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
-                            LOG.info("Are all orders canceled? " + areAllOrdersCanceled);
+                            if (areAllOrdersCanceled) {
+                                LOG.warn("All orders canceled succefully");
+                            } else {
+                                LOG.error("There was a problem cancelling the orders");
+                            }
                             count += wait;
                             timedOut = count > timeout;
 
@@ -698,7 +701,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     }
 
                     if (order1Response.isPositive()) {
-                        HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString1, MessageColor.YELLOW);
+                        HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
                         String response1String = (String) order1Response.getResponseObject();
                         LOG.warn("Strategy - " + type + " Response1 = " + response1String);
                     } else {
@@ -717,7 +720,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
                     if (order2Response.isPositive()) {
-                        HipChatNotifications.sendMessage("New " + type + " wall is up on " + Global.options.getExchangeName() + " : " + orderString2, MessageColor.YELLOW);
+                        HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
                         LOG.warn("Strategy : " + type + " Response2 = " + response2String);
                     } else {

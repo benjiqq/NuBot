@@ -35,6 +35,7 @@ public class Currency {
     private String extendedName; // the extended name where available
 
 
+
     /**
      *
      */

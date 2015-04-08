@@ -1,5 +1,7 @@
 syntax: keytool -importcert -file certificate.cer -keystore keystore.jks -alias "Alias"
 
-Example:keytool -importcert -file poloniex-dec.cer -keystore nubot_keystore.jks -alias “poloniex-dec-2014”
+Example:
+keytool -importcert -file bittrex.cer -keystore nubot_keystore.jks -alias “bittrex-apr-2015”
+
 
 certificate password : nub0tSSL

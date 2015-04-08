@@ -34,7 +34,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * ParseOptions from one JSON files
@@ -100,7 +101,7 @@ public class ParseOptions {
             backupfeeds,
             wallchangethreshold,
             spread};
-            //distributeliquidity
+    //distributeliquidity
 
 
     private static String[] comp = {exchangename, apisecret, mailrecipient, dualside, pair};
@@ -249,11 +250,6 @@ public class ParseOptions {
             throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
         }
 
-        boolean aggregate = true; //true only for USD
-        if (!options.getPair().getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
-            options.aggregate = false; //default to false
-        }
-
         //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
@@ -307,7 +303,6 @@ public class ParseOptions {
         }
 
 
-
         //TOOO distributeLiquidity not implemented
         /*try {
             options.distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, distributeliquidity);
@@ -339,6 +334,7 @@ public class ParseOptions {
                     + MailNotifications.MAIL_LEVEL_NONE;
             LOG.error(error);
             throw new NuBotConfigException(error);
+
         }
 
         return options;
@@ -352,9 +348,9 @@ public class ParseOptions {
 
         //Iterate on backupFeeds
         JSONArray bfeeds = null;
-        try{
+        try {
             bfeeds = (JSONArray) getIgnoreCase(optionsJSON, backupfeeds);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new NuBotConfigException("can't parse array " + e);
         }
 

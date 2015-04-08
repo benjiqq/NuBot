@@ -63,8 +63,7 @@ public class TaskManager {
     public TaskManager(boolean iniTasks) {
         this.running = false;
         taskList = new ArrayList<BotTask>();
-        if(iniTasks)
-        {
+        if (iniTasks) {
             setTasks();
         }
     }
@@ -130,7 +129,7 @@ public class TaskManager {
     }
 
     public void stopAll() throws IllegalStateException {
-        LOG.info("Stopping all tasks. ");
+        LOG.info("Stopping all BotTasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
@@ -143,8 +142,9 @@ public class TaskManager {
             } catch (IllegalStateException e) {
                 throw e;
             }
-
         }
+        LOG.info("BotTasks stopped. ");
+
     }
 
     public void printTasksStatus() {

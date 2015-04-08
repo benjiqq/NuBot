@@ -78,26 +78,15 @@ public class Global {
             public void run() {
 
                 //shutdown logic of the bot handled in the bot related to the global thread
-                LOG.info("shutdown bot");
                 Global.bot.shutdownBot();
                 Global.sessionRunning = false;
 
                 Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
                 Global.sessionStopped = System.currentTimeMillis();
-                sessionLOG.info("session end;" + Global.sessionStopped);
+                sessionLOG.info("Session terminated. Timestamp " + Global.sessionStopped);
 
-                LOG.info("Exit. ");
-
+                //Interrupt mainThread
                 Global.mainThread.interrupt();
-                if (Global.taskManager != null) {
-                    if (Global.taskManager.isInitialized()) {
-                        try {
-                            Global.taskManager.stopAll();
-                        } catch (IllegalStateException e) {
-                            LOG.error(e.toString());
-                        }
-                    }
-                }
 
                 LOG.info("Exit main");
 

@@ -121,11 +121,6 @@ public class NuBotOptions {
     public boolean hipchat;
 
     /**
-     * TODO: describe this
-     */
-    public boolean aggregate;
-
-    /**
      * if set to true, will sync with remote NPT and reset orders often
      */
     public boolean multipleCustodians;
@@ -181,12 +176,13 @@ public class NuBotOptions {
         backupFeeds = new ArrayList<>();
     }
 
-    public static String optionsToJson(NuBotOptions opt){
+    public static String optionsToJson(NuBotOptions opt) {
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
         //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
         String js = parser.toJson(opt);
         return js;
+
     }
 
 
@@ -338,10 +334,6 @@ public class NuBotOptions {
         return nubitAddress;
     }
 
-    public boolean isAggregate() {
-        return aggregate;
-    }
-
     public boolean isDistributeLiquidity() {
         return distributeLiquidity;
     }
@@ -350,21 +342,20 @@ public class NuBotOptions {
         return this.spread;
     }
 
-    public String getMainFeed() {
-        return mainFeed;
+    public void setSpread(double spread) {
+        this.spread = spread;
     }
 
-
-    public void setWallchangeThreshold(double wallchangeThreshold) {
-        this.wallchangeThreshold = wallchangeThreshold;
+    public String getMainFeed() {
+        return mainFeed;
     }
 
     public double getWallchangeThreshold() {
         return this.wallchangeThreshold;
     }
 
-    public void setSpread(double spread) {
-        this.spread = spread;
+    public void setWallchangeThreshold(double wallchangeThreshold) {
+        this.wallchangeThreshold = wallchangeThreshold;
     }
 
     public ArrayList<String> getBackupFeeds() {

@@ -19,14 +19,10 @@
 package com.nubits.nubot.exchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.*;
-import com.nubits.nubot.trading.wrappers.BterWrapper;
-import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.trading.wrappers.ExcoinWrapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,6 +51,8 @@ public class ExchangeFacade {
     public static final String ALLCOIN = "Allcoin";
     public static final String EXCOIN = "Excoin";
     public static final String BITCOINCOID = "Bitcoincoid";
+    public static final String COMKORT = "Comkort";
+    public static final String BITTREX = "Bittrex";
 
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "https://178.62.140.24";
@@ -77,16 +75,21 @@ public class ExchangeFacade {
         supportedExchanges.add(BTER);
         supportedExchanges.add(CCEDK);
         supportedExchanges.add(EXCOIN);
+        supportedExchanges.add(COMKORT);
+        supportedExchanges.add(BITTREX);
 
-        exchangeInterfaces.put(ALTSTRADE,AltsTradeWrapper.class);
-        exchangeInterfaces.put(POLONIEX,PoloniexWrapper.class);
-        exchangeInterfaces.put(CCEX,CcexWrapper.class);
-        exchangeInterfaces.put(ALLCOIN,AllCoinWrapper.class);
-        exchangeInterfaces.put(BITSPARK_PEATIO,BitSparkWrapper.class);
-        exchangeInterfaces.put(BITCOINCOID,BitcoinCoIDWrapper.class);
-        exchangeInterfaces.put(INTERNAL_EXCHANGE_PEATIO,PeatioWrapper.class);
-        exchangeInterfaces.put(BTCE,BtceWrapper.class);
-        exchangeInterfaces.put(EXCOIN,ExcoinWrapper.class);
+        exchangeInterfaces.put(ALTSTRADE, AltsTradeWrapper.class);
+        exchangeInterfaces.put(POLONIEX, PoloniexWrapper.class);
+        exchangeInterfaces.put(CCEX, CcexWrapper.class);
+        exchangeInterfaces.put(ALLCOIN, AllCoinWrapper.class);
+        exchangeInterfaces.put(BITSPARK_PEATIO, BitSparkWrapper.class);
+        exchangeInterfaces.put(BITCOINCOID, BitcoinCoIDWrapper.class);
+        exchangeInterfaces.put(INTERNAL_EXCHANGE_PEATIO, PeatioWrapper.class);
+        exchangeInterfaces.put(BTCE, BtceWrapper.class);
+        exchangeInterfaces.put(EXCOIN, ExcoinWrapper.class);
+        exchangeInterfaces.put(COMKORT, ComkortWrapper.class);
+        exchangeInterfaces.put(BITTREX, BittrexWrapper.class);
+
 
     }
 
@@ -122,10 +125,10 @@ public class ExchangeFacade {
         return ti;
     }
 
-    private static String capitalizieName(String name){
+    private static String capitalizieName(String name) {
         char firstChar = name.charAt(0);
         char fu = Character.toUpperCase(firstChar);
-        name = fu + name.substring(1,name.length());
+        name = fu + name.substring(1, name.length());
         return name;
     }
 
@@ -147,11 +150,9 @@ public class ExchangeFacade {
                 if (name.equalsIgnoreCase(INTERNAL_EXCHANGE_PEATIO)) {
                     constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class, String.class);
                     instance = constructor.newInstance(keys, exchange, INTERNAL_EXCHANGE_PEATIO_API_BASE);
-                }
-                else
-                {
-                     constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
-                     instance = constructor.newInstance(keys, exchange);
+                } else {
+                    constructor = wrapperClazz.getConstructor(ApiKeys.class, Exchange.class);
+                    instance = constructor.newInstance(keys, exchange);
                 }
                 ti = (TradeInterface) instance;
                 return ti;

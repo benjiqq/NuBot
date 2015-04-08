@@ -373,13 +373,12 @@ public class Utils {
             String wdir = FilesystemUtils.getBotAbsolutePath();
             String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
+            LOG.info("Reading keystorefile from : " + wdirpath);
+
             System.setProperty("javax.net.ssl.trustStore", wdirpath);
             System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }
-
-
-
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];

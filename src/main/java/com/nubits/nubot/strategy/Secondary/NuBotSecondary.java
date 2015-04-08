@@ -82,7 +82,7 @@ public class NuBotSecondary extends NuBotBase {
             pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeeds(), toTrackCurrencyPair);
         } catch (NuBotConfigException e) {
             throw new NuBotConfigException("can't configure price feeds");
-        } catch(Exception e){
+        } catch (Exception e) {
             LOG.error("" + Global.options);
             throw new NuBotConfigException("something wrong with options");
         }
@@ -127,7 +127,7 @@ public class NuBotSecondary extends NuBotBase {
             LOG.info("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
         } else {
 
-            LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
+            LOG.info("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
         }
         //then start the thread
         Global.taskManager.getPriceTriggerTask().start(delaySeconds);

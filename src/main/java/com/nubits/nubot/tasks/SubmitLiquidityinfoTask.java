@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -43,7 +44,6 @@ import java.util.TimerTask;
 
 /**
  * Submit info via NuWalletRPC
- *
  */
 public class SubmitLiquidityinfoTask extends TimerTask {
 
@@ -66,18 +66,18 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private void initFiles() {
 
-         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME +".csv";
-         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
-         this.jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
+        this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".csv";
+        this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
+        this.jsonFile_balances = Global.sessionLogFolder + "/" + Settings.BALANCES_FILEAME + ".json";
 
         //create json file if it doesn't already exist
         LOG.debug("init files");
         File jsonF1 = new File(this.jsonFile_orders);
         if (!jsonF1.exists()) {
-            try{
+            try {
                 jsonF1.createNewFile();
                 LOG.debug("created " + jsonF1);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error creating file " + jsonF1 + " " + e);
             }
 
@@ -90,10 +90,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         //create json file if it doesn't already exist
         File jsonF2 = new File(this.jsonFile_balances);
         if (!jsonF2.exists()) {
-            try{
+            try {
                 jsonF2.createNewFile();
                 LOG.debug("created " + jsonF2);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error creating file " + jsonF1 + " " + e);
             }
 
@@ -104,11 +104,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
 
         File of = new File(this.outputFile_orders);
-        if (!of.exists()){
-            try{
+        if (!of.exists()) {
+            try {
                 of.createNewFile();
                 LOG.debug("created " + of);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error creating file " + of + "  " + e);
             }
         }
@@ -120,8 +120,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     @Override
     public void run() {
         LOG.debug("Executing task : CheckOrdersTask ");
-        if(firstExecution)
-        {
+        if (firstExecution) {
             initFiles();
             firstExecution = false;
         }
@@ -134,8 +133,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             if (isFirstOrdersPlaced()) {
                 String response1 = reportTier1(); //active orders
                 String response2 = reportTier2(); //balance
-                if(Global.options.isSubmitliquidity()) {
-                    LOG.info("RPC Response : " + response1 + "\n" + response2);
+                if (Global.options.isSubmitliquidity()) {
+                    LOG.info("Liquidity info submitted:\n\t" + response1 + "\n\t" + response2);
                 }
             } else {
                 LOG.warn("Liquidity is not being sent : orders are not yet initialized");
@@ -163,14 +162,16 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         LOG.debug("Active orders : " + orderList.size());
 
         Iterator<Order> it = orderList.iterator();
-        while (it.hasNext()){
+        while (it.hasNext()) {
             Order o = it.next();
             LOG.debug("order: " + o.getDigest());
         }
 
         if (verbose) {
-            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Global.exchange.getLiveData().getNBTonbuy());
-            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Global.exchange.getLiveData().getNBTonsell());
+            DecimalFormat nf = new DecimalFormat("0");
+            nf.setMinimumFractionDigits(8);
+            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + nf.format(Global.exchange.getLiveData().getNBTonbuy()));
+            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + nf.format(Global.exchange.getLiveData().getNBTonsell()));
         }
 
         double nbt_onsell = 0;
@@ -266,8 +267,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         logOrderJSON(orderHistory);
 
         if (verbose) {
-            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nbt_onbuy);
-            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nbt_onsell);
+            DecimalFormat nf = new DecimalFormat("0");
+            nf.setMinimumFractionDigits(8);
+            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nf.format(nbt_onbuy));
+            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nf.format(nbt_onsell));
         }
 
         if (Global.options.isSubmitliquidity()) {
@@ -368,15 +371,19 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             responseObject = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
                     buySide, sellSide, tier);
 
-            toReturn = "buy : " + buySide + " sell : " + sellSide + " tier: " + tier + " response: " + responseObject.toJSONString();
+            toReturn = "tier=" + tier
+                    + " buy=" + buySide
+                    + " sell=" + sellSide
+                    + " identifier=" + Global.rpcClient.generateIdentifier(tier)
+                    + " response=" + responseObject.toJSONString();
             if (null == responseObject) {
                 LOG.error("Something went wrong while sending liquidityinfo");
             } else {
-                LOG.info(responseObject.toJSONString());
+                LOG.debug(responseObject.toJSONString());
                 if ((boolean) responseObject.get("submitted")) {
-                    LOG.info("RPC Liquidityinfo sent : "
-                            + "\nbuyside : " + buySide
-                            + "\nsellside : " + sellSide);
+                    LOG.debug("RPC Liquidityinfo sent : "
+                            + " buyside : " + buySide
+                            + " sellside : " + sellSide);
                     if (verbose) {
                         JSONObject infoObject = Global.rpcClient.getLiquidityInfo(NuRPCClient.USDchar);
                         LOG.info("getliquidityinfo result : ");
@@ -385,7 +392,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
                 }
             }
         } else {
-            LOG.error("Client offline. ");
+            LOG.error("Can't reach Nud client. ");
         }
         return toReturn;
     }

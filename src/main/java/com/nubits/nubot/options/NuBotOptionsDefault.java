@@ -60,6 +60,7 @@ public class NuBotOptionsDefault {
         opt.spread = 0;
         opt.mainFeed = FeedFacade.CoinbasePriceFeed;
         opt.backupFeeds = new ArrayList<String>() {{
+
             add(FeedFacade.BtcePriceFeed);
             add(FeedFacade.BlockchainPriceFeed);
             add(FeedFacade.CoinmarketcapnexuistPriceFeed);

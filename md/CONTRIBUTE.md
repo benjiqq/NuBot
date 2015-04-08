@@ -47,6 +47,8 @@ public static final String EXCHANGE_RATE_LAB = "xyz"; //http://api.exchangeratel
 
 A test exchange is located at http://178.62.186.229. Accounts for testing can be created on request.
 
+## Release process 
+Refer to RELEASE-PROCESS.md
 ## Nofications
 
 HipChat is used for notifications.

@@ -51,7 +51,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Created by sammoth on 30/11/14.
+ * Created by woolly_sammoth on 30/11/14.
  */
 public class ExcoinWrapper implements TradeInterface {
 
