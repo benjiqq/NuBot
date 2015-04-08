@@ -21,7 +21,6 @@ package functions;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import com.nubits.nubot.utils.NuLog;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;

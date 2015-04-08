@@ -18,20 +18,17 @@
 
 package com.nubits.nubot.global;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.*;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.testsmanual.TestPriceFeed;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
