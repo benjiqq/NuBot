@@ -32,7 +32,7 @@ public class SessionManager {
      *
      * @param configfile
      */
-    public static void setConfig(String configfile) {
+    public static void setConfigGlobal(String configfile) {
 
         sessionLOG.debug("parsing options from " + configfile);
 

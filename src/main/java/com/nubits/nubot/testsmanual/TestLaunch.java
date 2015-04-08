@@ -62,7 +62,7 @@ public class TestLaunch {
         sessionLOG.debug("test launch");
 
         LOG.info("set global config");
-        SessionManager.setConfig(configFile);
+        SessionManager.setConfigGlobal(configFile);
 
         if (runui){
 

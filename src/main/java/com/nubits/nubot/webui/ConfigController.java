@@ -62,25 +62,44 @@ public class ConfigController {
 
     }
 
-    public ConfigController(String endpoint, String configfile) {
+    public ConfigController(String configfile) {
 
         this.configfile = configfile;
 
-        get(endpoint, "application/json", (request, response) -> {
+        post("/configreset", (request, response) -> {
+
+            //SaveOptions.saveOptions()
+            //return jsonString;
+
+            Map opmap = new HashMap();
+            opmap.put("success",false);
+            String json = new Gson().toJson(opmap);
+            return json;
+        });
+
+        get("/configfile", "application/json", (request, response) -> {
+
+            Map opmap = new HashMap();
+            opmap.put("file", Global.currentOptionsFile);
+            String json = new Gson().toJson(opmap);
+            return json;
+        });
+
+        get("/config", "application/json", (request, response) -> {
 
             //get from memory. any change in the file is reflected in the global options
             String jsonString = NuBotOptions.optionsToJson(Global.options);
             return jsonString;
         });
 
-        post(endpoint, "application/json", (request, response) -> {
+        post("/config" , "application/json", (request, response) -> {
 
             //check if bot is running
             boolean active = SessionManager.isSessionActive();
             LOG.info("session currently active " + active);
 
             if (active){
-                //if bot is running needs show an error
+                //if bot is running show an error
                 Map opmap = new HashMap();
                 opmap.put("success", false);
                 opmap.put("error", "Session running: can't save config");

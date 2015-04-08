@@ -79,7 +79,7 @@ public class MainLaunch {
             } else {
                 LOG.info("Run NuBot from CLI");
                 //set global config
-                SessionManager.setConfig(configFile);
+                SessionManager.setConfigGlobal(configFile);
                 sessionLOG.debug("launch bot");
                 SessionManager.launchBot(Global.options);
             }

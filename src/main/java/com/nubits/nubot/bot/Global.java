@@ -59,6 +59,8 @@ public class Global {
 
     public static boolean sessionRunning = false;
 
+    public static String currentOptionsFile;
+
     /**
      * the bot connected to the global thread
      */

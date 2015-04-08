@@ -31,22 +31,20 @@ public class UiServer {
         //binds GET and POST
         LayoutTemplateEngine tmpl = new LayoutTemplateEngine(Settings.HTML_FOLDER);
 
-        new ConfigController("/config", configFile);
+        new ConfigController(configFile);
 
         new LogController("/logdump");
 
+        //controller wants some map. perhaps this can be removed
+        Map empty = new HashMap();
+
+        get("/", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "operation.mustache"), tmpl);
+
         Map configmap = new HashMap();
         configmap.put("configfile", configFile);
-
-
-        Map opmap = new HashMap();
-        get("/", (request, response) -> new ModelAndView(opmap, Settings.HTML_FOLDER + "operation.mustache"), tmpl);
-
-
         get("/configui", (request, response) -> new ModelAndView(configmap, Settings.HTML_FOLDER + "config.mustache"), tmpl);
 
-        //controller wants some map (?)
-        Map empty = new HashMap();
+
         get("/about", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "about.mustache"), tmpl);
 
         new BotController("/startstop");

@@ -26,12 +26,10 @@ public class BotController {
 
             Map opmap = new HashMap();
 
-            //TODO: query session (in appfolder)
-            boolean running = false;
-            opmap.put("running", running);
+            boolean active = SessionManager.isSessionActive();
+            opmap.put("running", active);
 
             String json = new Gson().toJson(opmap);
-
             return json;
         });
 
@@ -69,7 +67,7 @@ public class BotController {
                     opmap.put("error", "" + e);
                 }
 
-                LOG.info("satrt bot success? " + success);
+                LOG.info("start bot success? " + success);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);

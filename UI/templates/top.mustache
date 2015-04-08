@@ -68,7 +68,6 @@
                     }
                });
 
-
             });
 
 
@@ -267,6 +266,39 @@
                            }, 2000);
                       }
 
+
+                    },
+
+                    error: function(xhr, textStatus, errorThrown) {
+                        alert("error posting to server " + textStatus + " " + errorThrown);
+                        alert(xhr.responseText);
+                    }
+               });
+            }
+
+            function postreset(){
+
+                var posturl = "http://" + host + ":" + port + "/configreset";
+
+                $.ajax(posturl, {
+
+                    contentType : 'application/json',
+                    type : 'POST',
+                    success: function(data){
+
+                     //on success of post change the color of the button
+                      var rbtn = $('#resetbutton');
+
+                      if (rbtn.hasClass("btn-primary")) {
+                           rbtn.removeClass("btn-primary");
+                           rbtn.addClass("btn-success");
+
+                           //change color back after 2000 msec
+                           setTimeout(function() {
+                                 rbtn.removeClass("btn-success");
+                                 rbtn.addClass("btn-primary");
+                           }, 2000);
+                      }
 
                     },
 

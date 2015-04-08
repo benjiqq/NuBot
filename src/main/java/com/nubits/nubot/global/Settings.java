@@ -85,6 +85,7 @@ public class Settings {
     // ------ Paths and filenames
     // Refer to md/FILES-AND-FOLDERS.md for the convention of where to place files and folders
     // In defining folder names, omit the "/" at the end
+
     //--- Logging ---
 
     /**
