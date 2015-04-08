@@ -18,16 +18,9 @@
 
 package com.nubits.nubot.RPC;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import com.nubits.nubot.utils.NuLog;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -41,6 +34,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 
 /**

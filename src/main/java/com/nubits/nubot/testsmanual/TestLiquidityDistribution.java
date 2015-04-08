@@ -19,30 +19,19 @@
 package com.nubits.nubot.testsmanual;
 
 
-
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.OrderToPlace;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLin;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurveLog;
-import com.nubits.nubot.trading.LiquidityDistribution.LiquidityDistributionModel;
-import com.nubits.nubot.trading.LiquidityDistribution.ModelParameters;
+import com.nubits.nubot.trading.LiquidityDistribution.*;
 import com.nubits.nubot.utils.InitTests;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class TestLiquidityDistribution {
 

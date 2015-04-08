@@ -24,8 +24,6 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
-
-import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

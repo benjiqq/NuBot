@@ -19,11 +19,9 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
-import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
