@@ -18,31 +18,27 @@
 
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.PairBalance;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.models.*;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import org.apache.commons.codec.binary.Hex;
+import org.json.JSONException;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -52,17 +48,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.TreeMap;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
-import org.apache.commons.codec.binary.Hex;
-import org.json.JSONException;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 
 public class BtceWrapper implements TradeInterface {

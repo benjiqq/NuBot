@@ -6,7 +6,6 @@ import com.nubits.nubot.options.*;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.utils.FilesystemUtils;
-import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

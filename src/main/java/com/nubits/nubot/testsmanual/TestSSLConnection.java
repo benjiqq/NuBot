@@ -20,13 +20,13 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.InitTests;
-import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.*;
+import java.io.InputStream;
+import java.io.OutputStream;
  
 /** Establish a SSL connection to a host and port, writes a byte and
  * prints the response. See

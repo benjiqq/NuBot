@@ -18,25 +18,23 @@
 
 package com.nubits.nubot.strategy.Primary;
 
-import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
-import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.TimerTask;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class StrategyPrimaryPegTask extends TimerTask {

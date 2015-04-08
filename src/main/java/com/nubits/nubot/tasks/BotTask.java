@@ -18,12 +18,11 @@
 
 package com.nubits.nubot.tasks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.nubits.nubot.utils.NuLog;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class BotTask {

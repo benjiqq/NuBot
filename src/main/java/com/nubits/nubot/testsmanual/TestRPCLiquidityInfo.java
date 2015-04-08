@@ -25,7 +25,6 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.InitTests;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.slf4j.Logger;

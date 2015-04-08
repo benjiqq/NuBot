@@ -27,7 +27,6 @@ import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.feedservices.*;
 import com.nubits.nubot.utils.InitTests;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

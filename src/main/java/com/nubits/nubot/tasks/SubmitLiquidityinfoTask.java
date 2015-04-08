@@ -19,29 +19,27 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.RPC.NuRPCClient;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.utils.FilesystemUtils;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.TimerTask;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 /**
  * Submit info via NuWalletRPC

@@ -21,7 +21,6 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.VersionInfo;
 import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;

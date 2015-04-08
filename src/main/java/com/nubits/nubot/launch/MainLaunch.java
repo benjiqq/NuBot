@@ -21,7 +21,6 @@ package com.nubits.nubot.launch;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.webui.UiServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;

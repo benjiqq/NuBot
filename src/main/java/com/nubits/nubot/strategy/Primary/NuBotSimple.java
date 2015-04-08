@@ -21,7 +21,6 @@ package com.nubits.nubot.strategy.Primary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
-import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

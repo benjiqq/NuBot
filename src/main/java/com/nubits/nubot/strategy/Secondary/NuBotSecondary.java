@@ -21,17 +21,16 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.*;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
-import com.nubits.nubot.utils.NuLog;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * a NuBot implementing dual strategy

@@ -19,9 +19,9 @@
 package com.nubits.nubot.launch.toolkit;
 
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -31,11 +31,11 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
 import com.nubits.nubot.utils.FilesystemUtils;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NuCMC {
 

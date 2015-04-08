@@ -35,7 +35,6 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.CcexWrapper;
 import com.nubits.nubot.utils.FrozenBalancesManager;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
 import com.nubits.nubot.utils.VersionInfo;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -205,7 +204,7 @@ public abstract class NuBotBase {
         //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
-            NuLog.warn(LOG, "Trades will be executed");
+            LOG.warn("Trades will be executed");
         } else {
             LOG.info("Trades will not be executed [executetrade:false]");
             liveTrading = false;

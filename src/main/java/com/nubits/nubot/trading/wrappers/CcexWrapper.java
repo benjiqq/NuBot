@@ -19,42 +19,17 @@
 package com.nubits.nubot.trading.wrappers;
 
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.PairBalance;
+import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
-import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
-import com.nubits.nubot.utils.NuLog;
 import com.nubits.nubot.utils.Utils;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TreeMap;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -67,6 +42,17 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class CcexWrapper implements TradeInterface {
 

@@ -2,7 +2,6 @@ package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.InitTests;
-import com.nubits.nubot.utils.NuLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

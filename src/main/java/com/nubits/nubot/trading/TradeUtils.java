@@ -19,22 +19,19 @@
 package com.nubits.nubot.trading;
 
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.CurrencyList;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.OrderToPlace;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.TreeMap;
-
-import com.nubits.nubot.utils.NuLog;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 public class TradeUtils {
 
