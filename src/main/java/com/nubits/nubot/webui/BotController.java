@@ -65,6 +65,7 @@ public class BotController {
                     SessionManager.launchBot(Global.options);
                 } catch (Exception e) {
                     success = false;
+                    opmap.put("error", "" + e);
                 }
                 opmap.put("success", success);
 

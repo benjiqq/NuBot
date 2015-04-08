@@ -291,7 +291,6 @@ public class ParseOptions {
         options.hipchat = (boolean) getIgnoreCase(optionsJSON, hipchat);
 
         try {
-
             String lstr = "" + getIgnoreCase(optionsJSON, emergencytimeout);
             LOG.debug("lstr " + lstr);
             int emergencyTimeoutLong = new Integer(lstr).intValue();

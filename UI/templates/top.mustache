@@ -97,8 +97,6 @@
 
             function loadlog() {
 
-                //console.log("load log");
-
                 var url = baseurl + "/logdump";
 
                 console.log("url  " + url);
@@ -109,7 +107,6 @@
                 })
                 .fail(function() {
                   console.log("error loading log");
-                  //alert( "error loading log" );
                 })
                 .done(function( data ) {
                   $('#logarea').val(data["log"]);
@@ -119,8 +116,6 @@
                 if(psconsole.length)
                   psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
 
-                //bottom = $("#logarea")[0].scrollHeight - $("#logarea").height()
-
                 setTimeout(loadlog,updateTime);
             }
 
@@ -129,7 +124,6 @@
                 loadlog();
 
             }
-
 
             function loadconfig() {
 
@@ -141,8 +135,6 @@
                   url: url,
                 })
                 .done(function( data ) {
-
-                    //console.log("data: " + data);
 
                     $("#exchangename").attr("value", data["exchangeName"]);
                     $("#apikey").attr("value", data["apiKey"]);
@@ -177,6 +169,7 @@
             }
 
             function postall(){
+
                 var posturl = "http://" + host + ":" + port + "/config";
 
                 //get all vars and post them
@@ -184,7 +177,7 @@
                 var exchangename = $("#exchangename").attr("value");
                 var apikey = $("#apikey").attr("value");
                 var apisecret = $("#apisecret").attr("value");
-                var txfee =$("#txfee").attr("value");
+                var txfee = $("#txfee").attr("value");
                 var pair = $("#pair").attr("value");
                 var dualside = $("#dualside").prop("checked");
                 var multiplecustodians = $("#multiplecustodians").prop("checked");
@@ -192,8 +185,8 @@
                 var verbose = $("#verbose").prop("checked");
                 var hipchat = $("#hipchat").prop("checked");
                 var mailnotifications = $("#mailnotifications").attr("value");
-                var mailrecipient =$("#mailrecipient").attr("value");
-                var emergencytimeout =$("#emergencytimeout").attr("value");
+                var mailrecipient = $("#mailrecipient").attr("value");
+                var emergencytimeout = $("#emergencytimeout").attr("value");
                 var keepproceeds = $("#keepproceeds").attr("value");
                 var maxsellvolume = $("#maxsellvolume").attr("value");
                 var maxbuyvolume = $("#maxbuyvolume").attr("value");
@@ -210,7 +203,6 @@
 
                 var backupfeedsString = $("#backupfeeds").attr("value");
                 var backupfeedsarray = backupfeedsString.split(',');
-
 
                 //could check on the client side if valid post
 
@@ -245,23 +237,29 @@
 
                 });
 
-
                 makePost(posturl, jsondata);
+
             }
 
             function makePost(url, jsondata){
                 //make HTTP post to server
+
                 $.ajax(url, {
                     data : jsondata,
                     contentType : 'application/json',
                     type : 'POST',
                     success: function(data){
-                      console.log("ok " + data);
-                      //btn btn-success
+
+                     // console.log("ok " + data);
+
+                     //on success of post change the color of the button
                       var cbtn = $('#saveconfigbutton');
+
                       if (cbtn.hasClass("btn-primary")) {
                            cbtn.removeClass("btn-primary");
                            cbtn.addClass("btn-success");
+
+                           //change color back after 2000 msec
                            setTimeout(function() {
                                  cbtn.removeClass("btn-success");
                                  cbtn.addClass("btn-primary");
@@ -270,9 +268,7 @@
 
 
                     },
-                    /*fail:  function(xhr, textStatus, errorThrown) {
 
-                        }*/
                     error: function(xhr, textStatus, errorThrown) {
                         alert("error posting to server " + textStatus + " " + errorThrown);
                         alert(xhr.responseText);
