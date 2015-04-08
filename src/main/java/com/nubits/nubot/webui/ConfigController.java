@@ -23,7 +23,9 @@ import static spark.Spark.get;
 import static spark.Spark.post;
 
 /**
- * controller for changing Configurations
+ * controller for changing Configurations.
+ * GET from predefined file (which is the same as global.options)
+ * POST user options. is loaded to global.options also
  */
 public class ConfigController {
 
@@ -66,8 +68,7 @@ public class ConfigController {
 
         get(endpoint, "application/json", (request, response) -> {
 
-            //get from memory
-            //any change in the file is reflected in the global options
+            //get from memory. any change in the file is reflected in the global options
             String jsonString = SerializeOptions.optionsToJson(Global.options);
             return jsonString;
         });

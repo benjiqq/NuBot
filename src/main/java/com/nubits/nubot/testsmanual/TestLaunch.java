@@ -57,8 +57,6 @@ public class TestLaunch {
 
         NuLog.info(LOG, "test");
 
-        //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
-
         Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
         NuLog.info(LOG, "defined session path " + Global.sessionPath);
@@ -69,8 +67,6 @@ public class TestLaunch {
 
         LOG.info("set global config");
         SessionManager.setConfig(configFile);
-        //sessionLOG.debug("launch bot");
-        //SessionManager.launchBot(Global.options);
 
         if (runui){
             String workingdir = ".";
@@ -81,10 +77,6 @@ public class TestLaunch {
                 LOG.error("error setting up UI server " + e);
             }
         }
-
-        //SessionManager.setConfig(configfile);
-
-        //SessionManager.setConfig(configfile, false);
 
     }
 
