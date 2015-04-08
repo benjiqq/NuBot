@@ -7,6 +7,7 @@
 | [Bitspark](https://www.bitspark.io)    | live  |  https://www.bitspark.io |
 | [Poloniex](https://poloniex.com)    | live  |  https://poloniex.com |
 | [Comkort](https://comkort.com)    | live  |  https://comkort.com |
+| [Bittrex](https://bittrex.com)    | live  |  https://bittrex.com |
 | [AltsTrade](https://alts.trade)    | in progress  |  https://alts.trade |
 | [Peatio]    | test exchange  |  live | https://178.62.140.24/ |
 
