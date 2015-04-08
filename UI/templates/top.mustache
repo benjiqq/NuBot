@@ -49,6 +49,21 @@
 
         $(document).ready(function() {
 
+        $.ajax({
+          type: "GET",
+          dataType: "json",
+          url:  "http://" + host + ":" + port + "/configfile"
+        })
+        .fail(function() {
+          console.log("error loading configfile");
+        })
+        .done(function( data ) {
+            console.log("data: " + data);
+            $('#configfile').html(data["configfile"]);
+        });
+
+
+
           $('#startbot').click(function(){
 
                 if (debug) console.log("calling start on server");

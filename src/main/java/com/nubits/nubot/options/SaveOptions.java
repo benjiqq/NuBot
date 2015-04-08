@@ -65,6 +65,8 @@ public class SaveOptions {
     public static boolean optionsReset(String filepath) {
         NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
         Global.options = opt;
+        Global.currentOptionsFile = filepath;
+        saveOptions(opt,filepath);
         return true;
     }
 

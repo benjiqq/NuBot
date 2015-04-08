@@ -68,7 +68,7 @@ public class ConfigController {
 
         post("/configreset", (request, response) -> {
 
-            //SaveOptions.saveOptions()
+            SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
             //return jsonString;
 
             Map opmap = new HashMap();
@@ -80,7 +80,7 @@ public class ConfigController {
         get("/configfile", "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
-            opmap.put("file", Global.currentOptionsFile);
+            opmap.put("configfile", Global.currentOptionsFile);
             String json = new Gson().toJson(opmap);
             return json;
         });
