@@ -65,10 +65,9 @@ public class TestLaunch {
         SessionManager.setConfig(configFile);
 
         if (runui){
-            String workingdir = ".";
 
             try{
-                UiServer.startUIserver(workingdir, configFile);
+                UiServer.startUIserver(configFile);
             }catch(Exception e){
                 LOG.error("error setting up UI server " + e);
             }
@@ -90,10 +89,9 @@ public class TestLaunch {
         SessionManager.setConfigDefault();
 
         if (runui){
-            String workingdir = ".";
 
             try{
-                UiServer.startUIserver(workingdir, Settings.DEFAULT_CONFIG_FILE_PATH);
+                UiServer.startUIserver(Settings.DEFAULT_CONFIG_FILE_PATH);
             }catch(Exception e){
                 LOG.error("error setting up UI server " + e);
             }
