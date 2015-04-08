@@ -44,8 +44,6 @@ public class MainLaunch {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    private static boolean runui = false;
-
 
     /**
      * Start the NuBot. start if config is valid and other instance is running
@@ -71,9 +69,9 @@ public class MainLaunch {
 
             if (runGUI) {
                 LOG.info("Running NuBot GUI");
-                String workingdir = ".";
+
                 try {
-                    UiServer.startUIserver(workingdir, configFile);
+                    UiServer.startUIserver(configFile);
                 } catch (Exception e) {
                     LOG.error("error setting up UI server " + e);
                 }

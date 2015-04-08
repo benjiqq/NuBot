@@ -22,7 +22,7 @@ public class UiServer {
     /**
      * start the UI server
      */
-    public static void startUIserver(String configdir, String configFile) {
+    public static void startUIserver(String configFile) {
 
         //set up all endpoints
 
@@ -31,7 +31,7 @@ public class UiServer {
         //binds GET and POST
         LayoutTemplateEngine tmpl = new LayoutTemplateEngine(Settings.HTML_FOLDER);
 
-        new ConfigController("/config", configdir, configFile);
+        new ConfigController("/config", configFile);
 
         new LogController("/logdump");
 

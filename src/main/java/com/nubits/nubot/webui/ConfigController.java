@@ -4,6 +4,7 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.options.SaveOptions;
@@ -28,7 +29,8 @@ import static spark.Spark.post;
  */
 public class ConfigController {
 
-    private String configDir;
+    //default config folder
+    private String configDir = Settings.CONFIG_DIR;
     private String configfile;
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
@@ -60,9 +62,8 @@ public class ConfigController {
 
     }
 
-    public ConfigController(String endpoint, String configDir, String configfile) {
+    public ConfigController(String endpoint, String configfile) {
 
-        this.configDir = configDir;
         this.configfile = configfile;
 
         get(endpoint, "application/json", (request, response) -> {
