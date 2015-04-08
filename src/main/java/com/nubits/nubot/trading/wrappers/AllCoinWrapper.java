@@ -729,7 +729,7 @@ public class AllCoinWrapper implements TradeInterface {
         protected ApiKeys keys;
         protected String method;
 
-        private final ExecutorService pool = Executors.newFixedThreadPool(10);
+        private final ExecutorService pool = Executors.newFixedThreadPool(5);
 
         public AllCoinService(String url, String method, TreeMap<String, String> args, ApiKeys keys) {
             this.url = url;
