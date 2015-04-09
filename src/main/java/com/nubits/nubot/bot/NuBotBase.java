@@ -194,7 +194,7 @@ public abstract class NuBotBase {
     /**
      * execute the NuBot based on a configuration
      */
-    public void execute(NuBotOptions opt) throws Exception {
+    public void execute(NuBotOptions opt) throws NuBotRunException {
 
         LOG.info("Setting up NuBot version : " + VersionInfo.getVersionName());
 
@@ -237,7 +237,7 @@ public abstract class NuBotBase {
         if (activeOrdersResponse.isPositive()) {
         } else {
             //MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
-            throw new Exception("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+            throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
 
@@ -263,8 +263,8 @@ public abstract class NuBotBase {
 
         try {
             configureStrategy();
-        } catch (NuBotConfigException e) {
-            throw new Exception("can't configure strategy");
+        } catch (Exception e) {
+            throw new NuBotRunException("" + e);
         }
 
         notifyOnline();
@@ -287,6 +287,7 @@ public abstract class NuBotBase {
                 + "<strong>" + Global.options.getExchangeName() + "</strong> ["
                 + Global.options.getPair().toStringSep() + "]";
 
+        LOG.info(additionalInfo);
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 
         //Interrupt all BotTasks
@@ -294,6 +295,7 @@ public abstract class NuBotBase {
         if (Global.taskManager != null) {
             if (Global.taskManager.isInitialized()) {
                 try {
+                    LOG.info("try to shutdown all tasks");
                     Global.taskManager.stopAll();
                 } catch (IllegalStateException e) {
 

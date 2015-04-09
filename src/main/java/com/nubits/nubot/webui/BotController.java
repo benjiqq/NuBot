@@ -2,6 +2,7 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.launch.MainLaunch;
 import org.json.simple.JSONObject;
@@ -19,6 +20,9 @@ import static spark.Spark.post;
 public class BotController {
 
     final static Logger LOG = LoggerFactory.getLogger(BotController.class);
+
+    private final static String START = "start";
+    private final static String STOP = "stop";
 
     public BotController(String endpoint) {
 
@@ -53,15 +57,14 @@ public class BotController {
 
             String json = new Gson().toJson(opmap);
 
-            if (startstop.equals("start")) {
+            if (startstop.equals(START)) {
                 boolean success = true;
 
-                opmap.put("success", "" + false);
                 LOG.info("trying to start bot");
 
                 try {
                     SessionManager.launchBot(Global.options);
-                } catch (Exception e) {
+                } catch (NuBotRunException e) {
                     success = false;
                     LOG.error("could not start bot " + e);
                     opmap.put("error", "" + e);
@@ -75,16 +78,17 @@ public class BotController {
                 return json;
             }
 
-            if (startstop.equals("stop")) {
+            if (startstop.equals(STOP)) {
                 boolean success = true;
                 try {
                     LOG.info("try interrupt bot");
+                    Global.bot.shutdownBot();
+
                     Global.mainThread.interrupt();
                 } catch (Exception e) {
                     success = false;
                 }
 
-                SessionManager.launchBot(Global.options);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);

@@ -33,12 +33,12 @@ import org.slf4j.MDC;
  */
 public class TestLaunch {
 
-
     static {
         System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 
     static String configFile = "config/myconfig/poloniex.json";
+    //static String configFile = "config/myconfig/bitspark.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
 
@@ -62,7 +62,6 @@ public class TestLaunch {
 
         LOG.info("set global config");
         SessionManager.setConfigGlobal(configFile);
-
 
         if (runui){
 

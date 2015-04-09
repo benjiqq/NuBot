@@ -184,6 +184,7 @@ public class StrategySecondaryPegUtils {
 
         if (balance.getQuantity() < oneNBT * 2) {
             LOG.info("no need to execute " + type + "orders : available balance < 1 NBT");
+            //throw error
             return true;
         }
 

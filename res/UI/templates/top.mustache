@@ -47,21 +47,25 @@
               var updateTime = 2000;
               var debug = true;
 
+
+        function updateConfigFile(){
+                 $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url:  "http://" + host + ":" + port + "/configfile"
+                })
+                .fail(function() {
+                  console.log("error loading configfile");
+                })
+                .done(function( data ) {
+                    console.log("data: " + data);
+                    $('#configfile').html(data["configfile"]);
+                });
+        }
+
         $(document).ready(function() {
 
-        $.ajax({
-          type: "GET",
-          dataType: "json",
-          url:  "http://" + host + ":" + port + "/configfile"
-        })
-        .fail(function() {
-          console.log("error loading configfile");
-        })
-        .done(function( data ) {
-            console.log("data: " + data);
-            $('#configfile').html(data["configfile"]);
-        });
-
+            updateConfigFile();
 
 
           $('#startbot').click(function(){
@@ -330,6 +334,7 @@
                       }
 
                       //reset values from server
+                      updateConfigFile();
                       loadconfig();
 
                     },

@@ -98,7 +98,7 @@ public class SessionManager {
      *
      * @param opt
      */
-    public static void launchBot(NuBotOptions opt) {
+    public static void launchBot(NuBotOptions opt) throws NuBotRunException {
 
         Global.mainThread = Thread.currentThread();
 
@@ -113,16 +113,16 @@ public class SessionManager {
             Global.bot = new NuBotSecondary();
             try {
                 Global.bot.execute(opt);
-            } catch (Exception e) {
-
+            } catch (NuBotRunException e) {
+                throw e;
             }
         } else {
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
             try {
                 Global.bot.execute(opt);
-            } catch (Exception e) {
-
+            } catch (NuBotRunException e) {
+                throw e;
             }
         }
 

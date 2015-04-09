@@ -19,6 +19,7 @@
 package com.nubits.nubot.launch;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.webui.UiServer;
@@ -80,7 +81,11 @@ public class MainLaunch {
                 //set global config
                 SessionManager.setConfigGlobal(configFile);
                 sessionLOG.debug("launch bot");
-                SessionManager.launchBot(Global.options);
+                try{
+                    SessionManager.launchBot(Global.options);
+                }catch(NuBotRunException e){
+                    exitWithNotice("could not launch bot");
+                }
             }
 
 

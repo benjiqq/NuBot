@@ -35,7 +35,7 @@ public class ConfigController {
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
 
-    private void saveConfig(NuBotOptions newopt){
+    private void saveConfig(NuBotOptions newopt, String saveTo){
 
         LOG.info("parsed: new opt: " + newopt);
 
@@ -45,7 +45,7 @@ public class ConfigController {
             LOG.info("error with backup " + e);
         }
 
-        String saveTo = this.configDir + File.separator + this.configfile;
+
         String js = SaveOptions.jsonPretty(newopt);
         LOG.info("new opt: " + js);
 
@@ -68,6 +68,7 @@ public class ConfigController {
 
         post("/configreset", (request, response) -> {
 
+            Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
             boolean result = SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
             //return jsonString;
 
@@ -138,7 +139,8 @@ public class ConfigController {
             opmap.put("success", success);
 
             if (success) {
-                saveConfig(newopt);
+                String saveTo = Global.currentOptionsFile;
+                saveConfig(newopt, saveTo);
             }
 
             opmap.put("error", error);
