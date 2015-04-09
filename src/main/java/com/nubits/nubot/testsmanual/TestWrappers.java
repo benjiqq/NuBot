@@ -43,7 +43,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/bittrex.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/bter.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -59,8 +59,8 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
 
-        //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testGetAvailableBalance(testCurrency);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
@@ -151,8 +151,8 @@ public class TestWrappers {
         InitTests.loadKeystore(trustAll);
 
         try {
-            LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + Global.options.getExchangeName());
+            LOG.info("Public API key: " + Global.options.getApiKey());
+            LOG.info("Exchange: " + Global.options.getExchangeName());
             WrapperTestUtils.configureExchange(Global.options.getExchangeName());
             InitTests.startConnectionCheck();
 

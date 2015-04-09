@@ -330,7 +330,7 @@ public class WrapperTestUtils {
 
         //TODO:  remove when tested
         //Assign the keys to the TradeInterface
-        //ti.setKeys(keys);
+        ti.setKeys(keys);
 
         //Assign the TradeInterface to the exchange
         Global.exchange.setTrade(ti);

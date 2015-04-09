@@ -89,6 +89,8 @@ public class ExchangeFacade {
         exchangeInterfaces.put(EXCOIN, ExcoinWrapper.class);
         exchangeInterfaces.put(COMKORT, ComkortWrapper.class);
         exchangeInterfaces.put(BITTREX, BittrexWrapper.class);
+        exchangeInterfaces.put(BTER, BterWrapper.class);
+        exchangeInterfaces.put(CCEDK, CcedkWrapper.class);
 
 
     }
