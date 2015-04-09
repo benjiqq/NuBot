@@ -3,6 +3,7 @@
  - Use gitflow to create a new release branch out of develop, naming it with the name of the release (X.X.X)
  - Update the changelog.md using the resolved issues on github
  - Edit the file build.gradle and change the value of the *version* variable to current release name (X.X.X)
+ - Copy a version of Setup.html and about.html in res/UI (see issue #475)
  - Tag the commit with a new tag, including the release candidate number starting from one (X.X.X-RC1) and push to upstream.  
  - Run the gradle task *NuBotDist* which will create a new bundle under the */dist* folder
  - Rename the folder to [nubot-vX.X.X-RC1], and zip it
