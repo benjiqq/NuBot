@@ -1,16 +1,12 @@
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
 import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.apache.http.Header;
@@ -50,6 +46,8 @@ public class AltsTradeWrapper implements TradeInterface {
     private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected AltsTradeService service;
+
     private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
     private final String ENCODING = "UTF-8";
@@ -69,13 +67,11 @@ public class AltsTradeWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    public AltsTradeWrapper() {
-        setupErrors();
-    }
-
     public AltsTradeWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new AltsTradeService(keys);
+
         setupErrors();
     }
 
@@ -85,7 +81,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -145,7 +141,7 @@ public class AltsTradeWrapper implements TradeInterface {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             if (currency != null) { //get just one currency balance
                 Amount balance = new Amount(0, currency);
-                for (Iterator<JSONObject> wallet = httpAnswerJson.iterator(); wallet.hasNext();) {
+                for (Iterator<JSONObject> wallet = httpAnswerJson.iterator(); wallet.hasNext(); ) {
                     JSONObject thisWallet = wallet.next();
                     if (thisWallet.get("code").equals(currency.getCode().toUpperCase())) {
                         balance.setQuantity(Utils.getDouble(thisWallet.get("balance")));
@@ -157,7 +153,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
                 Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
                 Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
-                for (Iterator<JSONObject> wallet = httpAnswerJson.iterator(); wallet.hasNext();) {
+                for (Iterator<JSONObject> wallet = httpAnswerJson.iterator(); wallet.hasNext(); ) {
                     JSONObject thisWallet = wallet.next();
                     if (thisWallet.get("code").equals(pair.getOrderCurrency().getCode().toUpperCase())) {
                         NBTAvail.setQuantity(Utils.getDouble(thisWallet.get("balance")));
@@ -237,7 +233,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 ArrayList<Order> orders = (ArrayList) getOpenOrders.getResponseObject();
                 Date checkDate = null;
                 String order_id = null;
-                for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                     Order thisOrder = order.next();
                     if (checkDate == null || thisOrder.getInsertedDate().getTime() > checkDate.getTime()) {
                         checkDate = thisOrder.getInsertedDate();
@@ -266,7 +262,7 @@ public class AltsTradeWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
-            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
                 orderList.add(parseOrder(order.next(), null));
             }
             apiResponse.setResponseObject(orderList);
@@ -290,7 +286,7 @@ public class AltsTradeWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
-            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
                 orderList.add(parseOrder(order.next(), pair));
             }
             apiResponse.setResponseObject(orderList);
@@ -334,7 +330,7 @@ public class AltsTradeWrapper implements TradeInterface {
         ApiResponse getAllOrders = getActiveOrders();
         if (getAllOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getAllOrders.getResponseObject();
-            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
@@ -401,7 +397,7 @@ public class AltsTradeWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray history = (JSONArray) httpAnswerJson.get("history");
-            for (Iterator<JSONObject> trade = history.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = history.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next(), pair);
                 if (startTime > 0 && thisTrade.getDate().getTime() < startTime) continue;
                 tradeList.add(thisTrade);
@@ -444,7 +440,7 @@ public class AltsTradeWrapper implements TradeInterface {
         if (getActiveOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getActiveOrders.getResponseObject();
             boolean isActive = false;
-            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                 if (order.next().getId().equals(id)) {
                     isActive = true;
                 }
@@ -468,7 +464,7 @@ public class AltsTradeWrapper implements TradeInterface {
         if (getOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
             boolean allClear = true;
-            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                 ApiResponse cancel = cancelOrder(order.next().getId(), pair);
                 if (!cancel.isPositive()) {
                     allClear = false;
@@ -491,35 +487,21 @@ public class AltsTradeWrapper implements TradeInterface {
         return API_BASE_URL;
     }
 
+
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
+    public String query(String base, String method, AbstractMap<String, String> args, boolean isGet) {
         if (!exchange.getLiveData().isConnected()) {
             LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
             return TOKEN_BAD_RETURN;
         }
-        String queryResult;
-        AltsTradeService query = new AltsTradeService(url, args, keys);
+        String queryResult = "";
         if (isGet) {
-            queryResult = query.executeQuery(false, isGet);
+            service.executeQuery(base, "", args, false, isGet);
         } else {
-            queryResult = query.executeQuery(true, isGet);
+            service.executeQuery(base, "", args, true, isGet);
         }
         return queryResult;
-    }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
     }
 
     @Override
@@ -539,35 +521,25 @@ public class AltsTradeWrapper implements TradeInterface {
 
     class AltsTradeService implements ServiceInterface {
 
-        protected String url;
-        protected HashMap args;
         protected ApiKeys keys;
 
-        public AltsTradeService(String url, HashMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.args = args;
+        public AltsTradeService(ApiKeys keys) {
             this.keys = keys;
-        }
-
-        private AltsTradeService(String url, HashMap<String, String> args) {
-            //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
         }
 
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String answer = null;
             String signature = "";
             String post_data = "";
 
             args.put("nonce", Objects.toString(System.currentTimeMillis()));
 
-            List< NameValuePair> urlParameters = new ArrayList< NameValuePair>();
+            List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
 
-            for (Iterator< Map.Entry< String, String>> argumentIterator = args.entrySet().iterator(); argumentIterator.hasNext();) {
-                Map.Entry< String, String> argument = argumentIterator.next();
+            for (Iterator<Map.Entry<String, String>> argumentIterator = args.entrySet().iterator(); argumentIterator.hasNext(); ) {
+                Map.Entry<String, String> argument = argumentIterator.next();
                 urlParameters.add(new BasicNameValuePair(argument.getKey(), argument.getValue()));
             }
 
@@ -577,9 +549,9 @@ public class AltsTradeWrapper implements TradeInterface {
 
             // add header
             Header[] headers = new Header[3];
-            headers[ 0] = new BasicHeader("Rest-Key", keys.getApiKey());
-            headers[ 1] = new BasicHeader("Rest-Sign", signature);
-            headers[ 2] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
+            headers[0] = new BasicHeader("Rest-Key", keys.getApiKey());
+            headers[1] = new BasicHeader("Rest-Sign", signature);
+            headers[2] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
 
             HttpClient client = HttpClientBuilder.create().build();
             HttpPost post = null;
@@ -588,12 +560,12 @@ public class AltsTradeWrapper implements TradeInterface {
 
             try {
                 if (!isGet) {
-                    post = new HttpPost(url);
+                    post = new HttpPost(base);
                     post.setEntity(new UrlEncodedFormEntity(urlParameters, ENCODING));
                     post.setHeaders(headers);
                     response = client.execute(post);
                 } else {
-                    get = new HttpGet(url);
+                    get = new HttpGet(base);
                     get.setHeaders(headers);
                     response = client.execute(get);
                 }
@@ -648,7 +620,7 @@ public class AltsTradeWrapper implements TradeInterface {
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.fine("\nSending request to URL : " + url + " ; get = " + isGet);
+                LOG.fine("\nSending request to URL : " + base + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
