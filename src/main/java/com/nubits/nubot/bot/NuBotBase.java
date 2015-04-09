@@ -347,6 +347,8 @@ public abstract class NuBotBase {
         }
 
         LOG.info("Logs of this session saved in " + Global.sessionPath);
+
+        LOG.info("** end of the session **");
     }
 
 }
