@@ -104,17 +104,17 @@ public class TestOptionsSample extends TestCase {
             inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
             //assertTrue(inputJSON.containsKey("options"));
             //JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
-            assertTrue(inputJSON.containsKey(ParseOptions.exchangename));
         } catch (Exception e) {
 
         }
+
         assertTrue(!catched);
 
-        assertTrue(inputJSON.containsKey(ParseOptions.exchangename));
-        assertTrue(inputJSON.containsKey(ParseOptions.apikey));
-        assertTrue(inputJSON.containsKey(ParseOptions.spread));
-        assertTrue(inputJSON.containsKey(ParseOptions.hipchat));
-        assertTrue(inputJSON.containsKey(ParseOptions.pair));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.exchangename));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.apikey));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.spread));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.hipchat));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.pair));
     }
 
     @Test

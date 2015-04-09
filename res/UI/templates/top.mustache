@@ -127,9 +127,12 @@
                   $('#logarea').val(data["log"]);
                 });
 
+                /*
+                //autoscrolling. not used - how to make log readable also?
                 var psconsole = $('#logarea');
                 if(psconsole.length)
                   psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+                */
 
                 setTimeout(loadlog,updateTime);
             }

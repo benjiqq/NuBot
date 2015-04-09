@@ -63,6 +63,7 @@ public class TestLaunch {
         LOG.info("set global config");
         SessionManager.setConfigGlobal(configFile);
 
+
         if (runui){
 
             try{
@@ -87,8 +88,6 @@ public class TestLaunch {
         LOG.info("set global config");
         SessionManager.setConfigDefault();
 
-        Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
-
         if (runui){
 
             try{
@@ -106,8 +105,8 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        //testlaunchWithFile();
-        testlaunchNoFile();
+        testlaunchWithFile();
+        //testlaunchNoFile();
 
     }
 

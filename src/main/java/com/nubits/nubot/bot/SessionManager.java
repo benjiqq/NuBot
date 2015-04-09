@@ -40,6 +40,7 @@ public class SessionManager {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile);
             LOG.debug("loading opt: " + opt.toStringNoKeys());
             Global.options = opt;
+            Global.currentOptionsFile = configfile;
         } catch (NuBotConfigException e) {
             MainLaunch.exitWithNotice("" + e);
         }
@@ -53,6 +54,7 @@ public class SessionManager {
 
         NuBotOptions defaultOpt = NuBotOptionsDefault.defaultFactory();
         Global.options = defaultOpt;
+        Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
         SaveOptions.saveOptionsPretty(defaultOpt,Settings.DEFAULT_CONFIG_FILE_PATH);
 
     }
