@@ -126,6 +126,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
         checkOrders();
 
+        Utils.logActiveThreads();
     }
 
     private void checkOrders() {

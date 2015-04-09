@@ -39,6 +39,7 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.rmi.CORBA.Util;
 import java.io.File;
 import java.util.*;
 
@@ -145,6 +146,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             }
         }
 
+        Utils.logActiveThreads();
     }
 
     private void initStrategy(double peg_price) throws NuBotConnectionException {
