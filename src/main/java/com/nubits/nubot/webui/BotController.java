@@ -82,9 +82,11 @@ public class BotController {
                 boolean success = true;
                 try {
                     LOG.info("try interrupt bot");
+
                     Global.bot.shutdownBot();
 
                     Global.mainThread.interrupt();
+
                 } catch (Exception e) {
                     success = false;
                 }
