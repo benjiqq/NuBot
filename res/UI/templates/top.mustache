@@ -63,6 +63,22 @@
                 });
         }
 
+
+        function flashButton(cbtn){
+
+            if (cbtn.hasClass("btn-primary")) {
+               cbtn.removeClass("btn-primary");
+               cbtn.addClass("btn-success");
+
+               //change color back after 2000 msec
+               setTimeout(function() {
+                     cbtn.removeClass("btn-success");
+                     cbtn.addClass("btn-primary");
+               }, 2000);
+          }
+
+        }
+
         $(document).ready(function() {
 
             updateConfigFile();
@@ -77,10 +93,20 @@
 
               $.ajax(baseurl + "/startstop", {
                     data : jsondata,
-                    contentType : 'application/json',
+                    dataType: "json",
                     type : 'POST',
                     success: function(data){
                         console.log("starting bot ok " + data);
+                        var success = data["success"];
+                        if (success){
+                         //on success of post change the color of the button
+                          var cbtn = $('#startbot');
+                          flashButton(cbtn);
+
+                        } else{
+                              alert(errormsg);
+                        }
+
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert("error posting to server " + textStatus + " " + errorThrown);
@@ -100,10 +126,19 @@
 
               $.ajax(baseurl + "/startstop", {
                     data : jsondata,
-                    contentType : 'application/json',
+                    dataType: "json",
                     type : 'POST',
                     success: function(data){
-                        console.log("ok " + data);
+                       console.log("starting bot ok " + data);
+                       var success = data["success"];
+                       if (success){
+                        //on success of post change the color of the button
+                         var cbtn = $('#stopbot');
+                         flashButton(cbtn);
+
+                       } else{
+                             alert(errormsg);
+                       }
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert("error posting to server " + textStatus + " " + errorThrown);
@@ -113,6 +148,8 @@
 
             });
     });
+
+
 
             function loadlog() {
 
@@ -144,7 +181,6 @@
 
             function loadbot() {
                 loadlog();
-
             }
 
 
@@ -264,6 +300,8 @@
 
             }
 
+
+
             function makePost(url, jsondata){
                 //make HTTP post to server
 
@@ -285,17 +323,8 @@
 
                          //on success of post change the color of the button
                           var cbtn = $('#saveconfigbutton');
+                          flashButton(cbtn);
 
-                          if (cbtn.hasClass("btn-primary")) {
-                               cbtn.removeClass("btn-primary");
-                               cbtn.addClass("btn-success");
-
-                               //change color back after 2000 msec
-                               setTimeout(function() {
-                                     cbtn.removeClass("btn-success");
-                                     cbtn.addClass("btn-primary");
-                               }, 2000);
-                          }
                       } else{
                           alert(errormsg);
                       }
