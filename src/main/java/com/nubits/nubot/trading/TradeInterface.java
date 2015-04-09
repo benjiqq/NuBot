@@ -165,7 +165,7 @@ public interface TradeInterface {
      *
      * @param pair      pair.orderCurrency is the currency on order and
      *                  pair.paymentCurrency is unit for its payment/redeem
-     * @param startDate a unix-timestamp (seconds) indicating the start of the
+     * @param startTime a unix-timestamp (seconds) indicating the start of the
      *                  period
      * @return an ApiResponse object with an array of Trades
      */

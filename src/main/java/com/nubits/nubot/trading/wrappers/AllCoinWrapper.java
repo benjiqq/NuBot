@@ -55,6 +55,7 @@ public class AllCoinWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AllCoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected AllCoinService service;
     private Exchange exchange;
     private final int TIME_OUT = 15000;
     private String checkConnectionUrl = "https://www.allcoin.com/";
@@ -85,13 +86,10 @@ public class AllCoinWrapper implements TradeInterface {
     //Errors
     ErrorManager errors = new ErrorManager();
 
-    public AllCoinWrapper() {
-        setupErrors();
-    }
-
     public AllCoinWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new AllCoinService(keys);
         setupErrors();
     }
 
@@ -99,10 +97,10 @@ public class AllCoinWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
 
-        String queryResult = query(url, method, query_args, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         if (queryResult == null)
 
         {
@@ -196,7 +194,7 @@ public class AllCoinWrapper implements TradeInterface {
             method = API_SELL_COIN;
         }
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true,isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
@@ -235,7 +233,7 @@ public class AllCoinWrapper implements TradeInterface {
         String url = API_AUTH_URL;
         String method = API_GET_INFO;
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
@@ -312,19 +310,9 @@ public class AllCoinWrapper implements TradeInterface {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String url, String method, TreeMap<String, String> args, boolean isGet) {
-        AllCoinService query = new AllCoinService(url, method, args, keys);
+    public String query(String url, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         long now = System.currentTimeMillis();
         long sleeptime = 0;
         if (now - lastRequest < MIN_SPACING) {
@@ -334,7 +322,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         Future<String> queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQueryAsync(true, isGet, sleeptime);
+            queryResult = service.executeQueryAsync(url, method, args, true, isGet, sleeptime);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to AllCoin");
             return TOKEN_BAD_RETURN;
@@ -348,11 +336,6 @@ public class AllCoinWrapper implements TradeInterface {
             LOG.error(e.toString());
             return TOKEN_BAD_RETURN;
         }
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override
@@ -388,7 +371,7 @@ public class AllCoinWrapper implements TradeInterface {
         String url = API_AUTH_URL;
         String method = API_OPEN_ORDERS;
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
@@ -505,7 +488,7 @@ public class AllCoinWrapper implements TradeInterface {
         String method = API_CANCEL_ORDERS;
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson;
@@ -573,7 +556,7 @@ public class AllCoinWrapper implements TradeInterface {
         query_args.put("page", "1");
         query_args.put("page_size", "20");
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
@@ -724,28 +707,21 @@ public class AllCoinWrapper implements TradeInterface {
 
     private class AllCoinService implements ServiceInterface {
 
-        protected String url;
-        protected TreeMap args;
         protected ApiKeys keys;
-        protected String method;
+
 
         private final ExecutorService pool = Executors.newFixedThreadPool(5);
 
-        public AllCoinService(String url, String method, TreeMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.args = args;
+        public AllCoinService(ApiKeys keys) {
             this.keys = keys;
-            this.method = method;
         }
 
-        private AllCoinService(String url, TreeMap<String, String> args) {
+        private AllCoinService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
         }
 
-        public Future<String> executeQueryAsync(boolean needAuth, boolean isGet, final long sleeptime) {
-
+        public Future<String> executeQueryAsync(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet, final long sleeptime) {
+            String url=base+method;
             LOG.debug("sleeptime = " + sleeptime);
 
             final long finalSleeptime = sleeptime;
@@ -845,19 +821,6 @@ public class AllCoinWrapper implements TradeInterface {
                         return null;
                     }
 
-                    /*
-
-                     if (httpError) {
-                     JSONParser parser = new JSONParser();
-                     try {
-                     JSONObject obj = (JSONObject) (parser.parse(answer));
-                     answer = (String) obj.get(TOKEN_ERR);
-                     } catch (ParseException pe) {
-                     LOG.error(pe.toStringSep());
-                     }
-                     }
-                     */
-
                     connection.disconnect();
                     connection = null;
 
@@ -867,10 +830,10 @@ public class AllCoinWrapper implements TradeInterface {
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String toRet = "";
             try {
-                toRet = executeQueryAsync(needAuth, isGet, 0).get(); //call sync
+                toRet = executeQueryAsync(base, method, args, needAuth, isGet, 0).get(); //call sync
             } catch (InterruptedException e) {
                 LOG.error(e.toString());
             } catch (ExecutionException e) {

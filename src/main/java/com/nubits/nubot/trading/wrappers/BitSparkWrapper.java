@@ -19,35 +19,32 @@
 package com.nubits.nubot.trading.wrappers;
 
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
-
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class BitSparkWrapper implements TradeInterface {
@@ -57,6 +54,7 @@ public class BitSparkWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(BitSparkWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected BitSparkService service;
     private Exchange exchange;
     private final int SPACING_BETWEEN_CALLS = 1100;
     private final int TIME_OUT = 15000;
@@ -80,11 +78,6 @@ public class BitSparkWrapper implements TradeInterface {
     ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
-
-    public BitSparkWrapper() {
-        setupErrors();
-
-    }
 
     public BitSparkWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
@@ -125,9 +118,9 @@ public class BitSparkWrapper implements TradeInterface {
         return TICKER_BASE + pair.toString();
     }
 
-    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -192,7 +185,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "GET");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             Amount NBTonOrder = null,
                     NBTAvail = null,
@@ -266,9 +259,9 @@ public class BitSparkWrapper implements TradeInterface {
         String ticker_url = API_BASE_URL + getTickerPath(pair);
         LOG.trace("get content from url " + ticker_url);
         String queryResult = null;
-        try{
+        try {
             queryResult = HttpUtils.getContentForGet(ticker_url, 5000);
-        }catch(Exception e){
+        } catch (Exception e) {
             LOG.error("error getting content from " + ticker_url + " " + e);
         }
 
@@ -332,7 +325,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("id")) {
@@ -372,7 +365,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("market", pair.toString());
         query_args.put("limit", "999"); //default is 10 , max is 1000
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Object anOrdersResponse : httpAnswerJson) {
@@ -405,7 +398,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_uri", "/api/v2/order");
         query_args.put("id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("error")) {
@@ -439,7 +432,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("error")) {
@@ -518,17 +511,10 @@ public class BitSparkWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        BitSparkService query = new BitSparkService(base, method, args, keys);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
-
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to BitSpark");
             queryResult = TOKEN_BAD_RETURN;
@@ -574,15 +560,6 @@ public class BitSparkWrapper implements TradeInterface {
 
     }
 
-    @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     private Date parseDate(String dateStr) {
         Date toRet = null;
@@ -614,7 +591,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -699,7 +676,7 @@ public class BitSparkWrapper implements TradeInterface {
         query_args.put("market", pair.toString());
         query_args.put("limit", "1000");
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             LOG.debug("A maximum of 1000 trades can be returned from the BitSpark API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
@@ -758,31 +735,15 @@ public class BitSparkWrapper implements TradeInterface {
     }
 
     private class BitSparkService implements ServiceInterface {
-
-        protected String base;
-        protected String method;
-        protected TreeMap args;
         protected ApiKeys keys;
-        protected String url;
 
-        public BitSparkService(String base, String method, TreeMap<String, String> args, ApiKeys keys) {
-            this.base = base;
-            this.method = method;
-            this.args = args;
+        public BitSparkService(ApiKeys keys) {
             this.keys = keys;
-
         }
 
-        private BitSparkService(String url, TreeMap<String, String> args) {
-            //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
-            this.method = "";
-
-        }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
 
             args.put("access_key", keys.getApiKey());
 
@@ -828,7 +789,7 @@ public class BitSparkWrapper implements TradeInterface {
             throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters");
         }
 
-        private String getSign(TreeMap<String, String> parameters) {
+        private String getSign(AbstractMap<String, String> parameters) {
             if (parameters.containsKey("signature")) {
                 parameters.remove("signature");
             }

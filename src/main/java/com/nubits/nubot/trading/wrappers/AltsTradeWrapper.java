@@ -533,7 +533,7 @@ public class AltsTradeWrapper implements TradeInterface {
             String answer = null;
             String signature = "";
             String post_data = "";
-
+            String url=base+method;
             args.put("nonce", Objects.toString(System.currentTimeMillis()));
 
             List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
@@ -560,12 +560,12 @@ public class AltsTradeWrapper implements TradeInterface {
 
             try {
                 if (!isGet) {
-                    post = new HttpPost(base);
+                    post = new HttpPost(url);
                     post.setEntity(new UrlEncodedFormEntity(urlParameters, ENCODING));
                     post.setHeaders(headers);
                     response = client.execute(post);
                 } else {
-                    get = new HttpGet(base);
+                    get = new HttpGet(url);
                     get.setHeaders(headers);
                     response = client.execute(get);
                 }

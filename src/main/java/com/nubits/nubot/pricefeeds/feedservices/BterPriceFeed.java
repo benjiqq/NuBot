@@ -20,8 +20,8 @@ package com.nubits.nubot.pricefeeds.feedservices;
 
 
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,17 +30,25 @@ import com.nubits.nubot.pricefeeds.FeedFacade;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class BterPriceFeed extends AbstractPriceFeed {
 
     private static final Logger LOG = LoggerFactory.getLogger(BterPriceFeed.class.getName());
 
     public static final String name = FeedFacade.BterPriceFeed;
+    public BterWrapper trader;
 
     public BterPriceFeed() {
         refreshMinTime = 50 * 1000; //one minutee
+        Exchange exch = new Exchange(ExchangeFacade.BTER);
+        ExchangeLiveData liveData = new ExchangeLiveData();
+        exch.setLiveData(liveData);
+        ApiKeys keys = new ApiKeys("a", "b");
+        exch.setTrade(new BterWrapper(keys, exch));
+
+        trader = (BterWrapper) exch.getTrade();
     }
 
     @Override
@@ -49,14 +57,7 @@ public class BterPriceFeed extends AbstractPriceFeed {
         long diff = now - lastRequest;
         if (diff >= refreshMinTime) {
             try {
-                Exchange exch = new Exchange(ExchangeFacade.BTER);
-                ExchangeLiveData liveData = new ExchangeLiveData();
-                exch.setLiveData(liveData);
-                ApiKeys keys = new ApiKeys("a", "b");
-                exch.setTrade(new BterWrapper(keys, exch));
-
-                BterWrapper trader = (BterWrapper) exch.getTrade();
-                ApiResponse lastPriceResponse = trader.getLastPriceFeed(pair);
+                ApiResponse lastPriceResponse = trader.getLastPrice(pair);
                 if (lastPriceResponse.isPositive()) {
                     Ticker ticker = (Ticker) lastPriceResponse.getResponseObject();
                     double last = ticker.getLast();
