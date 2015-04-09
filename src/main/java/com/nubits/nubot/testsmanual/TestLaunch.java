@@ -63,6 +63,7 @@ public class TestLaunch {
         LOG.info("set global config");
         SessionManager.setConfigGlobal(configFile);
 
+
         if (runui){
 
             try{
