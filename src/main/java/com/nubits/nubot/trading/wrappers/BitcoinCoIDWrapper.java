@@ -84,9 +84,9 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args,boolean needAuth, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args,needAuth, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -149,7 +149,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         String method = API_GET_INFO;
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -197,7 +197,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         double bid = -1;
         Ticker ticker = new Ticker();
 
-        String queryResult = query(url,"", query_args,false, isGet);
+        String queryResult = query(url, "", query_args, false, isGet);
         JSONParser parser = new JSONParser();
         JSONObject httpAnswerJson = null;
         try {
@@ -250,7 +250,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             args.put(pair.getPaymentCurrency().getCode().toLowerCase(), nf.format(amount * price));
         }
 
-        ApiResponse response = getQuery(url, method, args,true, isGet);
+        ApiResponse response = getQuery(url, method, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -290,7 +290,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             query_args.put("pair", pair.toStringSep());
         }
 
-        ApiResponse response = getQuery(url, method, query_args, true,isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -377,7 +377,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
         query_args.put("type", currentOrder.getType().toLowerCase());
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -428,7 +428,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             query_args.put("since", Objects.toString(startTime));
         }
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -555,7 +555,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             HttpsURLConnection connection = null;
-            String url=base+method;
+            String url = base;
             URL queryUrl = null;
             String post_data = "";
             boolean httpError = false;
