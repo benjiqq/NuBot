@@ -226,7 +226,7 @@ public interface TradeInterface {
      * @param isGet
      * @return A String with the raw HTTP response
      */
-    public String query(String base, String method, AbstractMap<String, String> args, boolean isGet);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet);
 
     /**
      * @param keys

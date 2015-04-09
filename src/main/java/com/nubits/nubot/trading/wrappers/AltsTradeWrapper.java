@@ -79,9 +79,9 @@ public class AltsTradeWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args,boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, "", query_args, isGet);
+        String queryResult = query(url, "", query_args,needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -136,7 +136,7 @@ public class AltsTradeWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             if (currency != null) { //get just one currency balance
@@ -188,7 +188,7 @@ public class AltsTradeWrapper implements TradeInterface {
         double bid = -1;
         Ticker ticker = new Ticker();
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,false, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject result = (JSONObject) httpAnswerJson.get("result");
@@ -226,7 +226,7 @@ public class AltsTradeWrapper implements TradeInterface {
         args.put("price", Objects.toString(rate));
         args.put("action", type);
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             ApiResponse getOpenOrders = getActiveOrders(pair);
             if (getOpenOrders.isPositive()) {
@@ -258,7 +258,7 @@ public class AltsTradeWrapper implements TradeInterface {
         boolean isGet = false;
         ArrayList<Order> orderList = new ArrayList<>();
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -282,7 +282,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("market", pair.toStringSepSpecial("/").toUpperCase());
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -351,7 +351,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true,isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -393,7 +393,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("market", pair.toStringSepSpecial("/"));
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray history = (JSONArray) httpAnswerJson.get("history");
@@ -489,7 +489,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
 
     @Override
-    public String query(String base, String method, AbstractMap<String, String> args, boolean isGet) {
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         if (!exchange.getLiveData().isConnected()) {
             LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
             return TOKEN_BAD_RETURN;
