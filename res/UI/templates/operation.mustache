@@ -30,41 +30,26 @@
 
 <div class="container">
 
+    <div class="row">
 
-<div class="row">
-<div class="col-md-6">
+      <button id="startbot" type="button" class="btn btn-primary">Start</button>
+      <button id="stopbot" type="button" class="btn btn-primary">Stop</button>
+      <br>
+      <p style="margin-top: 10px">Status: <span id="botstatus">not started<span></p>
+      <p>Sesssion start: <span id="sessionstart"></span></p>
+      <p>Sesssion duration: <span id="duration"></span></p>
 
-  <button id="startbot" type="button" class="btn btn-primary">Start</button>
-  <button id="stopbot" type="button" class="btn btn-primary">Stop</button>
-  <br>
-  <p style="margin-top: 10px">Status: <span id="botstatus">not started<span></p>
-  <p>Sesssion start: <span id="sessionstart"></span></p>
-  <p>Sesssion duration: <span id="duration"></span></p>
-
-</div>
-
-<div class="col-md-6">
-</div>
-</div>
-
-
-<div class="row" style="margin-top: -10px">
-
-  <div class="col-md-6">
-    <h3>Log</h3>
- <!--   <button>Clear</button>-->
-    <div class="input-group">
-        <textarea id="logarea" class="form-control custom-control"></textarea>
     </div>
 
-  </div>
 
-  <!--
-  <div class="col-md-6">
+    <div class="row" style="margin-top: -30px">
 
-  </div>
-  -->
+        <h3>Log</h3>
+        <div class="input-group">
+            <textarea id="logarea" class="form-control custom-control"></textarea>
+        </div>
+
+    </div>
+
 
 </div>
-
-
