@@ -43,10 +43,10 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/bittrex.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/bter.json";
 
-    public static final CurrencyPair testPair = CurrencyList.DOGE_BTC;
-    public static final Currency testCurrency = CurrencyList.BTC;
+    public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
+    public static final Currency testCurrency = CurrencyList.NBT;
 
     public static void main(String[] args) {
         init();
@@ -59,8 +59,8 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
 
-        //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        WrapperTestUtils.testGetAvailableBalance(testCurrency);
+        WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
@@ -83,6 +83,36 @@ public class TestWrappers {
         //WrapperTestUtils.testClearAllOrders(testPair);
 
 
+        //-------- Stress test start ---------
+        /*
+        Thread t = new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    WrapperTestUtils.testGetActiveOrders();
+                }
+            }
+        });
+
+        Thread t2 = new Thread(new Runnable() {
+            public void run() {
+                for (int i = 0; i < 100; i++) {
+                    WrapperTestUtils.testClearAllOrders(testPair);
+                }
+            }
+        });
+
+
+        t.start();
+        t2.start();
+
+        for (int i = 0; i < 100; i++) {
+            WrapperTestUtils.testGetAvailableBalance(testCurrency);
+        }
+
+        //-------- Stress test end ---------
+        */
+
+
         //Create multiple orders for testing
         /*
          ArrayList<OrderToPlace> orders = new ArrayList<>();
@@ -99,7 +129,7 @@ public class TestWrappers {
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
-        WrapperTestUtils.testGetLastPrice(testPair);
+        //WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
         //WrapperTestUtils.testGetLastTrades(testPair);
 
@@ -109,22 +139,20 @@ public class TestWrappers {
         System.exit(0);
     }
 
-    private static void init()
-    {
+    private static void init() {
         InitTests.setLoggingFilename(LOG);
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Load keystore
         boolean trustAll = false;
-        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO))
-        {
+        if (Global.options.getExchangeName().equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
             trustAll = true;
         }
         InitTests.loadKeystore(trustAll);
 
         try {
-            LOG.info("using key: " + Global.options.getApiKey());
-            LOG.info("config exchange " + Global.options.getExchangeName());
+            LOG.info("Public API key: " + Global.options.getApiKey());
+            LOG.info("Exchange: " + Global.options.getExchangeName());
             WrapperTestUtils.configureExchange(Global.options.getExchangeName());
             InitTests.startConnectionCheck();
 

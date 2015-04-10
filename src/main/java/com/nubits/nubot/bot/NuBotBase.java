@@ -59,7 +59,7 @@ public abstract class NuBotBase {
     /**
      * Logger for session data. called only once per session
      */
-    private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG");
+    // private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG"); //TODO remove if never used
 
     protected String mode;
 
@@ -87,7 +87,6 @@ public abstract class NuBotBase {
         setupExchange();
 
     }
-
 
 
     /**
@@ -143,10 +142,11 @@ public abstract class NuBotBase {
             MainLaunch.exitWithNotice("exchange unknown");
         }
 
+        //TODO remove this block after testing it
         //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
-        LOG.debug("Create a new TradeInterface object");
-        ti.setKeys(keys);
-        ti.setExchange(Global.exchange);
+        //LOG.debug("Create a new TradeInterface object");
+        //ti.setKeys(keys);
+        //ti.setExchange(Global.exchange);
 
 
         //TODO handle on exchange level, not bot level
@@ -187,15 +187,12 @@ public abstract class NuBotBase {
         }
     }
 
-
     protected void checkNuConn() throws NuBotConnectionException {
-
-        LOG.info("Check connection with nud");
         if (Global.rpcClient.isConnected()) {
-            LOG.info("RPC connection OK!");
+            LOG.info("Nud RPC connection ok.");
         } else {
             //TODO: recover?
-            throw new NuBotConnectionException("problem with nu connectivity");
+            throw new NuBotConnectionException("Problem with nud connectivity");
         }
     }
 
@@ -285,15 +282,27 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
-    public void shutdownBot(){
+    public void shutdownBot() {
 
-        LOG.info("Bot shutting down..");
+        LOG.info("Bot shutting down sequence started.");
 
         String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
                 + Global.options.getExchangeName() + " ["
                 + Global.options.getPair().toStringSep() + "]";
 
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+
+        //Interrupt all BotTasks
+
+        if (Global.taskManager != null) {
+            if (Global.taskManager.isInitialized()) {
+                try {
+                    Global.taskManager.stopAll();
+                } catch (IllegalStateException e) {
+
+                }
+            }
+        }
 
         //Try to cancel all orders, if any
         if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
@@ -308,7 +317,6 @@ public abstract class NuBotBase {
                 } else {
                     LOG.error("Could not submit request to clear orders");
                 }
-
             } else {
                 LOG.error(deleteOrdersResponse.getError().toString());
             }
@@ -325,7 +333,7 @@ public abstract class NuBotBase {
                 if (null == responseObject1) {
                     LOG.error("Something went wrong while sending liquidityinfo");
                 } else {
-                    LOG.info(responseObject1.toJSONString());
+                    LOG.debug(responseObject1.toJSONString());
                 }
 
                 JSONObject responseObject2 = Global.rpcClient.submitLiquidityInfo(Global.rpcClient.USDchar,
@@ -333,10 +341,12 @@ public abstract class NuBotBase {
                 if (null == responseObject2) {
                     LOG.error("Something went wrong while sending liquidityinfo");
                 } else {
-                    LOG.info(responseObject2.toJSONString());
+                    LOG.debug(responseObject2.toJSONString());
                 }
             }
         }
+
+        LOG.info("Logs of this session saved in " + Global.sessionPath);
     }
 
 }

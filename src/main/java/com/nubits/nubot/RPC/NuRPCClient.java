@@ -18,15 +18,9 @@
 
 package com.nubits.nubot.RPC;
 
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
-
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -40,6 +34,13 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -47,8 +48,8 @@ import org.json.simple.parser.ParseException;
  */
 public class NuRPCClient {
 
-    private static final Logger LOG = LoggerFactory.getLogger(NuRPCClient.class.getName());
     public static final String USDchar = "B";
+    private static final Logger LOG = LoggerFactory.getLogger(NuRPCClient.class.getName());
     private static final String COMMAND_GET_INFO = "getinfo";
     private static final String COMMAND_LIQUIDITYINFO = "liquidityinfo";
     private static final String COMMAND_GETLIQUIDITYINFO = "getliquidityinfo";
@@ -59,17 +60,15 @@ public class NuRPCClient {
     private boolean connected;
     private boolean useIdentifier;
     private String custodianPublicAddress;
-    private boolean verbose;
     private String exchangeName;
     private CurrencyPair pair;
 
 
-    public NuRPCClient(String ip, int port, String rpcUser, String rpcPass, boolean verbose, boolean useIdentifier, String custodianPublicAddress, CurrencyPair pair, String exchangeName) {
+    public NuRPCClient(String ip, int port, String rpcUser, String rpcPass, boolean useIdentifier, String custodianPublicAddress, CurrencyPair pair, String exchangeName) {
         this.ip = ip;
         this.port = port;
         this.rpcPassword = rpcPass;
         this.rpcUsername = rpcUser;
-        this.verbose = verbose;
         this.useIdentifier = useIdentifier;
         this.custodianPublicAddress = custodianPublicAddress;
         this.pair = pair;
@@ -94,14 +93,14 @@ public class NuRPCClient {
         }
 
 
-        LOG.info("RPC parameters " + params.toString());
+        LOG.debug("RPC parameters " + params.toString());
 
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_LIQUIDITYINFO, params);
         if (json != null) {
 
             if (json.get("null") == null) {
                 //Correct answer, try to getliquidityinfo
-                LOG.info("RPC : Liquidity info submitted correctly.");
+                LOG.debug("RPC : Liquidity info submitted correctly.");
                 JSONObject jo = new JSONObject();
                 jo.put("submitted", true);
                 return jo;
@@ -180,6 +179,7 @@ public class NuRPCClient {
      return (String)json.get("result");
      }
      */
+
     public JSONObject getInfo() {
         JSONObject json = invokeRPC(UUID.randomUUID().toString(), COMMAND_GET_INFO, null);
         if (json != null) {
@@ -192,7 +192,7 @@ public class NuRPCClient {
 
     public void checkConnection() {
         boolean conn = false;
-        JSONObject responseObject = Global.rpcClient.getInfo();
+        JSONObject responseObject = this.getInfo();
         if (responseObject.get("blocks") != null) {
             conn = true;
         }
@@ -205,11 +205,14 @@ public class NuRPCClient {
             }
         }
         this.setConnected(conn);
-
     }
 
     public boolean isConnected() {
         return this.connected;
+    }
+
+    private void setConnected(boolean connected) {
+        this.connected = connected;
     }
 
     //Private methods
@@ -235,14 +238,6 @@ public class NuRPCClient {
         return rpcUsername;
     }
 
-    public boolean isVerbose() {
-        return verbose;
-    }
-
-    public void setVerbose(boolean verbose) {
-        this.verbose = verbose;
-    }
-
     public void setRpcUsername(String rpcUsername) {
         this.rpcUsername = rpcUsername;
 
@@ -255,10 +250,6 @@ public class NuRPCClient {
     public void setRpcPassword(String rpcPassword) {
         this.rpcPassword = rpcPassword;
 
-    }
-
-    private void setConnected(boolean connected) {
-        this.connected = connected;
     }
 
     private JSONObject invokeRPC(String id, String method, List params) {
@@ -277,19 +268,19 @@ public class NuRPCClient {
             httpclient.getCredentialsProvider().setCredentials(new AuthScope(this.ip, this.port),
                     new UsernamePasswordCredentials(this.rpcUsername, this.rpcPassword));
             StringEntity myEntity = new StringEntity(json.toJSONString());
-            if (this.verbose) {
+            if (Global.options.verbose) {
                 LOG.info("RPC : " + json.toString());
             }
             HttpPost httppost = new HttpPost("http://" + this.ip + ":" + this.port);
             httppost.setEntity(myEntity);
 
-            if (this.verbose) {
+            if (Global.options.verbose) {
                 LOG.info("RPC executing request :" + httppost.getRequestLine());
             }
             HttpResponse response = httpclient.execute(httppost);
             HttpEntity entity = response.getEntity();
 
-            if (this.verbose) {
+            if (Global.options.verbose) {
                 LOG.info("RPC----------------------------------------");
                 LOG.info("" + response.getStatusLine());
 
@@ -299,14 +290,17 @@ public class NuRPCClient {
             }
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
-            LOG.info("Entity = " + entityString);
+            LOG.debug("Entity = " + entityString);
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
-            LOG.error(e.toString());
+            LOG.error("Nud RPC Connection problem:" + e.toString());
+            this.connected = false;
         } catch (IOException e) {
-            LOG.error(e.toString());
+            LOG.error("Nud RPC Connection problem:" + e.toString());
+            this.connected = false;
         } catch (ParseException ex) {
-            LOG.error("" + ex);
+            LOG.error("Nud RPC Connection problem:" + ex.toString());
+            this.connected = false;
         } finally {
             // When HttpClient instance is no longer needed,
             // shut down the connection manager to ensure
@@ -316,15 +310,16 @@ public class NuRPCClient {
         return responseJsonObj;
     }
 
-    private String generateIdentifier(int tier) {
+    public String generateIdentifier(int tier) {
         //tier:pair:exchange:sessionid
-        //Example : 2_BTCNBT_ccedk_0.1.5|1424193501841|788606
+        //Example : 2:BTCNBT:ccedk:0.1.5|1424193501841|d5ef77
 
         String separator = ":";
-
-        return tier + separator
+        String identifier = tier + separator
                 + pair.toString().toUpperCase() + separator
                 + exchangeName + separator
                 + Global.sessionId;
+        LOG.debug("liquidity identifier = " + identifier);
+        return identifier;
     }
 }

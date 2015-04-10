@@ -18,48 +18,47 @@
 
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
+import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.*;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
-
 /**
- * Created by sammoth on 30/11/14.
+ * Created by woolly_sammoth on 30/11/14.
  */
 public class ExcoinWrapper implements TradeInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(ExcoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected ExcoinService service;
     private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA256";
     private final String ENCODING = "UTF-8";
@@ -83,13 +82,11 @@ public class ExcoinWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    public ExcoinWrapper() {
-        setupErrors();
-    }
-
     public ExcoinWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new ExcoinService(keys);
+
         setupErrors();
     }
 
@@ -101,7 +98,7 @@ public class ExcoinWrapper implements TradeInterface {
         ApiResponse apiResponse = new ApiResponse();
         HashMap<String, String> query_args = new HashMap<>();
         boolean isGet = true;
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args, true, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -638,11 +635,10 @@ public class ExcoinWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        ExcoinService query = new ExcoinService(url, keys);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to Excoin");
             queryResult = TOKEN_BAD_RETURN;
@@ -650,20 +646,6 @@ public class ExcoinWrapper implements TradeInterface {
         return queryResult;
     }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -686,11 +668,9 @@ public class ExcoinWrapper implements TradeInterface {
 
     private class ExcoinService implements ServiceInterface {
 
-        protected String url;
         protected ApiKeys keys;
 
-        public ExcoinService(String url, ApiKeys keys) {
-            this.url = url + "?expire=" + getExpireTimeStamp();
+        public ExcoinService(ApiKeys keys) {
             this.keys = keys;
         }
 
@@ -700,8 +680,9 @@ public class ExcoinWrapper implements TradeInterface {
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             HttpsURLConnection connection = null;
+            String url = base + method + "?expire=" + getExpireTimeStamp();
             boolean httpError = false;
             String output;
             int response = 200;

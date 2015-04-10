@@ -21,17 +21,16 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.launch.MainLaunch;
-import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.options.*;
+import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
-import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
+import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * a NuBot implementing dual strategy
@@ -83,7 +82,7 @@ public class NuBotSecondary extends NuBotBase {
             pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeedNames(), toTrackCurrencyPair);
         } catch (NuBotConfigException e) {
             throw new NuBotConfigException("can't configure price feeds");
-        } catch(Exception e){
+        } catch (Exception e) {
             LOG.error("" + Global.options);
             throw new NuBotConfigException("something wrong with options");
         }
@@ -128,7 +127,7 @@ public class NuBotSecondary extends NuBotBase {
             LOG.info("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
         } else {
 
-            LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
+            LOG.info("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
         }
         //then start the thread
         Global.taskManager.getPriceTriggerTask().start(delaySeconds);

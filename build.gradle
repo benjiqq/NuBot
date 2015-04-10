@@ -24,7 +24,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = '0.20-rc1' //will be used for logging
+version = '0.2.0' //Change for new releases
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
@@ -264,6 +264,8 @@ task NuBotDist(dependsOn: NuBotJar) {
             from "${resdir}/ssl/updateKeystore.sh"
             into "${distdir}/res/ssl"
         }
+
+        tasks.cleanhtml.execute()
 
     }
 

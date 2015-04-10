@@ -119,6 +119,8 @@ public class NuPriceMonitorTask extends TimerTask {
             }
 
         }
+
+        Utils.logActiveThreads();
     }
 
     private boolean sanityCheck(ArrayList<LastPrice> priceList, int mainPriceIndex) {

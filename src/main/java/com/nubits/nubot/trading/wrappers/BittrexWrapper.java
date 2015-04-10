@@ -1,8 +1,27 @@
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
@@ -23,10 +42,7 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Objects;
-import java.util.TreeMap;
+import java.util.*;
 
 /**
  * Created by woolly_sammoth on 05/03/15.
@@ -36,6 +52,8 @@ public class BittrexWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(BittrexWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected BittrexService service;
+
     private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
     private final String ENCODING = "UTF-8";
@@ -65,9 +83,9 @@ public class BittrexWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -81,7 +99,7 @@ public class BittrexWrapper implements TradeInterface {
 
         try {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
-            if ((boolean) httpAnswerJson.get("success") == false) {
+            if (!(boolean) httpAnswerJson.get("success")) {
                 ApiError error = errors.apiReturnError;
                 error.setDescription(httpAnswerJson.get("message").toString());
                 apiResponse.setError(error);
@@ -112,8 +130,9 @@ public class BittrexWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         String method = API_BALANCES;
         boolean isGet = true;
+        boolean needAuth = true;
 
-        ApiResponse response = getQuery(url, method, args, isGet);
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.get("result") == null) {
@@ -144,6 +163,7 @@ public class BittrexWrapper implements TradeInterface {
             apiResponse = response;
         }
         return apiResponse;
+
     }
 
     @Override
@@ -154,8 +174,9 @@ public class BittrexWrapper implements TradeInterface {
         String method = API_BALANCE;
         args.put("currency", currency.getCode().toUpperCase());
         boolean isGet = true;
+        boolean needAuth = true;
 
-        ApiResponse response = getQuery(url, method, args, isGet);
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.get("result") == null) {
@@ -180,8 +201,10 @@ public class BittrexWrapper implements TradeInterface {
         String method = API_TICKER;
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = true;
+        boolean needAuth = true;
+
         args.put("market", pair.toStringSepInverse("-").toUpperCase());
-        ApiResponse response = getQuery(url, method, args, isGet);
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
 
         if (response.isPositive()) {
 
@@ -275,34 +298,12 @@ public class BittrexWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         if (!exchange.getLiveData().isConnected()) {
-            LOG.error("The bot will not execute the query, there is no connection to Bittrex");
+            LOG.error("The bot will not execute the query, there is no connection to " + exchange.getName());
             return TOKEN_BAD_RETURN;
         }
-        String queryResult;
-        BittrexService query = new BittrexService(base, method, args, keys);
-        if (isGet) {
-            queryResult = query.executeQuery(true, isGet);
-        } else {
-            queryResult = query.executeQuery(true, isGet);
-        }
-        return queryResult;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
+        return service.executeQuery(base, method, args, needAuth, isGet);
     }
 
     @Override
@@ -322,27 +323,18 @@ public class BittrexWrapper implements TradeInterface {
 
     class BittrexService implements ServiceInterface {
 
-        protected String url;
-        protected String method;
-        protected HashMap args;
         protected ApiKeys keys;
 
-        public BittrexService(String url, String method, HashMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.method = method;
-            this.args = args;
+        public BittrexService(ApiKeys keys) {
             this.keys = keys;
         }
 
-        private BittrexService(String url, String method, HashMap<String, String> args) {
+        private BittrexService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.method = method;
-            this.args = args;
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             HttpsURLConnection connection = null;
             boolean httpError = false;
             String output;
@@ -358,7 +350,7 @@ public class BittrexWrapper implements TradeInterface {
 
             try {
                 post_data = TradeUtils.buildQueryString(args, ENCODING);
-                queryUrl = new URL(url + "/" + method + "?" + post_data);
+                queryUrl = new URL(base + "/" + method + "?" + post_data);
             } catch (MalformedURLException mal) {
                 LOG.error(mal.toString());
             }
@@ -424,24 +416,13 @@ public class BittrexWrapper implements TradeInterface {
                 return null;
             }
 
-            /*
-             if (httpError) {
-             JSONParser parser = new JSONParser();
-             try {
-             JSONObject obj = (JSONObject) (parser.parse(answer));
-             answer = (String) obj.get(TOKEN_ERR);
-             } catch (ParseException pe) {
-             LOG.error(pe.toStringSep());
-             return null;
-             }
-             }
-             */
-
             connection.disconnect();
             connection = null;
 
             return answer;
+
         }
+
 
         @Override
         public String signRequest(String secret, String hash_data) {
@@ -466,5 +447,4 @@ public class BittrexWrapper implements TradeInterface {
             return sign;
         }
     }
-
 }

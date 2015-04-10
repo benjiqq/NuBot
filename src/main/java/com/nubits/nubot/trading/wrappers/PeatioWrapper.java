@@ -19,36 +19,32 @@
 package com.nubits.nubot.trading.wrappers;
 
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
-import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.HttpUtils;
-
-import java.math.BigInteger;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class PeatioWrapper implements TradeInterface {
@@ -56,6 +52,7 @@ public class PeatioWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(PeatioWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected PeatioService service;
     private Exchange exchange;
     private final int SPACING_BETWEEN_CALLS = 1100;
     private final int TIME_OUT = 15000;
@@ -80,15 +77,12 @@ public class PeatioWrapper implements TradeInterface {
     boolean isFirstNonce = true;
     long timeDiffMs = 0;
 
-    public PeatioWrapper() {
-        setupErrors();
-    }
-
     public PeatioWrapper(ApiKeys keys, Exchange exchange, String api_base) {
         this.keys = keys;
         this.exchange = exchange;
         this.apiBaseUrl = api_base;
         this.checkConnectionUrl = api_base;
+        service = new PeatioService(keys);
         setupErrors();
 
     }
@@ -122,12 +116,12 @@ public class PeatioWrapper implements TradeInterface {
         return "api/v2/tickers/" + pair.toString();
     }
 
-    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean needAuth, boolean isGet) {
 
         //LOG.warn("\nurl: " + url + "\nmethod: " + method + "\nquery_args: " + query_args.toStringSep() + "\nisGet: " + isGet);
 
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         //LOG.warn("\n\n" + queryResult + "\n\n");
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
@@ -197,7 +191,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_verb", "GET");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             Amount NBTonOrder = null,
                     NBTAvail = null,
@@ -332,7 +326,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("id")) {
@@ -371,7 +365,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("market", pair.toString());
         query_args.put("limit", "999"); //default is 10 , max is 1000
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (Object anOrdersResponse : httpAnswerJson) {
@@ -404,7 +398,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_uri", "/api/v2/order");
         query_args.put("id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("error")) {
@@ -439,7 +433,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.containsKey("error")) {
@@ -518,17 +512,10 @@ public class PeatioWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        PeatioService query = new PeatioService(base, method, args, keys);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
-
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to Peatio");
             queryResult = TOKEN_BAD_RETURN;
@@ -575,16 +562,6 @@ public class PeatioWrapper implements TradeInterface {
 
     }
 
-    @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
     private Date parseDate(String dateStr) {
         Date toRet = null;
         //Parse the date
@@ -615,7 +592,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("canonical_verb", "POST");
         query_args.put("canonical_uri", method);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -708,7 +685,7 @@ public class PeatioWrapper implements TradeInterface {
         query_args.put("market", pair.toString());
         query_args.put("limit", "1000");
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             LOG.info("A maximum of 1000 trades can be returned from the Peatio API");
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
@@ -794,30 +771,18 @@ public class PeatioWrapper implements TradeInterface {
 
     private class PeatioService implements ServiceInterface {
 
-        protected String base;
-        protected String method;
-        protected TreeMap args;
         protected ApiKeys keys;
-        protected String url;
 
-        public PeatioService(String base, String method, TreeMap<String, String> args, ApiKeys keys) {
-            this.base = base;
-            this.method = method;
-            this.args = args;
+        public PeatioService(ApiKeys keys) {
             this.keys = keys;
-
         }
 
-        private PeatioService(String url, TreeMap<String, String> args) {
+        private PeatioService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
-            this.method = "";
-
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
 
             args.put("access_key", keys.getApiKey());
 
@@ -833,8 +798,8 @@ public class PeatioWrapper implements TradeInterface {
             Document doc;
             String response = null;
             try {
-                String url = apiBaseUrl + canonical_uri;
-                LOG.debug(canonical_verb.toUpperCase()+ " - Calling " + url + " with params:" + args);
+                String url = base + canonical_uri;
+                LOG.debug(canonical_verb.toUpperCase() + " - Calling " + url + " with params:" + args);
 
                 Connection connection = HttpUtils.getConnectionForPost(url, args).timeout(TIME_OUT);
 
@@ -860,7 +825,7 @@ public class PeatioWrapper implements TradeInterface {
             throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters");
         }
 
-        private String getSign(TreeMap<String, String> parameters) {
+        private String getSign(AbstractMap<String, String> parameters) {
             if (parameters.containsKey("signature")) {
                 parameters.remove("signature");
             }

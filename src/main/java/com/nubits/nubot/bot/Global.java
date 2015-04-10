@@ -78,20 +78,10 @@ public class Global {
 
                 Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
                 Global.sessionStopped = System.currentTimeMillis();
-                sessionLOG.info("session end;" + Global.sessionStopped);
+                sessionLOG.info("Session terminated. Timestamp " + Global.sessionStopped);
 
-                LOG.info("Exit. ");
-
+                //Interrupt mainThread
                 Global.mainThread.interrupt();
-                if (Global.taskManager != null) {
-                    if (Global.taskManager.isInitialized()) {
-                        try {
-                            Global.taskManager.stopAll();
-                        } catch (IllegalStateException e) {
-
-                        }
-                    }
-                }
 
                 //TODO! this shuts down UI as well
                 Thread.currentThread().interrupt();

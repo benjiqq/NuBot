@@ -41,10 +41,8 @@ import java.util.*;
  */
 public class ParseOptions {
 
-    private static String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
-
     private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
-
+    private static String[] comp = {"exchangename", "apisecret", "mailrecipient", "dualside", "pair"};
 
     /**
      * parse single JSON file to NuBoptions
@@ -189,13 +187,6 @@ public class ParseOptions {
             throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
         }
 
-
-        boolean aggregate = true; //true only for USD
-        if (!options.pair.getPaymentCurrency().getCode().equalsIgnoreCase("USD")) {
-            options.aggregate = false; //default to false
-        }
-
-
         //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
         //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
         //org.json.JSONObject pegOptionsJSON;
@@ -316,7 +307,7 @@ public class ParseOptions {
             if (tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
                     || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
                     || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
-                options.sendMails = tmpsendMails.toUpperCase(); //Convert to upper case
+                options.mailnotifications = tmpsendMails.toUpperCase(); //Convert to upper case
             } else {
                 String error = "Value not accepted for \"mail-notifications\" : " + tmpsendMails + " . Admitted values  : "
                         + MailNotifications.MAIL_LEVEL_ALL + " , "
@@ -340,7 +331,7 @@ public class ParseOptions {
         if (!containsIgnoreCase(optionsJSON, "backupfeeds"))
             throw new NuBotConfigException("backupfeed necessary parameter");
 
-        ArrayList<String> backupFeedNames = new ArrayList<>();
+        options.backupFeedNames = new ArrayList<>();
 
         //Iterate on backupFeeds
 
@@ -443,8 +434,8 @@ public class ParseOptions {
             newopt.nudIp = "" + getIgnoreCase(postJson, "nudIp");
         }
 
-        if (containsIgnoreCase(postJson, "sendMails")) {
-            newopt.sendMails = "" + getIgnoreCase(postJson, "sendMails");
+        if (containsIgnoreCase(postJson, "mailnotifications")) {
+            newopt.mailnotifications = "" + getIgnoreCase(postJson, "sendMails");
         }
 
 

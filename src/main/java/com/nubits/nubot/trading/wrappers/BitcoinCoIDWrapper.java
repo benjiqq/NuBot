@@ -24,12 +24,8 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -58,6 +54,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(BitcoinCoIDWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected BitcoinCoIDService service;
     private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
     private final String ENCODING = "UTF-8";
@@ -76,13 +73,10 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_CODE = "success";
 
-    public BitcoinCoIDWrapper() {
-        setupErrors();
-    }
-
     public BitcoinCoIDWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new BitcoinCoIDService(keys);
         setupErrors();
     }
 
@@ -90,9 +84,9 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -155,7 +149,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         String method = API_GET_INFO;
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -168,7 +162,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 double pegOnOrder = 0;
                 double nbtOnOrder = 0;
                 ArrayList<Order> orders = (ArrayList) getActiveOrders(pair).getResponseObject();
-                for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+                for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                     Order thisOrder = order.next();
                     if (thisOrder.getType().equals(Constant.SELL)) {
                         nbtOnOrder += thisOrder.getAmount().getQuantity();
@@ -203,7 +197,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         double bid = -1;
         Ticker ticker = new Ticker();
 
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args, false, isGet);
         JSONParser parser = new JSONParser();
         JSONObject httpAnswerJson = null;
         try {
@@ -256,7 +250,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             args.put(pair.getPaymentCurrency().getCode().toLowerCase(), nf.format(amount * price));
         }
 
-        ApiResponse response = getQuery(url, method, args, isGet);
+        ApiResponse response = getQuery(url, method, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -296,13 +290,13 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             query_args.put("pair", pair.toStringSep());
         }
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
             JSONArray orders = (JSONArray) data.get("orders");
             if (orders != null) {
-                for (Iterator<JSONObject> order = orders.iterator(); order.hasNext();) {
+                for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
                     JSONObject thisOrder = order.next();
                     orderList.add(parseOrder(thisOrder, pair));
                 }
@@ -343,13 +337,13 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     @Override
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
-        
+
         ApiResponse getActiveOrders = getActiveOrders();
-        
+
         if (getActiveOrders.isPositive()) {
             ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
             boolean found = false;
-            for (Iterator<Order> order = activeOrders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = activeOrders.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     found = true;
@@ -366,7 +360,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         } else {
             apiResponse = getActiveOrders;
         }
-        
+
         return apiResponse;
     }
 
@@ -383,7 +377,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
         query_args.put("type", currentOrder.getType().toLowerCase());
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
@@ -434,12 +428,12 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             query_args.put("since", Objects.toString(startTime));
         }
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject data = (JSONObject) httpAnswerJson.get("return");
             JSONArray trades = (JSONArray) data.get("trades");
-            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext(); ) {
                 JSONObject thisTrade = trade.next();
                 tradeList.add(parseTrade(thisTrade, pair));
             }
@@ -496,7 +490,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         if (getOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
-            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                 if (!(boolean) cancelOrder(order.next().getId(), pair).getResponseObject()) {
                     apiResponse.setResponseObject(false);
                 }
@@ -519,39 +513,15 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        BitcoinCoIdService query = new BitcoinCoIdService(url, args);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(false, isGet);
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        BitcoinCoIdService query = new BitcoinCoIdService(base, method, args, keys);
-        String queryResult;
-        if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
-        } else {
-            LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
-            queryResult = TOKEN_BAD_RETURN;
-        }
-        return queryResult;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
     }
 
     @Override
@@ -574,29 +544,18 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         throw new UnsupportedOperationException("BitcoinCoIDWrapper.getOrderBook() not implemented yet.");
     }
 
-    private class BitcoinCoIdService implements ServiceInterface {
+    private class BitcoinCoIDService implements ServiceInterface {
 
-        protected String url;
-        protected HashMap args;
         protected ApiKeys keys;
-        protected String method;
 
-        public BitcoinCoIdService(String url, String method, HashMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.args = args;
+        public BitcoinCoIDService(ApiKeys keys) {
             this.keys = keys;
-            this.method = method;
-        }
-
-        private BitcoinCoIdService(String url, HashMap<String, String> args) {
-            //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             HttpsURLConnection connection = null;
+            String url = base;
             URL queryUrl = null;
             String post_data = "";
             boolean httpError = false;

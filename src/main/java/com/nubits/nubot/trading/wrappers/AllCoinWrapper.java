@@ -23,24 +23,29 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
-import java.io.*;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
-import java.text.*;
-import java.util.*;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import javax.net.ssl.HttpsURLConnection;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.*;
 
 /**
  * Created by woolly_sammoth on 21/10/14.
@@ -50,11 +55,13 @@ public class AllCoinWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(AllCoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected AllCoinService service;
     private Exchange exchange;
     private final int TIME_OUT = 15000;
     private String checkConnectionUrl = "https://www.allcoin.com/";
     private final String SIGN_HASH_FUNCTION = "MD5";
     private final String ENCODING = "UTF-8";
+
     //Entry Points
     private final String API_BASE_URL = "https://www.allcoin.com/api2/";
     private final String API_AUTH_URL = "https://www.allcoin.com/api2/auth_api/";
@@ -72,16 +79,17 @@ public class AllCoinWrapper implements TradeInterface {
     private final String TOKEN_BAL_AVAIL = "balances_available";
     private final String TOKEN_BAL_HOLD = "balance_hold";
     private final String TOKEN_ORDER_ID = "order_id";
+
+    //Pool queue
+    protected long lastRequest = 0;
+    protected final long MIN_SPACING = 500;
     //Errors
     ErrorManager errors = new ErrorManager();
-
-    public AllCoinWrapper() {
-        setupErrors();
-    }
 
     public AllCoinWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new AllCoinService(keys);
         setupErrors();
     }
 
@@ -89,20 +97,29 @@ public class AllCoinWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, TreeMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args, isGet);
-        if (queryResult == null) {
+
+        String queryResult = query(url, method, query_args, needAuth, isGet);
+        if (queryResult == null)
+
+        {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
         }
-        if (queryResult.equals(TOKEN_BAD_RETURN)) {
+
+        if (queryResult.equals(TOKEN_BAD_RETURN))
+
+        {
             apiResponse.setError(errors.noConnectionError);
             return apiResponse;
         }
+
         JSONParser parser = new JSONParser();
 
-        try {
+        try
+
+        {
             JSONObject httpAnswerJson = (JSONObject) (parser.parse(queryResult));
             int code = 0;
             try {
@@ -129,11 +146,16 @@ public class AllCoinWrapper implements TradeInterface {
                 LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
-        } catch (ParseException pe) {
+        } catch (
+                ParseException pe
+                )
+
+        {
             LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
+
         return apiResponse;
     }
 
@@ -172,7 +194,7 @@ public class AllCoinWrapper implements TradeInterface {
             method = API_SELL_COIN;
         }
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true,isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
@@ -211,7 +233,7 @@ public class AllCoinWrapper implements TradeInterface {
         String url = API_AUTH_URL;
         String method = API_GET_INFO;
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
@@ -288,32 +310,32 @@ public class AllCoinWrapper implements TradeInterface {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    public String query(String url, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
+        long now = System.currentTimeMillis();
+        long sleeptime = 0;
+        if (now - lastRequest < MIN_SPACING) {
+            sleeptime = MIN_SPACING - (now - lastRequest);
+        }
+        lastRequest = System.currentTimeMillis();
 
-    @Override
-    public String query(String url, String method, TreeMap<String, String> args, boolean isGet) {
-        AllCoinService query = new AllCoinService(url, method, args, keys);
-        String queryResult;
+        Future<String> queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            queryResult = service.executeQueryAsync(url, method, args, true, isGet, sleeptime);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to AllCoin");
-            queryResult = TOKEN_BAD_RETURN;
+            return TOKEN_BAD_RETURN;
         }
-        return queryResult;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        try {
+            return queryResult.get();
+        } catch (InterruptedException e) {
+            LOG.error(e.toString());
+            return TOKEN_BAD_RETURN;
+        } catch (ExecutionException e) {
+            LOG.error(e.toString());
+            return TOKEN_BAD_RETURN;
+        }
     }
 
     @Override
@@ -349,7 +371,7 @@ public class AllCoinWrapper implements TradeInterface {
         String url = API_AUTH_URL;
         String method = API_OPEN_ORDERS;
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
@@ -357,7 +379,7 @@ public class AllCoinWrapper implements TradeInterface {
                 ApiError apiError = errors.nullReturnError;
                 apiResponse.setError(apiError);
             } else {
-                for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext();) {
+                for (Iterator<JSONObject> data = dataJson.iterator(); data.hasNext(); ) {
                     Order order = parseOrder(data.next());
                     if (pair != null && !order.getPair().equals(pair)) {
                         LOG.info("|" + order.getPair().toString() + "| = |" + pair.toString() + "|");
@@ -437,7 +459,7 @@ public class AllCoinWrapper implements TradeInterface {
         ApiResponse activeOrders = getActiveOrders();
         if (activeOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) activeOrders.getResponseObject();
-            for (Iterator<Order> order = orders.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
@@ -466,7 +488,7 @@ public class AllCoinWrapper implements TradeInterface {
         String method = API_CANCEL_ORDERS;
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson;
@@ -509,7 +531,7 @@ public class AllCoinWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        LOG.warn("AllCoin uses global TX fee, currency pair not supported. \n"
+        LOG.debug("AllCoin uses global TX fee, currency pair not supported. \n"
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -534,13 +556,13 @@ public class AllCoinWrapper implements TradeInterface {
         query_args.put("page", "1");
         query_args.put("page_size", "20");
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
             if (trades != null) {
                 //LOG.info(trades.toJSONString());
-                for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext();) {
+                for (Iterator<JSONObject> trade = trades.iterator(); trade.hasNext(); ) {
                     Trade thisTrade = parseTrade(trade.next());
                     if (!thisTrade.getPair().equals(pair)) {
                         continue;
@@ -623,7 +645,7 @@ public class AllCoinWrapper implements TradeInterface {
 
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(id)) {
                     apiResponse.setResponseObject(true);
@@ -685,136 +707,139 @@ public class AllCoinWrapper implements TradeInterface {
 
     private class AllCoinService implements ServiceInterface {
 
-        protected String url;
-        protected TreeMap args;
         protected ApiKeys keys;
-        protected String method;
 
-        public AllCoinService(String url, String method, TreeMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.args = args;
+
+        private final ExecutorService pool = Executors.newFixedThreadPool(5);
+
+        public AllCoinService(ApiKeys keys) {
             this.keys = keys;
-            this.method = method;
         }
 
-        private AllCoinService(String url, TreeMap<String, String> args) {
+        private AllCoinService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
+        }
+
+        public Future<String> executeQueryAsync(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet, final long sleeptime) {
+            String url=base+method;
+            LOG.debug("sleeptime = " + sleeptime);
+
+            final long finalSleeptime = sleeptime;
+            return pool.submit(new Callable<String>() {
+                @Override
+                public String call() throws Exception {
+                    Thread.sleep(sleeptime);
+
+                    HttpsURLConnection connection = null;
+                    URL queryUrl = null;
+                    String post_data = "";
+                    boolean httpError = false;
+                    String output;
+                    int response = 200;
+                    String answer = null;
+
+                    try {
+                        queryUrl = new URL(url);
+                    } catch (MalformedURLException mal) {
+                        LOG.error(mal.toString());
+                        return null;
+                    }
+
+                    if (needAuth) {
+                        //add the access key, secret key, timestamp, method and sign to the args
+                        args.put("access_key", keys.getApiKey());
+                        args.put("secret_key", keys.getPrivateKey());
+                        args.put("created", Objects.toString(System.currentTimeMillis() / 1000L));
+                        args.put("method", method);
+                        //the sign is the MD5 hash of all arguments so far in alphabetical order
+                        args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
+
+                        post_data = TradeUtils.buildQueryString(args, ENCODING);
+                    } else {
+                        post_data = TradeUtils.buildQueryString(args, ENCODING);
+                        try {
+                            queryUrl = new URL(queryUrl + "?" + post_data);
+                        } catch (MalformedURLException mal) {
+                            LOG.error(mal.toString());
+                            return null;
+                        }
+                    }
+
+                    try {
+                        connection = (HttpsURLConnection) queryUrl.openConnection();
+                        connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
+                        connection.setRequestProperty("User-Agent", Settings.APP_NAME);
+
+                        connection.setDoOutput(true);
+                        connection.setDoInput(true);
+
+                        if (isGet) {
+                            connection.setRequestMethod("GET");
+                        } else {
+                            connection.setRequestMethod("POST");
+                            DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+                            os.writeBytes(post_data);
+                            os.flush();
+                            os.close();
+                        }
+                    } catch (ProtocolException pe) {
+                        LOG.error(pe.toString());
+                        return null;
+                    } catch (IOException io) {
+                        LOG.error((io.toString()));
+                        return null;
+                    }
+
+
+                    BufferedReader br = null;
+                    try {
+                        if (connection.getResponseCode() >= 400) {
+                            httpError = true;
+                            response = connection.getResponseCode();
+                            br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
+                        } else {
+                            answer = "";
+                            br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                        }
+                    } catch (IOException io) {
+                        LOG.error(io.toString());
+                        return null;
+                    }
+
+                    if (httpError) {
+                        LOG.error("Query to : " + url + " (method = " + method + " )"
+                                + "\nData : \" + post_data"
+                                + "\nHTTP Response : " + Objects.toString(response));
+                    }
+
+                    try {
+                        while ((output = br.readLine()) != null) {
+                            answer += output;
+                        }
+                    } catch (IOException io) {
+                        LOG.error(io.toString());
+                        return null;
+                    }
+
+                    connection.disconnect();
+                    connection = null;
+
+                    return answer;
+                }
+            });
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
-
-            HttpsURLConnection connection = null;
-            URL queryUrl = null;
-            String post_data = "";
-            boolean httpError = false;
-            String output;
-            int response = 200;
-            String answer = null;
-
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
+            String toRet = "";
             try {
-                queryUrl = new URL(url);
-            } catch (MalformedURLException mal) {
-                LOG.error(mal.toString());
-                return null;
+                toRet = executeQueryAsync(base, method, args, needAuth, isGet, 0).get(); //call sync
+            } catch (InterruptedException e) {
+                LOG.error(e.toString());
+            } catch (ExecutionException e) {
+                LOG.error(e.toString());
             }
-
-            if (needAuth) {
-                //add the access key, secret key, timestamp, method and sign to the args
-                args.put("access_key", keys.getApiKey());
-                args.put("secret_key", keys.getPrivateKey());
-                args.put("created", Objects.toString(System.currentTimeMillis() / 1000L));
-                args.put("method", method);
-                //the sign is the MD5 hash of all arguments so far in alphabetical order
-                args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
-
-                post_data = TradeUtils.buildQueryString(args, ENCODING);
-            } else {
-                post_data = TradeUtils.buildQueryString(args, ENCODING);
-                try {
-                    queryUrl = new URL(queryUrl + "?" + post_data);
-                } catch (MalformedURLException mal) {
-                    LOG.error(mal.toString());
-                    return null;
-                }
-            }
-
-            try {
-                connection = (HttpsURLConnection) queryUrl.openConnection();
-                connection.setRequestProperty("Content-type", "application/x-www-form-urlencoded");
-                connection.setRequestProperty("User-Agent", Settings.APP_NAME);
-
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
-
-                if (isGet) {
-                    connection.setRequestMethod("GET");
-                } else {
-                    connection.setRequestMethod("POST");
-                    DataOutputStream os = new DataOutputStream(connection.getOutputStream());
-                    os.writeBytes(post_data);
-                    os.flush();
-                    os.close();
-                }
-            } catch (ProtocolException pe) {
-                LOG.error(pe.toString());
-                return null;
-            } catch (IOException io) {
-                LOG.error((io.toString()));
-                return null;
-            }
-
-
-            BufferedReader br = null;
-            try {
-                if (connection.getResponseCode() >= 400) {
-                    httpError = true;
-                    response = connection.getResponseCode();
-                    br = new BufferedReader(new InputStreamReader(connection.getErrorStream()));
-                } else {
-                    answer = "";
-                    br = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                }
-            } catch (IOException io) {
-                LOG.error(io.toString());
-                return null;
-            }
-
-            if (httpError) {
-                LOG.error("Query to : " + url + " (method = " + method + " )"
-                        + "\nData : \" + post_data"
-                        + "\nHTTP Response : " + Objects.toString(response));
-            }
-
-            try {
-                while ((output = br.readLine()) != null) {
-                    answer += output;
-                }
-            } catch (IOException io) {
-                LOG.error(io.toString());
-                return null;
-            }
-
-            /*
-
-             if (httpError) {
-             JSONParser parser = new JSONParser();
-             try {
-             JSONObject obj = (JSONObject) (parser.parse(answer));
-             answer = (String) obj.get(TOKEN_ERR);
-             } catch (ParseException pe) {
-             LOG.error(pe.toStringSep());
-             }
-             }
-             */
-
-
-            connection.disconnect();
-            connection = null;
-
-            return answer;
+            return toRet;
         }
 
         @Override

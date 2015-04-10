@@ -19,31 +19,31 @@
 package com.nubits.nubot.trading.wrappers;
 
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.PairBalance;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
-import com.nubits.nubot.models.Trade;
+import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.trading.ServiceInterface;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.ErrorManager;
 import com.nubits.nubot.utils.Utils;
+import org.apache.commons.codec.binary.Hex;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.HttpsURLConnection;
+import java.io.*;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
@@ -51,30 +51,13 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeMap;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.HttpsURLConnection;
-
-import org.apache.commons.codec.binary.Hex;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import java.util.*;
 
 public class PoloniexWrapper implements TradeInterface {
 
     private static final Logger LOG = LoggerFactory.getLogger(PoloniexWrapper.class.getName());
     private ApiKeys keys;
+    protected PoloniexService service;
     private Exchange exchange;
     private String checkConnectionUrl = "http://poloniex.com/";
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
@@ -95,6 +78,7 @@ public class PoloniexWrapper implements TradeInterface {
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new PoloniexService(keys);
         setupErrors();
     }
 
@@ -102,9 +86,9 @@ public class PoloniexWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, method, query_args, false);
+        String queryResult = query(url, method, query_args, needAuth, false);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -166,7 +150,7 @@ public class PoloniexWrapper implements TradeInterface {
 
         LOG.trace("get from " + url);
         LOG.trace("method " + method);
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
 
         LOG.trace("response " + response);
         if (!response.isPositive()) {
@@ -268,7 +252,7 @@ public class PoloniexWrapper implements TradeInterface {
         query_args.put("amount", Double.toString(amount));
         query_args.put("rate", Double.toString(rate));
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             String order_id = (String) httpAnswerJson.get("orderNumber");
@@ -306,7 +290,7 @@ public class PoloniexWrapper implements TradeInterface {
 
         query_args.put("currencyPair", pairString);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             if (pairString.equals("all")) {
                 JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
@@ -379,7 +363,7 @@ public class PoloniexWrapper implements TradeInterface {
         query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("orderNumber", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -476,32 +460,17 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        PoloniexService query = new PoloniexService(base, method, keys, args);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
-        //if (exchange.getLiveData().isConnected()) {
-        queryResult = query.executeQuery(true, isGet);
-        /*} else {
-            LOG.error("The bot will not execute the query, there is no connection to Poloniex");
+        if (exchange.getLiveData().isConnected()) {
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+        } else {
+            LOG.error("The bot will not execute the query, there is no connection to ccdek");
             queryResult = TOKEN_BAD_RETURN;
-        }*/
+        }
         return queryResult;
     }
 
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -549,7 +518,7 @@ public class PoloniexWrapper implements TradeInterface {
         query_args.put("currencyPair", pair.toStringSep().toUpperCase());
         query_args.put("start", startDateArg);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             for (int i = 0; i < httpAnswerJson.size(); i++) {
@@ -623,31 +592,22 @@ public class PoloniexWrapper implements TradeInterface {
 
     private class PoloniexService implements ServiceInterface {
 
-        protected String base;
-        protected String method;
-        protected HashMap args;
         protected ApiKeys keys;
-        protected String url;
 
-        private PoloniexService(String base, String method, ApiKeys keys, HashMap<String, String> args) {
-            this.base = base;
-            this.method = method;
-            this.args = args;
+        private PoloniexService(ApiKeys keys) {
             this.keys = keys;
         }
 
-        private PoloniexService(String url, HashMap<String, String> args) {
+        private PoloniexService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
-            this.method = "";
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String answer = "";
             String signature = "";
             String post_data = "";
+            String url = base + method;
             boolean httpError = false;
             HttpsURLConnection connection = null;
             URL queryUrl = null;

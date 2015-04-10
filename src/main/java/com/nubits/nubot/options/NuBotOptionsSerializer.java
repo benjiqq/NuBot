@@ -19,13 +19,12 @@
 package com.nubits.nubot.options;
 
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import com.nubits.nubot.models.CurrencyPair;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 
 
 public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
@@ -37,32 +36,32 @@ public class NuBotOptionsSerializer implements JsonSerializer<NuBotOptions> {
         root.addProperty("exchangename", opt.exchangeName);
         root.addProperty("apikey", opt.apiKey);
         root.addProperty("apisecret", opt.apiSecret);
+        root.addProperty("txfee", opt.txFee);
+        root.addProperty("pair", opt.pair.toStringSep());
         root.addProperty("dualside", opt.dualSide);
-        root.addProperty("submitliquidity", opt.submitLiquidity);
         root.addProperty("multiplecustodians", opt.multipleCustodians);
         root.addProperty("executeorders", opt.executeOrders);
         root.addProperty("verbose", opt.verbose);
         root.addProperty("hipchat", opt.sendHipchat);
-
-        root.addProperty("mailnotifications", opt.sendMails);
+        root.addProperty("mailnotifications", opt.mailnotifications);
         root.addProperty("mailrecipient", opt.mailRecipient);
         root.addProperty("emergencytimeout", opt.emergencyTimeout);
         root.addProperty("keepproceeds", opt.keepProceeds);
         root.addProperty("maxsellordervolume", opt.maxSellVolume);
         root.addProperty("maxbuyordervolume", opt.maxBuyVolume);
         root.addProperty("priceincrement", opt.priceIncrement);
+        root.addProperty("submitliquidity", opt.submitLiquidity);
         root.addProperty("nubitaddress", opt.nubitAddress);
+        root.addProperty("nudip", opt.nudIp);
         root.addProperty("nudport", opt.nudPort);
-        root.addProperty("nudIp", opt.nudIp);
         root.addProperty("rpcpass", opt.rpcPass);
         root.addProperty("rpcuser", opt.rpcUser);
-        root.addProperty("mainFeed", opt.mainFeed);
-        root.addProperty("wallchangeThreshold", opt.wallchangeThreshold);
-        root.addProperty("mailnotifications", opt.sendMails);
-        root.addProperty("txFee", opt.txFee);
-        root.addProperty("emergencyTimeout", opt.emergencyTimeout);
+        root.addProperty("wallchangethreshold", opt.wallchangeThreshold);
+        root.addProperty("spread", opt.spread);
+        root.addProperty("mainfeed", opt.mainFeed);
 
-        root.addProperty("pair", opt.pair.toStringSep());
+        String bfs = new Gson().toJson(opt.backupFeedNames,new TypeToken<ArrayList<String>>(){}.getType());
+        root.addProperty("backupfeeds", bfs);
 
         return root;
     }

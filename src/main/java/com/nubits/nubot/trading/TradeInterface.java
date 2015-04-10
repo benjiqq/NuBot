@@ -19,14 +19,10 @@
 package com.nubits.nubot.trading;
 
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import java.util.HashMap;
-import java.util.TreeMap;
+
+import java.util.AbstractMap;
 
 /**
  * This interface can be used to trade Please refer to readme to best practice
@@ -37,7 +33,6 @@ import java.util.TreeMap;
  * @see Order
  * @see ApiError
  * @see ServiceInterface
- *
  */
 public interface TradeInterface {
 
@@ -65,21 +60,20 @@ public interface TradeInterface {
      * pair.paymentCurrency
      *
      * @param pair pair.orderCurrency is the currency of interest and
-     * pair.paymentCurrency is unit for its price
+     *             pair.paymentCurrency is unit for its price
      * @return the last,bid,and ask price from the public ticker of the exchange
      * encapsulated into a Ticker object an ApiError in case of error.
-     *
      */
     public ApiResponse getLastPrice(CurrencyPair pair);
 
     /**
      * Place a sell order
      *
-     * @param pair pair.orderCurrency is the currency to order and
-     * pair.paymentCurrency is unit for its redeem
+     * @param pair   pair.orderCurrency is the currency to order and
+     *               pair.paymentCurrency is unit for its redeem
      * @param amount the amount of pair.OrderCurrency to sell
-     * @param rate the price rate for the order expressed in
-     * pair.paymentCurrency
+     * @param rate   the price rate for the order expressed in
+     *               pair.paymentCurrency
      * @return the String message of the response, containing the order id . an
      * ApiError in case of error.
      */
@@ -88,10 +82,10 @@ public interface TradeInterface {
     /**
      * Place a buy order
      *
-     * @param pair pair.orderCurrency is the currency to order and
-     * pair.paymentCurrency is unit for its payment
+     * @param pair   pair.orderCurrency is the currency to order and
+     *               pair.paymentCurrency is unit for its payment
      * @param amount the amount of pair.OrderCurrency to buy
-     * @param rate the price rate for the order pair.paymentCurrency
+     * @param rate   the price rate for the order pair.paymentCurrency
      * @return the String message of the response, containing the order id an
      * ApiError in case of error.
      */
@@ -110,7 +104,7 @@ public interface TradeInterface {
      * Get active orders for a specific CurrencyPair
      *
      * @param pair pair.orderCurrency is the currency on order and
-     * pair.paymentCurrency is unit for its payment/redeem
+     *             pair.paymentCurrency is unit for its payment/redeem
      * @return list of active* orders for the specified CurrencyPair (*on order
      * of partially filled) wrapped into ArrayList<Order>
      * an ApiError in case of error.
@@ -130,8 +124,8 @@ public interface TradeInterface {
      * Cancel an order
      *
      * @param orderID The id of the order (exchange specific)
-     * @param pair The currency pair of the order. Ignored by most exchanged,
-     * needed by some
+     * @param pair    The currency pair of the order. Ignored by most exchanged,
+     *                needed by some
      * @return an ApiResponse object with the a boolean object (true if
      * succesful) an ApiError in case of error.
      */
@@ -149,7 +143,7 @@ public interface TradeInterface {
      * Get the transaction fee for a specific currency
      *
      * @param pair pair.orderCurrency is the currency on order and
-     * pair.paymentCurrency is unit for its payment/redeem
+     *             pair.paymentCurrency is unit for its payment/redeem
      * @return an ApiResponse object with the response Double decimal, i.e 0.2
      * an ApiError in case of error.
      */
@@ -160,7 +154,7 @@ public interface TradeInterface {
      * depends on the exchange's default range
      *
      * @param pair pair.orderCurrency is the currency on order and
-     * pair.paymentCurrency is unit for its payment/redeem
+     *             pair.paymentCurrency is unit for its payment/redeem
      * @return an ApiResponse object with an array of Trades
      */
     public ApiResponse getLastTrades(CurrencyPair pair);
@@ -169,10 +163,10 @@ public interface TradeInterface {
      * Get the last trades associated with the account. The range of time
      * depends on the exchange's default range
      *
-     * @param pair pair.orderCurrency is the currency on order and
-     * pair.paymentCurrency is unit for its payment/redeem
-     * @param startDate a unix-timestamp (seconds) indicating the start of the
-     * period
+     * @param pair      pair.orderCurrency is the currency on order and
+     *                  pair.paymentCurrency is unit for its payment/redeem
+     * @param startTime a unix-timestamp (seconds) indicating the start of the
+     *                  period
      * @return an ApiResponse object with an array of Trades
      */
     public ApiResponse getLastTrades(CurrencyPair pair, long startTime);
@@ -199,7 +193,7 @@ public interface TradeInterface {
      * Delete all active orders. Async
      *
      * @param pair The currency pair of the order. Ignored by most exchanged,
-     * needed by some
+     *             needed by some
      * @return an ApiResponse object with the boolean response (positive,
      * submitted ok) an ApiError in case of error.
      */
@@ -221,64 +215,30 @@ public interface TradeInterface {
      */
     public String getUrlConnectionCheck();
 
-    /**
-     * Calls the HTTP query to a specific URL
-     *
-     * @param url A String with the URL of the entrypoint of the API
-     * @param args a list of parameters as arguments of the query
-     * @param isGet
-     * @return A String with the raw HTTP response
-     */
-    public String query(String url, HashMap<String, String> args, boolean isGet);
-
-    /**
-     * Calls the HTTP query to a specific URL
-     *
-     * @param base A String with the base URL of the API server
-     * @param method A String with the entry point of the API method
-     * @param args a list of parameters as arguments of the query
-     * @param isGet
-     * @return A String with the raw HTTP response
-     */
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet);
 
     /**
      * Calls the HTTP query to a specific URL with parameters sorted
-     * alphabetically
+     * alphabetically. Treat base as the url if method is already in the url
      *
-     * @param url A String with the URL of the entrypoint of the API
-     * @param args a list of parameters as arguments of the query
+     * @param base   A String with the base URL of the API server
+     * @param method A String with the entry point of the API method.
+     * @param args   a list of parameters as arguments of the query
      * @param isGet
      * @return A String with the raw HTTP response
      */
-    public String query(String url, TreeMap<String, String> args, boolean isGet);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet);
 
     /**
-     * Calls the HTTP query to a specific URL with parameters sorted
-     * alphabetically
-     *
-     * @param base A String with the base URL of the API server
-     * @param method A String with the entry point of the API method
-     * @param args a list of parameters as arguments of the query
-     * @param isGet
-     * @return A String with the raw HTTP response
-     */
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet);
-
-    /**
-     *
      * @param keys
      */
     public void setKeys(ApiKeys keys);
 
     /**
-     *
      * @param exchange
      */
     public void setExchange(Exchange exchange);
 
     /**
-     *
      * @param apiBaseUrl
      */
     public void setApiBaseUrl(String apiBaseUrl);

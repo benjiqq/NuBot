@@ -23,15 +23,17 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
+import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
-import static com.nubits.nubot.utils.LiquidityPlot.plot;
-
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.SecretKeySpec;
+import javax.net.ssl.*;
+import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
@@ -47,22 +49,33 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.spec.SecretKeySpec;
-import javax.net.ssl.*;
-
-import org.apache.commons.io.FileUtils;
+import static com.nubits.nubot.utils.LiquidityPlot.addPlot;
+import static com.nubits.nubot.utils.LiquidityPlot.plot;
 
 
 public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
+
+    private static final int maxThreadsError = 30;
+
+    public static void logActiveThreads(){
+        int active = Thread.activeCount();
+        LOG.trace("currently active threads: " + active);
+        Thread allThreads[] = new Thread[active];
+        Thread.enumerate(allThreads);
+
+        for (int i = 0; i < active; i++) {
+            Thread t = allThreads[i];
+            LOG.trace(i + ": " + t + " id: " + t.getId() + " name: " + t.getName() + " " + t.getContextClassLoader()
+            + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
+            LOG.trace("super: " + t.getClass().getSuperclass());
+        }
+
+        if (active > maxThreadsError){
+            LOG.error("too many threads started");
+        }
+    }
 
     /**
      * @param originalString
@@ -381,6 +394,8 @@ public class Utils {
             String wdir = System.getProperty("user.dir");
             String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
+            LOG.info("Reading keystorefile from : " + wdirpath);
+            
             System.setProperty("javax.net.ssl.trustStore", wdirpath);
             System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
@@ -388,6 +403,7 @@ public class Utils {
 
     /**
      * Determine whether the current thread runs inside a jar
+     *
      * @return
      */
     public static boolean insideJar() {
