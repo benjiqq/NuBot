@@ -101,7 +101,11 @@ public class SessionManager {
 
     public static String durationString(){
         Long diff = System.currentTimeMillis() - Global.sessionStarted;
-        return "" + diff;
+
+        Long sec = diff/1000;
+        Long min = sec/60;
+        Long hour = sec/(60*60);
+        return "" + hour + ":" + min + ":"  + (sec - (min*60));
     }
 
     public static boolean wasRunOnce(){
