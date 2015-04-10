@@ -61,12 +61,15 @@ public class Utils {
 
     public static void logActiveThreads(){
         int active = Thread.activeCount();
-        LOG.debug("currently active threads: " + active);
-        Thread all[] = new Thread[active];
-        Thread.enumerate(all);
+        LOG.trace("currently active threads: " + active);
+        Thread allThreads[] = new Thread[active];
+        Thread.enumerate(allThreads);
 
         for (int i = 0; i < active; i++) {
-            LOG.debug(i + ": " + all[i]);
+            Thread t = allThreads[i];
+            LOG.trace(i + ": " + t + " id: " + t.getId() + " name: " + t.getName() + " " + t.getContextClassLoader()
+            + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
+            LOG.trace("super: " + t.getClass().getSuperclass());
         }
 
         if (active > maxThreadsError){
