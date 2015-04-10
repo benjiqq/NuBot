@@ -240,6 +240,11 @@ task NuBotDist(dependsOn: NuBotJar) {
             into "${distdir}/res/sources"
         }
 
+        copy {
+            from "res/UI"
+            into "${distdir}/res/UI"
+        }
+
         delete "${distdir}/res/sources/main/java/com/nubits/nubot/global/Passwords.java"
 
         copy {
