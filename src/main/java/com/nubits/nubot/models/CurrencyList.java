@@ -31,6 +31,7 @@ public class CurrencyList {
     public static Currency NSR;
     public static Currency PPC;
     public static Currency LTC;
+    public static Currency DOGE;
     public static CurrencyPair NBT_USD;
     public static CurrencyPair NBT_BTC;
     public static CurrencyPair BTC_NBT;
@@ -47,6 +48,7 @@ public class CurrencyList {
     public static CurrencyPair PHP_USD;
     public static CurrencyPair HKD_USD;
     public static CurrencyPair LTC_BTC;
+    public static CurrencyPair DOGE_BTC;
 
     static {
         USD = Currency.createCurrency("USD");
@@ -59,6 +61,7 @@ public class CurrencyList {
         NSR = Currency.createCurrency("NSR");
         PPC = Currency.createCurrency("PPC");
         LTC = Currency.createCurrency("LTC");
+        DOGE = Currency.createCurrency("DOGE");
         NBT_USD = new CurrencyPair(NBT, USD);
         BTC_USD = new CurrencyPair(BTC, USD);
         NBT_BTC = new CurrencyPair(NBT, BTC);
@@ -76,6 +79,7 @@ public class CurrencyList {
         PHP_USD = new CurrencyPair(PHP, USD);
         HKD_USD = new CurrencyPair(HKD, USD);
         LTC_BTC = new CurrencyPair(LTC, BTC);
+        DOGE_BTC = new CurrencyPair(DOGE, BTC);
     }
 
 

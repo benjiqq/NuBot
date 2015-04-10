@@ -2,15 +2,10 @@ package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.trading.ErrorManager;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.models.*;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.Utils;
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -29,6 +24,7 @@ import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Objects;
 import java.util.TreeMap;
 
@@ -49,6 +45,7 @@ public class BittrexWrapper implements TradeInterface {
     private final String API_BASE_URL = "https://bittrex.com/api/v1.1";
     private final String API_BALANCE = "account/getbalance";
     private final String API_BALANCES = "account/getbalances";
+    private final String API_TICKER = "public/getticker";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -108,28 +105,12 @@ public class BittrexWrapper implements TradeInterface {
         return apiResponse;
     }
 
-
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
-        return getBalancesImpl(pair, null);
-    }
-
-    @Override
-    public ApiResponse getAvailableBalance(Currency currency) {
-        return getBalancesImpl(null, currency);
-    }
-
-    private ApiResponse getBalancesImpl(CurrencyPair pair, Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
         String url = API_BASE_URL;
-        String method = null;
         HashMap<String, String> args = new HashMap<>();
-        if (pair == null) { //get just single currency
-            method = API_BALANCE;
-            args.put("currency", currency.getCode().toUpperCase());
-        } else {
-            method = API_BALANCES;
-        }
+        String method = API_BALANCES;
         boolean isGet = true;
 
         ApiResponse response = getQuery(url, method, args, isGet);
@@ -137,13 +118,55 @@ public class BittrexWrapper implements TradeInterface {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (httpAnswerJson.get("result") == null) {
                 ApiError error = errors.nullReturnError;
-                if (pair == null) {
-                    error.setDescription("No Wallet Enabled for " + currency.getExtendedName());
-                }
+                error.setDescription("No Wallets Enabled");
                 apiResponse.setError(error);
-                return apiResponse;
+            } else {
+                Amount NBTOnOrder = new Amount(0, pair.getOrderCurrency());
+                Amount NBTAvailable = new Amount(0, pair.getOrderCurrency());
+                Amount PegOnOrder = new Amount(0, pair.getPaymentCurrency());
+                Amount PegAvailable = new Amount(0, pair.getPaymentCurrency());
+                JSONArray result = (JSONArray) httpAnswerJson.get("result");
+                for (Iterator<JSONObject> wallet = result.iterator(); wallet.hasNext();) {
+                    JSONObject thisWallet = wallet.next();
+                    if (thisWallet.get("Currency").equals(pair.getPaymentCurrency().getCode().toUpperCase())) {
+                        PegAvailable.setQuantity(Utils.getDouble(thisWallet.get("Available")));
+                        PegOnOrder.setQuantity(Utils.getDouble(thisWallet.get("Balance")) - PegAvailable.getQuantity());
+                    }
+                    if (thisWallet.get("Currency").equals(pair.getOrderCurrency().getCode().toUpperCase())) {
+                        NBTAvailable.setQuantity(Utils.getDouble(thisWallet.get("Available")));
+                        NBTOnOrder.setQuantity(Utils.getDouble(thisWallet.get("Balance")) - NBTAvailable.getQuantity());
+                    }
+                }
+                PairBalance balance = new PairBalance(PegAvailable, NBTAvailable, PegOnOrder, NBTOnOrder);
+                apiResponse.setResponseObject(balance);
             }
-            System.out.println(httpAnswerJson.toJSONString());
+        } else {
+            apiResponse = response;
+        }
+        return apiResponse;
+    }
+
+    @Override
+    public ApiResponse getAvailableBalance(Currency currency) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        HashMap<String, String> args = new HashMap<>();
+        String method = API_BALANCE;
+        args.put("currency", currency.getCode().toUpperCase());
+        boolean isGet = true;
+
+        ApiResponse response = getQuery(url, method, args, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            if (httpAnswerJson.get("result") == null) {
+                ApiError error = errors.nullReturnError;
+                error.setDescription("No Wallet Enabled for " + currency.getExtendedName());
+                apiResponse.setError(error);
+            } else {
+                JSONObject result = (JSONObject) httpAnswerJson.get("result");
+                Amount balance = new Amount(Utils.getDouble(result.get("Available")), currency);
+                apiResponse.setResponseObject(balance);
+            }
         } else {
             apiResponse = response;
         }
@@ -152,7 +175,28 @@ public class BittrexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_TICKER;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = true;
+        args.put("market", pair.toStringSepInverse("-").toUpperCase());
+        ApiResponse response = getQuery(url, method, args, isGet);
+
+        if (response.isPositive()) {
+
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject result = (JSONObject) httpAnswerJson.get("result");
+            double last = Utils.getDouble(result.get("Last"));
+            double ask = Utils.getDouble(result.get("Ask"));
+            double bid = Utils.getDouble(result.get("Bid"));
+            Ticker ticker = new Ticker(last, ask, bid);
+            apiResponse.setResponseObject(ticker);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
     }
 
     @Override

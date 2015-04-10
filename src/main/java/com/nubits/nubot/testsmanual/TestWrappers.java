@@ -45,7 +45,7 @@ public class TestWrappers {
      */
     private static final String TEST_OPTIONS_PATH = "config/myconfig/bittrex.json";
 
-    public static final CurrencyPair testPair = CurrencyList.LTC_BTC;
+    public static final CurrencyPair testPair = CurrencyList.DOGE_BTC;
     public static final Currency testCurrency = CurrencyList.BTC;
 
     public static void main(String[] args) {
@@ -60,7 +60,7 @@ public class TestWrappers {
         //-------------
 
         //WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
@@ -99,7 +99,7 @@ public class TestWrappers {
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
-        //WrapperTestUtils.testGetLastPrice(testPair);
+        WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
         //WrapperTestUtils.testGetLastTrades(testPair);
 

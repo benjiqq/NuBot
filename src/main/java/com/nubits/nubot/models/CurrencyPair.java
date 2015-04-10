@@ -77,6 +77,10 @@ public class CurrencyPair {
         return orderCurrency.getCode().toLowerCase() + sep + paymentCurrency.getCode().toLowerCase();
     }
 
+    public String toStringSepInverse(String sep) {
+        return paymentCurrency.getCode().toLowerCase() + sep + orderCurrency.getCode().toLowerCase();
+    }
+
     @Override
     public String toString() {
         return orderCurrency.getCode().toLowerCase() + "" + paymentCurrency.getCode().toLowerCase();
