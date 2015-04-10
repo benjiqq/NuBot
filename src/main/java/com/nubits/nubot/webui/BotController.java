@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.options.ParseOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -59,21 +60,35 @@ public class BotController {
             if (startstop.equals(START)) {
                 boolean success = true;
 
-                LOG.info("trying to start bot");
+                LOG.info("testing if global options are valid");
 
-                try {
-                    SessionManager.launchBot(Global.options);
-                } catch (NuBotRunException e) {
+                boolean active = SessionManager.isSessionActive();
+                if (active){
                     success = false;
-                    LOG.error("could not start bot " + e);
-                    opmap.put("error", "" + e);
+                    String errmsg ="could not start bot. sessoin already running";
+                    LOG.error(errmsg);
+                    opmap.put("error", errmsg);
+                }
+
+                if (ParseOptions.isValidOptions(Global.options)) {
+                    LOG.info("trying to start bot");
+                    try {
+                        SessionManager.launchBot(Global.options);
+                    } catch (NuBotRunException e) {
+                        success = false;
+                        LOG.error("could not start bot " + e);
+                        opmap.put("error", "" + e);
+                    }
+                }
+                else {
+                    success = false;
+                    LOG.error("could not start bot. invalid options");
                 }
 
                 LOG.info("start bot success? " + success);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);
-
                 return json;
             }
 
