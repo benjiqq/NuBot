@@ -146,7 +146,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
             }
         }
 
-        Utils.logActiveThreads();
     }
 
     private void initStrategy(double peg_price) throws NuBotConnectionException {
