@@ -145,7 +145,7 @@
 
                         } else{
                             flashButtonRed(cbtn);
-                              alert(data["error"]);
+                            alert(data["error"]);
                         }
 
                     },
@@ -175,6 +175,7 @@
                        if (success){
                         //on success of post change the color of the button
                          flashButton(cbtn);
+                         $('#duration').html("");
                        } else{
                            //alert(errormsg);
                            flashButtonRed(cbtn);
