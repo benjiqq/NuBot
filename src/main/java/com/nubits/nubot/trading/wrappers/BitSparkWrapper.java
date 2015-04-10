@@ -84,6 +84,7 @@ public class BitSparkWrapper implements TradeInterface {
         this.exchange = exchange;
         this.apiBaseUrl = API_BASE_URL;
         this.checkConnectionUrl = API_BASE_URL;
+        service = new BitSparkService(keys);
         setupErrors();
 
     }

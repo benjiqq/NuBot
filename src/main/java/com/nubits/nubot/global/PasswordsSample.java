@@ -36,6 +36,6 @@ public class PasswordsSample {
     public static final String HIPCHAT_CRITICAL_ROOM_TOKEN = "xxx"; //use for critical notifications
     public static final String OPEN_EXCHANGE_RATES_APP_ID = "xxx";
     public static final String EXCHANGE_RATE_LAB = "xxx";
-    public static final String KEYSTORE_ENCRYPTION_PASS = "h4rdc0r_";
+    public static final String KEYSTORE_ENCRYPTION_PASS = "xxx";
 
 }
