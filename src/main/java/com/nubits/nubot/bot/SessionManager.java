@@ -55,7 +55,7 @@ public class SessionManager {
         NuBotOptions defaultOpt = NuBotOptionsDefault.defaultFactory();
         Global.options = defaultOpt;
         Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
-        SaveOptions.saveOptionsPretty(defaultOpt,Settings.DEFAULT_CONFIG_FILE_PATH);
+        SaveOptions.saveOptionsPretty(defaultOpt, Settings.DEFAULT_CONFIG_FILE_PATH);
 
     }
 
@@ -72,18 +72,11 @@ public class SessionManager {
         // check if other bots are running
         boolean otherSessions = isSessionActive();
 
-        if (otherSessions) {
-            LOG.info("NuBot is already running");
-            //handle different cases later
-
-            //TODO: several NuBots running one exchange should be prohibited (?)
-        }
-
-        //create session file, which auto-deletes itself
-        //it increases the counter
+        //create session file
         createSessionFile();
 
         Global.sessionRunning = true;
+
         Global.sessionStarted = System.currentTimeMillis();
 
         String timestamp =
@@ -109,6 +102,7 @@ public class SessionManager {
         LOG.debug("execute bot depending on defined strategy");
 
         if (opt.requiresSecondaryPegStrategy()) {
+
             LOG.debug("creating secondary bot object");
             Global.bot = new NuBotSecondary();
             try {
@@ -116,7 +110,9 @@ public class SessionManager {
             } catch (NuBotRunException e) {
                 throw e;
             }
+
         } else {
+
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
             try {
@@ -124,6 +120,7 @@ public class SessionManager {
             } catch (NuBotRunException e) {
                 throw e;
             }
+
         }
 
     }
@@ -140,7 +137,7 @@ public class SessionManager {
 
         sessionFile = new File
                 (appFolder, Settings.SESSION_FILE);
-        LOG.info("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+        LOG.debug("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
 
@@ -171,7 +168,7 @@ public class SessionManager {
 
     }
 
-    public static void removeSessionFile(){
+    public static void removeSessionFile() {
         String sessionFileName = Settings.SESSION_FILE;
         sessionFile = new File(appFolder, sessionFileName);
         if (sessionFile.exists()) {

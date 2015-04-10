@@ -63,6 +63,25 @@
                 });
         }
 
+        function updateStatus(){
+                 $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url:  "http://" + host + ":" + port + "/opstatus"
+                })
+                .fail(function() {
+
+                })
+                .done(function( data ) {
+                    console.log("data: " + data);
+                    $('#botstatus').html(data["status"]);
+
+                });
+
+                //re-call the function
+                setTimeout(updateStatus,updateTime);
+        }
+
 
         function flashButton(cbtn){
 
@@ -168,7 +187,7 @@
 
 
 
-            function loadlog() {
+            function updateLog() {
 
                 var url = baseurl + "/logdump";
 
@@ -192,12 +211,13 @@
                   psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
                 */
 
-                setTimeout(loadlog,updateTime);
+                setTimeout(updateLog , updateTime);
             }
 
 
             function loadbot() {
-                loadlog();
+                updateLog();
+                updateStatus();
             }
 
 

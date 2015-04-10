@@ -8,6 +8,7 @@
     <property scope="context" name="SessionLOG" value="SessionLOG" />
     <property scope="context" name="sessionlogFile" value=".sessions.log" />
     <property scope="context" name="standardlogFile" value="ui_standard.log" />
+    <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
 
 
 
@@ -184,22 +185,47 @@
                     <onMismatch>NEUTRAL</onMismatch>
                 </filter>
 
-                <!--
-                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-                    <evaluator>
-                        <expression>
-                            return formattedMessage.contains("STRATEGY")
-                        </expression>
-                    </evaluator>
-                    <onMatch>NEUTRAL</onMatch>
-                    <onMismatch>DENY</onMismatch>
-                </filter>
-                -->
 
 
             </appender>
         </sift>
     </appender>
+
+    <appender name="verboseGUI" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+        <discriminator>
+            <key>session</key>
+            <defaultValue>session_main</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
+                <file>${session}/${UIverboselogFile}</file>
+
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>DEBUG</level>
+                </filter>
+
+                <encoder>
+                    <pattern>%date{HH:mm:ss.SSS} %logger{16} - %msg%n
+                    </pattern>
+                </encoder>
+
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("jetty");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
+
+
+            </appender>
+        </sift>
+    </appender>
+
 
     <!--
 	definition of all loggers
@@ -211,6 +237,8 @@
         <appender-ref ref="STDOUT" />
         <appender-ref ref="sessionFile" />
         <appender-ref ref="standardGUI" />
+        <appender-ref ref="verboseGUI" />
+
 
     </root>
 

@@ -49,7 +49,7 @@ public class UiServer {
 
         get("/setup", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "setup.mustache"), tmpl);
 
-        new BotController("/startstop");
+        new BotController();
 
 
     }

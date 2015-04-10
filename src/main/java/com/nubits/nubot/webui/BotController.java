@@ -24,21 +24,36 @@ public class BotController {
     private final static String START = "start";
     private final static String STOP = "stop";
 
-    public BotController(String endpoint) {
+    public BotController() {
 
-        get(endpoint, "application/json", (request, response) -> {
+        get("/opstatus", "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
-
             boolean active = SessionManager.isSessionActive();
-            opmap.put("running", active);
+            if (active) {
+                opmap.put("status", "running");
+                opmap.put("started", Global.sessionStarted);
+            } else {
+                opmap.put("status", "not started");
+            }
 
+            opmap.put("stopped", Global.sessionStopped);
             String json = new Gson().toJson(opmap);
             return json;
         });
 
+        /*get("/startstop", "application/json", (request, response) -> {
+
+            Map opmap = new HashMap();
+            boolean active = SessionManager.isSessionActive();
+            opmap.put("running", active);
+            String json = new Gson().toJson(opmap);
+            return json;
+        });*/
+
+
         // we expect options are set
-        post(endpoint, "application/json", (request, response) -> {
+        post("/startstop", "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
 
