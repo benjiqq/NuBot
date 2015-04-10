@@ -22,10 +22,13 @@ package com.nubits.nubot.notifications;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Passwords;
 import io.evanwong.oss.hipchat.v2.HipChatClient;
+import io.evanwong.oss.hipchat.v2.commons.NoContent;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import io.evanwong.oss.hipchat.v2.rooms.SendRoomNotificationRequestBuilder;
 import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+
+import java.util.concurrent.Future;
 
 public class HipChatNotifications {
 
@@ -79,7 +82,8 @@ public class HipChatNotifications {
                 colorToUse=color;
             }
 
-            builder.setColor(colorToUse).setNotify(notify).build().execute();
+            Future<NoContent> future = builder.setColor(colorToUse).setNotify(notify).build().execute();
+            NoContent noContent = future.get();
 
         } catch (Exception e) {
             LOG.error("Not sending hipchat notification. Network problem");
