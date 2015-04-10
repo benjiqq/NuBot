@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
-import com.nubits.nubot.launch.MainLaunch;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;

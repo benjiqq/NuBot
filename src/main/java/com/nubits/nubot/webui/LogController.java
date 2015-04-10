@@ -16,7 +16,7 @@ public class LogController {
     /**
      * the log file to send to client
      */
-    String logfile = Global.sessionPath  + "/ui_standard.log";
+    String logfile = Global.sessionPath + "/ui_standard.log";
 
     final static Logger LOG = LoggerFactory.getLogger(LogController.class);
 
@@ -29,12 +29,12 @@ public class LogController {
             try {
                 String l = new String(Files.readAllBytes(Paths.get(logfile)));
 
-                LOG.trace(">> log fetched " + l.substring(0,100));
+                LOG.trace(">> log fetched " + l.substring(0, 100));
 
                 object.addProperty("log", l);
                 return object;
 
-            } catch(Exception e){
+            } catch (Exception e) {
 
             }
 
