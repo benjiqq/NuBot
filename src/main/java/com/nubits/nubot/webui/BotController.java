@@ -63,9 +63,9 @@ public class BotController {
                 LOG.info("testing if global options are valid");
 
                 boolean active = SessionManager.isSessionActive();
-                if (active){
+                if (active) {
                     success = false;
-                    String errmsg ="could not start bot. session already running";
+                    String errmsg = "could not start bot. session already running";
                     LOG.error(errmsg);
                     opmap.put("error", errmsg);
                 }
@@ -79,8 +79,7 @@ public class BotController {
                         LOG.error("could not start bot " + e);
                         opmap.put("error", "" + e);
                     }
-                }
-                else {
+                } else {
                     success = false;
                     LOG.error("could not start bot. invalid options");
                 }
@@ -93,16 +92,26 @@ public class BotController {
             }
 
             if (startstop.equals(STOP)) {
+                boolean active = SessionManager.isSessionActive();
+
                 boolean success = true;
-                try {
-                    LOG.info("try interrupt bot");
+                if (active) {
+                    try {
+                        LOG.info("try interrupt bot");
 
-                    Global.bot.shutdownBot();
+                        Global.bot.shutdownBot();
 
-                    Global.mainThread.interrupt();
+                        Global.mainThread.interrupt();
 
-                } catch (Exception e) {
+                    } catch (Exception e) {
+                        success = false;
+                        opmap.put("error", "can't interrupt");
+                    }
+                } else {
                     success = false;
+                    String errmsg = "session already running";
+                    LOG.info(errmsg);
+                    opmap.put("error", errmsg);
                 }
 
                 opmap.put("success", success);
