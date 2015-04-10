@@ -109,7 +109,7 @@ public class BotController {
                     }
                 } else {
                     success = false;
-                    String errmsg = "session already running";
+                    String errmsg = "no session running";
                     LOG.info(errmsg);
                     opmap.put("error", errmsg);
                 }
