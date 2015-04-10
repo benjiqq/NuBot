@@ -25,6 +25,8 @@ public class SessionManager {
 
     private static String appFolder;
 
+    private static boolean runonce = false;
+
 
     /**
      * set config in global
@@ -76,6 +78,7 @@ public class SessionManager {
         createSessionFile();
 
         Global.sessionRunning = true;
+        runonce = true;
 
         Global.sessionStarted = System.currentTimeMillis();
 
@@ -84,6 +87,10 @@ public class SessionManager {
 
         LOG.info("*** session *** starting at " + timestamp);
 
+    }
+
+    public static boolean wasRunOnce(){
+        return runonce;
     }
 
     /**

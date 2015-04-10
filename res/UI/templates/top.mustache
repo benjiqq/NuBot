@@ -152,7 +152,6 @@
             });
 
 
-
           $('#stopbot').click(function(){
 
                 if (debug) console.log("calling stop on server");
@@ -165,7 +164,7 @@
                     dataType: "json",
                     type : 'POST',
                     success: function(data){
-                       console.log("starting bot ok " + data);
+                       console.log("stopping bot ok " + data);
                        var success = data["success"];
                         var cbtn = $('#stopbot');
                        if (success){

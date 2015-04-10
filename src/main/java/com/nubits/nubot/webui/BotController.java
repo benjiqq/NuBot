@@ -34,7 +34,10 @@ public class BotController {
                 opmap.put("status", "running");
                 opmap.put("started", Global.sessionStarted);
             } else {
-                opmap.put("status", "not started");
+                if (SessionManager.wasRunOnce())
+                    opmap.put("status", "halted");
+                else
+                    opmap.put("status", "not started");
             }
 
             opmap.put("stopped", Global.sessionStopped);
