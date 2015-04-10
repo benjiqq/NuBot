@@ -44,9 +44,20 @@
               var host = "localhost";
               var port = 4567;
               var baseurl = "http://" + host + ":" + port;
-              var updateTime = 2000;
+              var updateTime = 500;
               var debug = true;
 
+         function setRunning(){
+              $('#startbot').html("Running");
+              $('#startbot').removeClass("btn-primary");
+              $('#startbot').addClass("btn-success");
+         }
+
+         function setHalted(){
+              $('#startbot').removeClass("btn-success");
+              $('#startbot').addClass("btn-primary");
+              $('#startbot').html("Start");
+         }
 
         function updateConfigFile(){
                  $.ajax({
@@ -74,17 +85,21 @@
                 })
                 .done(function( data ) {
                     console.log("data: " + data);
+
                     $('#botstatus').html(data["status"]);
 
                     $('#sessionstart').html(data["sessionstart"]);
 
                     $('#duration').html(data["duration"]);
 
+                    if (data["status"] == "running"){
+                        setRunning();
+                    }
 
                 });
 
                 //re-call the function
-                setTimeout(updateStatus,updateTime);
+                setTimeout(updateStatus, updateTime);
         }
 
 
@@ -137,11 +152,11 @@
                     success: function(data){
                         console.log("starting bot ok " + data);
                         var success = data["success"];
-                        var cbtn = $('#startbot');
+
 
                         if (success){
                          //on success of post change the color of the button
-                          flashButton(cbtn);
+                          setRunning();
 
                         } else{
                             flashButtonRed(cbtn);
@@ -157,6 +172,8 @@
             });
 
 
+
+
           $('#stopbot').click(function(){
 
                 if (debug) console.log("calling stop on server");
@@ -169,15 +186,16 @@
                     dataType: "json",
                     type : 'POST',
                     success: function(data){
-                       console.log("stopping bot ok " + data);
+                       console.log("stopping bot " + data);
                        var success = data["success"];
                         var cbtn = $('#stopbot');
                        if (success){
                         //on success of post change the color of the button
                          flashButton(cbtn);
                          $('#duration').html("");
+                         setHalted();
                        } else{
-                           //alert(errormsg);
+                           alert(data["error"]);
                            flashButtonRed(cbtn);
                        }
                     },
