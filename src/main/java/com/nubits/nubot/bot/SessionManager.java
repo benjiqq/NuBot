@@ -157,25 +157,19 @@ public class SessionManager {
         } catch (Exception e) {
         }
 
-        boolean done = false;
-        int i = 0;
-        while (!done) {
 
-            String sessionFileName = Settings.APP_NAME + "_" + i + Settings.SESSION_FILE;
-            sessionFile = new File(appFolder, sessionFileName);
-            if (!sessionFile.exists()) {
-                try {
-                    sessionFile.createNewFile();
-                    //delete the file on exit
-                    sessionFile.deleteOnExit();
-                    done = true;
-                } catch (Exception e) {
-
-                }
+        String sessionFileName = Settings.APP_NAME + "_"  + Settings.SESSION_FILE;
+        sessionFile = new File(appFolder, sessionFileName);
+        if (!sessionFile.exists()) {
+            try {
+                sessionFile.createNewFile();
+                //delete the file on exit
+                sessionFile.deleteOnExit();
+            } catch (Exception e) {
 
             }
-            i++;
         }
+
     }
 
 
