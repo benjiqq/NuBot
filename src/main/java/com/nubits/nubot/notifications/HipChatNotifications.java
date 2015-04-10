@@ -31,6 +31,9 @@ public class HipChatNotifications {
 
     private static final Logger LOG = LoggerFactory.getLogger(HipChatNotifications.class.getName());
 
+    private static final HipChatClient normalHipChatClient = new HipChatClient(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_TOKEN) ;
+    private static final HipChatClient criticalHipChatClient = new HipChatClient(Passwords.HIPCHAT_CRITICAL_ROOM_TOKEN);
+
     public static void sendMessage(String message, MessageColor color) {
         sendMessageImpl(message, color, false);
     }
@@ -59,17 +62,24 @@ public class HipChatNotifications {
         String toSend = message + " <em>[" + sessionId + " - " + publicAddress + "] </em>";
 
         try {
+            HipChatClient hcc ;
+            SendRoomNotificationRequestBuilder builder;
+            MessageColor colorToUse;
+            boolean notify ;
+
             if (critical) {
-                HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_CRITICAL_ROOM_TOKEN);
-                SendRoomNotificationRequestBuilder builder = hipchat.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_CRITICAL_ROOM_ID, toSend);
-                builder.setColor(MessageColor.RED).setNotify(true).build().execute();
-
+                hcc = criticalHipChatClient;
+                builder = hcc.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_CRITICAL_ROOM_ID, toSend);
+                notify = true;
+                colorToUse=MessageColor.RED;
             } else {
-                HipChatClient hipchat = new HipChatClient(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_TOKEN);
-                SendRoomNotificationRequestBuilder builder = hipchat.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, toSend);
-                builder.setColor(color).setNotify(false).build().execute();
-
+                hcc = normalHipChatClient;
+                builder = hcc.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, toSend);
+                notify = false;
+                colorToUse=color;
             }
+
+            builder.setColor(colorToUse).setNotify(notify).build().execute();
 
         } catch (Exception e) {
             LOG.error("Not sending hipchat notification. Network problem");
