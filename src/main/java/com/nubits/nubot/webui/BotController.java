@@ -11,6 +11,11 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,12 +37,18 @@ public class BotController {
             boolean active = SessionManager.isSessionActive();
             if (active) {
                 opmap.put("status", "running");
-                opmap.put("started", Global.sessionStarted);
+
+                opmap.put("sessionstart", SessionManager.startedString());
+                opmap.put("duration", SessionManager.durationString());
+
+
             } else {
                 if (SessionManager.wasRunOnce())
                     opmap.put("status", "halted");
                 else
                     opmap.put("status", "not started");
+
+                opmap.put("sessionstart", "");
             }
 
             opmap.put("stopped", Global.sessionStopped);

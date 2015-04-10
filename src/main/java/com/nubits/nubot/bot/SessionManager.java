@@ -10,6 +10,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 
 /**
@@ -87,6 +90,18 @@ public class SessionManager {
 
         LOG.info("*** session *** starting at " + timestamp);
 
+    }
+
+    public static String startedString(){
+        Date startdate = Date.from(Instant.ofEpochSecond(Global.sessionStarted / 1000));
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        String dstr = df.format(startdate);
+        return dstr;
+    }
+
+    public static String durationString(){
+        Long diff = System.currentTimeMillis() - Global.sessionStarted;
+        return "" + diff;
     }
 
     public static boolean wasRunOnce(){
