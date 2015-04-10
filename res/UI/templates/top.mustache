@@ -75,7 +75,22 @@
                      cbtn.removeClass("btn-success");
                      cbtn.addClass("btn-primary");
                }, 2000);
-          }
+            }
+
+        }
+
+        function flashButtonRed(cbtn){
+
+            if (cbtn.hasClass("btn-primary")) {
+               cbtn.removeClass("btn-primary");
+               cbtn.addClass("btn-danger");
+
+               //change color back after 2000 msec
+               setTimeout(function() {
+                     cbtn.removeClass("btn-danger");
+                     cbtn.addClass("btn-primary");
+               }, 2000);
+            }
 
         }
 
@@ -98,12 +113,14 @@
                     success: function(data){
                         console.log("starting bot ok " + data);
                         var success = data["success"];
+                        var cbtn = $('#startbot');
+
                         if (success){
                          //on success of post change the color of the button
-                          var cbtn = $('#startbot');
                           flashButton(cbtn);
 
                         } else{
+                            flashButtonRed(cbtn);
                               alert(errormsg);
                         }
 
@@ -131,13 +148,13 @@
                     success: function(data){
                        console.log("starting bot ok " + data);
                        var success = data["success"];
+                        var cbtn = $('#stopbot');
                        if (success){
                         //on success of post change the color of the button
-                         var cbtn = $('#stopbot');
                          flashButton(cbtn);
-
                        } else{
-                             alert(errormsg);
+                           //alert(errormsg);
+                           flashButtonRed(cbtn);
                        }
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {

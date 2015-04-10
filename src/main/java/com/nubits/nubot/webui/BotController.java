@@ -65,7 +65,7 @@ public class BotController {
                 boolean active = SessionManager.isSessionActive();
                 if (active){
                     success = false;
-                    String errmsg ="could not start bot. sessoin already running";
+                    String errmsg ="could not start bot. session already running";
                     LOG.error(errmsg);
                     opmap.put("error", errmsg);
                 }
