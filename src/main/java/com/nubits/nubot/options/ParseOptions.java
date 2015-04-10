@@ -260,18 +260,13 @@ public class ParseOptions {
      */
     public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
 
-        //default values for optional settings
-
-        //NuBotOptions options = NuBotOptionsDefault.defaultFactory();
-        NuBotOptions options = new NuBotOptions();
-
         try {
             isValidJSON(optionsJSON);
         } catch (NuBotConfigException e) {
             throw e;
         }
 
-        //First try to parse compulsory parameters
+        NuBotOptions options = new NuBotOptions();
         options.exchangeName = (String) getIgnoreCase(optionsJSON, exchangename);
         options.dualSide = (boolean) getIgnoreCase(optionsJSON, dualside);
         options.apiKey = (String) getIgnoreCase(optionsJSON, apikey);
