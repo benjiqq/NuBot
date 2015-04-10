@@ -218,23 +218,10 @@ public class ParseOptions {
         //First try to parse compulsory parameters
         options.exchangeName = (String) getIgnoreCase(optionsJSON, exchangename);
 
-        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
-        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
-        if (!supported)
-            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
-
         try {
             options.dualSide = (boolean) getIgnoreCase(optionsJSON, dualside);
         } catch (Exception e) {
             throw new NuBotConfigException("can not cast dualSide to boolean " + e);
-        }
-
-        if (!options.exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
-            if (!containsIgnoreCase(optionsJSON, apikey)) {
-                throw new NuBotConfigException("The apikey parameter is compulsory.");
-            } else {
-                options.apiKey = (String) getIgnoreCase(optionsJSON, apikey);
-            }
         }
 
         options.apiKey = (String) getIgnoreCase(optionsJSON, apikey);
@@ -249,10 +236,6 @@ public class ParseOptions {
         if (!isSupportedPair(options.getPair())) {
             throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
         }
-
-        //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
-        //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
-        //org.json.JSONObject pegOptionsJSON;
 
         LOG.trace("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
 
@@ -336,6 +319,14 @@ public class ParseOptions {
             throw new NuBotConfigException(error);
 
         }
+
+        //valididty tests
+
+        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
+        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
+        if (!supported)
+            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
+
 
         return options;
     }
