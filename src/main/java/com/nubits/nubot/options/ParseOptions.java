@@ -164,6 +164,38 @@ public class ParseOptions {
 
     }
 
+    public static boolean isValidOptions(NuBotOptions options) throws NuBotConfigException {
+
+        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
+        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
+        if (!supported)
+            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
+
+        //test if configuration is supported
+        if (!isSupportedPair(options.getPair())) {
+            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        }
+
+        if (options.requiresSecondaryPegStrategy()) {
+            if (!FeedFacade.isValidFeed(options.mainFeed))
+                throw new NuBotConfigException("invalid mainfeed " + options.mainFeed);
+
+            for (String feed : options.backupFeeds){
+                if (!FeedFacade.isValidFeed(feed))
+                    throw new NuBotConfigException("invalid feed " + feed);
+            }
+
+            if (options.wallchangeThreshold < 0)
+                throw new NuBotConfigException("invalid " + options.wallchangeThreshold);
+
+            if (options.spread < 0)
+                throw new NuBotConfigException("invalid value for spread " + spread);
+
+        }
+
+        return true;
+    }
+
     /**
      * the rules for valid configurations
      *
@@ -289,27 +321,22 @@ public class ParseOptions {
         options.rpcPass = (String) getIgnoreCase(optionsJSON, rpcpass);
         options.rpcUser = (String) getIgnoreCase(optionsJSON, rpcuser);
         options.nudPort = new Integer("" + getIgnoreCase(optionsJSON, nudport)).intValue();
+        //secondary
+        LOG.trace("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
         options.mainFeed = (String) getIgnoreCase(optionsJSON, mainfeed);
         options.wallchangeThreshold = Utils.getDouble(getIgnoreCase(optionsJSON, wallchangethreshold));
         options.spread = Utils.getDouble(getIgnoreCase(optionsJSON, spread));
         options.backupFeeds = parseBackupFeeds(optionsJSON);
         options.mailnotifications = parseMails(optionsJSON);
 
-
         if (options.spread != 0) {
             LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
 
-        //valididty tests
-
-        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
-        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
-        if (!supported)
-            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
-
-        //test if configuration is supported
-        if (!isSupportedPair(options.getPair())) {
-            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        try {
+            isValidOptions(options);
+        } catch (NuBotConfigException e) {
+            throw e;
         }
 
         return options;
