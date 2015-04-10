@@ -149,7 +149,7 @@ public class Settings {
 
     public final static String APP_FOLDER = ".nubot";
 
-    public final static String SESSION_FILE = "_session.txt";
+    public final static String SESSION_FILE = APP_NAME + "_session.tmp";
 
     public final static String SESSION_LOGGER_NAME = "SessionLOG";
 

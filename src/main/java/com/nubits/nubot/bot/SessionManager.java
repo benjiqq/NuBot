@@ -139,7 +139,7 @@ public class SessionManager {
         appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
 
         sessionFile = new File
-                (appFolder, Settings.APP_NAME + Settings.SESSION_FILE);
+                (appFolder, Settings.SESSION_FILE);
         LOG.info("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
@@ -158,18 +158,29 @@ public class SessionManager {
         }
 
 
-        String sessionFileName = Settings.APP_NAME + "_"  + Settings.SESSION_FILE;
+        String sessionFileName = Settings.SESSION_FILE;
         sessionFile = new File(appFolder, sessionFileName);
         if (!sessionFile.exists()) {
             try {
                 sessionFile.createNewFile();
-                //delete the file on exit
-                sessionFile.deleteOnExit();
+
             } catch (Exception e) {
 
             }
         }
 
+    }
+
+    public static void removeSessionFile(){
+        String sessionFileName = Settings.SESSION_FILE;
+        sessionFile = new File(appFolder, sessionFileName);
+        if (sessionFile.exists()) {
+            try {
+                sessionFile.delete();
+            } catch (Exception e) {
+
+            }
+        }
     }
 
 
