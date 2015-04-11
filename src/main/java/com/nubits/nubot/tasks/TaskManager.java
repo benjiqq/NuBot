@@ -53,9 +53,7 @@ public class TaskManager {
         this.running = false;
         taskList = new ArrayList<BotTask>();
 
-        //TODO! options can't be null
         //assign default values just for testing without Global.options loaded
-        //TODO naming mixed
 
         setTasks();
     }
