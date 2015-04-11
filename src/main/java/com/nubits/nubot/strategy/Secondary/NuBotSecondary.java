@@ -63,19 +63,19 @@ public class NuBotSecondary extends NuBotBase {
         //TODO
 
         PriceMonitorTriggerTask pmTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
-        StrategySecondaryPegTask straTask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
+        StrategySecondaryPegTask stratTask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
 
         // set trading strategy to the price monitor task
-        pmTask.setStrategy(straTask);
+        pmTask.setStrategy(stratTask);
 
         //TODO circular
 
         // set price monitor task to the strategy
-        straTask.setPriceMonitorTask(pmTask);
+        stratTask.setPriceMonitorTask(pmTask);
 
         // set liquidityinfo task to the strategy
         SubmitLiquidityinfoTask liqTask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
-        straTask.setSendLiquidityTask(liqTask);
+        stratTask.setSendLiquidityTask(liqTask);
 
         PriceFeedManager pfm = null;
         try {
