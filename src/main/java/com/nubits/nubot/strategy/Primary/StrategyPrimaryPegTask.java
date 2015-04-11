@@ -439,8 +439,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
-        activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
+        activeSellOrders = TradeUtils.countActiveOrders(Constant.SELL);
+        activeBuyOrders = TradeUtils.countActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);
@@ -635,7 +635,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         LOG.debug("cap sell amount at " + most);
                     }
                 }
-
 
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
                     amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
