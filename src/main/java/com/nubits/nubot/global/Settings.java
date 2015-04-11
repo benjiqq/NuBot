@@ -152,6 +152,8 @@ public class Settings {
     public final static String SESSION_FILE = APP_NAME + "_session.tmp";
 
     public final static String SESSION_LOGGER_NAME = "SessionLOG";
+    public static final int DELAY_CONN = 1;
+    public final static int DELAY_LIQUIIDITY = 40;
 
 
     /**

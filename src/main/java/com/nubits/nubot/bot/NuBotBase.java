@@ -23,6 +23,7 @@ import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
@@ -215,14 +216,14 @@ public abstract class NuBotBase {
         Global.taskManager.setTasks();
 
         if (Global.options.isSubmitliquidity()) {
-            TaskManager.setupNuRPCTask();
-            TaskManager.startTaskNu();
+            Global.taskManager.setupNuRPCTask();
+            Global.taskManager.startTaskNu();
         }
 
 
         LOG.debug("Starting task : Check connection with exchange");
-        int conn_delay = 1;
-        Global.taskManager.getCheckConnectionTask().start(conn_delay);
+
+        Global.taskManager.getCheckConnectionTask().start(Settings.DELAY_CONN);
 
 
         LOG.info("Waiting a for the connectionThreads to detect connection");
@@ -240,10 +241,8 @@ public abstract class NuBotBase {
             throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
-
         //Start task to check orders
-        int start_delay = 40;
-        Global.taskManager.getSendLiquidityTask().start(start_delay);
+        Global.taskManager.getSendLiquidityTask().start(Settings.DELAY_LIQUIIDITY);
 
         if (Global.options.isSubmitliquidity()) {
             try {
