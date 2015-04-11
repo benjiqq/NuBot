@@ -163,7 +163,7 @@ public class SessionManager {
 
         sessionFile = new File
                 (appFolder, Settings.SESSION_FILE);
-        LOG.debug("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+        //LOG.trace("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
 

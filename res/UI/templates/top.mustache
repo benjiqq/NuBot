@@ -41,11 +41,11 @@
 
       <script>
 
-              var host = "localhost";
-              var port = 4567;
-              var baseurl = "http://" + host + ":" + port;
-              var updateTime = 500;
-              var debug = true;
+          var host = "localhost";
+          var port = 4567;
+          var baseurl = "http://" + host + ":" + port;
+          var updateTime = 500;
+          var debug = true;
 
          function setRunning(){
               $('#startbot').html("Running");
@@ -208,7 +208,16 @@
             });
     });
 
+            function autoScroll(){
 
+                //autoscrolling. not used - how to make log readable also?
+                var psconsole = $('#logarea');
+                if(psconsole.length)
+                  psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+
+            }
+
+            var i = 0;
 
             function updateLog() {
 
@@ -227,12 +236,11 @@
                   $('#logarea').val(data["log"]);
                 });
 
-                /*
-                //autoscrolling. not used - how to make log readable also?
-                var psconsole = $('#logarea');
-                if(psconsole.length)
-                  psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
-                */
+                i++;
+
+                if (i % 20 == 0) {
+                    autoScroll();
+                }
 
                 setTimeout(updateLog , updateTime);
             }

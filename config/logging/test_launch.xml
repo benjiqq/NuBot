@@ -11,7 +11,6 @@
     <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
 
 
-
     <!-- console output of NuBot -->
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
@@ -25,7 +24,8 @@
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
             <evaluator>
                 <expression>
-                    return logger.contains("jetty");
+                    return logger.contains("jetty") || logger.contains("JettyHandler")
+                    || logger.contains("spark.Request") || logger.contains("MatcherFilter");
                 </expression>
             </evaluator>
             <onMatch>DENY</onMatch>
