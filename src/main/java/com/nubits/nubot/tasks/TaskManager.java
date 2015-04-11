@@ -35,7 +35,7 @@ public class TaskManager {
     private static final String STRATEGY_FIAT = "Strategy Fiat Task";
     private static final String STRATEGY_CRYPTO = "Strategy Crypto Task";
 
-    protected int interval;
+    //protected int interval;
     private BotTask checkConnectionTask;
     private BotTask strategyFiatTask;
     private BotTask sendLiquidityTask;
@@ -120,6 +120,14 @@ public class TaskManager {
         initialized = true;
     }
 
+    public void startAll() {
+        for (int i = 0; i < taskList.size(); i++) {
+            BotTask task = taskList.get(i);
+            task.start();
+        }
+
+    }
+
     public void stopAll() throws IllegalStateException {
         LOG.info("Stopping all BotTasks. ");
         boolean sentNotification = false;
@@ -147,19 +155,6 @@ public class TaskManager {
         }
     }
 
-    /**
-     * @return the interval
-     */
-    public int getInterval() {
-        return interval;
-    }
-
-    /**
-     * @param interval the interval to set
-     */
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
 
     /**
      * @return the isRunning
@@ -213,14 +208,6 @@ public class TaskManager {
 
     public void setSendLiquidityTask(BotTask slt) {
         this.sendLiquidityTask = slt;
-    }
-
-    public ArrayList<BotTask> getTaskList() {
-        return taskList;
-    }
-
-    public void setTaskList(ArrayList<BotTask> taskList) {
-        this.taskList = taskList;
     }
 
     public BotTask getCheckNudTask() {
