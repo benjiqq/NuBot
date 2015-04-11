@@ -100,7 +100,7 @@ public class NuLastTrades {
 
 
         //Create a TaskManager and
-        Global.taskManager = new TaskManager(false);
+        Global.taskManager = new TaskManager();
         //Start checking for connection
         Global.taskManager.setCheckConnectionTask(new BotTask(
                 new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection"));
