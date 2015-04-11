@@ -114,11 +114,11 @@ public class FrozenBalancesManager {
                     df.setMaximumFractionDigits(8);
 
                     Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
-                    Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
+                    Global.frozenBalancesManager.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
 
                     HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
                             + percentageToSetApart * 100 + "% of  sale proceedings)"
-                            + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), MessageColor.PURPLE);
+                            + ". Funds frozen to date = " + df.format(Global.frozenBalancesManager.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), MessageColor.PURPLE);
                 }
             } else {
                 LOG.info("Nothing to freeze. The funds initially set apart (" + initialFunds.toString() + ") "
@@ -133,10 +133,10 @@ public class FrozenBalancesManager {
 
             if (balancesResponse.isPositive()) {
                 Amount balance = (Amount) balancesResponse.getResponseObject();
-                balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                balance = removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
                 double oneNBT = Utils.round(1 / Global.conversion, 8);
                 if (balance.getQuantity() > oneNBT) {
-                    tryKeepProceedsAside(balance, Global.frozenBalances.getAmountAlreadyThere());
+                    tryKeepProceedsAside(balance, Global.frozenBalancesManager.getAmountAlreadyThere());
                 }
                 setBalanceAlreadyThere(toFreezeCurrency);
             } else {
@@ -156,7 +156,7 @@ public class FrozenBalancesManager {
             if (balancesResponse.isPositive()) {
                 //Here its time to compute the balance to put apart, if any
                 balance = (Amount) balancesResponse.getResponseObject();
-                balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                balance = removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
 
                 //Only set this value is its greater than prev
                 if (balance.getQuantity() > getAmountAlreadyThere().getQuantity()) {
@@ -170,8 +170,8 @@ public class FrozenBalancesManager {
         }
         if (success) {
             String message = "Frozen funds already in balance (not proceeds) updated : "
-                    + Global.frozenBalances.getAmountAlreadyThere().getQuantity()
-                    + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency();
+                    + Global.frozenBalancesManager.getAmountAlreadyThere().getQuantity()
+                    + " " + Global.frozenBalancesManager.getAmountAlreadyThere().getCurrency();
             if(Global.options.getKeepProceeds()>0) {
                 LOG.info(message);
             }

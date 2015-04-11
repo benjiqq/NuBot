@@ -220,11 +220,9 @@ public abstract class NuBotBase {
             Global.taskManager.startTaskNu();
         }
 
-
         LOG.debug("Starting task : Check connection with exchange");
 
         Global.taskManager.getCheckConnectionTask().start(Settings.DELAY_CONN);
-
 
         LOG.info("Waiting a for the connectionThreads to detect connection");
         try {
@@ -237,7 +235,6 @@ public abstract class NuBotBase {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
         } else {
-            //MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
             throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
@@ -258,7 +255,7 @@ public abstract class NuBotBase {
 
         // Set the frozen balance manager in the global variable
 
-        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
+        Global.frozenBalancesManager = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
 
         try {
             configureStrategy();

@@ -54,7 +54,7 @@ public class Global {
 
     public static double conversion = 1; //Change this? update SendLiquidityinfoTask
 
-    public static FrozenBalancesManager frozenBalances;
+    public static FrozenBalancesManager frozenBalancesManager;
 
     public static boolean swappedPair; //true if payment currency is NBT
 
