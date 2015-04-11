@@ -79,6 +79,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private Long currentTime = null;
     private boolean first = true;
 
+    private final int PR = Settings.DEFAULT_PRECISION;
+
     public void init() {
         File c = new File(this.wallshiftsFilePathCSV);
         if (!c.exists()) {
@@ -169,7 +171,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Add(remove) the offset % from prices
 
         //compute half of the spread
-        double halfSpread = Utils.round(Global.options.getSpread() / 2, 6);
+        double halfSpread = Utils.round(Global.options.getSpread() / 2, 6); //TODO: different precision?
 
         double offset = Utils.round(halfSpread / 100, 6);
 
@@ -190,11 +192,11 @@ public class PriceMonitorTriggerTask extends TimerTask {
         double sellPricePEGInitial;
         double buyPricePEGInitial;
         if (Global.swappedPair) { //NBT as paymentCurrency
-            sellPricePEGInitial = Utils.round(Global.conversion * sellPriceUSD, 8);
-            buyPricePEGInitial = Utils.round(Global.conversion * buyPriceUSD, 8);
+            sellPricePEGInitial = Utils.round(Global.conversion * sellPriceUSD, PR);
+            buyPricePEGInitial = Utils.round(Global.conversion * buyPriceUSD, PR);
         } else {
-            sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, 8);
-            buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, 8);
+            sellPricePEGInitial = Utils.round(sellPriceUSD / peg_price, PR);
+            buyPricePEGInitial = Utils.round(buyPriceUSD / peg_price, PR);
         }
 
         //store first value
@@ -209,12 +211,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
         LOG.info(message2);
 
         //Assign prices
+        StrategySecondaryPegTask secTask = (StrategySecondaryPegTask) Global.taskManager.getSecondaryPegTask().getTask();
         if (!Global.swappedPair) {
-            ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(buyPricePEGInitial);
-            ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(sellPricePEGInitial);
+            secTask.setBuyPricePEG(buyPricePEGInitial);
+            secTask.setSellPricePEG(sellPricePEGInitial);
         } else {
-            ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setBuyPricePEG(sellPricePEGInitial);
-            ((StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask())).setSellPricePEG(buyPricePEGInitial);
+            secTask.setBuyPricePEG(sellPricePEGInitial);
+            secTask.setSellPricePEG(buyPricePEGInitial);
         }
         //Start strategy
         Global.taskManager.getSecondaryPegTask().start();
@@ -362,6 +365,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
             subject = Global.exchange.getName() + " Moving Average issue. Bot will replace orders in "
                     + sleepTime + "seconds.";
         }
+
         //we want to send Hip Chat and mail notifications,
         // cancel all orders to avoid arbitrage against the bot and
         // exit execution gracefully
@@ -617,7 +621,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
         this.wallsBeingShifted = wallsBeingShifted;
     }
 
-
     private void sendErrorNotification() {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
         String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
@@ -684,7 +687,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
      */
     protected boolean sanityCheck(ArrayList<LastPrice> priceList, int mainPriceIndex) {
 
-
         boolean[] ok = new boolean[priceList.size() - 1];
         double mainPrice = priceList.get(mainPriceIndex).getPrice().getQuantity();
 
@@ -720,7 +722,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         return overallOk;
     }
-
 
     protected void notifyDeviation(ArrayList<LastPrice> priceList) {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";

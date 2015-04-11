@@ -20,6 +20,7 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
@@ -103,18 +104,18 @@ public class TaskManager {
 
         //Select the correct interval
         int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
-        if (Global.options.getPair().getPaymentCurrency().isFiat() && !Global.swappedPair
-                || Global.options.getPair().getOrderCurrency().isFiat() && Global.swappedPair) {
+        CurrencyPair pair = Global.options.getPair();
+        boolean checkFiat = pair.getPaymentCurrency().isFiat() && !Global.swappedPair
+                || pair.getOrderCurrency().isFiat() && Global.swappedPair;
+
+        if (checkFiat) {
             checkPriceInterval = Settings.CHECK_PRICE_INTERVAL_FIAT;
         }
+
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
         taskList.add(priceTriggerTask);
         LOG.debug("priceTriggerTask : " + priceTriggerTask);
-
-        /*priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), Settings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
-        taskList.add(priceMonitorTask);*/
 
         initialized = true;
     }
