@@ -20,7 +20,6 @@ package com.nubits.nubot.bot;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
@@ -213,10 +212,11 @@ public abstract class NuBotBase {
 
         LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
 
         if (Global.options.isSubmitliquidity()) {
-            NuSetup.setupNuRPCTask();
-            NuSetup.startTask();
+            TaskManager.setupNuRPCTask();
+            TaskManager.startTaskNu();
         }
 
 

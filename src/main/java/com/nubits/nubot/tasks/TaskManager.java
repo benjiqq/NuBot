@@ -18,6 +18,7 @@
 
 package com.nubits.nubot.tasks;
 
+import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyPair;
@@ -55,16 +56,27 @@ public class TaskManager {
 
         //assign default values just for testing without Global.options loaded
 
-        setTasks();
     }
 
-    public TaskManager(boolean iniTasks) {
-        this.running = false;
-        taskList = new ArrayList<BotTask>();
-        if (iniTasks) {
-            setTasks();
-        }
+    /**
+     * setup the task for checking Nu RPC
+     */
+    public void setupNuRPCTask() {
+        LOG.info("Setting up RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
+
+        Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
+                Global.options.getRpcUser(), Global.options.getRpcPass(), true,
+                Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
+
+        this.setNudTask();
+
     }
+
+    public void startTaskNu() {
+        LOG.info("Starting task : Check connection with Nud");
+        this.getCheckNudTask().start();
+    }
+
 
     public void setNudTask() {
         this.checkNudTask = new BotTask(
@@ -73,7 +85,7 @@ public class TaskManager {
 
     }
 
-    private void setTasks() {
+    public void setTasks() {
         //connectivity tasks
 
         LOG.info("setting up tasks");
@@ -179,10 +191,6 @@ public class TaskManager {
         return strategyFiatTask;
     }
 
-    public void setStrategyFiatTask(BotTask strategyFiatTask) {
-        this.strategyFiatTask = strategyFiatTask;
-    }
-
     public BotTask getSendLiquidityTask() {
         return sendLiquidityTask;
     }
@@ -191,35 +199,16 @@ public class TaskManager {
         return secondaryPegTask;
     }
 
-    public void setSecondaryPegTask(BotTask secondaryPegTask) {
-        this.secondaryPegTask = secondaryPegTask;
-    }
-
     public BotTask getPriceTriggerTask() {
         return priceTriggerTask;
-    }
-
-    public void setPriceTriggerTask(BotTask priceTriggerTask) {
-        this.priceTriggerTask = priceTriggerTask;
-    }
-
-    public void setSendLiquidityTask(BotTask slt) {
-        this.sendLiquidityTask = slt;
     }
 
     public BotTask getCheckNudTask() {
         return checkNudTask;
     }
 
-    public void setCheckNudTask(BotTask checkNudTask) {
-        this.checkNudTask = checkNudTask;
-    }
-
     public boolean isInitialized() {
         return initialized;
     }
 
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
-    }
 }

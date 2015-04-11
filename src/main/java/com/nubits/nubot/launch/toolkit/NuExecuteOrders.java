@@ -140,6 +140,7 @@ public class NuExecuteOrders {
 
         //Create a TaskManager and
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
         //Start checking for connection
         Global.taskManager.getCheckConnectionTask().start();
 
