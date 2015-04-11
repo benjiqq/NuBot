@@ -17,10 +17,6 @@
  */
 package com.nubits.nubot.strategy.Secondary;
 
-/**
- * @author desrever <desrever at nubits.com>
- */
-
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
@@ -222,8 +218,8 @@ public class StrategySecondaryPegUtils {
             }
 
         }
-        //Prepare the orders
 
+        //Prepare the orders
         String orderString1;
         String sideStr = type + " side order : ";
 
@@ -364,46 +360,50 @@ public class StrategySecondaryPegUtils {
 
 
     public void recount() {
+
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-        if (balancesResponse.isPositive()) {
-            PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
-            double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-            strategy.setActiveSellOrders(TradeUtils.countActiveOrders(Constant.SELL));
-            strategy.setActiveBuyOrders(TradeUtils.countActiveOrders(Constant.BUY));
-            strategy.setTotalActiveOrders(strategy.getActiveBuyOrders() + strategy.getActiveSellOrders());
+        if (!balancesResponse.isPositive()) {
+            LOG.error(balancesResponse.getError().toString());
+            return;
+        }
 
-            strategy.setOrdersAndBalancesOK(false);
+        PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
+        double balanceNBT = balance.getNBTAvailable().getQuantity();
+        double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-            double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
+        strategy.setActiveSellOrders(TradeUtils.countActiveOrders(Constant.SELL));
+        strategy.setActiveBuyOrders(TradeUtils.countActiveOrders(Constant.BUY));
+        strategy.setTotalActiveOrders(strategy.getActiveBuyOrders() + strategy.getActiveSellOrders());
 
+        strategy.setOrdersAndBalancesOK(false);
 
-            int activeSellOrders = strategy.getActiveSellOrders();
-            int activeBuyOrders = strategy.getActiveBuyOrders();
-            if (Global.options.isDualSide()) {
-
-                strategy.setOrdersAndBalancesOK((activeSellOrders == 2 && activeBuyOrders == 2)
-                        || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+        double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
 
-                if (balancePEG > oneNBT
-                        && Global.options.getPair().getPaymentCurrency().isFiat()
-                        && !strategy.isFirstTime()
-                        && Global.options.getMaxBuyVolume() != 0) { //Only for EUR...CNY etc
-                    LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
-                            + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
-                    strategy.setProceedsInBalance(true);
-                } else {
-                    strategy.setProceedsInBalance(false);
-                }
+        int activeSellOrders = strategy.getActiveSellOrders();
+        int activeBuyOrders = strategy.getActiveBuyOrders();
+        if (Global.options.isDualSide()) {
+
+            strategy.setOrdersAndBalancesOK((activeSellOrders == 2 && activeBuyOrders == 2)
+                    || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
+                    || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+
+
+            if (balancePEG > oneNBT
+                    && Global.options.getPair().getPaymentCurrency().isFiat()
+                    && !strategy.isFirstTime()
+                    && Global.options.getMaxBuyVolume() != 0) { //Only for EUR...CNY etc
+                LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balancePEG + " ). If the balance represent proceedings "
+                        + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
+                strategy.setProceedsInBalance(true);
             } else {
-                strategy.setOrdersAndBalancesOK(activeSellOrders == 2 && activeBuyOrders == 0); // Ignore the balance
+                strategy.setProceedsInBalance(false);
             }
         } else {
-            LOG.error(balancesResponse.getError().toString());
+            strategy.setOrdersAndBalancesOK(activeSellOrders == 2 && activeBuyOrders == 0); // Ignore the balance
         }
+
     }
 
     public void aggregateAndKeepProceeds() {
@@ -411,38 +411,42 @@ public class StrategySecondaryPegUtils {
         LOG.info("aggregateAndKeepProceeds");
 
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
-        if (cancel) {
-
-            //get the balance and see if it does still require an aggregation
-
-            Global.frozenBalancesManager.freezeNewFunds();
-
-            //Introuce an aleatory sleep time to desync bots at the time of placing orders.
-            //This will favour competition in markets with multiple custodians
-            try {
-                Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
-            } catch (InterruptedException ex) {
-                LOG.error(ex.toString());
-            }
-
-            double buyPrice = strategy.getBuyPricePEG();
-            LOG.info("init buy orders. price " + buyPrice);
-            initOrders(Constant.BUY, buyPrice);
-
-        } else {
+        if (!cancel) {
             LOG.error("An error occurred while attempting to cancel buy orders.");
+            return;
         }
+
+        //get the balance and see if it does still require an aggregation
+
+        Global.frozenBalancesManager.freezeNewFunds();
+
+        //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+        //This will favour competition in markets with multiple custodians
+        try {
+            Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+        } catch (InterruptedException ex) {
+            LOG.error(ex.toString());
+        }
+
+        double buyPrice = strategy.getBuyPricePEG();
+        LOG.info("init buy orders. price " + buyPrice);
+        initOrders(Constant.BUY, buyPrice);
+
+
     }
 
     /* Returns an array of two strings representing orders id.
      * the first element of the array is the smallest order and the second the largest */
     public String[] getSmallerWallID(String type) {
+
         String[] toRet = new String[2];
         Order smallerOrder = new Order();
         Order biggerOrder = new Order();
         smallerOrder.setId("-1");
         biggerOrder.setId("-1");
+
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
             ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
@@ -462,7 +466,6 @@ public class StrategySecondaryPegUtils {
                 }
                 toRet[0] = smallerOrder.getId();
                 toRet[1] = biggerOrder.getId();
-
             }
 
         } else {

@@ -137,7 +137,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 buySide();
             }
 
-
         }
     }
 
@@ -719,7 +718,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
                     }
 
-
                     if (order2Response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
@@ -736,8 +734,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
         }
 
-
-        return true;
+        return success;
     }
 
     public SubmitLiquidityinfoTask getSendLiquidityTask() {
