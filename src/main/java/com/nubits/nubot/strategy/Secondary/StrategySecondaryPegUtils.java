@@ -33,8 +33,8 @@ import java.util.ArrayList;
 
 public class StrategySecondaryPegUtils {
 
-
     final static Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegUtils.class);
+
     private final int MAX_RANDOM_WAIT_SECONDS = 5;
     private final int SHORT_WAIT_SECONDS = 6;
     private StrategySecondaryPegTask strategy;
