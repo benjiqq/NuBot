@@ -40,7 +40,6 @@ public class TaskManager {
     private BotTask strategyFiatTask;
     private BotTask sendLiquidityTask;
     private BotTask checkNudTask;
-    private BotTask priceMonitorTask; //use only with NuPriceMonitor
 
     //these are used for secondary peg strategy
     private BotTask secondaryPegTask;
@@ -216,14 +215,6 @@ public class TaskManager {
 
     public void setCheckNudTask(BotTask checkNudTask) {
         this.checkNudTask = checkNudTask;
-    }
-
-    public BotTask getPriceMonitorTask() {
-        return priceMonitorTask;
-    }
-
-    public void setPriceMonitorTask(BotTask priceMonitorTask) {
-        this.priceMonitorTask = priceMonitorTask;
     }
 
     public boolean isInitialized() {
