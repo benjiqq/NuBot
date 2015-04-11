@@ -120,15 +120,6 @@ public class TaskManager {
         initialized = true;
     }
 
-    //Methods
-    public void startAll() {
-        for (int i = 0; i < taskList.size(); i++) {
-            BotTask task = taskList.get(i);
-            task.start();
-        }
-
-    }
-
     public void stopAll() throws IllegalStateException {
         LOG.info("Stopping all BotTasks. ");
         boolean sentNotification = false;
