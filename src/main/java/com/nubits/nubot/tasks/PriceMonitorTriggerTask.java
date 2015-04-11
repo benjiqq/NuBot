@@ -235,26 +235,27 @@ public class PriceMonitorTriggerTask extends TimerTask {
     private void executeUpdatePrice(int countTrials) throws FeedPriceException {
 
         if (countTrials <= MAX_ATTEMPTS) {
-            ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
+
+            ArrayList<LastPrice> currentPriceList = pfm.fetchLastPrices().getPrices();
 
             LOG.debug("CheckLastPrice received values from remote feeds. ");
 
-            if (priceList.size() == pfm.getFeedList().size()) {
+            if (currentPriceList.size() == pfm.getFeedList().size()) {
                 //All feeds returned a positive value
                 //Check if mainPrice is close enough to the others
                 // I am assuming that mainPrice is the first element of the list
-                if (sanityCheck(priceList, 0)) {
+                if (sanityCheck(currentPriceList, 0)) {
                     //mainPrice is reliable compared to the others
-                    this.updateLastPrice(priceList.get(0), priceList);
+                    this.updateLastPrice(currentPriceList.get(0), currentPriceList);
 
                 } else {
                     //mainPrice is not reliable compared to the others
                     //Check if other backup prices are close enough to each other
                     boolean foundSomeValidBackUp = false;
                     LastPrice goodPrice = null;
-                    for (int l = 1; l < priceList.size(); l++) {
-                        if (sanityCheck(priceList, l)) {
-                            goodPrice = priceList.get(l);
+                    for (int l = 1; l < currentPriceList.size(); l++) {
+                        if (sanityCheck(currentPriceList, l)) {
+                            goodPrice = currentPriceList.get(l);
                             foundSomeValidBackUp = true;
                             break;
                         }
@@ -263,33 +264,33 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
 
-                        this.updateLastPrice(goodPrice, priceList);
+                        this.updateLastPrice(goodPrice, currentPriceList);
                     } else {
                         //None of the source are in accord with others.
                         //Try to send a notification
-                        unableToUpdatePrice(priceList);
+                        unableToUpdatePrice(currentPriceList);
                     }
                 }
             } else {
                 //One or more feed returned an error value
 
-                if (priceList.size() == 2) { // if only 2 values are available
-                    double p1 = priceList.get(0).getPrice().getQuantity();
-                    double p2 = priceList.get(1).getPrice().getQuantity();
+                if (currentPriceList.size() == 2) { // if only 2 values are available
+                    double p1 = currentPriceList.get(0).getPrice().getQuantity();
+                    double p2 = currentPriceList.get(1).getPrice().getQuantity();
                     if (closeEnough(this.DISTANCE_TRESHHOLD, p1, p2)) {
 
-                        this.updateLastPrice(priceList.get(0), priceList);
+                        this.updateLastPrice(currentPriceList.get(0), currentPriceList);
                     } else {
                         //The two values are too unreliable
-                        unableToUpdatePrice(priceList);
+                        unableToUpdatePrice(currentPriceList);
                     }
-                } else if (priceList.size() > 2) { // more than two
+                } else if (currentPriceList.size() > 2) { // more than two
                     //Check if other backup prices are close enough to each other
                     boolean foundSomeValidBackUp = false;
                     LastPrice goodPrice = null;
-                    for (int l = 1; l < priceList.size(); l++) {
-                        if (sanityCheck(priceList, l)) {
-                            goodPrice = priceList.get(l);
+                    for (int l = 1; l < currentPriceList.size(); l++) {
+                        if (sanityCheck(currentPriceList, l)) {
+                            goodPrice = currentPriceList.get(l);
                             foundSomeValidBackUp = true;
                             break;
                         }
@@ -297,14 +298,14 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
 
-                        this.updateLastPrice(goodPrice, priceList);
+                        this.updateLastPrice(goodPrice, currentPriceList);
                     } else {
                         //None of the source are in accord with others.
                         //Try to send a notification
-                        unableToUpdatePrice(priceList);
+                        unableToUpdatePrice(currentPriceList);
                     }
                 } else {//if only one or 0 feeds are positive
-                    unableToUpdatePrice(priceList);
+                    unableToUpdatePrice(currentPriceList);
                 }
             }
 
@@ -342,8 +343,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //we need to check the reason that the refresh took a whole period.
         //if it's because of a no connection issue, we need to wait to see if connection restarts
         if (!Global.exchange.getLiveData().isConnected()) {
-            currentTime = System.currentTimeMillis();
 
+            currentTime = System.currentTimeMillis();
 
             logMessage = "There has been a connection issue for " + Settings.CHECK_PRICE_INTERVAL + " seconds\n"
                     + "Consider restarting the bot if the connection issue persists";
