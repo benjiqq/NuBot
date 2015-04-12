@@ -373,17 +373,16 @@ public class StrategySecondaryPegUtils {
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        strategy.orderManager.setNumActiveSellOrders(OrderManager.countActiveOrders(Constant.SELL));
-        strategy.orderManager.setNumActiveBuyOrders(OrderManager.countActiveOrders(Constant.BUY));
-        strategy.orderManager.setNumTotalActiveOrders(strategy.orderManager.getNumActiveBuyOrders() + strategy.orderManager.getNumActiveSellOrders());
+        strategy.orderManager.setNumActiveSellOrders();
+        strategy.orderManager.setNumActiveBuyOrders();
+        strategy.orderManager.setNumTotalActiveOrders();
+        int activeSellOrders = strategy.orderManager.getNumActiveSellOrders();
+        int activeBuyOrders = strategy.orderManager.getNumActiveBuyOrders();
 
         strategy.setOrdersAndBalancesOK(false);
 
         double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
-
-        int activeSellOrders = strategy.orderManager.getNumActiveSellOrders();
-        int activeBuyOrders = strategy.orderManager.getNumActiveBuyOrders();
         if (Global.options.isDualSide()) {
 
             strategy.setOrdersAndBalancesOK((activeSellOrders == 2 && activeBuyOrders == 2)
@@ -438,7 +437,7 @@ public class StrategySecondaryPegUtils {
 
     /* Returns an array of two strings representing orders id.
      * the first element of the array is the smallest order and the second the largest */
-    public String[] getSmallerWallID(String type) {
+    /*public String[] getSmallerWallID(String type) {
 
         String[] toRet = new String[2];
         Order smallerOrder = new Order();
@@ -475,7 +474,7 @@ public class StrategySecondaryPegUtils {
             return err;
         }
         return toRet;
-    }
+    }*/
 
     public boolean shiftWalls() {
 

@@ -1,6 +1,7 @@
 package com.nubits.nubot.strategy;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Order;
 import org.slf4j.Logger;
@@ -67,24 +68,24 @@ public class OrderManager {
         return numActiveSellOrders;
     }
 
-    public void setNumActiveSellOrders(int numActiveSellOrders) {
-        this.numActiveSellOrders = numActiveSellOrders;
+    public void setNumActiveSellOrders() {
+        this.numActiveSellOrders = this.countActiveOrders(Constant.SELL);
+    }
+
+    public void setNumActiveBuyOrders() {
+        this.numActiveBuyOrders = this.countActiveOrders(Constant.BUY);
+    }
+
+    public void setNumTotalActiveOrders() {
+        this.numTotalActiveOrders = this.getNumActiveBuyOrders() + this.getNumActiveSellOrders();
     }
 
     public int getNumActiveBuyOrders() {
         return numActiveBuyOrders;
     }
 
-    public void setNumActiveBuyOrders(int numActiveBuyOrders) {
-        this.numActiveBuyOrders = numActiveBuyOrders;
-    }
-
     public int getNumTotalActiveOrders() {
         return numTotalActiveOrders;
-    }
-
-    public void setNumTotalActiveOrders(int numTotalActiveOrders) {
-        this.numTotalActiveOrders = numTotalActiveOrders;
     }
 
 }
