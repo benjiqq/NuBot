@@ -23,6 +23,7 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -48,7 +49,7 @@ public class StrategySecondaryPegUtils {
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
-        if (strategy.getTotalActiveOrders() != 0) {
+        if (strategy.orderManager.getNumTotalActiveOrders() != 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
@@ -372,17 +373,17 @@ public class StrategySecondaryPegUtils {
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        strategy.setActiveSellOrders(TradeUtils.countActiveOrders(Constant.SELL));
-        strategy.setActiveBuyOrders(TradeUtils.countActiveOrders(Constant.BUY));
-        strategy.setTotalActiveOrders(strategy.getActiveBuyOrders() + strategy.getActiveSellOrders());
+        strategy.orderManager.setNumActiveSellOrders(OrderManager.countActiveOrders(Constant.SELL));
+        strategy.orderManager.setNumActiveBuyOrders(OrderManager.countActiveOrders(Constant.BUY));
+        strategy.orderManager.setNumTotalActiveOrders(strategy.orderManager.getNumActiveBuyOrders() + strategy.orderManager.getNumActiveSellOrders());
 
         strategy.setOrdersAndBalancesOK(false);
 
         double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
 
-        int activeSellOrders = strategy.getActiveSellOrders();
-        int activeBuyOrders = strategy.getActiveBuyOrders();
+        int activeSellOrders = strategy.orderManager.getNumActiveSellOrders();
+        int activeBuyOrders = strategy.orderManager.getNumActiveBuyOrders();
         if (Global.options.isDualSide()) {
 
             strategy.setOrdersAndBalancesOK((activeSellOrders == 2 && activeBuyOrders == 2)
@@ -449,7 +450,7 @@ public class StrategySecondaryPegUtils {
 
         if (activeOrdersResponse.isPositive()) {
             ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
+            ArrayList<Order> orderListCategorized = OrderManager.filterOrders(orderList, type);
 
             if (orderListCategorized.size() != 2) {
                 LOG.error("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");

@@ -21,6 +21,7 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -33,14 +34,23 @@ import java.util.TimerTask;
 public class StrategySecondaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
+
+    public OrderManager orderManager;
+
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
+
     private boolean mightNeedInit = true;
-    private int activeSellOrders, activeBuyOrders, totalActiveOrders;
+
     private boolean ordersAndBalancesOK;
+
     private boolean needWallShift;
+
     private double sellPricePEG;
+
     private double buyPricePEG;
+
     private boolean shiftingWalls = false;
+
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
     private SubmitLiquidityinfoTask sendLiquidityTask;
@@ -107,8 +117,12 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void initStrategy() {
+
         //First execution : reset orders and init strategy
         LOG.info("Initializing strategy");
+
+        orderManager = new OrderManager();
+
         isFirstTime = false;
         strategyUtils.recount();
         boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
@@ -205,29 +219,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.sendLiquidityTask = sendLiquidityTask;
     }
 
-    public int getActiveSellOrders() {
-        return activeSellOrders;
-    }
-
-    public void setActiveSellOrders(int activeSellOrders) {
-        this.activeSellOrders = activeSellOrders;
-    }
-
-    public int getActiveBuyOrders() {
-        return activeBuyOrders;
-    }
-
-    public void setActiveBuyOrders(int activeBuyOrders) {
-        this.activeBuyOrders = activeBuyOrders;
-    }
-
-    public int getTotalActiveOrders() {
-        return totalActiveOrders;
-    }
-
-    public void setTotalActiveOrders(int totalActiveOrders) {
-        this.totalActiveOrders = totalActiveOrders;
-    }
 
     public boolean isMightNeedInit() {
         return mightNeedInit;

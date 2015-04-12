@@ -37,55 +37,6 @@ public class TradeUtils {
 
     private static final Logger LOG = LoggerFactory.getLogger(TradeUtils.class.getName());
 
-    /*public static int countActiveOrders(String type) {
-        //Get active orders
-        int toRet = 0;
-
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return -1;
-        }
-
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-
-        for (int i = 0; i < orderList.size(); i++) {
-            Order tempOrder = orderList.get(i);
-            if (tempOrder.getType().equalsIgnoreCase(type)) {
-                LOG.info("active order: " + tempOrder);
-                toRet++;
-            }
-        }
-
-        return toRet;
-    }*/
-
-    public static int countActiveOrders(String type) {
-
-        LOG.trace("countActiveOrders " + type);
-        //Get active orders
-        int numOrders = 0;
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-            for (int i = 0; i < orderList.size(); i++) {
-                Order tempOrder = orderList.get(i);
-                if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    numOrders++;
-                }
-            }
-
-        } else {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return -1;
-        }
-        LOG.debug("activeorders " + type + " " + numOrders);
-        return numOrders;
-    }
-
     /**
      * cancel all outstanding orders
      * @param pair
@@ -210,18 +161,6 @@ public class TradeUtils {
 
     public static double getBuyPrice(double txFeeUSDNTB) {
         return 1 - (0.01 * txFeeUSDNTB);
-    }
-
-    public static ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
-        ArrayList<Order> toRet = new ArrayList<>();
-        for (int i = 0; i < originalList.size(); i++) {
-            Order temp = originalList.get(i);
-            if (temp.getType().equalsIgnoreCase(type)) {
-                toRet.add(temp);
-            }
-        }
-
-        return toRet;
     }
 
     /**

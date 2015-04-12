@@ -25,6 +25,7 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
@@ -35,7 +36,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.TimerTask;
-
 
 public class StrategyPrimaryPegTask extends TimerTask {
 
@@ -51,6 +51,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private boolean proceedsInBalance = false;
     private int cycles = 0;
 
+    public OrderManager orderManager;
 
     @Override
     public void run() {
@@ -144,7 +145,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.info("Initializing strategy");
 
+        orderManager = new OrderManager();
+
         checkBalancesAndOrders();
+
         isFirstTime = false;
 
         boolean reinitiateSuccess = reInitiateOrders(true);
@@ -294,7 +298,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
             return;
         }
 
-
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
             //Cannot get balance
@@ -390,19 +393,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        this.orderManager.fetch();
 
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return "-1";
-        }
+        ArrayList<Order> orderList = this.orderManager.getOrderList();
 
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        ArrayList<Order> orderListCategorized = OrderManager.filterOrders(orderList, type);
 
-        ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
-
-        for (int i = 0; i < orderListCategorized.size(); i++) {
-            Order tempOrder = orderListCategorized.get(i);
+        int i = 0;
+        for (Order tempOrder : orderListCategorized) {
             if (tempOrder.getType().equalsIgnoreCase(type)) {
                 if (i == 0) {
                     smallerOrder = tempOrder;
@@ -412,6 +410,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     }
                 }
             }
+            i++;
         }
 
         return smallerOrder.getId();
@@ -438,8 +437,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = TradeUtils.countActiveOrders(Constant.SELL);
-        activeBuyOrders = TradeUtils.countActiveOrders(Constant.BUY);
+        activeSellOrders = OrderManager.countActiveOrders(Constant.SELL);
+        activeBuyOrders = OrderManager.countActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);
