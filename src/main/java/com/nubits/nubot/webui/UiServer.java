@@ -33,7 +33,7 @@ public class UiServer {
 
         new ConfigController(configFile);
 
-        new LogController("/logdump");
+        new LogController();
 
         //controller wants some map. perhaps this can be removed
         Map empty = new HashMap();

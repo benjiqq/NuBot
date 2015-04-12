@@ -60,6 +60,13 @@ public class OrderManager {
         return toRet;
     }
 
+    public void logActiveOrders(){
+        this.setNumActiveBuyOrders();
+        this.setNumActiveSellOrders();
+        LOG.info("buy orders: " + this.numActiveBuyOrders);
+        LOG.info("sell orders: " + this.numActiveSellOrders);
+    }
+
     public ArrayList<Order> getOrderList(){
         return orderList;
     }

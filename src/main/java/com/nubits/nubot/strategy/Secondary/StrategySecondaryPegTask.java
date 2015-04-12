@@ -120,8 +120,8 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         //First execution : reset orders and init strategy
         LOG.info("Initializing strategy");
-
-        orderManager = new OrderManager();
+        LOG.info("setting up ordermanager");
+        this.orderManager = new OrderManager();
 
         isFirstTime = false;
         strategyUtils.recount();

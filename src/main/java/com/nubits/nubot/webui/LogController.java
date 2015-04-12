@@ -1,12 +1,16 @@
 package com.nubits.nubot.webui;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 import static spark.Spark.get;
 
@@ -21,13 +25,13 @@ public class LogController {
 
     final static Logger LOG = LoggerFactory.getLogger(LogController.class);
 
-    public LogController(String endpoint) {
+    public LogController() {
 
-        get(endpoint, "application/json", (request, response) -> {
+        get("/logdump", "application/json", (request, response) -> {
 
             JsonObject object = new JsonObject();
 
-            String f  = logfile;
+            String f = logfile;
             if (Global.options.isVerbose())
                 f = verboselogfile;
 
@@ -42,6 +46,35 @@ public class LogController {
             }
 
             return "error fetching log";
+
+        });
+
+        get("/info", "application/json", (request, response) -> {
+
+            Map opmap = new HashMap();
+            int numbuys = 0;
+            int numsells = 0;
+            if (Global.sessionRunning) {
+                try {
+                    StrategySecondaryPegTask t = (StrategySecondaryPegTask) Global.taskManager.getSecondaryPegTask().getTask();
+                    t.orderManager.logActiveOrders();
+                    numbuys = t.orderManager.getNumActiveBuyOrders();
+                    numsells = t.orderManager.getNumActiveSellOrders();
+                    LOG.info("buys: " + numbuys);
+                    LOG.info("sells: " + numsells);
+
+                } catch (Exception e) {
+
+                }
+            }
+
+            opmap.put("buys", numbuys);
+            opmap.put("sells", numsells);
+
+
+            String json = new Gson().toJson(opmap);
+            return json;
+
 
         });
 

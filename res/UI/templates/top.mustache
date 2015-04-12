@@ -69,10 +69,29 @@
                   console.log("error loading configfile");
                 })
                 .done(function( data ) {
-                    console.log("data: " + data);
+                    //console.log("config data: " + data);
                     $('#configfile').html(data["configfile"]);
                 });
         }
+
+        function updateOrders(){
+             $.ajax({
+              type: "GET",
+              dataType: "json",
+              url:  "http://" + host + ":" + port + "/info"
+            })
+            .fail(function() {
+              console.log("error loading info");
+            })
+            .done(function( data ) {
+                console.log("info data: " + data);
+                console.log("buys: " + data["buys"]);
+                console.log("sells: " + data["sells"]);
+
+            });
+            setTimeout(updateOrders , updateTime);
+         }
+
 
         function updateStatus(){
                  $.ajax({
@@ -84,7 +103,7 @@
 
                 })
                 .done(function( data ) {
-                    console.log("data: " + data);
+                    //console.log("status data: " + data);
 
                     $('#botstatus').html(data["status"]);
 
@@ -136,6 +155,7 @@
         $(document).ready(function() {
 
             updateConfigFile();
+            updateOrders();
 
 
           $('#startbot').click(function(){
