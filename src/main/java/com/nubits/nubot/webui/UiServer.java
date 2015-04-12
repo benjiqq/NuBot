@@ -24,6 +24,8 @@ public class UiServer {
      */
     public static void startUIserver(String configFile) {
 
+        LOG.info("start ui server. configfile " + configFile);
+
         //set up all endpoints
 
         LOG.info("launching on http://localhost:" + port);

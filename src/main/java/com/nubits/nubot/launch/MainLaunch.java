@@ -60,6 +60,7 @@ public class MainLaunch {
 
         boolean runGUI = false;
         String configFile;
+
         if (cli.hasOption(CLIOptions.GUI)) {
             runGUI = true;
             LOG.info("Running " + Settings.APP_NAME + " with GUI");
@@ -68,8 +69,7 @@ public class MainLaunch {
             configFile = cli.getOptionValue(CLIOptions.CFG);
 
             if (runGUI) {
-                LOG.info("Running NuBot GUI");
-
+                SessionManager.setConfigGlobal(configFile);
                 try {
                     UiServer.startUIserver(configFile);
                 } catch (Exception e) {
