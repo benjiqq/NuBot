@@ -28,7 +28,7 @@
           }
 
           #logarea {
-            width:800px;
+            width:650px;
             height:400px;
             resize:none
           }
@@ -155,7 +155,11 @@
         $(document).ready(function() {
 
             updateConfigFile();
+<<<<<<< HEAD
             updateOrders();
+=======
+            showOrders();
+>>>>>>> f2784d9... order table
 
 
           $('#startbot').click(function(){
@@ -227,6 +231,10 @@
 
             });
     });
+
+            function showOrders(){
+                $('#ordertable tr:last').after('<tr><td>column 1 value</td><td>column 2 value</td></tr>');
+            }
 
             function autoScroll(){
 
