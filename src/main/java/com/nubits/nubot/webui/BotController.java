@@ -39,6 +39,9 @@ public class BotController {
                 opmap.put("status", "running");
 
                 opmap.put("sessionstart", SessionManager.startedString());
+
+
+
                 opmap.put("duration", SessionManager.durationString());
 
             } else {
