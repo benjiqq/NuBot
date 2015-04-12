@@ -127,7 +127,7 @@ public class Settings {
 
     public final static String DEFAULT_CONFIG_FILENAME = "nubot-config.json";//Used by UI in case file not explicitly declared
 
-    public final static String CONFIG_DIR = "config" + "/" + "options";
+    public final static String CONFIG_DIR = "config";
 
     public final static String DEFAULT_CONFIG_FILE_PATH = CONFIG_DIR + "/" + DEFAULT_CONFIG_FILENAME;
 

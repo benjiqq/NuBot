@@ -13,6 +13,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -102,10 +103,10 @@ public class SessionManager {
     public static String durationString(){
         Long diff = System.currentTimeMillis() - Global.sessionStarted;
 
-        Long sec = diff/1000;
-        Long min = sec/60;
-        Long hour = sec/(60*60);
-        return "" + hour + ":" + min + ":"  + (sec - (min*60));
+        long seconds = diff / 1000;
+        LocalTime timeOfDay = LocalTime.ofSecondOfDay(seconds);
+        String time = timeOfDay.toString();
+        return time;
     }
 
     public static boolean wasRunOnce(){

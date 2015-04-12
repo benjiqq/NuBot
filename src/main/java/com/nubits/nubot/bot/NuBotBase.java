@@ -239,7 +239,11 @@ public abstract class NuBotBase {
         }
 
         //Start task to check orders
-        Global.taskManager.getSendLiquidityTask().start(Settings.DELAY_LIQUIIDITY);
+        try{
+            Global.taskManager.getSendLiquidityTask().start(Settings.DELAY_LIQUIIDITY);
+        }catch(Exception e){
+            throw new NuBotRunException("" + e);
+        }
 
         if (Global.options.isSubmitliquidity()) {
             try {

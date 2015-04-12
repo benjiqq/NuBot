@@ -33,8 +33,6 @@ public class NuBotOptions {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuBotOptions.class.getName());
 
-    //Compulsory settings ----------------------------
-
     /**
      * Custodian's public key to access the exchange
      */
