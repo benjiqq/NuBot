@@ -3,12 +3,14 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.Order;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,6 +64,12 @@ public class LogController {
                     numsells = t.orderManager.getNumActiveSellOrders();
                     LOG.info("buys: " + numbuys);
                     LOG.info("sells: " + numsells);
+
+                    ArrayList<Order> ol =  t.orderManager.getOrderList();
+                    opmap.put("orders",ol);
+                    for (Order o: ol){
+                        LOG.info("order: " + o);
+                    }
 
                 } catch (Exception e) {
 

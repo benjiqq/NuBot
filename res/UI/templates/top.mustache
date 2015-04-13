@@ -84,12 +84,31 @@
               console.log("error loading info");
             })
             .done(function( data ) {
-                console.log("info data: " + data);
+
+                //console.log("info data: " + data);
                 console.log("buys: " + data["buys"]);
-                console.log("sells: " + data["sells"]);
+                //console.log("sells: " + data["sells"]);
+                console.log("orders: " + data["orders"]);
+
+                if (data.hasOwnProperty("orders")) {
+
+                     $("#ordertable").find("tr:gt(0)").remove();
+
+                    var orders = data["orders"];
+                    for (var i = 0; i < orders.length; i++){
+                        var order = orders[i];
+                        var qty = order["amount"]["quantity"];
+                        var price = order["price"]["quantity"];
+                        //$('#ordertable tr:last').after('<tr><td>' + qty + '</td><td>' + price + '</td></tr>');
+                        var rowhtml = '<tr><td>' + qty + '</td><td>' + price + '</td></tr>';
+                        $("#ordertable").find('tbody').after(rowhtml);
+                    }
+                }
+
+                //$('#ordertable tr:last').after('<tr><td>column 1 value</td><td>column 2 value</td></tr>');
 
             });
-            setTimeout(updateOrders , updateTime);
+            setTimeout(updateOrders , 2000);
          }
 
 
@@ -155,11 +174,7 @@
         $(document).ready(function() {
 
             updateConfigFile();
-<<<<<<< HEAD
             updateOrders();
-=======
-            showOrders();
->>>>>>> f2784d9... order table
 
 
           $('#startbot').click(function(){
@@ -232,9 +247,6 @@
             });
     });
 
-            function showOrders(){
-                $('#ordertable tr:last').after('<tr><td>column 1 value</td><td>column 2 value</td></tr>');
-            }
 
             function autoScroll(){
 
@@ -393,9 +405,7 @@
                 });
 
                 makePost(posturl, jsondata);
-
             }
-
 
 
             function makePost(url, jsondata){
