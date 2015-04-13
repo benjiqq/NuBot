@@ -20,17 +20,17 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 public class StrategySecondaryPegUtils {
 
@@ -49,7 +49,7 @@ public class StrategySecondaryPegUtils {
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
-        if (strategy.orderManager.getNumTotalActiveOrders() != 0) {
+        if (Global.orderManager.getNumTotalActiveOrders() != 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
@@ -137,8 +137,8 @@ public class StrategySecondaryPegUtils {
         if (buysOrdersOk && sellsOrdersOk) {
             strategy.setMightNeedInit(false);
             LOG.info("Initial walls placed");
-            this.strategy.orderManager.fetch();
-            this.strategy.orderManager.logActiveOrders();
+            Global.orderManager.fetch();
+            Global.orderManager.logActiveOrders();
         } else {
             strategy.setMightNeedInit(true);
         }
@@ -375,9 +375,9 @@ public class StrategySecondaryPegUtils {
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        strategy.orderManager.fetch();
-        int activeSellOrders = strategy.orderManager.getNumActiveSellOrders();
-        int activeBuyOrders = strategy.orderManager.getNumActiveBuyOrders();
+        Global.orderManager.fetch();
+        int activeSellOrders = Global.orderManager.getNumActiveSellOrders();
+        int activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
 
         strategy.setOrdersAndBalancesOK(false);
 

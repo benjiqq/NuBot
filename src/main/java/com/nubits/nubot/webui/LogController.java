@@ -58,15 +58,15 @@ public class LogController {
             int numsells = 0;
             if (Global.sessionRunning) {
                 try {
-                    StrategySecondaryPegTask t = (StrategySecondaryPegTask) Global.taskManager.getSecondaryPegTask().getTask();
-                    t.orderManager.logActiveOrders();
-                    numbuys = t.orderManager.getNumActiveBuyOrders();
-                    numsells = t.orderManager.getNumActiveSellOrders();
+
+                    Global.orderManager.logActiveOrders();
+                    numbuys = Global.orderManager.getNumActiveBuyOrders();
+                    numsells = Global.orderManager.getNumActiveSellOrders();
                     LOG.info("buys: " + numbuys);
                     LOG.info("sells: " + numsells);
 
-                    ArrayList<Order> ol =  t.orderManager.getOrderList();
-                    opmap.put("orders",ol);
+                    ArrayList<Order> ol =  Global.orderManager.getOrderList();
+                    opmap.put("orders", ol);
                     for (Order o: ol){
                         LOG.info("order: " + o);
                     }

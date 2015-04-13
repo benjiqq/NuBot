@@ -35,7 +35,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
 
-    public OrderManager orderManager;
+
 
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
 
@@ -61,6 +61,8 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void run() {
 
         LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
+
+        Global.orderManager = new OrderManager();
 
         if (isFirstTime) {
             initStrategy();
@@ -121,7 +123,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         //First execution : reset orders and init strategy
         LOG.info("Initializing strategy");
         LOG.info("setting up ordermanager");
-        this.orderManager = new OrderManager();
+
 
         isFirstTime = false;
         strategyUtils.recount();

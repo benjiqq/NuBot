@@ -152,14 +152,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private String reportTier1() {
         String toReturn = "";
 
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return toReturn;
-        }
-
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        Global.orderManager.fetch();
+        ArrayList<Order> orderList = Global.orderManager.getOrderList();
 
         LOG.debug("Active orders : " + orderList.size());
 
