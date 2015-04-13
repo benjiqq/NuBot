@@ -21,7 +21,6 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -59,8 +58,6 @@ public class StrategySecondaryPegTask extends TimerTask {
     public void run() {
 
         LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
-
-        Global.orderManager = new OrderManager();
 
         if (isFirstTime) {
             initStrategy();

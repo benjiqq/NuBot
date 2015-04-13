@@ -3,6 +3,8 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
@@ -65,11 +67,27 @@ public class LogController {
                     LOG.info("buys: " + numbuys);
                     LOG.info("sells: " + numsells);
 
-                    ArrayList<Order> ol =  Global.orderManager.getOrderList();
+                    ArrayList<Order> ol = Global.orderManager.getOrderList();
                     opmap.put("orders", ol);
-                    for (Order o: ol){
+                    for (Order o : ol) {
                         LOG.info("order: " + o);
                     }
+
+                    //TODO: use global pair
+                    try {
+                        Global.balanceManager.fetchBalance(CurrencyList.BTC);
+                        Amount balance = Global.balanceManager.getBalance();
+                        opmap.put("BuyCurrency", balance);
+                    } catch (Exception e) {
+                    }
+
+                    try {
+                        Global.balanceManager.fetchBalance(CurrencyList.NBT);
+                        Amount balance = Global.balanceManager.getBalance();
+                        opmap.put("SellCurrency", balance);
+                    } catch (Exception e) {
+                    }
+
 
                 } catch (Exception e) {
 

@@ -166,9 +166,10 @@ public class StrategySecondaryPegUtils {
                 currency = Global.options.getPair().getOrderCurrency();
             }
         }
-        try{
+
+        try {
             Global.balanceManager.fetchBalance(currency);
-        }catch(Exception e){
+        } catch (Exception e) {
             return false;
         }
 
@@ -205,12 +206,10 @@ public class StrategySecondaryPegUtils {
         double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
         //check the calculated amount against the set maximum sell amount set in the options.json file
 
-
         if (maxSell > 0 && type.equals(Constant.SELL)) {
             if (amount1 > (maxSell / 2))
                 amount1 = (maxSell / 2);
         }
-
 
         if (type.equals(Constant.BUY) && !Global.swappedPair) {
             amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
@@ -219,7 +218,6 @@ public class StrategySecondaryPegUtils {
                 if (amount1 > (maxBuy / 2))
                     amount1 = (maxBuy / 2);
             }
-
         }
 
         //Prepare the orders
@@ -246,127 +244,129 @@ public class StrategySecondaryPegUtils {
                     + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
         }
 
-        if (Global.options.isExecuteOrders()) {
+        if (!Global.options.isExecuteOrders()) {
+            return success;
+        }
 
-            LOG.warn("Strategy - Submit order : " + orderString1);
+        LOG.warn("Strategy - Submit order : " + orderString1);
 
-            ApiResponse order1Response;
-            if (type.equals(Constant.SELL)) { //Place sellSide order 1
-                if (Global.swappedPair) {
-                    order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
-                } else {
-                    order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
-                }
-            } else { //Place buySide order 1
-                if (Global.swappedPair) {
-                    order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
-                } else {
-                    order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
-                }
-            }
-            if (order1Response.isPositive()) {
-                HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
-                String response1String = (String) order1Response.getResponseObject();
-                LOG.warn("Strategy - " + type + " Response1 = " + response1String);
+        ApiResponse order1Response;
+        if (type.equals(Constant.SELL)) { //Place sellSide order 1
+            if (Global.swappedPair) {
+                order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
             } else {
-                LOG.error(order1Response.getError().toString());
-                success = false;
+                order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
             }
-            //wait a while to give the time to the new amount to update
-
-            try {
-                Thread.sleep(5 * 1000);
-            } catch (InterruptedException ex) {
-                LOG.error(ex.toString());
-            }
-
-            //read balance again
-            ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
-            if (!balancesResponse2.isPositive()) {
-                LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
-                return false;
-            }
-
-            balance = (Amount) balancesResponse2.getResponseObject();
-
-            if (type.equals(Constant.BUY)) {
-                balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
-            }
-
-            double amount2 = balance.getQuantity();
-
-            //check the calculated amount against the set maximum sell amount set in the options.json file
-
-            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
-            }
-
-            if ((type.equals(Constant.BUY) && !Global.swappedPair)
-                    || (type.equals(Constant.SELL) && Global.swappedPair)) {
-                //hotfix
-                amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
-
-                amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
-
-                //check the calculated amount against the max buy amount option, if any.
-                if (maxBuy > 0) {
-                    if (amount2 > (maxBuy / 2))
-                        amount2 = (maxBuy / 2);
-                }
-
-            }
-
-            String orderString2;
-            if (!Global.swappedPair) {
-                orderString2 = sideStr + " " + type + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                        + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-
-            } else { //Swapped
-                String typeStr;
-                if (type.equals(Constant.SELL)) {
-                    typeStr = Constant.BUY;
-                } else {
-                    typeStr = Constant.SELL;
-                }
-                orderString2 = sideStr + " " + typeStr + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                        + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-            }
-            //put it on order
-
-            LOG.warn("Strategy - Submit order : " + orderString2);
-            ApiResponse order2Response;
-            if (type.equals(Constant.SELL)) { //Place sellSide order 2
-                if (Global.swappedPair) {
-                    order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
-                } else {
-                    order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
-                }
-            } else {//Place buySide order 2
-                if (Global.swappedPair) {
-                    order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
-                } else {
-                    order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
-                }
-            }
-            if (order2Response.isPositive()) {
-                HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
-                String response2String = (String) order2Response.getResponseObject();
-                LOG.warn("Strategy - " + type + " Response2 = " + response2String);
+        } else { //Place buySide order 1
+            if (Global.swappedPair) {
+                order1Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount1, price);
             } else {
-                LOG.error(order2Response.getError().toString());
-                success = false;
+                order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
             }
         }
+        if (order1Response.isPositive()) {
+            HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
+            String response1String = (String) order1Response.getResponseObject();
+            LOG.warn("Strategy - " + type + " Response1 = " + response1String);
+        } else {
+            LOG.error(order1Response.getError().toString());
+            success = false;
+        }
+        //wait a while to give the time to the new amount to update
+
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException ex) {
+            LOG.error(ex.toString());
+        }
+
+        //read balance again
+        try{
+            Global.balanceManager.fetchBalance(currency);
+        }catch (Exception e){
+            return false;
+        }
+
+        balance = Global.balanceManager.getBalance();
+
+        if (type.equals(Constant.BUY)) {
+            balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
+        }
+
+        double amount2 = balance.getQuantity();
+
+        //check the calculated amount against the set maximum sell amount set in the options.json file
+
+        if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+            amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
+        }
+
+        if ((type.equals(Constant.BUY) && !Global.swappedPair)
+                || (type.equals(Constant.SELL) && Global.swappedPair)) {
+            //hotfix
+            amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
+
+            amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
+
+            //check the calculated amount against the max buy amount option, if any.
+            if (maxBuy > 0) {
+                if (amount2 > (maxBuy / 2))
+                    amount2 = (maxBuy / 2);
+            }
+
+        }
+
+        String orderString2;
+        if (!Global.swappedPair) {
+            orderString2 = sideStr + " " + type + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+
+        } else { //Swapped
+            String typeStr;
+            if (type.equals(Constant.SELL)) {
+                typeStr = Constant.BUY;
+            } else {
+                typeStr = Constant.SELL;
+            }
+            orderString2 = sideStr + " " + typeStr + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+        }
+        //put it on order
+
+        LOG.warn("Strategy - Submit order : " + orderString2);
+        ApiResponse order2Response;
+        if (type.equals(Constant.SELL)) { //Place sellSide order 2
+            if (Global.swappedPair) {
+                order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+            } else {
+                order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
+            }
+        } else {//Place buySide order 2
+            if (Global.swappedPair) {
+                order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
+            } else {
+                order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
+            }
+        }
+        if (order2Response.isPositive()) {
+            HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
+            String response2String = (String) order2Response.getResponseObject();
+            LOG.warn("Strategy - " + type + " Response2 = " + response2String);
+        } else {
+            LOG.error(order2Response.getError().toString());
+            success = false;
+        }
+
 
         return success;
     }
 
 
-    public void recount(){
+    public void recount() {
 
-        try{
+        try {
             Global.balanceManager.fetchBalances(Global.options.getPair());
-        }catch (Exception e){
+        } catch (Exception e) {
             LOG.error("error fetching balanaces " + e);
             return;
         }
