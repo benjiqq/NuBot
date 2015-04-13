@@ -58,7 +58,7 @@ public class PriceFeedManager {
      */
     public LastPriceResponse fetchLastPrices() {
 
-        LOG.debug("fetch last prices");
+        LOG.debug("fetchBalance last prices");
 
         LastPriceResponse response = new LastPriceResponse();
         boolean isMainFeedValid = false;

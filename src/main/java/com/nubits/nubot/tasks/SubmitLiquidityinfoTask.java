@@ -59,9 +59,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private String jsonFile_balances;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
-
         this.verbose = verbose;
-
     }
 
     private void initFiles() {

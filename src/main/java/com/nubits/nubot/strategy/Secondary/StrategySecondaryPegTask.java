@@ -35,8 +35,6 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
 
-
-
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
 
     private boolean mightNeedInit = true;

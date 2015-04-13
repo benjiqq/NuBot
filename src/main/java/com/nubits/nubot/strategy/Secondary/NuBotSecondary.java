@@ -48,7 +48,6 @@ public class NuBotSecondary extends NuBotBase {
             LOG.info("Configuring NuBot for Sell-Side strategy");
         }
 
-
         //Peg to a USD price via crypto pair
         Currency toTrackCurrency;
 

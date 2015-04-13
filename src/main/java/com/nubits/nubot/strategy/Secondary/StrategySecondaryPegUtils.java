@@ -149,7 +149,7 @@ public class StrategySecondaryPegUtils {
         LOG.debug("initOrders " + type + ", price " + price);
 
         boolean success = true;
-        Amount balance = null;
+
         //Update the available balance
         Currency currency;
 
@@ -166,17 +166,17 @@ public class StrategySecondaryPegUtils {
                 currency = Global.options.getPair().getOrderCurrency();
             }
         }
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
-        if (!balancesResponse.isPositive()) {
-            LOG.error(balancesResponse.getError().toString());
+        try{
+            Global.balanceManager.fetchBalance(currency);
+        }catch(Exception e){
             return false;
         }
+
+        Amount balance = Global.balanceManager.getBalance();
+
         double oneNBT = 1;
-        if (type.equals(Constant.SELL)) {
-            balance = (Amount) balancesResponse.getResponseObject();
-        } else {
+        if (!type.equals(Constant.SELL)) {
             //Here its time to compute the balance to put apart, if any
-            balance = (Amount) balancesResponse.getResponseObject();
             balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
@@ -362,16 +362,17 @@ public class StrategySecondaryPegUtils {
     }
 
 
-    public void recount() {
+    public void recount(){
 
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-
-        if (!balancesResponse.isPositive()) {
-            LOG.error(balancesResponse.getError().toString());
+        try{
+            Global.balanceManager.fetchBalances(Global.options.getPair());
+        }catch (Exception e){
+            LOG.error("error fetching balanaces " + e);
             return;
         }
 
-        PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
+        PairBalance balance = Global.balanceManager.getPairBalance();
+
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 

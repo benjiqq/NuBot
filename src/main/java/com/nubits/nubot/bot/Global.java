@@ -22,6 +22,7 @@ import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.strategy.BalanceManager;
 import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
@@ -45,6 +46,8 @@ public class Global {
     public static NuBotBase bot;
 
     public static OrderManager orderManager;
+
+    public static BalanceManager balanceManager;
 
     public static Exchange exchange;
 
