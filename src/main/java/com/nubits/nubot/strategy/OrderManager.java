@@ -50,8 +50,7 @@ public class OrderManager {
 
     public static ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
         ArrayList<Order> toRet = new ArrayList<>();
-        for (int i = 0; i < originalList.size(); i++) {
-            Order temp = originalList.get(i);
+        for(Order temp: originalList) {
             if (temp.getType().equalsIgnoreCase(type)) {
                 toRet.add(temp);
             }
@@ -61,10 +60,8 @@ public class OrderManager {
     }
 
     public void logActiveOrders(){
-        this.setNumActiveBuyOrders();
-        this.setNumActiveSellOrders();
-        LOG.info("buy orders: " + this.numActiveBuyOrders);
-        LOG.info("sell orders: " + this.numActiveSellOrders);
+        LOG.info("buy orders: " + this.getNumActiveBuyOrders());
+        LOG.info("sell orders: " + this.getNumActiveSellOrders());
     }
 
     public ArrayList<Order> getOrderList(){
@@ -72,27 +69,15 @@ public class OrderManager {
     }
 
     public int getNumActiveSellOrders() {
-        return numActiveSellOrders;
-    }
-
-    public void setNumActiveSellOrders() {
-        this.numActiveSellOrders = this.countActiveOrders(Constant.SELL);
-    }
-
-    public void setNumActiveBuyOrders() {
-        this.numActiveBuyOrders = this.countActiveOrders(Constant.BUY);
-    }
-
-    public void setNumTotalActiveOrders() {
-        this.numTotalActiveOrders = this.getNumActiveBuyOrders() + this.getNumActiveSellOrders();
+        return this.countActiveOrders(Constant.SELL);
     }
 
     public int getNumActiveBuyOrders() {
-        return numActiveBuyOrders;
+        return this.countActiveOrders(Constant.BUY);
     }
 
     public int getNumTotalActiveOrders() {
-        return numTotalActiveOrders;
+        return orderList.size();
     }
 
 }

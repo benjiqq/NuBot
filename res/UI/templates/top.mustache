@@ -97,15 +97,13 @@
                     var orders = data["orders"];
                     for (var i = 0; i < orders.length; i++){
                         var order = orders[i];
+                        var type = order["type"];
                         var qty = order["amount"]["quantity"];
                         var price = order["price"]["quantity"];
-                        //$('#ordertable tr:last').after('<tr><td>' + qty + '</td><td>' + price + '</td></tr>');
-                        var rowhtml = '<tr><td>' + qty + '</td><td>' + price + '</td></tr>';
+                        var rowhtml = '<tr><td>' + type + '</td><td>' + qty + '</td><td>' + price + '</td></tr>';
                         $("#ordertable").find('tbody').after(rowhtml);
                     }
                 }
-
-                //$('#ordertable tr:last').after('<tr><td>column 1 value</td><td>column 2 value</td></tr>');
 
             });
             setTimeout(updateOrders , 2000);

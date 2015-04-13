@@ -375,9 +375,7 @@ public class StrategySecondaryPegUtils {
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        strategy.orderManager.setNumActiveSellOrders();
-        strategy.orderManager.setNumActiveBuyOrders();
-        strategy.orderManager.setNumTotalActiveOrders();
+        strategy.orderManager.fetch();
         int activeSellOrders = strategy.orderManager.getNumActiveSellOrders();
         int activeBuyOrders = strategy.orderManager.getNumActiveBuyOrders();
 
