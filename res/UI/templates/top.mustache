@@ -57,6 +57,10 @@
               $('#startbot').removeClass("btn-success");
               $('#startbot').addClass("btn-primary");
               $('#startbot').html("Start");
+
+              $("#ordertable").find("tr:gt(0)").remove();
+              $("#balancetable").find("tr:gt(0)").remove();
+
          }
 
         function updateConfigFile(){
