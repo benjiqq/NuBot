@@ -6,6 +6,10 @@ import com.nubits.nubot.models.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * BalanceManager channels balances queries to exchanges and stores the results
+ * gets triggered from tasks
+ */
 public class BalanceManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(BalanceManager.class.getName());

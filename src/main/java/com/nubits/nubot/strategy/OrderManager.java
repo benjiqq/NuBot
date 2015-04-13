@@ -9,14 +9,17 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-
+/**
+ * OrderManager channels order queries to exchanges and stores the results
+ * gets triggered from tasks
+ */
 public class OrderManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderManager.class.getName());
 
     private static ArrayList<Order> orderList;
 
-    public void fetch(){
+    public void fetch() {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             this.orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
@@ -32,7 +35,7 @@ public class OrderManager {
 
         int numOrders = 0;
 
-        for (Order tempOrder: orderList){
+        for (Order tempOrder : orderList) {
             if (tempOrder.getType().equalsIgnoreCase(type)) {
                 numOrders++;
             }
@@ -44,7 +47,7 @@ public class OrderManager {
 
     public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
         ArrayList<Order> toRet = new ArrayList<>();
-        for(Order temp: originalList) {
+        for (Order temp : originalList) {
             if (temp.getType().equalsIgnoreCase(type)) {
                 toRet.add(temp);
             }
@@ -53,12 +56,12 @@ public class OrderManager {
         return toRet;
     }
 
-    public void logActiveOrders(){
+    public void logActiveOrders() {
         LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
         LOG.debug("sell orders: " + this.getNumActiveSellOrders());
     }
 
-    public ArrayList<Order> getOrderList(){
+    public ArrayList<Order> getOrderList() {
         return orderList;
     }
 
