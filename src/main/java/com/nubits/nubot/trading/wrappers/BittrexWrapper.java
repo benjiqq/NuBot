@@ -18,7 +18,9 @@
 
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
@@ -42,6 +44,8 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -64,6 +68,11 @@ public class BittrexWrapper implements TradeInterface {
     private final String API_BALANCE = "account/getbalance";
     private final String API_BALANCES = "account/getbalances";
     private final String API_TICKER = "public/getticker";
+    private final String API_SELL = "market/selllimit";
+    private final String API_BUY = "market/buylimit";
+    private final String API_ACTIVE_ORDERS = "market/getopenorders";
+    private final String API_CANCEL = "market/cancel";
+    private final String API_LAST_ORDERS = "account/getorderhistory";
     //Errors
     private ErrorManager errors = new ErrorManager();
     private final String TOKEN_ERR = "error";
@@ -76,6 +85,7 @@ public class BittrexWrapper implements TradeInterface {
     public BittrexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new BittrexService(keys);
         setupErrors();
     }
 
@@ -224,57 +234,275 @@ public class BittrexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        return null;
+        return enterOrder(Constant.SELL, pair, amount, rate);
     }
 
     @Override
     public ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        return null;
+        return enterOrder(Constant.BUY, pair, amount, rate);
+    }
+
+    private ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method;
+        if (type.equals(Constant.SELL)) {
+            method = API_SELL;
+        } else {
+            method = API_BUY;
+        }
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = true;
+        boolean needAuth = true;
+
+        args.put("market", pair.toStringSepInverse("-").toUpperCase());
+        DecimalFormat nf = new DecimalFormat("0");
+        nf.setMinimumFractionDigits(8);
+        args.put("quantity", nf.format(amount));
+        args.put("rate", nf.format(rate));
+
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONObject result = (JSONObject) httpAnswerJson.get("result");
+            String orderId = result.get("uuid").toString();
+            apiResponse.setResponseObject(orderId);
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getActiveOrders() {
-        return null;
+        return getActiveOrdersImpl(null);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        return null;
+        return getActiveOrdersImpl(pair);
+    }
+
+    private ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_ACTIVE_ORDERS;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = true;
+        boolean needAuth = true;
+        ArrayList<Order> orderList = new ArrayList<>();
+
+        if (pair == null) {
+            pair = Global.options.getPair();
+        }
+        args.put("market", pair.toStringSepInverse("-"));
+
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray result = (JSONArray) httpAnswerJson.get("result");
+            for (Iterator<JSONObject> order = result.iterator(); order.hasNext();) {
+                JSONObject thisOrder = order.next();
+                orderList.add(parseOrder(thisOrder));
+            }
+
+        } else {
+            apiResponse = response;
+        }
+
+        return apiResponse;
+    }
+
+    private Order parseOrder(JSONObject in) {
+        Order out = new Order();
+
+        out.setId(in.get("OrderUuid").toString());
+        //Bittrex returns the currencies inverted. turn them round here.
+        CurrencyPair orderPair = CurrencyPair.getCurrencyPairFromString(in.get("Exchange").toString(), "-");
+        CurrencyPair pair = new CurrencyPair(orderPair.getPaymentCurrency(), orderPair.getOrderCurrency());
+        out.setPair(pair);
+        out.setType(in.get("OrderType").toString().contains("SELL") ? Constant.SELL : Constant.BUY);
+        Amount amount = new Amount(Utils.getDouble(in.get("Quantity")), pair.getOrderCurrency());
+        out.setAmount(amount);
+        Amount price = new Amount(Utils.getDouble(in.get("Price")), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //2014-07-09T03:55:48.77
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.S");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("Opened").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.error(pe.toString());
+        }
+        if (date != null) {
+            long timeStamp = date.getTime();
+            Date insertDate = new Date(timeStamp);
+            out.setInsertedDate(insertDate);
+        }
+        date = null;
+        try {
+            date = sdf.parse(in.get("Closed").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.error(pe.toString());
+        }
+        if (date != null) {
+            long timeStamp = date.getTime();
+            Date insertDate = new Date(timeStamp);
+            out.setExecutedDate(insertDate);
+        }
+        out.setCompleted(false);
+        if (Utils.getDouble(in.get("QuantityRemaining")) == 0) {
+            out.setCompleted(true);
+        }
+
+        return out;
     }
 
     @Override
     public ApiResponse getOrderDetail(String orderID) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        ApiResponse getOrders = getActiveOrders();
+
+        if (getOrders.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(orderID)) {
+                    apiResponse.setResponseObject(thisOrder);
+                }
+            }
+        } else {
+            apiResponse = getOrders;
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse cancelOrder(String orderID, CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_CANCEL;
+        HashMap<String, String> args = new HashMap<>();
+        boolean needAuth = true;
+        boolean isGet = true;
+
+        args.put("uuid", orderID);
+
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
+        if (response.isPositive()) {
+            apiResponse.setResponseObject(true);
+        } else {
+            apiResponse.setResponseObject(false);
+        }
+
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setResponseObject(0.25);
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+        apiResponse.setResponseObject(0.25);
+        return apiResponse;
     }
 
     @Override
     public ApiResponse getLastTrades(CurrencyPair pair) {
-        return null;
+        return getLastTradesImpl(pair, 0);
     }
 
     @Override
-    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
-        return null;
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) { return getLastTradesImpl(pair, startTime);     }
+
+    private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
+        ApiResponse apiResponse = new ApiResponse();
+        String url = API_BASE_URL;
+        String method = API_LAST_ORDERS;
+        HashMap<String, String> args = new HashMap<>();
+        boolean isGet = true;
+        boolean needAuth = true;
+        ArrayList<Trade> tradeList = new ArrayList<>();
+
+        ApiResponse response = getQuery(url, method, args, needAuth, isGet);
+        if (response.isPositive()) {
+            JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
+            JSONArray result = (JSONArray) httpAnswerJson.get("result");
+            for (Iterator<JSONObject> trade = result.iterator(); trade.hasNext();) {
+                Trade thisTrade = parseTrade(trade.next());
+                if (thisTrade.getDate() == null) {
+                    continue;
+                }
+                if (startTime > 0 && thisTrade.getDate().getTime() < startTime){
+                    continue;
+                }
+                tradeList.add(thisTrade);
+            }
+            apiResponse.setResponseObject(tradeList);
+        } else {
+            apiResponse = response;
+        }
+
+
+        return apiResponse;
+    }
+
+    private Trade parseTrade(JSONObject in) {
+        Trade out = new Trade();
+
+        out.setExchangeName(Global.exchange.getName());
+        //Bittrex returns the currencies inverted. turn them round here.
+        CurrencyPair orderPair = CurrencyPair.getCurrencyPairFromString(in.get("Exchange").toString(), "-");
+        CurrencyPair pair = new CurrencyPair(orderPair.getPaymentCurrency(), orderPair.getOrderCurrency());
+        out.setPair(pair);
+        out.setType(in.get("OrderType").toString().contains("SELL") ? Constant.SELL : Constant.BUY);
+        Amount amount = new Amount(Utils.getDouble(in.get("Quantity")), pair.getOrderCurrency());
+        out.setAmount(amount);
+        Amount price = new Amount(Utils.getDouble(in.get("Price")), pair.getPaymentCurrency());
+        out.setPrice(price);
+        //2014-07-09T03:55:48.77
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.S");
+        Date date = null;
+        try {
+            date = sdf.parse(in.get("Closed").toString());
+        } catch (java.text.ParseException pe) {
+            LOG.error(pe.toString());
+        }
+        if (date != null) {
+            long timeStamp = date.getTime();
+            Date insertDate = new Date(timeStamp);
+            out.setDate(insertDate);
+        }
+
+        return out;
     }
 
     @Override
     public ApiResponse isOrderActive(String id) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+
+        ApiResponse getOrders = getActiveOrders();
+        if (getOrders.isPositive()) {
+            apiResponse.setResponseObject(false);
+            ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                if (thisOrder.getId().equals(id)) {
+                    apiResponse.setResponseObject(!thisOrder.isCompleted());
+                }
+            }
+        } else {
+            apiResponse = getOrders;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -284,7 +512,20 @@ public class BittrexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        ApiResponse apiResponse = new ApiResponse();
+
+        ApiResponse getOrders = getActiveOrders(pair);
+        if (getOrders.isPositive()) {
+            ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+                Order thisOrder = order.next();
+                cancelOrder(thisOrder.getId(), thisOrder.getPair());
+            }
+        } else {
+            apiResponse = getOrders;
+        }
+
+        return apiResponse;
     }
 
     @Override
@@ -303,7 +544,8 @@ public class BittrexWrapper implements TradeInterface {
             LOG.error("The bot will not execute the query, there is no connection to " + exchange.getName());
             return TOKEN_BAD_RETURN;
         }
-        return service.executeQuery(base, method, args, needAuth, isGet);
+        String query = service.executeQuery(base, method, args, needAuth, isGet);
+        return query;
     }
 
     @Override
@@ -325,13 +567,7 @@ public class BittrexWrapper implements TradeInterface {
 
         protected ApiKeys keys;
 
-        public BittrexService(ApiKeys keys) {
-            this.keys = keys;
-        }
-
-        private BittrexService() {
-            //Used for ticker, does not require auth
-        }
+        public BittrexService(ApiKeys keys) { this.keys = keys; }
 
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
@@ -353,6 +589,7 @@ public class BittrexWrapper implements TradeInterface {
                 queryUrl = new URL(base + "/" + method + "?" + post_data);
             } catch (MalformedURLException mal) {
                 LOG.error(mal.toString());
+                return null;
             }
 
             try {
