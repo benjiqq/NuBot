@@ -520,7 +520,6 @@ public class AltsTradeWrapper implements TradeInterface {
             this.keys = keys;
         }
 
-
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String answer = null;
