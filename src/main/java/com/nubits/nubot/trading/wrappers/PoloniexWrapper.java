@@ -182,7 +182,7 @@ public class PoloniexWrapper implements TradeInterface {
             if (httpAnswerJson.containsKey(lookingFor)) {
                 JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                 double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                LOG.debug("balance double : " + balanceD);
+                LOG.trace("balance double : " + balanceD);
                 apiResponse.setResponseObject(new Amount(balanceD, currency));
             } else {
                 String errorMessage = "Cannot find a balance for currency " + lookingFor;
@@ -673,7 +673,7 @@ public class PoloniexWrapper implements TradeInterface {
                 // add nonce and build arg list
                 if (needAuth) {
                     String nonce = createNonce();
-                    LOG.debug("nonce used " + nonce);
+                    LOG.trace("nonce used " + nonce);
                     args.put("nonce", nonce);
                     args.put("command", method);
 
