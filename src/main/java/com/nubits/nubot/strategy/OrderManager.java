@@ -9,34 +9,28 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 
-/**
- *
- */
-public class OrderManager {
 
-    private int numActiveSellOrders, numActiveBuyOrders, numTotalActiveOrders;
+public class OrderManager {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderManager.class.getName());
 
     private static ArrayList<Order> orderList;
 
-    public static void fetch(){
+    public void fetch(){
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
-            orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+            this.orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
         } else {
             LOG.error(activeOrdersResponse.getError().toString());
         }
     }
 
-    public static int countActiveOrders(String type) {
+    public int countActiveOrders(String type) {
 
-        LOG.trace("countActiveOrders " + type);
-        //Get active orders
-        int numOrders = -1;
+        this.fetch();
 
-        fetch();
+        int numOrders = 0;
 
         for (Order tempOrder: orderList){
             if (tempOrder.getType().equalsIgnoreCase(type)) {
@@ -48,7 +42,7 @@ public class OrderManager {
         return numOrders;
     }
 
-    public static ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
+    public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
         ArrayList<Order> toRet = new ArrayList<>();
         for(Order temp: originalList) {
             if (temp.getType().equalsIgnoreCase(type)) {
@@ -60,8 +54,8 @@ public class OrderManager {
     }
 
     public void logActiveOrders(){
-        LOG.info("buy orders: " + this.getNumActiveBuyOrders());
-        LOG.info("sell orders: " + this.getNumActiveSellOrders());
+        LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
+        LOG.debug("sell orders: " + this.getNumActiveSellOrders());
     }
 
     public ArrayList<Order> getOrderList(){

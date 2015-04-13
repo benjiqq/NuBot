@@ -397,7 +397,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         ArrayList<Order> orderList = this.orderManager.getOrderList();
 
-        ArrayList<Order> orderListCategorized = OrderManager.filterOrders(orderList, type);
+        ArrayList<Order> orderListCategorized = this.orderManager.filterOrders(orderList, type);
 
         int i = 0;
         for (Order tempOrder : orderListCategorized) {
@@ -437,8 +437,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = OrderManager.countActiveOrders(Constant.SELL);
-        activeBuyOrders = OrderManager.countActiveOrders(Constant.BUY);
+        activeSellOrders = this.orderManager.countActiveOrders(Constant.SELL);
+        activeBuyOrders = this.orderManager.countActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);
