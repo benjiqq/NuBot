@@ -306,7 +306,7 @@ public class BittrexWrapper implements TradeInterface {
                 JSONObject thisOrder = order.next();
                 orderList.add(parseOrder(thisOrder));
             }
-
+            apiResponse.setResponseObject(orderList);
         } else {
             apiResponse = response;
         }
