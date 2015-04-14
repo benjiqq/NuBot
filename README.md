@@ -13,7 +13,7 @@ As explained in the [white paper](https://nubits.com/about/white-paper), a custo
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
 #Changelog
-See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
+See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/md/CHANGELOG.md?at=master)
 
 
 #How does it work?
