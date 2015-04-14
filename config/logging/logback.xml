@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Logging setup for launch tests-->
+<!-- Logging setup for launch-->
 
 <configuration>
 
-    <property scope="context" name="logfolder" value="logs"/>
-    <property scope="context" name="SessionLOG" value="SessionLOG"/>
-    <property scope="context" name="sessionlogFile" value=".sessions.log"/>
+    <property scope="context" name="testlogfolder" value="testlaunch" />
+    <property scope="context" name="SessionLOG" value="SessionLOG" />
+    <property scope="context" name="sessionlogFile" value=".sessions.log" />
     <property scope="context" name="standardlogFile" value="ui_standard.log" />
     <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
 
+
     <!-- console output of NuBot -->
+
+    <appender name="STDOUTerr" class="ch.qos.logback.core.ConsoleAppender">
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %red(%date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n)
+            </Pattern>
+        </layout>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+    </appender>
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n
+                %date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n
             </Pattern>
         </layout>
-
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
-        </filter>
 
         <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
             <evaluator>
@@ -35,14 +48,10 @@
             <onMismatch>NEUTRAL</onMismatch>
         </filter>
 
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    return logger.contains("hipchat");
-                </expression>
-            </evaluator>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
             <onMatch>DENY</onMatch>
-            <onMismatch>NEUTRAL</onMismatch>
+            <onMismatch>ACCEPT</onMismatch>
         </filter>
 
     </appender>
@@ -78,17 +87,6 @@
                     <onMatch>DENY</onMatch>
                     <onMismatch>NEUTRAL</onMismatch>
                 </filter>
-
-                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-                    <evaluator>
-                        <expression>
-                            return logger.contains("hipchat");
-                        </expression>
-                    </evaluator>
-                    <onMatch>DENY</onMatch>
-                    <onMismatch>NEUTRAL</onMismatch>
-                </filter>
-
 
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
@@ -160,7 +158,7 @@
             </pattern>
         </encoder>
 
-        <file>${logfolder}/${sessionlogFile}</file>
+        <file>${testlogfolder}/${sessionlogFile}</file>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
@@ -250,21 +248,25 @@
         </sift>
     </appender>
 
+
     <!--
-    definition of all loggers
-    -->
+	definition of all loggers
+	-->
 
     <root level="debug">
-        <appender-ref ref="standardHTML"/>
-        <appender-ref ref="verboseHTML"/>
-        <appender-ref ref="STDOUT"/>
-        <appender-ref ref="sessionFile"/>
+        <appender-ref ref="standardHTML" />
+        <appender-ref ref="verboseHTML" />
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUTerr" />
+        <appender-ref ref="sessionFile" />
         <appender-ref ref="standardGUI" />
         <appender-ref ref="verboseGUI" />
+
+
     </root>
 
 
     <!-- to surpress logback startup messages -->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
 
 </configuration>

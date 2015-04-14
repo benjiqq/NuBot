@@ -13,11 +13,27 @@
 
     <!-- console output of NuBot -->
 
+    <appender name="STDOUTerr" class="ch.qos.logback.core.ConsoleAppender">
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %red(%date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n)
+            </Pattern>
+        </layout>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+    </appender>
+
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %date{HH:mm:ss.SSS} %logger{16} %line %-5level - %msg%n
+                %date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n
             </Pattern>
         </layout>
 
@@ -30,6 +46,12 @@
             </evaluator>
             <onMatch>DENY</onMatch>
             <onMismatch>NEUTRAL</onMismatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
         </filter>
 
     </appender>
@@ -235,6 +257,7 @@
         <appender-ref ref="standardHTML" />
         <appender-ref ref="verboseHTML" />
         <appender-ref ref="STDOUT" />
+        <appender-ref ref="STDOUTerr" />
         <appender-ref ref="sessionFile" />
         <appender-ref ref="standardGUI" />
         <appender-ref ref="verboseGUI" />
