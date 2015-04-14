@@ -137,8 +137,6 @@ public class StrategySecondaryPegUtils {
         if (buysOrdersOk && sellsOrdersOk) {
             strategy.setMightNeedInit(false);
             LOG.info("Initial walls placed");
-            Global.orderManager.fetch();
-            Global.orderManager.logActiveOrders();
         } else {
             strategy.setMightNeedInit(true);
         }
@@ -149,7 +147,7 @@ public class StrategySecondaryPegUtils {
         LOG.debug("initOrders " + type + ", price " + price);
 
         boolean success = true;
-
+        Amount balance = null;
         //Update the available balance
         Currency currency;
 
@@ -166,18 +164,17 @@ public class StrategySecondaryPegUtils {
                 currency = Global.options.getPair().getOrderCurrency();
             }
         }
-
-        try {
-            Global.balanceManager.fetchBalance(currency);
-        } catch (Exception e) {
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
+        if (!balancesResponse.isPositive()) {
+            LOG.error(balancesResponse.getError().toString());
             return false;
         }
-
-        Amount balance = Global.balanceManager.getBalance();
-
         double oneNBT = 1;
-        if (!type.equals(Constant.SELL)) {
+        if (type.equals(Constant.SELL)) {
+            balance = (Amount) balancesResponse.getResponseObject();
+        } else {
             //Here its time to compute the balance to put apart, if any
+            balance = (Amount) balancesResponse.getResponseObject();
             balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
@@ -206,10 +203,12 @@ public class StrategySecondaryPegUtils {
         double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
         //check the calculated amount against the set maximum sell amount set in the options.json file
 
+
         if (maxSell > 0 && type.equals(Constant.SELL)) {
             if (amount1 > (maxSell / 2))
                 amount1 = (maxSell / 2);
         }
+
 
         if (type.equals(Constant.BUY) && !Global.swappedPair) {
             amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
@@ -218,6 +217,7 @@ public class StrategySecondaryPegUtils {
                 if (amount1 > (maxBuy / 2))
                     amount1 = (maxBuy / 2);
             }
+
         }
 
         //Prepare the orders
@@ -279,13 +279,13 @@ public class StrategySecondaryPegUtils {
             }
 
             //read balance again
-            try {
-                Global.balanceManager.fetchBalance(currency);
-            } catch (Exception e) {
+            ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
+            if (!balancesResponse2.isPositive()) {
+                LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
                 return false;
             }
 
-            balance = Global.balanceManager.getBalance();
+            balance = (Amount) balancesResponse2.getResponseObject();
 
             if (type.equals(Constant.BUY)) {
                 balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
@@ -354,10 +354,7 @@ public class StrategySecondaryPegUtils {
                 LOG.error(order2Response.getError().toString());
                 success = false;
             }
-        } else{
-            LOG.info("don't execute orders");
         }
-
 
         return success;
     }
@@ -365,25 +362,25 @@ public class StrategySecondaryPegUtils {
 
     public void recount() {
 
-        try {
-            Global.balanceManager.fetchBalances(Global.options.getPair());
-        } catch (Exception e) {
-            LOG.error("error fetching balanaces " + e);
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
+
+        if (!balancesResponse.isPositive()) {
+            LOG.error(balancesResponse.getError().toString());
             return;
         }
 
-        PairBalance balance = Global.balanceManager.getPairBalance();
-
+        PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        Global.orderManager.fetch();
-        int activeSellOrders = Global.orderManager.getNumActiveSellOrders();
-        int activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
 
         strategy.setOrdersAndBalancesOK(false);
 
         double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
+
+        Global.orderManager.fetch();
+        int activeSellOrders = Global.orderManager.getNumActiveSellOrders();
+        int activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
 
         if (Global.options.isDualSide()) {
 
