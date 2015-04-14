@@ -144,12 +144,17 @@ public class StrategySecondaryPegUtils {
     // ---- Trade Manager ----
 
     private ApiResponse buy(CurrencyPair pair, double amount, double rate) {
-        if (!Global.swappedPair) {
-            ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
-            return order1Response;
+        if (Global.options.isExecuteOrders()) {
+            if (!Global.swappedPair) {
+                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
+                return order1Response;
+            } else {
+                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
+                return order1Response;
+            }
         } else {
-            ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
-            return order1Response;
+            LOG.warn("Demo mode. Don't execute orders");
+            return null;
         }
     }
 
@@ -295,7 +300,6 @@ public class StrategySecondaryPegUtils {
             if (amount1 > (maxSell / 2))
                 amount1 = (maxSell / 2);
         }
-
 
         if (type.equals(Constant.BUY) && !Global.swappedPair) {
             amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
