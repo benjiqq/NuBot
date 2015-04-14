@@ -306,6 +306,7 @@ public class StrategySecondaryPegUtils {
             }
 
         }
+
         //Prepare the orders
 
         String orderString1 = orderString(type, amount1, price, maxSell);
@@ -323,8 +324,7 @@ public class StrategySecondaryPegUtils {
 
         if (order1Response != null && order1Response.isPositive()) {
             HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
-            String response1String = (String) order1Response.getResponseObject();
-            LOG.warn("Strategy - " + type + " Response1 = " + response1String);
+            LOG.warn("Strategy - " + type + " Response1 = " + order1Response.getResponseObject());
         } else {
             LOG.error(order1Response.getError().toString());
             success = false;
@@ -338,61 +338,59 @@ public class StrategySecondaryPegUtils {
         }
         //read balance again
         ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
-        if (balancesResponse2.isPositive()) {
-
-            balance = (Amount) balancesResponse2.getResponseObject();
-
-            if (type.equals(Constant.BUY)) {
-                balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
-            }
-
-            double amount2 = balance.getQuantity();
-
-            //check the calculated amount against the set maximum sell amount set in the options.json file
-
-            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
-            }
-
-            if ((type.equals(Constant.BUY) && !Global.swappedPair)
-                    || (type.equals(Constant.SELL) && Global.swappedPair)) {
-                //hotfix
-                amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
-
-                amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
-
-                //check the calculated amount against the max buy amount option, if any.
-                if (maxBuy > 0) {
-                    if (amount2 > (maxBuy / 2))
-                        amount2 = (maxBuy / 2);
-                }
-            }
-
-            String orderString2 = orderString2(type, amount2, price);
-
-            //put it on order
-
-            LOG.warn("Strategy - Submit order : " + orderString2);
-            ApiResponse order2Response;
-            if (type.equals(Constant.SELL)) {
-                //Place sellSide order 2
-                order2Response = this.sell(Global.options.getPair(), amount2, price);
-            } else {
-                //Place buySide order 2
-                order2Response = this.buy(Global.options.getPair(), amount2, price);
-            }
-            if (order2Response != null && order2Response.isPositive()) {
-                HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
-                String response2String = (String) order2Response.getResponseObject();
-                LOG.warn("Strategy - " + type + " Response2 = " + response2String);
-            } else {
-                LOG.error(order2Response.getError().toString());
-                success = false;
-            }
-        } else {
+        if (!balancesResponse2.isPositive()) {
             LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
+            return false;
         }
 
+        balance = (Amount) balancesResponse2.getResponseObject();
+
+        if (type.equals(Constant.BUY)) {
+            balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
+        }
+
+        double amount2 = balance.getQuantity();
+
+        //check the calculated amount against the set maximum sell amount set in the options.json file
+
+        if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+            amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
+        }
+
+        if ((type.equals(Constant.BUY) && !Global.swappedPair)
+                || (type.equals(Constant.SELL) && Global.swappedPair)) {
+            //hotfix
+            amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
+
+            amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
+
+            //check the calculated amount against the max buy amount option, if any.
+            if (maxBuy > 0) {
+                if (amount2 > (maxBuy / 2))
+                    amount2 = (maxBuy / 2);
+            }
+        }
+
+        String orderString2 = orderString2(type, amount2, price);
+
+        //put it on order
+
+        LOG.warn("Strategy - Submit order : " + orderString2);
+        ApiResponse order2Response;
+        if (type.equals(Constant.SELL)) {
+            //Place sellSide order 2
+            order2Response = this.sell(Global.options.getPair(), amount2, price);
+        } else {
+            //Place buySide order 2
+            order2Response = this.buy(Global.options.getPair(), amount2, price);
+        }
+        if (order2Response != null && order2Response.isPositive()) {
+            HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
+            LOG.warn("Strategy - " + type + " Response2 = " + order2Response.getResponseObject());
+        } else {
+            LOG.error(order2Response.getError().toString());
+            success = false;
+        }
 
         return success;
     }
@@ -490,45 +488,6 @@ public class StrategySecondaryPegUtils {
         } else {
             LOG.error("An error occurred while attempting to cancel buy orders.");
         }
-    }
-
-    /* Returns an array of two strings representing orders id.
-     * the first element of the array is the smallest order and the second the largest */
-    public String[] getSmallerWallID(String type) {
-        String[] toRet = new String[2];
-        Order smallerOrder = new Order();
-        Order biggerOrder = new Order();
-        smallerOrder.setId("-1");
-        biggerOrder.setId("-1");
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
-
-            if (orderListCategorized.size() != 2) {
-                LOG.error("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
-                String[] err = {"-1", "-1"};
-                return err;
-            } else {
-                Order tempOrder1 = orderListCategorized.get(0);
-                Order tempOrder2 = orderListCategorized.get(1);
-                smallerOrder = tempOrder1;
-                biggerOrder = tempOrder2;
-                if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
-                    smallerOrder = tempOrder2;
-                    biggerOrder = tempOrder1;
-                }
-                toRet[0] = smallerOrder.getId();
-                toRet[1] = biggerOrder.getId();
-
-            }
-
-        } else {
-            LOG.error(activeOrdersResponse.getError().toString());
-            String[] err = {"-1", "-1"};
-            return err;
-        }
-        return toRet;
     }
 
     public boolean shiftWalls() {
