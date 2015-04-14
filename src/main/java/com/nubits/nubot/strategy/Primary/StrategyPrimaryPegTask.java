@@ -18,7 +18,6 @@
 
 package com.nubits.nubot.strategy.Primary;
 
-import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
@@ -92,7 +91,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 //if there orders need to be cleared
                 if (totalActiveOrders > 0) {
                     try {
-                        BotUtil.clearOrders();
+                        OrderManager.clearOrders();
                     } catch (OrderException e) {
                         throw e;
                     }
