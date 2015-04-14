@@ -154,12 +154,18 @@ public class StrategySecondaryPegUtils {
     }
 
     private ApiResponse sell(CurrencyPair pair, double amount, double rate) {
-        if (!Global.swappedPair) {
-            ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
-            return order1Response;
+        if (Global.options.isExecuteOrders()) {
+            if (!Global.swappedPair) {
+                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
+                return order1Response;
+
+            } else {
+                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
+                return order1Response;
+            }
         } else {
-            ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
-            return order1Response;
+            LOG.warn("Demo mode. Don't execute orders");
+            return null;
         }
     }
 
@@ -235,7 +241,6 @@ public class StrategySecondaryPegUtils {
     }
 
 
-
     public boolean initOrders(String type, double price) {
 
         LOG.debug("initOrders " + type + ", price " + price);
@@ -276,129 +281,116 @@ public class StrategySecondaryPegUtils {
         double maxSell = Global.options.getMaxSellVolume();
         double maxBuy = Global.options.getMaxBuyVolume();
 
-        if (txFeeNTBPEGResponse.isPositive()) {
-            double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-            LOG.trace("Updated Transaction fee = " + txFeePEGNTB + "%");
+        if (!txFeeNTBPEGResponse.isPositive()) {
+            return success;
+        }
 
-            double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
+        double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
+        LOG.trace("Updated Transaction fee = " + txFeePEGNTB + "%");
+
+        double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
+        //check the calculated amount against the set maximum sell amount set in the options.json file
+
+        if (maxSell > 0 && type.equals(Constant.SELL)) {
+            if (amount1 > (maxSell / 2))
+                amount1 = (maxSell / 2);
+        }
+
+
+        if (type.equals(Constant.BUY) && !Global.swappedPair) {
+            amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
+            //check the calculated amount against the max buy amount option, if any.
+            if (maxBuy > 0) {
+                if (amount1 > (maxBuy / 2))
+                    amount1 = (maxBuy / 2);
+            }
+
+        }
+        //Prepare the orders
+
+        String orderString1 = orderString(type, amount1, price, maxSell);
+
+        LOG.warn("Strategy - Submit order : " + orderString1);
+
+        ApiResponse order1Response;
+        if (type.equals(Constant.SELL)) {
+            //Place sellSide order 1
+            order1Response = this.sell(Global.options.getPair(), amount1, price);
+        } else {
+            //Place buySide order 1
+            order1Response = this.buy(Global.options.getPair(), amount1, price);
+        }
+
+        if (order1Response != null && order1Response.isPositive()) {
+            HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
+            String response1String = (String) order1Response.getResponseObject();
+            LOG.warn("Strategy - " + type + " Response1 = " + response1String);
+        } else {
+            LOG.error(order1Response.getError().toString());
+            success = false;
+        }
+        //wait a while to give the time to the new amount to update
+
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException ex) {
+            LOG.error(ex.toString());
+        }
+        //read balance again
+        ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
+        if (balancesResponse2.isPositive()) {
+
+            balance = (Amount) balancesResponse2.getResponseObject();
+
+            if (type.equals(Constant.BUY)) {
+                balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
+            }
+
+            double amount2 = balance.getQuantity();
+
             //check the calculated amount against the set maximum sell amount set in the options.json file
 
-            if (maxSell > 0 && type.equals(Constant.SELL)) {
-                if (amount1 > (maxSell / 2))
-                    amount1 = (maxSell / 2);
+            if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
+                amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
             }
 
+            if ((type.equals(Constant.BUY) && !Global.swappedPair)
+                    || (type.equals(Constant.SELL) && Global.swappedPair)) {
+                //hotfix
+                amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
 
-            if (type.equals(Constant.BUY) && !Global.swappedPair) {
-                amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
+                amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
+
                 //check the calculated amount against the max buy amount option, if any.
                 if (maxBuy > 0) {
-                    if (amount1 > (maxBuy / 2))
-                        amount1 = (maxBuy / 2);
+                    if (amount2 > (maxBuy / 2))
+                        amount2 = (maxBuy / 2);
                 }
-
             }
-            //Prepare the orders
 
-            String orderString1 = orderString(type, amount1, price, maxSell);
+            String orderString2 = orderString2(type, amount2, price);
 
-            //TODO: isExecuteOrders in function
-            if (Global.options.isExecuteOrders()) {
-                LOG.warn("Strategy - Submit order : " + orderString1);
+            //put it on order
 
-                ApiResponse order1Response;
-                if (type.equals(Constant.SELL)) {
-                    //Place sellSide order 1
-                    order1Response = this.sell(Global.options.getPair(), amount1, price);
-                } else {
-                    //Place buySide order 1
-                    order1Response = this.buy(Global.options.getPair(), amount1, price);
-                }
-
-                if (order1Response.isPositive()) {
-                    HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
-                    String response1String = (String) order1Response.getResponseObject();
-                    LOG.warn("Strategy - " + type + " Response1 = " + response1String);
-                } else {
-                    LOG.error(order1Response.getError().toString());
-                    success = false;
-                }
-                //wait a while to give the time to the new amount to update
-
-                try {
-                    Thread.sleep(5 * 1000);
-                } catch (InterruptedException ex) {
-                    LOG.error(ex.toString());
-                }
-                //read balance again
-                ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
-                if (balancesResponse2.isPositive()) {
-
-                    balance = (Amount) balancesResponse2.getResponseObject();
-
-                    if (type.equals(Constant.BUY)) {
-                        balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
-                    }
-
-
-                    double amount2 = balance.getQuantity();
-
-                    //check the calculated amount against the set maximum sell amount set in the options.json file
-
-                    if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-                        amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
-                    }
-
-                    if ((type.equals(Constant.BUY) && !Global.swappedPair)
-                            || (type.equals(Constant.SELL) && Global.swappedPair)) {
-                        //hotfix
-                        amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
-
-                        amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
-
-                        //check the calculated amount against the max buy amount option, if any.
-                        if (maxBuy > 0) {
-                            if (amount2 > (maxBuy / 2))
-                                amount2 = (maxBuy / 2);
-                        }
-
-                    }
-
-
-                    String orderString2 = orderString2(type, amount2, price);
-
-                    //put it on order
-
-                    LOG.warn("Strategy - Submit order : " + orderString2);
-                    ApiResponse order2Response;
-                    if (type.equals(Constant.SELL)) { //Place sellSide order 2
-                        if (Global.swappedPair) {
-                            order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
-                        } else {
-                            order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
-                        }
-                    } else {//Place buySide order 2
-                        if (Global.swappedPair) {
-                            order2Response = Global.exchange.getTrade().sell(Global.options.getPair(), amount2, price);
-                        } else {
-                            order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
-                        }
-                    }
-                    if (order2Response.isPositive()) {
-                        HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
-                        String response2String = (String) order2Response.getResponseObject();
-                        LOG.warn("Strategy - " + type + " Response2 = " + response2String);
-                    } else {
-                        LOG.error(order2Response.getError().toString());
-                        success = false;
-                    }
-                } else {
-                    LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
-                }
+            LOG.warn("Strategy - Submit order : " + orderString2);
+            ApiResponse order2Response;
+            if (type.equals(Constant.SELL)) {
+                //Place sellSide order 2
+                order2Response = this.sell(Global.options.getPair(), amount2, price);
             } else {
-                //Just print the order without executing it
-                LOG.warn("Should execute orders");
+                //Place buySide order 2
+                order2Response = this.buy(Global.options.getPair(), amount2, price);
             }
+            if (order2Response != null && order2Response.isPositive()) {
+                HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
+                String response2String = (String) order2Response.getResponseObject();
+                LOG.warn("Strategy - " + type + " Response2 = " + response2String);
+            } else {
+                LOG.error(order2Response.getError().toString());
+                success = false;
+            }
+        } else {
+            LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
         }
 
 
