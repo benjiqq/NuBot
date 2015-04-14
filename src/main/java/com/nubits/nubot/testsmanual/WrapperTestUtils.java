@@ -228,9 +228,9 @@ public class WrapperTestUtils {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                LOG.info("Order clear request succesfully");
+                LOG.info("\nOrder clear request succesfully");
             } else {
-                LOG.info("Could not submit request to clear orders");
+                LOG.info("\nCould not submit request to clear orders");
             }
 
         } else {
