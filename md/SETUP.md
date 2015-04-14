@@ -184,7 +184,7 @@ Parameters :
 | mainfeed  | / | the name of the main price feed that has priority over the others | **see following table |
 | backupfeeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master) for an updated list of valid feed names.
+See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/03332b2637c5a67d9abd31b1c7bf1f37c239bc71/md/FEEDS.md?at=master) for an updated list of valid feed names.
 
 ---
 
@@ -201,11 +201,7 @@ java -jar NuBot.jar sample-config.json
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-<<<<<<< HEAD:SETUP.md
-nohup java -jar NuBot.jar market.json misc.json liquidity-info.json price-tracking.json  &
-=======
 nohup java -jar NuBot.jar sample-config.json
->>>>>>> release/0.2.0:md/SETUP.md
 ```
 
 The bot will start and write output in the */logs* folder. 
