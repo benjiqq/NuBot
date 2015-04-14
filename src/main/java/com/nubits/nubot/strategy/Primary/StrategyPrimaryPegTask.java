@@ -436,8 +436,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = this.orderManager.countActiveOrders(Constant.SELL);
-        activeBuyOrders = this.orderManager.countActiveOrders(Constant.BUY);
+        activeSellOrders = this.orderManager.FetchAndCountActiveOrders(Constant.SELL);
+        activeBuyOrders = this.orderManager.FetchAndCountActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);

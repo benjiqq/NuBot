@@ -9,7 +9,6 @@ import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.trading.OrderException;
-import com.nubits.nubot.trading.TradeUtils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -250,7 +249,7 @@ public class OrderManager {
         }
     }
 
-    public int countActiveOrders(String type) {
+    public int FetchAndCountActiveOrders(String type) {
 
         this.fetch();
 
@@ -287,11 +286,11 @@ public class OrderManager {
     }
 
     public int getNumActiveSellOrders() {
-        return this.countActiveOrders(Constant.SELL);
+        return this.FetchAndCountActiveOrders(Constant.SELL);
     }
 
     public int getNumActiveBuyOrders() {
-        return this.countActiveOrders(Constant.BUY);
+        return this.FetchAndCountActiveOrders(Constant.BUY);
     }
 
     public int getNumTotalActiveOrders() {
