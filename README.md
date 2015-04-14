@@ -13,7 +13,7 @@ As explained in the [white paper](https://nubits.com/about/white-paper), a custo
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
 #Changelog
-See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/md/CHANGELOG.md?at=master)
+See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/CHANGELOG.md?at=master)
 
 
 #How does it work?
@@ -26,7 +26,7 @@ NuBot permits a user to indicate they are either a sell side or dual side custod
 
 #Using NuBot
 
-See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/d69252c90538a92acb0f40a0367f0a10a207719e/SETUP.md?at=master)
+See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/SETUP.md?at=master)
 
 ##Dual-side strategy
 
@@ -74,7 +74,7 @@ Alternative strategies  :
 
 ##Supported exchanges 
 
-See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/EXCHANGES.md?at=master)
+See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/EXCHANGES.md?at=master)
 
 ##Design and diagrams
 
@@ -116,10 +116,10 @@ keytool -importcert -file poloniex-dec.cer -keystore nubot_keystore.jks -alias â
 You will be prompted for a passphrase : type nub0tSSL
 
 #Price Feeds
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
+See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/FEEDS.md?at=master)
 
 #Contribute
-See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CONTRIBUTE.md?at=master)
+See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/CONTRIBUTE.md?at=master)
 
 #License
-NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
+NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/LICENSE.md?at=master)
