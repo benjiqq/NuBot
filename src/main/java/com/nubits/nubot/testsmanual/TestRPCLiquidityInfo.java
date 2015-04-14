@@ -136,7 +136,7 @@ public class TestRPCLiquidityInfo {
 
     private void testCheckNudTask() {
         //Create a TaskManager and
-        Global.taskManager = new TaskManager(false);
+        Global.taskManager = new TaskManager();
         Global.taskManager.setNudTask();
         //Start checking for connection
         Global.taskManager.getCheckNudTask().start();

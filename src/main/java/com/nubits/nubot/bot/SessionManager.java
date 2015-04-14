@@ -10,6 +10,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -24,6 +28,8 @@ public class SessionManager {
     private static File sessionFile;
 
     private static String appFolder;
+
+    private static boolean runonce = false;
 
 
     /**
@@ -40,6 +46,7 @@ public class SessionManager {
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile);
             LOG.debug("loading opt: " + opt.toStringNoKeys());
             Global.options = opt;
+            Global.currentOptionsFile = configfile;
         } catch (NuBotConfigException e) {
             MainLaunch.exitWithNotice("" + e);
         }
@@ -53,7 +60,8 @@ public class SessionManager {
 
         NuBotOptions defaultOpt = NuBotOptionsDefault.defaultFactory();
         Global.options = defaultOpt;
-        SaveOptions.saveOptionsPretty(defaultOpt,Settings.DEFAULT_CONFIG_FILE_PATH);
+        Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
+        SaveOptions.saveOptionsPretty(defaultOpt, Settings.DEFAULT_CONFIG_FILE_PATH);
 
     }
 
@@ -70,18 +78,12 @@ public class SessionManager {
         // check if other bots are running
         boolean otherSessions = isSessionActive();
 
-        if (otherSessions) {
-            LOG.info("NuBot is already running");
-            //handle different cases later
-
-            //TODO: several NuBots running one exchange should be prohibited (?)
-        }
-
-        //create session file, which auto-deletes itself
-        //it increases the counter
+        //create session file
         createSessionFile();
 
         Global.sessionRunning = true;
+        runonce = true;
+
         Global.sessionStarted = System.currentTimeMillis();
 
         String timestamp =
@@ -91,12 +93,32 @@ public class SessionManager {
 
     }
 
+    public static String startedString(){
+        Date startdate = Date.from(Instant.ofEpochSecond(Global.sessionStarted / 1000));
+        DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+        String dstr = df.format(startdate);
+        return dstr;
+    }
+
+    public static String durationString(){
+        Long diff = System.currentTimeMillis() - Global.sessionStarted;
+
+        long seconds = diff / 1000;
+        LocalTime timeOfDay = LocalTime.ofSecondOfDay(seconds);
+        String time = timeOfDay.toString();
+        return time;
+    }
+
+    public static boolean wasRunOnce(){
+        return runonce;
+    }
+
     /**
      * execute a NuBot based on valid options
      *
      * @param opt
      */
-    public static void launchBot(NuBotOptions opt) {
+    public static void launchBot(NuBotOptions opt) throws NuBotRunException {
 
         Global.mainThread = Thread.currentThread();
 
@@ -107,21 +129,25 @@ public class SessionManager {
         LOG.debug("execute bot depending on defined strategy");
 
         if (opt.requiresSecondaryPegStrategy()) {
+
             LOG.debug("creating secondary bot object");
             Global.bot = new NuBotSecondary();
             try {
                 Global.bot.execute(opt);
-            } catch (Exception e) {
-
+            } catch (NuBotRunException e) {
+                throw e;
             }
+
         } else {
+
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
             try {
                 Global.bot.execute(opt);
-            } catch (Exception e) {
-
+            } catch (NuBotRunException e) {
+                throw e;
             }
+
         }
 
     }
@@ -137,8 +163,8 @@ public class SessionManager {
         appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
 
         sessionFile = new File
-                (appFolder, Settings.APP_NAME + Settings.SESSION_FILE);
-        LOG.info("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+                (appFolder, Settings.SESSION_FILE);
+        //LOG.trace("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
 
@@ -155,24 +181,29 @@ public class SessionManager {
         } catch (Exception e) {
         }
 
-        boolean done = false;
-        int i = 0;
-        while (!done) {
 
-            String sessionFileName = Settings.APP_NAME + "_" + i + Settings.SESSION_FILE;
-            sessionFile = new File(appFolder, sessionFileName);
-            if (!sessionFile.exists()) {
-                try {
-                    sessionFile.createNewFile();
-                    //delete the file on exit
-                    sessionFile.deleteOnExit();
-                    done = true;
-                } catch (Exception e) {
+        String sessionFileName = Settings.SESSION_FILE;
+        sessionFile = new File(appFolder, sessionFileName);
+        if (!sessionFile.exists()) {
+            try {
+                sessionFile.createNewFile();
 
-                }
+            } catch (Exception e) {
 
             }
-            i++;
+        }
+
+    }
+
+    public static void removeSessionFile() {
+        String sessionFileName = Settings.SESSION_FILE;
+        sessionFile = new File(appFolder, sessionFileName);
+        if (sessionFile.exists()) {
+            try {
+                sessionFile.delete();
+            } catch (Exception e) {
+
+            }
         }
     }
 

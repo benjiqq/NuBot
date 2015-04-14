@@ -20,10 +20,10 @@ package com.nubits.nubot.bot;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
@@ -194,7 +194,7 @@ public abstract class NuBotBase {
     /**
      * execute the NuBot based on a configuration
      */
-    public void execute(NuBotOptions opt) throws Exception {
+    public void execute(NuBotOptions opt) throws NuBotRunException {
 
         LOG.info("Setting up NuBot version : " + VersionInfo.getVersionName());
 
@@ -213,17 +213,16 @@ public abstract class NuBotBase {
 
         LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
 
         if (Global.options.isSubmitliquidity()) {
-            NuSetup.setupNuRPCTask();
-            NuSetup.startTask();
+            Global.taskManager.setupNuRPCTask();
+            Global.taskManager.startTaskNu();
         }
 
-
         LOG.debug("Starting task : Check connection with exchange");
-        int conn_delay = 1;
-        Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
+        Global.taskManager.getCheckConnectionTask().start(Settings.DELAY_CONN);
 
         LOG.info("Waiting a for the connectionThreads to detect connection");
         try {
@@ -236,14 +235,15 @@ public abstract class NuBotBase {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
         } else {
-            //MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
-            throw new Exception("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+            throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
         }
 
-
         //Start task to check orders
-        int start_delay = 40;
-        Global.taskManager.getSendLiquidityTask().start(start_delay);
+        try{
+            Global.taskManager.getSendLiquidityTask().start(Settings.DELAY_LIQUIIDITY);
+        }catch(Exception e){
+            throw new NuBotRunException("" + e);
+        }
 
         if (Global.options.isSubmitliquidity()) {
             try {
@@ -259,12 +259,12 @@ public abstract class NuBotBase {
 
         // Set the frozen balance manager in the global variable
 
-        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
+        Global.frozenBalancesManager = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
 
         try {
             configureStrategy();
-        } catch (NuBotConfigException e) {
-            throw new Exception("can't configure strategy");
+        } catch (Exception e) {
+            throw new NuBotRunException("" + e);
         }
 
         notifyOnline();
@@ -287,6 +287,7 @@ public abstract class NuBotBase {
                 + "<strong>" + Global.options.getExchangeName() + "</strong> ["
                 + Global.options.getPair().toStringSep() + "]";
 
+        LOG.info(additionalInfo);
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 
         //Interrupt all BotTasks
@@ -294,6 +295,7 @@ public abstract class NuBotBase {
         if (Global.taskManager != null) {
             if (Global.taskManager.isInitialized()) {
                 try {
+                    LOG.info("try to shutdown all tasks");
                     Global.taskManager.stopAll();
                 } catch (IllegalStateException e) {
 
@@ -345,6 +347,10 @@ public abstract class NuBotBase {
         }
 
         LOG.info("Logs of this session saved in " + Global.sessionPath);
+
+        SessionManager.removeSessionFile();
+
+        LOG.info("** end of the session **");
     }
 
 }

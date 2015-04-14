@@ -16,7 +16,8 @@ public class LogController {
     /**
      * the log file to send to client
      */
-    String logfile = Global.sessionPath  + "/ui_standard.log";
+    String logfile = Global.sessionPath + "/ui_standard.log";
+    String verboselogfile = Global.sessionPath + "/ui_verbose.log";
 
     final static Logger LOG = LoggerFactory.getLogger(LogController.class);
 
@@ -26,15 +27,17 @@ public class LogController {
 
             JsonObject object = new JsonObject();
 
-            try {
-                String l = new String(Files.readAllBytes(Paths.get(logfile)));
+            String f  = logfile;
+            if (Global.options.isVerbose())
+                f = verboselogfile;
 
-                LOG.trace(">> log fetched " + l.substring(0,100));
+            try {
+                String l = new String(Files.readAllBytes(Paths.get(f)));
 
                 object.addProperty("log", l);
                 return object;
 
-            } catch(Exception e){
+            } catch (Exception e) {
 
             }
 

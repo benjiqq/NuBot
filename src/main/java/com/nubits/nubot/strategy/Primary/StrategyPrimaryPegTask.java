@@ -55,7 +55,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
     @Override
     public void run() {
 
-        LOG.info("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
+        LOG.info("Executing " + this.getClass());
+
+        LOG.info("DualSide :  " + Global.options.isDualSide());
 
         cycles++;
 
@@ -123,7 +125,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             Amount balanceNBT = balance.getNBTAvailable();
 
-            Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            Amount balanceFIAT = Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount());
             LOG.info("Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
                     + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
 
@@ -134,7 +136,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
             if (Global.options.isDualSide() && proceedsInBalance) {
                 buySide();
             }
-
 
         }
     }
@@ -185,7 +186,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             Amount balanceNBT = balance.getNBTAvailable();
 
 
-            Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            Amount balanceFIAT = Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount());
             LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                     + balanceFIAT.getQuantity() + " USD");
 
@@ -305,7 +306,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         balanceNBT = balance.getNBTAvailable();
 
-        Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+        Amount balanceFIAT = Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount());
 
         LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                 + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
@@ -367,7 +368,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
-            Global.frozenBalances.freezeNewFunds();
+            Global.frozenBalancesManager.freezeNewFunds();
             ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBFIATResponse.isPositive()) {
                 double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
@@ -432,13 +433,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
         double balanceNBT = balance.getNBTAvailable().getQuantity();
-        double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+        double balanceFIAT = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
-        activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
+        activeSellOrders = TradeUtils.countActiveOrders(Constant.SELL);
+        activeBuyOrders = TradeUtils.countActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);
@@ -504,7 +505,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     LOG.warn("Clear all orders request successful");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
-                        Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                        Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
                     }
                     //Wait until there are no active orders
                     boolean timedOut = false;
@@ -557,7 +558,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         } else {
             if (firstTime) //update the initial balance of the secondary peg
             {
-                Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
             }
             placeInitialWalls();
         }
@@ -598,7 +599,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         } else {
             //Here its time to compute the balance to put apart, if any
             amount = (Amount) balancesResponse.getResponseObject();
-            amount = Global.frozenBalances.removeFrozenAmount(amount, Global.frozenBalances.getFrozenAmount());
+            amount = Global.frozenBalancesManager.removeFrozenAmount(amount, Global.frozenBalancesManager.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
 
@@ -633,7 +634,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         LOG.debug("cap sell amount at " + most);
                     }
                 }
-
 
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
                     amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
@@ -718,7 +718,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
                     }
 
-
                     if (order2Response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
@@ -735,8 +734,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
         }
 
-
-        return true;
+        return success;
     }
 
     public SubmitLiquidityinfoTask getSendLiquidityTask() {

@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -44,32 +45,32 @@ public class ParseOptions {
 
     private static final Logger LOG = LoggerFactory.getLogger(ParseOptions.class.getName());
 
-    public static String exchangename = "exchangename";
-    public static String apikey = "apikey";
-    public static String apisecret = "apisecret";
-    public static String mailrecipient = "mailrecipient";
+    public static String exchangename = "exchangeName";
+    public static String apikey = "apiKey";
+    public static String apisecret = "apiSecret";
+    public static String mailrecipient = "mailRecipient";
     public static String pair = "pair";
-    public static String nudip = "nudip";
-    public static String priceincrement = "priceincrement";
+    public static String nudip = "nudIp";
+    public static String priceincrement = "priceIncrement";
     public static String txfee = "txfee";
-    public static String submitliquidity = "submitliquidity";
-    public static String maxsellvolume = "maxsellvolume";
-    public static String maxbuyvolume = "maxbuyvolume";
-    public static String executeorders = "executeorders";
-    public static String dualside = "dualside";
+    public static String submitliquidity = "submitLiquidity";
+    public static String maxsellvolume = "maxSellVolume";
+    public static String maxbuyvolume = "maxBuyVolume";
+    public static String executeorders = "executeOrders";
+    public static String dualside = "dualSide";
     public static String verbose = "verbose";
     public static String hipchat = "hipchat";
-    public static String emergencytimeout = "emergencytimeout";
-    public static String keepproceeds = "keepproceeds";
-    public static String multiplecustodians = "multiplecustodians";
-    public static String nubitaddress = "nubitaddress";
-    public static String rpcpass = "rpcpass";
-    public static String rpcuser = "rpcuser";
-    public static String nudport = "nudport";
+    public static String emergencytimeout = "emergencyTimeout";
+    public static String keepproceeds = "keepProceeds";
+    public static String multiplecustodians = "multipleCustodians";
+    public static String nubitaddress = "nubitAddress";
+    public static String rpcpass = "rpcPass";
+    public static String rpcuser = "rpcUser";
+    public static String nudport = "nudPort";
     public static String mailnotifications = "mailnotifications";
     public static String mainfeed = "mainfeed";
-    public static String backupfeeds = "backupfeeds";
-    public static String wallchangethreshold = "wallchangethreshold";
+    public static String backupfeeds = "backupFeeds";
+    public static String wallchangethreshold = "wallchangeThreshold";
     public static String spread = "spread";
     //public static String distributeliquidity = "distributeliquidity";
 
@@ -102,6 +103,8 @@ public class ParseOptions {
             wallchangethreshold,
             spread};
     //distributeliquidity
+
+    private static String[] boolkeys = {submitliquidity, hipchat, verbose, executeorders, dualside, multiplecustodians};
 
 
     private static String[] comp = {exchangename, apisecret, mailrecipient, dualside, pair};
@@ -161,6 +164,38 @@ public class ParseOptions {
 
     }
 
+    public static boolean isValidOptions(NuBotOptions options) throws NuBotConfigException {
+
+        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
+        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
+        if (!supported)
+            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
+
+        //test if configuration is supported
+        if (!isSupportedPair(options.getPair())) {
+            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
+        }
+
+        if (options.requiresSecondaryPegStrategy()) {
+            if (!FeedFacade.isValidFeed(options.mainFeed))
+                throw new NuBotConfigException("invalid mainfeed " + options.mainFeed);
+
+            for (String feed : options.backupFeeds){
+                if (!FeedFacade.isValidFeed(feed))
+                    throw new NuBotConfigException("invalid feed " + feed);
+            }
+
+            if (options.wallchangeThreshold < 0)
+                throw new NuBotConfigException("invalid " + options.wallchangeThreshold);
+
+            if (options.spread < 0)
+                throw new NuBotConfigException("invalid value for spread " + spread);
+
+        }
+
+        return true;
+    }
+
     /**
      * the rules for valid configurations
      *
@@ -175,176 +210,33 @@ public class ParseOptions {
                 throw new NuBotConfigException("necessary key: " + allkeys[i]);
         }
 
-        boolean submitLiquidity = (boolean) getIgnoreCase(optionsJSON, submitliquidity);
-
-        if (submitLiquidity) {
-
-            String[] sneeded = {nubitaddress, rpcpass, rpcuser, nudport};
-
-            for (int i = 0; i < sneeded.length; i++) {
-                String s = sneeded[i];
-                if (!containsIgnoreCase(optionsJSON, s)) {
-                    throw new NuBotConfigException("When submit-liquidity is set to true "
-                            + "you need to declare a value for \"" +
-                            s + "\" ");
-                }
+        for (int i = 0; i < boolkeys.length; i++) {
+            try {
+                boolean b = (boolean) getIgnoreCase(optionsJSON, boolkeys[i]);
+            } catch (Exception e) {
+                throw new NuBotConfigException("can't parse to boolean: " + boolkeys[i]);
             }
+        }
+
+        try {
+            String lstr = "" + getIgnoreCase(optionsJSON, emergencytimeout);
+            int emergencyTimeoutLong = new Integer(lstr).intValue();
+        } catch (Exception e) {
+            throw new NuBotConfigException("can not cast emergencytimeout to int " + e);
+        }
+
+        try {
+            int nudPortlong = new Integer("" + getIgnoreCase(optionsJSON, nudport)).intValue();
+        } catch (Exception e) {
+            throw new NuBotConfigException("can not cast nudPortlong to long " + e);
         }
 
         return true;
     }
 
+    private static ArrayList parseBackupFeeds(JSONObject optionsJSON) throws NuBotConfigException {
 
-    /**
-     * parseOptions from JSON into NuBotOptions
-     * makes sure the parses object is valid
-     *
-     * @param optionsJSON
-     * @return
-     */
-    public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
-
-        //default values for optional settings
-
-        //NuBotOptions options = NuBotOptionsDefault.defaultFactory();
-        NuBotOptions options = new NuBotOptions();
-
-        try {
-            isValidJSON(optionsJSON);
-        } catch (NuBotConfigException e) {
-            throw e;
-        }
-
-        //First try to parse compulsory parameters
-        options.exchangeName = (String) getIgnoreCase(optionsJSON, exchangename);
-
-        boolean supported = ExchangeFacade.supportedExchange(options.exchangeName);
-        LOG.trace("exchange supported? " + options.exchangeName + " " + supported);
-        if (!supported)
-            throw new NuBotConfigException("exchange " + options.exchangeName + " not supported");
-
-        try {
-            options.dualSide = (boolean) getIgnoreCase(optionsJSON, dualside);
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast dualSide to boolean " + e);
-        }
-
-        if (!options.exchangeName.equalsIgnoreCase(ExchangeFacade.CCEX)) { //for ccex this parameter can be omitted
-            if (!containsIgnoreCase(optionsJSON, apikey)) {
-                throw new NuBotConfigException("The apikey parameter is compulsory.");
-            } else {
-                options.apiKey = (String) getIgnoreCase(optionsJSON, apikey);
-            }
-        }
-
-        options.apiKey = (String) getIgnoreCase(optionsJSON, apikey);
-
-        options.apiSecret = (String) getIgnoreCase(optionsJSON, apisecret);
-
-        options.mailRecipient = (String) getIgnoreCase(optionsJSON, mailrecipient);
-
-        options.pair = (String) getIgnoreCase(optionsJSON, pair);
-
-        //test if configuration is supported
-        if (!isSupportedPair(options.getPair())) {
-            throw new NuBotConfigException("This bot doesn't work yet with trading pair " + options.getPair().toString());
-        }
-
-        //Based on the pair, set a parameter do define whether setting SecondaryPegOptionsJSON i necessary or not
-        //boolean requireCryptoOptions = PegOptions.requiresSecondaryPegStrategy(pair);
-        //org.json.JSONObject pegOptionsJSON;
-
-        LOG.trace("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
-
-        if (options.requiresSecondaryPegStrategy()) {
-            try {
-                parseSecondary(options, optionsJSON);
-            } catch (NuBotConfigException e) {
-                throw e;
-            }
-        }
-
-
-        options.nudIp = (String) getIgnoreCase(optionsJSON, nudip);
-
-        options.priceIncrement = Utils.getDouble(getIgnoreCase(optionsJSON, priceincrement));
-
-        options.txFee = Utils.getDouble(getIgnoreCase(optionsJSON, txfee));
-
-        try {
-            options.submitLiquidity = (boolean) getIgnoreCase(optionsJSON, submitliquidity);
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast submitLiquidity to boolean " + e);
-        }
-        options.maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, maxsellvolume));
-        options.maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, maxbuyvolume));
-        try {
-            options.executeOrders = (boolean) getIgnoreCase(optionsJSON, executeorders);
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast executeOrders to boolean " + e);
-        }
-        options.verbose = (boolean) getIgnoreCase(optionsJSON, verbose);
-        options.hipchat = (boolean) getIgnoreCase(optionsJSON, hipchat);
-
-        try {
-            String lstr = "" + getIgnoreCase(optionsJSON, emergencytimeout);
-            LOG.debug("lstr " + lstr);
-            int emergencyTimeoutLong = new Integer(lstr).intValue();
-            options.emergencyTimeout = emergencyTimeoutLong;
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast emergencytimeout to int " + e);
-        }
-
-        options.keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, keepproceeds)));
-        try {
-            options.multipleCustodians = (boolean) getIgnoreCase(optionsJSON, multiplecustodians);
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast multipleCustodians to boolean " + e);
-        }
-
-
-        //TOOO distributeLiquidity not implemented
-        /*try {
-            options.distributeLiquidity = (boolean) getIgnoreCase(optionsJSON, distributeliquidity);
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast distributeLiquidity to boolean " + e);
-        }*/
-
-
-        options.nubitAddress = (String) getIgnoreCase(optionsJSON, nubitaddress);
-        options.rpcPass = (String) getIgnoreCase(optionsJSON, rpcpass);
-        options.rpcUser = (String) getIgnoreCase(optionsJSON, rpcuser);
-        try {
-            String pstr = "" + getIgnoreCase(optionsJSON, nudport);
-            int nudPortlong = new Integer(pstr).intValue();
-            options.nudPort = nudPortlong;
-        } catch (Exception e) {
-            throw new NuBotConfigException("can not cast nudPortlong to long " + e);
-        }
-
-        String tmpsendMails = (String) getIgnoreCase(optionsJSON, mailnotifications);
-        if (tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
-                || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
-                || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
-            options.mailnotifications = tmpsendMails.toUpperCase(); //Convert to upper case
-        } else {
-            String error = "Value not accepted for \"mail-notifications\" : " + tmpsendMails + " . Admitted values  : "
-                    + MailNotifications.MAIL_LEVEL_ALL + " , "
-                    + MailNotifications.MAIL_LEVEL_SEVERE + " or "
-                    + MailNotifications.MAIL_LEVEL_NONE;
-            LOG.error(error);
-            throw new NuBotConfigException(error);
-
-        }
-
-        return options;
-    }
-
-    public static void parseSecondary(NuBotOptions options, JSONObject optionsJSON) throws NuBotConfigException {
-
-        options.mainFeed = (String) getIgnoreCase(optionsJSON, mainfeed);
-
-        options.backupFeeds = new ArrayList<>();
+        ArrayList backupFeeds = new ArrayList<>();
 
         //Iterate on backupFeeds
         JSONArray bfeeds = null;
@@ -357,26 +249,97 @@ public class ParseOptions {
         if (bfeeds.size() < 2) {
             throw new NuBotConfigException("The bot requires at least two backup data feeds to run");
         }
+
         for (int i = 0; i < bfeeds.size(); i++) {
             try {
                 String feedname = (String) bfeeds.get(i);
                 if (!FeedFacade.isValidFeed(feedname))
                     throw new NuBotConfigException("invalid feed configured");
                 else
-                    options.backupFeeds.add(feedname);
+                    backupFeeds.add(feedname);
+
             } catch (JSONException ex) {
                 throw new NuBotConfigException("parse feeds json error" + ex);
             }
         }
 
-        options.wallchangeThreshold = Utils.getDouble(getIgnoreCase(optionsJSON, wallchangethreshold));
+        return backupFeeds;
+    }
 
+    private static String parseMails(JSONObject optionsJSON) throws NuBotConfigException {
+        String tmpsendMails = (String) getIgnoreCase(optionsJSON, mailnotifications);
+
+        if (tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_ALL)
+                || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_NONE)
+                || tmpsendMails.equalsIgnoreCase(MailNotifications.MAIL_LEVEL_SEVERE)) {
+            return tmpsendMails.toUpperCase(); //Convert to upper case
+        } else {
+            String error = "Value not accepted for \"mail-notifications\" : " + tmpsendMails + " . Admitted values  : "
+                    + MailNotifications.MAIL_LEVEL_ALL + " , "
+                    + MailNotifications.MAIL_LEVEL_SEVERE + " or "
+                    + MailNotifications.MAIL_LEVEL_NONE;
+            LOG.error(error);
+            throw new NuBotConfigException(error);
+        }
+    }
+
+    /**
+     * parseOptions from JSON into NuBotOptions
+     * makes sure the parses object is valid
+     *
+     * @param optionsJSON
+     * @return
+     */
+    public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
+
+        try {
+            isValidJSON(optionsJSON);
+        } catch (NuBotConfigException e) {
+            throw e;
+        }
+
+        NuBotOptions options = new NuBotOptions();
+        options.exchangeName = (String) getIgnoreCase(optionsJSON, exchangename);
+        options.dualSide = (boolean) getIgnoreCase(optionsJSON, dualside);
+        options.apiKey = (String) getIgnoreCase(optionsJSON, apikey);
+        options.apiSecret = (String) getIgnoreCase(optionsJSON, apisecret);
+        options.mailRecipient = (String) getIgnoreCase(optionsJSON, mailrecipient);
+        options.pair = (String) getIgnoreCase(optionsJSON, pair);
+        options.nudIp = (String) getIgnoreCase(optionsJSON, nudip);
+        options.priceIncrement = Utils.getDouble(getIgnoreCase(optionsJSON, priceincrement));
+        options.txFee = Utils.getDouble(getIgnoreCase(optionsJSON, txfee));
+        options.submitLiquidity = (boolean) getIgnoreCase(optionsJSON, submitliquidity);
+        options.maxSellVolume = Utils.getDouble(getIgnoreCase(optionsJSON, maxsellvolume));
+        options.maxBuyVolume = Utils.getDouble(getIgnoreCase(optionsJSON, maxbuyvolume));
+        options.executeOrders = (boolean) getIgnoreCase(optionsJSON, executeorders);
+        options.verbose = (boolean) getIgnoreCase(optionsJSON, verbose);
+        options.hipchat = (boolean) getIgnoreCase(optionsJSON, hipchat);
+        options.emergencyTimeout = new Integer("" + getIgnoreCase(optionsJSON, emergencytimeout)).intValue();
+        options.keepProceeds = Utils.getDouble((getIgnoreCase(optionsJSON, keepproceeds)));
+        options.multipleCustodians = (boolean) getIgnoreCase(optionsJSON, multiplecustodians);
+        options.nubitAddress = (String) getIgnoreCase(optionsJSON, nubitaddress);
+        options.rpcPass = (String) getIgnoreCase(optionsJSON, rpcpass);
+        options.rpcUser = (String) getIgnoreCase(optionsJSON, rpcuser);
+        options.nudPort = new Integer("" + getIgnoreCase(optionsJSON, nudport)).intValue();
+        //secondary
+        LOG.trace("options requiresSecondaryPegStrategy: " + options.requiresSecondaryPegStrategy());
+        options.mainFeed = (String) getIgnoreCase(optionsJSON, mainfeed);
+        options.wallchangeThreshold = Utils.getDouble(getIgnoreCase(optionsJSON, wallchangethreshold));
         options.spread = Utils.getDouble(getIgnoreCase(optionsJSON, spread));
+        options.backupFeeds = parseBackupFeeds(optionsJSON);
+        options.mailnotifications = parseMails(optionsJSON);
 
         if (options.spread != 0) {
             LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
 
+        try {
+            isValidOptions(options);
+        } catch (NuBotConfigException e) {
+            throw e;
+        }
+
+        return options;
     }
 
     public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
@@ -385,7 +348,6 @@ public class ParseOptions {
 
         try {
             //Check if NuBot has valid parameters
-
             newopt = ParseOptions.parseOptionsFromJson(postJson);
             LOG.debug("parse post opt: " + newopt);
 

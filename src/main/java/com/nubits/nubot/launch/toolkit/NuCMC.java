@@ -168,6 +168,7 @@ public class NuCMC {
         Utils.installKeystore(true);
 
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
 
         clearAll(ccedk);
         clearAll(bter);

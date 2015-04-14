@@ -35,24 +35,24 @@ public class ConfigController {
 
     final static Logger LOG = LoggerFactory.getLogger(ConfigController.class);
 
-    private void saveConfig(NuBotOptions newopt){
+    private void saveConfig(NuBotOptions newopt, String saveTo) {
 
         LOG.info("parsed: new opt: " + newopt);
 
         try {
             SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
-        } catch(IOException e){
+        } catch (IOException e) {
             LOG.info("error with backup " + e);
         }
 
-        String saveTo = this.configDir + File.separator + this.configfile;
+
         String js = SaveOptions.jsonPretty(newopt);
         LOG.info("new opt: " + js);
 
         boolean savesuccess = true;
         try {
             SaveOptions.saveOptionsPretty(newopt, saveTo);
-        }catch(Exception e){
+        } catch (Exception e) {
             LOG.info("error saving " + e);
             savesuccess = false;
         }
@@ -68,11 +68,12 @@ public class ConfigController {
 
         post("/configreset", (request, response) -> {
 
+            Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
             boolean result = SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
             //return jsonString;
 
             Map opmap = new HashMap();
-            opmap.put("success",result);
+            opmap.put("success", result);
             String json = new Gson().toJson(opmap);
             return json;
         });
@@ -92,13 +93,13 @@ public class ConfigController {
             return jsonString;
         });
 
-        post("/config" , "application/json", (request, response) -> {
+        post("/config", "application/json", (request, response) -> {
 
             //check if bot is running
             boolean active = SessionManager.isSessionActive();
             LOG.info("session currently active " + active);
 
-            if (active){
+            if (active) {
                 //if bot is running show an error
                 Map opmap = new HashMap();
                 opmap.put("success", false);
@@ -126,9 +127,9 @@ public class ConfigController {
             NuBotOptions newopt = null;
             Map opmap = new HashMap();
             String error = "none";
-            try{
+            try {
                 newopt = ParseOptions.parsePost(postJson);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error parsing " + postJson + "\n" + e);
                 //handle errors
                 success = false;
@@ -138,7 +139,8 @@ public class ConfigController {
             opmap.put("success", success);
 
             if (success) {
-                saveConfig(newopt);
+                String saveTo = Global.currentOptionsFile;
+                saveConfig(newopt, saveTo);
             }
 
             opmap.put("error", error);

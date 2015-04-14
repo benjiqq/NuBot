@@ -127,7 +127,7 @@ public class Settings {
 
     public final static String DEFAULT_CONFIG_FILENAME = "nubot-config.json";//Used by UI in case file not explicitly declared
 
-    public final static String CONFIG_DIR = "config" + "/" + "options";
+    public final static String CONFIG_DIR = "config";
 
     public final static String DEFAULT_CONFIG_FILE_PATH = CONFIG_DIR + "/" + DEFAULT_CONFIG_FILENAME;
 
@@ -149,9 +149,11 @@ public class Settings {
 
     public final static String APP_FOLDER = ".nubot";
 
-    public final static String SESSION_FILE = "_session.txt";
+    public final static String SESSION_FILE = APP_NAME + "_session.tmp";
 
     public final static String SESSION_LOGGER_NAME = "SessionLOG";
+    public static final int DELAY_CONN = 1;
+    public final static int DELAY_LIQUIIDITY = 40;
 
 
     /**

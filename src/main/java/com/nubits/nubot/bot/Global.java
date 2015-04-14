@@ -38,32 +38,35 @@ public class Global {
 
     public static NuBotOptions options;
 
-    //path of logs in this session
-    public static String sessionLogFolder;
-
-    public static TaskManager taskManager;
-
-    public static NuRPCClient rpcClient;
-
-    public static double conversion = 1; //Change this? update SendLiquidityinfoTask
-    public static FrozenBalancesManager frozenBalances;
-    public static boolean swappedPair; //true if payment currency is NBT
-
-    public static Exchange exchange;
-
-    public static String sessionId;
-    public static String sessionPath;
-    public static long sessionStarted, sessionStopped;
-
-    public static boolean sessionRunning = false;
-
-    public static String currentOptionsFile;
-
     /**
      * the bot connected to the global thread
      */
     public static NuBotBase bot;
 
+    public static Exchange exchange;
+
+    public static TaskManager taskManager;
+
+    //path of logs in this session
+    public static String sessionLogFolder;
+
+    public static NuRPCClient rpcClient;
+
+    public static double conversion = 1; //Change this? update SendLiquidityinfoTask
+
+    public static FrozenBalancesManager frozenBalancesManager;
+
+    public static boolean swappedPair; //true if payment currency is NBT
+
+    public static String sessionId;
+
+    public static String sessionPath;
+
+    public static long sessionStarted, sessionStopped;
+
+    public static boolean sessionRunning = false;
+
+    public static String currentOptionsFile;
 
     /**
      * shutdown mechanics
@@ -90,7 +93,7 @@ public class Global {
 
                 LOG.info("Exit main");
 
-                //TODO! this shuts down UI as well
+                //this shuts down UI as well
                 Thread.currentThread().interrupt();
                 return;
             }

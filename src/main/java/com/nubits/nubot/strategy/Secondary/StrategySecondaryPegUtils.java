@@ -17,10 +17,6 @@
  */
 package com.nubits.nubot.strategy.Secondary;
 
-/**
- * @author desrever <desrever at nubits.com>
- */
-
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
@@ -60,7 +56,7 @@ public class StrategySecondaryPegUtils {
                     LOG.warn("Clear all orders request succesfully");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
-                        Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                        Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
                     }
                     //Wait until there are no active orders
                     boolean timedOut = false;
@@ -112,7 +108,7 @@ public class StrategySecondaryPegUtils {
         } else {
             if (firstTime) //update the initial balance of the secondary peg
             {
-                Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
             }
             placeInitialWalls();
         }
@@ -178,7 +174,7 @@ public class StrategySecondaryPegUtils {
         } else {
             //Here its time to compute the balance to put apart, if any
             balance = (Amount) balancesResponse.getResponseObject();
-            balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+            balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
 
@@ -282,7 +278,7 @@ public class StrategySecondaryPegUtils {
                     balance = (Amount) balancesResponse2.getResponseObject();
 
                     if (type.equals(Constant.BUY)) {
-                        balance = Global.frozenBalances.removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                        balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
                     }
 
 
@@ -391,7 +387,7 @@ public class StrategySecondaryPegUtils {
         if (balancesResponse.isPositive()) {
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
             double balanceNBT = balance.getNBTAvailable().getQuantity();
-            double balancePEG = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+            double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
             strategy.setActiveSellOrders(countActiveOrders(Constant.SELL));
             strategy.setActiveBuyOrders(countActiveOrders(Constant.BUY));
@@ -438,7 +434,7 @@ public class StrategySecondaryPegUtils {
 
             //get the balance and see if it does still require an aggregation
 
-            Global.frozenBalances.freezeNewFunds();
+            Global.frozenBalancesManager.freezeNewFunds();
 
             //Introuce an aleatory sleep time to desync bots at the time of placing orders.
             //This will favour competition in markets with multiple custodians
@@ -540,7 +536,7 @@ public class StrategySecondaryPegUtils {
                         || !Global.options.getPair().getPaymentCurrency().isFiat()) //...do not do this for stable secondary pegs (e.g EUR)
                 {
                     // update the initial balance of the secondary peg
-                    Global.frozenBalances.freezeNewFunds();
+                    Global.frozenBalancesManager.freezeNewFunds();
                 }
 
                 //Reset sell side orders

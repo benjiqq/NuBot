@@ -2,14 +2,20 @@ package com.nubits.nubot.webui;
 
 import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
-import com.nubits.nubot.launch.MainLaunch;
+import com.nubits.nubot.options.ParseOptions;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -20,21 +26,50 @@ public class BotController {
 
     final static Logger LOG = LoggerFactory.getLogger(BotController.class);
 
-    public BotController(String endpoint) {
+    private final static String START = "start";
+    private final static String STOP = "stop";
 
-        get(endpoint, "application/json", (request, response) -> {
+    public BotController() {
+
+        get("/opstatus", "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
-
             boolean active = SessionManager.isSessionActive();
-            opmap.put("running", active);
+            if (active) {
+                opmap.put("status", "running");
 
+                opmap.put("sessionstart", SessionManager.startedString());
+
+
+
+                opmap.put("duration", SessionManager.durationString());
+
+            } else {
+                if (SessionManager.wasRunOnce())
+                    opmap.put("status", "halted");
+                else
+                    opmap.put("status", "not started");
+
+                opmap.put("sessionstart", "");
+            }
+
+            opmap.put("stopped", Global.sessionStopped);
             String json = new Gson().toJson(opmap);
             return json;
         });
 
+        /*get("/startstop", "application/json", (request, response) -> {
+
+            Map opmap = new HashMap();
+            boolean active = SessionManager.isSessionActive();
+            opmap.put("running", active);
+            String json = new Gson().toJson(opmap);
+            return json;
+        });*/
+
+
         // we expect options are set
-        post(endpoint, "application/json", (request, response) -> {
+        post("/startstop", "application/json", (request, response) -> {
 
             Map opmap = new HashMap();
 
@@ -53,38 +88,63 @@ public class BotController {
 
             String json = new Gson().toJson(opmap);
 
-            if (startstop.equals("start")) {
+            if (startstop.equals(START)) {
                 boolean success = true;
 
-                opmap.put("success", "" + false);
-                LOG.info("trying to start bot");
+                LOG.info("testing if global options are valid");
 
-                try {
-                    SessionManager.launchBot(Global.options);
-                } catch (Exception e) {
+                boolean active = SessionManager.isSessionActive();
+                if (active) {
                     success = false;
-                    LOG.error("could not start bot " + e);
-                    opmap.put("error", "" + e);
+                    String errmsg = "could not start bot. session already running";
+                    LOG.error(errmsg);
+                    opmap.put("error", errmsg);
+                }
+
+                if (ParseOptions.isValidOptions(Global.options)) {
+                    LOG.info("trying to start bot");
+                    try {
+                        SessionManager.launchBot(Global.options);
+                    } catch (NuBotRunException e) {
+                        success = false;
+                        LOG.error("could not start bot " + e);
+                        opmap.put("error", "" + e);
+                    }
+                } else {
+                    success = false;
+                    LOG.error("could not start bot. invalid options");
                 }
 
                 LOG.info("start bot success? " + success);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);
-
                 return json;
             }
 
-            if (startstop.equals("stop")) {
+            if (startstop.equals(STOP)) {
+                boolean active = SessionManager.isSessionActive();
+
                 boolean success = true;
-                try {
-                    LOG.info("try interrupt bot");
-                    Global.mainThread.interrupt();
-                } catch (Exception e) {
+                if (active) {
+                    try {
+                        LOG.info("try interrupt bot");
+
+                        Global.bot.shutdownBot();
+
+                        Global.mainThread.interrupt();
+
+                    } catch (Exception e) {
+                        success = false;
+                        opmap.put("error", "can't interrupt");
+                    }
+                } else {
                     success = false;
+                    String errmsg = "no session running";
+                    LOG.info(errmsg);
+                    opmap.put("error", errmsg);
                 }
 
-                SessionManager.launchBot(Global.options);
                 opmap.put("success", success);
 
                 json = new Gson().toJson(opmap);

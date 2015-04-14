@@ -16,12 +16,11 @@ import java.util.Map;
  * Render bootstrap based HTML with Mustache
  * Top: html head
  * Footer: footer
- *
  */
 public class LayoutTemplateEngine extends TemplateEngine {
 
     private MustacheFactory mustacheFactory;
-    private  String htmlfolder;
+    private String htmlfolder;
 
     /**
      * Constructs a mustache template engine
@@ -50,7 +49,7 @@ public class LayoutTemplateEngine extends TemplateEngine {
         //setPort(serverPort); // Spark will run on this port
         //map.put("port", "" + serverPort);
 
-        ModelAndView mv = new ModelAndView(map,  this.htmlfolder + "top.mustache");
+        ModelAndView mv = new ModelAndView(map, this.htmlfolder + "top.mustache");
         return renderTemplateFile(mv);
     }
 

@@ -31,7 +31,9 @@ public class CheckNudTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.debug("Executing task : CheckNudTask ");
+
+        LOG.info("Executing " + this.getClass());
+
         if (Global.rpcClient != null) {
             Global.rpcClient.checkConnection();
 

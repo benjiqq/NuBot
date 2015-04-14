@@ -41,27 +41,101 @@
 
       <script>
 
-              var host = "localhost";
-              var port = 4567;
-              var baseurl = "http://" + host + ":" + port;
-              var updateTime = 2000;
-              var debug = true;
+          var host = "localhost";
+          var port = 4567;
+          var baseurl = "http://" + host + ":" + port;
+          var updateTime = 500;
+          var debug = true;
+
+         function setRunning(){
+              $('#startbot').html("Running");
+              $('#startbot').removeClass("btn-primary");
+              $('#startbot').addClass("btn-success");
+         }
+
+         function setHalted(){
+              $('#startbot').removeClass("btn-success");
+              $('#startbot').addClass("btn-primary");
+              $('#startbot').html("Start");
+         }
+
+        function updateConfigFile(){
+                 $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url:  "http://" + host + ":" + port + "/configfile"
+                })
+                .fail(function() {
+                  console.log("error loading configfile");
+                })
+                .done(function( data ) {
+                    console.log("data: " + data);
+                    $('#configfile').html(data["configfile"]);
+                });
+        }
+
+        function updateStatus(){
+                 $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url:  "http://" + host + ":" + port + "/opstatus"
+                })
+                .fail(function() {
+
+                })
+                .done(function( data ) {
+                    console.log("data: " + data);
+
+                    $('#botstatus').html(data["status"]);
+
+                    $('#sessionstart').html(data["sessionstart"]);
+
+                    $('#duration').html(data["duration"]);
+
+                    if (data["status"] == "running"){
+                        setRunning();
+                    }
+
+                });
+
+                //re-call the function
+                setTimeout(updateStatus, updateTime);
+        }
+
+
+        function flashButton(cbtn){
+
+            if (cbtn.hasClass("btn-primary")) {
+               cbtn.removeClass("btn-primary");
+               cbtn.addClass("btn-success");
+
+               //change color back after 2000 msec
+               setTimeout(function() {
+                     cbtn.removeClass("btn-success");
+                     cbtn.addClass("btn-primary");
+               }, 2000);
+            }
+
+        }
+
+        function flashButtonRed(cbtn){
+
+            if (cbtn.hasClass("btn-primary")) {
+               cbtn.removeClass("btn-primary");
+               cbtn.addClass("btn-danger");
+
+               //change color back after 2000 msec
+               setTimeout(function() {
+                     cbtn.removeClass("btn-danger");
+                     cbtn.addClass("btn-primary");
+               }, 2000);
+            }
+
+        }
 
         $(document).ready(function() {
 
-        $.ajax({
-          type: "GET",
-          dataType: "json",
-          url:  "http://" + host + ":" + port + "/configfile"
-        })
-        .fail(function() {
-          console.log("error loading configfile");
-        })
-        .done(function( data ) {
-            console.log("data: " + data);
-            $('#configfile').html(data["configfile"]);
-        });
-
+            updateConfigFile();
 
 
           $('#startbot').click(function(){
@@ -73,10 +147,22 @@
 
               $.ajax(baseurl + "/startstop", {
                     data : jsondata,
-                    contentType : 'application/json',
+                    dataType: "json",
                     type : 'POST',
                     success: function(data){
                         console.log("starting bot ok " + data);
+                        var success = data["success"];
+
+
+                        if (success){
+                         //on success of post change the color of the button
+                          setRunning();
+
+                        } else{
+                            flashButtonRed(cbtn);
+                            alert(data["error"]);
+                        }
+
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert("error posting to server " + textStatus + " " + errorThrown);
@@ -84,6 +170,7 @@
                });
 
             });
+
 
 
 
@@ -96,10 +183,21 @@
 
               $.ajax(baseurl + "/startstop", {
                     data : jsondata,
-                    contentType : 'application/json',
+                    dataType: "json",
                     type : 'POST',
                     success: function(data){
-                        console.log("ok " + data);
+                       console.log("stopping bot " + data);
+                       var success = data["success"];
+                        var cbtn = $('#stopbot');
+                       if (success){
+                        //on success of post change the color of the button
+                         flashButton(cbtn);
+                         $('#duration').html("");
+                         setHalted();
+                       } else{
+                           alert(data["error"]);
+                           flashButtonRed(cbtn);
+                       }
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert("error posting to server " + textStatus + " " + errorThrown);
@@ -110,7 +208,18 @@
             });
     });
 
-            function loadlog() {
+            function autoScroll(){
+
+                //autoscrolling. not used - how to make log readable also?
+                var psconsole = $('#logarea');
+                if(psconsole.length)
+                  psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+
+            }
+
+            var i = 0;
+
+            function updateLog() {
 
                 var url = baseurl + "/logdump";
 
@@ -127,17 +236,19 @@
                   $('#logarea').val(data["log"]);
                 });
 
-                var psconsole = $('#logarea');
-                if(psconsole.length)
-                  psconsole.scrollTop(psconsole[0].scrollHeight - psconsole.height());
+                i++;
 
-                setTimeout(loadlog,updateTime);
+                if (i % 20 == 0) {
+                    autoScroll();
+                }
+
+                setTimeout(updateLog , updateTime);
             }
 
 
             function loadbot() {
-                loadlog();
-
+                updateLog();
+                updateStatus();
             }
 
 
@@ -257,6 +368,8 @@
 
             }
 
+
+
             function makePost(url, jsondata){
                 //make HTTP post to server
 
@@ -278,17 +391,8 @@
 
                          //on success of post change the color of the button
                           var cbtn = $('#saveconfigbutton');
+                          flashButton(cbtn);
 
-                          if (cbtn.hasClass("btn-primary")) {
-                               cbtn.removeClass("btn-primary");
-                               cbtn.addClass("btn-success");
-
-                               //change color back after 2000 msec
-                               setTimeout(function() {
-                                     cbtn.removeClass("btn-success");
-                                     cbtn.addClass("btn-primary");
-                               }, 2000);
-                          }
                       } else{
                           alert(errormsg);
                       }
@@ -327,6 +431,7 @@
                       }
 
                       //reset values from server
+                      updateConfigFile();
                       loadconfig();
 
                     },

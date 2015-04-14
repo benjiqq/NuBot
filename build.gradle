@@ -45,7 +45,7 @@ def resdir = new File("res")
 def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
 def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
-def sampleconfig = "config/options/sample-options.json"
+def sampleconfig = "config/sample-options.json"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
@@ -238,6 +238,11 @@ task NuBotDist(dependsOn: NuBotJar) {
         copy {
             from "src"
             into "${distdir}/res/sources"
+        }
+
+        copy {
+            from "res/UI"
+            into "${distdir}/res/UI"
         }
 
         delete "${distdir}/res/sources/main/java/com/nubits/nubot/global/Passwords.java"

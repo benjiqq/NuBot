@@ -24,6 +24,8 @@ public class UiServer {
      */
     public static void startUIserver(String configFile) {
 
+        LOG.info("start ui server. configfile " + configFile);
+
         //set up all endpoints
 
         LOG.info("launching on http://localhost:" + port);
@@ -49,11 +51,10 @@ public class UiServer {
 
         get("/setup", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "setup.mustache"), tmpl);
 
-        new BotController("/startstop");
+        new BotController();
 
 
     }
-
 
 
 }

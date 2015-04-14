@@ -81,14 +81,6 @@ public class BotTask {
         return timer;
     }
 
-    public void setTimer(Timer timer) {
-        this.timer = timer;
-    }
-
-    public long getInterval() {
-        return interval;
-    }
-
     public void setInterval(long interval) {
         this.interval = interval;
     }

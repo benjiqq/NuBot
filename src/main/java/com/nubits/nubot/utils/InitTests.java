@@ -63,6 +63,8 @@ public class InitTests {
     {
         //Create a TaskManager
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
+
         //Start checking for connection with the exchange
         Global.taskManager.getCheckConnectionTask().start();
         //Wait a couple of seconds for the connectionThread to get live

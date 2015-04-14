@@ -83,28 +83,4 @@ public class BotUtil {
 
     }
 
-    public static int countActiveOrders(String type) {
-        //Get active orders
-        int toRet = 0;
-
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return -1;
-        }
-
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-
-        for (int i = 0; i < orderList.size(); i++) {
-            Order tempOrder = orderList.get(i);
-            if (tempOrder.getType().equalsIgnoreCase(type)) {
-                LOG.info("active order: " + tempOrder);
-                toRet++;
-            }
-        }
-
-        return toRet;
-    }
 }
