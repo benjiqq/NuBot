@@ -1,29 +1,23 @@
+dist/
+logs/
+
+#Config files
+config/myconfig/
+
+#Reports
+testreports/
+
 #A folder containing utilities that do not need to be pushed
 /gitignore/
-
 
 #Folder with builds
 releases/
 
 #Directories to ignore
-
-/NuBot/res/options/private/
-/NuBot/nbproject/private/
-/NuBot/build/
-/NuBot/dist/
-/NuBot/dist-packaged/
-/NuBot/res/frozen
-/NuBot/logs/
+res/frozen-funds
 
 #Specific files to ignore
-ssl_readme.txt
-readme.html
-changelog.html
-setup.html
-feeds.html
-
-#launch configurations
-/NuBot/nbproject/configs/*.properties
+*.html
 
 #Prevent test passwords to be pushed
 Passwords.java
@@ -41,13 +35,16 @@ Passwords.java
 #Class files
 *.class
 
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
-*.jar
-*.war
-*.ear
-
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+/build/
+/bin/
+
+#Gradle
+.gradle
+
+#IJ
+.idea
+*.iml
+*.ipr
+*.iws
