@@ -49,7 +49,9 @@ public class StrategySecondaryPegUtils {
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
-        if (Global.orderManager.getNumTotalActiveOrders() != 0) {
+        Global.orderManager.fetch();
+        int totalOrders = Global.orderManager.getNumTotalActiveOrders();
+        if (totalOrders > 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
