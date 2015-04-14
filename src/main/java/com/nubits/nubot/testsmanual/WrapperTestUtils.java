@@ -138,7 +138,7 @@ public class WrapperTestUtils {
         }
     }
 
-    public static void testGetActiveOrders(CurrencyPair pair) {
+    public static void testGetActiveOrders(CurrencyPair pair, boolean printThem) {
         //Get active orders associated with a specific CurrencyPair
         ApiResponse activeOrdersUSDNTBResponse = Global.exchange.getTrade().getActiveOrders(pair);
         if (activeOrdersUSDNTBResponse.isPositive()) {
@@ -146,9 +146,11 @@ public class WrapperTestUtils {
             ArrayList<Order> orderListUSDNBT = (ArrayList<Order>) activeOrdersUSDNTBResponse.getResponseObject();
 
             LOG.info("Active orders : " + orderListUSDNBT.size());
-            for (int i = 0; i < orderListUSDNBT.size(); i++) {
-                Order tempOrder = orderListUSDNBT.get(i);
-                LOG.info(tempOrder.toString());
+            if (printThem) {
+                for (int i = 0; i < orderListUSDNBT.size(); i++) {
+                    Order tempOrder = orderListUSDNBT.get(i);
+                    LOG.info(tempOrder.toString());
+                }
             }
         } else {
             LOG.error(activeOrdersUSDNTBResponse.getError().toString());
