@@ -237,11 +237,14 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         if (countTrials <= MAX_ATTEMPTS) {
 
-            ArrayList<LastPrice> currentPriceList = pfm.fetchLastPrices().getPrices();
+            pfm.fetchLastPrices();
+            ArrayList<LastPrice> currentPriceList = pfm.getLastPrices();
 
             LOG.debug("CheckLastPrice received values from remote feeds. ");
 
-            if (currentPriceList.size() == pfm.getFeedList().size()) {
+            boolean gotall = currentPriceList.size() == pfm.getFeedList().size();
+
+            if (gotall) {
                 //All feeds returned a positive value
                 //Check if mainPrice is close enough to the others
                 // I am assuming that mainPrice is the first element of the list
@@ -264,7 +267,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
-
                         this.updateLastPrice(goodPrice, currentPriceList);
                     } else {
                         //None of the source are in accord with others.
@@ -298,7 +300,6 @@ public class PriceMonitorTriggerTask extends TimerTask {
                     }
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
-
                         this.updateLastPrice(goodPrice, currentPriceList);
                     } else {
                         //None of the source are in accord with others.
