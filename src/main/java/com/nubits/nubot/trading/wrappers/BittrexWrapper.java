@@ -155,7 +155,7 @@ public class BittrexWrapper implements TradeInterface {
                 Amount PegOnOrder = new Amount(0, pair.getPaymentCurrency());
                 Amount PegAvailable = new Amount(0, pair.getPaymentCurrency());
                 JSONArray result = (JSONArray) httpAnswerJson.get("result");
-                for (Iterator<JSONObject> wallet = result.iterator(); wallet.hasNext();) {
+                for (Iterator<JSONObject> wallet = result.iterator(); wallet.hasNext(); ) {
                     JSONObject thisWallet = wallet.next();
                     if (thisWallet.get("Currency").equals(pair.getPaymentCurrency().getCode().toUpperCase())) {
                         PegAvailable.setQuantity(Utils.getDouble(thisWallet.get("Available")));
@@ -302,7 +302,7 @@ public class BittrexWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray result = (JSONArray) httpAnswerJson.get("result");
-            for (Iterator<JSONObject> order = result.iterator(); order.hasNext();) {
+            for (Iterator<JSONObject> order = result.iterator(); order.hasNext(); ) {
                 JSONObject thisOrder = order.next();
                 orderList.add(parseOrder(thisOrder));
             }
@@ -328,7 +328,7 @@ public class BittrexWrapper implements TradeInterface {
         Amount price = new Amount(Utils.getDouble(in.get("Price")), pair.getPaymentCurrency());
         out.setPrice(price);
         //2014-07-09T03:55:48.77
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.S");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
         Date date = null;
         try {
             date = sdf.parse(in.get("Opened").toString());
@@ -366,7 +366,7 @@ public class BittrexWrapper implements TradeInterface {
 
         if (getOrders.isPositive()) {
             ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
@@ -420,7 +420,9 @@ public class BittrexWrapper implements TradeInterface {
     }
 
     @Override
-    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) { return getLastTradesImpl(pair, startTime);     }
+    public ApiResponse getLastTrades(CurrencyPair pair, long startTime) {
+        return getLastTradesImpl(pair, startTime);
+    }
 
     private ApiResponse getLastTradesImpl(CurrencyPair pair, long startTime) {
         ApiResponse apiResponse = new ApiResponse();
@@ -435,12 +437,12 @@ public class BittrexWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray result = (JSONArray) httpAnswerJson.get("result");
-            for (Iterator<JSONObject> trade = result.iterator(); trade.hasNext();) {
+            for (Iterator<JSONObject> trade = result.iterator(); trade.hasNext(); ) {
                 Trade thisTrade = parseTrade(trade.next());
                 if (thisTrade.getDate() == null) {
                     continue;
                 }
-                if (startTime > 0 && thisTrade.getDate().getTime() < startTime){
+                if (startTime > 0 && thisTrade.getDate().getTime() < startTime) {
                     continue;
                 }
                 tradeList.add(thisTrade);
@@ -492,7 +494,7 @@ public class BittrexWrapper implements TradeInterface {
         if (getOrders.isPositive()) {
             apiResponse.setResponseObject(false);
             ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(id)) {
                     apiResponse.setResponseObject(!thisOrder.isCompleted());
@@ -517,7 +519,7 @@ public class BittrexWrapper implements TradeInterface {
         ApiResponse getOrders = getActiveOrders(pair);
         if (getOrders.isPositive()) {
             ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 cancelOrder(thisOrder.getId(), thisOrder.getPair());
             }
@@ -567,7 +569,9 @@ public class BittrexWrapper implements TradeInterface {
 
         protected ApiKeys keys;
 
-        public BittrexService(ApiKeys keys) { this.keys = keys; }
+        public BittrexService(ApiKeys keys) {
+            this.keys = keys;
+        }
 
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
