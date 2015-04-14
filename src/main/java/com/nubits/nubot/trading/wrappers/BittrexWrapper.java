@@ -331,7 +331,9 @@ public class BittrexWrapper implements TradeInterface {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
         Date date = null;
         try {
-            date = sdf.parse(in.get("Opened").toString());
+            if (in.get("Opened") != null) {
+                date = sdf.parse(in.get("Opened").toString());
+            }
         } catch (java.text.ParseException pe) {
             LOG.error(pe.toString());
         }
@@ -342,7 +344,9 @@ public class BittrexWrapper implements TradeInterface {
         }
         date = null;
         try {
-            date = sdf.parse(in.get("Closed").toString());
+            if (in.get("Closed") != null) {
+                date = sdf.parse(in.get("Closed").toString());
+            }
         } catch (java.text.ParseException pe) {
             LOG.error(pe.toString());
         }
@@ -473,7 +477,9 @@ public class BittrexWrapper implements TradeInterface {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.S");
         Date date = null;
         try {
-            date = sdf.parse(in.get("Closed").toString());
+            if (in.get("Closed") != null) {
+                date = sdf.parse(in.get("Closed").toString());
+            }
         } catch (java.text.ParseException pe) {
             LOG.error(pe.toString());
         }
