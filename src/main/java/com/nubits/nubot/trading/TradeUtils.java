@@ -29,8 +29,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
+import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.TreeMap;
 
 public class TradeUtils {
@@ -88,6 +88,7 @@ public class TradeUtils {
 
     /**
      * cancel all outstanding orders
+     *
      * @param pair
      * @return
      */
@@ -231,7 +232,7 @@ public class TradeUtils {
      * @param encoding
      * @return
      */
-    public static String buildQueryString(HashMap<String, String> args, String encoding) {
+    public static String buildQueryString(AbstractMap<String, String> args, String encoding) {
         String result = new String();
         for (String hashkey : args.keySet()) {
             if (result.length() > 0) {

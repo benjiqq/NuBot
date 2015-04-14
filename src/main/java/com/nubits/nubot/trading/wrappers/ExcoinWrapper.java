@@ -58,6 +58,7 @@ public class ExcoinWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(ExcoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected ExcoinService service;
     private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA256";
     private final String ENCODING = "UTF-8";
@@ -81,13 +82,11 @@ public class ExcoinWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    public ExcoinWrapper() {
-        setupErrors();
-    }
-
     public ExcoinWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new ExcoinService(keys);
+
         setupErrors();
     }
 
@@ -99,7 +98,7 @@ public class ExcoinWrapper implements TradeInterface {
         ApiResponse apiResponse = new ApiResponse();
         HashMap<String, String> query_args = new HashMap<>();
         boolean isGet = true;
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args, true, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -636,11 +635,10 @@ public class ExcoinWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        ExcoinService query = new ExcoinService(url, keys);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to Excoin");
             queryResult = TOKEN_BAD_RETURN;
@@ -648,20 +646,6 @@ public class ExcoinWrapper implements TradeInterface {
         return queryResult;
     }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -684,11 +668,9 @@ public class ExcoinWrapper implements TradeInterface {
 
     private class ExcoinService implements ServiceInterface {
 
-        protected String url;
         protected ApiKeys keys;
 
-        public ExcoinService(String url, ApiKeys keys) {
-            this.url = url + "?expire=" + getExpireTimeStamp();
+        public ExcoinService(ApiKeys keys) {
             this.keys = keys;
         }
 
@@ -698,8 +680,9 @@ public class ExcoinWrapper implements TradeInterface {
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             HttpsURLConnection connection = null;
+            String url = base + method + "?expire=" + getExpireTimeStamp();
             boolean httpError = false;
             String output;
             int response = 200;

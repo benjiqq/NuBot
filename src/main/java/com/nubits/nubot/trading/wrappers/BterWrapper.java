@@ -67,6 +67,7 @@ public class BterWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(BterWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected BterService service;
     private Exchange exchange;
     private String checkConnectionUrl = "https://bter.com/";
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
@@ -85,13 +86,10 @@ public class BterWrapper implements TradeInterface {
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_ERROR_HTML_405 = "<title>405 Method Not Allowed</title>";
 
-    public BterWrapper() {
-        setupErrors();
-    }
-
     public BterWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new BterService(keys);
         setupErrors();
     }
 
@@ -99,9 +97,9 @@ public class BterWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args, needAuth, isGet);
 
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
@@ -181,7 +179,7 @@ public class BterWrapper implements TradeInterface {
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             boolean somethingLocked = false;
@@ -254,14 +252,11 @@ public class BterWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getLastPrice(CurrencyPair pair) {
-        return getLastPriceImpl(pair, false);
+        return getLastPriceImpl(pair);
     }
 
-    public ApiResponse getLastPriceFeed(CurrencyPair pair) { //used for BterPriceFeed only
-        return getLastPriceImpl(pair, true);
-    }
 
-    private ApiResponse getLastPriceImpl(CurrencyPair pair, boolean bypass) {
+    private ApiResponse getLastPriceImpl(CurrencyPair pair) {
         Ticker ticker = new Ticker();
         ApiResponse apiResponse = new ApiResponse();
 
@@ -277,13 +272,8 @@ public class BterWrapper implements TradeInterface {
          * {"result":"true","last":2599,"high":2620,"low":2406,"avg":2526.11,"sell":2598,"buy":2578,"vol_btc":544.5027,"vol_cny":1375475.92}
          */
 
-        String queryResult = "";
-        if (bypass) { //used by BterPriceFeed only
-            BterService query = new BterService(ticker_url, keys, query_args);
-            queryResult = query.executeQuery(true, true);
-        } else {
-            queryResult = query(ticker_url, query_args, true);
-        }
+        String queryResult = service.executeQuery(ticker_url, "", query_args, false, true);
+
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -349,7 +339,7 @@ public class BterWrapper implements TradeInterface {
         query_args.put("rate", Double.toString(rate));
         query_args.put("amount", Double.toString(amount));
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             order_id = "" + (long) httpAnswerJson.get("order_id");
@@ -389,7 +379,7 @@ public class BterWrapper implements TradeInterface {
 
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders;
@@ -435,7 +425,7 @@ public class BterWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             String msg = (String) httpAnswerJson.get("msg");
@@ -466,7 +456,7 @@ public class BterWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             String msg = (String) httpAnswerJson.get("msg");
@@ -500,7 +490,7 @@ public class BterWrapper implements TradeInterface {
 
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray array = (JSONArray) httpAnswerJson.get("pairs");
@@ -621,11 +611,10 @@ public class BterWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        BterService query = new BterService(url, keys, args);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to bter");
             queryResult = TOKEN_BAD_RETURN;
@@ -633,21 +622,6 @@ public class BterWrapper implements TradeInterface {
         return queryResult;
     }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -755,7 +729,7 @@ public class BterWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("pair", pair.toStringSep().toLowerCase());
 
-        ApiResponse response = getQuery(url, query_args, isGet);
+        ApiResponse response = getQuery(url, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders;
@@ -792,31 +766,24 @@ public class BterWrapper implements TradeInterface {
 
     private class BterService implements ServiceInterface {
 
-        protected String base;
-        protected String method;
-        protected HashMap args;
         protected ApiKeys keys;
-        protected String url;
 
-        private BterService(String url, ApiKeys keys, HashMap<String, String> args) {
-            //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
-            this.method = "";
+        private BterService(ApiKeys keys) {
             this.keys = keys;
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String answer = null;
             String signature = "";
             String post_data = "";
+            String url = base + method;
 
-            List< NameValuePair> urlParameters = new ArrayList< NameValuePair>();
+            List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
 
-            for (Iterator< Map.Entry< String, String>> argumentIterator = args.entrySet().iterator(); argumentIterator.hasNext();) {
+            for (Iterator<Map.Entry<String, String>> argumentIterator = args.entrySet().iterator(); argumentIterator.hasNext(); ) {
 
-                Map.Entry< String, String> argument = argumentIterator.next();
+                Map.Entry<String, String> argument = argumentIterator.next();
 
                 urlParameters.add(new BasicNameValuePair(argument.getKey().toString(), argument.getValue().toString()));
 
@@ -832,9 +799,9 @@ public class BterWrapper implements TradeInterface {
 
             // add header
             Header[] headers = new Header[3];
-            headers[ 0] = new BasicHeader("Key", keys.getApiKey());
-            headers[ 1] = new BasicHeader("Sign", signature);
-            headers[ 2] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
+            headers[0] = new BasicHeader("Key", keys.getApiKey());
+            headers[1] = new BasicHeader("Sign", signature);
+            headers[2] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");
 
             URL queryUrl;
             try {

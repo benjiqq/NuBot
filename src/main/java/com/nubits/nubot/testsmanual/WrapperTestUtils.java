@@ -328,6 +328,7 @@ public class WrapperTestUtils {
         //Create a new TradeInterface object using the custom implementation
         TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName, keys, Global.exchange);
 
+        //TODO:  remove when tested
         //Assign the keys to the TradeInterface
         ti.setKeys(keys);
 

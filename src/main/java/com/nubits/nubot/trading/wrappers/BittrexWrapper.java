@@ -29,8 +29,7 @@ import com.nubits.nubot.trading.keys.ApiKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.TreeMap;
+import java.util.AbstractMap;
 
 /**
  *
@@ -129,22 +128,7 @@ public class BittrexWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         return null;
     }
 
@@ -165,7 +149,7 @@ public class BittrexWrapper implements TradeInterface {
 
     private class BittrexService implements ServiceInterface {
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             return null;
         }
 

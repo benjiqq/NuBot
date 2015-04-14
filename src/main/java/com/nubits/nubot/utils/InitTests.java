@@ -27,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import java.io.File;
+
 /**
  *
  */
@@ -39,28 +41,32 @@ public class InitTests {
     private static final Logger LOG = LoggerFactory.getLogger(InitTests.class.getName());
 
 
-    public static void loadConfig(String path)
-    {
-        try {
-            Global.options = ParseOptions.parseOptionsSingle(path);
-        } catch (NuBotConfigException ex) {
-            LOG.error(ex.toString());
+    public static void loadConfig(String path) {
+        File f = new File(path);
+        if (f.exists() && !f.isDirectory()) {
+            try {
+                Global.options = ParseOptions.parseOptionsSingle(path);
+            } catch (NuBotConfigException ex) {
+                LOG.error(ex.toString());
+            }
+        } else {
+            LOG.error("Config file not found in " + path);
+            System.exit(0);
         }
+
     }
 
-    public static void loadKeystore(boolean trustAll)
-    {
+    public static void loadKeystore(boolean trustAll) {
         //Load keystore
         try {
-            LOG.info("install keystore, trust all certificate : "+ trustAll);
+            LOG.info("install keystore, trust all certificate : " + trustAll);
             Utils.installKeystore(trustAll);
         } catch (Exception ex) {
             LOG.error(ex.toString());
         }
     }
 
-    public static void startConnectionCheck()
-    {
+    public static void startConnectionCheck() {
         //Create a TaskManager
         Global.taskManager = new TaskManager();
         Global.taskManager.setTasks();
@@ -75,12 +81,11 @@ public class InitTests {
         }
     }
 
-    public static void setLoggingFilename(Logger log)
-    {
+    public static void setLoggingFilename(Logger log) {
         String fullName = log.getName();
-        String fileName = fullName.substring(fullName.lastIndexOf(".")+1) + "_"
+        String fileName = fullName.substring(fullName.lastIndexOf(".") + 1) + "_"
                 + Utils.getTimestampLong();
         MDC.put("testFileName", fileName);
-        LOG.info("Logging on "+ Settings.TEST_LOGFOLDER+"/"+fileName);
+        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + fileName);
     }
 }
