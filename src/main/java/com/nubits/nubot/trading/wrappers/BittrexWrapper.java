@@ -293,10 +293,9 @@ public class BittrexWrapper implements TradeInterface {
         boolean needAuth = true;
         ArrayList<Order> orderList = new ArrayList<>();
 
-        if (pair == null) {
-            pair = Global.options.getPair();
+        if (pair != null) {
+            args.put("market", pair.toStringSepInverse("-"));
         }
-        args.put("market", pair.toStringSepInverse("-"));
 
         ApiResponse response = getQuery(url, method, args, needAuth, isGet);
         if (response.isPositive()) {
