@@ -334,20 +334,35 @@ public class BittrexWrapper implements TradeInterface {
                 date = sdf.parse(in.get("Opened").toString());
             }
         } catch (java.text.ParseException pe) {
-            LOG.error(pe.toString());
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                if (in.get("Opened") != null) {
+                    date = sdf.parse(in.get("Opened").toString());
+                }
+            } catch (java.text.ParseException pe1) {
+                LOG.error(pe1.toString());
+            }
         }
         if (date != null) {
             long timeStamp = date.getTime();
             Date insertDate = new Date(timeStamp);
             out.setInsertedDate(insertDate);
         }
+        sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
         date = null;
         try {
             if (in.get("Closed") != null) {
                 date = sdf.parse(in.get("Closed").toString());
             }
         } catch (java.text.ParseException pe) {
-            LOG.error(pe.toString());
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                if (in.get("Opened") != null) {
+                    date = sdf.parse(in.get("Closed").toString());
+                }
+            } catch (java.text.ParseException pe1) {
+                LOG.error(pe1.toString());
+            }
         }
         if (date != null) {
             long timeStamp = date.getTime();
@@ -480,7 +495,14 @@ public class BittrexWrapper implements TradeInterface {
                 date = sdf.parse(in.get("Closed").toString());
             }
         } catch (java.text.ParseException pe) {
-            LOG.error(pe.toString());
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+            try {
+                if (in.get("Opened") != null) {
+                    date = sdf.parse(in.get("Closed").toString());
+                }
+            } catch (java.text.ParseException pe1) {
+                LOG.error(pe1.toString());
+            }
         }
         if (date != null) {
             long timeStamp = date.getTime();
