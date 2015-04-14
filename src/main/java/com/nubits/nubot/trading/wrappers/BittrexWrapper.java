@@ -524,10 +524,14 @@ public class BittrexWrapper implements TradeInterface {
 
         ApiResponse getOrders = getActiveOrders(pair);
         if (getOrders.isPositive()) {
+            apiResponse.setResponseObject(true);
             ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
             for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
-                cancelOrder(thisOrder.getId(), thisOrder.getPair());
+                ApiResponse cancel = cancelOrder(thisOrder.getId(), thisOrder.getPair());
+                if (!cancel.isPositive()) {
+                    apiResponse.setResponseObject(false);
+                }
             }
         } else {
             apiResponse = getOrders;
