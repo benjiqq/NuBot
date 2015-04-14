@@ -174,7 +174,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         cycles += Utils.randInt(0, 5);
 
         //Cancel sell side orders
-        boolean cancelSells = TradeUtils.takeDownOrders(Constant.SELL, Global.options.getPair());
+        boolean cancelSells = OrderManager.takeDownOrders(Constant.SELL, Global.options.getPair());
 
         if (cancelSells) {
             //Update balances
@@ -287,7 +287,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.warn("Sellside : Taking down smaller order to aggregate it with new balance");
 
-        boolean orderdelete = TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
+        boolean orderdelete = OrderManager.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
 
         if (!orderdelete) {
             String errMessagedeletingOrder = "could not delete order " + idToDelete;
@@ -368,7 +368,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.debug("buySide");
 
-        boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
+        boolean cancel = OrderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
             Global.frozenBalancesManager.freezeNewFunds();
             ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
@@ -516,7 +516,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         try {
 
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
+                            areAllOrdersCanceled = OrderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
                                 LOG.warn("All orders canceled succefully");
                             } else {

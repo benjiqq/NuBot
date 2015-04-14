@@ -26,7 +26,7 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
@@ -70,7 +70,7 @@ public class StrategySecondaryPegUtils {
                         try {
 
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
+                            areAllOrdersCanceled = OrderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
                                 LOG.warn("All orders canceled succefully");
                             } else {
@@ -412,7 +412,7 @@ public class StrategySecondaryPegUtils {
 
         LOG.info("aggregateAndKeepProceeds");
 
-        boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
+        boolean cancel = OrderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (!cancel) {
             LOG.error("An error occurred while attempting to cancel buy orders.");
             return;

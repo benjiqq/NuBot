@@ -25,9 +25,9 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -270,7 +270,7 @@ public class WrapperTestUtils {
 
     public static void testMultipleOrders(ArrayList<OrderToPlace> orders, CurrencyPair pair) {
 
-        boolean success = TradeUtils.placeMultipleOrders(orders);
+        boolean success = OrderManager.placeMultipleOrders(orders);
         LOG.info("Multiple orders (" + orders + ") placed. success = " + success);
 
     }

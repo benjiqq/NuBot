@@ -3,7 +3,9 @@ package com.nubits.nubot.strategy;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.trading.OrderException;
@@ -60,7 +62,7 @@ public class OrderManager {
             } catch (InterruptedException ex) {
                 LOG.error(ex.toString());
             }
-        } while (!TradeUtils.tryCancelAllOrders(Global.options.getPair()) && !timedOut);
+        } while (!tryCancelAllOrders(Global.options.getPair()) && !timedOut);
 
         if (timedOut) {
             String message = "There was a problem cancelling all existing orders";
@@ -70,6 +72,172 @@ public class OrderManager {
             //Continue anyway, maybe there is some balance to put up on order.
         }
 
+    }
+
+    /**
+     * cancel all outstanding orders
+     * @param pair
+     * @return
+     */
+    public static boolean tryCancelAllOrders(CurrencyPair pair) {
+        boolean toRet = false;
+        //get all orders
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (!activeOrdersResponse.isPositive()) {
+            LOG.error(activeOrdersResponse.getError().toString());
+            return false;
+        }
+
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+        if (orderList.size() == 0) {
+            toRet = true;
+        } else {
+            LOG.info("There are still : " + orderList.size() + " active orders");
+            //Retry to cancel them to fix issue #14
+            ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
+            if (deleteOrdersResponse.isPositive()) {
+                boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
+
+                if (deleted) {
+                    LOG.info("Order clear request succesful");
+                } else {
+                    toRet = false;
+                    LOG.info("Could not submit request to clear orders");
+                }
+            } else {
+                toRet = false;
+                LOG.error(deleteOrdersResponse.getError().toString());
+            }
+        }
+
+        return toRet;
+    }
+
+    public static boolean takeDownOrders(String type, CurrencyPair pair) {
+        boolean completed = true;
+        //Get active orders
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (!activeOrdersResponse.isPositive()) {
+            LOG.error(activeOrdersResponse.getError().toString());
+            return false;
+        }
+
+        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+        for (int i = 0; i < orderList.size(); i++) {
+            Order tempOrder = orderList.get(i);
+            if (tempOrder.getType().equalsIgnoreCase(type)) {
+                boolean tempDeleted = takeDownAndWait(tempOrder.getId(), 120 * 1000, pair);
+                if (!tempDeleted) {
+                    completed = false;
+                }
+            }
+        }
+
+        return completed;
+    }
+
+    public static boolean takeDownAndWait(String orderID, long timeoutMS, CurrencyPair pair) {
+
+        ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID, pair);
+        if (deleteOrderResponse.isPositive()) {
+            boolean delRequested = (boolean) deleteOrderResponse.getResponseObject();
+
+            if (delRequested) {
+                LOG.warn("Order " + orderID + " delete request submitted");
+            } else {
+                LOG.error("Could not submit request to delete order" + orderID);
+            }
+
+        } else {
+            LOG.error(deleteOrderResponse.getError().toString());
+        }
+
+
+        //Wait until the order is deleted or timeout
+        boolean timedout = false;
+        boolean deleted = false;
+        long wait = 6 * 1000;
+        long count = 0L;
+        do {
+            try {
+                Thread.sleep(wait);
+                count += wait;
+                timedout = count > timeoutMS;
+
+                ApiResponse orderDetailResponse = Global.exchange.getTrade().isOrderActive(orderID);
+                if (orderDetailResponse.isPositive()) {
+                    deleted = !((boolean) orderDetailResponse.getResponseObject());
+                    LOG.info("Does order " + orderID + "  still exist?" + !deleted);
+                } else {
+                    LOG.error(orderDetailResponse.getError().toString());
+                    return false;
+                }
+            } catch (InterruptedException ex) {
+                LOG.error(ex.toString());
+                return false;
+            }
+        } while (!deleted && !timedout);
+
+        if (timedout) {
+            return false;
+        }
+        return true;
+    }
+
+    public static ApiResponse placeOrder(OrderToPlace order) {
+        //TODO move into the trade interface when tested and ready
+        LOG.info(": Submit order : "
+                + order.getType() + " " + order.getSize() + " " + order.getPair().getOrderCurrency().getCode()
+                + " @ " + order.getPrice() + " " + order.getPair().getPaymentCurrency().getCode());
+
+        ApiResponse toReturn;
+        if (order.getType().equalsIgnoreCase(Constant.BUY)) {
+            toReturn = Global.exchange.getTrade().buy(order.getPair(), order.getSize(), order.getPrice());
+        } else {
+            toReturn = Global.exchange.getTrade().sell(order.getPair(), order.getSize(), order.getPrice());
+        }
+
+        return toReturn;
+    }
+
+    //Init the order
+    public static boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
+        //Observation : it can take between 15 and 20 seconds to place 10 orders
+        boolean success = true;
+
+        LOG.info(orders.size() + "need to be placed ");
+
+        int countSuccess = 0;
+        String failureString = "";
+        for (int i = 0; i < orders.size(); i++) {
+            ApiResponse tempResponse = placeOrder(orders.get(i));
+
+            if (tempResponse.isPositive()) {
+                String buyResponseString = (String) tempResponse.getResponseObject();
+                LOG.info("Order " + i + "/" + orders.size() + " response = " + buyResponseString);
+                countSuccess++;
+            } else {
+                success = false;
+                failureString += "Order " + i + " failed : " + tempResponse.getError().toString() + "\n";
+            }
+
+            try {
+                Thread.sleep(300); //sleep to avoid getting banned
+            } catch (InterruptedException ex) {
+                LOG.error(ex.getMessage());
+            }
+
+        }
+        if (success) {
+            LOG.info(orders.size() + " orders placed succesfully");
+        } else {
+            LOG.warn(orders.size() - countSuccess + "/" + orders.size() + " orders failed."
+                    + "\nDetails : \n" + failureString);
+        }
+
+        return success;
     }
 
     public void fetch() {
