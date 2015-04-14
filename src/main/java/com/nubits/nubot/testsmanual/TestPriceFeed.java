@@ -161,7 +161,8 @@ public class TestPriceFeed {
             LOG.error(e.toString());
         }
 
-        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
+        pfm.fetchLastPrices();
+        ArrayList<LastPrice> priceList = pfm.getLastPrices();
 
         LOG.info("\n\n\n ---------------------- Testing results for: " + pair.toStringSepSpecial("/"));
         LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");
