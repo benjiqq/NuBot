@@ -112,7 +112,7 @@ public class TestWriteOptions extends TestCase {
         Currency c = Currency.createCurrency("NBT");
         Currency usd = Currency.createCurrency("USD");
         opt.setPair(new CurrencyPair(c, usd));
-        String testout = Settings.TESTS_CONFIG_PATH + "/"  + "test_out.json";
+        String testout = Settings.TESTS_CONFIG_PATH + "/" + "test_out.json";
         SaveOptions.saveOptionsPretty(opt, testout);
         File newout = new File(testout);
         assertTrue(newout.exists());

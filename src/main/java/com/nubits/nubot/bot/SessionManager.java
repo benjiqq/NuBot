@@ -93,14 +93,14 @@ public class SessionManager {
 
     }
 
-    public static String startedString(){
+    public static String startedString() {
         Date startdate = Date.from(Instant.ofEpochSecond(Global.sessionStarted / 1000));
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
         String dstr = df.format(startdate);
         return dstr;
     }
 
-    public static String durationString(){
+    public static String durationString() {
         Long diff = System.currentTimeMillis() - Global.sessionStarted;
 
         long seconds = diff / 1000;
@@ -109,7 +109,7 @@ public class SessionManager {
         return time;
     }
 
-    public static boolean wasRunOnce(){
+    public static boolean wasRunOnce() {
         return runonce;
     }
 

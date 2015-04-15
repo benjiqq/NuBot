@@ -19,8 +19,8 @@
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
 import com.nubits.nubot.pricefeeds.FeedFacade;
+import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -55,8 +55,8 @@ public class TestPriceFeedsAll extends TestCase {
         int fn = allfeeds.size();
 
         Iterator<AbstractPriceFeed> it = allfeeds.iterator();
-        System.out.println("query feeds " + allfeeds.size() );
-        assert(allfeeds.size() > 0 );
+        System.out.println("query feeds " + allfeeds.size());
+        assert (allfeeds.size() > 0);
 
         double sum = 0.0;
         double min = 9999.9;
@@ -64,12 +64,11 @@ public class TestPriceFeedsAll extends TestCase {
         int n = 0;
         int fails = 0;
 
-        while (it.hasNext()){
+        while (it.hasNext()) {
 
             AbstractPriceFeed feed = it.next();
             System.out.println("query feed " + feed);
             LastPrice lastprice = feed.getLastPrice(testPair);
-
 
 
             assertNotNull(lastprice);
@@ -87,7 +86,7 @@ public class TestPriceFeedsAll extends TestCase {
                     min = ld;
 
                 n++;
-            }catch(Exception e){
+            } catch (Exception e) {
                 fails++;
             }
             //double ld = lastprice.getPrice().getQuantity();
@@ -101,7 +100,7 @@ public class TestPriceFeedsAll extends TestCase {
 
         assertTrue(fails <= 4);
 
-        double avg = sum/n;
+        double avg = sum / n;
 
         assertTrue(avg < sum);
         assertTrue(avg > min);

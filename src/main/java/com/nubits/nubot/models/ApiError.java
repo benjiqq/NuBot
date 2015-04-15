@@ -18,8 +18,8 @@
 
 package com.nubits.nubot.models;
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ApiError {
@@ -29,7 +29,6 @@ public class ApiError {
     private String description;
 
     /**
-     *
      * @param code
      * @param description
      */
@@ -40,7 +39,6 @@ public class ApiError {
     }
 
     /**
-     *
      * @return
      */
     public int getCode() {
@@ -48,7 +46,6 @@ public class ApiError {
     }
 
     /**
-     *
      * @param code
      */
     public void setCode(int code) {
@@ -56,7 +53,6 @@ public class ApiError {
     }
 
     /**
-     *
      * @return
      */
     public String getDescription() {
@@ -64,7 +60,6 @@ public class ApiError {
     }
 
     /**
-     *
      * @param description
      */
     public void setDescription(String description) {

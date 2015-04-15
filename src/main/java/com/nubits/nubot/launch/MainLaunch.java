@@ -81,9 +81,9 @@ public class MainLaunch {
                 //set global config
                 SessionManager.setConfigGlobal(configFile);
                 sessionLOG.debug("launch bot");
-                try{
+                try {
                     SessionManager.launchBot(Global.options);
-                }catch(NuBotRunException e){
+                } catch (NuBotRunException e) {
                     exitWithNotice("could not launch bot");
                 }
             }

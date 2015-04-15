@@ -195,7 +195,7 @@ public class AllCoinWrapper implements TradeInterface {
             method = API_SELL_COIN;
         }
 
-        ApiResponse response = getQuery(url, method, query_args, true,isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
@@ -234,7 +234,7 @@ public class AllCoinWrapper implements TradeInterface {
         String url = API_AUTH_URL;
         String method = API_GET_INFO;
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get(TOKEN_DATA);
@@ -372,7 +372,7 @@ public class AllCoinWrapper implements TradeInterface {
         String url = API_AUTH_URL;
         String method = API_OPEN_ORDERS;
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray dataJson = (JSONArray) httpAnswerJson.get(TOKEN_DATA);
@@ -489,7 +489,7 @@ public class AllCoinWrapper implements TradeInterface {
         String method = API_CANCEL_ORDERS;
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson;
@@ -557,7 +557,7 @@ public class AllCoinWrapper implements TradeInterface {
         query_args.put("page", "1");
         query_args.put("page_size", "20");
 
-        ApiResponse response = getQuery(url, method, query_args,true, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("data");
@@ -722,7 +722,7 @@ public class AllCoinWrapper implements TradeInterface {
         }
 
         public Future<String> executeQueryAsync(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet, final long sleeptime) {
-            String url=base+method;
+            String url = base + method;
             LOG.debug("sleeptime = " + sleeptime);
 
             final long finalSleeptime = sleeptime;

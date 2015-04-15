@@ -39,9 +39,8 @@ public class TestPriceFeedsBatch extends TestCase {
     private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeedsBatch.class.getName());
 
 
-    public void setup(){
+    public void setup() {
         TestPriceFeed test = new TestPriceFeed();
-
 
 
         //feed = new BitcoinaveragePriceFeed();
@@ -62,9 +61,9 @@ public class TestPriceFeedsBatch extends TestCase {
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
 
         PriceFeedManager pfm = null;
-        try{
+        try {
             pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
 
         }
 
@@ -77,7 +76,7 @@ public class TestPriceFeedsBatch extends TestCase {
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-          //  LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+            //  LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
             //        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }

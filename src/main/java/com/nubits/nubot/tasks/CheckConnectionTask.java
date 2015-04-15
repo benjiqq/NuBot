@@ -19,15 +19,12 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.NoRouteToHostException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.TimerTask;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.*;
+import java.util.TimerTask;
 
 
 public class CheckConnectionTask extends TimerTask {
@@ -35,6 +32,7 @@ public class CheckConnectionTask extends TimerTask {
     private static final Logger LOG = LoggerFactory.getLogger(CheckConnectionTask.class.getName());
 
     private String url;
+
     @Override
     public void run() {
 

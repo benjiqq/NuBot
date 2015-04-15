@@ -72,6 +72,7 @@ public class CSVtools {
 
     /**
      * parse a csv file. used by parseCsvFromClassPath to load from classhpath
+     *
      * @param file
      * @return
      */

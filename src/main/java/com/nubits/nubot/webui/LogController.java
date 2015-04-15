@@ -27,7 +27,7 @@ public class LogController {
 
             JsonObject object = new JsonObject();
 
-            String f  = logfile;
+            String f = logfile;
             if (Global.options.isVerbose())
                 f = verboselogfile;
 

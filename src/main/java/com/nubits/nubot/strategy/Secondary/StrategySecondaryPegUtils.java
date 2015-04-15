@@ -216,7 +216,7 @@ public class StrategySecondaryPegUtils {
         return orderString;
     }
 
-    private String hipchatMsg(String type, String orderString1){
+    private String hipchatMsg(String type, String orderString1) {
         return "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1;
     }
 
@@ -341,7 +341,7 @@ public class StrategySecondaryPegUtils {
             double maxcap = maxSell / 2;
             if (amount2 > maxcap && maxSell > 0)
                 amount2 = maxcap;
-        }  else if ((type.equals(Constant.BUY) && !Global.swappedPair)
+        } else if ((type.equals(Constant.BUY) && !Global.swappedPair)
                 || (type.equals(Constant.SELL) && Global.swappedPair)) {
             //hotfix
             amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT

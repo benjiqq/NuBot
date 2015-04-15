@@ -308,7 +308,6 @@ public class TradeUtils {
     }
 
 
-
     private static ApiResponse placeOrder(OrderToPlace order) {
         //TODO move into the trade interface when tested and ready
 

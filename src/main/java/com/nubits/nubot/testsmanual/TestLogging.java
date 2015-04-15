@@ -15,6 +15,7 @@ public class TestLogging {
         //define Logging by using predefined Settings which points to an XML
         System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
+
     private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
 
     public static void main(String[] args) {

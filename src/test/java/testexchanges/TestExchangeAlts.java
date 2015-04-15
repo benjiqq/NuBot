@@ -90,14 +90,13 @@ public class TestExchangeAlts extends TestCase {
         }
 
 
-
         Global.options = opt;
 
         CurrencyPair testPair = CurrencyList.NBT_BTC;
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 
@@ -123,7 +122,7 @@ public class TestExchangeAlts extends TestCase {
 
         long start = System.currentTimeMillis();
 
-        assertTrue(balancesResponse!=null);
+        assertTrue(balancesResponse != null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
         assertTrue(delta < 5000);

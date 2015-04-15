@@ -32,7 +32,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @param last
      * @param ask
      * @param bid
@@ -44,7 +43,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @return
      */
     public double getLast() {
@@ -52,7 +50,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @param last
      */
     public void setLast(double last) {
@@ -60,7 +57,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @return
      */
     public double getAsk() {
@@ -68,7 +64,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @param ask
      */
     public void setAsk(double ask) {
@@ -76,7 +71,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @return
      */
     public double getBid() {
@@ -84,7 +78,6 @@ public class Ticker {
     }
 
     /**
-     *
      * @param bid
      */
     public void setBid(double bid) {

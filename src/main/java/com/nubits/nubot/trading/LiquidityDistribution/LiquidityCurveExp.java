@@ -19,13 +19,9 @@
 package com.nubits.nubot.trading.LiquidityDistribution;
 
 
-import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_FLAT;
-import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_HIGH;
-import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_LOW;
-import static com.nubits.nubot.trading.LiquidityDistribution.LiquidityCurve.STEEPNESS_MID;
 import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class LiquidityCurveExp extends LiquidityCurve {
 

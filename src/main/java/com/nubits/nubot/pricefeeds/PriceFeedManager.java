@@ -20,13 +20,12 @@ package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-
-import java.util.ArrayList;
-
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  * Manager for a selected list of price feeds
@@ -55,6 +54,7 @@ public class PriceFeedManager {
 
     /**
      * trigger fetches from all feeds
+     *
      * @return
      */
     public void fetchLastPrices() {
@@ -66,7 +66,7 @@ public class PriceFeedManager {
         ArrayList<LastPrice> prices = new ArrayList<>();
         int i = 0;
         final int main_index = 0;
-        for (AbstractPriceFeed tempFeed : feedList){
+        for (AbstractPriceFeed tempFeed : feedList) {
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (lastPrice != null && !lastPrice.isError()) {
@@ -85,10 +85,9 @@ public class PriceFeedManager {
 
     }
 
-    public ArrayList<LastPrice> getLastPrices(){
+    public ArrayList<LastPrice> getLastPrices() {
         return this.response.getPrices();
     }
-
 
 
     public ArrayList<AbstractPriceFeed> getFeedList() {

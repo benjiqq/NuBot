@@ -87,9 +87,9 @@ public class TestExchangeBitspark extends TestCase {
             e.printStackTrace();
         }
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 
@@ -106,7 +106,7 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(ld != null);
         long start = System.currentTimeMillis();
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
-        assertTrue(balancesResponse!=null);
+        assertTrue(balancesResponse != null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
         assertTrue(delta < 5000);
@@ -147,9 +147,9 @@ public class TestExchangeBitspark extends TestCase {
             e.printStackTrace();
         }
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 

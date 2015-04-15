@@ -155,9 +155,9 @@ public class TestPriceFeed {
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
 
         PriceFeedManager pfm = null;
-        try{
+        try {
             pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             LOG.error(e.toString());
         }
 

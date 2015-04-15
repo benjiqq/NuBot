@@ -18,11 +18,12 @@
 
 package com.nubits.nubot.utils;
 
-import java.net.SocketTimeoutException;
-import java.util.Map;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+
+import java.net.SocketTimeoutException;
+import java.util.Map;
 
 public class HttpUtils {
 

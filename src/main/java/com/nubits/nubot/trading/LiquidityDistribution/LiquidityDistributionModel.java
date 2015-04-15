@@ -24,9 +24,10 @@ import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.utils.Utils;
-import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 public class LiquidityDistributionModel {
 
@@ -166,7 +167,6 @@ public class LiquidityDistributionModel {
                 toReturn[i] = Utils.round(startPrice - ((i + 1) * distanceAmongOrders), 8);
             }
         }
-
 
 
         return toReturn;

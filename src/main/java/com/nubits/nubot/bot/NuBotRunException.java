@@ -5,7 +5,7 @@ package com.nubits.nubot.bot;
  */
 public class NuBotRunException extends Exception {
 
-    public NuBotRunException(String msg){
+    public NuBotRunException(String msg) {
         super(msg);
     }
 

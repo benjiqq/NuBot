@@ -22,7 +22,6 @@ import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
- *
  * @author admin
  */
 public class Trade {
