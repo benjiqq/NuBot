@@ -144,7 +144,7 @@ public class StrategySecondaryPegUtils {
 
     // ---- Trade Manager ----
 
-    private ApiResponse buy(CurrencyPair pair, double amount, double rate) {
+    private ApiResponse executeBuy(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
@@ -159,7 +159,7 @@ public class StrategySecondaryPegUtils {
         }
     }
 
-    private ApiResponse sell(CurrencyPair pair, double amount, double rate) {
+    private ApiResponse executeSell(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
@@ -322,10 +322,10 @@ public class StrategySecondaryPegUtils {
         ApiResponse order1Response;
         if (type.equals(Constant.SELL)) {
             //Place sellSide order 1
-            order1Response = this.sell(Global.options.getPair(), amount1, price);
+            order1Response = this.executeSell(Global.options.getPair(), amount1, price);
         } else {
             //Place buySide order 1
-            order1Response = this.buy(Global.options.getPair(), amount1, price);
+            order1Response = this.executeBuy(Global.options.getPair(), amount1, price);
         }
 
         if (order1Response != null && order1Response.isPositive()) {
@@ -385,10 +385,10 @@ public class StrategySecondaryPegUtils {
         ApiResponse order2Response;
         if (type.equals(Constant.SELL)) {
             //Place sellSide order 2
-            order2Response = this.sell(Global.options.getPair(), amount2, price);
+            order2Response = this.executeSell(Global.options.getPair(), amount2, price);
         } else {
             //Place buySide order 2
-            order2Response = this.buy(Global.options.getPair(), amount2, price);
+            order2Response = this.executeBuy(Global.options.getPair(), amount2, price);
         }
         if (order2Response != null && order2Response.isPositive()) {
             HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
