@@ -51,8 +51,17 @@ import java.util.*;
  */
 public class ComkortWrapper implements TradeInterface {
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(ComkortWrapper.class.getName());
+
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
     private final String ENCODING = "UTF-8";
+
+    //Class fields
+    private ApiKeys keys;
+    protected ComkortService service;
+    private Exchange exchange;
+    private String apiBaseUrl;
+    private String checkConnectionUrl;
+    private int lastNonce = 0;
     //API Paths
     private final String API_BASE_URL = "https://api.comkort.com/v1/private";
     private final String API_BASE_URL_PUBLIC = "https://api.comkort.com/v1/public";
@@ -70,23 +79,13 @@ public class ComkortWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
     private final String TOKEN_CODE = "Code";
-    //Class fields
-    private ApiKeys keys;
-    private Exchange exchange;
-    private String apiBaseUrl;
-    private String checkConnectionUrl;
-    private int lastNonce = 0;
     //Errors
     private ErrorManager errors = new ErrorManager();
-
-
-    public ComkortWrapper() {
-        setupErrors();
-    }
 
     public ComkortWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new ComkortService(keys);
         setupErrors();
     }
 
@@ -94,9 +93,9 @@ public class ComkortWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -157,7 +156,7 @@ public class ComkortWrapper implements TradeInterface {
             args.put("key", currency.getCode().toUpperCase());
         }
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             if (currency != null) { //only one currency
@@ -190,7 +189,7 @@ public class ComkortWrapper implements TradeInterface {
 
         args.put("market_alias", pair.toStringSepSpecial("_"));
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
 
@@ -244,7 +243,7 @@ public class ComkortWrapper implements TradeInterface {
         args.put("amount", nf.format(amount));
         args.put("price", nf.format(rate));
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             String order_id = httpAnswerJson.get("order_id").toString();
@@ -264,7 +263,7 @@ public class ComkortWrapper implements TradeInterface {
         boolean isGet = false;
         ArrayList<Order> orderList = new ArrayList<>();
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject orders;
@@ -301,7 +300,7 @@ public class ComkortWrapper implements TradeInterface {
 
         args.put("market_alias", pair.toStringSepSpecial("_"));
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -365,7 +364,7 @@ public class ComkortWrapper implements TradeInterface {
 
         args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             try {
@@ -411,7 +410,7 @@ public class ComkortWrapper implements TradeInterface {
 
         args.put("market_alias", pair.toStringSepSpecial("_"));
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray trades = (JSONArray) httpAnswerJson.get("trades");
@@ -517,35 +516,16 @@ public class ComkortWrapper implements TradeInterface {
         return API_BASE_URL;
     }
 
+
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         if (!exchange.getLiveData().isConnected()) {
             LOG.warn("The bot will not execute the query, there is no connection to Comkort");
             return TOKEN_BAD_RETURN;
         }
-        String queryResult;
-        ComkortService query = new ComkortService(url, args, keys);
-        if (isGet) {
-            queryResult = query.executeQuery(false, isGet);
-        } else {
-            queryResult = query.executeQuery(true, isGet);
-        }
+        String queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+
         return queryResult;
-    }
-
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
     }
 
     @Override
@@ -566,27 +546,22 @@ public class ComkortWrapper implements TradeInterface {
 
     private class ComkortService implements ServiceInterface {
 
-        protected String url;
-        protected HashMap args;
         protected ApiKeys keys;
 
-        public ComkortService(String url, HashMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.args = args;
+        public ComkortService(ApiKeys keys) {
             this.keys = keys;
         }
 
-        private ComkortService(String url, HashMap<String, String> args) {
+        private ComkortService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             HttpsURLConnection connection = null;
             URL queryUrl = null;
             String post_data = "";
+            String url = base + method;
             boolean httpError = false;
             String output;
             int response = 200;

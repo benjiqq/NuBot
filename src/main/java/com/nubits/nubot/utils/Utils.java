@@ -55,6 +55,26 @@ public class Utils {
 
     private static final Logger LOG = LoggerFactory.getLogger(Utils.class.getName());
 
+    private static final int maxThreadsError = 30;
+
+    public static void logActiveThreads(){
+        int active = Thread.activeCount();
+        LOG.trace("currently active threads: " + active);
+        Thread allThreads[] = new Thread[active];
+        Thread.enumerate(allThreads);
+
+        for (int i = 0; i < active; i++) {
+            Thread t = allThreads[i];
+            LOG.trace(i + ": " + t + " id: " + t.getId() + " name: " + t.getName() + " " + t.getContextClassLoader()
+            + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
+            LOG.trace("super: " + t.getClass().getSuperclass());
+        }
+
+        if (active > maxThreadsError){
+            LOG.error("too many threads started");
+        }
+    }
+
     /**
      * @param originalString
      * @param passphrase

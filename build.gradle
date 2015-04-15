@@ -39,13 +39,13 @@ repositories {
 def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
-def docdir = new File("md")
+def docdir = new File("docs")
 def resdir = new File("res")
 
 def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
 def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
-def sampleconfig = "config/options/sample-options.json"
+def sampleconfig = "config/sample-options.json"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"

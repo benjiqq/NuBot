@@ -68,9 +68,8 @@ public class TestPriceFeedsBatch extends TestCase {
 
         }
 
-        PriceFeedManager.LastPriceResponse lpr = pfm.fetchLastPrices();
-
-        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
+        pfm.fetchLastPrices();
+        ArrayList<LastPrice> priceList = pfm.getLastPrices();
 
         int s = pfm.getFeedList().size();
         int ps = priceList.size();

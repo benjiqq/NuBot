@@ -55,6 +55,7 @@ public class CcedkWrapper implements TradeInterface {
 
     //Class fields
     private ApiKeys keys;
+    protected CcedkService service;
     private Exchange exchange;
     private final int SPACING_BETWEEN_CALLS = 1100;
     private final int TIME_OUT = 15000;
@@ -81,14 +82,11 @@ public class CcedkWrapper implements TradeInterface {
     private static final int ROUND_CUTOFF = 99;
     private static int INVALID_NONCE_COUNT = 1;
 
-    public CcedkWrapper() {
-        setupErrors();
-
-    }
-
     public CcedkWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new CcedkService(keys);
+
         setupErrors();
 
     }
@@ -135,10 +133,10 @@ public class CcedkWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
 
-        String queryResult = query(url, method, query_args, isGet);
+        String queryResult = query(url, method, query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -152,7 +150,7 @@ public class CcedkWrapper implements TradeInterface {
             error.setDescription(queryResult);
             apiResponse.setError(error);
             if (INVALID_NONCE_COUNT < 5) {
-                getQuery(url, method, query_args, isGet);
+                getQuery(url, method, query_args, needAuth, isGet);
                 INVALID_NONCE_COUNT++;
             }
             return apiResponse;
@@ -214,7 +212,7 @@ public class CcedkWrapper implements TradeInterface {
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -307,7 +305,7 @@ public class CcedkWrapper implements TradeInterface {
         query_args.put("price", Double.toString(price));
         query_args.put("volume", Double.toString(amount));
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -344,7 +342,7 @@ public class CcedkWrapper implements TradeInterface {
             query_args.put("pair_id", pair_id);
         }
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -383,7 +381,7 @@ public class CcedkWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -419,7 +417,7 @@ public class CcedkWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -466,7 +464,7 @@ public class CcedkWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -545,11 +543,10 @@ public class CcedkWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        CcedkService query = new CcedkService(url, args);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(false, false);
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to ccdek");
             queryResult = TOKEN_BAD_RETURN;
@@ -557,28 +554,6 @@ public class CcedkWrapper implements TradeInterface {
         return queryResult;
     }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        CcedkService query = new CcedkService(base, method, args, keys);
-        String queryResult;
-        if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, false);
-        } else {
-            LOG.error("The bot will not execute the query, there is no connection to ccdek");
-            queryResult = TOKEN_BAD_RETURN;
-        }
-        return queryResult;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     private Order parseOrder(JSONObject orderObject) {
         Order order = new Order();
@@ -699,7 +674,7 @@ public class CcedkWrapper implements TradeInterface {
         query_args.put("date_from", startDateArg);
         query_args.put("items_per_page", "10000");
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
@@ -731,35 +706,27 @@ public class CcedkWrapper implements TradeInterface {
 
     private class CcedkService implements ServiceInterface {
 
-        protected String base;
-        protected String method;
-        protected HashMap args;
         protected ApiKeys keys;
-        protected String url;
+
         //Parameters used to repeat an API call in case of wrong nonce error
         protected final int MAX_NUMBER_ATTEMPTS = 3;
         protected int wrongNonceCounter;
         protected String adjustedNonce;
 
-        public CcedkService(String base, String method, HashMap<String, String> args, ApiKeys keys) {
-            this.base = base;
-            this.method = method;
-            this.args = args;
+        public CcedkService(ApiKeys keys) {
+
             this.keys = keys;
             this.wrongNonceCounter = 0;
 
         }
 
-        private CcedkService(String url, HashMap<String, String> args) {
+        private CcedkService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
-            this.method = "";
             this.wrongNonceCounter = 0;
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
 
             String answer = "";
             String signature = "";
@@ -793,7 +760,7 @@ public class CcedkWrapper implements TradeInterface {
                 if (needAuth) {
                     queryUrl = new URL(base + method);
                 } else {
-                    queryUrl = new URL(url);
+                    queryUrl = new URL(base);
                 }
 
 

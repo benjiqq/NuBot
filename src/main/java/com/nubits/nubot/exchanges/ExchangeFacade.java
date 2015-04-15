@@ -89,6 +89,8 @@ public class ExchangeFacade {
         exchangeInterfaces.put(EXCOIN, ExcoinWrapper.class);
         exchangeInterfaces.put(COMKORT, ComkortWrapper.class);
         exchangeInterfaces.put(BITTREX, BittrexWrapper.class);
+        exchangeInterfaces.put(BTER, BterWrapper.class);
+        exchangeInterfaces.put(CCEDK, CcedkWrapper.class);
 
 
     }
@@ -120,8 +122,9 @@ public class ExchangeFacade {
         Global.exchange.setLiveData(liveData);
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.exchange.getName(), keys, Global.exchange);
-        ti.setKeys(keys);
-        ti.setExchange(Global.exchange);
+        //TODO remove when tested
+        //ti.setKeys(keys);
+        //ti.setExchange(Global.exchange);
         return ti;
     }
 

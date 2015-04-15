@@ -66,6 +66,8 @@ public class AltsTradeWrapper implements TradeInterface {
     private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected AltsTradeService service;
+
     private Exchange exchange;
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
     private final String ENCODING = "UTF-8";
@@ -85,13 +87,11 @@ public class AltsTradeWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    public AltsTradeWrapper() {
-        setupErrors();
-    }
-
     public AltsTradeWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new AltsTradeService(keys);
+
         setupErrors();
     }
 
@@ -99,9 +99,9 @@ public class AltsTradeWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args,boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, query_args, isGet);
+        String queryResult = query(url, "", query_args,needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -156,7 +156,7 @@ public class AltsTradeWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             if (currency != null) { //get just one currency balance
@@ -208,7 +208,7 @@ public class AltsTradeWrapper implements TradeInterface {
         double bid = -1;
         Ticker ticker = new Ticker();
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,false, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject result = (JSONObject) httpAnswerJson.get("result");
@@ -246,7 +246,7 @@ public class AltsTradeWrapper implements TradeInterface {
         args.put("price", Objects.toString(rate));
         args.put("action", type);
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             ApiResponse getOpenOrders = getActiveOrders(pair);
             if (getOpenOrders.isPositive()) {
@@ -278,7 +278,7 @@ public class AltsTradeWrapper implements TradeInterface {
         boolean isGet = false;
         ArrayList<Order> orderList = new ArrayList<>();
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -302,7 +302,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("market", pair.toStringSepSpecial("/").toUpperCase());
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -371,7 +371,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args, true,isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -413,7 +413,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("market", pair.toStringSepSpecial("/"));
 
-        ApiResponse response = getQuery(url, args, isGet);
+        ApiResponse response = getQuery(url, args,true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray history = (JSONArray) httpAnswerJson.get("history");
@@ -507,35 +507,21 @@ public class AltsTradeWrapper implements TradeInterface {
         return API_BASE_URL;
     }
 
+
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         if (!exchange.getLiveData().isConnected()) {
             LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
             return TOKEN_BAD_RETURN;
         }
-        String queryResult;
-        AltsTradeService query = new AltsTradeService(url, args, keys);
+        String queryResult = "";
         if (isGet) {
-            queryResult = query.executeQuery(false, isGet);
+            service.executeQuery(base, "", args, false, isGet);
         } else {
-            queryResult = query.executeQuery(true, isGet);
+            service.executeQuery(base, "", args, true, isGet);
         }
         return queryResult;
-    }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        return null;
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        return null;
     }
 
     @Override
@@ -555,29 +541,19 @@ public class AltsTradeWrapper implements TradeInterface {
 
     class AltsTradeService implements ServiceInterface {
 
-        protected String url;
-        protected HashMap args;
         protected ApiKeys keys;
 
-        public AltsTradeService(String url, HashMap<String, String> args, ApiKeys keys) {
-            this.url = url;
-            this.args = args;
+        public AltsTradeService(ApiKeys keys) {
             this.keys = keys;
-        }
-
-        private AltsTradeService(String url, HashMap<String, String> args) {
-            //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
         }
 
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String answer = null;
             String signature = "";
             String post_data = "";
-
+            String url=base+method;
             args.put("nonce", Objects.toString(System.currentTimeMillis()));
 
             List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
@@ -664,7 +640,7 @@ public class AltsTradeWrapper implements TradeInterface {
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.fine("\nSending request to URL : " + url + " ; get = " + isGet);
+                LOG.fine("\nSending request to URL : " + base + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }

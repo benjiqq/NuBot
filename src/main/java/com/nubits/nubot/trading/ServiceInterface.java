@@ -18,8 +18,9 @@
 
 package com.nubits.nubot.trading;
 
+import java.util.AbstractMap;
+
 /**
- *
  * @author advanced
  */
 public interface ServiceInterface {
@@ -33,19 +34,23 @@ public interface ServiceInterface {
      *
      *
      */
+
+
     /**
      * Execute a query
      *
      * @param needAuth True if the specific call requires Authentication
-     * @param isGet
+     * @param isGet    true for GET
+     * @param method
      * @return a String with the raw answer from the server
      */
-    public String executeQuery(boolean needAuth, boolean isGet);
+    public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet);
+
 
     /**
      * Sign the request
      *
-     * @param secret The secret key
+     * @param secret    The secret key
      * @param hash_data The hash data
      * @return A String with the signature
      */

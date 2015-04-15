@@ -57,6 +57,7 @@ import java.util.*;
 public class CcexWrapper implements TradeInterface {
 
     private ApiKeys keys;
+    protected CcexService service;
     private Exchange exchange;
     private String checkConnectionUrl = "https://c-cex.com/";
     private static final Logger LOG = LoggerFactory.getLogger(CcexWrapper.class.getName());
@@ -72,11 +73,7 @@ public class CcexWrapper implements TradeInterface {
         this.keys = keys;
         this.exchange = exchange;
         this.baseUrl = API_BASE + "key=" + keys.getPrivateKey();
-
-        setupErrors();
-    }
-
-    public CcexWrapper() {
+        service = new CcexService(keys);
         setupErrors();
     }
 
@@ -88,9 +85,8 @@ public class CcexWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-
 
         return apiResponse;
     }
@@ -110,7 +106,7 @@ public class CcexWrapper implements TradeInterface {
 
         String url = baseUrl + "&a=getbalance";
 
-        String queryResult = query(url, new HashMap<String, String>(), true);
+        String queryResult = query(url, "", new HashMap<String, String>(), true, true);
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -253,7 +249,7 @@ public class CcexWrapper implements TradeInterface {
         url += "&r=" + rate;
 
 
-        String queryResult = query(url, new HashMap<String, String>(), true);
+        String queryResult = query(url, "", new HashMap<String, String>(), true, true);
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -313,7 +309,7 @@ public class CcexWrapper implements TradeInterface {
             url += "&pair=" + (pair.toStringSepSpecial("-")).toLowerCase();
         }
 
-        String queryResult = query(url, new HashMap<String, String>(), true);
+        String queryResult = query(url, "", new HashMap<String, String>(), true, true);
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -421,7 +417,7 @@ public class CcexWrapper implements TradeInterface {
         String url = baseUrl + "&a=cancelorder";
         url += "&id=" + orderID;
 
-        String queryResult = query(url, new HashMap<String, String>(), true);
+        String queryResult = query(url, "", new HashMap<String, String>(), true, true);
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -464,7 +460,7 @@ public class CcexWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        
+
         return new ApiResponse(true, Global.options.getTxFee(), null);
 
     }
@@ -518,7 +514,7 @@ public class CcexWrapper implements TradeInterface {
         url += "&d2=" + formattedStopDate;
         url += "&pair=" + (pair.toStringSepSpecial("-")).toLowerCase();
 
-        String queryResult = query(url, new HashMap<String, String>(), true);
+        String queryResult = query(url, "", new HashMap<String, String>(), true, true);
 
         if (queryResult.equals(TOKEN_BAD_RETURN)) {
             apiResponse.setError(errors.nullReturnError);
@@ -636,11 +632,10 @@ public class CcexWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        CcexService query = new CcexService(url);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, isGet);
+            queryResult = service.executeQuery(base, "", args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to CCex");
             queryResult = TOKEN_BAD_RETURN;
@@ -649,20 +644,6 @@ public class CcexWrapper implements TradeInterface {
         return queryResult;
     }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -755,19 +736,20 @@ public class CcexWrapper implements TradeInterface {
     }
 
     private class CcexService implements ServiceInterface {
-
         protected ApiKeys keys;
-        protected String url;
 
-        private CcexService(String url) {
-            //Used for ticker, does not require auth
-            this.url = url;
+        private CcexService() {
         }
 
-        @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
-            String answer = "";
+        private CcexService(ApiKeys keys) {
+            this.keys = keys;
+        }
 
+
+        @Override
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
+            String answer = "";
+            String url = base + method;
             // add header
             Header[] headers = new Header[1];
             headers[0] = new BasicHeader("Content-type", "application/x-www-form-urlencoded");

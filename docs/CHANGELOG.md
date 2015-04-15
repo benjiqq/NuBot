@@ -1,3 +1,16 @@
+## v0.2.05 (2015-04-xx)
+
+#### New Features:
+	
+#### Improvements:
+
+#### Bug fixes:
+
+### Notes:
+  - Parameters have changed: use maxbuyvolume instead of maxbuyordervolume
+
+ 	
+	
 ## v0.2.0 (2015-03-26)
 
 #### New Features:

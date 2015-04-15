@@ -143,7 +143,7 @@ public class Settings {
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
-    public static final String TESTS_CONFIG_PATH = "config" + "/" + "myconfig"; //Directory containing configuration files used in tests
+    public static final String TESTS_CONFIG_PATH = CONFIG_DIR + "/" + "myconfig"; //Directory containing configuration files used in tests
 
     public final static String CURRENCY_FILE_PATH = RES_PATH + "/" + "currencies.csv";
 
@@ -159,7 +159,7 @@ public class Settings {
     /**
      * a utility file which gets created in the distribution folder
      */
-    public static String INFO_FILE = ".nubot";
+    public static String INFO_FILE = ".info";
 
     public static String HTML_FOLDER = "." + "/res" + "/" + "UI" + "/" + "templates/";
 }

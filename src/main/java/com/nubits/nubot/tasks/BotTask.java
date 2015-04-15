@@ -58,6 +58,8 @@ public class BotTask {
     }
 
     public void start(int delay) {
+
+
         LOG.info("BotTask [" + this.name + "] will start in " + delay + "s, and run it every " + interval + "s");
         timer.scheduleAtFixedRate(task, delay * 1000, interval * 1000);
         setRunning(true);

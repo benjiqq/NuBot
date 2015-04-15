@@ -14,20 +14,7 @@ After gradle is installed, run gradle tasks. The relevant tasks appear at the en
 
 ## Directory layout
 
-The project uses the standard Gradle directory layout:
-
-* src : all source files
-* src/main/java
-* src/main/resources : resource files for production
-* src/test
-
-* md : markdown documents
-
-* config
-
-* ssltools
-
-* templates: html files for UI
+See FILES-AND-FOLDERS.md
 
 ## Install
 

@@ -74,8 +74,6 @@ public class Global {
 
     public static String currentOptionsFile;
 
-
-
     /**
      * shutdown mechanics
      */
@@ -101,7 +99,7 @@ public class Global {
 
                 LOG.info("Exit main");
 
-                //TODO! this shuts down UI as well
+                //this shuts down UI as well
                 Thread.currentThread().interrupt();
                 return;
             }

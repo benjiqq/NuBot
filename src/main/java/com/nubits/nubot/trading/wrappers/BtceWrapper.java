@@ -44,10 +44,14 @@ import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+<<<<<<< HEAD
 import java.util.TreeMap;
+=======
+>>>>>>> release/0.2.0
 
 
 public class BtceWrapper implements TradeInterface {
@@ -55,6 +59,7 @@ public class BtceWrapper implements TradeInterface {
     private static final Logger LOG = LoggerFactory.getLogger(BtceWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
+    protected BtceService service;
     private Exchange exchange;
     private String checkConnectionUrl = "http://btc-e.com";
     private final String SIGN_HASH_FUNCTION = "HmacSHA512";
@@ -72,14 +77,11 @@ public class BtceWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    public BtceWrapper() {
-        setupErrors();
-
-    }
 
     public BtceWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
+        service = new BtceService(keys);
         setupErrors();
 
     }
@@ -94,9 +96,9 @@ public class BtceWrapper implements TradeInterface {
         return Long.toString(toRet);
     }
 
-    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean isGet) {
+    private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(API_BASE_URL, method, query_args, false);
+        String queryResult = query(API_BASE_URL, method, query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -149,7 +151,7 @@ public class BtceWrapper implements TradeInterface {
          *
          */
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
 
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
@@ -182,7 +184,7 @@ public class BtceWrapper implements TradeInterface {
         boolean isGet = false;
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
 
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
@@ -212,7 +214,7 @@ public class BtceWrapper implements TradeInterface {
         double bid = -1;
         HashMap<String, String> query_args = new HashMap<>();
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, false, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject tickerObject = (JSONObject) httpAnswerJson.get("ticker");
@@ -292,7 +294,7 @@ public class BtceWrapper implements TradeInterface {
 
         query_args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -305,7 +307,7 @@ public class BtceWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee() {
 
-            return new ApiResponse(true, Global.options.getTxFee(), null);
+        return new ApiResponse(true, Global.options.getTxFee(), null);
 
         /* else {
             ApiResponse apiResponse = new ApiResponse();
@@ -435,7 +437,7 @@ public class BtceWrapper implements TradeInterface {
             query_args.put("pair", pair.toStringSep());
         }
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             try {
                 JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
@@ -511,7 +513,7 @@ public class BtceWrapper implements TradeInterface {
         query_args.put("rate", Double.toString(rate));
         query_args.put("amount", Double.toString(amount));
 
-        ApiResponse response = getQuery(url, method, query_args, isGet);
+        ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("return");
@@ -552,11 +554,10 @@ public class BtceWrapper implements TradeInterface {
     }
 
     @Override
-    public String query(String url, HashMap<String, String> args, boolean isGet) {
-        BtceService query = new BtceService(url, args);
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
         String queryResult;
         if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(false, false);
+            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
             LOG.error("The bot will not execute the query, there is no connection to btce");
             queryResult = TOKEN_BAD_RETURN;
@@ -564,28 +565,6 @@ public class BtceWrapper implements TradeInterface {
         return queryResult;
     }
 
-    @Override
-    public String query(String base, String method, HashMap<String, String> args, boolean isGet) {
-        BtceService query = new BtceService(base, method, args, keys);
-        String queryResult;
-        if (exchange.getLiveData().isConnected()) {
-            queryResult = query.executeQuery(true, false);
-        } else {
-            LOG.error("The bot will not execute the query, there is no connection to btce");
-            queryResult = TOKEN_BAD_RETURN;
-        }
-        return queryResult;
-    }
-
-    @Override
-    public String query(String url, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public String query(String base, String method, TreeMap<String, String> args, boolean isGet) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
@@ -670,29 +649,19 @@ public class BtceWrapper implements TradeInterface {
     /* Service implementation */
     private class BtceService implements ServiceInterface {
 
-        protected String base;
-        protected String method;
-        protected HashMap args;
         protected ApiKeys keys;
-        protected String url;
 
-        public BtceService(String base, String method, HashMap<String, String> args, ApiKeys keys) {
-            this.base = base;
-            this.method = method;
-            this.args = args;
+        public BtceService(ApiKeys keys) {
             this.keys = keys;
         }
 
-        private BtceService(String url, HashMap<String, String> args) {
+        private BtceService() {
             //Used for ticker, does not require auth
-            this.url = url;
-            this.args = args;
-            this.method = "";
         }
 
         @Override
-        public String executeQuery(boolean needAuth, boolean isGet) {
-
+        public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
+            String url = base + method;
             String answer = null;
             String signature = "";
             String post_data = "";
