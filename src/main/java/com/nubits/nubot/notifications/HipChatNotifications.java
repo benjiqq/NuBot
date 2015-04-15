@@ -25,8 +25,8 @@ import io.evanwong.oss.hipchat.v2.HipChatClient;
 import io.evanwong.oss.hipchat.v2.commons.NoContent;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import io.evanwong.oss.hipchat.v2.rooms.SendRoomNotificationRequestBuilder;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.Future;
 
@@ -34,7 +34,7 @@ public class HipChatNotifications {
 
     private static final Logger LOG = LoggerFactory.getLogger(HipChatNotifications.class.getName());
 
-    private static final HipChatClient normalHipChatClient = new HipChatClient(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_TOKEN) ;
+    private static final HipChatClient normalHipChatClient = new HipChatClient(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_TOKEN);
     private static final HipChatClient criticalHipChatClient = new HipChatClient(Passwords.HIPCHAT_CRITICAL_ROOM_TOKEN);
 
     public static void sendMessage(String message, MessageColor color) {
@@ -65,21 +65,21 @@ public class HipChatNotifications {
         String toSend = message + " <em>[" + sessionId + " - " + publicAddress + "] </em>";
 
         try {
-            HipChatClient hcc ;
+            HipChatClient hcc;
             SendRoomNotificationRequestBuilder builder;
             MessageColor colorToUse;
-            boolean notify ;
+            boolean notify;
 
             if (critical) {
                 hcc = criticalHipChatClient;
                 builder = hcc.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_CRITICAL_ROOM_ID, toSend);
                 notify = true;
-                colorToUse=MessageColor.RED;
+                colorToUse = MessageColor.RED;
             } else {
                 hcc = normalHipChatClient;
                 builder = hcc.prepareSendRoomNotificationRequestBuilder(Passwords.HIPCHAT_NOTIFICATIONS_ROOM_ID, toSend);
                 notify = false;
-                colorToUse=color;
+                colorToUse = color;
             }
 
             Future<NoContent> future = builder.setColor(colorToUse).setNotify(notify).build().execute();

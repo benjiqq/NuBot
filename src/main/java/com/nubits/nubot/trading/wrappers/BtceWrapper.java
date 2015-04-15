@@ -48,10 +48,6 @@ import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-<<<<<<< HEAD
-import java.util.TreeMap;
-=======
->>>>>>> release/0.2.0
 
 
 public class BtceWrapper implements TradeInterface {
