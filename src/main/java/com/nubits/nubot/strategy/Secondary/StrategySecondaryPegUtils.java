@@ -141,15 +141,41 @@ public class StrategySecondaryPegUtils {
         }
     }
 
-    public boolean initOrders(String type, double price) {
+    // ---- Trade Manager ----
 
-        LOG.debug("initOrders " + type + ", price " + price);
+    private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
+        if (Global.options.isExecuteOrders()) {
+            if (!Global.swappedPair) {
+                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
+                return order1Response;
+            } else {
+                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
+                return order1Response;
+            }
+        } else {
+            LOG.warn("Demo mode. Don't execute orders");
+            return null;
+        }
+    }
 
-        boolean success = true;
-        Amount balance = null;
-        //Update the available balance
+    private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
+        if (Global.options.isExecuteOrders()) {
+            if (!Global.swappedPair) {
+                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
+                return order1Response;
+
+            } else {
+                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
+                return order1Response;
+            }
+        } else {
+            LOG.warn("Demo mode. Don't execute orders");
+            return null;
+        }
+    }
+
+    private Currency getCurrency(String type) {
         Currency currency;
-
         if (!Global.swappedPair) {
             if (type.equals(Constant.SELL)) {
                 currency = Global.options.getPair().getOrderCurrency();
@@ -163,6 +189,46 @@ public class StrategySecondaryPegUtils {
                 currency = Global.options.getPair().getOrderCurrency();
             }
         }
+
+        return currency;
+    }
+
+    private String orderString(String type, double amount1, double price) {
+
+        String orderString;
+        String sideStr = type + " side order : ";
+
+        if (!Global.swappedPair) {
+            orderString = sideStr + " " + type + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+        } else {
+            String typeStr;
+            if (type.equals(Constant.SELL)) {
+                typeStr = Constant.BUY;
+            } else {
+                typeStr = Constant.SELL;
+            }
+            orderString = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+        }
+
+        return orderString;
+    }
+
+    private String hipchatMsg(String type, String orderString1){
+        return "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1;
+    }
+
+
+    public boolean initOrders(String type, double price) {
+
+        LOG.debug("initOrders " + type + ", price " + price);
+
+        boolean success = true;
+        Amount balance = null;
+        //Update the available balance
+        Currency currency = getCurrency(type);
+
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
         if (!balancesResponse.isPositive()) {
             LOG.error(balancesResponse.getError().toString());
@@ -451,45 +517,6 @@ public class StrategySecondaryPegUtils {
         } else {
             LOG.error("An error occurred while attempting to cancel buy orders.");
         }
-    }
-
-    /* Returns an array of two strings representing orders id.
-     * the first element of the array is the smallest order and the second the largest */
-    public String[] getSmallerWallID(String type) {
-        String[] toRet = new String[2];
-        Order smallerOrder = new Order();
-        Order biggerOrder = new Order();
-        smallerOrder.setId("-1");
-        biggerOrder.setId("-1");
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-            ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
-
-            if (orderListCategorized.size() != 2) {
-                LOG.error("The number of orders on the " + type + " side is not two (" + orderListCategorized.size() + ")");
-                String[] err = {"-1", "-1"};
-                return err;
-            } else {
-                Order tempOrder1 = orderListCategorized.get(0);
-                Order tempOrder2 = orderListCategorized.get(1);
-                smallerOrder = tempOrder1;
-                biggerOrder = tempOrder2;
-                if (tempOrder1.getAmount().getQuantity() > tempOrder2.getAmount().getQuantity()) {
-                    smallerOrder = tempOrder2;
-                    biggerOrder = tempOrder1;
-                }
-                toRet[0] = smallerOrder.getId();
-                toRet[1] = biggerOrder.getId();
-
-            }
-
-        } else {
-            LOG.error(activeOrdersResponse.getError().toString());
-            String[] err = {"-1", "-1"};
-            return err;
-        }
-        return toRet;
     }
 
     public boolean shiftWalls() {
