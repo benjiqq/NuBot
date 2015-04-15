@@ -37,7 +37,7 @@ public class TestLaunch {
         System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
     }
 
-    static String configFile = "config/myconfig/wally.json";
+    static String configFile = "config/poloniex.json";
     //static String configFile = "config/myconfig/bitspark.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
