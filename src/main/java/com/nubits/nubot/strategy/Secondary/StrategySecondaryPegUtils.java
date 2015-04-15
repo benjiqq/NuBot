@@ -196,11 +196,11 @@ public class StrategySecondaryPegUtils {
 
     private String orderString(String type, double amount1, double price) {
 
-        String orderString1;
+        String orderString;
         String sideStr = type + " side order : ";
 
         if (!Global.swappedPair) {
-            orderString1 = sideStr + " " + type + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+            orderString = sideStr + " " + type + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
                     + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
         } else {
             String typeStr;
@@ -209,38 +209,12 @@ public class StrategySecondaryPegUtils {
             } else {
                 typeStr = Constant.SELL;
             }
-            orderString1 = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+            orderString = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
                     + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
         }
 
-
-        return orderString1;
+        return orderString;
     }
-
-    //same as orderString except the checkt for maxSellVolume (?)
-    /*private String orderString2(String type, double amount2, double price) {
-
-        String orderString2;
-        String sideStr = type + " side order : ";
-
-        if (!Global.swappedPair) {
-            orderString2 = sideStr + " " + type + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-
-        } else { //Swapped
-            String typeStr;
-            if (type.equals(Constant.SELL)) {
-                typeStr = Constant.BUY;
-            } else {
-                typeStr = Constant.SELL;
-            }
-            orderString2 = sideStr + " " + typeStr + " " + Utils.round(amount2, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-        }
-
-
-        return orderString2;
-    }*/
 
     private String hipchatMsg(String type, String orderString1){
         return "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1;
