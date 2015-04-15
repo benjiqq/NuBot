@@ -75,9 +75,6 @@ public class SessionManager {
 
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
 
-        // check if other bots are running
-        boolean otherSessions = isSessionActive();
-
         //create session file
         createSessionFile();
 
