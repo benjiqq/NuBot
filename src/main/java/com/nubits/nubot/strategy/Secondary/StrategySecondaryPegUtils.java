@@ -298,18 +298,18 @@ public class StrategySecondaryPegUtils {
         double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
         //check the calculated amount against the set maximum sell amount set in the options.json file
 
-        if (maxSell > 0 && type.equals(Constant.SELL)) {
-            if (amount1 > (maxSell / 2))
-                amount1 = (maxSell / 2);
+        if (type.equals(Constant.SELL)) {
+            double maxsellcap = maxSell / 2;
+            if (amount1 > maxsellcap && maxSell > 0)
+                amount1 = maxsellcap;
         }
 
         if (type.equals(Constant.BUY) && !Global.swappedPair) {
             amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
             //check the calculated amount against the max buy amount option, if any.
-            if (maxBuy > 0) {
-                if (amount1 > (maxBuy / 2))
-                    amount1 = (maxBuy / 2);
-            }
+            double maxbuycap = maxBuy / 2;
+            if (amount1 > maxbuycap && maxBuy > 0)
+                amount1 = maxbuycap;
 
         }
 
@@ -335,8 +335,8 @@ public class StrategySecondaryPegUtils {
             LOG.error(order1Response.getError().toString());
             success = false;
         }
-        //wait a while to give the time to the new amount to update
 
+        //wait a while to give the time to the new amount to update
         try {
             Thread.sleep(5 * 1000);
         } catch (InterruptedException ex) {
@@ -359,8 +359,10 @@ public class StrategySecondaryPegUtils {
 
         //check the calculated amount against the set maximum sell amount set in the options.json file
 
-        if (Global.options.getMaxSellVolume() > 0 && type.equals(Constant.SELL)) {
-            amount2 = amount2 > (maxSell / 2) ? (maxSell / 2) : amount2;
+        if (type.equals(Constant.SELL)) {
+            double maxcap = maxSell / 2;
+            if (amount2 > maxcap && maxSell > 0)
+                amount2 = maxcap;
         }
 
         if ((type.equals(Constant.BUY) && !Global.swappedPair)
@@ -371,10 +373,9 @@ public class StrategySecondaryPegUtils {
             amount2 = Utils.round(amount2 / price, Settings.DEFAULT_PRECISION);
 
             //check the calculated amount against the max buy amount option, if any.
-            if (maxBuy > 0) {
-                if (amount2 > (maxBuy / 2))
-                    amount2 = (maxBuy / 2);
-            }
+            double maxbuycap = maxBuy / 2;
+            if (amount2 > maxbuycap && maxBuy > 0)
+                amount2 = maxbuycap;
         }
 
         String orderString2 = orderString2(type, amount2, price);
