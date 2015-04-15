@@ -194,7 +194,7 @@ public class StrategySecondaryPegUtils {
         return currency;
     }
 
-    private String orderString(String type, double amount1, double price, double maxSell) {
+    private String orderString(String type, double amount1, double price) {
 
         String orderString1;
         String sideStr = type + " side order : ";
@@ -206,11 +206,6 @@ public class StrategySecondaryPegUtils {
             String typeStr;
             if (type.equals(Constant.SELL)) {
                 typeStr = Constant.BUY;
-                amount1 = Utils.round(amount1 / Global.conversion, Settings.DEFAULT_PRECISION);
-                if (Global.options.getMaxSellVolume() > 0) {
-                    if (amount1 > maxSell)
-                        amount1 = maxSell;
-                }
             } else {
                 typeStr = Constant.SELL;
             }
@@ -223,7 +218,7 @@ public class StrategySecondaryPegUtils {
     }
 
     //same as orderString except the checkt for maxSellVolume (?)
-    private String orderString2(String type, double amount2, double price) {
+    /*private String orderString2(String type, double amount2, double price) {
 
         String orderString2;
         String sideStr = type + " side order : ";
@@ -245,7 +240,7 @@ public class StrategySecondaryPegUtils {
 
 
         return orderString2;
-    }
+    }*/
 
     private String hipchatMsg(String type, String orderString1){
         return "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1;
@@ -317,7 +312,13 @@ public class StrategySecondaryPegUtils {
 
         //Prepare the orders
 
-        String orderString1 = orderString(type, amount1, price, maxSell);
+        amount1 = Utils.round(amount1 / Global.conversion, Settings.DEFAULT_PRECISION);
+        if (Global.options.getMaxSellVolume() > 0) {
+            if (amount1 > maxSell)
+                amount1 = maxSell;
+        }
+
+        String orderString1 = orderString(type, amount1, price);
 
         LOG.warn("Strategy - Submit order : " + orderString1);
 
@@ -379,7 +380,7 @@ public class StrategySecondaryPegUtils {
                 amount2 = maxbuycap;
         }
 
-        String orderString2 = orderString2(type, amount2, price);
+        String orderString2 = orderString(type, amount2, price);
 
         //put it on order
 
