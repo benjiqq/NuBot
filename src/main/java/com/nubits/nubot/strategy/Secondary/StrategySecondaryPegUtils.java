@@ -175,6 +175,14 @@ public class StrategySecondaryPegUtils {
         }
     }
 
+    private ApiResponse executeOrder(String type, CurrencyPair pair, double amount, double rate) {
+        if (type.equals(Constant.BUY)) {
+            return executeBuysideOrder(pair, amount, rate);
+        } else{
+            return executeSellsideOrder(pair, amount, rate);
+        }
+    }
+
     private Currency getCurrency(String type) {
         Currency currency;
         if (!Global.swappedPair) {
@@ -225,6 +233,9 @@ public class StrategySecondaryPegUtils {
 
         LOG.debug("initOrders " + type + ", price " + price);
 
+        if (!type.equals(Constant.BUY) || (type.equals(Constant.SELL)))
+            return false;
+
         boolean success = true;
         Amount balance = null;
 
@@ -271,17 +282,18 @@ public class StrategySecondaryPegUtils {
         double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
         //check the calculated amount against the set maximum sell amount set in the options.json file
 
+
         if (type.equals(Constant.SELL)) {
             double maxsellcap = maxSell / 2;
             if (amount1 > maxsellcap && maxSell > 0)
                 amount1 = maxsellcap;
-        } else if (type.equals(Constant.BUY) && !Global.swappedPair) {
+        } else if (!Global.swappedPair){
+            //BUY
             amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
             //check the calculated amount against the max buy amount option, if any.
             double maxbuycap = maxBuy / 2;
             if (amount1 > maxbuycap && maxBuy > 0)
                 amount1 = maxbuycap;
-
         }
 
         //Prepare the orders
@@ -296,14 +308,7 @@ public class StrategySecondaryPegUtils {
 
         LOG.warn("Strategy - Submit order : " + orderString1);
 
-        ApiResponse order1Response;
-        if (type.equals(Constant.SELL)) {
-            //Place sellSide order 1
-            order1Response = this.executeSellsideOrder(Global.options.getPair(), amount1, price);
-        } else {
-            //Place buySide order 1
-            order1Response = this.executeBuysideOrder(Global.options.getPair(), amount1, price);
-        }
+        ApiResponse order1Response = this.executeOrder(type,Global.options.getPair(), amount1, price );
 
         if (order1Response != null && order1Response.isPositive()) {
             String msg = hipchatMsg(type, orderString1);
@@ -320,6 +325,7 @@ public class StrategySecondaryPegUtils {
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
         }
+
         //read balance again
         ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
         if (!balancesResponse2.isPositive()) {
@@ -341,8 +347,8 @@ public class StrategySecondaryPegUtils {
             double maxcap = maxSell / 2;
             if (amount2 > maxcap && maxSell > 0)
                 amount2 = maxcap;
-        } else if ((type.equals(Constant.BUY) && !Global.swappedPair)
-                || (type.equals(Constant.SELL) && Global.swappedPair)) {
+        } else if (!Global.swappedPair
+            || (type.equals(Constant.SELL) && Global.swappedPair)){
             //hotfix
             amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
 
@@ -359,14 +365,8 @@ public class StrategySecondaryPegUtils {
         //put it on order
 
         LOG.warn("Strategy - Submit order : " + orderString2);
-        ApiResponse order2Response;
-        if (type.equals(Constant.SELL)) {
-            //Place sellSide order 2
-            order2Response = this.executeSellsideOrder(Global.options.getPair(), amount2, price);
-        } else {
-            //Place buySide order 2
-            order2Response = this.executeBuysideOrder(Global.options.getPair(), amount2, price);
-        }
+        ApiResponse order2Response = this.executeOrder(type, Global.options.getPair(), amount2, price);
+
         if (order2Response != null && order2Response.isPositive()) {
             String msg = hipchatMsg(type, orderString2);
             HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
