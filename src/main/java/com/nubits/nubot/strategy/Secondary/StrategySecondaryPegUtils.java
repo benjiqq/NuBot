@@ -306,9 +306,9 @@ public class StrategySecondaryPegUtils {
             ApiResponse order1Response = this.executeOrder(type, Global.options.getPair(), amount1, price);
 
             if (order1Response.isPositive()) {
-                HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
-                String response1String = (String) order1Response.getResponseObject();
-                LOG.warn("Strategy - " + type + " Response1 = " + response1String);
+                String msg = hipchatMsg(type, orderString1);
+                HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
+                LOG.warn("Strategy - " + type + " Response1 = " + order1Response.getResponseObject());
             } else {
                 LOG.error(order1Response.getError().toString());
                 success = false;
@@ -366,9 +366,9 @@ public class StrategySecondaryPegUtils {
                 ApiResponse order2Response = this.executeOrder(type, Global.options.getPair(), amount2, price);
 
                 if (order2Response.isPositive()) {
-                    HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
-                    String response2String = (String) order2Response.getResponseObject();
-                    LOG.warn("Strategy - " + type + " Response2 = " + response2String);
+                    String msg = hipchatMsg(type, orderString2);
+                    HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
+                    LOG.warn("Strategy - " + type + " Response2 = " + order2Response.getResponseObject());
                 } else {
                     LOG.error(order2Response.getError().toString());
                     success = false;
