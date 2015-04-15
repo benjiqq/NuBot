@@ -39,7 +39,7 @@ repositories {
 def distdir = new File("dist")
 def testdistdir = new File("testdist")
 def builddir = new File("build")
-def docdir = new File("md")
+def docdir = new File("docs")
 def resdir = new File("res")
 
 def jarname = "NuBot.jar"
