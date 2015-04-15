@@ -144,6 +144,7 @@ public class StrategySecondaryPegUtils {
     // ---- Trade Manager ----
 
     private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
+        LOG.info("executeBuysideOrder : " + pair + " " + amount + " " + rate);
         if (Global.options.isExecuteOrders()) {
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
@@ -159,6 +160,7 @@ public class StrategySecondaryPegUtils {
     }
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
+        LOG.info("executeSellsideOrder : " + pair + " " + amount + " " + rate);
         if (Global.options.isExecuteOrders()) {
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
