@@ -144,7 +144,7 @@ public class StrategySecondaryPegUtils {
 
     // ---- Trade Manager ----
 
-    private ApiResponse executeBuy(CurrencyPair pair, double amount, double rate) {
+    private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
@@ -159,7 +159,7 @@ public class StrategySecondaryPegUtils {
         }
     }
 
-    private ApiResponse executeSell(CurrencyPair pair, double amount, double rate) {
+    private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
@@ -247,6 +247,10 @@ public class StrategySecondaryPegUtils {
         return orderString2;
     }
 
+    private String hipchatMsg(String type, String orderString1){
+        return "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1;
+    }
+
 
     public boolean initOrders(String type, double price) {
 
@@ -302,9 +306,7 @@ public class StrategySecondaryPegUtils {
             double maxsellcap = maxSell / 2;
             if (amount1 > maxsellcap && maxSell > 0)
                 amount1 = maxsellcap;
-        }
-
-        if (type.equals(Constant.BUY) && !Global.swappedPair) {
+        } else if (type.equals(Constant.BUY) && !Global.swappedPair) {
             amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
             //check the calculated amount against the max buy amount option, if any.
             double maxbuycap = maxBuy / 2;
@@ -322,14 +324,15 @@ public class StrategySecondaryPegUtils {
         ApiResponse order1Response;
         if (type.equals(Constant.SELL)) {
             //Place sellSide order 1
-            order1Response = this.executeSell(Global.options.getPair(), amount1, price);
+            order1Response = this.executeSellsideOrder(Global.options.getPair(), amount1, price);
         } else {
             //Place buySide order 1
-            order1Response = this.executeBuy(Global.options.getPair(), amount1, price);
+            order1Response = this.executeBuysideOrder(Global.options.getPair(), amount1, price);
         }
 
         if (order1Response != null && order1Response.isPositive()) {
-            HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
+            String msg = hipchatMsg(type, orderString1);
+            HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
             LOG.warn("Strategy - " + type + " Response1 = " + order1Response.getResponseObject());
         } else {
             LOG.error(order1Response.getError().toString());
@@ -363,9 +366,7 @@ public class StrategySecondaryPegUtils {
             double maxcap = maxSell / 2;
             if (amount2 > maxcap && maxSell > 0)
                 amount2 = maxcap;
-        }
-
-        if ((type.equals(Constant.BUY) && !Global.swappedPair)
+        }  else if ((type.equals(Constant.BUY) && !Global.swappedPair)
                 || (type.equals(Constant.SELL) && Global.swappedPair)) {
             //hotfix
             amount2 = Utils.round(amount2 - (oneNBT * 0.9), Settings.DEFAULT_PRECISION); //multiply by .9 to keep it below one NBT
@@ -386,13 +387,14 @@ public class StrategySecondaryPegUtils {
         ApiResponse order2Response;
         if (type.equals(Constant.SELL)) {
             //Place sellSide order 2
-            order2Response = this.executeSell(Global.options.getPair(), amount2, price);
+            order2Response = this.executeSellsideOrder(Global.options.getPair(), amount2, price);
         } else {
             //Place buySide order 2
-            order2Response = this.executeBuy(Global.options.getPair(), amount2, price);
+            order2Response = this.executeBuysideOrder(Global.options.getPair(), amount2, price);
         }
         if (order2Response != null && order2Response.isPositive()) {
-            HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
+            String msg = hipchatMsg(type, orderString2);
+            HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
             LOG.warn("Strategy - " + type + " Response2 = " + order2Response.getResponseObject());
         } else {
             LOG.error(order2Response.getError().toString());
