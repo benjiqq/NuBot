@@ -144,8 +144,8 @@ public class StrategySecondaryPegUtils {
     // ---- Trade Manager ----
 
     private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
-        LOG.info("executeBuysideOrder : " + pair + " " + amount + " " + rate);
         if (Global.options.isExecuteOrders()) {
+            LOG.warn("executeBuysideOrder : " + pair + " " + amount + " " + rate);
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
                 return order1Response;
@@ -160,8 +160,8 @@ public class StrategySecondaryPegUtils {
     }
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
-        LOG.info("executeSellsideOrder : " + pair + " " + amount + " " + rate);
         if (Global.options.isExecuteOrders()) {
+            LOG.warn("executeSellsideOrder : " + pair + " " + amount + " " + rate);
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
                 return order1Response;
@@ -268,14 +268,14 @@ public class StrategySecondaryPegUtils {
         double maxSell = Global.options.getMaxSellVolume();
         double maxBuy = Global.options.getMaxBuyVolume();
 
-        LOG.info("balance " + balance + " maxBuy " + maxBuy + ". maxSell " + maxSell);
+        LOG.debug("balance " + balance + " maxBuy " + maxBuy + ". maxSell " + maxSell);
 
         if (txFeeNTBPEGResponse.isPositive()) {
             double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
             LOG.trace("Updated Transaction fee = " + txFeePEGNTB + "%");
 
             double amount1 = Utils.round(balance.getQuantity() / 2, Settings.DEFAULT_PRECISION);
-            LOG.info("amount1: " + amount1 + " . balance " + balance.getQuantity());
+            LOG.debug("amount1: " + amount1 + " . balance " + balance.getQuantity());
             //check the calculated amount against the set maximum sell amount set in the options.json file
 
 
@@ -286,9 +286,8 @@ public class StrategySecondaryPegUtils {
 
 
             if (type.equals(Constant.BUY) && !Global.swappedPair) {
-                LOG.info("buy: amount " + amount1);
                 amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
-                LOG.info("buy: => amount " + amount1);
+                LOG.debug("buy: => amount " + amount1);
                 //check the calculated amount against the max buy amount option, if any.
                 if (maxBuy > 0) {
                     if (amount1 > (maxBuy / 2))
@@ -299,9 +298,7 @@ public class StrategySecondaryPegUtils {
             //Prepare the orders
 
             String orderString1 = orderString(type, amount1, price);
-            LOG.info("order1: " + orderString1);
-
-            LOG.warn("Strategy - Submit order : " + orderString1);
+            LOG.debug("order1: " + orderString1);
 
             ApiResponse order1Response = this.executeOrder(type, Global.options.getPair(), amount1, price);
 
@@ -332,7 +329,6 @@ public class StrategySecondaryPegUtils {
                     balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
                 }
 
-
                 double amount2 = balance.getQuantity();
 
                 //check the calculated amount against the set maximum sell amount set in the options.json file
@@ -358,7 +354,7 @@ public class StrategySecondaryPegUtils {
                 }
 
                 String orderString2 = orderString(type, amount2, price);
-                LOG.info("order2: " + orderString2);
+                LOG.debug("order2: " + orderString2);
 
                 //put it on order
 
