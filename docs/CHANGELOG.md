@@ -1,17 +1,18 @@
+
 ## v0.2.0.5 (xxxx-xx-zz)
+- Parameters have changed: use maxbuyvolume instead of maxbuyordervolume
 
 #### New Features:
-  - Parameters have changed: use maxbuyvolume instead of maxbuyordervolume
   - A
-
 
 #### Improvements:
   - Refactored Trading Strategy code extracing methods to Order and Balance Manager objects
 
 
 #### Bug fixes:
-  - C
+  - Wrong count of locked peg balance on bitcoin.co.id
 	
+	 
 	
 ## v0.2.0 (2015-03-26)
 
