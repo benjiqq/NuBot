@@ -54,6 +54,10 @@
             <onMismatch>ACCEPT</onMismatch>
         </filter>
 
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
     </appender>
 
     <!-- main file output, not verbose -->
