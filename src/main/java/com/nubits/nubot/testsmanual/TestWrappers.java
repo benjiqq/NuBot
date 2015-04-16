@@ -58,6 +58,8 @@ public class TestWrappers {
 
         //Methods strictly necessary for NuBot to run-------------
         //-------------
+
+        /*
         try {
             long waitTime = 4500;//ms
             WrapperTestUtils.testGetActiveOrders(testPair, false); //How many any active orders prior to starting the test?
@@ -91,6 +93,7 @@ public class TestWrappers {
         } catch (InterruptedException e) {
             LOG.error(e.toString());
         }
+        */
 
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
 
@@ -113,13 +116,14 @@ public class TestWrappers {
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("2063803", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testGetActiveOrders(testPair, true); //Read active orders (should be 0)
         //WrapperTestUtils.testGetOrderDetail("1139");
-        //WrapperTestUtils.testIsOrderActive("1139");
+        //WrapperTestUtils.testIsOrderActive("7d27fb8b-05bd-4937-b404-a808766f2dfc");
         //WrapperTestUtils.testGetTxFee();
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
 
         //WrapperTestUtils.testClearAllOrders(testPair);
-
+        WrapperTestUtils.testGetLastTrades(testPair);
 
         //-------- Stress test start ---------
         /*
