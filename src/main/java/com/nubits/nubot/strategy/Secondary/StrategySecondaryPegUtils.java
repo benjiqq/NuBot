@@ -69,7 +69,7 @@ public class StrategySecondaryPegUtils {
                         try {
 
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = OrderManager.tryCancelAllOrders(Global.options.getPair());
+                            areAllOrdersCanceled = Global.orderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
                                 LOG.warn("All orders canceled succefully");
                             } else {
@@ -424,7 +424,7 @@ public class StrategySecondaryPegUtils {
 
         LOG.info("aggregateAndKeepProceeds");
 
-        boolean cancel = OrderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
+        boolean cancel = Global.orderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (!cancel) {
             LOG.error("An error occurred while attempting to cancel buy orders.");
             return;

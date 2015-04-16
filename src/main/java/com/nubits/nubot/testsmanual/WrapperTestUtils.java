@@ -269,8 +269,8 @@ public class WrapperTestUtils {
     }
 
     public static void testMultipleOrders(ArrayList<OrderToPlace> orders, CurrencyPair pair) {
-
-        boolean success = OrderManager.placeMultipleOrders(orders);
+        OrderManager om = new OrderManager();
+        boolean success = om.placeMultipleOrders(orders);
         LOG.info("Multiple orders (" + orders + ") placed. success = " + success);
 
     }

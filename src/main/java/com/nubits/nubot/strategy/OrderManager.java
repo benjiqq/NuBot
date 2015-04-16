@@ -30,7 +30,7 @@ public class OrderManager {
      *
      * @throws com.nubits.nubot.trading.OrderException
      */
-    public static void clearOrders() throws OrderException {
+    public void clearOrders() throws OrderException {
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
         if (!deleteOrdersResponse.isPositive()) {
             LOG.error(deleteOrdersResponse.getError().toString());
@@ -78,7 +78,7 @@ public class OrderManager {
      * @param pair
      * @return
      */
-    public static boolean tryCancelAllOrders(CurrencyPair pair) {
+    public boolean tryCancelAllOrders(CurrencyPair pair) {
         boolean toRet = false;
         //get all orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -113,7 +113,7 @@ public class OrderManager {
         return toRet;
     }
 
-    public static boolean takeDownOrders(String type, CurrencyPair pair) {
+    public boolean takeDownOrders(String type, CurrencyPair pair) {
         boolean completed = true;
         //Get active orders
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
@@ -137,7 +137,7 @@ public class OrderManager {
         return completed;
     }
 
-    public static boolean takeDownAndWait(String orderID, long timeoutMS, CurrencyPair pair) {
+    public boolean takeDownAndWait(String orderID, long timeoutMS, CurrencyPair pair) {
 
         ApiResponse deleteOrderResponse = Global.exchange.getTrade().cancelOrder(orderID, pair);
         if (deleteOrderResponse.isPositive()) {
@@ -185,7 +185,7 @@ public class OrderManager {
         return true;
     }
 
-    public static ApiResponse placeOrder(OrderToPlace order) {
+    public ApiResponse placeOrder(OrderToPlace order) {
         //TODO move into the trade interface when tested and ready
         LOG.info(": Submit order : "
                 + order.getType() + " " + order.getSize() + " " + order.getPair().getOrderCurrency().getCode()
@@ -202,7 +202,7 @@ public class OrderManager {
     }
 
     //Init the order
-    public static boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
+    public boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
         //Observation : it can take between 15 and 20 seconds to place 10 orders
         boolean success = true;
 
