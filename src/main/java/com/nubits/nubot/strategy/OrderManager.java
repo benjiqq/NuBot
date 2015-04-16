@@ -25,6 +25,8 @@ public class OrderManager {
 
     private static ArrayList<Order> orderList;
 
+    private long lastFetch;
+
     /**
      * clear all orders
      *
@@ -242,6 +244,7 @@ public class OrderManager {
     public void fetch() {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
+            lastFetch = System.currentTimeMillis();
             this.orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
 
         } else {
