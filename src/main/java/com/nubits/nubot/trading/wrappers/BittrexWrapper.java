@@ -488,7 +488,7 @@ public class BittrexWrapper implements TradeInterface {
         Amount price = new Amount(Utils.getDouble(in.get("Price")), pair.getPaymentCurrency());
         out.setPrice(price);
         //2014-07-09T03:55:48.77
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-ddTHH:mm:ss.S");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.S");
         Date date = null;
         try {
             if (in.get("Closed") != null) {
