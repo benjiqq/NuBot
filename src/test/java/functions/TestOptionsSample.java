@@ -35,7 +35,7 @@ import java.nio.file.Paths;
 public class TestOptionsSample extends TestCase {
 
     private static String testconfigFile = "sample-options.json";
-    private static String testconfigdir = "config/options/";
+    private static String testconfigdir = "config/";
     private static String testconfig = testconfigdir + testconfigFile;
 
     @Override
