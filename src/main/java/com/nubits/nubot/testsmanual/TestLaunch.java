@@ -21,6 +21,7 @@ package com.nubits.nubot.testsmanual;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.utils.VersionInfo;
 import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;
@@ -98,6 +99,8 @@ public class TestLaunch {
         }
     }
 
+
+
     /**
      * Start the NuBot. start if config is valid and other instance is running
      *
@@ -105,8 +108,10 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        testlaunchWithFile();
+        //testlaunchWithFile();
         //testlaunchNoFile();
+        String[] args2 = {"-cfg=" + configFile,"-GUI"};
+        MainLaunch.main(args2);
 
     }
 

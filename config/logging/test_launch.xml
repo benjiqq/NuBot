@@ -4,7 +4,7 @@
 
 <configuration>
 
-    <property scope="context" name="testlogfolder" value="testlaunch" />
+    <property scope="context" name="logfolder" value="logs" />
     <property scope="context" name="SessionLOG" value="SessionLOG" />
     <property scope="context" name="sessionlogFile" value=".sessions.log" />
     <property scope="context" name="standardlogFile" value="ui_standard.log" />
@@ -158,7 +158,7 @@
             </pattern>
         </encoder>
 
-        <file>${testlogfolder}/${sessionlogFile}</file>
+        <file>${logfolder}/${sessionlogFile}</file>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
