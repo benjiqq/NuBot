@@ -19,6 +19,7 @@
 package com.nubits.nubot.models;
 
 import com.nubits.nubot.utils.Utils;
+
 import java.text.DecimalFormat;
 
 
@@ -29,7 +30,6 @@ public class Amount {
     private Currency currency;
 
     /**
-     *
      * @param quantity
      * @param currency
      */
@@ -39,7 +39,6 @@ public class Amount {
     }
 
     /**
-     *
      * @return
      */
     public double getQuantity() {
@@ -47,7 +46,6 @@ public class Amount {
     }
 
     /**
-     *
      * @param quantity
      */
     public void setQuantity(double quantity) {
@@ -55,7 +53,6 @@ public class Amount {
     }
 
     /**
-     *
      * @return
      */
     public Currency getCurrency() {
@@ -63,7 +60,6 @@ public class Amount {
     }
 
     /**
-     *
      * @param currency
      */
     public void setCurrency(Currency currency) {
@@ -78,7 +74,6 @@ public class Amount {
     }
 
     /**
-     *
      * @param multiplyFactor
      * @return
      */

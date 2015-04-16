@@ -19,15 +19,15 @@
 package functions;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class TestDateFormat  extends TestCase {
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class TestDateFormat extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestDateFormat.class
             .getName());

@@ -75,14 +75,10 @@ public class NuCMC {
             init();
 
 
-
-
-
         } else {
             LOG.error("Problem while reading options from " + optionsPath);
             System.exit(0);
         }
-
 
 
     }
@@ -111,7 +107,6 @@ public class NuCMC {
             ExchangeLiveData liveDataB = new ExchangeLiveData();
             ccedk.setLiveData(liveDataC);
             bter.setLiveData(liveDataB);
-
 
 
             ccedk.setTrade(new CcedkWrapper(new ApiKeys(ccedkSecret, ccedkKey), ccedk));
@@ -151,9 +146,9 @@ public class NuCMC {
             public void run() {
                 LOG.info("Exiting...");
                 mainThread.interrupt();
-                try{
+                try {
                     Global.taskManager.stopAll();
-                }catch(IllegalStateException e){
+                } catch (IllegalStateException e) {
 
                 }
 

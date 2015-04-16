@@ -47,11 +47,11 @@ public class TestLaunch {
     private static boolean runui = true;
 
 
-    public static void testlaunchWithFile(){
+    public static void testlaunchWithFile() {
 
         LOG.info("test");
 
-        Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        Global.sessionPath = "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
 
         LOG.info("defined session path " + Global.sessionPath);
@@ -64,21 +64,21 @@ public class TestLaunch {
         SessionManager.setConfigGlobal(configFile);
 
 
-        if (runui){
+        if (runui) {
 
-            try{
+            try {
                 UiServer.startUIserver(configFile);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error setting up UI server " + e);
             }
         }
     }
 
-    public static void testlaunchNoFile(){
+    public static void testlaunchNoFile() {
 
         LOG.info("test");
 
-        Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        Global.sessionPath = "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
         MDC.put("session", Global.sessionPath);
         LOG.info("defined session path " + Global.sessionPath);
         LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
@@ -88,11 +88,11 @@ public class TestLaunch {
         LOG.info("set global config");
         SessionManager.setConfigDefault();
 
-        if (runui){
+        if (runui) {
 
-            try{
+            try {
                 UiServer.startUIserver(Settings.DEFAULT_CONFIG_FILE_PATH);
-            }catch(Exception e){
+            } catch (Exception e) {
                 LOG.error("error setting up UI server " + e);
             }
         }
@@ -109,8 +109,6 @@ public class TestLaunch {
         //testlaunchNoFile();
 
     }
-
-
 
 
 }

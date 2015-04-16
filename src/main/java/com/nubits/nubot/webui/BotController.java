@@ -11,11 +11,6 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,7 +34,6 @@ public class BotController {
                 opmap.put("status", "running");
 
                 opmap.put("sessionstart", SessionManager.startedString());
-
 
 
                 opmap.put("duration", SessionManager.durationString());

@@ -200,7 +200,7 @@ public class TestOptions extends TestCase {
         assertTrue(opt.rpcPass.equals("xxx"));
         assertTrue(opt.rpcUser.equals("xxx"));
         assertTrue(opt.mainFeed.equals("btce"));
-        
+
         assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
         assertTrue(opt.backupFeeds.get(1).equals("blockchain"));
         assertTrue(opt.wallchangeThreshold == 0.1);

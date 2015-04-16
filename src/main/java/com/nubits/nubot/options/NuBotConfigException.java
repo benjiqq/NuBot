@@ -23,7 +23,7 @@ package com.nubits.nubot.options;
  */
 public class NuBotConfigException extends Exception {
 
-    public NuBotConfigException(String errorMessage){
+    public NuBotConfigException(String errorMessage) {
         super(errorMessage);
     }
 }

@@ -18,8 +18,6 @@
 
 package com.nubits.nubot.utils;
 
-import sun.security.krb5.Config;
-
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
@@ -69,13 +67,13 @@ public class ClasspathUtils {
         // or use:
         // ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         // depending on what's appropriate in your case.
-        try{
+        try {
             Enumeration<URL> roots = classLoader.getResources(".");
             while (roots.hasMoreElements()) {
                 final URL url = roots.nextElement();
                 System.out.println(url);
             }
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 

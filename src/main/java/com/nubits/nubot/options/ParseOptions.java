@@ -34,7 +34,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -180,7 +179,7 @@ public class ParseOptions {
             if (!FeedFacade.isValidFeed(options.mainFeed))
                 throw new NuBotConfigException("invalid mainfeed " + options.mainFeed);
 
-            for (String feed : options.backupFeeds){
+            for (String feed : options.backupFeeds) {
                 if (!FeedFacade.isValidFeed(feed))
                     throw new NuBotConfigException("invalid feed " + feed);
             }

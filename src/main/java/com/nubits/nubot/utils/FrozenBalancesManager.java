@@ -30,6 +30,13 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
+import org.apache.commons.io.FileUtils;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,14 +46,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
-import org.apache.commons.io.FileUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class FrozenBalancesManager {
 
@@ -172,10 +171,9 @@ public class FrozenBalancesManager {
             String message = "Frozen funds already in balance (not proceeds) updated : "
                     + Global.frozenBalancesManager.getAmountAlreadyThere().getQuantity()
                     + " " + Global.frozenBalancesManager.getAmountAlreadyThere().getCurrency();
-            if(Global.options.getKeepProceeds()>0) {
+            if (Global.options.getKeepProceeds() > 0) {
                 LOG.info(message);
-            }
-            else
+            } else
                 LOG.debug(message);
         } else {
             LOG.error("An error occurred while trying to set the balance already there (not proceeds)");

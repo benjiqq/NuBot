@@ -20,7 +20,6 @@ package com.nubits.nubot.models;
 
 /**
  * An API response
- *
  */
 public class ApiResponse {
 
@@ -35,7 +34,6 @@ public class ApiResponse {
     }
 
     /**
-     *
      * @param positive
      * @param responseObject
      * @param error
@@ -47,7 +45,6 @@ public class ApiResponse {
     }
 
     /**
-     *
      * @return
      */
     public boolean isPositive() {
@@ -59,7 +56,6 @@ public class ApiResponse {
     }
 
     /**
-     *
      * @return
      */
     public Object getResponseObject() {
@@ -67,7 +63,6 @@ public class ApiResponse {
     }
 
     /**
-     *
      * @param responseObject
      */
     public void setResponseObject(Object responseObject) {
@@ -76,7 +71,6 @@ public class ApiResponse {
     }
 
     /**
-     *
      * @return
      */
     public ApiError getError() {
@@ -84,7 +78,6 @@ public class ApiResponse {
     }
 
     /**
-     *
      * @param error
      */
     public void setError(ApiError error) {

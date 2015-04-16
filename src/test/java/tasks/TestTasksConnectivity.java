@@ -43,20 +43,19 @@ public class TestTasksConnectivity extends TestCase {
         assertTrue(!r);
 
         checkConnectionTask.start();
-        try{
+        try {
             Thread.sleep(1000);
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 
-        CheckConnectionTask t =(CheckConnectionTask)checkConnectionTask.getTask();
+        CheckConnectionTask t = (CheckConnectionTask) checkConnectionTask.getTask();
         boolean isconnected = t.isConnected();
         assertTrue(isconnected);
 
 
         checkConnectionTask.stop();
     }
-
 
 
 }

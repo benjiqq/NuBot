@@ -19,6 +19,7 @@
 package com.nubits.nubot.models;
 
 import com.nubits.nubot.utils.Utils;
+
 import java.util.Date;
 
 
@@ -37,7 +38,6 @@ public class Order {
 
 
     /**
-     *
      * @param id
      * @param insertedDate
      * @param type
@@ -63,8 +63,8 @@ public class Order {
     }
 
     //Methods
+
     /**
-     *
      * @return
      */
     public String getId() {
@@ -72,7 +72,6 @@ public class Order {
     }
 
     /**
-     *
      * @param id
      */
     public void setId(String id) {
@@ -80,7 +79,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public Date getInsertedDate() {
@@ -88,7 +86,6 @@ public class Order {
     }
 
     /**
-     *
      * @param insertedDate
      */
     public void setInsertedDate(Date insertedDate) {
@@ -96,7 +93,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public Date getExecutedDate() {
@@ -104,7 +100,6 @@ public class Order {
     }
 
     /**
-     *
      * @param executedDate
      */
     public void setExecutedDate(Date executedDate) {
@@ -112,7 +107,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public String getType() {
@@ -120,7 +114,6 @@ public class Order {
     }
 
     /**
-     *
      * @param type
      */
     public void setType(String type) {
@@ -128,7 +121,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public CurrencyPair getPair() {
@@ -136,7 +128,6 @@ public class Order {
     }
 
     /**
-     *
      * @param pair
      */
     public void setPair(CurrencyPair pair) {
@@ -144,7 +135,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public Amount getAmount() {
@@ -152,7 +142,6 @@ public class Order {
     }
 
     /**
-     *
      * @param amount
      */
     public void setAmount(Amount amount) {
@@ -160,7 +149,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public Amount getPrice() {
@@ -168,7 +156,6 @@ public class Order {
     }
 
     /**
-     *
      * @param price
      */
     public void setPrice(Amount price) {
@@ -176,7 +163,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public Amount getAmountPlusFee() {
@@ -184,7 +170,6 @@ public class Order {
     }
 
     /**
-     *
      * @return
      */
     public boolean isCompleted() {
@@ -192,7 +177,6 @@ public class Order {
     }
 
     /**
-     *
      * @param completed
      */
     public void setCompleted(boolean completed) {

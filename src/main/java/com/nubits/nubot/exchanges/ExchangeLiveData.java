@@ -18,8 +18,9 @@
 
 package com.nubits.nubot.exchanges;
 
-import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.PairBalance;
+
 import java.util.ArrayList;
 
 

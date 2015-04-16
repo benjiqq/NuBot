@@ -19,7 +19,6 @@
 package com.nubits.nubot.testsmanual;
 
 
-
 import com.nubits.nubot.NTP.NTPClient;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
@@ -27,8 +26,9 @@ import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.*;
-import com.nubits.nubot.pricefeeds.feedservices.*;
+import com.nubits.nubot.pricefeeds.FeedFacade;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
 import com.nubits.nubot.utils.InitTests;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -131,22 +131,22 @@ public class TestSync extends TimerTask {
         String mainFeed = null;
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        try{
+        try {
             mainFeed = FeedFacade.BtcePriceFeed;
-            String  f1 = FeedFacade.BitcoinaveragePriceFeed;
+            String f1 = FeedFacade.BitcoinaveragePriceFeed;
             String f2 = FeedFacade.BlockchainPriceFeed;
             String f3 = FeedFacade.CoinbasePriceFeed;
             backupFeedList.add(f1);
             backupFeedList.add(f2);
             backupFeedList.add(f3);
-        }catch(Exception e){
+        } catch (Exception e) {
 
         }
 
         PriceFeedManager pfm = null;
-        try{
+        try {
             pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
 
         }
 

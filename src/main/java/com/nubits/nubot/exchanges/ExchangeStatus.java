@@ -36,7 +36,7 @@ public class ExchangeStatus {
 
     }
 
-//Methods
+    //Methods
     public String getBotStatusString() {
         return botStatusString;
     }

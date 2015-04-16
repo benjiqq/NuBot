@@ -57,7 +57,7 @@ public class Utils {
 
     private static final int maxThreadsError = 30;
 
-    public static void logActiveThreads(){
+    public static void logActiveThreads() {
         int active = Thread.activeCount();
         LOG.trace("currently active threads: " + active);
         Thread allThreads[] = new Thread[active];
@@ -66,11 +66,11 @@ public class Utils {
         for (int i = 0; i < active; i++) {
             Thread t = allThreads[i];
             LOG.trace(i + ": " + t + " id: " + t.getId() + " name: " + t.getName() + " " + t.getContextClassLoader()
-            + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
+                    + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
             LOG.trace("super: " + t.getClass().getSuperclass());
         }
 
-        if (active > maxThreadsError){
+        if (active > maxThreadsError) {
             LOG.error("too many threads started");
         }
     }

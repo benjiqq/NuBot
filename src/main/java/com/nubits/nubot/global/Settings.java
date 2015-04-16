@@ -45,7 +45,7 @@ public class Settings {
      * [seconds] Submit liquidity info
      */
     public static final int SUBMIT_LIQUIDITY_SECONDS = 130;
-    
+
     /**
      * [seconds] Execute StrategyTask
      */

@@ -240,9 +240,9 @@ public abstract class NuBotBase {
         }
 
         //Start task to check orders
-        try{
+        try {
             Global.taskManager.getSendLiquidityTask().start(Settings.DELAY_LIQUIIDITY);
-        }catch(Exception e){
+        } catch (Exception e) {
             throw new NuBotRunException("" + e);
         }
 
@@ -284,11 +284,14 @@ public abstract class NuBotBase {
 
         LOG.info("Bot shutting down sequence started.");
 
+        String openStrongTaging = "<strong>";
+        String closingStrongTaging = "</strong>";
+
         String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
-                + "<strong>" + Global.options.getExchangeName() + "</strong> ["
+                + openStrongTaging + Global.options.getExchangeName() + closingStrongTaging + " ["
                 + Global.options.getPair().toStringSep() + "]";
 
-        LOG.info(additionalInfo);
+        LOG.info(additionalInfo.replace(closingStrongTaging, "").replace(openStrongTaging, "")); //Remove html tags
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 
         //Interrupt all BotTasks

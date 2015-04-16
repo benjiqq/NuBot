@@ -32,7 +32,6 @@ public class LastPrice {
 
 
     /**
-     *
      * @param error
      * @param source
      * @param currencyMeasured
@@ -47,7 +46,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @return
      */
     public long getAge() {
@@ -56,8 +54,8 @@ public class LastPrice {
     }
 
     //Methods
+
     /**
-     *
      * @return
      */
     public String getSource() {
@@ -65,7 +63,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @param source
      */
     public void setSource(String source) {
@@ -73,7 +70,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @return
      */
     public Currency getCurrencyMeasured() {
@@ -81,7 +77,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @param currencyMeasured
      */
     public void setCurrencyMeasured(Currency currencyMeasured) {
@@ -89,7 +84,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @return
      */
     public Amount getPrice() {
@@ -97,7 +91,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @param price
      */
     public void setPrice(Amount price) {
@@ -105,7 +98,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @return
      */
     public Date getTimestamp() {
@@ -113,7 +105,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @return
      */
     public boolean isError() {
@@ -121,7 +112,6 @@ public class LastPrice {
     }
 
     /**
-     *
      * @param error
      */
     public void setError(boolean error) {

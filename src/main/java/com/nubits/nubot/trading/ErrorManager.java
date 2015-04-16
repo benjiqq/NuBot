@@ -20,7 +20,6 @@ package com.nubits.nubot.trading;
 
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.ApiError;
-import com.nubits.nubot.models.ApiResponse;
 
 /**
  *

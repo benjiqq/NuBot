@@ -23,7 +23,6 @@ import com.nubits.nubot.models.LastPrice;
 
 /**
  * A price feed
- *
  */
 public abstract class AbstractPriceFeed {
 
@@ -31,7 +30,7 @@ public abstract class AbstractPriceFeed {
     long lastRequest;
     LastPrice lastPrice;
 
-    public AbstractPriceFeed(){
+    public AbstractPriceFeed() {
     }
 
     public abstract LastPrice getLastPrice(CurrencyPair pair);

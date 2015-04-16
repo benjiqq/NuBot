@@ -76,7 +76,6 @@ public final class NTPClient {
         return new Date(); //statement is never reached
 
 
-
     }
 
     private Date getTimeImpl(String host) throws IOException {
