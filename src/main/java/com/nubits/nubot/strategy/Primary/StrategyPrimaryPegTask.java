@@ -24,7 +24,6 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.trading.OrderException;
 import com.nubits.nubot.trading.TradeUtils;
@@ -49,8 +48,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean proceedsInBalance = false;
     private int cycles = 0;
-
-    public OrderManager orderManager;
 
     @Override
     public void run() {
@@ -91,7 +88,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 //if there orders need to be cleared
                 if (totalActiveOrders > 0) {
                     try {
-                        OrderManager.clearOrders();
+                        Global.orderManager.clearOrders();
                     } catch (OrderException e) {
                         throw e;
                     }
@@ -144,8 +141,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.info("Initializing strategy");
 
-        orderManager = new OrderManager();
-
         checkBalancesAndOrders();
 
         isFirstTime = false;
@@ -174,7 +169,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         cycles += Utils.randInt(0, 5);
 
         //Cancel sell side orders
-        boolean cancelSells = OrderManager.takeDownOrders(Constant.SELL, Global.options.getPair());
+        boolean cancelSells = Global.orderManager.takeDownOrders(Constant.SELL, Global.options.getPair());
 
         if (cancelSells) {
             //Update balances
@@ -287,7 +282,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.warn("Sellside : Taking down smaller order to aggregate it with new balance");
 
-        boolean orderdelete = OrderManager.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
+        boolean orderdelete = Global.orderManager.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
 
         if (!orderdelete) {
             String errMessagedeletingOrder = "could not delete order " + idToDelete;
@@ -368,7 +363,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.debug("buySide");
 
-        boolean cancel = OrderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
+        boolean cancel = Global.orderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
             Global.frozenBalancesManager.freezeNewFunds();
             ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
@@ -392,11 +387,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
-        this.orderManager.fetch();
+        Global.orderManager.fetch();
 
-        ArrayList<Order> orderList = this.orderManager.getOrderList();
+        ArrayList<Order> orderList = Global.orderManager.getOrderList();
 
-        ArrayList<Order> orderListCategorized = this.orderManager.filterOrders(orderList, type);
+        ArrayList<Order> orderListCategorized = Global.orderManager.filterOrders(orderList, type);
 
         int i = 0;
         for (Order tempOrder : orderListCategorized) {
@@ -436,8 +431,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = this.orderManager.FetchAndCountActiveOrders(Constant.SELL);
-        activeBuyOrders = this.orderManager.FetchAndCountActiveOrders(Constant.BUY);
+        activeSellOrders = Global.orderManager.FetchAndCountActiveOrders(Constant.SELL);
+        activeBuyOrders = Global.orderManager.FetchAndCountActiveOrders(Constant.BUY);
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);
@@ -516,7 +511,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         try {
 
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = OrderManager.tryCancelAllOrders(Global.options.getPair());
+                            areAllOrdersCanceled = Global.orderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
                                 LOG.warn("All orders canceled succefully");
                             } else {
