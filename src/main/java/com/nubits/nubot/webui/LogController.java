@@ -64,13 +64,13 @@ public class LogController {
                     Global.orderManager.logActiveOrders();
                     numbuys = Global.orderManager.getNumActiveBuyOrders();
                     numsells = Global.orderManager.getNumActiveSellOrders();
-                    LOG.info("buys: " + numbuys);
-                    LOG.info("sells: " + numsells);
+                    LOG.debug("buys: " + numbuys);
+                    LOG.debug("sells: " + numsells);
 
                     ArrayList<Order> ol = Global.orderManager.getOrderList();
                     opmap.put("orders", ol);
                     for (Order o : ol) {
-                        LOG.info("order: " + o);
+                        LOG.debug("order: " + o);
                     }
 
                     //TODO: use global pair
