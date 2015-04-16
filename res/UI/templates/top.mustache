@@ -28,7 +28,7 @@
           }
 
           #logarea {
-            width:800px;
+            width:650px;
             height:400px;
             resize:none
           }
@@ -57,6 +57,10 @@
               $('#startbot').removeClass("btn-success");
               $('#startbot').addClass("btn-primary");
               $('#startbot').html("Start");
+
+              $("#ordertable").find("tr:gt(0)").remove();
+              $("#balancetable").find("tr:gt(0)").remove();
+
          }
 
         function updateConfigFile(){
@@ -69,10 +73,60 @@
                   console.log("error loading configfile");
                 })
                 .done(function( data ) {
-                    console.log("data: " + data);
+                    //console.log("config data: " + data);
                     $('#configfile').html(data["configfile"]);
                 });
         }
+
+        function updateOrders(){
+             $.ajax({
+              type: "GET",
+              dataType: "json",
+              url:  "http://" + host + ":" + port + "/info"
+            })
+            .fail(function() {
+              console.log("error loading info");
+            })
+            .done(function( data ) {
+
+                //console.log("buys: " + data["buys"]);
+                console.log("BuyCurrency: " + data["BuyCurrency"]);
+                console.log("SellCurrency: " + data["SellCurrency"]);
+
+                if (data.hasOwnProperty("BuyCurrency")) {
+                        $("#balancetable").find("tr:gt(0)").remove();
+
+                        var qty = data["BuyCurrency"]["quantity"];
+                        var cry = data["BuyCurrency"]["currency"]["code"];
+
+                        var rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
+                        $("#balancetable").find('tbody').after(rowhtml);
+
+                        qty = data["SellCurrency"]["quantity"];
+                        cry = data["SellCurrency"]["currency"]["code"];
+                        rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
+                        $("#balancetable").find('tbody').after(rowhtml);
+                }
+
+                if (data.hasOwnProperty("orders")) {
+
+                     $("#ordertable").find("tr:gt(0)").remove();
+
+                    var orders = data["orders"];
+                    for (var i = 0; i < orders.length; i++){
+                        var order = orders[i];
+                        var type = order["type"];
+                        var qty = order["amount"]["quantity"];
+                        var price = order["price"]["quantity"];
+                        var rowhtml = '<tr><td>' + type + '</td><td>' + qty + '</td><td>' + price + '</td></tr>';
+                        $("#ordertable").find('tbody').after(rowhtml);
+                    }
+                }
+
+            });
+            setTimeout(updateOrders , 2000);
+         }
+
 
         function updateStatus(){
                  $.ajax({
@@ -84,7 +138,7 @@
 
                 })
                 .done(function( data ) {
-                    console.log("data: " + data);
+                    //console.log("status data: " + data);
 
                     $('#botstatus').html(data["status"]);
 
@@ -136,6 +190,7 @@
         $(document).ready(function() {
 
             updateConfigFile();
+            updateOrders();
 
 
           $('#startbot').click(function(){
@@ -207,6 +262,7 @@
 
             });
     });
+
 
             function autoScroll(){
 
@@ -365,9 +421,7 @@
                 });
 
                 makePost(posturl, jsondata);
-
             }
-
 
 
             function makePost(url, jsondata){

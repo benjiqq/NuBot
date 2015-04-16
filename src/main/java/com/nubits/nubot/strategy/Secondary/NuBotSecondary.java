@@ -26,6 +26,8 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.strategy.BalanceManager;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.utils.Utils;
@@ -42,12 +44,14 @@ public class NuBotSecondary extends NuBotBase {
     @Override
     public void configureStrategy() throws NuBotConfigException {
 
+        Global.balanceManager = new BalanceManager();
+        Global.orderManager = new OrderManager();
+
         if (Global.options.isDualSide()) {
             LOG.info("Configuring NuBot for Dual-Side strategy");
         } else {
             LOG.info("Configuring NuBot for Sell-Side strategy");
         }
-
 
         //Peg to a USD price via crypto pair
         Currency toTrackCurrency;

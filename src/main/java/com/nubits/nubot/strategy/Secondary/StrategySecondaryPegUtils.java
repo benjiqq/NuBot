@@ -23,13 +23,11 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.trading.TradeUtils;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
 
 public class StrategySecondaryPegUtils {
 
@@ -48,7 +46,9 @@ public class StrategySecondaryPegUtils {
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
-        if (strategy.getTotalActiveOrders() != 0) {
+        Global.orderManager.fetch();
+        int totalOrders = Global.orderManager.getNumTotalActiveOrders();
+        if (totalOrders > 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
@@ -69,7 +69,7 @@ public class StrategySecondaryPegUtils {
                         try {
 
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
+                            areAllOrdersCanceled = OrderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
                                 LOG.warn("All orders canceled succefully");
                             } else {
@@ -329,6 +329,7 @@ public class StrategySecondaryPegUtils {
                     balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
                 }
 
+
                 double amount2 = balance.getQuantity();
 
                 //check the calculated amount against the set maximum sell amount set in the options.json file
@@ -379,30 +380,6 @@ public class StrategySecondaryPegUtils {
         return success;
     }
 
-    public int countActiveOrders(String type) {
-
-        LOG.trace("countActiveOrders " + type);
-        //Get active orders
-        int numOrders = 0;
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-            ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
-
-            for (int i = 0; i < orderList.size(); i++) {
-                Order tempOrder = orderList.get(i);
-                if (tempOrder.getType().equalsIgnoreCase(type)) {
-                    numOrders++;
-                }
-            }
-
-        } else {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return -1;
-        }
-        LOG.debug("activeorders " + type + " " + numOrders);
-        return numOrders;
-    }
-
     public void recount() {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
@@ -410,17 +387,14 @@ public class StrategySecondaryPegUtils {
             double balanceNBT = balance.getNBTAvailable().getQuantity();
             double balancePEG = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-            strategy.setActiveSellOrders(countActiveOrders(Constant.SELL));
-            strategy.setActiveBuyOrders(countActiveOrders(Constant.BUY));
-            strategy.setTotalActiveOrders(strategy.getActiveBuyOrders() + strategy.getActiveSellOrders());
-
             strategy.setOrdersAndBalancesOK(false);
 
             double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
+            Global.orderManager.fetch();
+            int activeSellOrders = Global.orderManager.getNumActiveSellOrders();
+            int activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
 
-            int activeSellOrders = strategy.getActiveSellOrders();
-            int activeBuyOrders = strategy.getActiveBuyOrders();
             if (Global.options.isDualSide()) {
 
                 strategy.setOrdersAndBalancesOK((activeSellOrders == 2 && activeBuyOrders == 2)
@@ -450,29 +424,31 @@ public class StrategySecondaryPegUtils {
 
         LOG.info("aggregateAndKeepProceeds");
 
-        boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
-        if (cancel) {
-
-            //get the balance and see if it does still require an aggregation
-
-            Global.frozenBalancesManager.freezeNewFunds();
-
-            //Introuce an aleatory sleep time to desync bots at the time of placing orders.
-            //This will favour competition in markets with multiple custodians
-            try {
-                Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
-            } catch (InterruptedException ex) {
-                LOG.error(ex.toString());
-            }
-
-            double buyPrice = strategy.getBuyPricePEG();
-            LOG.info("init buy orders. price " + buyPrice);
-            initOrders(Constant.BUY, buyPrice);
-
-        } else {
+        boolean cancel = OrderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
+        if (!cancel) {
             LOG.error("An error occurred while attempting to cancel buy orders.");
+            return;
         }
+
+        //get the balance and see if it does still require an aggregation
+
+        Global.frozenBalancesManager.freezeNewFunds();
+
+        //Introuce an aleatory sleep time to desync bots at the time of placing orders.
+        //This will favour competition in markets with multiple custodians
+        try {
+            Thread.sleep(Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000);
+        } catch (InterruptedException ex) {
+            LOG.error(ex.toString());
+        }
+
+        double buyPrice = strategy.getBuyPricePEG();
+        LOG.info("init buy orders. price " + buyPrice);
+        initOrders(Constant.BUY, buyPrice);
+
+
     }
+
 
     public boolean shiftWalls() {
 

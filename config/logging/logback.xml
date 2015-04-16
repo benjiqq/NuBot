@@ -235,7 +235,8 @@
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
                         <expression>
-                            return logger.contains("jetty");
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter");
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>

@@ -52,15 +52,6 @@ public class BotController {
             return json;
         });
 
-        /*get("/startstop", "application/json", (request, response) -> {
-
-            Map opmap = new HashMap();
-            boolean active = SessionManager.isSessionActive();
-            opmap.put("running", active);
-            String json = new Gson().toJson(opmap);
-            return json;
-        });*/
-
 
         // we expect options are set
         post("/startstop", "application/json", (request, response) -> {

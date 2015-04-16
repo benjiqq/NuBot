@@ -108,7 +108,6 @@ public class ConfigController {
                 return json;
             }
 
-
             LOG.info("config received post" + request);
             String json_body = request.body();
 
