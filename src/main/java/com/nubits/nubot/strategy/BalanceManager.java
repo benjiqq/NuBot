@@ -23,12 +23,12 @@ public class BalanceManager {
     public void fetchBalance(Currency currency) throws Exception {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
         if (!balancesResponse.isPositive()) {
-            lastFetchBalance = System.currentTimeMillis();
             String errmsg = balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
 
+        lastFetchBalance = System.currentTimeMillis();
         this.balance = (Amount) balancesResponse.getResponseObject();
 
     }
@@ -37,12 +37,12 @@ public class BalanceManager {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
 
         if (!balancesResponse.isPositive()) {
-            lastFetchPairBalance = System.currentTimeMillis();
             String errmsg =balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
 
+        lastFetchPairBalance = System.currentTimeMillis();
         this.pairBalance = (PairBalance) balancesResponse.getResponseObject();
 
     }
