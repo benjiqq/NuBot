@@ -9,7 +9,19 @@
 ### Notes:
   - Parameters have changed: use maxbuyvolume instead of maxbuyordervolume
 
- 	
+## v0.2.0.5 (xxxx-xx-zz)
+
+#### New Features:
+  - A
+
+
+#### Improvements:
+  - Refactored Trading Strategy code extracing methods to Order and Balance Manager objects
+
+
+#### Bug fixes:
+  - C
+	
 	
 ## v0.2.0 (2015-03-26)
 
