@@ -30,11 +30,11 @@ public class BotTask {
     private static final Logger LOG = LoggerFactory.getLogger(BotTask.class.getName());
     private Timer timer;
     private boolean running;
-    private long interval; //expressed in millseconds
+    private long interval; //expressed in seconds
     private TimerTask task;
     private String name;
 
-    public BotTask(TimerTask task, long interval, String name) {
+    public BotTask(TimerTask task, int interval, String name) {
         this.timer = new Timer(name);
         this.running = false;
 
