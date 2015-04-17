@@ -43,7 +43,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/bter.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/bittrex.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -59,14 +59,55 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
 
-        WrapperTestUtils.testGetAvailableBalance(testCurrency);
-        WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testGetActiveOrders(testPair);
+        /*
+        try {
+            long waitTime = 4500;//ms
+            WrapperTestUtils.testGetActiveOrders(testPair, false); //How many any active orders prior to starting the test?
+
+            WrapperTestUtils.testClearAllOrders(testPair); //Clear all orders
+            Thread.sleep(waitTime); //Wait
+            LOG.info("Forcing waiting ms:" + waitTime);
+            WrapperTestUtils.testGetActiveOrders(testPair, false); //Read active orders (should be 0)
+
+            //Place some orders
+            int count = 0;
+            for (int i = 0; i < 30; i++) {
+                WrapperTestUtils.testBuy(0.18, 0.00300, testPair);  //ok
+                WrapperTestUtils.testSell(0.2, 0.09000, testPair);  //ok
+                count += 2;
+            }
+
+            LOG.info("\n\n" + count + " orders placed \n\n");
+
+            for (int i = 0; i < 5; i++) {
+                Thread.sleep(waitTime); //wait
+                LOG.info("Forcing waiting ms:" + waitTime);
+                WrapperTestUtils.testGetActiveOrders(testPair, false); //try to get active orders
+            }
+
+            WrapperTestUtils.testClearAllOrders(testPair); //Clear all orders
+            Thread.sleep(waitTime); //wait
+            LOG.info("Forcing waiting ms:" + waitTime);
+            WrapperTestUtils.testGetActiveOrders(testPair, false); //Read active orders (should be 0)
+
+        } catch (InterruptedException e) {
+            LOG.error(e.toString());
+        }
+        */
+
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
+
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
+        //WrapperTestUtils.testGetActiveOrders(testPair);
+        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+
         //WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
-        //WrapperTestUtils.testBuy(0.003, 0.00100, testPair);  //ok
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("123199680", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
@@ -75,13 +116,14 @@ public class TestWrappers {
         //WrapperTestUtils.testGetActiveOrders();
         //WrapperTestUtils.testCancelOrder("2063803", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testGetActiveOrders(testPair, true); //Read active orders (should be 0)
         //WrapperTestUtils.testGetOrderDetail("1139");
-        //WrapperTestUtils.testIsOrderActive("1139");
+        //WrapperTestUtils.testIsOrderActive("7d27fb8b-05bd-4937-b404-a808766f2dfc");
         //WrapperTestUtils.testGetTxFee();
         //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
 
         //WrapperTestUtils.testClearAllOrders(testPair);
-
+        WrapperTestUtils.testGetLastTrades(testPair);
 
         //-------- Stress test start ---------
         /*
