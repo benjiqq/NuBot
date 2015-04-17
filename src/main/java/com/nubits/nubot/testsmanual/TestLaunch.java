@@ -34,7 +34,7 @@ import org.slf4j.MDC;
 public class TestLaunch {
 
     static {
-        System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
     static String configFile = "config/poloniex.json";
