@@ -33,10 +33,13 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.*;
+import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.InvalidKeyException;
@@ -438,6 +441,20 @@ public class Utils {
             toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
         }
         return toReturn;
+    }
+
+    public static void launchBrowser(String url) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(new URI(url));
+            } catch (IOException e) {
+                LOG.error(e.toString());
+            } catch (URISyntaxException e) {
+                LOG.error(e.toString());
+            }
+        } else {
+            LOG.error("Can't open browser: Desktop not supported");
+        }
     }
 
     public static double getHoursFromMillis(long millis) {
