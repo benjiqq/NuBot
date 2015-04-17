@@ -46,6 +46,7 @@ def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
 def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
 def sampleconfig = "config/sample-options.json"
+def infofile = ".info"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
@@ -86,10 +87,11 @@ dependencies {
     compile 'io.evanwong.oss:hipchat-java:0.3.0'
     compile 'org.apache.commons:commons-lang3:3.3.2'
 
+    compile 'joda-time:joda-time:2.7'
+
     //webUI
     compile "javax.servlet:servlet-api:2.5"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
-
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
     compile 'com.github.spullara.mustache.java:compiler:0.9.0'
 
@@ -369,7 +371,7 @@ task propfile << {
     prop.put("branch", branch);
 
 
-    def propFile = new File("${distdir}/.nubot")
+    def propFile = new File("${distdir}/${infofile}")
     propFile.createNewFile();
     prop.store(propFile.newWriter(), null);
 
