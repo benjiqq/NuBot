@@ -24,11 +24,10 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = '0.2.0' //Change for new releases
+version = '0.2.0a' //Change for new releases
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
-
 
 //Get dependencies from Maven central repository
 repositories {
@@ -45,12 +44,12 @@ def docdir = new File("md")
 def resdir = new File("res")
 
 def jarname = "NuBot.jar"
-def jarnamelasttrades="NuGetLastTrades.jar"
+def jarnamelasttrades = "NuGetLastTrades.jar"
 def sampleconfig = "config/options/sample-options.json"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
-def getlasttradeclass =  "com.nubits.nubot.launch.toolkit.NuLastTrades"
+def getlasttradeclass = "com.nubits.nubot.launch.toolkit.NuLastTrades"
 def includeTestConfig = true
 
 FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
@@ -133,7 +132,6 @@ task distInit << {
     println("creating distdir")
     distdir.mkdirs()
 }
-
 
 //create a single Jar with all dependencies
 task NuBotJar(type: Jar) {
@@ -318,23 +316,23 @@ task NuLastTradesDist(dependsOn: NuGetLastTradesJar) {
 //when run as jar NuBot will look for this file
 task propfile << {
     def prop = new Properties()
-    prop.put("version",project.version)
+    prop.put("version", project.version)
 
     //determine hash of current branch
     def proc = "git rev-parse HEAD".execute()
     def b = new StringBuffer()
     proc.consumeProcessErrorStream(b)
     def commit = proc.text
-    commit = commit.replace("\n","")
+    commit = commit.replace("\n", "")
 
     proc = "git rev-parse --abbrev-ref HEAD".execute()
     b = new StringBuffer()
     proc.consumeProcessErrorStream(b)
     def branch = proc.text
-    branch = branch.replace("\n","")
+    branch = branch.replace("\n", "")
 
-    prop.put("lastcommit",commit);
-    prop.put("branch",branch);
+    prop.put("lastcommit", commit);
+    prop.put("branch", branch);
 
 
     def propFile = new File("${distdir}/.nubot")
@@ -386,7 +384,6 @@ task testexchanges(type: Test) {
     include 'testexchanges/*'
     testexchanges.reports.html.destination = file("${testreportdir}/exchangetests")
 }
-
 
 /*task runUI(type: JavaExec) {
     description 'run the WebUI'
