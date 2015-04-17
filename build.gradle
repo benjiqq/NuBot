@@ -107,6 +107,15 @@ dependencies {
     //compile 'org.zeromq:jeromq:0.3.4'
 }
 
+//check version
+def gv = GradleVersion.current().toString().replace('Gradle ', '')
+gv = gv.replace('.', '')
+gv = gv.toInteger()
+if (gv < 200) {
+    println 'WARNING: using old gradle version. please switch to 2.0'
+}
+
+
 task compiledocs(type: Exec) {
     //copy from root into md first
     doFirst {
@@ -138,15 +147,6 @@ task distInit << {
     distdir.mkdirs()
 }
 
-task checkversion << {
-    def gv = GradleVersion.current().toString().replace('Gradle ', '')
-    gv = gv.replace('.', '')
-    gv = gv.toInteger()
-    println gv
-    if (gv < 200) {
-        println 'using old gradle version'
-    }
-}
 
 //create an executable Jar to launch the UI
 task LaunchUIjar(type: Jar) {
