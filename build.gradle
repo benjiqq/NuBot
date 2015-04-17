@@ -46,6 +46,7 @@ def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
 def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
 def sampleconfig = "config/sample-options.json"
+def infofile = ".info"
 
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
@@ -298,6 +299,11 @@ task NuBotDist(dependsOn: NuBotJar) {
             into "${distdir}/res/ssl"
         }
 
+        copy {
+            from "${resdir}/${infofile}"
+            into "${distdir}/res"
+        }
+
         tasks.cleanhtml.execute()
 
     }
@@ -370,7 +376,7 @@ task propfile << {
     prop.put("branch", branch);
 
 
-    def propFile = new File("${distdir}/.nubot")
+    def propFile = new File("${resdir}/${infofile}")
     propFile.createNewFile();
     prop.store(propFile.newWriter(), null);
 
