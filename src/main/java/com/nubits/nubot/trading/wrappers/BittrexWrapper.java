@@ -381,6 +381,7 @@ public class BittrexWrapper implements TradeInterface {
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
         ApiResponse getOrders = getActiveOrders();
+        boolean found = false;
 
         if (getOrders.isPositive()) {
             ArrayList<Order> orderList = (ArrayList) getOrders.getResponseObject();
@@ -388,10 +389,18 @@ public class BittrexWrapper implements TradeInterface {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
+                    found = true;
+                    break;
                 }
             }
         } else {
-            apiResponse = getOrders;
+            return getOrders;
+        }
+        if (!found) {
+            String message = "The order " + orderID + " does not exist";
+            ApiError err = errors.apiReturnError;
+            err.setDescription(message);
+            apiResponse.setError(err);
         }
 
         return apiResponse;
