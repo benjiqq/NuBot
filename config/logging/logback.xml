@@ -48,7 +48,7 @@
 
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n
+                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{1x6}:%line]%n
             </Pattern>
         </layout>
 
@@ -56,7 +56,8 @@
             <evaluator>
                 <expression>
                     return logger.contains("jetty") || logger.contains("JettyHandler")
-                    || logger.contains("spark.Request") || logger.contains("MatcherFilter");
+                    || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                    || logger.contains("hipchat");
                 </expression>
             </evaluator>
             <onMatch>DENY</onMatch>
