@@ -4,12 +4,10 @@
 
 <configuration>
 
-    <property scope="context" name="testlogfolder" value="testlaunch" />
     <property scope="context" name="SessionLOG" value="SessionLOG" />
     <property scope="context" name="sessionlogFile" value=".sessions.log" />
     <property scope="context" name="standardlogFile" value="ui_standard.log" />
     <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
-
 
     <!-- console output of NuBot -->
 
@@ -64,6 +62,8 @@
             <onMatch>DENY</onMatch>
             <onMismatch>NEUTRAL</onMismatch>
         </filter>
+
+        <filter class="com.nubits.nubot.utils.OptionLogFilter" />
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -185,7 +185,7 @@
             </pattern>
         </encoder>
 
-        <file>${testlogfolder}/${sessionlogFile}</file>
+        <file>${session}/${sessionlogFile}</file>
 
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>TRACE</level>
@@ -290,8 +290,6 @@
         <appender-ref ref="sessionFile" />
         <appender-ref ref="standardGUI" />
         <appender-ref ref="verboseGUI" />
-
-
     </root>
 
 

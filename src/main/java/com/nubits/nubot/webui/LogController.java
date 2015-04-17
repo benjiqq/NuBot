@@ -58,6 +58,7 @@ public class LogController {
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;
+
             if (Global.sessionRunning) {
                 try {
 
@@ -100,7 +101,6 @@ public class LogController {
 
             String json = new Gson().toJson(opmap);
             return json;
-
 
         });
 
