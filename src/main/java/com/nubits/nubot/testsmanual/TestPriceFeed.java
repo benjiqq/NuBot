@@ -51,12 +51,12 @@ public class TestPriceFeed {
         test.init();
         //test.executeSingle(BitcoinaveragePriceFeed, Constant.BTC_USD); //Uncomment to test a single price feed
 
-        test.trackBTC(); //Test BTC
-        test.trackPPC(); //Test PPC
+        //test.trackBTC(); //Test BTC
+        //test.trackPPC(); //Test PPC
         test.trackEUR(); //Test EUR
-        test.trackCNY(); //Test CNY
-        test.trackHKD(); //Test HKD
-        test.trackPHP(); //Test PHP
+        //test.trackCNY(); //Test CNY
+        //test.trackHKD(); //Test HKD
+        //test.trackPHP(); //Test PHP
 
     }
 

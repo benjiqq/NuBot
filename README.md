@@ -13,7 +13,7 @@ As explained in the [white paper](https://nubits.com/about/white-paper), a custo
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
 #Changelog
-See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CHANGELOG.md?at=master)
+See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/CHANGELOG.md)
 
 ##Disclaimer . Use NuBot at your own risk
 
@@ -31,7 +31,7 @@ NuBot permits a user to indicate they are either a sell side or dual side custod
 
 #Using NuBot
 
-See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/d69252c90538a92acb0f40a0367f0a10a207719e/SETUP.md?at=master)
+See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/SETUP.md)
 
 ##Dual-side strategy
 
@@ -79,7 +79,7 @@ Alternative strategies  :
 
 ##Supported exchanges 
 
-See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/EXCHANGES.md?at=master)
+See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/EXCHANGES.md)
 
 ##Design and diagrams
 
@@ -95,7 +95,7 @@ See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5e
 
 ##Auto-Updating the latest version of the keystore
 In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.
-NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](../master/NuBot/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
+NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
 
 Exchanges tend to upgrade their SSL certificates multiple times per year, and you need to maintain the keystore up-to-date for security reasons. We are committed to keep the *java keystore* always updated with most recent certificates available in the develop branch of this repository. 
 
@@ -106,7 +106,7 @@ cd res/ssl
  ./updateKeystore.sh
 ```
 
-Alternatively you can manually download the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/cfa0c7699ccd96300c1b1f77d416b9a6f1fa6e8d/NuBot/res/ssl/nubot_keystore.jks?at=develop) and place it in the *res/ssl* folder of NuBot.
+Alternatively you can manually download the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/develop/res/ssl/nubot_keystore.jks) and place it in the *res/ssl* folder of NuBot.
 
 ##Manually Adding SSL certificates for an exchange
 
@@ -121,10 +121,10 @@ keytool -importcert -file poloniex-dec.cer -keystore nubot_keystore.jks -alias â
 You will be prompted for a passphrase : type nub0tSSL
 
 #Price Feeds
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master)
+See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/FEEDS.md)
 
 #Contribute
-See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/CONTRIBUTE.md?at=master)
+See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/CONTRIBUTE.md)
 
 #License
-NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/LICENSE.md?at=master)
+NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/LICENSE.md)

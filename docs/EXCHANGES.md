@@ -7,7 +7,9 @@
 | [Bitspark](https://www.bitspark.io)    | live  |  https://www.bitspark.io |
 | [Poloniex](https://poloniex.com)    | live  |  https://poloniex.com |
 | [Comkort](https://comkort.com)    | live  |  https://comkort.com |
-| [Bittrex](https://bittrex.com)    | live  |  https://bittrex.com |
+| [Bittrex](https://bittrex.com)    | in progress  |  https://bittrex.com |
+| [CCEDK](https://ccedk.com)    | live  |  https://ccedk.com |
+| [Bter](https://bter.com)    | live  |  https://bter.com |
 | [AltsTrade](https://alts.trade)    | in progress  |  https://alts.trade |
 | [Peatio]    | test exchange  |  live | https://178.62.140.24/ |
 
@@ -18,7 +20,5 @@ not operational for liquidity operations
 | Btce    | datafeed only  |   |
 | [ShapeShift](https://shapeshift.io)    | no nubot operations  | https://shapeshift.io  |
 | CCEX    |   |   |
-| Bter    | defunct  |   |
-| CCEDK    | defunct  |   |
 | Excoin    | defunct  |   |
 
