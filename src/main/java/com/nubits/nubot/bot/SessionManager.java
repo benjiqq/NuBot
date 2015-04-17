@@ -6,6 +6,8 @@ import com.nubits.nubot.options.*;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.utils.FilesystemUtils;
+import org.joda.time.Period;
+import org.joda.time.PeriodType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,7 +15,6 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.Date;
 
 /**
@@ -100,10 +101,17 @@ public class SessionManager {
     public static String durationString() {
         Long diff = System.currentTimeMillis() - Global.sessionStarted;
 
-        long seconds = diff / 1000;
+        /*long seconds = diff / 1000;
         LocalTime timeOfDay = LocalTime.ofSecondOfDay(seconds);
         String time = timeOfDay.toString();
-        return time;
+        return time;*/
+
+        PeriodType minutesEtc = PeriodType.time().withHoursRemoved();
+        Period period = new Period(diff, minutesEtc);
+        String periodString = String.format("%d min, %d sec",
+                period.getMinutes(),
+                period.getSeconds());
+        return periodString;
     }
 
     public static boolean wasRunOnce() {

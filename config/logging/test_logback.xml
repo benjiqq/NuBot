@@ -7,14 +7,74 @@
 
     <property scope="context" name="testlogfolder" value="logs/tests"/>
 
+    <appender name="STDOUTerr" class="ch.qos.logback.core.ConsoleAppender">
 
-    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n
+                %red(%date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n)
             </Pattern>
-
         </layout>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+    </appender>
+
+    <appender name="STDOUTwarn" class="ch.qos.logback.core.ConsoleAppender">
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %blue(%date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n)
+            </Pattern>
+        </layout>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n
+            </Pattern>
+        </layout>
+
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    return logger.contains("jetty") || logger.contains("JettyHandler")
+                    || logger.contains("spark.Request") || logger.contains("MatcherFilter");
+                </expression>
+            </evaluator>
+            <onMatch>DENY</onMatch>
+            <onMismatch>NEUTRAL</onMismatch>
+        </filter>
+
+        <filter class="com.nubits.nubot.utils.OptionFilter" />
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
 
     </appender>
 
@@ -39,6 +99,8 @@
     <root level="debug">
         <appender-ref ref="SIFT"/>
         <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUTwarn" />
+        <appender-ref ref="STDOUTerr" />
     </root>
 
 

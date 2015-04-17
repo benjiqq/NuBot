@@ -5,6 +5,7 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.options.ParseOptions;
+import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -35,8 +36,7 @@ public class BotController {
 
                 opmap.put("sessionstart", SessionManager.startedString());
 
-
-                opmap.put("duration", SessionManager.durationString());
+                opmap.put("duration", Utils.getBotUptime());
 
             } else {
                 if (SessionManager.wasRunOnce())
