@@ -137,6 +137,17 @@ task distInit << {
     println("creating distdir")
     distdir.mkdirs()
 }
+
+task checkversion << {
+    def gv = GradleVersion.current().toString().replace('Gradle ', '')
+    gv = gv.replace('.', '')
+    gv = gv.toInteger()
+    println gv
+    if (gv < 200) {
+        println 'using old gradle version'
+    }
+}
+
 //create an executable Jar to launch the UI
 task LaunchUIjar(type: Jar) {
     archiveName jarnameuilauncher
