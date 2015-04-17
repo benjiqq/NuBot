@@ -65,7 +65,7 @@
                 <onMismatch>NEUTRAL</onMismatch>
             </filter>
 
-            <filter class="com.nubits.nubot.utils.OptionLogFilter" />
+            <filter class="com.nubits.nubot.utils.LogVerboseFilter" />
 
             <filter class="ch.qos.logback.classic.filter.LevelFilter">
                 <level>ERROR</level>
@@ -82,6 +82,7 @@
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>DEBUG</level>
             </filter>
+
 
         </appender>
 
