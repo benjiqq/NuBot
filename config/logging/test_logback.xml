@@ -17,7 +17,7 @@
 
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>
-                    %red(%date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n)
+                    %red(%date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n)
                 </Pattern>
             </layout>
 
@@ -33,7 +33,7 @@
 
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>
-                    %blue(%date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n)
+                    %blue(%date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n)
                 </Pattern>
             </layout>
 
@@ -50,7 +50,7 @@
 
             <layout class="ch.qos.logback.classic.PatternLayout">
                 <Pattern>
-                    %date{HH:mm:ss.SSS} %logger{16} %-5level %line  - %msg%n
+                    %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n
                 </Pattern>
             </layout>
 
