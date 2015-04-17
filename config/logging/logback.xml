@@ -265,7 +265,8 @@
                     <evaluator>
                         <expression>
                             return logger.contains("jetty") || logger.contains("JettyHandler")
-                            || logger.contains("spark.Request") || logger.contains("MatcherFilter");
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>
