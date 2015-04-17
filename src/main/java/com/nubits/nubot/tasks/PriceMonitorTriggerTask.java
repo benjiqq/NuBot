@@ -115,7 +115,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     @Override
     public void run() {
 
-        LOG.info("Executing " + this.getClass());
+        LOG.debug("Executing " + this.getClass());
 
         if (first) {
             LOG.info("running PriceMonitorTrigger for first time");

@@ -23,7 +23,6 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
-import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
@@ -53,7 +52,7 @@ public class StrategySecondaryPegUtils {
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
-                    LOG.warn("Clear all orders request succesfully");
+                    LOG.info("Clear all orders request succesfully");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
                         Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
@@ -161,7 +160,7 @@ public class StrategySecondaryPegUtils {
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
-            LOG.warn("executeSellsideOrder : " + pair + " " + amount + " " + rate);
+            LOG.debug("executeSellsideOrder : " + pair + " " + amount + " " + rate);
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
                 return order1Response;
@@ -256,7 +255,7 @@ public class StrategySecondaryPegUtils {
         }
 
         if (balance.getQuantity() < oneNBT * 2) {
-            LOG.info("No need to execute " + type + "orders : available balance < 1 " + currency + " (1 NBT equivalent).  Balance : "+ balance.getQuantity());
+            LOG.info("No need to execute " + type + "orders : available balance < 1 " + currency + " (1 NBT equivalent).  Balance : " + balance.getQuantity());
             return true;
         }
 
@@ -300,12 +299,14 @@ public class StrategySecondaryPegUtils {
             String orderString1 = orderString(type, amount1, price);
             LOG.debug("order1: " + orderString1);
 
+            LOG.warn("Strategy - Submit order : " + orderString1);
+
             ApiResponse order1Response = this.executeOrder(type, Global.options.getPair(), amount1, price);
 
             if (order1Response.isPositive()) {
                 String msg = hipchatMsg(type, orderString1);
                 HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-                LOG.warn("Strategy - " + type + " Response1 = " + order1Response.getResponseObject());
+                LOG.info("Strategy - " + type + " Response1 = " + order1Response.getResponseObject());
             } else {
                 LOG.error(order1Response.getError().toString());
                 success = false;
@@ -365,7 +366,7 @@ public class StrategySecondaryPegUtils {
                 if (order2Response.isPositive()) {
                     String msg = hipchatMsg(type, orderString2);
                     HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-                    LOG.warn("Strategy - " + type + " Response2 = " + order2Response.getResponseObject());
+                    LOG.info("Strategy - " + type + " Response2 = " + order2Response.getResponseObject());
                 } else {
                     LOG.error(order2Response.getError().toString());
                     success = false;
@@ -478,7 +479,7 @@ public class StrategySecondaryPegUtils {
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
             if (deleted) {
-                LOG.info("Orders deleted");
+                LOG.warn("Orders deleted");
                 if (Global.options.isMultipleCustodians()) {
                     //Introuce an aleatory sleep time to desync bots at the time of placing orders.
                     //This will favour competition in markets with multiple custodians

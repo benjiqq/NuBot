@@ -118,7 +118,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     @Override
     public void run() {
 
-        LOG.info("Executing " + this.getClass());
+        LOG.debug("Executing " + this.getClass());
 
         if (firstExecution) {
             initFiles();

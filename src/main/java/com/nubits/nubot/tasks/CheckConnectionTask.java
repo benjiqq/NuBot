@@ -36,7 +36,7 @@ public class CheckConnectionTask extends TimerTask {
     @Override
     public void run() {
 
-        LOG.info("Executing " + this.getClass());
+        LOG.debug("Executing " + this.getClass());
 
         this.url = Global.exchange.getLiveData().getUrlConnectionCheck();
         Global.exchange.getLiveData().setConnected(isConnected());
