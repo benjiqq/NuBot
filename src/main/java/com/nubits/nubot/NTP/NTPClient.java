@@ -38,7 +38,6 @@ public final class NTPClient {
 
     private void initHosts() {
         hostnames = new ArrayList<>();
-        hostnames.add("ntp.xs4all.nl");
         hostnames.add("nist1-pa.ustiming.org");
         hostnames.add("nist-time-server.eoni.com");
         hostnames.add("time.nist.gov");
