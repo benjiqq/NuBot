@@ -514,14 +514,7 @@ public class AltsTradeWrapper implements TradeInterface {
             LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
             return TOKEN_BAD_RETURN;
         }
-        String queryResult = "";
-        if (isGet) {
-            service.executeQuery(base, "", args, false, isGet);
-        } else {
-            service.executeQuery(base, "", args, true, isGet);
-        }
-        return queryResult;
-
+        return service.executeQuery(base, "", args, needAuth, isGet);
     }
 
     @Override
@@ -546,7 +539,6 @@ public class AltsTradeWrapper implements TradeInterface {
         public AltsTradeService(ApiKeys keys) {
             this.keys = keys;
         }
-
 
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
