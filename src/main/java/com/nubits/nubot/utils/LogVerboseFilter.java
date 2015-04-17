@@ -20,17 +20,23 @@ public class LogVerboseFilter extends ch.qos.logback.core.filter.AbstractMatcher
         if (loggingEvent.getLevel().equals(Level.WARN) || loggingEvent.getLevel().equals(Level.ERROR))
             return FilterReply.DENY;
 
+        //return FilterReply.NEUTRAL;
+
         //only filter if global.options is defined
         if (Global.options != null) {
             boolean isDebug = (loggingEvent.getLevel().equals(Level.DEBUG));
-            if (Global.options.isVerbose() && isDebug) {
-                return FilterReply.NEUTRAL;
-            } else {
-                return FilterReply.DENY;
+            if (isDebug) {
+                if (Global.options.isVerbose()) {
+                    return FilterReply.NEUTRAL;
+                } else {
+                    return FilterReply.DENY;
+                }
             }
-        } else {
-            return FilterReply.NEUTRAL;
+
         }
+
+        return FilterReply.NEUTRAL;
+
 
     }
 
