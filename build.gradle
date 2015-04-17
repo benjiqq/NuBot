@@ -299,6 +299,11 @@ task NuBotDist(dependsOn: NuBotJar) {
             into "${distdir}/res/ssl"
         }
 
+        copy {
+            from "${resdir}/${infofile}"
+            into "${distdir}/res"
+        }
+
         tasks.cleanhtml.execute()
 
     }
@@ -371,7 +376,7 @@ task propfile << {
     prop.put("branch", branch);
 
 
-    def propFile = new File("${distdir}/${infofile}")
+    def propFile = new File("${resdir}/${infofile}")
     propFile.createNewFile();
     prop.store(propFile.newWriter(), null);
 
