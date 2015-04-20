@@ -4,13 +4,16 @@
   var updateTime = 500;
   var debug = true;
 
+  var dotCounter = 1 ;
+
  function setRunning(){
       $('#startbot').html("Running");
       $('#startbot').removeClass("btn-primary");
       $('#startbot').addClass("btn-success");
-      document.title = 'NuBot GUI - Running';
-      $("#favicon").attr("href","favicon-running.ico");
+      document.title = 'NuBot GUI - Running'+generateRandomDots();
+      //$("#favicon").attr("href","favicon-running.ico");
  }
+
 
  function setHalted(){
       $('#startbot').removeClass("btn-success");
@@ -20,8 +23,7 @@
       $("#ordertable").find("tr:gt(0)").remove();
       $("#balancetable").find("tr:gt(0)").remove();
       document.title = 'NuBot GUI - Stopped';
-      $("#favicon").attr("href","favicon.ico");
-
+      //$("#favicon").attr("href","favicon.ico");
  }
 
  function updateNavbar(page) {
@@ -97,6 +99,7 @@
              $("#ordertable").find("tr:gt(0)").remove();
 
             var orders = data["orders"];
+            updateFavico(orders.length);
             for (var i = 0; i < orders.length; i++){
                 var order = orders[i];
                 var type = order["type"];
@@ -178,7 +181,7 @@ $(document).ready(function() {
 
 
   $('#startbot').click(function(){
-    if(confirm("Are you sure?")){
+    if(confirm("Are you sure you want to start the bot?")){
         if (debug) console.log("calling start on server");
 
         var jsondata = JSON.stringify({
@@ -485,3 +488,25 @@ function updateIframe(pageName)
       {
          $('#docu-iframe').attr('src', 'docs/'+pageName+'.html');
       }
+function updateFavico(howmany)
+{
+    var favicon = new Favico({
+        animation : 'popFade'
+    });
+
+    //intial value
+    favicon.badge(howmany);
+ }
+
+ function generateRandomDots()
+ {
+     toReturn = "";
+     dotCounter++;
+     if(dotCounter>4)
+     {
+         dotCounter=1;
+     }
+     for(i=0; i<dotCounter; i++)
+         toReturn+='.';
+     return toReturn;
+ }

@@ -20,7 +20,7 @@ package com.nubits.nubot.trading;
 
 
 import com.nubits.nubot.bot.Global;
-import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,12 +98,12 @@ public class TradeUtils {
             Mac mac;
             SecretKeySpec key;
             // Create a new secret key
-            key = new SecretKeySpec(Base64.decodeBase64(secret), hashfFunction);
+            key = new SecretKeySpec(secret.getBytes(encoding), hashfFunction);
             // Create a new mac
             mac = Mac.getInstance(hashfFunction);
             // Init mac with key.
             mac.init(key);
-            sign = Base64.encodeBase64String(mac.doFinal(hash_data.getBytes(encoding)));
+            sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(encoding)));
         } catch (UnsupportedEncodingException uee) {
             LOG.error("Unsupported encoding exception: " + uee.toString());
         } catch (NoSuchAlgorithmException nsae) {
