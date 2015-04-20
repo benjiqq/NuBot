@@ -143,60 +143,61 @@ public class StrategySecondaryPegUtils {
     // ---- Trade Manager ----
 
     private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
-        if (Global.options.isExecuteOrders()) {
-            LOG.warn("executeBuysideOrder : " + pair + " " + amount + " " + rate);
-            if (!Global.swappedPair) {
-                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
-                return order1Response;
-            } else {
-                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
-                return order1Response;
-            }
+
+        LOG.warn("executeBuysideOrder : " + pair + " " + amount + " " + rate);
+        ApiResponse orderResponse;
+        if (!Global.swappedPair) {
+            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
         } else {
-            LOG.warn("Demo mode. Don't execute orders");
-            return null;
+            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
         }
+        return orderResponse;
     }
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
-        if (Global.options.isExecuteOrders()) {
-            LOG.warn("executeSellsideOrder : " + pair + " " + amount + " " + rate);
-            if (!Global.swappedPair) {
-                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
-                return order1Response;
 
-            } else {
-                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
-                return order1Response;
-            }
+        String type = Constant.SELL;
+
+        LOG.warn("executeSellsideOrder : " + pair + " " + amount + " " + rate);
+        ApiResponse orderResponse;
+        if (!Global.swappedPair) {
+            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
         } else {
-            LOG.warn("Demo mode. Don't execute orders");
-            return null;
+            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
         }
+
+        return orderResponse;
     }
+
 
     private boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
 
-        String orderString1 = orderString(type, amount, rate);
+        String orderString = orderString(type, amount, rate);
+        LOG.info("Strategy - Submit order : " + orderString);
 
-        LOG.info("Strategy - Submit order : " + orderString1);
+        if (Global.options.isExecuteOrders()) {
 
-        ApiResponse orderResponse;
-        if (type.equals(Constant.BUY)) {
-            orderResponse= executeBuysideOrder(pair, amount, rate);
+            ApiResponse orderResponse;
+            if (type.equals(Constant.BUY)) {
+                orderResponse = executeBuysideOrder(pair, amount, rate);
+            } else {
+                orderResponse = executeSellsideOrder(pair, amount, rate);
+            }
+
+            if (orderResponse.isPositive()) {
+                String msg = hipchatMsg(type, orderString);
+                HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
+                LOG.info("Strategy - " + type + " Response = " + orderResponse.getResponseObject());
+                return true;
+            } else {
+                LOG.error(orderResponse.getError().toString());
+                return false;
+            }
         } else {
-            orderResponse= executeSellsideOrder(pair, amount, rate);
-        }
-
-        if (orderResponse.isPositive()) {
-            String msg = hipchatMsg(type, orderString1);
-            HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-            LOG.info("Strategy - " + type + " Response1 = " + orderResponse.getResponseObject());
-            return true;
-        } else {
-            LOG.error(orderResponse.getError().toString());
+            LOG.warn("Demo mode. Don't execute orders");
             return false;
         }
+
 
     }
 
