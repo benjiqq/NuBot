@@ -7,6 +7,7 @@
 
 #### Improvements:
   - Refactored Trading Strategy code extracing methods to Order and Balance Manager objects
+  - Introduced Utils.formatNumber
 
 
 #### Bug fixes:
