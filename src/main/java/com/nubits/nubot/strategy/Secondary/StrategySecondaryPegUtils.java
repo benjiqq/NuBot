@@ -195,7 +195,7 @@ public class StrategySecondaryPegUtils {
             }
         } else {
             LOG.warn("Demo mode[executeorders:false] . Not executing orders");
-            return false;
+            return true;
         }
 
 
