@@ -67,26 +67,21 @@ dependencies {
     compile 'ch.qos.logback:logback-core:1.1.2'
     compile 'ch.qos.logback:logback-classic:1.1.2'
     compile 'org.codehaus.janino:janino:2.7.8' //for filtering
-
     compile 'org.apache.httpcomponents:httpclient:4.3.4'
     compile 'com.google.code.gson:gson:2.2.3'
     compile 'org.codehaus.jackson:jackson-core-asl:1.9.13'
-
     compile 'com.googlecode.json-simple:json-simple:1.1.1'
     compile 'org.jsoup:jsoup:1.7.3'
     compile 'org.codeartisans:org.json:20131017'
-
     compile 'commons-codec:commons-codec:1.7'
     compile 'commons-io:commons-io:2.4'
     compile 'commons-net:commons-net:3.3'
     compile 'commons-cli:commons-cli:1.2'
-
     compile 'com.sun.mail:mailapi:1.5.2'
     compile 'javax.mail:mail:1.4.4' //replaces mail.jar
     compile 'com.sun.mail:smtp:1.5.2'
     compile 'io.evanwong.oss:hipchat-java:0.3.0'
     compile 'org.apache.commons:commons-lang3:3.3.2'
-
     compile 'joda-time:joda-time:2.7'
 
     //webUI
