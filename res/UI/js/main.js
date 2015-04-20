@@ -27,8 +27,7 @@
  function updateNavbar(page) {
     $('#operation-nav').removeClass('active');
     $('#config-nav').removeClass('active');
-    $('#setup-nav').removeClass('active');
-    $('#about-nav').removeClass('active');
+    $('#docu-nav').removeClass('active');
 
     switch (page) {
         case "operation":
@@ -39,12 +38,12 @@
             loadconfig();
              $('#config-nav').addClass('active')
             break;
-        case "setup":
-            $('#setup').addClass('active')
+        case "docu":
+            $('#docu-nav').addClass('active')
             break;
-        case "about":
-            $('#about').addClass('active')
-           break;
+        case "disclaimer":
+            $('#disclaimer-nav').addClass('active')
+        break;
     }
  }
 
@@ -479,5 +478,10 @@ $(document).ready(function() {
             alert(xhr.responseText);
         }
    });
- å}
+ }
 }
+
+function updateIframe(pageName)
+      {
+         $('#docu-iframe').attr('src', 'docs/'+pageName+'.html');
+      }
