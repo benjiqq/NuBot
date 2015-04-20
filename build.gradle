@@ -41,6 +41,7 @@ def testdistdir = new File("testdist")
 def builddir = new File("build")
 def docdir = new File("docs")
 def resdir = new File("res")
+def staticDocsDir = new File("res/UI/docs")
 
 def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
@@ -309,6 +310,7 @@ task NuBotDist(dependsOn: NuBotJar) {
             into "${distdir}/res"
         }
 
+        tasks.moveHTMLtoStaticDocs.execute()
         tasks.cleanhtml.execute()
 
     }
@@ -389,10 +391,19 @@ task propfile << {
 }
 
 task cleanhtml << {
-
     html_files.each { File file ->
         println 'delete ' + file.name
         delete(file)
+    }
+}
+
+task moveHTMLtoStaticDocs << {
+    html_files.each { File file ->
+        println 'copy HTML documentation to GUI static folder ' + file.name
+        copy {
+            from file.name
+            into "${staticDocsDir}"
+        }
     }
 }
 
