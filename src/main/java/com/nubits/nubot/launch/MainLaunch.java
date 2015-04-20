@@ -61,12 +61,22 @@ public class MainLaunch {
         boolean runGUI = false;
         String configFile;
 
+        boolean defaultCfg = false;
         if (cli.hasOption(CLIOptions.GUI)) {
             runGUI = true;
             LOG.info("Running " + Settings.APP_NAME + " with GUI");
+
+            if (!cli.hasOption(CLIOptions.CFG)) {
+                LOG.info("Setting default config file location :" + Settings.DEFAULT_CONFIG_FILE_PATH);
+                defaultCfg = true;
+            }
         }
-        if (cli.hasOption(CLIOptions.CFG)) {
-            configFile = cli.getOptionValue(CLIOptions.CFG);
+        if (cli.hasOption(CLIOptions.CFG) || defaultCfg) {
+            if (defaultCfg) {
+                configFile = Settings.DEFAULT_CONFIG_FILE_PATH;
+            } else {
+                configFile = cli.getOptionValue(CLIOptions.CFG);
+            }
 
             if (runGUI) {
                 SessionManager.setConfigGlobal(configFile);
