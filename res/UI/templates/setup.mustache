@@ -1,517 +1,629 @@
-
-
 <body>
 
-    <!-- Fixed navbar -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-      <div class="container">
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
         <div class="navbar-header">
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          <a class="navbar-brand" href="/">NuBot</a>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">NuBot</a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
-          <ul class="nav navbar-nav">
-            <li><a href="/">Operation</a></li>
-            <li><a href="/configui">Configuration</a></li>
-            <li class="active"><a href="/setup">Setup</a></li>
-            <li><a href="/about">About</a></li>
-          </ul>
+            <ul class="nav navbar-nav">
+                <li><a href="/">Operation</a></li>
+                <li><a href="/configui">Configuration</a></li>
+                <li class="active"><a href="/setup">Setup</a></li>
+                <li><a href="/about">About</a></li>
+            </ul>
 
-        </div><!--/.nav-collapse -->
-      </div>
-    </nav>
-
-
-    <div class="container">
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
 
 
-<div class="row">
+<div class="container">
 
-   <title>SETUP.md - Grip</title>
-   <link rel="icon" href="data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAKCgr/FRUX/xYWGP8YGBr/GRkb/xsbHP8dHR7/Hh4f/x4eIP8fHyD/ICAh/yMjJP8kJCX/JiYo/ygoKv8pKSr/LCwu/y0tLv80NDT/QUFC/0ZGR/9MTE7/UFBR/1JSUv9bW1v/XFxc/2BgYP9hYWP/aGhp/2xsbP9ycnL/d3d3/3l5e/98fHz/f3+A/2dn/P9z3a//cNX8/4CAgP+Xl5f/nZ2e/56en/+fn5//n5+h/6amp/+rq6v/rKys/7CvsP+zs7T/uLi5/7u7u/+8vLz/wMDA/8fHx//Kysr/zc3N/9HR0f/d3d3/3t7e/+Xl5f/q6ur/6+vr/+3t7f/z8/P/9fX1//b29v/39/f/+Pj4//n5+f/6+vr/+/v7//z8/P/9/f3//v7+//////8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/NCYmJiYmJiYmJiYmJiYmNCZKSkpKSkpKSkpKSkpKSiYmSkpKRisdRkMbMklKSkomJkpKSSEiNUhEEQwpSUpKJiZKSi8LHhhAPAwBDDZKSiYmSkoWACA7SEc6HAEaSkomJkpKBxI/SkpKSj4ICkpKJiZKSgUTR0pKSkpGDwZKSiYmSkoTED1KSkpKOQQVSkomJkpKKgowMy4sNycIMUpKJiZKSkEZDgkDAgsNH0VKSiYmSkpKQigUBgkXLUhKSkomJkpKSkpKSkpKSkpKSkpKJiYmJiYmJiYmJiYmJiYmJiYmIyUkNDQ0NDQ0NDQ0NDQmOCYmJiYmJiYmJiYmJiYmOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=" />
 
-             <div id="readme" class="boxed-group flush clearfix announce instapaper_body md">
+    <div class="row">
 
-                 <h3>
-                   <span class="octicon octicon-book"></span>
-                   SETUP.md
-                 </h3>
+        <title>SETUP.md - Grip</title>
+        <link rel="icon"
+              href="data:image/x-icon;base64,AAABAAEAEBAAAAEACABoBQAAFgAAACgAAAAQAAAAIAAAAAEACAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAKCgr/FRUX/xYWGP8YGBr/GRkb/xsbHP8dHR7/Hh4f/x4eIP8fHyD/ICAh/yMjJP8kJCX/JiYo/ygoKv8pKSr/LCwu/y0tLv80NDT/QUFC/0ZGR/9MTE7/UFBR/1JSUv9bW1v/XFxc/2BgYP9hYWP/aGhp/2xsbP9ycnL/d3d3/3l5e/98fHz/f3+A/2dn/P9z3a//cNX8/4CAgP+Xl5f/nZ2e/56en/+fn5//n5+h/6amp/+rq6v/rKys/7CvsP+zs7T/uLi5/7u7u/+8vLz/wMDA/8fHx//Kysr/zc3N/9HR0f/d3d3/3t7e/+Xl5f/q6ur/6+vr/+3t7f/z8/P/9fX1//b29v/39/f/+Pj4//n5+f/6+vr/+/v7//z8/P/9/f3//v7+//////8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/AAAA/wAAAP8AAAD/NCYmJiYmJiYmJiYmJiYmNCZKSkpKSkpKSkpKSkpKSiYmSkpKRisdRkMbMklKSkomJkpKSSEiNUhEEQwpSUpKJiZKSi8LHhhAPAwBDDZKSiYmSkoWACA7SEc6HAEaSkomJkpKBxI/SkpKSj4ICkpKJiZKSgUTR0pKSkpGDwZKSiYmSkoTED1KSkpKOQQVSkomJkpKKgowMy4sNycIMUpKJiZKSkEZDgkDAgsNH0VKSiYmSkpKQigUBgkXLUhKSkomJkpKSkpKSkpKSkpKSkpKJiYmJiYmJiYmJiYmJiYmJiYmIyUkNDQ0NDQ0NDQ0NDQmOCYmJiYmJiYmJiYmJiYmOAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA="/>
 
-               <div class="markdown-body entry-content">
-                 <h1>
- <a id="user-content-setting-up-nubot" class="anchor" href="#setting-up-nubot" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up NuBot</h1>
+        <div id="readme" class="boxed-group flush clearfix announce instapaper_body md">
 
- <p>A tutorial for custodians and users of NuBot.</p>
+            <h3>
+                <span class="octicon octicon-book"></span>
+                SETUP.md
+            </h3>
 
- <h2>
- <a id="user-content-disclaimer--use-nubot-at-your-own-risk" class="anchor" href="#disclaimer--use-nubot-at-your-own-risk" aria-hidden="true"><span class="octicon octicon-link"></span></a>Disclaimer . Use NuBot at your own risk</h2>
+            <div class="markdown-body entry-content">
+                <h1>
+                    <a id="user-content-setting-up-nubot" class="anchor" href="#setting-up-nubot"
+                       aria-hidden="true"><span class="octicon octicon-link"></span></a>Setting up NuBot</h1>
 
- <p><em>PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL. ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS. NONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF NUBOT</em></p>
+                <p>A tutorial for custodians and users of NuBot.</p>
 
- <p>By using NuBot you declare to have accepted the afore-mentioned risks. See the DISCLAIMER.md for detailed terms.</p>
+                <h2>
+                    <a id="user-content-disclaimer--use-nubot-at-your-own-risk" class="anchor"
+                       href="#disclaimer--use-nubot-at-your-own-risk" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>Disclaimer . Use NuBot at your own risk</h2>
 
- <h2>
- <a id="user-content-requirements-for-a-correct-functioning" class="anchor" href="#requirements-for-a-correct-functioning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements for a correct functioning</h2>
+                <p><em>PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL.
+                    ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS. NONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR
+                    ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF
+                    NUBOT</em></p>
 
- <ul>
- <li>The machine that runs NuBot must be connected to the internet</li>
- <li>The custodian must provide the bot with access to market exchanges where NuBits are traded</li>
- <li>The custodian must avoid manual interaction with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. </li>
- <li>To communicate <em>liquidityinfo</em>, the custodian should possess an unlocked NuBit client which controls the custodial grant address. </li>
- <li>Before running the bot on a market where another instance of NuBot is operating, make sure to reach an agreement with the other operator on the price-feed to be used.</li>
- </ul>
+                <p>By using NuBot you declare to have accepted the afore-mentioned risks. See the DISCLAIMER.md for
+                    detailed terms.</p>
 
- <h3>
- <a id="user-content-setup-overview" class="anchor" href="#setup-overview" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup overview.</h3>
+                <h2>
+                    <a id="user-content-requirements-for-a-correct-functioning" class="anchor"
+                       href="#requirements-for-a-correct-functioning" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>Requirements for a correct functioning</h2>
 
- <p>TL; DR  Make sure you run both the NuBits client and NuBot  on a machine connected to the internet 24/7, configure NuBits client to accept RCP commands, configure NuBot, launch it and monitor it.</p>
+                <ul>
+                    <li>The machine that runs NuBot must be connected to the internet</li>
+                    <li>The custodian must provide the bot with access to market exchanges where NuBits are traded</li>
+                    <li>The custodian must avoid manual interaction with the exchange while the automated bot is
+                        operating. Do not try to trade, do not try to deposit/withdraw funds.
+                    </li>
+                    <li>To communicate <em>liquidityinfo</em>, the custodian should possess an unlocked NuBit client
+                        which controls the custodial grant address.
+                    </li>
+                    <li>Before running the bot on a market where another instance of NuBot is operating, make sure to
+                        reach an agreement with the other operator on the price-feed to be used.
+                    </li>
+                </ul>
 
- <p>Detailed tutorial below : </p>
+                <h3>
+                    <a id="user-content-setup-overview" class="anchor" href="#setup-overview" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>Setup overview.</h3>
 
- <h3>
- <a id="user-content-0-setup-the-machine" class="anchor" href="#0-setup-the-machine" aria-hidden="true"><span class="octicon octicon-link"></span></a>0) Setup the machine</h3>
+                <p>TL; DR Make sure you run both the NuBits client and NuBot on a machine connected to the internet
+                    24/7, configure NuBits client to accept RCP commands, configure NuBot, launch it and monitor it.</p>
 
- <p>NuBot can run on a computer, on a raspberry pi, or a remote VPS, as long as it has a permanent connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java Runtime Environment to be installed.
- NuBot comes as a cross platform executable jar file to run from command line. </p>
+                <p>Detailed tutorial below : </p>
 
- <p>Type <code>java -version</code> in your terminal to make sure you have JRE &gt;= 1.8 installed on your machine, otherwise download Java JRE:1.8<a href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">from oracle's download page</a></p>
+                <h3>
+                    <a id="user-content-0-setup-the-machine" class="anchor" href="#0-setup-the-machine"
+                       aria-hidden="true"><span class="octicon octicon-link"></span></a>0) Setup the machine</h3>
 
- <p>Or install via apt-get </p>
+                <p>NuBot can run on a computer, on a raspberry pi, or a remote VPS, as long as it has a permanent
+                    connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java
+                    Runtime Environment to be installed.
+                    NuBot comes as a cross platform executable jar file to run from command line. </p>
+
+                <p>Type <code>java -version</code> in your terminal to make sure you have JRE &gt;= 1.8 installed on
+                    your machine, otherwise download Java JRE:1.8<a
+                            href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">from
+                        oracle's download page</a></p>
+
+                <p>Or install via apt-get </p>
 
  <pre><code>$ sudo add-apt-repository ppa:webupd8team/java
- $ sudo apt-get update
- $ sudo apt-get install oracle-java8-installer
+     $ sudo apt-get update
+     $ sudo apt-get install oracle-java8-installer
  </code></pre>
 
- <h3>
- <a id="user-content-1-prepare-the-nubits-client" class="anchor" href="#1-prepare-the-nubits-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>1) Prepare the NuBits client</h3>
+                <h3>
+                    <a id="user-content-1-prepare-the-nubits-client" class="anchor" href="#1-prepare-the-nubits-client"
+                       aria-hidden="true"><span class="octicon octicon-link"></span></a>1) Prepare the NuBits client
+                </h3>
 
- <p>To function correctly, NuBot needs to communicate with the NuBit client of the custodian. The bot needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have real-time information about active orders in the network across custodians, and react to it.  It does so by interacting via the <em>NuBits client of the custodian</em>. </p>
+                <p>To function correctly, NuBot needs to communicate with the NuBit client of the custodian. The bot
+                    needs to broadcast liquidity notification to NuNet. By doing so, it allow shareholders to have
+                    real-time information about active orders in the network across custodians, and react to it. It does
+                    so by interacting via the <em>NuBits client of the custodian</em>. </p>
 
- <p>Install the latest version of the NuBit client <a href="https://nubits.com/download">from the official website</a> and let the client sync with the network (downloading the whole blockchain from scratch can take a while). </p>
+                <p>Install the latest version of the NuBit client <a href="https://nubits.com/download">from the
+                    official website</a> and let the client sync with the network (downloading the whole blockchain from
+                    scratch can take a while). </p>
 
- <p><em>NOTE: Is it also possible to test NuBot without being a custodian and setting the <code>"submit-liquidity":false</code> in the configuration file. In this case you can ignore this section.</em></p>
+                <p><em>NOTE: Is it also possible to test NuBot without being a custodian and setting the <code>"submit-liquidity":false</code>
+                    in the configuration file. In this case you can ignore this section.</em></p>
 
- <p>To allow the bot to communicate with the Nu client via RCP over HTTP, open your <em>nu.conf</em> and add make sure you have it properly configured: <a href="https://en.bitcoin.it/wiki/Data_directory#Default_Location">Read this bitcoin tutorial to locate the data directory</a>.  </p>
+                <p>To allow the bot to communicate with the Nu client via RCP over HTTP, open your <em>nu.conf</em> and
+                    add make sure you have it properly configured: <a
+                            href="https://en.bitcoin.it/wiki/Data_directory#Default_Location">Read this bitcoin tutorial
+                        to locate the data directory</a>. </p>
 
- <p><em>nu.conf</em>  sample configuration</p>
+                <p><em>nu.conf</em> sample configuration</p>
 
  <pre><code>server=1
- rpcuser=&lt;choose-a-username&gt;
- rpcpassword=&lt;choose-a-password&gt;
- port=9090
- rpcport=9091
- rpcallowip=&lt;ip_of_machine_running_the_bot&gt;*
+     rpcuser=&lt;choose-a-username&gt;
+     rpcpassword=&lt;choose-a-password&gt;
+     port=9090
+     rpcport=9091
+     rpcallowip=&lt;ip_of_machine_running_the_bot&gt;*
  </code></pre>
 
- <p>*NOTE: if you plan using NuBot and NuBits on the same machine, the last parameter can be omitted. If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client.</p>
+                <p>*NOTE: if you plan using NuBot and NuBits on the same machine, the last parameter can be omitted. If
+                    you plan to run the bot on a different machine, you must authorise remote calls to your Nu
+                    client.</p>
 
- <p>Restart the NuBits client to make changes effective. Make sure that the NuBit client controls a public address which received a custodial grant.  If the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to <em>liquidityinfo</em>. Unlocking the wallet <em>for minting only</em> is not enough.  </p>
+                <p>Restart the NuBits client to make changes effective. Make sure that the NuBit client controls a
+                    public address which received a custodial grant. If the NuBits wallet is encrypted with a
+                    passphrase, make sure to unlock it, otherwise it won't accept RPC calls to <em>liquidityinfo</em>.
+                    Unlocking the wallet <em>for minting only</em> is not enough. </p>
 
- <p>The two Nu wallets are locked/unlocked separately. To unlock the NuBits wallets, first make sure the client is displaying the NuBits units, then open the console and type:</p>
+                <p>The two Nu wallets are locked/unlocked separately. To unlock the NuBits wallets, first make sure the
+                    client is displaying the NuBits units, then open the console and type:</p>
 
  <pre><code>walletpassphrase &lt;your passphrase&gt; 9999999999
  </code></pre>
 
- <p>The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg!</p>
+                <p>The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be
+                    enough time for your bot to keep the peg!</p>
 
- <h3>
- <a id="user-content-2-configure-the-nubot" class="anchor" href="#2-configure-the-nubot" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Configure the NuBot</h3>
+                <h3>
+                    <a id="user-content-2-configure-the-nubot" class="anchor" href="#2-configure-the-nubot"
+                       aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Configure the NuBot</h3>
 
- <p><em>Download and unzip the latest stable build from the <a href="https://bitbucket.org/JordanLeePeershares/nubottrading/downloads">download page</a>.</em></p>
+                <p><em>Download and unzip the latest stable build from the <a
+                        href="https://bitbucket.org/JordanLeePeershares/nubottrading/downloads">download page</a>.</em>
+                </p>
 
- <p>The bot reads configuration options from one <em>.json</em> file.  Below you can find a list of all the available options parameter along a brief description.
- Please make sure you fully understand in which way changing a setting will affect the bot before doing anything that can lead to losses. </p>
+                <p>The bot reads configuration options from one <em>.json</em> file. Below you can find a list of all
+                    the available options parameter along a brief description.
+                    Please make sure you fully understand in which way changing a setting will affect the bot before
+                    doing anything that can lead to losses. </p>
 
- <p>In this tutorial we will use the following grouping : </p>
+                <p>In this tutorial we will use the following grouping : </p>
 
- <ul>
- <li>market options: exchange keys and market-related settings ;<br>
- </li>
- <li>misc options: miscellaneous configuration parameters ;</li>
- <li>liquidity-info options: define nubits client communication ;</li>
- <li>price-tracking options: for non-USD pairs, define price feeds ;</li>
- </ul>
+                <ul>
+                    <li>market options: exchange keys and market-related settings ;<br>
+                    </li>
+                    <li>misc options: miscellaneous configuration parameters ;</li>
+                    <li>liquidity-info options: define nubits client communication ;</li>
+                    <li>price-tracking options: for non-USD pairs, define price feeds ;</li>
+                </ul>
 
- <p>Refer to the <code>sample-config.json</code> file provided with the bot. You can edit the provided sample file or create a new configuration file.</p>
+                <p>Refer to the <code>sample-config.json</code> file provided with the bot. You can edit the provided
+                    sample file or create a new configuration file.</p>
 
- <p>Sample options:</p>
+                <p>Sample options:</p>
 
- <div class="highlight highlight-json"><pre>{
-   <span class="pl-s"><span class="pl-pds">"</span>exchangename<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>poloniex<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>apikey<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>apisecret<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>txfee<span class="pl-pds">"</span></span>: <span class="pl-c1">0.2</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>pair<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>nbt_btc<span class="pl-pds">"</span></span>,
+                <div class="highlight highlight-json"><pre>{
+   <span class="pl-s"><span class="pl-pds">"</span>exchangename<span class="pl-pds">"</span></span>:<span
+                            class="pl-s"><span class="pl-pds">"</span>poloniex<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>apikey<span class="pl-pds">"</span></span>: <span class="pl-s"><span
+                            class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>apisecret<span class="pl-pds">"</span></span>: <span
+                            class="pl-s"><span class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>txfee<span class="pl-pds">"</span></span>: <span
+                            class="pl-c1">0.2</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>pair<span class="pl-pds">"</span></span>:<span class="pl-s"><span
+                            class="pl-pds">"</span>nbt_btc<span class="pl-pds">"</span></span>,
 
    <span class="pl-s"><span class="pl-pds">"</span>dualside<span class="pl-pds">"</span></span>: <span class="pl-c1">true</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>multiplecustodians<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>executeorders<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>verbose<span class="pl-pds">"</span></span>:<span class="pl-c1">false</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>hipchat<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>mailnotifications<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>severe<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>mailrecipient<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xxx@xxx.xxx<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>emergencytimeout<span class="pl-pds">"</span></span>:<span class="pl-c1">60</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>multiplecustodians<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">false</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>executeorders<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">true</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>verbose<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">false</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>hipchat<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">true</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>mailnotifications<span class="pl-pds">"</span></span>:<span
+                            class="pl-s"><span class="pl-pds">"</span>severe<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>mailrecipient<span class="pl-pds">"</span></span>:<span class="pl-s"><span
+                            class="pl-pds">"</span>xxx@xxx.xxx<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>emergencytimeout<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">60</span>,
    <span class="pl-s"><span class="pl-pds">"</span>keepproceeds<span class="pl-pds">"</span></span>:<span class="pl-c1">0</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>maxsellordervolume<span class="pl-pds">"</span></span> : <span class="pl-c1">0.0</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>maxbuyordervolume<span class="pl-pds">"</span></span> : <span class="pl-c1">0.0</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>priceincrement<span class="pl-pds">"</span></span>: <span class="pl-c1">0.1</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>maxsellordervolume<span class="pl-pds">"</span></span> : <span
+                            class="pl-c1">0.0</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>maxbuyordervolume<span class="pl-pds">"</span></span> : <span
+                            class="pl-c1">0.0</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>priceincrement<span class="pl-pds">"</span></span>: <span
+                            class="pl-c1">0.1</span>,
 
-   <span class="pl-s"><span class="pl-pds">"</span>submitliquidity<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>nubitaddress<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>nudip<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>nudport<span class="pl-pds">"</span></span>: <span class="pl-c1">9091</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>rpcpass<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>rpcuser<span class="pl-pds">"</span></span>: <span class="pl-s"><span class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>submitliquidity<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">true</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>nubitaddress<span class="pl-pds">"</span></span>: <span class="pl-s"><span
+                            class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>nudip<span class="pl-pds">"</span></span>: <span class="pl-s"><span
+                            class="pl-pds">"</span>127.0.0.1<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>nudport<span class="pl-pds">"</span></span>: <span
+                            class="pl-c1">9091</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>rpcpass<span class="pl-pds">"</span></span>: <span class="pl-s"><span
+                            class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>rpcuser<span class="pl-pds">"</span></span>: <span class="pl-s"><span
+                            class="pl-pds">"</span>xxx<span class="pl-pds">"</span></span>,
 
-   <span class="pl-s"><span class="pl-pds">"</span>wallchangeThreshold<span class="pl-pds">"</span></span>: <span class="pl-c1">0.1</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>spread<span class="pl-pds">"</span></span>:<span class="pl-c1">0.0</span>,
-   <span class="pl-s"><span class="pl-pds">"</span>mainfeed<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>blockchain<span class="pl-pds">"</span></span>,
-   <span class="pl-s"><span class="pl-pds">"</span>backupfeeds<span class="pl-pds">"</span></span>: [<span class="pl-s"><span class="pl-pds">"</span>coinbase<span class="pl-pds">"</span></span>, <span class="pl-s"><span class="pl-pds">"</span>btce<span class="pl-pds">"</span></span>]
+   <span class="pl-s"><span class="pl-pds">"</span>wallchangeThreshold<span class="pl-pds">"</span></span>: <span
+                            class="pl-c1">0.1</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>spread<span class="pl-pds">"</span></span>:<span
+                            class="pl-c1">0.0</span>,
+   <span class="pl-s"><span class="pl-pds">"</span>mainfeed<span class="pl-pds">"</span></span>:<span class="pl-s"><span
+                            class="pl-pds">"</span>blockchain<span class="pl-pds">"</span></span>,
+   <span class="pl-s"><span class="pl-pds">"</span>backupfeeds<span class="pl-pds">"</span></span>: [<span class="pl-s"><span
+                            class="pl-pds">"</span>coinbase<span class="pl-pds">"</span></span>, <span
+                            class="pl-s"><span class="pl-pds">"</span>btce<span class="pl-pds">"</span></span>]
  }
- </pre></div>
+ </pre>
+                </div>
 
- <hr>
+                <hr>
 
- <h4>
- <a id="user-content-market-options" class="anchor" href="#market-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Market options</h4>
+                <h4>
+                    <a id="user-content-market-options" class="anchor" href="#market-options" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>Market options</h4>
 
- <p>Parameters : </p>
+                <p>Parameters : </p>
 
- <table>
- <thead>
- <tr>
- <th>Parameter</th>
- <th align="center">Default value</th>
- <th align="right">Description</th>
- <th align="right">Admitted values</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>exchangename</td>
- <td align="center">/</td>
- <td align="right">Name of the exchange where the bots operates</td>
- <td align="right">**see list of accepted exchange names</td>
- </tr>
- <tr>
- <td>apikey</td>
- <td align="center">/</td>
- <td align="right">Custodian's public key to access the exchange . <em>this param is optional for ccex</em>
- </td>
- <td align="right">String</td>
- </tr>
- <tr>
- <td>apisecret</td>
- <td align="center">/</td>
- <td align="right">Custodian's secret key to access the exchange</td>
- <td align="right">String</td>
- </tr>
- <tr>
- <td>txfee</td>
- <td align="center">0.2</td>
- <td align="right">If transaction fee not available from the exchange via api, this value will be used</td>
- <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
- </tr>
- <tr>
- <td>pair</td>
- <td align="center">The currency pair where the bot operates</td>
- <td align="right">valid currency pair for the specified  eg. "nbt_usd"</td>
- <td align="right"></td>
- </tr>
- </tbody>
- </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th align="center">Default value</th>
+                        <th align="right">Description</th>
+                        <th align="right">Admitted values</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>exchangename</td>
+                        <td align="center">/</td>
+                        <td align="right">Name of the exchange where the bots operates</td>
+                        <td align="right">**see list of accepted exchange names</td>
+                    </tr>
+                    <tr>
+                        <td>apikey</td>
+                        <td align="center">/</td>
+                        <td align="right">Custodian's public key to access the exchange . <em>this param is optional for
+                            ccex</em>
+                        </td>
+                        <td align="right">String</td>
+                    </tr>
+                    <tr>
+                        <td>apisecret</td>
+                        <td align="center">/</td>
+                        <td align="right">Custodian's secret key to access the exchange</td>
+                        <td align="right">String</td>
+                    </tr>
+                    <tr>
+                        <td>txfee</td>
+                        <td align="center">0.2</td>
+                        <td align="right">If transaction fee not available from the exchange via api, this value will be
+                            used
+                        </td>
+                        <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
+                    </tr>
+                    <tr>
+                        <td>pair</td>
+                        <td align="center">The currency pair where the bot operates</td>
+                        <td align="right">valid currency pair for the specified eg. "nbt_usd"</td>
+                        <td align="right"></td>
+                    </tr>
+                    </tbody>
+                </table>
 
- <p>See EXCHANGES.md for an updated list of valid exchange names.</p>
+                <p>See EXCHANGES.md for an updated list of valid exchange names.</p>
 
- <hr>
+                <hr>
 
- <h4>
- <a id="user-content-misc-options" class="anchor" href="#misc-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Misc options</h4>
+                <h4>
+                    <a id="user-content-misc-options" class="anchor" href="#misc-options" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>Misc options</h4>
 
- <p>Parameters : </p>
+                <p>Parameters : </p>
 
- <table>
- <thead>
- <tr>
- <th>Parameter</th>
- <th align="center">Default value</th>
- <th align="right">Description</th>
- <th align="right">Admitted values</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>dualside</td>
- <td align="center">/</td>
- <td align="right">If set to true, the bot will behave as a dual side custodian, if false as a sell side custodian.</td>
- <td align="right">true,false</td>
- </tr>
- <tr>
- <td>multiplecustodians</td>
- <td align="center">false</td>
- <td align="right">if set to true, will sync with remote NPT and reset orders often</td>
- <td align="right">boolean</td>
- </tr>
- <tr>
- <td>executeorders</td>
- <td align="center">true</td>
- <td align="right">if set to false the bot will print a warning instead of executing orders</td>
- <td align="right">boolean</td>
- </tr>
- <tr>
- <td>verbose</td>
- <td align="center">false</td>
- <td align="right">if set to true, will print on screen additional debug messages</td>
- <td align="right">boolean</td>
- </tr>
- <tr>
- <td>hipchat</td>
- <td align="center">true</td>
- <td align="right">if set to false will disable hipchat notifications</td>
- <td align="right">boolean</td>
- </tr>
- <tr>
- <td>mailnotifications</td>
- <td align="center">severe</td>
- <td align="right">set notification level: none at all, all: including non-critical, severe: only critical</td>
- <td align="right">String ("none", "all", "severe")</td>
- </tr>
- <tr>
- <td>mailrecipient</td>
- <td align="center">/</td>
- <td align="right">the email to which emergency email are sent</td>
- <td align="right">String</td>
- </tr>
- <tr>
- <td>emergencytimeout</td>
- <td align="center">60</td>
- <td align="right">max amount of minutes of consecutive failure. After those minute elapse, emergency procedure starts</td>
- <td align="right">int (minutes)</td>
- </tr>
- <tr>
- <td>keepproceeds</td>
- <td align="center">0</td>
- <td align="right">Specific setting for KTm's proposal. Will keep the specified proceeds from sales apart instead of putting 100% of balance on buy .</td>
- <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
- </tr>
- <tr>
- <td>maxsellordervolume</td>
- <td align="center">0</td>
- <td align="right">maximum volume to put on sell walls.</td>
- <td align="right">double , expressed in NBT . 0=no limit;</td>
- </tr>
- <tr>
- <td>maxbuyordervolume</td>
- <td align="center">0</td>
- <td align="right">maximum volume to put on buy walls.</td>
- <td align="right">double , expressed NBT. 0=no limit;</td>
- </tr>
- <tr>
- <td>priceincrement</td>
- <td align="center">0.0003</td>
- <td align="right">if working in sell-side mode, this value (considered USD) will be added to the sell price</td>
- <td align="right">double , price increment in expressed USD</td>
- </tr>
- </tbody>
- </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th align="center">Default value</th>
+                        <th align="right">Description</th>
+                        <th align="right">Admitted values</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>dualside</td>
+                        <td align="center">/</td>
+                        <td align="right">If set to true, the bot will behave as a dual side custodian, if false as a
+                            sell side custodian.
+                        </td>
+                        <td align="right">true,false</td>
+                    </tr>
+                    <tr>
+                        <td>multiplecustodians</td>
+                        <td align="center">false</td>
+                        <td align="right">if set to true, will sync with remote NPT and reset orders often</td>
+                        <td align="right">boolean</td>
+                    </tr>
+                    <tr>
+                        <td>executeorders</td>
+                        <td align="center">true</td>
+                        <td align="right">if set to false the bot will print a warning instead of executing orders</td>
+                        <td align="right">boolean</td>
+                    </tr>
+                    <tr>
+                        <td>verbose</td>
+                        <td align="center">false</td>
+                        <td align="right">if set to true, will print on screen additional debug messages</td>
+                        <td align="right">boolean</td>
+                    </tr>
+                    <tr>
+                        <td>hipchat</td>
+                        <td align="center">true</td>
+                        <td align="right">if set to false will disable hipchat notifications</td>
+                        <td align="right">boolean</td>
+                    </tr>
+                    <tr>
+                        <td>mailnotifications</td>
+                        <td align="center">severe</td>
+                        <td align="right">set notification level: none at all, all: including non-critical, severe: only
+                            critical
+                        </td>
+                        <td align="right">String ("none", "all", "severe")</td>
+                    </tr>
+                    <tr>
+                        <td>mailrecipient</td>
+                        <td align="center">/</td>
+                        <td align="right">the email to which emergency email are sent</td>
+                        <td align="right">String</td>
+                    </tr>
+                    <tr>
+                        <td>emergencytimeout</td>
+                        <td align="center">60</td>
+                        <td align="right">max amount of minutes of consecutive failure. After those minute elapse,
+                            emergency procedure starts
+                        </td>
+                        <td align="right">int (minutes)</td>
+                    </tr>
+                    <tr>
+                        <td>keepproceeds</td>
+                        <td align="center">0</td>
+                        <td align="right">Specific setting for KTm's proposal. Will keep the specified proceeds from
+                            sales apart instead of putting 100% of balance on buy .
+                        </td>
+                        <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
+                    </tr>
+                    <tr>
+                        <td>maxsellordervolume</td>
+                        <td align="center">0</td>
+                        <td align="right">maximum volume to put on sell walls.</td>
+                        <td align="right">double , expressed in NBT . 0=no limit;</td>
+                    </tr>
+                    <tr>
+                        <td>maxbuyordervolume</td>
+                        <td align="center">0</td>
+                        <td align="right">maximum volume to put on buy walls.</td>
+                        <td align="right">double , expressed NBT. 0=no limit;</td>
+                    </tr>
+                    <tr>
+                        <td>priceincrement</td>
+                        <td align="center">0.0003</td>
+                        <td align="right">if working in sell-side mode, this value (considered USD) will be added to the
+                            sell price
+                        </td>
+                        <td align="right">double , price increment in expressed USD</td>
+                    </tr>
+                    </tbody>
+                </table>
 
- <hr>
+                <hr>
 
- <h4>
- <a id="user-content-liquidity-info-options" class="anchor" href="#liquidity-info-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Liquidity-info options</h4>
+                <h4>
+                    <a id="user-content-liquidity-info-options" class="anchor" href="#liquidity-info-options"
+                       aria-hidden="true"><span class="octicon octicon-link"></span></a>Liquidity-info options</h4>
 
- <p>Parameters : </p>
+                <p>Parameters : </p>
 
- <table>
- <thead>
- <tr>
- <th>Parameter</th>
- <th align="center">Default value</th>
- <th align="right">Description</th>
- <th align="right">Admitted values</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>submitliquidity</td>
- <td align="center">true</td>
- <td align="right">if set to false, the bot will not try to submit liquidity info. If set to false, it will also allow the custodian to omit the declaration of <em>nubitaddress</em> ,  <em>nudport</em> , <em>rpcuser</em> and <em>rpcpass</em>
- </td>
- <td align="right">boolean</td>
- </tr>
- <tr>
- <td>nubitaddress</td>
- <td align="center">/</td>
- <td align="right">The public address where the custodial grant has been received</td>
- <td align="right">valid custodian NBT addresses (String)</td>
- </tr>
- <tr>
- <td>nudip</td>
- <td align="center">"127.0.0.1"</td>
- <td align="right">The IP address of the machine that hosts the Nu Client</td>
- <td align="right">IP address (String)</td>
- </tr>
- <tr>
- <td>nudport</td>
- <td align="center">/</td>
- <td align="right">The RPC port of the Nu daemon</td>
- <td align="right">1024...65535</td>
- </tr>
- <tr>
- <td>rpcpass</td>
- <td align="center">/</td>
- <td align="right">The RPC password of the Nu daemon</td>
- <td align="right">String</td>
- </tr>
- <tr>
- <td>rpcuser</td>
- <td align="center">/</td>
- <td align="right">The RPC username  of the Nu daemon</td>
- <td align="right">String</td>
- </tr>
- </tbody>
- </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th align="center">Default value</th>
+                        <th align="right">Description</th>
+                        <th align="right">Admitted values</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>submitliquidity</td>
+                        <td align="center">true</td>
+                        <td align="right">if set to false, the bot will not try to submit liquidity info. If set to
+                            false, it will also allow the custodian to omit the declaration of <em>nubitaddress</em> ,
+                            <em>nudport</em> , <em>rpcuser</em> and <em>rpcpass</em>
+                        </td>
+                        <td align="right">boolean</td>
+                    </tr>
+                    <tr>
+                        <td>nubitaddress</td>
+                        <td align="center">/</td>
+                        <td align="right">The public address where the custodial grant has been received</td>
+                        <td align="right">valid custodian NBT addresses (String)</td>
+                    </tr>
+                    <tr>
+                        <td>nudip</td>
+                        <td align="center">"127.0.0.1"</td>
+                        <td align="right">The IP address of the machine that hosts the Nu Client</td>
+                        <td align="right">IP address (String)</td>
+                    </tr>
+                    <tr>
+                        <td>nudport</td>
+                        <td align="center">/</td>
+                        <td align="right">The RPC port of the Nu daemon</td>
+                        <td align="right">1024...65535</td>
+                    </tr>
+                    <tr>
+                        <td>rpcpass</td>
+                        <td align="center">/</td>
+                        <td align="right">The RPC password of the Nu daemon</td>
+                        <td align="right">String</td>
+                    </tr>
+                    <tr>
+                        <td>rpcuser</td>
+                        <td align="center">/</td>
+                        <td align="right">The RPC username of the Nu daemon</td>
+                        <td align="right">String</td>
+                    </tr>
+                    </tbody>
+                </table>
 
- <hr>
+                <hr>
 
- <h4>
- <a id="user-content-price-tracking-options" class="anchor" href="#price-tracking-options" aria-hidden="true"><span class="octicon octicon-link"></span></a>Price-tracking options</h4>
+                <h4>
+                    <a id="user-content-price-tracking-options" class="anchor" href="#price-tracking-options"
+                       aria-hidden="true"><span class="octicon octicon-link"></span></a>Price-tracking options</h4>
 
- <p>When running the bot against a currency pair different from NBT/USD, the bot needs additional parameters to run.<br>
- The custodian must specify the price feeds that the bot must use to track the price of a currency (both fiat and crypto) different from USD.<br>
- The price feed will track the live rate between the <em>secondary peg</em> currency and USD.</p>
+                <p>When running the bot against a currency pair different from NBT/USD, the bot needs additional
+                    parameters to run.<br>
+                    The custodian must specify the price feeds that the bot must use to track the price of a currency
+                    (both fiat and crypto) different from USD.<br>
+                    The price feed will track the live rate between the <em>secondary peg</em> currency and USD.</p>
 
- <p>Parameters : </p>
+                <p>Parameters : </p>
 
- <table>
- <thead>
- <tr>
- <th>Parameter</th>
- <th align="center">Default value</th>
- <th align="right">Description</th>
- <th align="right">Admitted values</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>wallchangeThreshold</td>
- <td align="center">/</td>
- <td align="right">how much the price need to change to trigger a wall-shift.</td>
- <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
- </tr>
- <tr>
- <td>spread</td>
- <td align="center">/</td>
- <td align="right">the spread between buy and sell walls</td>
- <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
- </tr>
- <tr>
- <td>mainfeed</td>
- <td align="center">/</td>
- <td align="right">the name of the main price feed that has priority over the others</td>
- <td align="right">**see following table</td>
- </tr>
- <tr>
- <td>backupfeeds</td>
- <td align="center">/</td>
- <td align="right">a json array containing an arbitrary number (&gt;2) of backup price feed names</td>
- <td align="right">**see following table</td>
- </tr>
- </tbody>
- </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th align="center">Default value</th>
+                        <th align="right">Description</th>
+                        <th align="right">Admitted values</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>wallchangeThreshold</td>
+                        <td align="center">/</td>
+                        <td align="right">how much the price need to change to trigger a wall-shift.</td>
+                        <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
+                    </tr>
+                    <tr>
+                        <td>spread</td>
+                        <td align="center">/</td>
+                        <td align="right">the spread between buy and sell walls</td>
+                        <td align="right">double. Expressed in absolute percentage. 10 = 10% , 0.5 = 0.5%</td>
+                    </tr>
+                    <tr>
+                        <td>mainfeed</td>
+                        <td align="center">/</td>
+                        <td align="right">the name of the main price feed that has priority over the others</td>
+                        <td align="right">**see following table</td>
+                    </tr>
+                    <tr>
+                        <td>backupfeeds</td>
+                        <td align="center">/</td>
+                        <td align="right">a json array containing an arbitrary number (&gt;2) of backup price feed
+                            names
+                        </td>
+                        <td align="right">**see following table</td>
+                    </tr>
+                    </tbody>
+                </table>
 
- <p>See <a href="https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master">FEEDS.md</a> for an updated list of valid feed names.</p>
+                <p>See <a
+                        href="https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master">FEEDS.md</a>
+                    for an updated list of valid feed names.</p>
 
- <hr>
+                <hr>
 
- <h3>
- <a id="user-content-3-run-nubot" class="anchor" href="#3-run-nubot" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Run NuBot</h3>
+                <h3>
+                    <a id="user-content-3-run-nubot" class="anchor" href="#3-run-nubot" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>3) Run NuBot</h3>
 
- <p>Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the <em>.json</em> file(s) you want to use as configuration.
- This is the syntax : </p>
+                <p>Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the
+                    <em>.json</em> file(s) you want to use as configuration.
+                    This is the syntax : </p>
 
  <pre><code>java -jar NuBot.jar -cfg=sample-config.json [-GUI]
  </code></pre>
 
- <p>You can also use nohup in *nix system to redirect the output, and run it in background with the <code>&amp;</code> char. For, example, if you followed the structured configuration files explained above you can run nubot with :  </p>
+                <p>You can also use nohup in *nix system to redirect the output, and run it in background with the
+                    <code>&amp;</code> char. For, example, if you followed the structured configuration files explained
+                    above you can run nubot with : </p>
 
  <pre><code>nohup java -jar NuBot.jar sample-config.json
  </code></pre>
 
- <p>The [optional] flug -GUI will spin up the UI. </p>
+                <p>The [optional] flug -GUI will spin up the UI. </p>
 
- <p>The bot will start and write output in the <em>/logs</em> folder. </p>
+                <p>The bot will start and write output in the <em>/logs</em> folder. </p>
 
- <p>To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and orders.</p>
+                <p>To terminate the bot, exit the process with "Ctrl+C" : the bot will clear our liquidityinfo and
+                    orders.</p>
 
- <h2>
- <a id="user-content-logging-files" class="anchor" href="#logging-files" aria-hidden="true"><span class="octicon octicon-link"></span></a>Logging files</h2>
+                <h2>
+                    <a id="user-content-logging-files" class="anchor" href="#logging-files" aria-hidden="true"><span
+                            class="octicon octicon-link"></span></a>Logging files</h2>
 
- <p>The bot produces different output log files, all stored in a special folder created for each session under <em>logs/</em>.<br>
- On startup, NuBot prints out the name of the folder it is using to log:</p>
+                <p>The bot produces different output log files, all stored in a special folder created for each session
+                    under <em>logs/</em>.<br>
+                    On startup, NuBot prints out the name of the folder it is using to log:</p>
 
- <p>example: </p>
+                <p>example: </p>
 
- <pre><code>INFO  - defined session path logs/session_1427479041022
+ <pre><code>INFO - defined session path logs/session_1427479041022
  </code></pre>
 
- <p>Log files: </p>
+                <p>Log files: </p>
 
- <table>
- <thead>
- <tr>
- <th>filename</th>
- <th align="center">Description</th>
- </tr>
- </thead>
- <tbody>
- <tr>
- <td>standard.html</td>
- <td align="center">Standard output of the bot</td>
- </tr>
- <tr>
- <td>verbose.html</td>
- <td align="center">Verbose output of the bot with additional messages</td>
- </tr>
- <tr>
- <td>orders_history.(csv;json)</td>
- <td align="center">snapshots of active orders (taken every minute)</td>
- </tr>
- <tr>
- <td>balance_history.json</td>
- <td align="center">snapshots of balances (taken every minute)</td>
- </tr>
- <tr>
- <td>wall_shifts.(csv;json)</td>
- <td align="center">list of wall shifts</td>
- </tr>
- </tbody>
- </table>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>filename</th>
+                        <th align="center">Description</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>standard.html</td>
+                        <td align="center">Standard output of the bot</td>
+                    </tr>
+                    <tr>
+                        <td>verbose.html</td>
+                        <td align="center">Verbose output of the bot with additional messages</td>
+                    </tr>
+                    <tr>
+                        <td>orders_history.(csv;json)</td>
+                        <td align="center">snapshots of active orders (taken every minute)</td>
+                    </tr>
+                    <tr>
+                        <td>balance_history.json</td>
+                        <td align="center">snapshots of balances (taken every minute)</td>
+                    </tr>
+                    <tr>
+                        <td>wall_shifts.(csv;json)</td>
+                        <td align="center">list of wall shifts</td>
+                    </tr>
+                    </tbody>
+                </table>
 
- <p>NOTE: to avoid huge files, html files gets rotated at 50MB.</p>
+                <p>NOTE: to avoid huge files, html files gets rotated at 50MB.</p>
 
- <p>Additional messages are logged to console if the option <code>"verbose"=true</code> is set. Useful for debug</p>
+                <p>Additional messages are logged to console if the option <code>"verbose"=true</code> is set. Useful
+                    for debug</p>
 
- <p>Additionally there are two other logs that trace the history of wall shifts and a history of.</p>
+                <p>Additionally there are two other logs that trace the history of wall shifts and a history of.</p>
 
- <p>For additional control over logging, the user can also manually edit the <em>config/logging/logback.xml</em> configuration file.</p>
+                <p>For additional control over logging, the user can also manually edit the <em>config/logging/logback.xml</em>
+                    configuration file.</p>
 
-               </div>
-             </div>
-           </div>
+            </div>
+        </div>
+    </div>
 
 
-       </div>
-     </div>
-   </div>
-   <div>&nbsp;</div>
-   </div><script>
+</div>
+</div>
+</div>
+<div>&nbsp;</div>
+</div>
+<script>
+
+
      function showCanonicalImages() {
        var images = document.getElementsByTagName('img');
        if (!images) {
@@ -539,6 +651,13 @@
        scrollToHash();
      }
      showCanonicalImages();
-   </script>
- </body>
- </html>
+
+
+    $( document ).ready(function() {
+        updateNavbar("setup");
+    });
+
+
+</script>
+</body>
+</html>

@@ -1,4 +1,4 @@
-var host = "localhost";
+  var host = "localhost";
   var port = 4567;
   var baseurl = "http://" + host + ":" + port;
   var updateTime = 500;
@@ -9,7 +9,7 @@ var host = "localhost";
       $('#startbot').removeClass("btn-primary");
       $('#startbot').addClass("btn-success");
       document.title = 'NuBot GUI - Running';
-      $("#favicon").attr("href","favicon.ico");
+      $("#favicon").attr("href","favicon-running.ico");
  }
 
  function setHalted(){
@@ -20,8 +20,32 @@ var host = "localhost";
       $("#ordertable").find("tr:gt(0)").remove();
       $("#balancetable").find("tr:gt(0)").remove();
       document.title = 'NuBot GUI - Stopped';
-      $("#favicon").attr("href","favicon-running.ico");
+      $("#favicon").attr("href","favicon.ico");
 
+ }
+
+ function updateNavbar(page) {
+    $('#operation-nav').removeClass('active');
+    $('#config-nav').removeClass('active');
+    $('#setup-nav').removeClass('active');
+    $('#about-nav').removeClass('active');
+
+    switch (page) {
+        case "operation":
+            $('#operation-nav').addClass('active')
+            loadbot();
+            break;
+        case "config":
+            loadconfig();
+             $('#config-nav').addClass('active')
+            break;
+        case "setup":
+            $('#setup').addClass('active')
+            break;
+        case "about":
+            $('#about').addClass('active')
+           break;
+    }
  }
 
  function updateConfigFile(){
@@ -448,7 +472,6 @@ $(document).ready(function() {
           //reset values from server
           updateConfigFile();
           loadconfig();
-
         },
 
         error: function(xhr, textStatus, errorThrown) {
