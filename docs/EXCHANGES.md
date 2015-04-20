@@ -6,7 +6,6 @@
 | [BitcoinCoID](https://vip.bitcoin.co.id)    | live  |  https://vip.bitcoin.co.id |
 | [Bitspark](https://www.bitspark.io)    | live  |  https://www.bitspark.io |
 | [Poloniex](https://poloniex.com)    | live  |  https://poloniex.com |
-| [Comkort](https://comkort.com)    | live  |  https://comkort.com |
 | [Bittrex](https://bittrex.com)    | in progress  |  https://bittrex.com |
 | [CCEDK](https://ccedk.com)    | live  |  https://ccedk.com |
 | [Bter](https://bter.com)    | live  |  https://bter.com |
@@ -19,6 +18,8 @@ not operational for liquidity operations
 | ------------- |:-------------:| -------------:| 
 | Btce    | datafeed only  |   |
 | [ShapeShift](https://shapeshift.io)    | no nubot operations  | https://shapeshift.io  |
-| CCEX    |   |   |
+| CCEX    |  delisted nubits |   |
 | Excoin    | defunct  |   |
+| [Comkort](https://comkort.com)    | delisted nubits  |  https://comkort.com |
+
 
