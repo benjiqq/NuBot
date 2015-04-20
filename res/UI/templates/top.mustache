@@ -1,46 +1,46 @@
 <!DOCTYPE html>
 <html>
-    <head>
+<head>
     <title>NuBot GUI</title>
-        <style>
+    <style>
 
-            body {
-                font-family: Helvetica;
-                padding-top: 70px;
-            }
+        body {
+        font-family: Helvetica;
+        padding-top: 70px;
+        }
 
-          .row {
-            margin-bottom: 20px;
-          }
-          .row .row {
-            margin-top: -20px;
-            margin-bottom: 0;
-          }
-          [class*="col-"] {
-            padding-top: 2px;
-            padding-bottom: 2px;
-            border: 0px solid #ddd;
-            border: 0px solid rgba(86,61,124,.2);
-          }
+        .row {
+        margin-bottom: 20px;
+        }
+        .row .row {
+        margin-top: -20px;
+        margin-bottom: 0;
+        }
+        [class*="col-"] {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        border: 0px solid #ddd;
+        border: 0px solid rgba(86,61,124,.2);
+        }
 
-          hr {
-            margin-top: 20px;
-            margin-bottom: 20px;
-          }
+        hr {
+        margin-top: 20px;
+        margin-bottom: 20px;
+        }
 
-          #logarea {
-            width:650px;
-            height:400px;
-            resize:none
-          }
+        #logarea {
+        width:650px;
+        height:400px;
+        resize:none
+        }
 
-        </style>
+    </style>
 
 
-<script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-<script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 
-      <script>
+    <script>
 
           var host = "localhost";
           var port = 4567;
@@ -195,7 +195,7 @@
 
 
           $('#startbot').click(function(){
-
+            if(confirm("Are you sure?")){
                 if (debug) console.log("calling start on server");
 
                 var jsondata = JSON.stringify({
@@ -224,7 +224,7 @@
                         alert("error posting to server " + textStatus + " " + errorThrown);
                     }
                });
-
+             }
             });
 
 
@@ -462,7 +462,7 @@
             }
 
             function postreset(){
-
+                if(confirm("Are you sure?")){
                 var posturl = "http://" + host + ":" + port + "/configreset";
 
                 $.ajax(posturl, {
@@ -497,21 +497,22 @@
                     }
                });
             }
+           }
 
 
-        </script>
+    </script>
 
 
-<!-- Latest compiled and minified CSS -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
 
-<!-- Optional theme -->
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
 
-<!-- Latest compiled and minified JavaScript -->
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
 
 
-    </head>
+</head>
 
 
