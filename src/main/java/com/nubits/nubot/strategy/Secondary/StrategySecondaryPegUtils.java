@@ -313,8 +313,6 @@ public class StrategySecondaryPegUtils {
 
             }
 
-            //Prepare the orders
-
             success = this.executeOrder(type, Global.options.getPair(), amount1, price);
             if (!success)
                 return false;
@@ -363,7 +361,7 @@ public class StrategySecondaryPegUtils {
                 }
 
 
-                //put it on order
+                //execute second order
 
                 success = this.executeOrder(type, Global.options.getPair(), amount2, price);
                 if (!success)
