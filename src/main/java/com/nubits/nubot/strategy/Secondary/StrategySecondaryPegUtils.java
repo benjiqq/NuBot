@@ -144,7 +144,7 @@ public class StrategySecondaryPegUtils {
 
     private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
-            LOG.debug("executeBuysideOrder : " + pair + " " + amount + " " + rate);
+            LOG.warn("executeBuysideOrder : " + pair + " " + amount + " " + rate);
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
                 return order1Response;
@@ -160,7 +160,7 @@ public class StrategySecondaryPegUtils {
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
         if (Global.options.isExecuteOrders()) {
-            LOG.debug("executeSellsideOrder : " + pair + " " + amount + " " + rate);
+            LOG.warn("executeSellsideOrder : " + pair + " " + amount + " " + rate);
             if (!Global.swappedPair) {
                 ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
                 return order1Response;
@@ -179,7 +179,7 @@ public class StrategySecondaryPegUtils {
 
         String orderString1 = orderString(type, amount, rate);
 
-        LOG.warn("Strategy - Submit order : " + orderString1);
+        LOG.info("Strategy - Submit order : " + orderString1);
 
         ApiResponse orderResponse;
         if (type.equals(Constant.BUY)) {
