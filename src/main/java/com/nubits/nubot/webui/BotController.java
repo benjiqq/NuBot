@@ -36,7 +36,7 @@ public class BotController {
 
                 opmap.put("sessionstart", SessionManager.startedString());
 
-                opmap.put("duration", Utils.getBotUptime());
+                opmap.put("duration", Utils.getBotUptimeDate());
 
             } else {
                 if (SessionManager.wasRunOnce())
