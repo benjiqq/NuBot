@@ -143,44 +143,62 @@ public class StrategySecondaryPegUtils {
     // ---- Trade Manager ----
 
     private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
-        if (Global.options.isExecuteOrders()) {
-            LOG.debug("executeBuysideOrder : " + pair + " " + amount + " " + rate);
-            if (!Global.swappedPair) {
-                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
-                return order1Response;
-            } else {
-                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
-                return order1Response;
-            }
+
+        LOG.info("executeBuysideOrder : " + pair + " " + amount + " " + rate);
+        ApiResponse orderResponse;
+        if (!Global.swappedPair) {
+            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
         } else {
-            LOG.warn("Demo mode. Don't execute orders");
-            return null;
+            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
         }
+        return orderResponse;
     }
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
-        if (Global.options.isExecuteOrders()) {
-            LOG.debug("executeSellsideOrder : " + pair + " " + amount + " " + rate);
-            if (!Global.swappedPair) {
-                ApiResponse order1Response = Global.exchange.getTrade().sell(pair, amount, rate);
-                return order1Response;
 
-            } else {
-                ApiResponse order1Response = Global.exchange.getTrade().buy(pair, amount, rate);
-                return order1Response;
-            }
+        String type = Constant.SELL;
+
+        LOG.info("executeSellsideOrder : " + pair + " " + amount + " " + rate);
+        ApiResponse orderResponse;
+        if (!Global.swappedPair) {
+            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
         } else {
-            LOG.warn("Demo mode. Don't execute orders");
-            return null;
+            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
         }
+
+        return orderResponse;
     }
 
-    private ApiResponse executeOrder(String type, CurrencyPair pair, double amount, double rate) {
-        if (type.equals(Constant.BUY)) {
-            return executeBuysideOrder(pair, amount, rate);
+
+    private boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
+
+        String orderString = orderString(type, amount, rate);
+        LOG.warn("Submiting limit order : " + orderString);
+
+        if (Global.options.isExecuteOrders()) {
+
+            ApiResponse orderResponse;
+            if (type.equals(Constant.BUY)) {
+                orderResponse = executeBuysideOrder(pair, amount, rate);
+            } else {
+                orderResponse = executeSellsideOrder(pair, amount, rate);
+            }
+
+            if (orderResponse.isPositive()) {
+                String msg = hipchatMsg(type, orderString);
+                HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
+                LOG.info("Strategy - " + type + " Response = " + orderResponse.getResponseObject());
+                return true;
+            } else {
+                LOG.error(orderResponse.getError().toString());
+                return false;
+            }
         } else {
-            return executeSellsideOrder(pair, amount, rate);
+            LOG.warn("Demo mode[executeorders:false] . Not executing orders");
+            return true;
         }
+
+
     }
 
     private Currency getCurrency(String type) {
@@ -294,23 +312,10 @@ public class StrategySecondaryPegUtils {
                 }
 
             }
-            //Prepare the orders
 
-            String orderString1 = orderString(type, amount1, price);
-            LOG.debug("order1: " + orderString1);
-
-            LOG.warn("Strategy - Submit order : " + orderString1);
-
-            ApiResponse order1Response = this.executeOrder(type, Global.options.getPair(), amount1, price);
-
-            if (order1Response.isPositive()) {
-                String msg = hipchatMsg(type, orderString1);
-                HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-                LOG.info("Strategy - " + type + " Response1 = " + order1Response.getResponseObject());
-            } else {
-                LOG.error(order1Response.getError().toString());
-                success = false;
-            }
+            success = this.executeOrder(type, Global.options.getPair(), amount1, price);
+            if (!success)
+                return false;
 
             //wait a while to give the time to the new amount to update
 
@@ -355,22 +360,13 @@ public class StrategySecondaryPegUtils {
 
                 }
 
-                String orderString2 = orderString(type, amount2, price);
-                LOG.debug("order2: " + orderString2);
 
-                //put it on order
+                //execute second order
 
-                LOG.warn("Strategy - Submit order : " + orderString2);
-                ApiResponse order2Response = this.executeOrder(type, Global.options.getPair(), amount2, price);
+                success = this.executeOrder(type, Global.options.getPair(), amount2, price);
+                if (!success)
+                    return false;
 
-                if (order2Response.isPositive()) {
-                    String msg = hipchatMsg(type, orderString2);
-                    HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-                    LOG.info("Strategy - " + type + " Response2 = " + order2Response.getResponseObject());
-                } else {
-                    LOG.error(order2Response.getError().toString());
-                    success = false;
-                }
             } else {
                 LOG.error("Error while reading the balance the second time " + balancesResponse2.getError().toString());
             }
