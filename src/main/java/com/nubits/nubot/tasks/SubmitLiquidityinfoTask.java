@@ -36,7 +36,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -162,10 +161,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
 
         if (verbose) {
-            DecimalFormat nf = new DecimalFormat("0");
-            nf.setMinimumFractionDigits(8);
-            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + nf.format(Global.exchange.getLiveData().getNBTonbuy()));
-            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + nf.format(Global.exchange.getLiveData().getNBTonsell()));
+
+            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Utils.formatNumber(Global.exchange.getLiveData().getNBTonbuy(), Settings.DEFAULT_PRECISION));
+            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Utils.formatNumber(Global.exchange.getLiveData().getNBTonsell(), Settings.DEFAULT_PRECISION));
         }
 
         double nbt_onsell = 0;
@@ -261,10 +259,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         logOrderJSON(orderHistory);
 
         if (verbose) {
-            DecimalFormat nf = new DecimalFormat("0");
-            nf.setMinimumFractionDigits(8);
-            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nf.format(nbt_onbuy));
-            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nf.format(nbt_onsell));
+            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + Utils.formatNumber(nbt_onbuy, Settings.DEFAULT_PRECISION));
+            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + Utils.formatNumber(nbt_onsell, Settings.DEFAULT_PRECISION));
         }
 
         if (Global.options.isSubmitliquidity()) {

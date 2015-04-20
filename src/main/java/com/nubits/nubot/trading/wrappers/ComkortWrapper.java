@@ -42,7 +42,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -237,11 +236,10 @@ public class ComkortWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        DecimalFormat nf = new DecimalFormat("0");
-        nf.setMinimumFractionDigits(8);
+
         args.put("market_alias", pair.toStringSepSpecial("_"));
-        args.put("amount", nf.format(amount));
-        args.put("price", nf.format(rate));
+        args.put("amount", Utils.formatNumber(amount, 8));
+        args.put("price", Utils.formatNumber(rate, 8));
 
         ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
