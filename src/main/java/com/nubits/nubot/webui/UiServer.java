@@ -1,6 +1,7 @@
 package com.nubits.nubot.webui;
 
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
@@ -28,7 +29,8 @@ public class UiServer {
 
         //set up all endpoints
 
-        LOG.info("launching on http://localhost:" + port);
+        String urlStr = "http://localhost:" + port;
+        LOG.info("launching on " + urlStr);
 
         //binds GET and POST
         LayoutTemplateEngine tmpl = new LayoutTemplateEngine(Settings.HTML_FOLDER);
@@ -52,6 +54,9 @@ public class UiServer {
         get("/setup", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "setup.mustache"), tmpl);
 
         new BotController();
+
+        LOG.debug("Opening the system default browser :");
+        Utils.launchBrowser(urlStr);
 
 
     }
