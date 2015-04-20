@@ -153,7 +153,7 @@ public class StrategySecondaryPegUtils {
                 return order1Response;
             }
         } else {
-            LOG.warn("Demo mode. Don't execute orders");
+            LOG.warn("Demo mode[executeorders:false] . Not executing orders");
             return null;
         }
     }
@@ -170,7 +170,7 @@ public class StrategySecondaryPegUtils {
                 return order1Response;
             }
         } else {
-            LOG.warn("Demo mode. Don't execute orders");
+            LOG.warn("Demo mode[executeorders:false] . Not executing orders");
             return null;
         }
     }
@@ -183,9 +183,9 @@ public class StrategySecondaryPegUtils {
 
         ApiResponse orderResponse;
         if (type.equals(Constant.BUY)) {
-            orderResponse= executeBuysideOrder(pair, amount, rate);
+            orderResponse = executeBuysideOrder(pair, amount, rate);
         } else {
-            orderResponse= executeSellsideOrder(pair, amount, rate);
+            orderResponse = executeSellsideOrder(pair, amount, rate);
         }
 
         if (orderResponse.isPositive()) {
