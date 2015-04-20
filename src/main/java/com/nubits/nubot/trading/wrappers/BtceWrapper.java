@@ -26,7 +26,6 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,15 +34,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -675,7 +673,7 @@ public class BtceWrapper implements TradeInterface {
                     // args signature with apache cryptografic tools
                     String toHash = post_data;
 
-                    signature = signRequest(keys.getPrivateKey(), toHash);
+                    signature = TradeUtils.signRequest(keys.getPrivateKey(), toHash, SIGN_HASH_FUNCTION, ENCODING);
                 }
                 // build URL
 
@@ -762,43 +760,5 @@ public class BtceWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String signature = "";
-
-            Mac mac;
-            SecretKeySpec key = null;
-
-            // Create a new secret key
-            try {
-                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-            } catch (UnsupportedEncodingException uee) {
-                LOG.error("Unsupported encoding exception: " + uee.toString());
-                return null;
-            }
-
-            // Create a new mac
-            try {
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.error("No such algorithm exception: " + nsae.toString());
-                return null;
-            }
-
-            // Init mac with key.
-            try {
-                mac.init(key);
-            } catch (InvalidKeyException ike) {
-                LOG.error("Invalid key exception: " + ike.toString());
-                return null;
-            }
-            try {
-                signature = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.error(ex.toString());
-            }
-            return signature;
-        }
     }
 }
