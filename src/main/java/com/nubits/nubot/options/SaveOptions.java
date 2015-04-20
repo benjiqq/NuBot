@@ -24,6 +24,8 @@ import com.google.gson.GsonBuilder;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.utils.FilesystemUtils;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -32,6 +34,7 @@ import java.io.IOException;
  * Save NuBotOptions to disk
  */
 public class SaveOptions {
+    private static final Logger LOG = LoggerFactory.getLogger(SaveOptions.class.getName());
 
 
     public static String jsonPretty(NuBotOptions opt) {
@@ -60,6 +63,7 @@ public class SaveOptions {
         Gson gson = builder.create();
         String jsonOpt = gson.toJson(opt);
         FilesystemUtils.writeToFile(jsonOpt, filepath, false);
+        LOG.info("Options saved on " + filepath);
         return true;
     }
 

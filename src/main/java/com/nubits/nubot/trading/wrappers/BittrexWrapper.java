@@ -44,7 +44,6 @@ import java.net.ProtocolException;
 import java.net.URL;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -256,10 +255,9 @@ public class BittrexWrapper implements TradeInterface {
         boolean needAuth = true;
 
         args.put("market", pair.toStringSepInverse("-").toUpperCase());
-        DecimalFormat nf = new DecimalFormat("0");
-        nf.setMinimumFractionDigits(8);
-        args.put("quantity", nf.format(amount));
-        args.put("rate", nf.format(rate));
+
+        args.put("quantity", Utils.formatNumber(amount, 8));
+        args.put("rate", Utils.formatNumber(rate, 8));
 
         ApiResponse response = getQuery(url, method, args, needAuth, isGet);
         if (response.isPositive()) {

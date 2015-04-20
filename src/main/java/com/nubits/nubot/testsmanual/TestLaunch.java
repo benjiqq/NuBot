@@ -61,7 +61,7 @@ public class TestLaunch {
         sessionLOG.debug("test launch");
 
         LOG.info("set global config");
-        SessionManager.setConfigGlobal(configFile);
+        SessionManager.setConfigGlobal(configFile, false);
 
 
         if (runui) {
@@ -99,7 +99,6 @@ public class TestLaunch {
     }
 
 
-
     /**
      * Start the NuBot. start if config is valid and other instance is running
      *
@@ -109,7 +108,7 @@ public class TestLaunch {
 
         //testlaunchWithFile();
         //testlaunchNoFile();
-        String[] args2 = {"-cfg=" + configFile,"-GUI"};
+        String[] args2 = {"-cfg=" + configFile, "-GUI"};
         MainLaunch.main(args2);
 
     }

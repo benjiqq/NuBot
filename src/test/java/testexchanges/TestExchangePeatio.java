@@ -69,8 +69,7 @@ public class TestExchangePeatio extends TestCase {
     private TradeInterface setupTI() {
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
             assertTrue(opt != null);
 

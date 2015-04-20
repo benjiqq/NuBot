@@ -116,7 +116,7 @@ public class ParseOptions {
      * @return
      * @throws NuBotConfigException
      */
-    public static NuBotOptions parseOptionsSingle(String filepath) throws NuBotConfigException {
+    public static NuBotOptions parseOptionsSingle(String filepath, boolean skipValidation) throws NuBotConfigException {
 
 
         File f = new File(filepath);
@@ -125,7 +125,7 @@ public class ParseOptions {
 
         try {
             JSONObject inputJSON = parseSingleJsonFile(filepath);
-            return parseOptionsFromJson(inputJSON);
+            return parseOptionsFromJson(inputJSON, skipValidation);
 
         } catch (ParseException ex) {
             throw new NuBotConfigException("Parse Exception. Configuration error from single file");
@@ -289,7 +289,7 @@ public class ParseOptions {
      * @param optionsJSON
      * @return
      */
-    public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON) throws NuBotConfigException {
+    public static NuBotOptions parseOptionsFromJson(JSONObject optionsJSON, boolean skipValidation) throws NuBotConfigException {
 
         try {
             isValidJSON(optionsJSON);
@@ -332,22 +332,26 @@ public class ParseOptions {
             LOG.warn("You are using the \"spread\" != 0 , which is not reccomented by Nu developers for purposes different from testing.");
         }
 
-        try {
-            isValidOptions(options);
-        } catch (NuBotConfigException e) {
-            throw e;
+        if (!skipValidation) {
+            try {
+                isValidOptions(options);
+            } catch (NuBotConfigException e) {
+                throw e;
+            }
+        } else {
+            LOG.debug("Skipping validation of configuration file.");
         }
 
         return options;
     }
 
-    public static NuBotOptions parsePost(JSONObject postJson) throws Exception {
+    public static NuBotOptions parsePost(JSONObject postJson, boolean skipValidation) throws Exception {
 
         NuBotOptions newopt = null;
 
         try {
             //Check if NuBot has valid parameters
-            newopt = ParseOptions.parseOptionsFromJson(postJson);
+            newopt = ParseOptions.parseOptionsFromJson(postJson, skipValidation);
             LOG.debug("parse post opt: " + newopt);
 
         } catch (NuBotConfigException e) {
