@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>NuBot GUI</title>
+    <title>NuBot GUI - Stopped</title>
     <style>
 
         body {
@@ -52,6 +52,7 @@
               $('#startbot').html("Running");
               $('#startbot').removeClass("btn-primary");
               $('#startbot').addClass("btn-success");
+              document.title = 'NuBot GUI - Running';
          }
 
          function setHalted(){
@@ -61,7 +62,7 @@
 
               $("#ordertable").find("tr:gt(0)").remove();
               $("#balancetable").find("tr:gt(0)").remove();
-
+              document.title = 'NuBot GUI - Stopped';
          }
 
         function updateConfigFile(){
@@ -498,6 +499,9 @@
                });
             }
            }
+
+
+
 
 
     </script>
