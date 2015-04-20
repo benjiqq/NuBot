@@ -60,7 +60,7 @@ public class TestExchangeBitspark extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
             assertTrue(opt != null);
             assertTrue(opt.getExchangeName().equals("bitspark"));
@@ -78,7 +78,7 @@ public class TestExchangeBitspark extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             LOG.info("using opt " + opt);
             LOG.info("key: " + opt.apiKey);
             LOG.info("secret: " + opt.apiSecret);
@@ -138,7 +138,7 @@ public class TestExchangeBitspark extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             LOG.info("using opt " + opt);
             LOG.info("key: " + opt.apiKey);
             LOG.info("secret: " + opt.apiSecret);

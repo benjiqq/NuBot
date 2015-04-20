@@ -56,7 +56,7 @@ public class TestExchangePoloniex extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
             assertTrue(opt != null);
             assertTrue(opt.getExchangeName().equals("Poloniex"));
@@ -74,7 +74,7 @@ public class TestExchangePoloniex extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -112,7 +112,7 @@ public class TestExchangePoloniex extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             Global.options = opt;
         } catch (NuBotConfigException e) {
             e.printStackTrace();
@@ -145,7 +145,7 @@ public class TestExchangePoloniex extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
         } catch (NuBotConfigException e) {
             e.printStackTrace();

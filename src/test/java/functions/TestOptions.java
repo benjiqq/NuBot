@@ -116,7 +116,7 @@ public class TestOptions extends TestCase {
     public void testLoadConfig() {
         try {
             NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
             assertTrue(nuo != null);
 
@@ -156,7 +156,7 @@ public class TestOptions extends TestCase {
 
         boolean catched = false;
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
             assertTrue(opt.isSubmitliquidity() == false);
 
@@ -179,7 +179,7 @@ public class TestOptions extends TestCase {
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
         } catch (NuBotConfigException e) {
             System.out.println("error " + e);
@@ -248,7 +248,7 @@ public class TestOptions extends TestCase {
         String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
         boolean catched = false;
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig, false);
             assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("btce"));
             assertTrue(opt.backupFeeds.size() == 2);

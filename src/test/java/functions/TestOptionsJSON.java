@@ -105,7 +105,7 @@ public class TestOptionsJSON extends TestCase {
         }
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions.parseOptionsFromJson(optionJson);
+            opt = ParseOptions.parseOptionsFromJson(optionJson, false);
         } catch (Exception e) {
 
         }
@@ -143,7 +143,7 @@ public class TestOptionsJSON extends TestCase {
 
         NuBotOptions newopt = null;
         try {
-            newopt = ParseOptions.parseOptionsSingle(configFile);
+            newopt = ParseOptions.parseOptionsSingle(configFile, false);
         } catch (Exception e) {
 
         }

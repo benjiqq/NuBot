@@ -45,7 +45,7 @@ public class InitTests {
         File f = new File(path);
         if (f.exists() && !f.isDirectory()) {
             try {
-                Global.options = ParseOptions.parseOptionsSingle(path);
+                Global.options = ParseOptions.parseOptionsSingle(path, false);
             } catch (NuBotConfigException ex) {
                 LOG.error(ex.toString());
             }

@@ -38,13 +38,13 @@ public class SessionManager {
      *
      * @param configfile
      */
-    public static void setConfigGlobal(String configfile) {
+    public static void setConfigGlobal(String configfile, boolean skipValidation) {
 
         sessionLOG.debug("parsing options from " + configfile);
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile, skipValidation);
             LOG.debug("loading opt: " + opt.toStringNoKeys());
             Global.options = opt;
             Global.currentOptionsFile = configfile;
