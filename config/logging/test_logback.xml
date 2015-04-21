@@ -97,7 +97,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>logs/tests/${session}/standard.html</file>
+                    <file>${session}/standard.html</file>
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                         <level>INFO</level>
@@ -143,7 +143,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>logs/tests/${session}/verbose.html</file>
+                    <file>${session}/verbose.html</file>
                     <!--<append>false</append>-->
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -190,7 +190,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>logs/tests/${session}/${standardlogFile}</file>
+                    <file>${session}/${standardlogFile}</file>
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                         <level>INFO</level>
@@ -225,7 +225,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>logs/tests/${session}/${UIverboselogFile}</file>
+                    <file>${session}/${UIverboselogFile}</file>
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                         <level>DEBUG</level>
