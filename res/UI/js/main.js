@@ -14,7 +14,10 @@ function toggleBot(running)
     if(running)
     {
       botRunning = true;
-      $('#togglebot').html("Stop Bot");
+      $('#togglebot-text').html("Stop Bot");
+      $('#togglebot-text').addClass("glyphicon-off");
+      $('#togglebot-text').removeClass("glyphicon-play");
+
       $('#togglebot').removeClass("btn-primary");
       $('#togglebot').addClass("btn-warning");
 
@@ -27,7 +30,9 @@ function toggleBot(running)
     {
       botRunning = false;
       updateFavico(0);
-      $('#togglebot').html("Start Bot");
+      $('#togglebot-text').html("Start Bot");
+      $('#togglebot-text').addClass("glyphicon-play");
+      $('#togglebot-text').removeClass("glyphicon-off");
 
       $('#togglebot').removeClass("btn-warning");
       $('#togglebot').addClass("btn-primary");
