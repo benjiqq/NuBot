@@ -91,13 +91,14 @@ public class PoloniexWrapper implements TradeInterface {
         ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
         if (!response.isPositive()) {
             String errMsg = response.getError().getDescription();
-            LOG.error("nonce error. retry with correct nonce");
             if (errMsg.contains("Poloniex API returned an error: Nonce must be greater than ")) {
-                //handle noncex
+                LOG.error("nonce error. retry with correct nonce");
+                //handle nonce exception. get the nonce they want and add some
                 int i = errMsg.indexOf("Nonce must be greater than ");
                 int j = errMsg.indexOf(". You");
                 int greaterNonce = new Integer(errMsg.substring(i, j));
-                this.nonceCount = greaterNonce + 1;
+                int addNonce = 5;
+                this.nonceCount = greaterNonce + addNonce;
                 response = getQueryMain(url, method, query_args, needAuth, isGet);
                 return response;
             }
@@ -486,7 +487,7 @@ public class PoloniexWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to ccdek");
+            LOG.error("The bot will not execute the query, there is no connection to " + this.getClass());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
