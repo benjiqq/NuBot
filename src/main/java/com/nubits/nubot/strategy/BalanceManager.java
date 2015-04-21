@@ -33,7 +33,15 @@ public class BalanceManager {
 
     }
 
+    public void fetchBalancesIfTimePast(CurrencyPair pair, double tresh) throws Exception {
+        long current = System.currentTimeMillis();
+        if (current - lastFetchBalance > tresh){
+            fetchBalances(pair);
+        }
+    }
+
     public void fetchBalances(CurrencyPair pair) throws Exception {
+        lastFetchBalance = System.currentTimeMillis();
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
 
         if (!balancesResponse.isPositive()) {
