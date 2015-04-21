@@ -15,9 +15,11 @@ function toggleBot(running)
     {
       botRunning = true;
       $('#togglebot').html("Stop Bot");
-
       $('#togglebot').removeClass("btn-primary");
       $('#togglebot').addClass("btn-success");
+
+      //$('#status-img').attr("src","img/bot_running.gif");
+
       document.title = 'NuBot GUI - Running'+animateDots();
       //$("#favicon").attr("href","favicon-running.ico");
     }
@@ -30,6 +32,8 @@ function toggleBot(running)
       $('#togglebot').removeClass("btn-success");
       $('#togglebot').addClass("btn-primary");
       $('#togglebot').html("Start");
+
+      //$('#status-img').attr("src","img/bot_running.png");
 
       $("#ordertable").find("tr:gt(0)").remove();
       $("#balancetable").find("tr:gt(0)").remove();
@@ -136,7 +140,7 @@ function updateStatus(){
 
         })
         .done(function( data ) {
-            //console.log("status data: " + data);
+            console.log("status data: " + JSON.parse(JSON.stringify(data)));
 
             $('#botstatus').html(data["status"]);
 
