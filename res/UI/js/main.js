@@ -9,6 +9,12 @@
 
   var logLine = 0;
 
+
+function clearTables(){
+    $("#ordertable").find("tr:gt(0)").remove();
+    $("#balancetable").find("tr:gt(0)").remove();
+}
+
 function toggleBot(running)
 {
     if(running)
@@ -39,8 +45,8 @@ function toggleBot(running)
 
       //$('#status-img').attr("src","img/bot_running.png");
 
-      $("#ordertable").find("tr:gt(0)").remove();
-      $("#balancetable").find("tr:gt(0)").remove();
+      setTimeout(clearTables, 2000);
+
       document.title = 'NuBot GUI - Stopped';
       //$("#favicon").attr("href","favicon.ico");
     }
@@ -83,6 +89,7 @@ function updateConfigFile(){
             $('#configfile').html(data["configfile"]);
         });
 }
+
 
 function updateOrders(){
      $.ajax({
