@@ -35,7 +35,7 @@ import java.io.File;
 public class InitTests {
 
     static {
-        System.setProperty("logback.configurationFile", "allconfig/testlog.xml");
+        System.setProperty("logback.configurationFile", "config/logging/test_logback.xml");
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(InitTests.class.getName());
