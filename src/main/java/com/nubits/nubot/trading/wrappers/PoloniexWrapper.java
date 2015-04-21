@@ -97,7 +97,7 @@ public class PoloniexWrapper implements TradeInterface {
                 int i = errMsg.indexOf(stmp);
                 int j = errMsg.indexOf(". You");
                 String subs = errMsg.substring(i + stmp.length(), j);
-                LOG.info("subs: " + subs);
+
                 int greaterNonce = new Integer(subs);
                 int addNonce = 5;
                 this.nonceCount = greaterNonce + addNonce;
