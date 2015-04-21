@@ -87,6 +87,26 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
+
+        ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
+        if (!response.isPositive()) {
+            String errMsg = response.getError().getDescription();
+            LOG.error("nonce error. retry with correct nonce");
+            if (errMsg.contains("Poloniex API returned an error: Nonce must be greater than ")) {
+                //handle noncex
+                int i = errMsg.indexOf("Nonce must be greater than ");
+                int j = errMsg.indexOf(". You");
+                int greaterNonce = new Integer(errMsg.substring(i, j));
+                this.nonceCount = greaterNonce + 1;
+                response = getQueryMain(url, method, query_args, needAuth, isGet);
+                return response;
+            }
+
+        }
+        return response;
+    }
+
+    private ApiResponse getQueryMain(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, needAuth, false);
         if (queryResult == null) {
@@ -106,14 +126,6 @@ public class PoloniexWrapper implements TradeInterface {
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
                 LOG.error("Poloniex API returned an error: " + errorMessage);
-
-                if (errorMessage.contains("Poloniex API returned an error: Nonce must be greater than ")){
-                    //handle nonce
-                    int i = errorMessage.indexOf("Nonce must be greater than ");
-                    int j = errorMessage.indexOf(". You");
-                    int greaterNonce = new Integer(errorMessage.substring(i,j));
-                    this.nonceCount = greaterNonce+1;
-                }
 
                 apiResponse.setError(apiErr);
             } else {
