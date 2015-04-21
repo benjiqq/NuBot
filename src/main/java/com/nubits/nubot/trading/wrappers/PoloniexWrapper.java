@@ -73,6 +73,8 @@ public class PoloniexWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
+    private int nonceCount = new Long(System.currentTimeMillis()/1000).intValue();
+
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
@@ -104,6 +106,15 @@ public class PoloniexWrapper implements TradeInterface {
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
                 LOG.error("Poloniex API returned an error: " + errorMessage);
+
+                if (errorMessage.contains("Poloniex API returned an error: Nonce must be greater than ")){
+                    //handle nonce
+                    int i = errorMessage.indexOf("Nonce must be greater than ");
+                    int j = errorMessage.indexOf(". You");
+                    int greaterNonce = new Integer(errorMessage.substring(i,j));
+                    this.nonceCount = greaterNonce+1;
+                }
+
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -696,16 +707,18 @@ public class PoloniexWrapper implements TradeInterface {
                     }
                 }
             } //Capture Exceptions
+            //2ERROR - Poloniex API returned an error: Nonce must be greater than 14296103443350000. You provided 2. [c.n.n.t.w.PoloniexWrapper:106]
+
             catch (IllegalStateException ex) {
-                LOG.error(ex.toString());
+                LOG.error("IllegalStateException: " + ex.toString());
                 return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.error(ex.toString());
+                LOG.error("NoRouteToHostException: " + ex.toString());
 
                 answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
-                LOG.error(ex.toString());
+                LOG.error("IOException: " + ex.toString());
                 return null;
             } finally {
                 //close the connection, set all objects to null
@@ -714,11 +727,16 @@ public class PoloniexWrapper implements TradeInterface {
             return answer;
         }
 
+
+
         private String createNonce() {
+
             //potential FIX: add some time to the nonce, since time sync has issues
             //long fixtime = 1000;
-            long toRet = System.currentTimeMillis() * 10000; // + fixtime;
-            return Long.toString(toRet);
+            //long toRet = System.currentTimeMillis(); // + fixtime;
+            nonceCount++;
+            LOG.debug("nonce used " + nonceCount);
+            return Long.toString(nonceCount);
         }
     }
 }
