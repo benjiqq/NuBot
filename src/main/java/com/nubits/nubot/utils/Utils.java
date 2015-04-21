@@ -24,6 +24,12 @@ import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -430,8 +436,41 @@ public class Utils {
 
     }
 
+    public static String getBotUptimeDate() {
+        //DateTime history = new DateTime( "1901-01-01", DateTimeZone.UTC ).withTimeAtStartOfDay();
+        //DateTime today = new DateTime( DateTimeZone.UTC ).withTimeAtStartOfDay();
+
+        DateTime now = new DateTime();
+        Duration duration = new Duration(now, Global.sessionStartDate);
+        Period period = duration.toPeriod();
+        PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
+                .appendDays()
+                .appendSuffix(" day", " days")
+                .appendSeparator(" ")
+                .printZeroIfSupported()
+                .minimumPrintedDigits(2)
+                .appendHours()
+                .appendSeparator(":")
+                .appendMinutes()
+                .printZeroIfSupported()
+                .minimumPrintedDigits(2)
+                .appendSeparator(":")
+                .appendSeconds()
+                .minimumPrintedDigits(2)
+                .toFormatter();
+
+                /*
+                .printZeroAlways()
+                .appendMinutes()
+                .appendSeparator(":")
+                .appendSeconds()
+                .toFormatter();*/
+        String result = minutesAndSeconds.print(period);
+        return result;
+    }
+
     //Return the uptime of the bot [hours]
-    public static String getBotUptime() {
+    public static String getBotUptimeReadable() {
         long upTimeMs = System.currentTimeMillis() - Global.sessionStarted;
         String toReturn = "";
         if (getDaysFromMillis(upTimeMs) > 2) {

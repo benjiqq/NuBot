@@ -26,6 +26,7 @@ import com.nubits.nubot.strategy.BalanceManager;
 import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,8 @@ public class Global {
     public static String sessionPath;
 
     public static long sessionStarted, sessionStopped;
+
+    public static DateTime sessionStartDate, sessionStopDate;
 
     public static boolean sessionRunning = false;
 
