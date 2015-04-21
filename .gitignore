@@ -18,6 +18,7 @@ res/frozen-funds
 
 #Specific files to ignore
 *.html
+!res/UI/docs/*.html
 
 #Prevent test passwords to be pushed
 Passwords.java
