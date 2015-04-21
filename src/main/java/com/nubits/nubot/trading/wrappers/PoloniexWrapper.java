@@ -91,14 +91,22 @@ public class PoloniexWrapper implements TradeInterface {
         ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
         if (!response.isPositive()) {
             String errMsg = response.getError().getDescription();
-            if (errMsg.contains("Poloniex API returned an error: Nonce must be greater than ")) {
-                LOG.error("nonce error. retry with correct nonce");
+            if (errMsg.contains("Nonce must be greater than ")) {
                 //handle nonce exception. get the nonce they want and add some
-                int i = errMsg.indexOf("Nonce must be greater than ");
+                String stmp = "Nonce must be greater than ";
+                int i = errMsg.indexOf(stmp);
                 int j = errMsg.indexOf(". You");
-                int greaterNonce = new Integer(errMsg.substring(i, j));
+                String subs = errMsg.substring(i + stmp.length(), j);
+                LOG.info("subs: " + subs);
+                int greaterNonce = new Integer(subs);
                 int addNonce = 5;
                 this.nonceCount = greaterNonce + addNonce;
+                LOG.error("nonce error. retry with corrected nonce " + this.nonceCount);
+                try{
+                    Thread.sleep(100);
+                }catch (InterruptedException e){
+
+                }
                 response = getQueryMain(url, method, query_args, needAuth, isGet);
                 return response;
             }
