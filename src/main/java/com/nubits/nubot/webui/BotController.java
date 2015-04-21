@@ -121,7 +121,7 @@ public class BotController {
 
                     } catch (Exception e) {
                         success = false;
-                        opmap.put("error", "can't interrupt");
+                        opmap.put("error", "can't interrupt : " + e.toString());
                     }
                 } else {
                     success = false;
