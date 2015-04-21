@@ -436,19 +436,35 @@ public class Utils {
 
     }
 
-    public static String getBotUptimeDate(){
+    public static String getBotUptimeDate() {
         //DateTime history = new DateTime( "1901-01-01", DateTimeZone.UTC ).withTimeAtStartOfDay();
         //DateTime today = new DateTime( DateTimeZone.UTC ).withTimeAtStartOfDay();
 
         DateTime now = new DateTime();
-        Duration duration = new Duration( Global.sessionStartDate, now );
+        Duration duration = new Duration(now, Global.sessionStartDate);
         Period period = duration.toPeriod();
         PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
+                .appendDays()
+                .appendSuffix(" day", " days")
+                .appendSeparator(" ")
+                .printZeroIfSupported()
+                .minimumPrintedDigits(2)
+                .appendHours()
+                .appendSeparator(":")
+                .appendMinutes()
+                .printZeroIfSupported()
+                .minimumPrintedDigits(2)
+                .appendSeparator(":")
+                .appendSeconds()
+                .minimumPrintedDigits(2)
+                .toFormatter();
+
+                /*
                 .printZeroAlways()
                 .appendMinutes()
                 .appendSeparator(":")
                 .appendSeconds()
-                .toFormatter();
+                .toFormatter();*/
         String result = minutesAndSeconds.print(period);
         return result;
     }
