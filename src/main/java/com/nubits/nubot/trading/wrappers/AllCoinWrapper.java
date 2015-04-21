@@ -753,7 +753,7 @@ public class AllCoinWrapper implements TradeInterface {
                         args.put("created", Objects.toString(System.currentTimeMillis() / 1000L));
                         args.put("method", method);
                         //the sign is the MD5 hash of all arguments so far in alphabetical order
-                        args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
+                        args.put("sign", getSign(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
 
                         post_data = TradeUtils.buildQueryString(args, ENCODING);
                     } else {
@@ -843,8 +843,7 @@ public class AllCoinWrapper implements TradeInterface {
             return toRet;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
+        private String getSign(String secret, String hash_data) {
             try {
                 java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
                 byte[] array = md.digest(hash_data.getBytes());

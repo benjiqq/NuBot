@@ -24,13 +24,9 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.trading.ErrorManager;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -48,18 +44,13 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class BterWrapper implements TradeInterface {
@@ -795,7 +786,7 @@ public class BterWrapper implements TradeInterface {
 
             }
 
-            signature = signRequest(keys.getPrivateKey(), post_data);
+            signature = TradeUtils.signRequest(keys.getPrivateKey(), post_data, SIGN_HASH_FUNCTION, ENCODING);
 
             // add header
             Header[] headers = new Header[3];
@@ -889,40 +880,5 @@ public class BterWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String sign = "";
-            try {
-                Mac mac = null;
-                SecretKeySpec key = null;
-                // Create a new secret key
-                try {
-                    key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-                } catch (UnsupportedEncodingException uee) {
-                    LOG.error("Unsupported encoding exception: " + uee.toString());
-                }
-
-                // Create a new mac
-                try {
-                    mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                } catch (NoSuchAlgorithmException nsae) {
-                    LOG.error("No such algorithm exception: " + nsae.toString());
-                }
-
-                // Init mac with key.
-                try {
-                    mac.init(key);
-                } catch (InvalidKeyException ike) {
-                    LOG.error("Invalid key exception: " + ike.toString());
-                }
-
-                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.error(ex.toString());
-            }
-            return sign;
-
-        }
     }
 }

@@ -41,6 +41,7 @@ def testdistdir = new File("testdist")
 def builddir = new File("build")
 def docdir = new File("docs")
 def resdir = new File("res")
+def staticDocsDir = new File("res/UI/docs")
 
 def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
@@ -206,6 +207,8 @@ task NuBotDist(dependsOn: NuBotJar) {
     doFirst {
         println 'start making distribution'
 
+        tasks.cleanhtml.execute()
+
         //copy jar
         copy {
             "build/libs/${jarname}"
@@ -220,8 +223,6 @@ task NuBotDist(dependsOn: NuBotJar) {
         println 'dist do last'
 
         tasks.propfile.execute()
-
-        tasks.cleanhtml.execute()
 
         tasks.LaunchUIjar.execute()
 
@@ -309,7 +310,7 @@ task NuBotDist(dependsOn: NuBotJar) {
             into "${distdir}/res"
         }
 
-        tasks.cleanhtml.execute()
+        tasks.moveHTMLtoStaticDocs.execute()
 
     }
 
@@ -389,10 +390,19 @@ task propfile << {
 }
 
 task cleanhtml << {
-
     html_files.each { File file ->
         println 'delete ' + file.name
         delete(file)
+    }
+}
+
+task moveHTMLtoStaticDocs << {
+    html_files.each { File file ->
+        println "copy " + "${docdir}/" + file.name + " to ${staticDocsDir}"
+        copy {
+            from "${docdir}/" + file.name
+            into "${staticDocsDir}"
+        }
     }
 }
 

@@ -55,11 +55,9 @@ public class UiServer {
         configmap.put("configfile", configFile);
         get("/configui", (request, response) -> new ModelAndView(configmap, Settings.HTML_FOLDER + "config.mustache"), tmpl);
 
+        get("/docu", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "docu.mustache"), tmpl);
 
-        get("/about", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "about.mustache"), tmpl);
-
-        get("/setup", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "setup.mustache"), tmpl);
-
+        get("/disclaimer", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "disclaimer.mustache"), tmpl);
 
         new BotController();
 

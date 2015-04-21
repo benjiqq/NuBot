@@ -785,11 +785,6 @@ public class BitSparkWrapper implements TradeInterface {
             }
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters");
-        }
-
         private String getSign(AbstractMap<String, String> parameters) {
             if (parameters.containsKey("signature")) {
                 parameters.remove("signature");

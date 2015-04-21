@@ -480,5 +480,5 @@ $(document).ready(function() {
             alert(xhr.responseText);
         }
    });
- å}
+ Ã¥}
 }
