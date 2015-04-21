@@ -14,7 +14,7 @@ function toggleBot(running)
     if(running)
     {
       botRunning = true;
-      $('#togglebot-text').html("Stop Bot");
+      $('#togglebot-text').html(" Stop Bot");
       $('#togglebot-text').addClass("glyphicon-off");
       $('#togglebot-text').removeClass("glyphicon-play");
 
@@ -30,7 +30,7 @@ function toggleBot(running)
     {
       botRunning = false;
       updateFavico(0);
-      $('#togglebot-text').html("Start Bot");
+      $('#togglebot-text').html(" Start Bot");
       $('#togglebot-text').addClass("glyphicon-play");
       $('#togglebot-text').removeClass("glyphicon-off");
 
