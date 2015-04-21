@@ -31,7 +31,6 @@ function toggleBot(running)
 
       $('#togglebot').removeClass("btn-success");
       $('#togglebot').addClass("btn-primary");
-      $('#togglebot').html("Start");
 
       //$('#status-img').attr("src","img/bot_running.png");
 
