@@ -39,7 +39,7 @@ public class TestFroozenAmounts {
     private static final Logger LOG = LoggerFactory.getLogger(TestFroozenAmounts.class.getName());
 
     public static void main(String[] args) {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestFroozenAmounts.class.getSimpleName());
 
         CurrencyPair pair = CurrencyList.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();

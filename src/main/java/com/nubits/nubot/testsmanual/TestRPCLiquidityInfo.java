@@ -56,7 +56,7 @@ public class TestRPCLiquidityInfo {
 
     public static void main(String[] args) {
 
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestRPCLiquidityInfo.class.getSimpleName());
 
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 

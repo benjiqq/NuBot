@@ -51,7 +51,7 @@ public class TestSync extends TimerTask {
     private static AbstractPriceFeed feed;
 
     public static void main(String[] args) throws InterruptedException {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestSync.class.getSimpleName());
 
         //Run multiple instance of this test to see if they read the same price.
         //It sends a notification on hipchat after syncing with a remote time server

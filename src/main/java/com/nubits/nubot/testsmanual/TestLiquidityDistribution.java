@@ -53,7 +53,7 @@ public class TestLiquidityDistribution {
     double pegPrice;
 
     public static void main(String a[]) {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestLiquidityDistribution.class.getSimpleName());
 
         TestLiquidityDistribution test = new TestLiquidityDistribution();
 

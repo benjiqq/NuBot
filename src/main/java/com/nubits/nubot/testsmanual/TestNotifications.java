@@ -40,7 +40,7 @@ public class TestNotifications {
 
     public static void main(String[] a) {
 
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestNotifications.class.getSimpleName());
 
         InitTests.loadConfig(TEST_OPTIONS_PATH);
         InitTests.loadKeystore(false);

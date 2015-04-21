@@ -73,7 +73,7 @@ public class TestSSLConnection {
             System.out.println("Usage: " + TestSSLConnection.class.getName() + " <host> <port>");
             System.exit(1);
         }
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestSSLConnection.class.getSimpleName());
 
         connectionTest(args[0], Integer.parseInt(args[1]));
 

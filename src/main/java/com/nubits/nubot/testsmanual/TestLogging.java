@@ -16,11 +16,11 @@ public class TestLogging {
         System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
-    private static final Logger LOG = LoggerFactory.getLogger(TestWrappers.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(TestLogging.class.getName());
 
     public static void main(String[] args) {
 
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestLogging.class.getSimpleName());
         LOG.info("abcd" + LOG.getName());
     }
 

@@ -45,7 +45,7 @@ public class TestPriceFeed {
     private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeed.class.getName());
 
     public static void main(String a[]) {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestPriceFeed.class.getSimpleName());
 
         TestPriceFeed test = new TestPriceFeed();
         test.init();
