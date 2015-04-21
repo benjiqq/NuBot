@@ -109,7 +109,9 @@
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
                         <expression>
-                            return logger.contains("jetty");
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>
@@ -156,7 +158,9 @@
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
                         <expression>
-                            return logger.contains("jetty");
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>
