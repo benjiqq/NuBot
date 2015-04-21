@@ -287,7 +287,7 @@ public abstract class NuBotBase {
         String openStrongTaging = "<strong>";
         String closingStrongTaging = "</strong>";
 
-        String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
+        String additionalInfo = "after " + Utils.getBotUptimeReadable() + " uptime on "
                 + openStrongTaging + Global.options.getExchangeName() + closingStrongTaging + " ["
                 + Global.options.getPair().toStringSep() + "]";
 

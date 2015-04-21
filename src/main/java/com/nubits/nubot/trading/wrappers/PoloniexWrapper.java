@@ -73,6 +73,8 @@ public class PoloniexWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
+    private long nonceCount = new Long(System.currentTimeMillis()/1000).longValue();
+
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
@@ -85,6 +87,35 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
+
+        ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
+        if (!response.isPositive()) {
+            String errMsg = response.getError().getDescription();
+            if (errMsg.contains("Nonce must be greater than ")) {
+                //handle nonce exception. get the nonce they want and add some
+                String stmp = "Nonce must be greater than ";
+                int i = errMsg.indexOf(stmp);
+                int j = errMsg.indexOf(". You");
+                String subs = errMsg.substring(i + stmp.length(), j);
+
+                long greaterNonce = new Long(subs);
+                int addNonce = 5;
+                this.nonceCount = greaterNonce + addNonce;
+                LOG.error("nonce error. retry with corrected nonce " + this.nonceCount);
+                try{
+                    Thread.sleep(100);
+                }catch (InterruptedException e){
+
+                }
+                response = getQueryMain(url, method, query_args, needAuth, isGet);
+                return response;
+            }
+
+        }
+        return response;
+    }
+
+    private ApiResponse getQueryMain(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, needAuth, false);
         if (queryResult == null) {
@@ -104,6 +135,7 @@ public class PoloniexWrapper implements TradeInterface {
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
                 LOG.error("Poloniex API returned an error: " + errorMessage);
+
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -463,7 +495,7 @@ public class PoloniexWrapper implements TradeInterface {
         if (exchange.getLiveData().isConnected()) {
             queryResult = service.executeQuery(base, method, args, needAuth, isGet);
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to ccdek");
+            LOG.error("The bot will not execute the query, there is no connection to " + this.getClass());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -696,16 +728,18 @@ public class PoloniexWrapper implements TradeInterface {
                     }
                 }
             } //Capture Exceptions
+            //2ERROR - Poloniex API returned an error: Nonce must be greater than 14296103443350000. You provided 2. [c.n.n.t.w.PoloniexWrapper:106]
+
             catch (IllegalStateException ex) {
-                LOG.error(ex.toString());
+                LOG.error("IllegalStateException: " + ex.toString());
                 return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.error(ex.toString());
+                LOG.error("NoRouteToHostException: " + ex.toString());
 
                 answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
-                LOG.error(ex.toString());
+                LOG.error("IOException: " + ex.toString());
                 return null;
             } finally {
                 //close the connection, set all objects to null
@@ -714,11 +748,16 @@ public class PoloniexWrapper implements TradeInterface {
             return answer;
         }
 
+
+
         private String createNonce() {
+
             //potential FIX: add some time to the nonce, since time sync has issues
             //long fixtime = 1000;
-            long toRet = System.currentTimeMillis() * 10000; // + fixtime;
-            return Long.toString(toRet);
+            //long toRet = System.currentTimeMillis(); // + fixtime;
+            nonceCount++;
+            LOG.debug("nonce used " + nonceCount);
+            return Long.toString(nonceCount);
         }
     }
 }
