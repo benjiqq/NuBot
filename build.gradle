@@ -222,8 +222,6 @@ task NuBotDist(dependsOn: NuBotJar) {
 
         tasks.propfile.execute()
 
-        tasks.cleanhtml.execute()
-
         tasks.LaunchUIjar.execute()
 
         println "finish distribution"
