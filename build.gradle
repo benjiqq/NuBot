@@ -207,6 +207,8 @@ task NuBotDist(dependsOn: NuBotJar) {
     doFirst {
         println 'start making distribution'
 
+        tasks.cleanhtml.execute()
+
         //copy jar
         copy {
             "build/libs/${jarname}"
@@ -221,8 +223,6 @@ task NuBotDist(dependsOn: NuBotJar) {
         println 'dist do last'
 
         tasks.propfile.execute()
-
-        tasks.cleanhtml.execute()
 
         tasks.LaunchUIjar.execute()
 
@@ -311,7 +311,6 @@ task NuBotDist(dependsOn: NuBotJar) {
         }
 
         tasks.moveHTMLtoStaticDocs.execute()
-        tasks.cleanhtml.execute()
 
     }
 
@@ -399,9 +398,9 @@ task cleanhtml << {
 
 task moveHTMLtoStaticDocs << {
     html_files.each { File file ->
-        println 'copy HTML documentation to GUI static folder ' + file.name
+        println "copy " + "${docdir}/" + file.name + " to ${staticDocsDir}"
         copy {
-            from file.name
+            from "${docdir}/" + file.name
             into "${staticDocsDir}"
         }
     }
