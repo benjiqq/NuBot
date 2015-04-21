@@ -46,13 +46,4 @@ public interface ServiceInterface {
      */
     public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet);
 
-
-    /**
-     * Sign the request
-     *
-     * @param secret    The secret key
-     * @param hash_data The hash data
-     * @return A String with the signature
-     */
-    public String signRequest(String secret, String hash_data);
 }

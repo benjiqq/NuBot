@@ -19,15 +19,18 @@
 package functions;
 
 
+import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.options.NuBotOptionsDefault;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.FilesystemUtils;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
@@ -116,7 +119,7 @@ public class TestOptions extends TestCase {
     public void testLoadConfig() {
         try {
             NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
             assertTrue(nuo != null);
 
@@ -156,7 +159,7 @@ public class TestOptions extends TestCase {
 
         boolean catched = false;
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
             assertTrue(opt.isSubmitliquidity() == false);
 
@@ -179,7 +182,7 @@ public class TestOptions extends TestCase {
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
         } catch (NuBotConfigException e) {
             System.out.println("error " + e);
@@ -248,7 +251,7 @@ public class TestOptions extends TestCase {
         String testconfig = Settings.TESTS_CONFIG_PATH + "/" + testconfigFile;
         boolean catched = false;
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig, false);
             assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("btce"));
             assertTrue(opt.backupFeeds.size() == 2);
@@ -263,6 +266,127 @@ public class TestOptions extends TestCase {
 
         assertTrue(!catched);
 
+
+    }
+
+    @Test
+    public void testToJson() {
+
+        NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
+        assertTrue(opt != null);
+
+        String jsonString = NuBotOptions.optionsToJson(opt);
+
+        assertTrue(jsonString.length() > 0);
+
+        JSONParser jsonparser = new JSONParser();
+        JSONObject optionJson = null;
+        try {
+            optionJson = (JSONObject) (jsonparser.parse(jsonString));
+        } catch (Exception e) {
+
+        }
+
+        System.out.println(optionJson);
+
+        for (int i = 0; i < ParseOptions.allkeys.length; i++) {
+            String f = ParseOptions.allkeys[i];
+            System.out.println(f);
+            //assertTrue(optionJson.containsKey(f));
+            assertTrue(ParseOptions.containsIgnoreCase(optionJson, f));
+        }
+
+
+    }
+
+    @Test
+    public void testRoundTrip() {
+
+
+        String jsonString = "{\n" +
+                "  \"exchangename\":\"Poloniex\",\n" +
+                "  \"apiKey\": \"def\",\n" +
+                "  \"apiSecret\": \"abc\",\n" +
+                "  \"executeorders\":true,\n" +
+                "  \"txfee\": 0.0,\n" +
+                "  \"pair\":\"nbt_btc\",\n" +
+                "  \"submitliquidity\":false,\n" +
+                "  \"nubitaddress\": \"xxx\",\n" +
+                "  \"nudip\": \"127.0.0.1\",\n" +
+                "  \"nudport\": 9091,\n" +
+                "  \"rpcpass\": \"xxx\",\n" +
+                "  \"rpcuser\": \"xxx\",\n" +
+                "  \"mainfeed\":\"blockchain\",\n" +
+                "  \"backupfeeds\": [\"coinbase\", \"btce\"],\n" +
+                "  \"wallchangeThreshold\": 0.1,\n" +
+                "  \"dualside\": true,\n" +
+                "  \"multiplecustodians\":false,\n" +
+                "  \"verbose\":true,\n" +
+                "  \"hipchat\":true,\n" +
+                "  \"mailnotifications\":\"ALL\",\n" +
+                "  \"mailrecipient\":\"test@gmail.com\",\n" +
+                "  \"emergencytimeout\":60,\n" +
+                "  \"keepproceeds\":0,\n" +
+                "  \"maxsellvolume\" : 10.0,\n" +
+                "  \"maxbuyvolume\" : 10.0,\n" +
+                "  \"priceincrement\": 0.1,\n" +
+                "  \"spread\":0.0,\n" +
+                "  \"wallchangeThreshold\": 0.1\n" +
+                "}\n";
+
+        JSONParser jsonparser = new JSONParser();
+        JSONObject optionJson = null;
+        try {
+            optionJson = (JSONObject) (jsonparser.parse(jsonString));
+        } catch (Exception e) {
+
+        }
+        NuBotOptions opt = null;
+        try {
+            opt = ParseOptions.parseOptionsFromJson(optionJson, false);
+        } catch (Exception e) {
+
+        }
+
+        assertTrue(opt.getExchangeName().equals("Poloniex"));
+        assertTrue(opt.getApiKey().equals("def"));
+        assertTrue(opt.getApiSecret().equals("abc"));
+        assertTrue(opt.isExecuteOrders() == true);
+        assertTrue(opt.getTxFee() == 0.0);
+        assertTrue(opt.isSubmitliquidity() == false);
+        assertTrue(opt.nubitAddress.equals("xxx"));
+        assertTrue(opt.rpcUser.equals("xxx"));
+        assertTrue(opt.mainFeed.equals("blockchain"));
+        assertTrue(opt.isDualSide() == true);
+        assertTrue(opt.isVerbose() == true);
+        assertTrue(opt.isHipchat() == true);
+        assertTrue(opt.getSendMailsLevel().equals("ALL"));
+        assertTrue(opt.getMailRecipient().equals("test@gmail.com"));
+        assertTrue(opt.getEmergencyTimeout() == 60);
+        assertTrue(opt.getMaxBuyVolume() == 10.0);
+        assertTrue(opt.getMaxSellVolume() == 10.0);
+        assertTrue(opt.getPriceIncrement() == 0.1);
+        assertTrue(opt.getSpread() == 0.0);
+        assertTrue(opt.getWallchangeThreshold() == 0.1);
+        assertTrue(opt.getBackupFeeds().get(0).equals("coinbase"));
+        assertTrue(opt.getBackupFeeds().get(1).equals("btce"));
+
+
+    }
+
+    @Test
+    public void testFromFile() {
+
+        String configFile = "config/myconfig/poloniex.json";
+
+        NuBotOptions newopt = null;
+        try {
+            newopt = ParseOptions.parseOptionsSingle(configFile, false);
+        } catch (Exception e) {
+
+        }
+
+        assertTrue(newopt.getExchangeName().equals(ExchangeFacade.POLONIEX));
 
     }
 

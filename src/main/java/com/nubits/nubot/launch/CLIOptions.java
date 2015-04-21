@@ -45,7 +45,6 @@ public class CLIOptions {
         gnuOptions.addOption(UIOption);
 
         Option CfgFileOption = new Option(CFG, "configuration file", true, "Specify Configuration file");
-        CfgFileOption.setRequired(true);
         gnuOptions.addOption(CfgFileOption);
 
         return gnuOptions;

@@ -78,8 +78,7 @@ public class TestOptionsSample extends TestCase {
     @Test
     public void testLoadConfig() {
         try {
-            NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle(testconfig);
+            NuBotOptions nuo = ParseOptions.parseOptionsSingle(testconfig, false);
 
             assertTrue(nuo != null);
 
@@ -124,7 +123,7 @@ public class TestOptionsSample extends TestCase {
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
         } catch (NuBotConfigException e) {
             System.out.println("error " + e);
@@ -160,7 +159,7 @@ public class TestOptionsSample extends TestCase {
 
         boolean catched = false;
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig, false);
             assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("blockchain"));
             assertTrue(opt.backupFeeds.size() == 2);

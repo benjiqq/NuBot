@@ -22,12 +22,16 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.options.SaveOptions;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.webui.UiServer;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.Options;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
+
+import java.io.File;
 
 
 /**
@@ -61,15 +65,35 @@ public class MainLaunch {
         boolean runGUI = false;
         String configFile;
 
+        boolean defaultCfg = false;
         if (cli.hasOption(CLIOptions.GUI)) {
             runGUI = true;
             LOG.info("Running " + Settings.APP_NAME + " with GUI");
+
+            if (!cli.hasOption(CLIOptions.CFG)) {
+                LOG.info("Setting default config file location :" + Settings.DEFAULT_CONFIG_FILE_PATH);
+                //Cancel any previously existing file, if any
+                File f = new File(Settings.DEFAULT_CONFIG_FILE_PATH);
+                if (f.exists() && !f.isDirectory()) {
+                    LOG.warn("Detected a non-empty configuration file, resetting it to default. " +
+                            "Printing existing file content, for reference:\n"
+                            + FilesystemUtils.readFromFile(Settings.DEFAULT_CONFIG_FILE_PATH));
+                    FilesystemUtils.deleteFile(Settings.DEFAULT_CONFIG_FILE_PATH);
+                }
+                //Create a default file
+                SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
+                defaultCfg = true;
+            }
         }
-        if (cli.hasOption(CLIOptions.CFG)) {
-            configFile = cli.getOptionValue(CLIOptions.CFG);
+        if (cli.hasOption(CLIOptions.CFG) || defaultCfg) {
+            if (defaultCfg) {
+                configFile = Settings.DEFAULT_CONFIG_FILE_PATH;
+            } else {
+                configFile = cli.getOptionValue(CLIOptions.CFG);
+            }
 
             if (runGUI) {
-                SessionManager.setConfigGlobal(configFile);
+                SessionManager.setConfigGlobal(configFile, true);
                 try {
                     UiServer.startUIserver(configFile);
                 } catch (Exception e) {
@@ -79,7 +103,7 @@ public class MainLaunch {
             } else {
                 LOG.info("Run NuBot from CLI");
                 //set global config
-                SessionManager.setConfigGlobal(configFile);
+                SessionManager.setConfigGlobal(configFile, false);
                 sessionLOG.debug("launch bot");
                 try {
                     SessionManager.launchBot(Global.options);

@@ -66,9 +66,8 @@ public class LaunchUI {
         command = EXECUTE_JAR + " " + JAR_FILE + " ";
         if (!configPath.equals("")) {//User indicated a file
             command += CFG_PREFIX + configPath + " ";
-        } else {
-            command += CFG_PREFIX + Settings.DEFAULT_CONFIG_FILENAME + " "; //Default config
         }
+        
         command += ARGS;
 
         Runtime rt = Runtime.getRuntime();

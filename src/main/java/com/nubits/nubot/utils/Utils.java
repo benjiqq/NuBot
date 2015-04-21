@@ -53,6 +53,7 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -464,6 +465,13 @@ public class Utils {
             toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
         }
         return toReturn;
+    }
+
+    //Format numbers in decimal notation with custom digits
+    public static String formatNumber(double number, int digits) {
+        DecimalFormat df = new DecimalFormat("0");
+        df.setMaximumFractionDigits(digits);
+        return df.format(number);
     }
 
     public static void launchBrowser(String url) {

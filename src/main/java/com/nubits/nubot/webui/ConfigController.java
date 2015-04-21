@@ -127,7 +127,7 @@ public class ConfigController {
             Map opmap = new HashMap();
             String error = "none";
             try {
-                newopt = ParseOptions.parsePost(postJson);
+                newopt = ParseOptions.parsePost(postJson, false);
             } catch (Exception e) {
                 LOG.error("error parsing " + postJson + "\n" + e);
                 //handle errors

@@ -43,7 +43,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/bittrex.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/allcoin.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -58,6 +58,37 @@ public class TestWrappers {
 
         //Methods strictly necessary for NuBot to run-------------
         //-------------
+
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+
+        WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
+
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
+        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+        //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
+        //WrapperTestUtils.testGetActiveOrders(testPair);
+        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
+
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
+        //WrapperTestUtils.testGetActiveOrders();
+        //WrapperTestUtils.testCancelOrder("123199680", testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
+        //WrapperTestUtils.testGetActiveOrders();
+        //WrapperTestUtils.testCancelOrder("2063803", testPair);
+        //WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testGetActiveOrders(testPair, true); //Read active orders (should be 0)
+        //WrapperTestUtils.testGetOrderDetail("1139");
+        //WrapperTestUtils.testIsOrderActive("7d27fb8b-05bd-4937-b404-a808766f2dfc");
+        //WrapperTestUtils.testGetTxFee();
+        //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
+
+        //WrapperTestUtils.testClearAllOrders(testPair);
+        //WrapperTestUtils.testGetLastTrades(testPair);
+
 
         /*
         try {
@@ -94,36 +125,6 @@ public class TestWrappers {
             LOG.error(e.toString());
         }
         */
-
-        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
-
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testClearAllOrders(testPair);
-
-        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
-        //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
-        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-        //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
-        //WrapperTestUtils.testGetActiveOrders(testPair);
-        //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
-
-        //WrapperTestUtils.testGetAvailableBalances(testPair);
-        //WrapperTestUtils.testGetActiveOrders();
-        //WrapperTestUtils.testCancelOrder("123199680", testPair);
-        //WrapperTestUtils.testClearAllOrders(testPair);
-        //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
-        //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
-        //WrapperTestUtils.testGetActiveOrders();
-        //WrapperTestUtils.testCancelOrder("2063803", testPair);
-        //WrapperTestUtils.testClearAllOrders(testPair);
-        //WrapperTestUtils.testGetActiveOrders(testPair, true); //Read active orders (should be 0)
-        //WrapperTestUtils.testGetOrderDetail("1139");
-        //WrapperTestUtils.testIsOrderActive("7d27fb8b-05bd-4937-b404-a808766f2dfc");
-        //WrapperTestUtils.testGetTxFee();
-        //WrapperTestUtils.testGetTxFeeWithArgs(testPair);
-
-        //WrapperTestUtils.testClearAllOrders(testPair);
-        WrapperTestUtils.testGetLastTrades(testPair);
 
         //-------- Stress test start ---------
         /*

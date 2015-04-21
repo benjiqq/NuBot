@@ -41,6 +41,7 @@ def testdistdir = new File("testdist")
 def builddir = new File("build")
 def docdir = new File("docs")
 def resdir = new File("res")
+def staticDocsDir = new File("res/UI/docs")
 
 def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
@@ -85,7 +86,7 @@ dependencies {
     compile 'joda-time:joda-time:2.7'
 
     //webUI
-    compile "javax.servlet:servlet-api:2.5"
+    compile "javax.servlet:servlet-api:3.0-alpha-1"
     compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M1'
     compile 'com.sparkjava:spark-template-mustache:1.0.0'
     compile 'com.github.spullara.mustache.java:compiler:0.9.0'
@@ -141,7 +142,6 @@ task distInit << {
     println("creating distdir")
     distdir.mkdirs()
 }
-
 
 //create an executable Jar to launch the UI
 task LaunchUIjar(type: Jar) {
@@ -207,6 +207,8 @@ task NuBotDist(dependsOn: NuBotJar) {
     doFirst {
         println 'start making distribution'
 
+        tasks.cleanhtml.execute()
+
         //copy jar
         copy {
             "build/libs/${jarname}"
@@ -221,8 +223,6 @@ task NuBotDist(dependsOn: NuBotJar) {
         println 'dist do last'
 
         tasks.propfile.execute()
-
-        tasks.cleanhtml.execute()
 
         tasks.LaunchUIjar.execute()
 
@@ -310,7 +310,7 @@ task NuBotDist(dependsOn: NuBotJar) {
             into "${distdir}/res"
         }
 
-        tasks.cleanhtml.execute()
+        tasks.moveHTMLtoStaticDocs.execute()
 
     }
 
@@ -390,10 +390,19 @@ task propfile << {
 }
 
 task cleanhtml << {
-
     html_files.each { File file ->
         println 'delete ' + file.name
         delete(file)
+    }
+}
+
+task moveHTMLtoStaticDocs << {
+    html_files.each { File file ->
+        println "copy " + "${docdir}/" + file.name + " to ${staticDocsDir}"
+        copy {
+            from "${docdir}/" + file.name
+            into "${staticDocsDir}"
+        }
     }
 }
 

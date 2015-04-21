@@ -1,14 +1,18 @@
 package com.nubits.nubot.webui;
 
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.FilesystemUtils;
+import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import spark.ModelAndView;
+import spark.Spark;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import static spark.Spark.get;
+
 
 /**
  * the main UI server
@@ -28,10 +32,15 @@ public class UiServer {
 
         //set up all endpoints
 
-        LOG.info("launching on http://localhost:" + port);
+        String urlStr = "http://localhost:" + port;
+        LOG.info("launching on " + urlStr);
+
+        //Set folder for static resources
+        Spark.externalStaticFileLocation(FilesystemUtils.getBotAbsolutePath() + "/res/UI");
 
         //binds GET and POST
         LayoutTemplateEngine tmpl = new LayoutTemplateEngine(Settings.HTML_FOLDER);
+
 
         new ConfigController(configFile);
 
@@ -46,13 +55,14 @@ public class UiServer {
         configmap.put("configfile", configFile);
         get("/configui", (request, response) -> new ModelAndView(configmap, Settings.HTML_FOLDER + "config.mustache"), tmpl);
 
+        get("/docu", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "docu.mustache"), tmpl);
 
-        get("/about", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "about.mustache"), tmpl);
-
-        get("/setup", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "setup.mustache"), tmpl);
+        get("/disclaimer", (request, response) -> new ModelAndView(empty, Settings.HTML_FOLDER + "disclaimer.mustache"), tmpl);
 
         new BotController();
 
+        LOG.debug("Opening the system default browser :");
+        Utils.launchBrowser(urlStr);
 
     }
 

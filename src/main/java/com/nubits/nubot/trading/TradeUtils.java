@@ -20,15 +20,17 @@ package com.nubits.nubot.trading;
 
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.ApiResponse;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.Order;
+import org.apache.commons.codec.binary.Hex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.TreeMap;
 
 public class TradeUtils {
@@ -86,6 +88,30 @@ public class TradeUtils {
             }
         }
         return result;
+    }
+
+
+    public static String signRequest(String secret, String hash_data, String hashfFunction, String encoding) {
+
+        String sign = "";
+        try {
+            Mac mac;
+            SecretKeySpec key;
+            // Create a new secret key
+            key = new SecretKeySpec(secret.getBytes(encoding), hashfFunction);
+            // Create a new mac
+            mac = Mac.getInstance(hashfFunction);
+            // Init mac with key.
+            mac.init(key);
+            sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(encoding)));
+        } catch (UnsupportedEncodingException uee) {
+            LOG.error("Unsupported encoding exception: " + uee.toString());
+        } catch (NoSuchAlgorithmException nsae) {
+            LOG.error("No such algorithm exception: " + nsae.toString());
+        } catch (InvalidKeyException ike) {
+            LOG.error("Invalid key exception: " + ike.toString());
+        }
+        return sign;
     }
 
 }

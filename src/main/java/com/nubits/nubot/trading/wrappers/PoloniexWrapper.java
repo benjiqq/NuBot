@@ -32,7 +32,6 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -40,15 +39,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -642,7 +640,7 @@ public class PoloniexWrapper implements TradeInterface {
                     // args signature with apache cryptographic tools
                     String toHash = post_data;
 
-                    signature = signRequest(keys.getPrivateKey(), toHash);
+                    signature = TradeUtils.signRequest(keys.getPrivateKey(), toHash, SIGN_HASH_FUNCTION, ENCODING);
                 }
 
 
@@ -716,45 +714,10 @@ public class PoloniexWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String sign = "";
-            try {
-                Mac mac = null;
-                SecretKeySpec key = null;
-                // Create a new secret key
-                try {
-                    key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-                } catch (UnsupportedEncodingException uee) {
-                    LOG.error("Unsupported encoding exception: " + uee.toString());
-                }
-
-                // Create a new mac
-                try {
-                    mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                } catch (NoSuchAlgorithmException nsae) {
-                    LOG.error("No such algorithm exception: " + nsae.toString());
-                }
-
-                // Init mac with key.
-                try {
-                    mac.init(key);
-                } catch (InvalidKeyException ike) {
-                    LOG.error("Invalid key exception: " + ike.toString());
-                }
-
-                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.error(ex.toString());
-            }
-            return sign;
-        }
-
         private String createNonce() {
             //potential FIX: add some time to the nonce, since time sync has issues
             //long fixtime = 1000;
-            long toRet = System.currentTimeMillis()*10000; // + fixtime;
+            long toRet = System.currentTimeMillis() * 10000; // + fixtime;
             return Long.toString(toRet);
         }
     }

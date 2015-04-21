@@ -35,7 +35,7 @@ import java.io.File;
 public class InitTests {
 
     static {
-        System.setProperty("logback.configurationFile", "allconfig/testlog.xml");
+        System.setProperty("logback.configurationFile", "config/logging/test_logback.xml");
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(InitTests.class.getName());
@@ -45,7 +45,7 @@ public class InitTests {
         File f = new File(path);
         if (f.exists() && !f.isDirectory()) {
             try {
-                Global.options = ParseOptions.parseOptionsSingle(path);
+                Global.options = ParseOptions.parseOptionsSingle(path, false);
             } catch (NuBotConfigException ex) {
                 LOG.error(ex.toString());
             }

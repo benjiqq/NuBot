@@ -6,6 +6,7 @@ import com.nubits.nubot.options.*;
 import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.utils.FilesystemUtils;
+import org.joda.time.DateTime;
 import org.joda.time.Period;
 import org.joda.time.PeriodType;
 import org.slf4j.Logger;
@@ -38,13 +39,13 @@ public class SessionManager {
      *
      * @param configfile
      */
-    public static void setConfigGlobal(String configfile) {
+    public static void setConfigGlobal(String configfile, boolean skipValidation) {
 
         sessionLOG.debug("parsing options from " + configfile);
 
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile, skipValidation);
             LOG.debug("loading opt: " + opt.toStringNoKeys());
             Global.options = opt;
             Global.currentOptionsFile = configfile;

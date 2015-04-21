@@ -93,7 +93,7 @@
 
             <discriminator>
                 <key>session</key>
-                <defaultValue>session_main</defaultValue>
+                <defaultValue>session_test</defaultValue>
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
@@ -139,7 +139,7 @@
 
             <discriminator>
                 <key>session</key>
-                <defaultValue>session_main</defaultValue>
+                <defaultValue>session_test</defaultValue>
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
@@ -186,7 +186,7 @@
 
             <discriminator>
                 <key>session</key>
-                <defaultValue>session_main</defaultValue>
+                <defaultValue>session_test</defaultValue>
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
@@ -221,7 +221,7 @@
 
             <discriminator>
                 <key>session</key>
-                <defaultValue>session_main</defaultValue>
+                <defaultValue>session_test</defaultValue>
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">

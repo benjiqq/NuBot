@@ -808,9 +808,5 @@ public class CcexWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            throw new UnsupportedOperationException("Not supported yet.");
-        }
     }
 }

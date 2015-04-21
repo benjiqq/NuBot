@@ -27,7 +27,6 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -43,16 +42,11 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Logger;
@@ -557,7 +551,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
             post_data = TradeUtils.buildQueryString(args, ENCODING);
 
-            signature = signRequest(keys.getPrivateKey(), post_data);
+            signature = TradeUtils.signRequest(keys.getPrivateKey(), post_data, SIGN_HASH_FUNCTION, ENCODING);
 
             // add header
             Header[] headers = new Header[3];
@@ -644,28 +638,5 @@ public class AltsTradeWrapper implements TradeInterface {
 
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-
-            String sign = "";
-            try {
-                Mac mac;
-                SecretKeySpec key;
-                // Create a new secret key
-                key = new SecretKeySpec(Base64.decode(secret), SIGN_HASH_FUNCTION);
-                // Create a new mac
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                // Init mac with key.
-                mac.init(key);
-                sign = Base64.encode(mac.doFinal(hash_data.getBytes(ENCODING)));
-            } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
-            } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
-            }
-            return sign;
-        }
     }
 }
