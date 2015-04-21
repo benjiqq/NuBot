@@ -45,7 +45,7 @@ function toggleBot(running)
 
       //$('#status-img').attr("src","img/bot_running.png");
 
-      setTimeout(clearTables, 2000);
+      setTimeout(clearTables, 500);
 
       document.title = 'NuBot GUI - Stopped';
       //$("#favicon").attr("href","favicon.ico");
@@ -91,7 +91,7 @@ function updateConfigFile(){
 }
 
 
-function updateOrders(){
+function updateOrdersBalances(){
      $.ajax({
       type: "GET",
       dataType: "json",
@@ -101,6 +101,9 @@ function updateOrders(){
       console.log("error loading info");
     })
     .done(function( data ) {
+
+        // prevent update at shutdown
+        if (!botRunning) {return};
 
         //console.log("buys: " + data["buys"]);
         console.log("BuyCurrency: " + data["BuyCurrency"]);
@@ -138,7 +141,7 @@ function updateOrders(){
         }
 
     });
-    setTimeout(updateOrders , 2000);
+    setTimeout(updateOrdersBalances , 2000);
  }
 
 function updateStatus(){
@@ -266,7 +269,7 @@ function stopBot()
 $(document).ready(function() {
 
     updateConfigFile();
-    updateOrders();
+    updateOrdersBalances();
 
 
     $('#togglebot').click(function()
