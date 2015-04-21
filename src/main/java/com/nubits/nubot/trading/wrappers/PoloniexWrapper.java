@@ -73,7 +73,7 @@ public class PoloniexWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    private int nonceCount = new Long(System.currentTimeMillis()/1000).intValue();
+    private long nonceCount = new Long(System.currentTimeMillis()/1000).longValue();
 
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
@@ -98,7 +98,7 @@ public class PoloniexWrapper implements TradeInterface {
                 int j = errMsg.indexOf(". You");
                 String subs = errMsg.substring(i + stmp.length(), j);
 
-                int greaterNonce = new Integer(subs);
+                long greaterNonce = new Long(subs);
                 int addNonce = 5;
                 this.nonceCount = greaterNonce + addNonce;
                 LOG.error("nonce error. retry with corrected nonce " + this.nonceCount);
