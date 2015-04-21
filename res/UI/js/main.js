@@ -140,7 +140,7 @@ function updateStatus(){
 
         })
         .done(function( data ) {
-            console.log("status data: " + JSON.parse(JSON.stringify(data)));
+            //console.log("status data: " + JSON.parse(JSON.stringify(data)));
 
             $('#botstatus').html(data["status"]);
 
