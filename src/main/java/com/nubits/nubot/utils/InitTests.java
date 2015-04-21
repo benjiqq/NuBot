@@ -86,7 +86,7 @@ public class InitTests {
         /*String fileName = fullName.substring(fullName.lastIndexOf(".") + 1) + "_"
                 + Utils.getTimestampLong();*/
         //MDC.put("testFileName", fileName);
-        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + name);
         MDC.put("session", name);
+        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + name);
     }
 }
