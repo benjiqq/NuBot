@@ -81,11 +81,12 @@ public class InitTests {
         }
     }
 
-    public static void setLoggingFilename(Logger log) {
-        String fullName = log.getName();
-        String fileName = fullName.substring(fullName.lastIndexOf(".") + 1) + "_"
-                + Utils.getTimestampLong();
-        MDC.put("testFileName", fileName);
-        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + fileName);
+    public static void setLoggingFilename(String name) {
+        /*String name = log.getName();*/
+        /*String fileName = fullName.substring(fullName.lastIndexOf(".") + 1) + "_"
+                + Utils.getTimestampLong();*/
+        //MDC.put("testFileName", fileName);
+        MDC.put("session", name);
+        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + name);
     }
 }

@@ -183,7 +183,7 @@ public class TestWrappers {
     }
 
     private static void init() {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestWrappers.class.getSimpleName());
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Load keystore
