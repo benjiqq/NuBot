@@ -2,8 +2,9 @@
 
     <div class="row">
 
-        <button id="startbot" type="button" class="btn btn-primary">Start</button>
-        <button id="stopbot" type="button" class="btn btn-primary">Stop</button>
+        <button id="togglebot" type="button" class="btn btn-primary">Start NuBot</button>
+
+
         <br>
 
         <p style="margin-top: 10px">Config file: <span id="configfile"><span></p>
@@ -68,6 +69,7 @@
 <script>
    $( document ).ready(function() {
         updateNavbar("operation");
+        toggleBot(false);
     });
 
 
