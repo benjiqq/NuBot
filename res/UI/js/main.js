@@ -110,8 +110,8 @@ function updateOrdersBalances(){
         if (!botRunning) {return};
 
         //console.log("buys: " + data["buys"]);
-        console.log("BuyCurrency: " + data["BuyCurrency"]);
-        console.log("SellCurrency: " + data["SellCurrency"]);
+        //console.log("BuyCurrency: " + data["BuyCurrency"]);
+        //console.log("SellCurrency: " + data["SellCurrency"]);
 
         if (data.hasOwnProperty("BuyCurrency")) {
                 $("#balancetable").find("tr:gt(0)").remove();

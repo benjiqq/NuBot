@@ -53,7 +53,7 @@ public class LogController {
         });
 
         get("/info", "application/json", (request, response) -> {
-            LOG.debug("/info called");
+            LOG.trace("/info called");
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;

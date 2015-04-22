@@ -104,7 +104,7 @@ public abstract class NuBotBase {
         Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
         while (it.hasNext()) {
             ch.qos.logback.classic.Logger l = it.next();
-            LOG.debug("" + l);
+            LOG.trace("" + l);
         }
     }
 

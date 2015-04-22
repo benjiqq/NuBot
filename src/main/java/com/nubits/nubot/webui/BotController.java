@@ -28,7 +28,7 @@ public class BotController {
     public BotController() {
 
         get("/opstatus", "application/json", (request, response) -> {
-            LOG.debug("/opstatus called");
+            LOG.trace("/opstatus called");
             Map opmap = new HashMap();
             boolean active = SessionManager.isSessionActive();
             if (active) {
@@ -55,7 +55,7 @@ public class BotController {
 
         // we expect options are set
         post("/startstop", "application/json", (request, response) -> {
-            LOG.debug("/startstop called");
+            LOG.trace("/startstop called");
 
             Map opmap = new HashMap();
 
@@ -118,7 +118,10 @@ public class BotController {
 
                         Global.bot.shutdownBot();
 
+                        Global.sessionRunning = false;
+
                         Global.mainThread.interrupt();
+
                     } catch (Exception e) {
                         success = false;
                         opmap.put("error", "can't interrupt : " + e);
