@@ -2,8 +2,8 @@
   var port = 4567;
   var baseurl = "http://" + host + ":" + port;
 
-  var refreshStatusInterval = 15*1000; //ms
-  var refreshOrdersAndBalanceInterval = 10*1000; //ms
+  var refreshStatusInterval = 11*1000; //ms
+  var refreshOrdersAndBalanceInterval = 7*1000; //ms
   var refreshTablesInterval = 5*1000; //ms
   var refreshLogInterval = 3*1000; //ms
 
@@ -145,6 +145,8 @@ function updateOrdersBalances(){
         }
 
     });
+
+    setTimeout(updateOrdersBalances , refreshOrdersAndBalanceInterval);
  }
 
 function updateStatus(){
@@ -171,6 +173,7 @@ function updateStatus(){
 
         });
 
+        setTimeout(updateStatus, refreshStatusInterval);
 }
 
 function flashButton(cbtn){
@@ -523,11 +526,10 @@ function startupPage(pageName)
                  updateNavbar("operation");
                     toggleBot(false);
 
+                    updateStatus();
                     updateLog();
                     updateOrdersBalances();
 
-                    setTimeout(updateStatus(), refreshStatusInterval);
-                    setTimeout(updateOrdersBalances , refreshOrdersAndBalanceInterval);
                 break;
             case "config":
                 updateNavbar("config");
