@@ -99,9 +99,9 @@ public class PoloniexWrapper implements TradeInterface {
                 if (errMsg.contains("Nonce must be greater than ")) {
                     //handle nonce exception. get the nonce they want and add some
                     String stmp = "Nonce must be greater than ";
-                    int i = errMsg.indexOf(stmp);
-                    int j = errMsg.indexOf(". You");
-                    String subs = errMsg.substring(i + stmp.length(), j);
+                    int k = errMsg.indexOf(stmp);
+                    int q = errMsg.indexOf(". You");
+                    String subs = errMsg.substring(k + stmp.length(), q);
                     fixNonce = true;
                     long greaterNonce = new Long(subs);
                     int addNonce = 5;
