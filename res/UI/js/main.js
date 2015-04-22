@@ -32,12 +32,9 @@
           $('#togglebot').addClass("btn-warning");
 
           //$('#status-img').attr("src","img/bot_running.gif");
-
-          document.title = 'NuBot GUI - Running' + animateDots();
-          //$("#favicon").attr("href","favicon-running.ico");
+          document.title = 'Running! - NuBot GUI';
       } else {
           botRunning = false;
-          updateFavico(0);
           //console.log("upd0");
 
           $('#togglebot-text').html(" Start Bot");
@@ -52,7 +49,7 @@
           setTimeout(clearTables, refreshTablesInterval);
 
           document.title = 'NuBot GUI - Stopped';
-          //$("#favicon").attr("href","favicon.ico");
+          //clearInterval(dotsAnimationID);
       }
   }
 
@@ -134,8 +131,8 @@
                   $("#ordertable").find("tr:gt(0)").remove();
 
                   var orders = data["orders"];
-                  updateFavico(orders.length);
-                  //console.log("!!!");
+                  //updateFavico(orders.length);
+                  //console.log("update badge + "+orders.length);
                   for (var i = 0; i < orders.length; i++) {
                       var order = orders[i];
                       var type = order["type"];
@@ -298,7 +295,7 @@
 
       var url = baseurl + "/logdump";
 
-      console.log("url  " + url);
+      //console.log("url  " + url);
       $.ajax({
               type: "GET",
               dataType: "json",
@@ -509,15 +506,6 @@
       $('#docu-iframe').attr('src', 'docs/' + pageName + '.html');
   }
 
-  function updateFavico(howmany) {
-      var favicon = new Favico({
-          animation: 'popFade'
-      });
-
-      //intial value
-      favicon.badge(howmany);
-  }
-
   function startupPage(pageName) {
       switch (pageName) {
           case "operation":
@@ -539,15 +527,4 @@
               updateNavbar("disclaimer");
               break;
       }
-  }
-
-  function animateDots() {
-      toReturn = "";
-      dotCounter++;
-      if (dotCounter > 4) {
-          dotCounter = 1;
-      }
-      for (i = 0; i < dotCounter; i++)
-          toReturn += '.';
-      return toReturn;
   }
