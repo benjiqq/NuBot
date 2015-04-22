@@ -89,31 +89,38 @@ public class PoloniexWrapper implements TradeInterface {
 
     private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
 
-        ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
-        if (!response.isPositive()) {
-            String errMsg = response.getError().getDescription();
-            if (errMsg.contains("Nonce must be greater than ")) {
-                //handle nonce exception. get the nonce they want and add some
-                String stmp = "Nonce must be greater than ";
-                int i = errMsg.indexOf(stmp);
-                int j = errMsg.indexOf(". You");
-                String subs = errMsg.substring(i + stmp.length(), j);
-                fixNonce = true;
-                long greaterNonce = new Long(subs);
-                int addNonce = 5;
-                this.nonceCount = greaterNonce + addNonce;
-                LOG.error("nonce error. retry with corrected nonce " + this.nonceCount);
-                try {
-                    Thread.sleep(100);
-                } catch (InterruptedException e) {
+        int maxRetry = 10;
+        boolean done = false;
+        int i = 0;
+        while (!done) {
+            ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
+            if (!response.isPositive()) {
+                String errMsg = response.getError().getDescription();
+                if (errMsg.contains("Nonce must be greater than ")) {
+                    //handle nonce exception. get the nonce they want and add some
+                    String stmp = "Nonce must be greater than ";
+                    int i = errMsg.indexOf(stmp);
+                    int j = errMsg.indexOf(". You");
+                    String subs = errMsg.substring(i + stmp.length(), j);
+                    fixNonce = true;
+                    long greaterNonce = new Long(subs);
+                    int addNonce = 5;
+                    this.nonceCount = greaterNonce + addNonce;
+                    LOG.debug("nonce error. retry with corrected nonce " + this.nonceCount);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
 
+                    }
+                    return response;
                 }
-                response = getQueryMain(url, method, query_args, needAuth, isGet);
-                return response;
-            }
 
+            } else
+                return response;
+            i++;
+            if (i > maxRetry)
+                return response;
         }
-        return response;
     }
 
     private ApiResponse getQueryMain(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
