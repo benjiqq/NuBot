@@ -302,7 +302,7 @@ public abstract class NuBotBase {
                     LOG.info("try to shutdown all tasks");
                     Global.taskManager.stopAll();
                 } catch (IllegalStateException e) {
-
+                    LOG.error(e.toString());
                 }
             }
         }
