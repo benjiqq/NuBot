@@ -28,7 +28,7 @@ public class BotController {
     public BotController() {
 
         get("/opstatus", "application/json", (request, response) -> {
-
+            LOG.debug("/opstatus called");
             Map opmap = new HashMap();
             boolean active = SessionManager.isSessionActive();
             if (active) {
@@ -55,6 +55,7 @@ public class BotController {
 
         // we expect options are set
         post("/startstop", "application/json", (request, response) -> {
+            LOG.debug("/startstop called");
 
             Map opmap = new HashMap();
 

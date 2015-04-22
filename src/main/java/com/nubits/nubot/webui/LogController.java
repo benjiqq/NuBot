@@ -6,7 +6,6 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Order;
-import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,7 @@ public class LogController {
     public LogController() {
 
         get("/logdump", "application/json", (request, response) -> {
-
+            LOG.debug("/logdump called");
             JsonObject object = new JsonObject();
 
             String f = logfile;
@@ -54,7 +53,7 @@ public class LogController {
         });
 
         get("/info", "application/json", (request, response) -> {
-
+            LOG.debug("/info called");
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;

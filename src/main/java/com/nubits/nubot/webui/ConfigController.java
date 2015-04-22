@@ -67,6 +67,7 @@ public class ConfigController {
         this.configfile = configfile;
 
         post("/configreset", (request, response) -> {
+            LOG.debug("/configreset called");
 
             Global.currentOptionsFile = Settings.DEFAULT_CONFIG_FILE_PATH;
             boolean result = SaveOptions.optionsReset(Settings.DEFAULT_CONFIG_FILE_PATH);
@@ -79,6 +80,7 @@ public class ConfigController {
         });
 
         get("/configfile", "application/json", (request, response) -> {
+            LOG.debug("/configfile called");
 
             Map opmap = new HashMap();
             opmap.put("configfile", Global.currentOptionsFile);
@@ -87,6 +89,7 @@ public class ConfigController {
         });
 
         get("/config", "application/json", (request, response) -> {
+            LOG.debug("/config called");
 
             //get from memory. any change in the file is reflected in the global options
             String jsonString = NuBotOptions.optionsToJson(Global.options);
@@ -94,7 +97,6 @@ public class ConfigController {
         });
 
         post("/config", "application/json", (request, response) -> {
-
             //check if bot is running
             boolean active = SessionManager.isSessionActive();
             LOG.info("session currently active " + active);
