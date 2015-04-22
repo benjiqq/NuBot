@@ -189,9 +189,10 @@ public class SessionManager {
         }
 
 
-        String sessionFileName = Settings.SESSION_FILE;
+        appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
+        sessionFile = new File
+                (appFolder, Settings.SESSION_FILE);
         if (!sessionFile.exists()) {
-            sessionFile = new File(appFolder, sessionFileName);
 
             try {
                 sessionFile.createNewFile();
