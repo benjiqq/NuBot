@@ -193,6 +193,19 @@ public abstract class NuBotBase {
     }
 
     /**
+     * test setup exchange
+     * @throws NuBotRunException
+     */
+    public void testExchange() throws NuBotRunException {
+
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+        } else {
+            throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+        }
+    }
+
+    /**
      * execute the NuBot based on a configuration
      */
     public void execute(NuBotOptions opt) throws NuBotRunException {
@@ -232,12 +245,7 @@ public abstract class NuBotBase {
             LOG.error(ex.toString());
         }
 
-        //test setup exchange
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-        } else {
-            throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
-        }
+        testExchange();
 
         //Start task to check orders
         try {
