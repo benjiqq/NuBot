@@ -89,7 +89,7 @@ public class ConfigController {
         });
 
         get("/config", "application/json", (request, response) -> {
-            LOG.debug("/config called");
+            LOG.trace("/config called");
 
             //get from memory. any change in the file is reflected in the global options
             String jsonString = NuBotOptions.optionsToJson(Global.options);
