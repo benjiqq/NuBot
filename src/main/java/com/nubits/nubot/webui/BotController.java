@@ -118,10 +118,9 @@ public class BotController {
                         Global.bot.shutdownBot();
 
                         Global.mainThread.interrupt();
-
                     } catch (Exception e) {
                         success = false;
-                        opmap.put("error", "can't interrupt : " + e.toString());
+                        opmap.put("error", "can't interrupt : " + e);
                     }
                 } else {
                     success = false;
