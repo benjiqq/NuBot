@@ -92,8 +92,9 @@ public class PoloniexWrapper implements TradeInterface {
         int maxRetry = 10;
         boolean done = false;
         int i = 0;
+        ApiResponse response = null;
         while (!done) {
-            ApiResponse response = getQueryMain(url, method, query_args, needAuth, isGet);
+            response = getQueryMain(url, method, query_args, needAuth, isGet);
             if (!response.isPositive()) {
                 String errMsg = response.getError().getDescription();
                 if (errMsg.contains("Nonce must be greater than ")) {
@@ -121,6 +122,7 @@ public class PoloniexWrapper implements TradeInterface {
             if (i > maxRetry)
                 return response;
         }
+        return response;
     }
 
     private ApiResponse getQueryMain(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
