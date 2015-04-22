@@ -82,11 +82,9 @@ public class InitTests {
     }
 
     public static void setLoggingFilename(String name) {
-        /*String name = log.getName();*/
-        /*String fileName = fullName.substring(fullName.lastIndexOf(".") + 1) + "_"
-                + Utils.getTimestampLong();*/
-        //MDC.put("testFileName", fileName);
-        MDC.put("session", "logs/tests/" + name);
-        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + name);
+        name += "_" + Utils.getTimestampLong();
+        String path = Settings.TEST_LOGFOLDER + "/" + name;
+        MDC.put("session", path);
+        LOG.info("Logging on " + path);
     }
 }
