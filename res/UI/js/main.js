@@ -16,7 +16,7 @@
   var requestedStop = false;
 
   function handleFailServer(){
-    $('#maincontainer').html("server shutdown");
+    $('#maincontainer').html("server is shutdown");
   }
 
   function clearTables() {
