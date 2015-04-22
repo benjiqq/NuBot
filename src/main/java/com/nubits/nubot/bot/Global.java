@@ -82,20 +82,16 @@ public class Global {
      */
     public static void createShutDownHook() {
 
-        Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
-        sessionLOG.info("adding shutdown hook");
-
         Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
             @Override
             public void run() {
 
                 //shutdown logic of the bot handled in the bot related to the global thread
-                Global.bot.shutdownBot();
-                Global.sessionRunning = false;
-
-                Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
-                Global.sessionStopped = System.currentTimeMillis();
-                sessionLOG.info("Session terminated. Timestamp " + Global.sessionStopped);
+                if (Global.sessionRunning) {
+                    Global.bot.shutdownBot();
+                    Global.sessionRunning = false;
+                    Global.sessionStopped = System.currentTimeMillis();
+                }
 
                 //Interrupt mainThread
                 Global.mainThread.interrupt();
