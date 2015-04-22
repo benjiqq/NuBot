@@ -167,6 +167,8 @@ public class SessionManager {
      */
     public static boolean isSessionActive() {
 
+        LOG.warn("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+
         appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
 
         sessionFile = new File
@@ -194,6 +196,7 @@ public class SessionManager {
         if (!sessionFile.exists()) {
             try {
                 sessionFile.createNewFile();
+                sessionFile.deleteOnExit();
 
             } catch (Exception e) {
 
