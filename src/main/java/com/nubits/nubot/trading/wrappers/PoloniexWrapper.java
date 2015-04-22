@@ -113,7 +113,7 @@ public class PoloniexWrapper implements TradeInterface {
                     } catch (InterruptedException e) {
 
                     }
-                    return response;
+
                 }
 
             } else
