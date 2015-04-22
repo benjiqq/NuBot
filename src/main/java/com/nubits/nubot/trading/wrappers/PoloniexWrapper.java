@@ -119,8 +119,10 @@ public class PoloniexWrapper implements TradeInterface {
             } else
                 return response;
             i++;
-            if (i > maxRetry)
+            if (i > maxRetry) {
+                LOG.error("nonce reset failed");
                 return response;
+            }
         }
         return response;
     }
