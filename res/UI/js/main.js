@@ -65,7 +65,6 @@ function updateNavbar(page) {
     switch (page) {
         case "operation":
             $('#operation-nav').addClass('active')
-            loadbot();
             break;
         case "config":
             loadconfig();
@@ -146,7 +145,6 @@ function updateOrdersBalances(){
         }
 
     });
-    setTimeout(updateOrdersBalances , refreshOrdersAndBalanceInterval);
  }
 
 function updateStatus(){
@@ -173,8 +171,6 @@ function updateStatus(){
 
         });
 
-        //re-call the function
-        setTimeout(updateStatus, refreshStatusInterval);
 }
 
 function flashButton(cbtn){
@@ -274,7 +270,6 @@ function stopBot()
 $(document).ready(function() {
 
     updateConfigFile();
-    updateOrdersBalances();
 
 
     $('#togglebot').click(function()
@@ -314,17 +309,10 @@ function updateLog() {
 
     logLine++;
 
-    if (logLine % 20 == 0) {
-        autoScroll();
-    }
-
+    autoScroll();
     setTimeout(updateLog , refreshLogInterval);
 }
 
-function loadbot() {
-        updateLog();
-        updateStatus();
-    }
 
 function loadconfig() {
 
@@ -528,6 +516,30 @@ function updateFavico(howmany)
     favicon.badge(howmany);
  }
 
+function startupPage(pageName)
+{
+    switch (pageName) {
+            case "operation":
+                 updateNavbar("operation");
+                    toggleBot(false);
+
+                    updateLog();
+                    updateOrdersBalances();
+
+                    setTimeout(updateStatus(), refreshStatusInterval);
+                    setTimeout(updateOrdersBalances , refreshOrdersAndBalanceInterval);
+                break;
+            case "config":
+                updateNavbar("config");
+                break;
+            case "docu":
+                updateNavbar("docu");
+                break;
+            case "disclaimer":
+                updateNavbar("disclaimer");
+            break;
+        }
+}
  function animateDots()
  {
      toReturn = "";
