@@ -167,7 +167,7 @@ public class SessionManager {
      */
     public static boolean isSessionActive() {
 
-        LOG.warn("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+        LOG.warn("checking is SessionActive");
 
         appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
 
