@@ -90,12 +90,14 @@ public class Global {
             public void run() {
 
                 //shutdown logic of the bot handled in the bot related to the global thread
-                Global.bot.shutdownBot();
-                Global.sessionRunning = false;
+                if (Global.sessionRunning) {
+                    Global.bot.shutdownBot();
+                    Global.sessionRunning = false;
+                }
 
-                Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
-                Global.sessionStopped = System.currentTimeMillis();
-                sessionLOG.info("Session terminated. Timestamp " + Global.sessionStopped);
+                //Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
+                //Global.sessionStopped = System.currentTimeMillis();
+                //sessionLOG.info("Session terminated. Timestamp " + Global.sessionStopped);
 
                 //Interrupt mainThread
                 Global.mainThread.interrupt();
