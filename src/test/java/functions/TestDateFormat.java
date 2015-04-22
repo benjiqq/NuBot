@@ -19,7 +19,12 @@
 package functions;
 
 
+import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
+import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.Duration;
+import org.joda.time.Interval;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,5 +52,21 @@ public class TestDateFormat extends TestCase {
         }
 
 
+    }
+
+    @Test
+    public void testDuration(){
+
+        DateTime a = new DateTime(2015, 2, 2, 7, 0, 0, 0, DateTimeZone.forID("CET"));
+        DateTime b = new DateTime(2015, 2, 2, 8, 0, 0, 0, DateTimeZone.forID("CET"));
+        String durs = Utils.getDurationDate(a,b);
+        System.out.println(durs);
+        assertTrue(durs.equals("01:00"));
+
+        a = new DateTime(2015, 2, 2, 7, 0, 0, 0, DateTimeZone.forID("CET"));
+        b = new DateTime(2015, 2, 2, 17, 0, 0, 0, DateTimeZone.forID("CET"));
+        durs = Utils.getDurationDate(a,b);
+        System.out.println(durs);
+        assertTrue(durs.equals("10:00"));
     }
 }

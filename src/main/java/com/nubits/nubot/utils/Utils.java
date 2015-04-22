@@ -436,12 +436,8 @@ public class Utils {
 
     }
 
-    public static String getBotUptimeDate() {
-        //DateTime history = new DateTime( "1901-01-01", DateTimeZone.UTC ).withTimeAtStartOfDay();
-        //DateTime today = new DateTime( DateTimeZone.UTC ).withTimeAtStartOfDay();
-
-        DateTime now = new DateTime();
-        Duration duration = new Duration(now, Global.sessionStartDate);
+    public static String getDurationDate(DateTime from, DateTime to) {
+        Duration duration = new Duration(from, to);
         Period period = duration.toPeriod();
         PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
                 .appendDays()
@@ -454,9 +450,9 @@ public class Utils {
                 .appendMinutes()
                 .printZeroIfSupported()
                 .minimumPrintedDigits(2)
-                .appendSeparator(":")
+                /*.appendSeparator(":")
                 .appendSeconds()
-                .minimumPrintedDigits(2)
+                .minimumPrintedDigits(2)*/
                 .toFormatter();
 
                 /*
@@ -467,6 +463,11 @@ public class Utils {
                 .toFormatter();*/
         String result = minutesAndSeconds.print(period);
         return result;
+    }
+
+    public static String getBotUptimeDate() {
+        DateTime now = new DateTime();
+        return getDurationDate(Global.sessionStartDate, now);
     }
 
     //Return the uptime of the bot [hours]
