@@ -108,7 +108,7 @@ public class MainLaunch {
                 try {
                     SessionManager.launchBot(Global.options);
                 } catch (NuBotRunException e) {
-                    exitWithNotice("could not launch bot");
+                    exitWithNotice("could not launch bot " + e);
                 }
             }
 
