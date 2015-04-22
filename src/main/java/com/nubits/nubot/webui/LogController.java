@@ -3,9 +3,8 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.Amount;
-import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.Order;
+import com.nubits.nubot.models.PairBalance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,19 +72,15 @@ public class LogController {
                         LOG.debug("order: " + o);
                     }
 
-                    //TODO: use global pair
                     try {
-                        Global.balanceManager.fetchBalance(CurrencyList.BTC);
-                        Amount balance = Global.balanceManager.getBalance();
-                        opmap.put("BuyCurrency", balance);
+                        //query only up to every 1 second otherwise just get the last info
+                        long delta = 1000;
+                        Global.balanceManager.fetchBalancesIfTimePast(Global.options.getPair(), delta);
+                        PairBalance balance = Global.balanceManager.getPairBalance();
+                        opmap.put("BuyCurrency", balance.getNubitsBalance());
+                        opmap.put("SellCurrency", balance.getPEGBalance());
                     } catch (Exception e) {
-                    }
 
-                    try {
-                        Global.balanceManager.fetchBalance(CurrencyList.NBT);
-                        Amount balance = Global.balanceManager.getBalance();
-                        opmap.put("SellCurrency", balance);
-                    } catch (Exception e) {
                     }
 
 
