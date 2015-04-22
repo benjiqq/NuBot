@@ -439,17 +439,20 @@ public class Utils {
     public static String getDurationDate(DateTime from, DateTime to) {
         Duration duration = new Duration(from, to);
         Period period = duration.toPeriod();
+        Period normalizedPeriod = period.normalizedStandard();
         PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
                 .appendDays()
                 .appendSuffix(" day", " days")
                 .appendSeparator(" ")
                 .printZeroIfSupported()
-                .minimumPrintedDigits(2)
+                //.minimumPrintedDigits(2)
                 .appendHours()
-                .appendSeparator(":")
+                .appendSuffix(" hour", " hours")
+                .appendSeparator(" ")
                 .appendMinutes()
-                .printZeroIfSupported()
-                .minimumPrintedDigits(2)
+                .appendSuffix(" minute", " minutes")
+                //.printZeroIfSupported()
+                //.minimumPrintedDigits(2)
                 /*.appendSeparator(":")
                 .appendSeconds()
                 .minimumPrintedDigits(2)*/
@@ -461,7 +464,7 @@ public class Utils {
                 .appendSeparator(":")
                 .appendSeconds()
                 .toFormatter();*/
-        String result = minutesAndSeconds.print(period);
+        String result = minutesAndSeconds.print(normalizedPeriod);
         return result;
     }
 
