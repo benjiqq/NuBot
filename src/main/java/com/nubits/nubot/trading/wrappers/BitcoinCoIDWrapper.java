@@ -161,6 +161,10 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 double pegOnOrder = 0;
                 double nbtOnOrder = 0;
                 ArrayList<Order> orders = (ArrayList) getActiveOrdersToCountLockedBalance(pair).getResponseObject();
+                if (orders == null) {
+                    apiResponse.setError(errors.nullReturnError);
+                    return apiResponse;
+                }
                 for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                     Order thisOrder = order.next();
                     if (thisOrder.getType().equals(Constant.SELL)) {
@@ -498,8 +502,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (getOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
             for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
-                if (!(boolean) cancelOrder(order.next().getId(), pair).getResponseObject()) {
+                Order o = order.next();
+                String id = o.getId();
+                ApiResponse r = cancelOrder(id, pair);
+                boolean posi = r.isPositive();
+                if (!posi) {
                     apiResponse.setResponseObject(false);
+                } else {
+                    apiResponse.setResponseObject(r.getResponseObject());
                 }
             }
         } else {
