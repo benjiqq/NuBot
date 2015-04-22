@@ -107,7 +107,7 @@ public class PoloniexWrapper implements TradeInterface {
                     long greaterNonce = new Long(subs);
                     int addNonce = 5;
                     this.nonceCount = greaterNonce + addNonce;
-                    LOG.debug("nonce error. retry with corrected nonce " + this.nonceCount);
+                    LOG.debug("retry with corrected nonce " + this.nonceCount);
                     try {
                         Thread.sleep(100);
                     } catch (InterruptedException e) {
@@ -119,8 +119,10 @@ public class PoloniexWrapper implements TradeInterface {
             } else
                 return response;
             i++;
-            if (i > maxRetry)
+            if (i > maxRetry) {
+                LOG.error("nonce reset failed");
                 return response;
+            }
         }
         return response;
     }
@@ -144,7 +146,7 @@ public class PoloniexWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
-                LOG.error("Poloniex API returned an error: " + errorMessage);
+                LOG.debug("Poloniex API returned an error: " + errorMessage);
 
                 apiResponse.setError(apiErr);
             } else {

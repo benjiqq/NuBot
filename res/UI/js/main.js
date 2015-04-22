@@ -15,6 +15,9 @@
   var logLine = 0;
   var requestedStop = false;
 
+  function handleFailServer(){
+    $('#maincontainer').html("server is shutdown");
+  }
 
   function clearTables() {
       $("#ordertable").find("tr:gt(0)").remove();
@@ -83,6 +86,7 @@
           })
           .fail(function() {
               console.log("error loading configfile");
+              handleFailServer();
           })
           .done(function(data) {
               //console.log("config data: " + data);
@@ -99,6 +103,7 @@
           })
           .fail(function() {
               console.log("error loading info");
+              handleFailServer();
           })
           .done(function(data) {
 
@@ -155,7 +160,7 @@
               url: "http://" + host + ":" + port + "/opstatus"
           })
           .fail(function() {
-
+              handleFailServer();
           })
           .done(function(data) {
               //console.log("status data: " + JSON.parse(JSON.stringify(data)));
@@ -303,6 +308,7 @@
           })
           .fail(function() {
               console.log("error loading log");
+              handleFailServer();
           })
           .done(function(data) {
               $('#logarea').val(data["log"]);

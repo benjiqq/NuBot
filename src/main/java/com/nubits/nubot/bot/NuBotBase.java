@@ -201,7 +201,7 @@ public abstract class NuBotBase {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
         } else {
-            throw new NuBotRunException("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+            throw new NuBotRunException("could not query exchange: [ " + activeOrdersResponse.getError() + " ]");
         }
     }
 
