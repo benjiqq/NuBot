@@ -84,6 +84,7 @@ public class SessionManager {
         runonce = true;
 
         Global.sessionStarted = System.currentTimeMillis();
+        Global.sessionStartDate = new DateTime();
 
         String timestamp =
                 new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());

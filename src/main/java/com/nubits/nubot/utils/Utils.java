@@ -451,11 +451,12 @@ public class Utils {
                 .appendSeparator(" ")
                 .appendMinutes()
                 .appendSuffix(" minute", " minutes")
-                //.printZeroIfSupported()
+                .printZeroIfSupported()
                 //.minimumPrintedDigits(2)
-                /*.appendSeparator(":")
+                .appendSeparator(" ")
                 .appendSeconds()
-                .minimumPrintedDigits(2)*/
+                .appendSuffix(" second", " seconds")
+                //.minimumPrintedDigits(2)
                 .toFormatter();
 
                 /*
@@ -474,7 +475,7 @@ public class Utils {
     }
 
     //Return the uptime of the bot [hours]
-    public static String getBotUptimeReadable() {
+    /*public static String getBotUptimeReadable() {
         long upTimeMs = System.currentTimeMillis() - Global.sessionStarted;
         String toReturn = "";
         if (getDaysFromMillis(upTimeMs) > 2) {
@@ -485,7 +486,7 @@ public class Utils {
             toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
         }
         return toReturn;
-    }
+    }*/
 
     //Format numbers in decimal notation with custom digits
     public static String formatNumber(double number, int digits) {
