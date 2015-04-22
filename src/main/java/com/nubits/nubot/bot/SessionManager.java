@@ -167,13 +167,11 @@ public class SessionManager {
      */
     public static boolean isSessionActive() {
 
-        LOG.warn("checking is SessionActive");
-
         appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
 
         sessionFile = new File
                 (appFolder, Settings.SESSION_FILE);
-        //LOG.trace("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
+        //LOG.warn("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
     }
 
@@ -192,8 +190,9 @@ public class SessionManager {
 
 
         String sessionFileName = Settings.SESSION_FILE;
-        sessionFile = new File(appFolder, sessionFileName);
         if (!sessionFile.exists()) {
+            sessionFile = new File(appFolder, sessionFileName);
+
             try {
                 sessionFile.createNewFile();
                 sessionFile.deleteOnExit();

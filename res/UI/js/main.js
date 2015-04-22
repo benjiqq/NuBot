@@ -1,7 +1,12 @@
   var host = "localhost";
   var port = 4567;
   var baseurl = "http://" + host + ":" + port;
-  var updateTime = 500;
+
+  var refreshStatusInterval = 15*1000; //ms
+  var refreshOrdersAndBalanceInterval = 10*1000; //ms
+  var refreshTablesInterval = 5*1000; //ms
+  var refreshLogInterval = 3*1000; //ms
+
   var debug = true;
 
   var dotCounter = 1 ;
@@ -45,7 +50,7 @@ function toggleBot(running)
 
       //$('#status-img').attr("src","img/bot_running.png");
 
-      setTimeout(clearTables, 500);
+      setTimeout(clearTables, refreshTablesInterval);
 
       document.title = 'NuBot GUI - Stopped';
       //$("#favicon").attr("href","favicon.ico");
@@ -141,7 +146,7 @@ function updateOrdersBalances(){
         }
 
     });
-    setTimeout(updateOrdersBalances , 2000);
+    setTimeout(updateOrdersBalances , refreshOrdersAndBalanceInterval);
  }
 
 function updateStatus(){
@@ -169,7 +174,7 @@ function updateStatus(){
         });
 
         //re-call the function
-        setTimeout(updateStatus, updateTime);
+        setTimeout(updateStatus, refreshStatusInterval);
 }
 
 function flashButton(cbtn){
@@ -313,7 +318,7 @@ function updateLog() {
         autoScroll();
     }
 
-    setTimeout(updateLog , updateTime);
+    setTimeout(updateLog , refreshLogInterval);
 }
 
 function loadbot() {
