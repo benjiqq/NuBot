@@ -73,7 +73,8 @@ public class PoloniexWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
-    private long nonceCount = new Long(System.currentTimeMillis()/1000).longValue();
+    private long nonceCount = new Long(System.currentTimeMillis() / 100000).longValue();
+    private boolean fixNonce = false;
 
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
@@ -97,14 +98,14 @@ public class PoloniexWrapper implements TradeInterface {
                 int i = errMsg.indexOf(stmp);
                 int j = errMsg.indexOf(". You");
                 String subs = errMsg.substring(i + stmp.length(), j);
-
+                fixNonce = true;
                 long greaterNonce = new Long(subs);
                 int addNonce = 5;
                 this.nonceCount = greaterNonce + addNonce;
                 LOG.error("nonce error. retry with corrected nonce " + this.nonceCount);
-                try{
+                try {
                     Thread.sleep(100);
-                }catch (InterruptedException e){
+                } catch (InterruptedException e) {
 
                 }
                 response = getQueryMain(url, method, query_args, needAuth, isGet);
@@ -749,15 +750,17 @@ public class PoloniexWrapper implements TradeInterface {
         }
 
 
-
         private String createNonce() {
 
             //potential FIX: add some time to the nonce, since time sync has issues
             //long fixtime = 1000;
-            //long toRet = System.currentTimeMillis(); // + fixtime;
-            nonceCount++;
-            LOG.debug("nonce used " + nonceCount);
-            return Long.toString(nonceCount);
+            if (!fixNonce)
+                return "" + System.currentTimeMillis();
+            else {
+                nonceCount++;
+                LOG.debug("nonce used " + nonceCount);
+                return "" + nonceCount;
+            }
         }
     }
 }
