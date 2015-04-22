@@ -187,7 +187,7 @@ public class StrategySecondaryPegUtils {
             if (orderResponse.isPositive()) {
                 String msg = hipchatMsg(type, orderString);
                 HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-                LOG.info("Strategy - " + type + " Response = " + orderResponse.getResponseObject());
+                LOG.info("Strategy - Order success: " + type + " Response = " + orderResponse.getResponseObject());
                 return true;
             } else {
                 LOG.error(orderResponse.getError().toString());
