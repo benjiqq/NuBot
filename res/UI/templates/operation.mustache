@@ -1,79 +1,54 @@
+<div class="row">
+    <button id="togglebot" type="button" class="btn btn-lg btn-primary">
+        <span id="togglebot-text" class="glyphicon glyphicon-star"> Start Bot</span>
+    </button>
+    <br>
 
+    <p style="margin-top: 10px">Config file: <span id="configfile"><span></p>
 
-    <div class="row">
+    <p style="margin-top: 10px">Status: <span id="botstatus">Stopped<span></p>
 
-        <button id="togglebot" type="button" class="btn btn-lg btn-primary">
-            <span id="togglebot-text" class="glyphicon glyphicon-star"> Start Bot</span>
-        </button>
+    <p>Sesssion start: <span id="sessionstart"></span></p>
 
+    <p>Sesssion duration: <span id="duration"></span></p>
+</div>
+<div class="row" style="margin-top: -30px">
+    <div class="col-xs-12 col-md-8">
+        <h3>Log</h3>
 
-        <br>
-
-        <p style="margin-top: 10px">Config file: <span id="configfile"><span></p>
-
-        <p style="margin-top: 10px">Status: <span id="botstatus">Stopped<span></p>
-
-        <p>Sesssion start: <span id="sessionstart"></span></p>
-
-        <p>Sesssion duration: <span id="duration"></span></p>
-
-    </div>
-
-
-    <div class="row" style="margin-top: -30px">
-
-        <div class="col-xs-12 col-md-8">
-            <h3>Log</h3>
-
-            <div class="input-group">
-                <textarea id="logarea" class="form-control custom-control"></textarea>
-            </div>
+        <div class="input-group">
+            <textarea id="logarea" class="form-control custom-control"></textarea>
         </div>
-
-        <div class="col-xs-12 col-md-4">
-            <h3>Active Orders</h3>
-
-            <table id="ordertable" class="table">
-                <thead>
-                <tr>
-                    <th>Buy/Sell</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
-                </tr>
-                </thead>
-
-                <tbody>
-
-                </tbody>
-            </table>
-
-            <h3>Balances</h3>
-            <table id="balancetable" class="table">
-                <thead>
-                <tr>
-                    <th>Quantity</th>
-                    <th>Unit</th>
-                </tr>
-                </thead>
-
-                <tbody>
-
-                </tbody>
-            </table>
-
-
-        </div>
-
     </div>
-
-
-
+    <div class="col-xs-12 col-md-4">
+        <h3>Active Orders</h3>
+        <table id="ordertable" class="table">
+            <thead>
+            <tr>
+                <th>Buy/Sell</th>
+                <th>Quantity (NBT)</th>
+                <th>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <h3>Total Balance</h3>
+        <table id="balancetable" class="table">
+            <thead>
+            <tr>
+                <th>Quantity</th>
+                <th>Unit</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
 <script>
    $( document ).ready(function() {
         startupPage("operation");
     });
-
-
-
 
 </script>
