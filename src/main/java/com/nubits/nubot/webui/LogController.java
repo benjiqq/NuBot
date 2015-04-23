@@ -36,7 +36,7 @@ public class LogController {
     public LogController() {
 
         get("/logdump", "application/json", (request, response) -> {
-            LOG.debug("/logdump called");
+            LOG.trace("/logdump called");
             JsonObject object = new JsonObject();
 
             String f = logfile;

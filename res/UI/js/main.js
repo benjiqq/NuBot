@@ -5,6 +5,8 @@
   var orderEndPoint = "orders";
   var balanceEndPoint = "balances";
 
+  var refreshStatusInterval = 2*1000; //ms
+
   /*
      No matter how fast we set the refreshOrders,
      it will be capped by Server
@@ -18,7 +20,7 @@
   var refreshLogInterval = 500;
   var refreshOrders = 500;
   var refreshTablesInterval = 500;
-  var refreshLogInterval = 500;
+  var refreshLogInterval = 250;
 
   var debug = true;
 
