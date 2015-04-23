@@ -5,15 +5,13 @@
   var orderEndPoint = "orders";
   var balanceEndPoint = "balances";
 
-  var refreshStatusInterval = 500; //ms
-
   /*
      No matter how fast we set the refreshOrders,
      it will be capped by Server
      in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
   */
-  var refreshOrders = 500; //ms
-  var refreshBalances = 500;
+  var refreshOrders = 4*1000; //ms
+  var refreshBalances = 4*1000; //ms
 
   //in ms
   var refreshTablesInterval = 500;
