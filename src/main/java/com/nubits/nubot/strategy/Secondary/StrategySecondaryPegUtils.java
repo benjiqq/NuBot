@@ -45,7 +45,7 @@ public class StrategySecondaryPegUtils {
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         //They are either 0 or need to be cancelled
-        Global.orderManager.fetch();
+        Global.orderManager.fetchOrders();
         int totalOrders = Global.orderManager.getNumTotalActiveOrders();
         if (totalOrders > 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -388,7 +388,7 @@ public class StrategySecondaryPegUtils {
 
             double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
-            Global.orderManager.fetch();
+            Global.orderManager.fetchOrders();
             int activeSellOrders = Global.orderManager.getNumActiveSellOrders();
             int activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
 

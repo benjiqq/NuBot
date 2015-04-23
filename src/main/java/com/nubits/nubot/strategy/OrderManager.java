@@ -241,7 +241,10 @@ public class OrderManager {
         return success;
     }
 
-    public void fetch() {
+    /**
+     * fetch orders without delay
+     */
+    public void fetchOrders() {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             lastFetch = System.currentTimeMillis();
@@ -252,10 +255,24 @@ public class OrderManager {
         }
     }
 
-    public int FetchAndCountActiveOrders(String type) {
 
-        this.fetch();
+    /**
+     * fetch bound with time
+     * @param tresh
+     */
+    public void fetchTimeBound(double tresh){
+        long cur = System.currentTimeMillis();
+        long diff = cur - lastFetch;
+        LOG.debug("OrderManager. diff: " + diff);
+        if (diff > tresh) {
+            LOG.debug("triggered fetch");
+            fetchOrders();
+        }
+    }
 
+    //public int getumOrders
+
+    public int countOrder(String type){
         int numOrders = 0;
 
         for (Order tempOrder : orderList) {
@@ -267,6 +284,7 @@ public class OrderManager {
         LOG.debug("activeorders " + type + " " + numOrders);
         return numOrders;
     }
+
 
     public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
         ArrayList<Order> toRet = new ArrayList<>();
@@ -288,12 +306,22 @@ public class OrderManager {
         return orderList;
     }
 
-    public int getNumActiveSellOrders() {
-        return this.FetchAndCountActiveOrders(Constant.SELL);
+    public int getNumActiveSellOrders(){
+        return countOrder(Constant.SELL);
     }
 
-    public int getNumActiveBuyOrders() {
-        return this.FetchAndCountActiveOrders(Constant.BUY);
+    public int getNumActiveBuyOrders(){
+        return countOrder(Constant.BUY);
+    }
+
+    public int fetchSellOrdersTimeBound(double timetresh) {
+        this.fetchTimeBound(timetresh);
+        return this.getNumActiveSellOrders();
+    }
+
+    public int fetchBuyOrdersTimeBound(double timetresh) {
+        this.fetchTimeBound(timetresh);
+        return this.getNumActiveBuyOrders();
     }
 
     public int getNumTotalActiveOrders() {

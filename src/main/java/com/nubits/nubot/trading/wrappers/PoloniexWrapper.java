@@ -769,7 +769,7 @@ public class PoloniexWrapper implements TradeInterface {
                 return "" + System.currentTimeMillis();
             else {
                 nonceCount++;
-                LOG.debug("nonce used " + nonceCount);
+                LOG.trace("nonce used " + nonceCount);
                 return "" + nonceCount;
             }
         }

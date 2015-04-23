@@ -3,6 +3,7 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.PairBalance;
 import org.slf4j.Logger;
@@ -24,6 +25,9 @@ public class LogController {
      */
     String logfile = Global.sessionPath + "/ui_standard.log";
     String verboselogfile = Global.sessionPath + "/ui_verbose.log";
+
+    private String orderEndPoint = "orders";
+    private String balanceEndPoint = "balances";
 
     final static Logger LOG = LoggerFactory.getLogger(LogController.class);
 
@@ -51,8 +55,10 @@ public class LogController {
 
         });
 
-        get("/info", "application/json", (request, response) -> {
-            LOG.trace("/info called");
+
+
+        get("/" + orderEndPoint, "application/json", (request, response) -> {
+            LOG.trace("/orders called");
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;
@@ -61,21 +67,20 @@ public class LogController {
                 try {
 
                     Global.orderManager.logActiveOrders();
-                    numbuys = Global.orderManager.getNumActiveBuyOrders();
-                    numsells = Global.orderManager.getNumActiveSellOrders();
+                    numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
+                    numsells = Global.orderManager.fetchSellOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
+
                     LOG.debug("buys: " + numbuys);
                     LOG.debug("sells: " + numsells);
 
                     ArrayList<Order> ol = Global.orderManager.getOrderList();
                     opmap.put("orders", ol);
-                    for (Order o : ol) {
-                        LOG.debug("order: " + o);
-                    }
+                    LOG.debug("orders: " + ol);
 
                     try {
-                        //query only up to every 1 second otherwise just get the last info
-                        long delta = 1000;
-                        Global.balanceManager.fetchBalancesIfTimePast(Global.options.getPair(), delta);
+                        //query only up to every X msec, otherwise just get the last info
+                        //this caps the maximum queries we can do, so to not overload the exchange
+                        Global.balanceManager.fetchBalancePairTimeBound(Global.options.getPair(), Settings.BALANCE_MAX_INTERVAL);
                         PairBalance balance = Global.balanceManager.getPairBalance();
                         opmap.put("BuyCurrency", balance.getNubitsBalance());
                         opmap.put("SellCurrency", balance.getPEGBalance());
@@ -83,9 +88,7 @@ public class LogController {
 
                     }
 
-
                 } catch (Exception e) {
-
                 }
             }
 
@@ -95,7 +98,34 @@ public class LogController {
 
             String json = new Gson().toJson(opmap);
             return json;
+        });
 
+
+
+        get("/" + balanceEndPoint, "application/json", (request, response) -> {
+            LOG.trace("/balances called");
+            Map opmap = new HashMap();
+
+            if (Global.sessionRunning) {
+                try {
+
+                    try {
+                        //query only up to every X msec, otherwise just get the last info
+                        //this caps the maximum queries we can do, so to not overload the exchange
+                        Global.balanceManager.fetchBalancePairTimeBound(Global.options.getPair(), Settings.BALANCE_MAX_INTERVAL);
+                        PairBalance balance = Global.balanceManager.getPairBalance();
+                        opmap.put("BuyCurrency", balance.getNubitsBalance());
+                        opmap.put("SellCurrency", balance.getPEGBalance());
+                    } catch (Exception e) {
+
+                    }
+
+                } catch (Exception e) {
+                }
+            }
+
+            String json = new Gson().toJson(opmap);
+            return json;
         });
 
 

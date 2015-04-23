@@ -387,7 +387,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
-        Global.orderManager.fetch();
+        Global.orderManager.fetchOrders();
 
         ArrayList<Order> orderList = Global.orderManager.getOrderList();
 
@@ -431,8 +431,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
         LOG.info("balance NBT " + balanceNBT);
         LOG.info("balance FIAT " + balanceFIAT);
 
-        activeSellOrders = Global.orderManager.FetchAndCountActiveOrders(Constant.SELL);
-        activeBuyOrders = Global.orderManager.FetchAndCountActiveOrders(Constant.BUY);
+        Global.orderManager.fetchOrders();
+        activeSellOrders = Global.orderManager.getNumActiveSellOrders();
+        activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
         LOG.info("activeSellOrders " + activeSellOrders);

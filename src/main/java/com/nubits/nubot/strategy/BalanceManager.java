@@ -20,28 +20,21 @@ public class BalanceManager {
 
     private long lastFetchBalance, lastFetchPairBalance;
 
-    public void fetchBalance(Currency currency) throws Exception {
+    /*public void fetchBalance(Currency currency) throws Exception {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
         if (!balancesResponse.isPositive()) {
+            this.lastFetchBalance = System.currentTimeMillis();
             String errmsg = balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
 
-        lastFetchBalance = System.currentTimeMillis();
         this.balance = (Amount) balancesResponse.getResponseObject();
 
-    }
+    }*/
 
-    public void fetchBalancesIfTimePast(CurrencyPair pair, double tresh) throws Exception {
-        long current = System.currentTimeMillis();
-        if (current - lastFetchBalance > tresh){
-            fetchBalances(pair);
-        }
-    }
 
     public void fetchBalances(CurrencyPair pair) throws Exception {
-        lastFetchBalance = System.currentTimeMillis();
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
 
         if (!balancesResponse.isPositive()) {
@@ -50,10 +43,22 @@ public class BalanceManager {
             throw new Exception(errmsg);
         }
 
-        lastFetchPairBalance = System.currentTimeMillis();
+        this.lastFetchPairBalance = System.currentTimeMillis();
+
         this.pairBalance = (PairBalance) balancesResponse.getResponseObject();
 
     }
+
+    public void fetchBalancePairTimeBound(CurrencyPair pair, double tresh) throws Exception {
+        long current = System.currentTimeMillis();
+        long diff = current - this.lastFetchPairBalance;
+        LOG.debug("balance. diff: " + diff);
+        if (diff > tresh){
+            LOG.debug("triggered fetch");
+            fetchBalances(pair);
+        }
+    }
+
 
     public Amount getBalance() {
         return this.balance;
