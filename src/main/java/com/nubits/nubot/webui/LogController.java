@@ -98,9 +98,8 @@ public class LogController {
 
 
             String json = new Gson().toJson(opmap);
-            LOG.warn(json);
+            LOG.trace("info/ data: " + json);
             return json;
-
         });
 
 
@@ -115,22 +114,22 @@ public class LogController {
                     balance.getPEGAvailableBalance().getCurrency().getCode().toUpperCase());
 
             balanceObj.put("balanceTotal",
-                    Utils.formatNumber(balance.getPEGBalance().getQuantity(), Settings.DEFAULT_PRECISION));
+                    Utils.formatNumber(balance.getPEGBalance().getQuantity(), 6));
             balanceObj.put("balanceAvailable",
-                    Utils.formatNumber(balance.getPEGAvailableBalance().getQuantity(), Settings.DEFAULT_PRECISION));
+                    Utils.formatNumber(balance.getPEGAvailableBalance().getQuantity(), 6));
             balanceObj.put("balanceLocked",
-                    Utils.formatNumber(balance.getPEGBalanceonOrder().getQuantity(), Settings.DEFAULT_PRECISION));
+                    Utils.formatNumber(balance.getPEGBalanceonOrder().getQuantity(), 6));
 
         } else // nbt
         {
             balanceObj.put("currencyCode", balance.getNBTAvailable().getCurrency().getCode().toUpperCase());
 
             balanceObj.put("balanceTotal",
-                    Utils.formatNumber(balance.getNubitsBalance().getQuantity(), Settings.DEFAULT_PRECISION));
+                    Utils.formatNumber(balance.getNubitsBalance().getQuantity(), 6));
             balanceObj.put("balanceAvailable",
-                    Utils.formatNumber(balance.getNBTAvailable().getQuantity(), Settings.DEFAULT_PRECISION));
+                    Utils.formatNumber(balance.getNBTAvailable().getQuantity(), 6));
             balanceObj.put("balanceLocked",
-                    Utils.formatNumber(balance.getNBTonOrder().getQuantity(), Settings.DEFAULT_PRECISION));
+                    Utils.formatNumber(balance.getNBTonOrder().getQuantity(), 6));
 
         }
 

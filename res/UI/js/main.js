@@ -106,26 +106,43 @@
               handleFailServer();
           })
           .done(function(data) { //For a sample data see [1] at the bottom of this file :
-              console.log(JSON.stringify(data));
+              //console.log(JSON.stringify(data));
               // prevent update at shutdown
               if (!botRunning) {
                   return
               };
 
 
-              if (data.hasOwnProperty("BuyCurrency")) {
+              if (data.hasOwnProperty("pegBalance")) {
                   $("#balancetable").find("tr:gt(0)").remove();
 
-                  var qty = data["BuyCurrency"]["quantity"];
-                  var cry = data["BuyCurrency"]["currency"]["code"];
+                  var pegTotal =  data["pegBalance"]["balanceTotal"];
+                  var pegAvailable = data["pegBalance"]["balanceAvailable"];
+                  var pegLocked =  data["pegBalance"]["balanceLocked"];
+                  var pegCurrencyCode = data["pegBalance"]["currencyCode"] ;
 
-                  var rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
-                  $("#balancetable").find('tbody').after(rowhtml);
+                  var pegHTMLrow = '<tr>'+
+                                     '<td>' + pegCurrencyCode + '</td>'+
+                                     '<td align=\'right\'>' + pegTotal + '</td>'+
+                                     '<td align=\'right\'>' + pegLocked + '</td>'+
+                                     '<td align=\'right\'>' + pegAvailable + '</td>'+
+                                   '</tr>';
 
-                  qty = data["SellCurrency"]["quantity"];
-                  cry = data["SellCurrency"]["currency"]["code"];
-                  rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
-                  $("#balancetable").find('tbody').after(rowhtml);
+                  $("#balancetable").find('tbody').after(pegHTMLrow);
+
+                  var nbtTotal =  data["nbtBalance"]["balanceTotal"];
+                  var nbtAvailable = data["nbtBalance"]["balanceAvailable"];
+                  var nbtLocked =  data["nbtBalance"]["balanceLocked"];
+                  var nbtCurrencyCode = data["nbtBalance"]["currencyCode"] ;
+
+                  var nbtHTMLrow = '<tr>'+
+                                  '<td>' + nbtCurrencyCode + '</td>'+
+                                  '<td align=\'right\'>' + nbtTotal + '</td>'+
+                                  '<td align=\'right\'>' + nbtLocked + '</td>'+
+                                  '<td align=\'right\'>' + nbtAvailable + '</td>'+
+                                  '</tr>';
+
+                  $("#balancetable").find('tbody').after(nbtHTMLrow);
               }
 
               if (data.hasOwnProperty("orders")) {
@@ -140,7 +157,7 @@
                       var type = order["type"];
                       var qty = order["amount"]["quantity"];
                       var price = order["price"]["quantity"];
-                      var rowhtml = '<tr><td>' + type + '</td><td>' + qty + '</td><td>' + price + '</td></tr>';
+                      var rowhtml = '<tr><td>' + type + '</td><td align=\'right\'>' + qty + '</td><td align=\'right\'>' + price + '</td></tr>';
                       $("#ordertable").find('tbody').after(rowhtml);
                   }
               }
