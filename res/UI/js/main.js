@@ -12,15 +12,13 @@
      it will be capped by Server
      in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
   */
-  var refreshOrders = 4*1000; //ms
-  var refreshBalances = 4*1000; //ms
+  var refreshOrders = 4*1000;
+  var refreshBalances = 4*1000;
 
-  //in ms
+
   var refreshTablesInterval = 500;
-  var refreshLogInterval = 500;
-  var refreshOrders = 500;
-  var refreshTablesInterval = 500;
-  var refreshLogInterval = 250;
+  var refreshLogInterval = 150;
+
 
   var debug = true;
 
