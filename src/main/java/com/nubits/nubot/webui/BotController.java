@@ -28,7 +28,7 @@ public class BotController {
     public BotController() {
 
         get("/opstatus", "application/json", (request, response) -> {
-            LOG.debug("/opstatus called");
+            LOG.trace("/opstatus called");
             Map opmap = new HashMap();
             boolean active = SessionManager.isSessionActive();
             if (active) {
