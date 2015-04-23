@@ -75,8 +75,9 @@ public class LogController {
                     }
 
                     try {
-                        //query only up to every 1 second otherwise just get the last info
 
+                        //query only up to every X msec, otherwise just get the last info
+                        //this caps the maximum queries we can do, so to not overload the exchange
                         Global.balanceManager.fetchBalancePairTimeBound(Global.options.getPair(), Settings.BALANCE_MAX_INTERVAL);
                         PairBalance balance = Global.balanceManager.getPairBalance();
                         opmap.put("BuyCurrency", balance.getNubitsBalance());
