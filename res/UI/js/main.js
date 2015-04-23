@@ -3,7 +3,11 @@
   var baseurl = "http://" + host + ":" + port;
 
   var refreshStatusInterval = 11 * 1000; //ms
-  var refreshOrdersAndBalanceInterval = 7 * 1000; //ms
+
+  // No matter how fast we set the refresh time below, it will be capped by ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
+  var refreshOrdersAndBalanceInterval = 7 * 1000;
+
+
   var refreshTablesInterval = 5 * 1000; //ms
   var refreshLogInterval = 3 * 1000; //ms
 
