@@ -77,7 +77,7 @@ public class LogController {
                     try {
                         //query only up to every 1 second otherwise just get the last info
 
-                        Global.balanceManager.fetchBalancesTimeBound(Global.options.getPair(), Settings.BALANCE_MIN_UPDATE);
+                        Global.balanceManager.fetchBalancePairTimeBound(Global.options.getPair(), Settings.BALANCE_MIN_UPDATE);
                         PairBalance balance = Global.balanceManager.getPairBalance();
                         opmap.put("BuyCurrency", balance.getNubitsBalance());
                         opmap.put("SellCurrency", balance.getPEGBalance());

@@ -23,19 +23,19 @@ public class BalanceManager {
     public void fetchBalance(Currency currency) throws Exception {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
         if (!balancesResponse.isPositive()) {
+            lastFetchBalance = System.currentTimeMillis();
             String errmsg = balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
 
-        lastFetchBalance = System.currentTimeMillis();
         this.balance = (Amount) balancesResponse.getResponseObject();
 
     }
 
-    public void fetchBalancesTimeBound(CurrencyPair pair, double tresh) throws Exception {
+    public void fetchBalancePairTimeBound(CurrencyPair pair, double tresh) throws Exception {
         long current = System.currentTimeMillis();
-        long diff = current - lastFetchBalance;
+        long diff = current - lastFetchPairBalance;
         LOG.debug("balance. diff: " + diff);
         if (diff > tresh){
             LOG.debug("triggered fetch");
@@ -44,16 +44,16 @@ public class BalanceManager {
     }
 
     public void fetchBalances(CurrencyPair pair) throws Exception {
-        lastFetchBalance = System.currentTimeMillis();
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
 
         if (!balancesResponse.isPositive()) {
+            lastFetchPairBalance = System.currentTimeMillis();
             String errmsg =balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
 
-        lastFetchPairBalance = System.currentTimeMillis();
+
         this.pairBalance = (PairBalance) balancesResponse.getResponseObject();
 
     }
