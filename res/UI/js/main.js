@@ -105,16 +105,13 @@
               console.log("error loading info");
               handleFailServer();
           })
-          .done(function(data) {
+          .done(function(data) { //For a sample data see [1] at the bottom of this file :
 
               // prevent update at shutdown
               if (!botRunning) {
                   return
               };
 
-              //console.log("buys: " + data["buys"]);
-              //console.log("BuyCurrency: " + data["BuyCurrency"]);
-              //console.log("SellCurrency: " + data["SellCurrency"]);
 
               if (data.hasOwnProperty("BuyCurrency")) {
                   $("#balancetable").find("tr:gt(0)").remove();
@@ -534,3 +531,67 @@
               break;
       }
   }
+
+
+/*
+
+    1. Sample Data -------------------
+
+    {
+                    "BuyCurrency": {
+                      "quantity": 9.53076606,
+                      "currency": {
+                        "fiat": false,
+                        "code": "NBT",
+                        "extendedName": "NuBit"
+                      }
+                    },
+                    "buys": 1,
+                    "sells": 0,
+                    "SellCurrency": {
+                      "quantity": 0.02201121,
+                      "currency": {
+                        "fiat": false,
+                        "code": "BTC",
+                        "extendedName": "Bitcoin"
+                      }
+                    },
+                    "orders": [
+                      {
+                        "id": "46522",
+                        "insertedDate": "Apr 23, 2015 11:22:35 AM",
+                        "type": "BUY",
+                        "pair": {
+                          "orderCurrency": {
+                            "fiat": false,
+                            "code": "NBT",
+                            "extendedName": "NuBit"
+                          },
+                          "paymentCurrency": {
+                            "fiat": false,
+                            "code": "BTC",
+                            "extendedName": "Bitcoin"
+                          }
+                        },
+                        "amount": {
+                          "quantity": 1.82272164,
+                          "currency": {
+                            "fiat": false,
+                            "code": "NBT",
+                            "extendedName": "NuBit"
+                          }
+                        },
+                        "price": {
+                          "quantity": 0.004196,
+                          "currency": {
+                            "fiat": false,
+                            "code": "BTC",
+                            "extendedName": "Bitcoin"
+                          }
+                        },
+                        "completed": false
+                      }
+                    ]
+                  }
+        <end[1]> -------------
+      */
