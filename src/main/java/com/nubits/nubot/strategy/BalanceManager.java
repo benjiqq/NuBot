@@ -20,10 +20,10 @@ public class BalanceManager {
 
     private long lastFetchBalance, lastFetchPairBalance;
 
-    public void fetchBalance(Currency currency) throws Exception {
+    /*public void fetchBalance(Currency currency) throws Exception {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalance(currency);
         if (!balancesResponse.isPositive()) {
-            lastFetchBalance = System.currentTimeMillis();
+            this.lastFetchBalance = System.currentTimeMillis();
             String errmsg = balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
@@ -31,11 +31,27 @@ public class BalanceManager {
 
         this.balance = (Amount) balancesResponse.getResponseObject();
 
+    }*/
+
+
+    public void fetchBalances(CurrencyPair pair) throws Exception {
+        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
+
+        if (!balancesResponse.isPositive()) {
+            String errmsg =balancesResponse.getError().toString();
+            LOG.error(errmsg);
+            throw new Exception(errmsg);
+        }
+
+        this.lastFetchPairBalance = System.currentTimeMillis();
+
+        this.pairBalance = (PairBalance) balancesResponse.getResponseObject();
+
     }
 
     public void fetchBalancePairTimeBound(CurrencyPair pair, double tresh) throws Exception {
         long current = System.currentTimeMillis();
-        long diff = current - lastFetchPairBalance;
+        long diff = current - this.lastFetchPairBalance;
         LOG.debug("balance. diff: " + diff);
         if (diff > tresh){
             LOG.debug("triggered fetch");
@@ -43,20 +59,6 @@ public class BalanceManager {
         }
     }
 
-    public void fetchBalances(CurrencyPair pair) throws Exception {
-        ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
-
-        if (!balancesResponse.isPositive()) {
-            lastFetchPairBalance = System.currentTimeMillis();
-            String errmsg =balancesResponse.getError().toString();
-            LOG.error(errmsg);
-            throw new Exception(errmsg);
-        }
-
-
-        this.pairBalance = (PairBalance) balancesResponse.getResponseObject();
-
-    }
 
     public Amount getBalance() {
         return this.balance;
