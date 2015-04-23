@@ -64,6 +64,7 @@ public class LogController {
                     Global.orderManager.logActiveOrders();
                     numbuys = Global.orderManager.FetchGetNumActiveBuyOrders(Settings.ORDER_MIN_UPDATE);
                     numsells = Global.orderManager.FetchGetNumActiveSellOrders(Settings.ORDER_MIN_UPDATE);
+
                     LOG.debug("buys: " + numbuys);
                     LOG.debug("sells: " + numsells);
 

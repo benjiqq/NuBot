@@ -279,16 +279,6 @@ public class OrderManager {
         return countOrder(type);
     }*/
 
-    public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
-        ArrayList<Order> toRet = new ArrayList<>();
-        for (Order temp : originalList) {
-            if (temp.getType().equalsIgnoreCase(type)) {
-                toRet.add(temp);
-            }
-        }
-
-        return toRet;
-    }
 
     public void logActiveOrders() {
         LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
