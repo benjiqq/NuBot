@@ -117,7 +117,7 @@
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/" + balanceEndPoint;
+              url: "http://" + host + ":" + port + "/" + balanceEndPoint
           })
           .fail(function() {
               console.log("error loading info");
@@ -159,13 +159,12 @@
 
 
   function updateOrders() {
-
       console.log("updateOrders");
 
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/" + orderEndPoint;
+              url: "http://" + host + ":" + port + "/" + orderEndPoint
           })
           .fail(function() {
               console.log("error loading info");
@@ -572,6 +571,7 @@
               updateStatus();
               updateLog();
               updateOrders();
+              updateBalances();
 
               break;
           case "config":
