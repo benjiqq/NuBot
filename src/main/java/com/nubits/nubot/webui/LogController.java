@@ -61,8 +61,8 @@ public class LogController {
                 try {
 
                     Global.orderManager.logActiveOrders();
-                    numbuys = Global.orderManager.FetchGetNumActiveBuyOrders();
-                    numsells = Global.orderManager.FetchGetNumActiveSellOrders();
+                    numbuys = Global.orderManager.getNumActiveBuyOrders();
+                    numsells = Global.orderManager.getNumActiveSellOrders();
                     LOG.debug("buys: " + numbuys);
                     LOG.debug("sells: " + numsells);
 
