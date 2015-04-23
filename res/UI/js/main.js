@@ -110,10 +110,9 @@
 
   var first = true;
   function updateBalances() {
-      if (!botRunning) { return };
-
-      console.log("updateBalances");
-
+      //console.log("updatebalance, botrunning="+botRunning);
+      if(botRunning)
+      {
       $.ajax({
               type: "GET",
               dataType: "json",
@@ -126,7 +125,6 @@
           .done(function(data) { //For a sample data see [1] at the bottom of this file :
               //console.log(JSON.stringify(data));
               // prevent update at shutdown
-
 
               if (data.hasOwnProperty("pegBalance")) {
 
@@ -162,6 +160,7 @@
               }
           });
 
+       }
       //pipeline the call
       var updatetime = refreshBalances;
       if (first)
@@ -173,9 +172,9 @@
 
 
   function updateOrders() {
-      if (!botRunning) { return };
+    //console.log("updateorders, botrunning="+botRunning);
 
-
+    if (botRunning) {
       $.ajax({
               type: "GET",
               dataType: "json",
@@ -186,6 +185,7 @@
               handleFailServer();
           })
           .done(function(data) {
+
 
 
               //console.log("buys: " + data["buys"]);
@@ -210,7 +210,7 @@
               }
 
           });
-
+        }
       setTimeout(updateOrders, refreshOrders);
   }
 
@@ -582,7 +582,8 @@
               updateStatus();
               updateLog();
 
-              updateBalances(); 
+              updateBalances();
+              updateOrders();
 
               break;
           case "config":
