@@ -252,9 +252,16 @@ public class OrderManager {
         }
     }
 
+    public void fetchTime(double tresh){
+        long cur = System.currentTimeMillis();
+        long dif = cur - lastFetch;
+        if (dif > tresh)
+            fetch();
+    }
+
     //public int getumOrders
 
-    public int num(String type){
+    public int countOrder(String type){
         int numOrders = 0;
 
         for (Order tempOrder : orderList) {
@@ -267,11 +274,10 @@ public class OrderManager {
         return numOrders;
     }
 
-    public int FetchAndCountActiveOrders(String type) {
-
+    /*public int FetchAndCountActiveOrders(String type) {
         this.fetch();
-        return num(type);
-    }
+        return countOrder(type);
+    }*/
 
     public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
         ArrayList<Order> toRet = new ArrayList<>();
@@ -285,20 +291,30 @@ public class OrderManager {
     }
 
     public void logActiveOrders() {
-        LOG.debug("buy orders: " + this.FetchGetNumActiveBuyOrders());
-        LOG.debug("sell orders: " + this.FetchGetNumActiveSellOrders());
+        LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
+        LOG.debug("sell orders: " + this.getNumActiveSellOrders());
     }
 
     public ArrayList<Order> getOrderList() {
         return orderList;
     }
 
-    public int FetchGetNumActiveSellOrders() {
-        return this.FetchAndCountActiveOrders(Constant.SELL);
+    public int getNumActiveSellOrders(){
+        return countOrder(Constant.SELL);
     }
 
-    public int FetchGetNumActiveBuyOrders() {
-        return this.FetchAndCountActiveOrders(Constant.BUY);
+    public int getNumActiveBuyOrders(){
+        return countOrder(Constant.BUY);
+    }
+
+    public int FetchGetNumActiveSellOrders(double timetresh) {
+        this.fetchTime(timetresh);
+        return this.getNumActiveSellOrders();
+    }
+
+    public int FetchGetNumActiveBuyOrders(double timetresh) {
+        this.fetchTime(timetresh);
+        return this.getNumActiveBuyOrders();
     }
 
     public int getNumTotalActiveOrders() {

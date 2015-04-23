@@ -157,4 +157,6 @@ public class Settings {
     public static String INFO_FILE = "res/.info";
 
     public static String HTML_FOLDER = "." + "/res" + "/" + "UI" + "/" + "templates/";
+
+    public static final int ORDER_MIN_UPDATE = 500;
 }

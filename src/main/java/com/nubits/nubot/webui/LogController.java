@@ -3,6 +3,7 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.PairBalance;
 import org.slf4j.Logger;
@@ -61,8 +62,8 @@ public class LogController {
                 try {
 
                     Global.orderManager.logActiveOrders();
-                    numbuys = Global.orderManager.FetchGetNumActiveBuyOrders();
-                    numsells = Global.orderManager.FetchGetNumActiveSellOrders();
+                    numbuys = Global.orderManager.FetchGetNumActiveBuyOrders(Settings.ORDER_MIN_UPDATE);
+                    numsells = Global.orderManager.FetchGetNumActiveSellOrders(Settings.ORDER_MIN_UPDATE);
                     LOG.debug("buys: " + numbuys);
                     LOG.debug("sells: " + numsells);
 

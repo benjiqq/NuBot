@@ -389,8 +389,8 @@ public class StrategySecondaryPegUtils {
             double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
 
             Global.orderManager.fetch();
-            int activeSellOrders = Global.orderManager.FetchGetNumActiveSellOrders();
-            int activeBuyOrders = Global.orderManager.FetchGetNumActiveBuyOrders();
+            int activeSellOrders = Global.orderManager.FetchGetNumActiveSellOrders(Settings.ORDER_MIN_UPDATE);
+            int activeBuyOrders = Global.orderManager.FetchGetNumActiveBuyOrders(Settings.ORDER_MIN_UPDATE);
 
             if (Global.options.isDualSide()) {
 
