@@ -38,12 +38,12 @@ public class BalanceManager {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
 
         if (!balancesResponse.isPositive()) {
-            this.lastFetchPairBalance = System.currentTimeMillis();
             String errmsg =balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
 
+        this.lastFetchPairBalance = System.currentTimeMillis();
 
         this.pairBalance = (PairBalance) balancesResponse.getResponseObject();
 
