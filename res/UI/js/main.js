@@ -112,6 +112,8 @@
 
   var first = true;
   function updateBalances() {
+      if (!botRunning) { return };
+
       console.log("updateBalances");
 
       $.ajax({
@@ -126,9 +128,7 @@
           .done(function(data) { //For a sample data see [1] at the bottom of this file :
               //console.log(JSON.stringify(data));
               // prevent update at shutdown
-              if (!botRunning) {
-                  return
-              };
+
 
               if (data.hasOwnProperty("pegBalance")) {
 
@@ -175,7 +175,8 @@
 
 
   function updateOrders() {
-      console.log("updateOrders");
+      if (!botRunning) { return };
+
 
       $.ajax({
               type: "GET",
@@ -188,10 +189,6 @@
           })
           .done(function(data) {
 
-              // prevent update at shutdown
-              if (!botRunning) {
-                  return
-              };
 
               //console.log("buys: " + data["buys"]);
               //console.log("BuyCurrency: " + data["BuyCurrency"]);
