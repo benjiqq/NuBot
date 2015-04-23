@@ -387,7 +387,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
-        Global.orderManager.fetch();
+        Global.orderManager.fetchOrders();
 
         ArrayList<Order> orderList = Global.orderManager.getOrderList();
 

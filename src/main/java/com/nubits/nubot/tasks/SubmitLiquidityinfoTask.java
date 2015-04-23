@@ -149,7 +149,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private String reportTier1() {
         String toReturn = "";
 
-        Global.orderManager.fetch();
+        Global.orderManager.fetchOrders();
         ArrayList<Order> orderList = Global.orderManager.getOrderList();
 
         LOG.debug("Active orders : " + orderList.size());

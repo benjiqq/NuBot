@@ -241,7 +241,10 @@ public class OrderManager {
         return success;
     }
 
-    public void fetch() {
+    /**
+     * fetch orders without delay
+     */
+    public void fetchOrders() {
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             lastFetch = System.currentTimeMillis();
@@ -252,11 +255,18 @@ public class OrderManager {
         }
     }
 
+    /**
+     * fetch bound with time
+     * @param tresh
+     */
     public void fetchTimeBound(double tresh){
         long cur = System.currentTimeMillis();
-        long dif = cur - lastFetch;
-        if (dif > tresh)
-            fetch();
+        long diff = cur - lastFetch;
+        LOG.trace("OrderManager. diff: " + diff);
+        if (diff > tresh) {
+            LOG.trace("triggered fetch");
+            fetchOrders();
+        }
     }
 
     //public int getumOrders
