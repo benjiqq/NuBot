@@ -3,8 +3,11 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.PairBalance;
+import com.nubits.nubot.utils.Utils;
+import org.json.simple.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,8 +66,8 @@ public class LogController {
                     Global.orderManager.logActiveOrders();
                     numbuys = Global.orderManager.getNumActiveBuyOrders();
                     numsells = Global.orderManager.getNumActiveSellOrders();
-                    LOG.debug("buys: " + numbuys);
-                    LOG.debug("sells: " + numsells);
+                    LOG.debug("GET /info : buys: " + numbuys);
+                    LOG.debug("GET /info : sells: " + numsells);
 
                     ArrayList<Order> ol = Global.orderManager.getOrderList();
                     opmap.put("orders", ol);
@@ -77,8 +80,9 @@ public class LogController {
                         long delta = 1000;
                         Global.balanceManager.fetchBalancesIfTimePast(Global.options.getPair(), delta);
                         PairBalance balance = Global.balanceManager.getPairBalance();
-                        opmap.put("BuyCurrency", balance.getNubitsBalance());
-                        opmap.put("SellCurrency", balance.getPEGBalance());
+
+                        opmap.put("pegBalance", prepareBalanceObject("peg", balance));
+                        opmap.put("nbtBalance", prepareBalanceObject("nbt", balance));
                     } catch (Exception e) {
 
                     }
@@ -94,10 +98,42 @@ public class LogController {
 
 
             String json = new Gson().toJson(opmap);
+            LOG.warn(json);
             return json;
 
         });
 
 
+    }
+
+    private HashMap prepareBalanceObject(String type, PairBalance balance) {
+        String toRet = "";
+        HashMap balanceObj = new JSONObject();
+
+        if (type.equalsIgnoreCase("peg")) {
+            balanceObj.put("currencyCode",
+                    balance.getPEGAvailableBalance().getCurrency().getCode().toUpperCase());
+
+            balanceObj.put("balanceTotal",
+                    Utils.formatNumber(balance.getPEGBalance().getQuantity(), Settings.DEFAULT_PRECISION));
+            balanceObj.put("balanceAvailable",
+                    Utils.formatNumber(balance.getPEGAvailableBalance().getQuantity(), Settings.DEFAULT_PRECISION));
+            balanceObj.put("balanceLocked",
+                    Utils.formatNumber(balance.getPEGBalanceonOrder().getQuantity(), Settings.DEFAULT_PRECISION));
+
+        } else // nbt
+        {
+            balanceObj.put("currencyCode", balance.getNBTAvailable().getCurrency().getCode().toUpperCase());
+
+            balanceObj.put("balanceTotal",
+                    Utils.formatNumber(balance.getNubitsBalance().getQuantity(), Settings.DEFAULT_PRECISION));
+            balanceObj.put("balanceAvailable",
+                    Utils.formatNumber(balance.getNBTAvailable().getQuantity(), Settings.DEFAULT_PRECISION));
+            balanceObj.put("balanceLocked",
+                    Utils.formatNumber(balance.getNBTonOrder().getQuantity(), Settings.DEFAULT_PRECISION));
+
+        }
+
+        return balanceObj;
     }
 }

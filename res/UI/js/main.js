@@ -16,7 +16,7 @@
   var requestedStop = false;
 
   function handleFailServer(){
-    $('#maincontainer').html("server is shutdown");
+    $('#maincontainer').html("NuBot engine is down. Relaunch it");
   }
 
   function clearTables() {
@@ -106,7 +106,7 @@
               handleFailServer();
           })
           .done(function(data) { //For a sample data see [1] at the bottom of this file :
-
+              console.log(JSON.stringify(data));
               // prevent update at shutdown
               if (!botRunning) {
                   return
@@ -538,60 +538,56 @@
     1. Sample Data -------------------
 
     {
-                    "BuyCurrency": {
-                      "quantity": 9.53076606,
-                      "currency": {
-                        "fiat": false,
-                        "code": "NBT",
-                        "extendedName": "NuBit"
-                      }
-                    },
-                    "buys": 1,
-                    "sells": 0,
-                    "SellCurrency": {
-                      "quantity": 0.02201121,
-                      "currency": {
-                        "fiat": false,
-                        "code": "BTC",
-                        "extendedName": "Bitcoin"
-                      }
-                    },
-                    "orders": [
-                      {
-                        "id": "46522",
-                        "insertedDate": "Apr 23, 2015 11:22:35 AM",
-                        "type": "BUY",
-                        "pair": {
-                          "orderCurrency": {
-                            "fiat": false,
-                            "code": "NBT",
-                            "extendedName": "NuBit"
-                          },
-                          "paymentCurrency": {
-                            "fiat": false,
-                            "code": "BTC",
-                            "extendedName": "Bitcoin"
-                          }
-                        },
-                        "amount": {
-                          "quantity": 1.82272164,
-                          "currency": {
-                            "fiat": false,
-                            "code": "NBT",
-                            "extendedName": "NuBit"
-                          }
-                        },
-                        "price": {
-                          "quantity": 0.004196,
-                          "currency": {
-                            "fiat": false,
-                            "code": "BTC",
-                            "extendedName": "Bitcoin"
-                          }
-                        },
-                        "completed": false
-                      }
-                    ]
-                  }
+      "pegBalance": {
+        "balanceTotal": "0.02201121",
+        "balanceLocked": "0",
+        "balanceAvailable": "0.02201121",
+        "currencyCode": "BTC"
+      },
+      "buys": 0,
+      "sells": 1,
+      "nbtBalance": {
+        "balanceTotal": "9.53076606",
+        "balanceLocked": "2.5",
+        "balanceAvailable": "7.03076606",
+        "currencyCode": "NBT"
+      },
+      "orders": [
+        {
+          "id": "46533",
+          "insertedDate": "Apr 23, 2015 12:13:37 PM",
+          "type": "SELL",
+          "pair": {
+            "orderCurrency": {
+              "fiat": false,
+              "code": "NBT",
+              "extendedName": "NuBit"
+            },
+            "paymentCurrency": {
+              "fiat": false,
+              "code": "BTC",
+              "extendedName": "Bitcoin"
+            }
+          },
+          "amount": {
+            "quantity": 2.5,
+            "currency": {
+              "fiat": false,
+              "code": "NBT",
+              "extendedName": "NuBit"
+            }
+          },
+          "price": {
+            "quantity": 0.00439,
+            "currency": {
+              "fiat": false,
+              "code": "BTC",
+              "extendedName": "Bitcoin"
+            }
+          },
+          "completed": true
+        }
+      ]
+    }
         <end[1]> -------------
       */
