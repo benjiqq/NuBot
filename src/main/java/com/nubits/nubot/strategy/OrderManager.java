@@ -252,10 +252,9 @@ public class OrderManager {
         }
     }
 
-    public int FetchAndCountActiveOrders(String type) {
+    //public int getumOrders
 
-        this.fetch();
-
+    public int num(String type){
         int numOrders = 0;
 
         for (Order tempOrder : orderList) {
@@ -266,6 +265,12 @@ public class OrderManager {
 
         LOG.debug("activeorders " + type + " " + numOrders);
         return numOrders;
+    }
+
+    public int FetchAndCountActiveOrders(String type) {
+
+        this.fetch();
+        return num(type);
     }
 
     public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
@@ -280,19 +285,19 @@ public class OrderManager {
     }
 
     public void logActiveOrders() {
-        LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
-        LOG.debug("sell orders: " + this.getNumActiveSellOrders());
+        LOG.debug("buy orders: " + this.FetchGetNumActiveBuyOrders());
+        LOG.debug("sell orders: " + this.FetchGetNumActiveSellOrders());
     }
 
     public ArrayList<Order> getOrderList() {
         return orderList;
     }
 
-    public int getNumActiveSellOrders() {
+    public int FetchGetNumActiveSellOrders() {
         return this.FetchAndCountActiveOrders(Constant.SELL);
     }
 
-    public int getNumActiveBuyOrders() {
+    public int FetchGetNumActiveBuyOrders() {
         return this.FetchAndCountActiveOrders(Constant.BUY);
     }
 
