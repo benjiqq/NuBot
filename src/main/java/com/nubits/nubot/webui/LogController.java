@@ -74,18 +74,6 @@ public class LogController {
                     opmap.put("orders", ol);
                     LOG.debug("orders: " + ol);
 
-                    try {
-                        //query only up to every X msec, otherwise just get the last info
-                        //this caps the maximum queries we can do, so to not overload the exchange
-                        Global.balanceManager.fetchBalancePairTimeBound(Global.options.getPair(), Settings.BALANCE_MAX_INTERVAL);
-                        PairBalance balance = Global.balanceManager.getPairBalance();
-
-                        opmap.put("pegBalance", prepareBalanceObject("peg", balance));
-                        opmap.put("nbtBalance", prepareBalanceObject("nbt", balance));
-                    } catch (Exception e) {
-                        LOG.error(e.toString());
-                    }
-
                 } catch (Exception e) {
                     LOG.error(e.toString());
                 }
