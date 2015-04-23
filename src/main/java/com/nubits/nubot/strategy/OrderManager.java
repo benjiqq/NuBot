@@ -262,9 +262,9 @@ public class OrderManager {
     public void fetchTimeBound(double tresh){
         long cur = System.currentTimeMillis();
         long diff = cur - lastFetch;
-        LOG.trace("OrderManager. diff: " + diff);
+        LOG.debug("OrderManager. diff: " + diff);
         if (diff > tresh) {
-            LOG.trace("triggered fetch");
+            LOG.debug("triggered fetch");
             fetchOrders();
         }
     }
