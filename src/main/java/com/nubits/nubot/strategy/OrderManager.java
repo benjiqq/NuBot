@@ -252,7 +252,7 @@ public class OrderManager {
         }
     }
 
-    public void fetchTime(double tresh){
+    public void fetchTimeBound(double tresh){
         long cur = System.currentTimeMillis();
         long dif = cur - lastFetch;
         if (dif > tresh)
@@ -279,6 +279,16 @@ public class OrderManager {
         return countOrder(type);
     }*/
 
+    public ArrayList<Order> filterOrders(ArrayList<Order> originalList, String type) {
+        ArrayList<Order> toRet = new ArrayList<>();
+        for (Order temp : originalList) {
+            if (temp.getType().equalsIgnoreCase(type)) {
+                toRet.add(temp);
+            }
+        }
+
+        return toRet;
+    }
 
     public void logActiveOrders() {
         LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
@@ -297,13 +307,13 @@ public class OrderManager {
         return countOrder(Constant.BUY);
     }
 
-    public int FetchGetNumActiveSellOrders(double timetresh) {
-        this.fetchTime(timetresh);
+    public int fetchSellOrdersTimeBound(double timetresh) {
+        this.fetchTimeBound(timetresh);
         return this.getNumActiveSellOrders();
     }
 
-    public int FetchGetNumActiveBuyOrders(double timetresh) {
-        this.fetchTime(timetresh);
+    public int fetchBuyOrdersTimeBound(double timetresh) {
+        this.fetchTimeBound(timetresh);
         return this.getNumActiveBuyOrders();
     }
 

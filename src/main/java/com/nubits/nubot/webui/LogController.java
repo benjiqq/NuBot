@@ -62,8 +62,8 @@ public class LogController {
                 try {
 
                     Global.orderManager.logActiveOrders();
-                    numbuys = Global.orderManager.FetchGetNumActiveBuyOrders(Settings.ORDER_MIN_UPDATE);
-                    numsells = Global.orderManager.FetchGetNumActiveSellOrders(Settings.ORDER_MIN_UPDATE);
+                    numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MIN_UPDATE);
+                    numsells = Global.orderManager.fetchSellOrdersTimeBound(Settings.ORDER_MIN_UPDATE);
 
                     LOG.debug("buys: " + numbuys);
                     LOG.debug("sells: " + numsells);
@@ -76,8 +76,8 @@ public class LogController {
 
                     try {
                         //query only up to every 1 second otherwise just get the last info
-                        long delta = 1000;
-                        Global.balanceManager.fetchBalancesIfTimePast(Global.options.getPair(), delta);
+
+                        Global.balanceManager.fetchBalancesTresh(Global.options.getPair(), Settings.BALANCE_MIN_UPDATE);
                         PairBalance balance = Global.balanceManager.getPairBalance();
                         opmap.put("BuyCurrency", balance.getNubitsBalance());
                         opmap.put("SellCurrency", balance.getPEGBalance());

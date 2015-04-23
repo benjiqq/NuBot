@@ -33,7 +33,7 @@ public class BalanceManager {
 
     }
 
-    public void fetchBalancesIfTimePast(CurrencyPair pair, double tresh) throws Exception {
+    public void fetchBalancesTresh(CurrencyPair pair, double tresh) throws Exception {
         long current = System.currentTimeMillis();
         if (current - lastFetchBalance > tresh){
             fetchBalances(pair);
