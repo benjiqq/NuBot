@@ -62,10 +62,9 @@ public class LogController {
             if (Global.sessionRunning) {
                 try {
 
-                    Global.orderManager.logActiveOrders();
-
                     numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
                     numsells = Global.orderManager.fetchSellOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
+                    Global.orderManager.logActiveOrders();
 
                     LOG.trace("GET /info : buys: " + numbuys);
                     LOG.trace("GET /info : sells: " + numsells);
