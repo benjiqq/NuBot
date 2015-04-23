@@ -36,7 +36,7 @@ public class LogController {
     public LogController() {
 
         get("/logdump", "application/json", (request, response) -> {
-            LOG.trace("/logdump called");
+            LOG.debug("/logdump called");
             JsonObject object = new JsonObject();
 
             String f = logfile;
@@ -54,7 +54,7 @@ public class LogController {
 
 
         get("/" + orderEndPoint, "application/json", (request, response) -> {
-            LOG.trace("/" + orderEndPoint + " called");
+            LOG.debug("/" + orderEndPoint + " called");
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;
@@ -102,7 +102,7 @@ public class LogController {
 
 
         get("/" + balanceEndPoint, "application/json", (request, response) -> {
-            LOG.trace("/" + balanceEndPoint + " called");
+            LOG.debug("/" + balanceEndPoint + " called");
             Map opmap = new HashMap();
 
             if (Global.sessionRunning) {
