@@ -13,12 +13,12 @@
      in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
   */
   var refreshOrders = 500; //ms
+  var refreshBalances = 500;
 
   //in ms
   var refreshTablesInterval = 500;
   var refreshLogInterval = 500;
   var refreshOrders = 500;
-  var refreshBalances = 500;
   var refreshTablesInterval = 500;
   var refreshLogInterval = 500;
 
@@ -31,7 +31,7 @@
   var requestedStop = false;
 
   function handleFailServer(){
-    $('#maincontainer').html("server is shutdown");
+    $('#maincontainer').html("NuBot engine is down. Relaunch it");
   }
 
   function clearTables() {
@@ -123,29 +123,45 @@
               console.log("error loading info");
               handleFailServer();
           })
-          .done(function(data) {
-
+          .done(function(data) { //For a sample data see [1] at the bottom of this file :
+              //console.log(JSON.stringify(data));
               // prevent update at shutdown
               if (!botRunning) {
                   return
               };
 
-              if (data.hasOwnProperty("BuyCurrency")) {
+              if (data.hasOwnProperty("pegBalance")) {
+
                   $("#balancetable").find("tr:gt(0)").remove();
 
-                  var qty = data["BuyCurrency"]["quantity"];
-                  var cry = data["BuyCurrency"]["currency"]["code"];
+                  var pegTotal =  data["pegBalance"]["balanceTotal"];
+                  var pegAvailable = data["pegBalance"]["balanceAvailable"];
+                  var pegLocked =  data["pegBalance"]["balanceLocked"];
+                  var pegCurrencyCode = data["pegBalance"]["currencyCode"] ;
 
-                  var rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
-                  $("#balancetable").find('tbody').after(rowhtml);
+                  var pegHTMLrow = '<tr>'+
+                                     '<td>' + pegCurrencyCode + '</td>'+
+                                     '<td align=\'right\'>' + pegTotal + '</td>'+
+                                     '<td align=\'right\'>' + pegLocked + '</td>'+
+                                     '<td align=\'right\'>' + pegAvailable + '</td>'+
+                                   '</tr>';
 
-                  qty = data["SellCurrency"]["quantity"];
-                  cry = data["SellCurrency"]["currency"]["code"];
-                  rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
-                  $("#balancetable").find('tbody').after(rowhtml);
+                  $("#balancetable").find('tbody').after(pegHTMLrow);
+
+                  var nbtTotal =  data["nbtBalance"]["balanceTotal"];
+                  var nbtAvailable = data["nbtBalance"]["balanceAvailable"];
+                  var nbtLocked =  data["nbtBalance"]["balanceLocked"];
+                  var nbtCurrencyCode = data["nbtBalance"]["currencyCode"] ;
+
+                  var nbtHTMLrow = '<tr>'+
+                                  '<td>' + nbtCurrencyCode + '</td>'+
+                                  '<td align=\'right\'>' + nbtTotal + '</td>'+
+                                  '<td align=\'right\'>' + nbtLocked + '</td>'+
+                                  '<td align=\'right\'>' + nbtAvailable + '</td>'+
+                                  '</tr>';
+
+                  $("#balancetable").find('tbody').after(nbtHTMLrow);
               }
-
-
           });
 
       //pipeline the call
@@ -193,7 +209,7 @@
                       var type = order["type"];
                       var qty = order["amount"]["quantity"];
                       var price = order["price"]["quantity"];
-                      var rowhtml = '<tr><td>' + type + '</td><td>' + qty + '</td><td>' + price + '</td></tr>';
+                      var rowhtml = '<tr><td>' + type + '</td><td align=\'right\'>' + qty + '</td><td align=\'right\'>' + price + '</td></tr>';
                       $("#ordertable").find('tbody').after(rowhtml);
                   }
               }
@@ -585,3 +601,63 @@
               break;
       }
   }
+
+
+/*
+
+    1. Sample Data -------------------
+
+    {
+      "pegBalance": {
+        "balanceTotal": "0.02201121",
+        "balanceLocked": "0",
+        "balanceAvailable": "0.02201121",
+        "currencyCode": "BTC"
+      },
+      "buys": 0,
+      "sells": 1,
+      "nbtBalance": {
+        "balanceTotal": "9.53076606",
+        "balanceLocked": "2.5",
+        "balanceAvailable": "7.03076606",
+        "currencyCode": "NBT"
+      },
+      "orders": [
+        {
+          "id": "46533",
+          "insertedDate": "Apr 23, 2015 12:13:37 PM",
+          "type": "SELL",
+          "pair": {
+            "orderCurrency": {
+              "fiat": false,
+              "code": "NBT",
+              "extendedName": "NuBit"
+            },
+            "paymentCurrency": {
+              "fiat": false,
+              "code": "BTC",
+              "extendedName": "Bitcoin"
+            }
+          },
+          "amount": {
+            "quantity": 2.5,
+            "currency": {
+              "fiat": false,
+              "code": "NBT",
+              "extendedName": "NuBit"
+            }
+          },
+          "price": {
+            "quantity": 0.00439,
+            "currency": {
+              "fiat": false,
+              "code": "BTC",
+              "extendedName": "Bitcoin"
+            }
+          },
+          "completed": true
+        }
+      ]
+    }
+        <end[1]> -------------
+      */
