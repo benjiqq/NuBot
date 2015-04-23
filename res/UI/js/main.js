@@ -2,21 +2,25 @@
   var port = 4567;
   var baseurl = "http://" + host + ":" + port;
 
+  var orderEndPoint = "orders";
+  var balanceEndPoint = "balances";
+
   var refreshStatusInterval = 500; //ms
 
   /*
-     No matter how fast we set the refreshOrdersAndBalanceInterval,
+     No matter how fast we set the refreshOrders,
      it will be capped by Server
      in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
   */
-  var refreshOrdersAndBalanceInterval = 500; //ms
+  var refreshOrders = 500; //ms
 
-
-  var refreshTablesInterval = 500; //ms
-  var refreshLogInterval = 500; //ms
-  var refreshOrdersAndBalanceInterval = 500; //ms
-  var refreshTablesInterval = 500; //ms
-  var refreshLogInterval = 500; //ms
+  //in ms
+  var refreshTablesInterval = 500;
+  var refreshLogInterval = 500;
+  var refreshOrders = 500;
+  var refreshBalances = 500;
+  var refreshTablesInterval = 500;
+  var refreshLogInterval = 500;
 
   var debug = true;
 
@@ -106,13 +110,14 @@
   }
 
 
-  function updateOrdersBalances() {
+  var first = true;
+  function updateBalances() {
+      console.log("updateBalances");
 
-      console.log("updateOrdersBalances");
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/info"
+              url: "http://" + host + ":" + port + "/" + balanceEndPoint;
           })
           .fail(function() {
               console.log("error loading info");
@@ -124,10 +129,6 @@
               if (!botRunning) {
                   return
               };
-
-              //console.log("buys: " + data["buys"]);
-              //console.log("BuyCurrency: " + data["BuyCurrency"]);
-              //console.log("SellCurrency: " + data["SellCurrency"]);
 
               if (data.hasOwnProperty("BuyCurrency")) {
                   $("#balancetable").find("tr:gt(0)").remove();
@@ -143,6 +144,43 @@
                   rowhtml = '<tr><td>' + qty + '</td><td>' + cry + '</td></tr>';
                   $("#balancetable").find('tbody').after(rowhtml);
               }
+
+
+          });
+
+      //pipeline the call
+      var updatetime = refreshBalances;
+      if (first)
+            updatetime += 0.5 * refreshBalances;
+
+      setTimeout(updateBalances, updatetime);
+      first = false;
+  }
+
+
+  function updateOrders() {
+
+      console.log("updateOrders");
+
+      $.ajax({
+              type: "GET",
+              dataType: "json",
+              url: "http://" + host + ":" + port + "/" + orderEndPoint;
+          })
+          .fail(function() {
+              console.log("error loading info");
+              handleFailServer();
+          })
+          .done(function(data) {
+
+              // prevent update at shutdown
+              if (!botRunning) {
+                  return
+              };
+
+              //console.log("buys: " + data["buys"]);
+              //console.log("BuyCurrency: " + data["BuyCurrency"]);
+              //console.log("SellCurrency: " + data["SellCurrency"]);
 
               if (data.hasOwnProperty("orders")) {
 
@@ -163,7 +201,7 @@
 
           });
 
-      setTimeout(updateOrdersBalances, refreshOrdersAndBalanceInterval);
+      setTimeout(updateOrders, refreshOrders);
   }
 
   function updateStatus() {
@@ -533,7 +571,7 @@
 
               updateStatus();
               updateLog();
-              updateOrdersBalances();
+              updateOrders();
 
               break;
           case "config":
