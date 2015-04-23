@@ -581,8 +581,8 @@
 
               updateStatus();
               updateLog();
-              updateOrders();
-              updateBalances();
+
+              updateBalances(); 
 
               break;
           case "config":
