@@ -4,8 +4,14 @@
 
   var refreshStatusInterval = 500; //ms
 
-  // No matter how fast we set the refresh time below, it will be capped by ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
+  /*
+     No matter how fast we set the refreshOrdersAndBalanceInterval,
+     it will be capped by Server
+     in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
+  */
   var refreshOrdersAndBalanceInterval = 500; //ms
+
+
   var refreshTablesInterval = 500; //ms
   var refreshLogInterval = 500; //ms
   var refreshOrdersAndBalanceInterval = 500; //ms
