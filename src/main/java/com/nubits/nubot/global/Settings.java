@@ -158,7 +158,13 @@ public class Settings {
 
     public static String HTML_FOLDER = "." + "/res" + "/" + "UI" + "/" + "templates/";
 
-    public static final int ORDER_MIN_UPDATE = 500;
+    /**
+     * for OrderManager: the maximum refresh period triggered from the UI. strategy can trigger at higher rates
+     */
+    public static final int ORDER_MAX_INTERVAL = 500;
 
-    public static final int BALANCE_MIN_UPDATE = 500;
+    /**
+     * for BalanceManager: the maximum refresh period triggered from the UI. strategy can trigger at higher rates
+     */
+    public static final int BALANCE_MAX_INTERVAL = 500;
 }
