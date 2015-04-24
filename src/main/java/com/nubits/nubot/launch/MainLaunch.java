@@ -96,6 +96,7 @@ public class MainLaunch {
                 SessionManager.setConfigGlobal(configFile, true);
                 try {
                     UiServer.startUIserver(configFile);
+                    Global.createShutDownHook();
                 } catch (Exception e) {
                     LOG.error("error setting up UI server " + e);
                 }
@@ -107,6 +108,7 @@ public class MainLaunch {
                 sessionLOG.debug("launch bot");
                 try {
                     SessionManager.launchBot(Global.options);
+                    Global.createShutDownHook();
                 } catch (NuBotRunException e) {
                     exitWithNotice("could not launch bot " + e);
                 }
