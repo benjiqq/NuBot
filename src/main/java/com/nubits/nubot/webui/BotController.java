@@ -31,7 +31,7 @@ public class BotController {
             LOG.trace("/opstatus called");
             Map opmap = new HashMap();
             boolean active = SessionManager.isSessionActive();
-            if (active || Global.sessionShuttingDown) {
+            if (active) {
                 opmap.put("status", "running");
 
                 opmap.put("sessionstart", SessionManager.startedString());
