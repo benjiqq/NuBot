@@ -137,7 +137,7 @@ public class TaskManager {
 
     }
 
-    public void stopAll() throws IllegalStateException {
+    public boolean stopAll() throws IllegalStateException {
         LOG.info("Stopping all BotTasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
@@ -153,7 +153,7 @@ public class TaskManager {
             }
         }
         LOG.info("BotTasks stopped. ");
-
+        return true;
     }
 
     public void printTasksStatus() {
