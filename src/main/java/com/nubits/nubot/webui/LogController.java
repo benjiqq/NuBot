@@ -60,7 +60,7 @@ public class LogController {
             int numbuys = 0;
             int numsells = 0;
 
-            if (!SessionManager.sessionInterrupted()) {
+            if (!SessionManager.sessionInterrupted() && Global.orderManager != null) {
                 try {
 
                     numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
@@ -93,7 +93,7 @@ public class LogController {
             LOG.trace("/" + balanceEndPoint + " called");
             Map opmap = new HashMap();
 
-            if (SessionManager.sessionRunning) {
+            if (SessionManager.sessionRunning && Global.balanceManager != null) {
                 try {
                     try {
                         //query only up to every X msec, otherwise just get the last info
