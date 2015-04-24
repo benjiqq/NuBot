@@ -19,6 +19,7 @@
 package com.nubits.nubot.notifications;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Passwords;
 import com.sun.mail.smtp.SMTPTransport;
 import org.slf4j.Logger;
@@ -119,8 +120,8 @@ public class MailNotifications {
         title = "[NuBot] " + title;
         Date now = new Date();
         String sessionId = "";
-        if (Global.sessionId != null) {
-            sessionId = Global.sessionId;
+        if (SessionManager.sessionId != null) {
+            sessionId = SessionManager.sessionId;
         }
         String footer = "\n --- \n Message generated at " + now;
         footer += " from bot with custodial address "

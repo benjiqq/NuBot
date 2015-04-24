@@ -2,7 +2,11 @@ package com.nubits.nubot.strategy;
 
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.models.*;
+import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.CurrencyPair;
+import com.nubits.nubot.models.PairBalance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,9 +40,10 @@ public class BalanceManager {
 
     public void fetchBalances(CurrencyPair pair) throws Exception {
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(pair);
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         if (!balancesResponse.isPositive()) {
-            String errmsg =balancesResponse.getError().toString();
+            String errmsg = balancesResponse.getError().toString();
             LOG.error(errmsg);
             throw new Exception(errmsg);
         }
@@ -53,7 +58,7 @@ public class BalanceManager {
         long current = System.currentTimeMillis();
         long diff = current - this.lastFetchPairBalance;
         LOG.debug("balance. diff: " + diff);
-        if (diff > tresh){
+        if (diff > tresh) {
             LOG.debug("triggered fetch");
             fetchBalances(pair);
         }
@@ -64,7 +69,7 @@ public class BalanceManager {
         return this.balance;
     }
 
-    public PairBalance getPairBalance(){
+    public PairBalance getPairBalance() {
         return this.pairBalance;
     }
 }

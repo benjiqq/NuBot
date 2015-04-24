@@ -1,6 +1,7 @@
 package com.nubits.nubot.strategy;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -77,6 +78,7 @@ public class OrderManager {
 
     /**
      * cancel all outstanding orders
+     *
      * @param pair
      * @return
      */
@@ -245,6 +247,8 @@ public class OrderManager {
      * fetch orders without delay
      */
     public void fetchOrders() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
         if (activeOrdersResponse.isPositive()) {
             lastFetch = System.currentTimeMillis();
@@ -258,9 +262,10 @@ public class OrderManager {
 
     /**
      * fetch bound with time
+     *
      * @param tresh
      */
-    public void fetchTimeBound(double tresh){
+    public void fetchTimeBound(double tresh) {
         long cur = System.currentTimeMillis();
         long diff = cur - lastFetch;
         LOG.debug("OrderManager. diff: " + diff);
@@ -272,7 +277,7 @@ public class OrderManager {
 
     //public int getumOrders
 
-    public int countOrder(String type){
+    public int countOrder(String type) {
         int numOrders = 0;
 
         for (Order tempOrder : orderList) {
@@ -306,11 +311,11 @@ public class OrderManager {
         return orderList;
     }
 
-    public int getNumActiveSellOrders(){
+    public int getNumActiveSellOrders() {
         return countOrder(Constant.SELL);
     }
 
-    public int getNumActiveBuyOrders(){
+    public int getNumActiveBuyOrders() {
         return countOrder(Constant.BUY);
     }
 
