@@ -2,15 +2,15 @@
   var orderEndPoint = "orders";
   var balanceEndPoint = "balances";
 
-  var refreshStatusInterval = 2*1000; //ms
+  var refreshStatusInterval = 2 * 1000; //ms
 
   /*
      No matter how fast we set the refreshOrders,
      it will be capped by Server
      in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
   */
-  var refreshOrders = 4*1000;
-  var refreshBalances = 4*1000;
+  var refreshOrders = 4 * 1000;
+  var refreshBalances = 4 * 1000;
 
 
   var refreshTablesInterval = 500;
@@ -25,8 +25,8 @@
   var logLine = 0;
   var requestedStop = false;
 
-  function handleFailServer(){
-    $('#maincontainer').html("NuBot engine is down. Relaunch it");
+  function handleFailServer() {
+      $('#maincontainer').html("NuBot engine is down. Relaunch it");
   }
 
   function clearTables() {
@@ -106,62 +106,62 @@
 
 
   var first = true;
+
   function updateBalances() {
       //console.log("updatebalance, botrunning="+botRunning);
-      if(botRunning)
-      {
-      $.ajax({
-              type: "GET",
-              dataType: "json",
-              url: baseurl + "/" + balanceEndPoint
-          })
-          .fail(function() {
-              console.log("error loading info");
-              handleFailServer();
-          })
-          .done(function(data) { //For a sample data see [1] at the bottom of this file :
-              //console.log(JSON.stringify(data));
-              // prevent update at shutdown
+      if (botRunning) {
+          $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: baseurl + "/" + balanceEndPoint
+              })
+              .fail(function() {
+                  console.log("error loading info");
+                  handleFailServer();
+              })
+              .done(function(data) { //For a sample data see [1] at the bottom of this file :
+                  //console.log(JSON.stringify(data));
+                  // prevent update at shutdown
 
-              if (data.hasOwnProperty("pegBalance")) {
+                  if (data.hasOwnProperty("pegBalance")) {
 
-                  $("#balancetable").find("tr:gt(0)").remove();
+                      $("#balancetable").find("tr:gt(0)").remove();
 
-                  var pegTotal =  data["pegBalance"]["balanceTotal"];
-                  var pegAvailable = data["pegBalance"]["balanceAvailable"];
-                  var pegLocked =  data["pegBalance"]["balanceLocked"];
-                  var pegCurrencyCode = data["pegBalance"]["currencyCode"] ;
+                      var pegTotal = data["pegBalance"]["balanceTotal"];
+                      var pegAvailable = data["pegBalance"]["balanceAvailable"];
+                      var pegLocked = data["pegBalance"]["balanceLocked"];
+                      var pegCurrencyCode = data["pegBalance"]["currencyCode"];
 
-                  var pegHTMLrow = '<tr>'+
-                                     '<td>' + pegCurrencyCode + '</td>'+
-                                     '<td align=\'right\'>' + pegTotal + '</td>'+
-                                     '<td align=\'right\'>' + pegLocked + '</td>'+
-                                     '<td align=\'right\'>' + pegAvailable + '</td>'+
-                                   '</tr>';
+                      var pegHTMLrow = '<tr>' +
+                          '<td>' + pegCurrencyCode + '</td>' +
+                          '<td align=\'right\'>' + pegTotal + '</td>' +
+                          '<td align=\'right\'>' + pegLocked + '</td>' +
+                          '<td align=\'right\'>' + pegAvailable + '</td>' +
+                          '</tr>';
 
-                  $("#balancetable").find('tbody').after(pegHTMLrow);
+                      $("#balancetable").find('tbody').after(pegHTMLrow);
 
-                  var nbtTotal =  data["nbtBalance"]["balanceTotal"];
-                  var nbtAvailable = data["nbtBalance"]["balanceAvailable"];
-                  var nbtLocked =  data["nbtBalance"]["balanceLocked"];
-                  var nbtCurrencyCode = data["nbtBalance"]["currencyCode"] ;
+                      var nbtTotal = data["nbtBalance"]["balanceTotal"];
+                      var nbtAvailable = data["nbtBalance"]["balanceAvailable"];
+                      var nbtLocked = data["nbtBalance"]["balanceLocked"];
+                      var nbtCurrencyCode = data["nbtBalance"]["currencyCode"];
 
-                  var nbtHTMLrow = '<tr>'+
-                                  '<td>' + nbtCurrencyCode + '</td>'+
-                                  '<td align=\'right\'>' + nbtTotal + '</td>'+
-                                  '<td align=\'right\'>' + nbtLocked + '</td>'+
-                                  '<td align=\'right\'>' + nbtAvailable + '</td>'+
-                                  '</tr>';
+                      var nbtHTMLrow = '<tr>' +
+                          '<td>' + nbtCurrencyCode + '</td>' +
+                          '<td align=\'right\'>' + nbtTotal + '</td>' +
+                          '<td align=\'right\'>' + nbtLocked + '</td>' +
+                          '<td align=\'right\'>' + nbtAvailable + '</td>' +
+                          '</tr>';
 
-                  $("#balancetable").find('tbody').after(nbtHTMLrow);
-              }
-          });
+                      $("#balancetable").find('tbody').after(nbtHTMLrow);
+                  }
+              });
 
-       }
+      }
       //pipeline the call
       var updatetime = refreshBalances;
       if (first)
-            updatetime += 0.5 * refreshBalances;
+          updatetime += 0.5 * refreshBalances;
 
       setTimeout(updateBalances, updatetime);
       first = false;
@@ -169,45 +169,45 @@
 
 
   function updateOrders() {
-    //console.log("updateorders, botrunning="+botRunning);
+      //console.log("updateorders, botrunning="+botRunning);
 
-    if (botRunning) {
-      $.ajax({
-              type: "GET",
-              dataType: "json",
-              url: baseurl + "/" + orderEndPoint
-          })
-          .fail(function() {
-              console.log("error loading info");
-              handleFailServer();
-          })
-          .done(function(data) {
+      if (botRunning) {
+          $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: baseurl + "/" + orderEndPoint
+              })
+              .fail(function() {
+                  console.log("error loading info");
+                  handleFailServer();
+              })
+              .done(function(data) {
 
 
 
-              //console.log("buys: " + data["buys"]);
-              //console.log("BuyCurrency: " + data["BuyCurrency"]);
-              //console.log("SellCurrency: " + data["SellCurrency"]);
+                  //console.log("buys: " + data["buys"]);
+                  //console.log("BuyCurrency: " + data["BuyCurrency"]);
+                  //console.log("SellCurrency: " + data["SellCurrency"]);
 
-              if (data.hasOwnProperty("orders")) {
+                  if (data.hasOwnProperty("orders")) {
 
-                  $("#ordertable").find("tr:gt(0)").remove();
+                      $("#ordertable").find("tr:gt(0)").remove();
 
-                  var orders = data["orders"];
-                  //updateFavico(orders.length);
-                  //console.log("update badge + "+orders.length);
-                  for (var i = 0; i < orders.length; i++) {
-                      var order = orders[i];
-                      var type = order["type"];
-                      var qty = order["amount"]["quantity"];
-                      var price = order["price"]["quantity"];
-                      var rowhtml = '<tr><td>' + type + '</td><td align=\'right\'>' + qty + '</td><td align=\'right\'>' + price + '</td></tr>';
-                      $("#ordertable").find('tbody').after(rowhtml);
+                      var orders = data["orders"];
+                      //updateFavico(orders.length);
+                      //console.log("update badge + "+orders.length);
+                      for (var i = 0; i < orders.length; i++) {
+                          var order = orders[i];
+                          var type = order["type"];
+                          var qty = order["amount"]["quantity"];
+                          var price = order["price"]["quantity"];
+                          var rowhtml = '<tr><td>' + type + '</td><td align=\'right\'>' + qty + '</td><td align=\'right\'>' + price + '</td></tr>';
+                          $("#ordertable").find('tbody').after(rowhtml);
+                      }
                   }
-              }
 
-          });
-        }
+              });
+      }
       setTimeout(updateOrders, refreshOrders);
   }
 
@@ -596,65 +596,64 @@
   }
 
 
-function getBaseUrl()
-{
-    return "http://"+location.host;
-}
-/*
+  function getBaseUrl() {
+          return "http://" + location.host;
+      }
+      /*
 
-    1. Sample Data -------------------
+          1. Sample Data -------------------
 
-    {
-      "pegBalance": {
-        "balanceTotal": "0.02201121",
-        "balanceLocked": "0",
-        "balanceAvailable": "0.02201121",
-        "currencyCode": "BTC"
-      },
-      "buys": 0,
-      "sells": 1,
-      "nbtBalance": {
-        "balanceTotal": "9.53076606",
-        "balanceLocked": "2.5",
-        "balanceAvailable": "7.03076606",
-        "currencyCode": "NBT"
-      },
-      "orders": [
-        {
-          "id": "46533",
-          "insertedDate": "Apr 23, 2015 12:13:37 PM",
-          "type": "SELL",
-          "pair": {
-            "orderCurrency": {
-              "fiat": false,
-              "code": "NBT",
-              "extendedName": "NuBit"
+          {
+            "pegBalance": {
+              "balanceTotal": "0.02201121",
+              "balanceLocked": "0",
+              "balanceAvailable": "0.02201121",
+              "currencyCode": "BTC"
             },
-            "paymentCurrency": {
-              "fiat": false,
-              "code": "BTC",
-              "extendedName": "Bitcoin"
-            }
-          },
-          "amount": {
-            "quantity": 2.5,
-            "currency": {
-              "fiat": false,
-              "code": "NBT",
-              "extendedName": "NuBit"
-            }
-          },
-          "price": {
-            "quantity": 0.00439,
-            "currency": {
-              "fiat": false,
-              "code": "BTC",
-              "extendedName": "Bitcoin"
-            }
-          },
-          "completed": true
-        }
-      ]
-    }
-        <end[1]> -------------
-      */
+            "buys": 0,
+            "sells": 1,
+            "nbtBalance": {
+              "balanceTotal": "9.53076606",
+              "balanceLocked": "2.5",
+              "balanceAvailable": "7.03076606",
+              "currencyCode": "NBT"
+            },
+            "orders": [
+              {
+                "id": "46533",
+                "insertedDate": "Apr 23, 2015 12:13:37 PM",
+                "type": "SELL",
+                "pair": {
+                  "orderCurrency": {
+                    "fiat": false,
+                    "code": "NBT",
+                    "extendedName": "NuBit"
+                  },
+                  "paymentCurrency": {
+                    "fiat": false,
+                    "code": "BTC",
+                    "extendedName": "Bitcoin"
+                  }
+                },
+                "amount": {
+                  "quantity": 2.5,
+                  "currency": {
+                    "fiat": false,
+                    "code": "NBT",
+                    "extendedName": "NuBit"
+                  }
+                },
+                "price": {
+                  "quantity": 0.00439,
+                  "currency": {
+                    "fiat": false,
+                    "code": "BTC",
+                    "extendedName": "Bitcoin"
+                  }
+                },
+                "completed": true
+              }
+            ]
+          }
+       <end[1]> -------------
+       */
