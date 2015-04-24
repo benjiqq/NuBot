@@ -84,7 +84,8 @@ public class Global {
                 }
 
                 //Interrupt mainThread
-                Global.mainThread.interrupt();
+                if (Global.mainThread != null)
+                    Global.mainThread.interrupt();
 
                 LOG.info("Exit main");
 
