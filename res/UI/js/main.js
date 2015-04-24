@@ -15,7 +15,7 @@
   var refreshTablesInterval = 500;
   var refreshLogInterval = 150;
 
-
+  var pageName = "operation";
   var debug = true;
 
   var dotCounter = 1;
@@ -232,13 +232,20 @@
 
               $('#duration').html(data["duration"]);
 
-              if (data["status"] == "running") {
-                  toggleBot(true);
-              }
+                  var run=false;
+                  if (data["status"] == "running") {
+                      run = true;
+                  }
 
+                  if(pageName=="operation"){
+                      toggleBot(run);
+                      }
+                   else if(pageName=="config"){
+                      updateConfigElements(run);
+                      }
           });
 
-      setTimeout(updateStatus, refreshStatusInterval);
+        setTimeout(updateStatus, refreshStatusInterval);
   }
 
   function flashButton(cbtn) {
@@ -576,13 +583,14 @@
       $('#docu-iframe').attr('src', 'docs/' + pageName + '.html');
   }
 
-  function startupPage(pageName) {
-      switch (pageName) {
+  function startupPage(page_name) {
+  pageName=page_name;
+      switch (page_name) {
           case "operation":
               updateNavbar("operation");
               toggleBot(false);
 
-              updateStatus();
+              updateStatus("operation");
               updateLog();
 
               updateBalances();
@@ -591,6 +599,7 @@
               break;
           case "config":
               updateNavbar("config");
+              updateStatus("config");
               loadconfig();
               break;
           case "docu":
@@ -603,14 +612,10 @@
   }
 
 
-  function updateConfigElements(status)
+  function updateConfigElements(running)
   {
-      var disableBtn=false;
-      if(status=="started")
-            enableSaveBtn = true;
-
-      $('#saveconfigbutton').prop('disabled', disableBtn);
-      $('#saveconfigbutton').prop('resetbutton', disableBtn);
+      $('#saveconfigbutton').prop('disabled', running);
+      $('#resetbutton').prop('disabled', running);
   }
 
 
