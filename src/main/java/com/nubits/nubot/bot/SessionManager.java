@@ -194,14 +194,6 @@ public class SessionManager {
     }
 
 
-    //TODO this is not clean but a workaround due to race conditions at startup
-    public static boolean sessionRunningFinal() {
-        if (sessionRunning && Global.orderManager != null && Global.balanceManager != null) {
-            return true;
-        }
-        return false;
-    }
-
     /**
      * create a session file in the app folder. increase session counter with each session
      * Note: session file gets marked as deleted after exit
