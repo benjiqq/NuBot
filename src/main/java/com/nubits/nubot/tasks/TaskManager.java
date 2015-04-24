@@ -28,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Timer;
 
 
 public class TaskManager {
@@ -144,10 +145,9 @@ public class TaskManager {
 
             BotTask bt = taskList.get(i);
 
-            LOG.debug("Shutting down " + bt.getName());
+            LOG.debug("Shutting down " + bt.getName() + " (" + bt.getTask().getClass().getSimpleName() + ")");
             try {
-                bt.getTimer().cancel();
-                bt.getTimer().purge();
+                bt.stop();
             } catch (IllegalStateException e) {
                 LOG.error("" + e);
                 throw e;
