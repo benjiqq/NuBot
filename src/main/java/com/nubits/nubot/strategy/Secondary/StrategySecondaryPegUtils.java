@@ -18,6 +18,7 @@
 package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
@@ -44,15 +45,14 @@ public class StrategySecondaryPegUtils {
 
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
-        if (Global.sessionShuttingDown)
-            return true;
-
+        if (SessionManager.sessionInterrupted()) return false; //external interruption
         //They are either 0 or need to be cancelled
         Global.orderManager.fetchOrders();
         int totalOrders = Global.orderManager.getNumTotalActiveOrders();
         if (totalOrders > 0) {
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
             if (deleteOrdersResponse.isPositive()) {
+                if (SessionManager.sessionInterrupted()) return false;
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
                     LOG.info("Clear all orders request succesfully");
@@ -69,7 +69,7 @@ public class StrategySecondaryPegUtils {
                     boolean areAllOrdersCanceled = false;
                     do {
                         try {
-
+                            if (SessionManager.sessionInterrupted()) return false;
                             Thread.sleep(wait);
                             areAllOrdersCanceled = Global.orderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
@@ -80,7 +80,7 @@ public class StrategySecondaryPegUtils {
 
                             count += wait;
                             timedOut = count > timeout;
-
+                            if (SessionManager.sessionInterrupted()) return false;
                         } catch (InterruptedException ex) {
                             LOG.error(ex.toString());
                         }
@@ -123,16 +123,19 @@ public class StrategySecondaryPegUtils {
     }
 
     public void placeInitialWalls() {
-
+        if (SessionManager.sessionInterrupted()) return;
         boolean buysOrdersOk = true;
         double sellPrice = strategy.getSellPricePEG();
+        if (SessionManager.sessionInterrupted()) return;
         LOG.debug("init sell orders. price: " + sellPrice);
         boolean sellsOrdersOk = initOrders(Constant.SELL, sellPrice);
-
+        if (SessionManager.sessionInterrupted()) return;
         if (Global.options.isDualSide()) {
+            if (SessionManager.sessionInterrupted()) return;
             double buyPrice = strategy.getBuyPricePEG();
             LOG.debug("init buy orders. price: " + buyPrice);
             buysOrdersOk = initOrders(Constant.BUY, buyPrice);
+            if (SessionManager.sessionInterrupted()) return;
         }
 
         if (buysOrdersOk && sellsOrdersOk) {
@@ -146,7 +149,6 @@ public class StrategySecondaryPegUtils {
     // ---- Trade Manager ----
 
     private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
-
         LOG.info("executeBuysideOrder : " + pair + " " + amount + " " + rate);
         ApiResponse orderResponse;
         if (!Global.swappedPair) {
@@ -174,7 +176,7 @@ public class StrategySecondaryPegUtils {
 
 
     private boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
-
+        if (SessionManager.sessionInterrupted()) return false;
         String orderString = orderString(type, amount, rate);
         LOG.warn("Submiting limit order : " + orderString);
 
@@ -186,6 +188,7 @@ public class StrategySecondaryPegUtils {
             } else {
                 orderResponse = executeSellsideOrder(pair, amount, rate);
             }
+            if (SessionManager.sessionInterrupted()) return false;
 
             if (orderResponse.isPositive()) {
                 String msg = hipchatMsg(type, orderString);
@@ -251,6 +254,7 @@ public class StrategySecondaryPegUtils {
 
 
     public boolean initOrders(String type, double price) {
+        if (SessionManager.sessionInterrupted()) return false;
 
         LOG.info("initOrders " + type + ", price " + price);
 
@@ -264,6 +268,7 @@ public class StrategySecondaryPegUtils {
             LOG.error(balancesResponse.getError().toString());
             return false;
         }
+        if (SessionManager.sessionInterrupted()) return false;
 
         double oneNBT = 1;
         if (type.equals(Constant.SELL)) {
@@ -274,6 +279,7 @@ public class StrategySecondaryPegUtils {
             balance = Global.frozenBalancesManager.removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
+        if (SessionManager.sessionInterrupted()) return false;
 
         if (balance.getQuantity() < oneNBT * 2) {
             LOG.info("No need to execute " + type + "orders : available balance < 1 " + currency.getCode() + " (1 NBT equivalent).  Balance : " + balance.getQuantity());
@@ -283,6 +289,7 @@ public class StrategySecondaryPegUtils {
         //Update TX fee :
         //Get the current transaction fee associated with a specific CurrencyPair
         ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+        if (SessionManager.sessionInterrupted()) return false;
 
         //short hand variables
         double maxSell = Global.options.getMaxSellVolume();
@@ -315,6 +322,7 @@ public class StrategySecondaryPegUtils {
                 }
 
             }
+            if (SessionManager.sessionInterrupted()) return false;
 
             success = this.executeOrder(type, Global.options.getPair(), amount1, price);
             if (!success)
@@ -327,6 +335,7 @@ public class StrategySecondaryPegUtils {
             } catch (InterruptedException ex) {
                 LOG.error(ex.toString());
             }
+            if (SessionManager.sessionInterrupted()) return false;
 
             //read balance again
             ApiResponse balancesResponse2 = Global.exchange.getTrade().getAvailableBalance(currency);
@@ -365,6 +374,7 @@ public class StrategySecondaryPegUtils {
 
 
                 //execute second order
+                if (SessionManager.sessionInterrupted()) return false;
 
                 success = this.executeOrder(type, Global.options.getPair(), amount2, price);
                 if (!success)
@@ -381,6 +391,8 @@ public class StrategySecondaryPegUtils {
     }
 
     public void recount() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
@@ -390,6 +402,7 @@ public class StrategySecondaryPegUtils {
             strategy.setOrdersAndBalancesOK(false);
 
             double oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
+            if (SessionManager.sessionInterrupted()) return; //external interruption
 
             Global.orderManager.fetchOrders();
             int activeSellOrders = Global.orderManager.getNumActiveSellOrders();
@@ -421,6 +434,7 @@ public class StrategySecondaryPegUtils {
     }
 
     public void aggregateAndKeepProceeds() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.info("aggregateAndKeepProceeds");
 
@@ -451,6 +465,7 @@ public class StrategySecondaryPegUtils {
 
 
     public boolean shiftWalls() {
+        if (SessionManager.sessionInterrupted()) return false; //external interruption
 
         LOG.debug("Executing shiftWalls()");
 
@@ -471,9 +486,11 @@ public class StrategySecondaryPegUtils {
         }
 
         LOG.info("Immediately try to cancel all orders");
+        if (SessionManager.sessionInterrupted()) return false; //external interruption
 
         //immediately try to : cancel all active orders
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+        if (SessionManager.sessionInterrupted()) return false; //external interruption
 
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
@@ -482,12 +499,15 @@ public class StrategySecondaryPegUtils {
                 if (Global.options.isMultipleCustodians()) {
                     //Introuce an aleatory sleep time to desync bots at the time of placing orders.
                     //This will favour competition in markets with multiple custodians
+                    if (SessionManager.sessionInterrupted()) return false; //external interruption
+
                     try {
                         Thread.sleep(SHORT_WAIT_SECONDS + Utils.randInt(0, MAX_RANDOM_WAIT_SECONDS) * 1000); //SHORT_WAIT_SECONDS gives the time to other bots to take down their order
                     } catch (InterruptedException ex) {
                         LOG.error(ex.toString());
                     }
                 }
+                if (SessionManager.sessionInterrupted()) return false; //external interruption
 
                 //Update frozen balances
                 if (!Global.options.isDualSide() //Do not do this for sell side custodians or...
@@ -496,6 +516,9 @@ public class StrategySecondaryPegUtils {
                     // update the initial balance of the secondary peg
                     Global.frozenBalancesManager.freezeNewFunds();
                 }
+
+
+                if (SessionManager.sessionInterrupted()) return false; //external interruption
 
                 //Reset sell side orders
                 boolean initSells = initOrders(Constant.SELL, sellPrice); //Force init sell orders
@@ -507,11 +530,15 @@ public class StrategySecondaryPegUtils {
                 if (initSells) { //Only move the buy orders if sure that the sell have been taken down
                     if (Global.options.isDualSide()) {
                         boolean initBuys;
+                        if (SessionManager.sessionInterrupted()) return false; //external interruption
+
                         initBuys = initOrders(Constant.BUY, buyPrice);
                         if (!initBuys) {
                             success = false;
                             LOG.error("NuBot has not been able to shift buy orders");
                         }
+                        if (SessionManager.sessionInterrupted()) return false; //external interruption
+
                     }
                 } else { //success false with the first part of the shift
                     LOG.error("NuBot has not been able to shift sell orders");

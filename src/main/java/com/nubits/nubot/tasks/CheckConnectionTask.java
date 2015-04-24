@@ -19,6 +19,7 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,13 +36,11 @@ public class CheckConnectionTask extends TimerTask {
 
     @Override
     public void run() {
-
+        //if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
         LOG.debug("Executing " + this.getClass());
-
         this.url = Global.exchange.getLiveData().getUrlConnectionCheck();
         Global.exchange.getLiveData().setConnected(isConnected());
         LOG.debug("Checking connection to " + url + " -  Connected : " + Global.exchange.getLiveData().isConnected());
-
     }
 
     public boolean isConnected() {

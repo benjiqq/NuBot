@@ -19,7 +19,7 @@
 package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
@@ -470,7 +470,7 @@ public class Utils {
 
     public static String getBotUptimeDate() {
         DateTime now = new DateTime();
-        return getDurationDate(Global.sessionStartDate, now);
+        return getDurationDate(SessionManager.sessionStartDate, now);
     }
 
     //Return the uptime of the bot [hours]

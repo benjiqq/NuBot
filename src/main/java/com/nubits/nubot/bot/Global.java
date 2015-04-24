@@ -20,13 +20,11 @@ package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.strategy.BalanceManager;
 import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
-import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,17 +63,7 @@ public class Global {
 
     public static boolean swappedPair; //true if payment currency is NBT
 
-    public static String sessionId;
-
     public static String sessionPath;
-
-    public static long sessionStarted, sessionStopped;
-
-    public static DateTime sessionStartDate, sessionStopDate;
-
-    public static boolean sessionRunning = false;
-
-    public static boolean sessionShuttingDown = false;
 
     public static String currentOptionsFile;
 
@@ -89,14 +77,15 @@ public class Global {
             public void run() {
 
                 //shutdown logic of the bot handled in the bot related to the global thread
-                if (Global.sessionRunning) {
+                if (SessionManager.sessionRunning) {
                     Global.bot.shutdownBot();
-                    Global.sessionRunning = false;
-                    Global.sessionStopped = System.currentTimeMillis();
+                    SessionManager.sessionRunning = false;
+                    SessionManager.sessionStopped = System.currentTimeMillis();
                 }
 
                 //Interrupt mainThread
-                Global.mainThread.interrupt();
+                if (Global.mainThread != null)
+                    Global.mainThread.interrupt();
 
                 LOG.info("Exit main");
 
@@ -106,4 +95,6 @@ public class Global {
             }
         }));
     }
+
+
 }

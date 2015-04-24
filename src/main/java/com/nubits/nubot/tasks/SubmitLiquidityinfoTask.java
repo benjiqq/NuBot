@@ -20,6 +20,7 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
@@ -62,6 +63,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     }
 
     private void initFiles() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".csv";
         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
@@ -83,6 +85,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             history.put("orders", orders);
             FilesystemUtils.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
         }
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         //create json file if it doesn't already exist
         File jsonF2 = new File(this.jsonFile_balances);
@@ -99,6 +102,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             history.put("balances", balances);
             FilesystemUtils.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
         }
+
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         File of = new File(this.outputFile_orders);
         if (!of.exists()) {
@@ -117,6 +122,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     @Override
     public void run() {
 
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         LOG.debug("Executing " + this.getClass());
 
         if (firstExecution) {
@@ -128,9 +135,15 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     }
 
     private void checkOrders() {
+
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
             if (isFirstOrdersPlaced()) {
                 String response1 = reportTier1(); //active orders
+
+                if (SessionManager.sessionInterrupted()) return; //external interruption
+
                 String response2 = reportTier2(); //balance
                 if (Global.options.isSubmitliquidity()) {
                     LOG.info("Liquidity info submitted:\n\t" + response1 + "\n\t" + response2);
@@ -150,7 +163,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         String toReturn = "";
 
         Global.orderManager.fetchOrders();
+
         ArrayList<Order> orderList = Global.orderManager.getOrderList();
+
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         LOG.debug("Active orders : " + orderList.size());
 
@@ -159,6 +175,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             Order o = it.next();
             LOG.debug("order: " + o.getDigest());
         }
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         if (verbose) {
 
@@ -209,6 +226,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
         logOrderCSV(toWrite);
 
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
         //Also update a json version of the output file
         //build the latest data into a JSONObject
         JSONObject latestOrders = new JSONObject();
@@ -242,6 +261,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
         latestOrders.put("digest", jsonDigest);
 
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         //now read the existing object if one exists
         JSONParser parser = new JSONParser();
@@ -262,6 +282,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + Utils.formatNumber(nbt_onbuy, Settings.DEFAULT_PRECISION));
             LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + Utils.formatNumber(nbt_onsell, Settings.DEFAULT_PRECISION));
         }
+
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         if (Global.options.isSubmitliquidity()) {
             //Call RPC
@@ -290,6 +312,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private String reportTier2() {
         String toReturn = "";
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
@@ -318,6 +342,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             latestBalances.put("balance-not-on-order", availableBalancesArray);
 
+            if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
             //now read the existing object if one exists
             JSONObject balanceHistory = null;
             try {
@@ -342,6 +368,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             if (Global.options.isSubmitliquidity()) {
                 //Call RPC
+                if (SessionManager.sessionInterrupted()) return ""; //external interruption
                 toReturn = sendLiquidityInfoImpl(buyside, sellside, 2);
             }
 
@@ -354,6 +381,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private String sendLiquidityInfoImpl(double buySide, double sellSide, int tier) {
         String toReturn = "";
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject;
 

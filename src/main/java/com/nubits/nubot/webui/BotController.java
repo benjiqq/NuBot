@@ -31,7 +31,7 @@ public class BotController {
             LOG.trace("/opstatus called");
             Map opmap = new HashMap();
             boolean active = SessionManager.isSessionActive();
-            if (active || Global.sessionShuttingDown) {
+            if (active) {
                 opmap.put("status", "running");
 
                 opmap.put("sessionstart", SessionManager.startedString());
@@ -47,7 +47,7 @@ public class BotController {
                 opmap.put("sessionstart", "");
             }
 
-            opmap.put("stopped", Global.sessionStopped);
+            opmap.put("stopped", SessionManager.sessionStopped);
             String json = new Gson().toJson(opmap);
             return json;
         });
@@ -116,11 +116,11 @@ public class BotController {
                     try {
                         LOG.info("try interrupt bot");
 
-                        Global.sessionShuttingDown = true;
+                        SessionManager.sessionShuttingDown = true;
 
                         Global.bot.shutdownBot();
 
-                        Global.sessionRunning = false;
+                        SessionManager.sessionRunning = false;
 
                         Global.mainThread.interrupt();
 
