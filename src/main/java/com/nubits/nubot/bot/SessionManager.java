@@ -85,6 +85,7 @@ public class SessionManager {
     private static void sessionStarted(){
 
         Global.sessionRunning = true;
+        Global.sessionShuttingDown = false;
         runonce = true;
 
         Global.sessionStarted = System.currentTimeMillis();

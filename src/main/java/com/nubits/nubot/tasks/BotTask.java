@@ -66,7 +66,9 @@ public class BotTask {
     }
 
     public void stop() {
+        LOG.debug("Stopping " + this.name + " (" + this + ")");
         timer.cancel();
+        timer.purge();
         setRunning(false);
         LOG.info("Stopped BotTask " + this.name);
     }

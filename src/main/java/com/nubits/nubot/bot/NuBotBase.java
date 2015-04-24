@@ -363,6 +363,8 @@ public abstract class NuBotBase {
         SessionManager.removeSessionFile();
 
         LOG.info("** end of the session **");
+
+        Global.sessionShuttingDown = false;
     }
 
 }
