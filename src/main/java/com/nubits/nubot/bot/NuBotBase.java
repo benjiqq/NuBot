@@ -364,7 +364,6 @@ public abstract class NuBotBase {
 
         LOG.info("** end of the session **");
 
-        Global.sessionShuttingDown = false;
     }
 
 }
