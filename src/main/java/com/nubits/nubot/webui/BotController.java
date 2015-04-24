@@ -116,6 +116,8 @@ public class BotController {
                     try {
                         LOG.info("try interrupt bot");
 
+                        Global.sessionShuttingDown = true;
+
                         Global.bot.shutdownBot();
 
                         Global.sessionRunning = false;

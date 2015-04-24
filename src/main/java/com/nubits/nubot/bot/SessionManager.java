@@ -80,6 +80,10 @@ public class SessionManager {
         //create session file
         createSessionFile();
 
+    }
+
+    private static void sessionStarted(){
+
         Global.sessionRunning = true;
         runonce = true;
 
@@ -141,6 +145,7 @@ public class SessionManager {
             Global.bot = new NuBotSecondary();
             try {
                 Global.bot.execute(opt);
+                sessionStarted();
             } catch (NuBotRunException e) {
                 throw e;
             }
@@ -151,6 +156,7 @@ public class SessionManager {
             Global.bot = new NuBotSimple();
             try {
                 Global.bot.execute(opt);
+                sessionStarted();
             } catch (NuBotRunException e) {
                 throw e;
             }

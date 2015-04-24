@@ -44,6 +44,9 @@ public class StrategySecondaryPegUtils {
 
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
+        if (Global.sessionShuttingDown)
+            return true;
+
         //They are either 0 or need to be cancelled
         Global.orderManager.fetchOrders();
         int totalOrders = Global.orderManager.getNumTotalActiveOrders();

@@ -59,6 +59,9 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
+        if (Global.sessionShuttingDown)
+            return;
+
         if (isFirstTime) {
             initStrategy();
         } else {

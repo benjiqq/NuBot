@@ -75,6 +75,8 @@ public class Global {
 
     public static boolean sessionRunning = false;
 
+    public static boolean sessionShuttingDown = false;
+
     public static String currentOptionsFile;
 
     /**
