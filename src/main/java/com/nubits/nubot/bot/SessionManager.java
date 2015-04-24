@@ -94,7 +94,7 @@ public class SessionManager {
 
     }
 
-    private static void sessionStart(){
+    private static void sessionStart() {
 
         sessionRunning = true;
         runonce = true;
@@ -195,8 +195,8 @@ public class SessionManager {
 
 
     //TODO this is not clean but a workaround due to race conditions at startup
-    public static boolean sessionRunningFinal(){
-        if (sessionRunning && Global.orderManager != null && Global.balanceManager != null){
+    public static boolean sessionRunningFinal() {
+        if (sessionRunning && Global.orderManager != null && Global.balanceManager != null) {
             return true;
         }
         return false;
@@ -230,6 +230,10 @@ public class SessionManager {
             }
         }
 
+    }
+
+    public static boolean sessionInterrupted() {
+        return sessionShuttingDown || !sessionRunning;
     }
 
     public static void removeSessionFile() {

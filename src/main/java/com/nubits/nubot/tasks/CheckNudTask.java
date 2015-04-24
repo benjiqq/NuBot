@@ -32,12 +32,13 @@ public class CheckNudTask extends TimerTask {
 
     @Override
     public void run() {
-        if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.info("Executing " + this.getClass());
 
         if (Global.rpcClient != null) {
             Global.rpcClient.checkConnection();
+            if (SessionManager.sessionInterrupted()) return; //external interruption
 
             if (Global.options.verbose) {
                 String connectedString = "offline";
