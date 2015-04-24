@@ -54,7 +54,7 @@ public class LogController {
 
 
         get("/" + orderEndPoint, "application/json", (request, response) -> {
-            LOG.debug("/" + orderEndPoint + " called");
+            LOG.trace("/" + orderEndPoint + " called");
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;
@@ -62,10 +62,9 @@ public class LogController {
             if (Global.sessionRunning) {
                 try {
 
-                    Global.orderManager.logActiveOrders();
-
                     numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
                     numsells = Global.orderManager.fetchSellOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
+                    Global.orderManager.logActiveOrders();
 
                     LOG.trace("GET /info : buys: " + numbuys);
                     LOG.trace("GET /info : sells: " + numsells);
@@ -73,18 +72,6 @@ public class LogController {
                     ArrayList<Order> ol = Global.orderManager.getOrderList();
                     opmap.put("orders", ol);
                     LOG.debug("orders: " + ol);
-
-                    try {
-                        //query only up to every X msec, otherwise just get the last info
-                        //this caps the maximum queries we can do, so to not overload the exchange
-                        Global.balanceManager.fetchBalancePairTimeBound(Global.options.getPair(), Settings.BALANCE_MAX_INTERVAL);
-                        PairBalance balance = Global.balanceManager.getPairBalance();
-
-                        opmap.put("pegBalance", prepareBalanceObject("peg", balance));
-                        opmap.put("nbtBalance", prepareBalanceObject("nbt", balance));
-                    } catch (Exception e) {
-                        LOG.error(e.toString());
-                    }
 
                 } catch (Exception e) {
                     LOG.error(e.toString());
@@ -102,7 +89,7 @@ public class LogController {
 
 
         get("/" + balanceEndPoint, "application/json", (request, response) -> {
-            LOG.debug("/" + balanceEndPoint + " called");
+            LOG.trace("/" + balanceEndPoint + " called");
             Map opmap = new HashMap();
 
             if (Global.sessionRunning) {
