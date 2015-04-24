@@ -43,7 +43,7 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/poloniex.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/bitcoincoid.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -90,9 +90,8 @@ public class TestWrappers {
         //WrapperTestUtils.testGetLastTrades(testPair);
 
 
-        /*
         try {
-            long waitTime = 4500;//ms
+            long waitTime = 500;//ms
             WrapperTestUtils.testGetActiveOrders(testPair, false); //How many any active orders prior to starting the test?
 
             WrapperTestUtils.testClearAllOrders(testPair); //Clear all orders
@@ -103,8 +102,8 @@ public class TestWrappers {
             //Place some orders
             int count = 0;
             for (int i = 0; i < 30; i++) {
-                WrapperTestUtils.testBuy(0.18, 0.00300, testPair);  //ok
-                WrapperTestUtils.testSell(0.2, 0.09000, testPair);  //ok
+                WrapperTestUtils.testBuy(0.4, 0.00300, testPair);  //ok
+                WrapperTestUtils.testSell(0.4, 0.09000, testPair);  //ok
                 count += 2;
             }
 
@@ -124,7 +123,7 @@ public class TestWrappers {
         } catch (InterruptedException e) {
             LOG.error(e.toString());
         }
-        */
+
 
         //-------- Stress test start ---------
         /*
