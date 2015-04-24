@@ -149,6 +149,7 @@ public class TaskManager {
                 bt.getTimer().cancel();
                 bt.getTimer().purge();
             } catch (IllegalStateException e) {
+                LOG.error("" + e);
                 throw e;
             }
         }
