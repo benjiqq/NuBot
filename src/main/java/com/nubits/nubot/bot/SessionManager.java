@@ -156,8 +156,8 @@ public class SessionManager {
             LOG.debug("creating secondary bot object");
             Global.bot = new NuBotSecondary();
             try {
-                Global.bot.execute(opt);
                 sessionStart();
+                Global.bot.execute(opt);
             } catch (NuBotRunException e) {
                 throw e;
             }
