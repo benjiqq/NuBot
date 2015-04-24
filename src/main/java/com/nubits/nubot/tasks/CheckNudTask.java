@@ -19,6 +19,7 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,6 +32,7 @@ public class CheckNudTask extends TimerTask {
 
     @Override
     public void run() {
+        if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
 
         LOG.info("Executing " + this.getClass());
 

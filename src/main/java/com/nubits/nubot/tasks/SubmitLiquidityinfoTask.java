@@ -20,6 +20,7 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
@@ -62,6 +63,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     }
 
     private void initFiles() {
+        if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
 
         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".csv";
         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";

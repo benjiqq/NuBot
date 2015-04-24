@@ -52,6 +52,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
     @Override
     public void run() {
+        if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
 
         LOG.info("Executing " + this.getClass());
 

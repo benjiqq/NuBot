@@ -57,11 +57,10 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     @Override
     public void run() {
+        if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
 
         LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
-
-        if (SessionManager.sessionShuttingDown)
-            return;
+        
 
         if (isFirstTime) {
             initStrategy();
