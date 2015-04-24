@@ -385,7 +385,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         query_args.put("pair", pair.toStringSep());
         query_args.put("order_id", orderID);
-        Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
+
+        ApiResponse orderDetailResponse = getOrderDetail(orderID);
+        Order currentOrder;
+        if (!orderDetailResponse.isPositive()) {
+            return orderDetailResponse;
+        }
+        
+        currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
         query_args.put("type", currentOrder.getType().toLowerCase());
 
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
