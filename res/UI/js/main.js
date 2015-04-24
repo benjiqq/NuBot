@@ -1,7 +1,4 @@
-  var host = "localhost";
-  var port = 4567;
-  var baseurl = "http://" + host + ":" + port;
-
+  var baseurl = getBaseUrl();
   var orderEndPoint = "orders";
   var balanceEndPoint = "balances";
 
@@ -95,7 +92,7 @@
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/configfile"
+              url: baseurl + "/configfile"
           })
           .fail(function() {
               console.log("error loading configfile");
@@ -116,7 +113,7 @@
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/" + balanceEndPoint
+              url: baseurl + "/" + balanceEndPoint
           })
           .fail(function() {
               console.log("error loading info");
@@ -178,7 +175,7 @@
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/" + orderEndPoint
+              url: baseurl + "/" + orderEndPoint
           })
           .fail(function() {
               console.log("error loading info");
@@ -218,7 +215,7 @@
       $.ajax({
               type: "GET",
               dataType: "json",
-              url: "http://" + host + ":" + port + "/opstatus"
+              url: baseurl + "/opstatus"
           })
           .fail(function() {
               handleFailServer();
@@ -384,7 +381,7 @@
 
   function loadconfig() {
 
-      var url = "http://" + host + ":" + port + "/config";
+      var url = baseurl + "/config";
 
       $.ajax({
               type: "GET",
@@ -426,7 +423,7 @@
 
   function postall() {
 
-      var posturl = "http://" + host + ":" + port + "/config";
+      var posturl = baseurl + "/config";
 
       //get all vars and post them
 
@@ -534,7 +531,7 @@
 
   function postreset() {
       if (confirm("Are you sure?")) {
-          var posturl = "http://" + host + ":" + port + "/configreset";
+          var posturl = baseurl + "/configreset";
 
           $.ajax(posturl, {
 
@@ -599,6 +596,10 @@
   }
 
 
+function getBaseUrl()
+{
+    return "http://"+location.host;
+}
 /*
 
     1. Sample Data -------------------

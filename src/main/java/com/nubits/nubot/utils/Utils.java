@@ -25,7 +25,6 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
 import org.apache.commons.io.FileUtils;
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
 import org.joda.time.Duration;
 import org.joda.time.Period;
 import org.joda.time.format.PeriodFormatter;
@@ -445,18 +444,18 @@ public class Utils {
                 .appendSuffix(" day", " days")
                 .appendSeparator(" ")
                 .printZeroIfSupported()
-                //.minimumPrintedDigits(2)
+                        //.minimumPrintedDigits(2)
                 .appendHours()
                 .appendSuffix(" hour", " hours")
                 .appendSeparator(" ")
                 .appendMinutes()
                 .appendSuffix(" minute", " minutes")
                 .printZeroIfSupported()
-                //.minimumPrintedDigits(2)
+                        //.minimumPrintedDigits(2)
                 .appendSeparator(" ")
                 .appendSeconds()
                 .appendSuffix(" second", " seconds")
-                //.minimumPrintedDigits(2)
+                        //.minimumPrintedDigits(2)
                 .toFormatter();
 
                 /*
@@ -505,7 +504,7 @@ public class Utils {
                 LOG.error(e.toString());
             }
         } else {
-            LOG.error("Can't open browser: Desktop not supported");
+            LOG.warn("Can't launch browser: Desktop not supported.");
         }
     }
 
