@@ -44,6 +44,9 @@
           $('#togglebot').removeClass("btn-primary");
           $('#togglebot').addClass("btn-warning");
 
+
+          $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
+
           //$('#status-img').attr("src","img/bot_running.gif");
           document.title = 'Running! - NuBot GUI';
       } else {
@@ -63,6 +66,8 @@
 
           document.title = 'NuBot GUI - Stopped';
           //clearInterval(dotsAnimationID);
+          $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
+
       }
   }
 
