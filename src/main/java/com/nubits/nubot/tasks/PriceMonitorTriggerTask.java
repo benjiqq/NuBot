@@ -91,6 +91,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 LOG.error("error creating " + c);
             }
         }
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         FilesystemUtils.writeToFile("timestamp,source,crypto,price,currency,sellprice,buyprice,otherfeeds\n", wallshiftsFilePathCSV, true);
 
@@ -115,7 +116,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
     @Override
     public void run() {
-        if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.debug("Executing " + this.getClass());
 
@@ -132,6 +133,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
             return;
         }
 
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         //take a note of the current time.
         //sudden changes in price can cause the bot to re-request the price data repeatedly
         // until the moving average is within 10% of the reported price.
@@ -145,15 +148,19 @@ public class PriceMonitorTriggerTask extends TimerTask {
             count = 1;
             try {
                 executeUpdatePrice(count);
+                if (SessionManager.sessionInterrupted()) return; //external interruption
             } catch (FeedPriceException e) {
                 sendErrorNotification();
                 Global.exchange.getTrade().clearOrders(Global.options.getPair());
+                if (SessionManager.sessionInterrupted()) return; //external interruption
             }
         }
 
     }
 
     private void initStrategy(double peg_price) throws NuBotConnectionException {
+
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         Global.conversion = peg_price; //used then for liquidity info
         //Compute the buy/sell prices in USD
@@ -214,6 +221,8 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
         LOG.info(message2);
 
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         //Assign prices
         StrategySecondaryPegTask secTask = (StrategySecondaryPegTask) Global.taskManager.getSecondaryPegTask().getTask();
         if (!Global.swappedPair) {
@@ -235,8 +244,10 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private void executeUpdatePrice(int countTrials) throws FeedPriceException {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         if (countTrials <= MAX_ATTEMPTS) {
+            if (SessionManager.sessionInterrupted()) return; //external interruption
 
             pfm.fetchLastPrices();
             ArrayList<LastPrice> currentPriceList = pfm.getLastPrices();
@@ -251,11 +262,13 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 // I am assuming that mainPrice is the first element of the list
                 if (sanityCheck(currentPriceList, 0)) {
                     //mainPrice is reliable compared to the others
+                    if (SessionManager.sessionInterrupted()) return; //external interruption
                     this.updateLastPrice(currentPriceList.get(0), currentPriceList);
 
                 } else {
                     //mainPrice is not reliable compared to the others
                     //Check if other backup prices are close enough to each other
+                    if (SessionManager.sessionInterrupted()) return; //external interruption
                     boolean foundSomeValidBackUp = false;
                     LastPrice goodPrice = null;
                     for (int l = 1; l < currentPriceList.size(); l++) {
@@ -268,6 +281,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
                     if (foundSomeValidBackUp) {
                         //goodPrice is a valid price backup!
+                        if (SessionManager.sessionInterrupted()) return; //external interruption
                         this.updateLastPrice(goodPrice, currentPriceList);
                     } else {
                         //None of the source are in accord with others.
@@ -277,18 +291,22 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 }
             } else {
                 //One or more feed returned an error value
+                if (SessionManager.sessionInterrupted()) return; //external interruption
 
                 if (currentPriceList.size() == 2) { // if only 2 values are available
+                    if (SessionManager.sessionInterrupted()) return; //external interruption
+
                     double p1 = currentPriceList.get(0).getPrice().getQuantity();
                     double p2 = currentPriceList.get(1).getPrice().getQuantity();
                     if (closeEnough(this.DISTANCE_TRESHHOLD, p1, p2)) {
-
                         this.updateLastPrice(currentPriceList.get(0), currentPriceList);
                     } else {
                         //The two values are too unreliable
                         unableToUpdatePrice(currentPriceList);
                     }
                 } else if (currentPriceList.size() > 2) { // more than two
+                    if (SessionManager.sessionInterrupted()) return; //external interruption
+
                     //Check if other backup prices are close enough to each other
                     boolean foundSomeValidBackUp = false;
                     LastPrice goodPrice = null;
@@ -392,6 +410,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     public void updateLastPrice(LastPrice lp, ArrayList<LastPrice> priceList) {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         //We need to fill up the moving average queue so that 30 data points exist.
         if (queueMA.size() < MOVING_AVERAGE_SIZE) {
@@ -433,6 +452,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 return;
             }
         }
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         //carry on with updating the wall price shift
         this.lastPrice = lp;
@@ -454,6 +474,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private void verifyPegPrices() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.debug("Executing tryMoveWalls");
 
@@ -478,6 +499,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private boolean needToMoveWalls(LastPrice last) {
+
         double currentWallPEGprice = currentWallPEGPrice.getPrice().getQuantity();
         double distance = Math.abs(last.getPrice().getQuantity() - currentWallPEGprice);
         double percentageDistance = Utils.round((distance * 100) / currentWallPEGprice, 4);
@@ -491,6 +513,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     }
 
     private void computeNewPrices() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         double peg_price = lastPrice.getPrice().getQuantity();
 
@@ -554,6 +577,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
 
         LOG.info("New price computed [" + row + "]");
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         row += otherPricesAtThisTime.toString() + "\n";
         backup_feeds.add(otherPricesAtThisTime);
@@ -586,6 +610,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //then save
 
         logWallShift(wall_shift_info.toJSONString());
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         if (Global.options.sendMails()) {
             String title = " production (" + Global.options.getExchangeName() + ") [" + pfm.getPair().toString() + "] price changed more than " + wallchangeThreshold + "%";
