@@ -233,6 +233,9 @@ public class SessionManager {
     }
 
     public static boolean sessionInterrupted() {
+        boolean interrupted = sessionShuttingDown || !sessionRunning;
+        if (interrupted)
+            LOG.debug("Session Interrupted catch");
         return sessionShuttingDown || !sessionRunning;
     }
 
