@@ -12,7 +12,6 @@
   var refreshOrders = 4 * 1000;
   var refreshBalances = 4 * 1000;
 
-
   var refreshTablesInterval = 500;
   var refreshLogInterval = 150;
 
@@ -81,7 +80,6 @@
               $('#operation-nav').addClass('active')
               break;
           case "config":
-              loadconfig();
               $('#config-nav').addClass('active')
               break;
           case "docu":
@@ -538,7 +536,7 @@
   }
 
   function postreset() {
-      if (confirm("Are you sure?")) {
+      if (confirm("The bot will use a clean config saved in config/nubot-config.json. Are you sure?")) {
           var posturl = baseurl + "/configreset";
 
           $.ajax(posturl, {
@@ -593,6 +591,7 @@
               break;
           case "config":
               updateNavbar("config");
+              loadconfig();
               break;
           case "docu":
               updateNavbar("docu");
@@ -601,6 +600,17 @@
               updateNavbar("disclaimer");
               break;
       }
+  }
+
+
+  function updateConfigElements(status)
+  {
+      var disableBtn=false;
+      if(status=="started")
+            enableSaveBtn = true;
+
+      $('#saveconfigbutton').prop('disabled', disableBtn);
+      $('#saveconfigbutton').prop('resetbutton', disableBtn);
   }
 
 
