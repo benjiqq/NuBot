@@ -28,7 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Timer;
 
 
 public class TaskManager {
@@ -84,6 +83,13 @@ public class TaskManager {
                 new CheckNudTask(), Settings.CHECK_NUD_INTERVAL, "checkNud");
         taskList.add(checkNudTask);
 
+    }
+
+    public void setTestTask() {
+        checkConnectionTask = new BotTask(
+                new CheckConnectionTask(), 3, "checkConnectionTest");
+        taskList.add(checkConnectionTask);
+        LOG.debug("adde checkConnectionTask : " + checkConnectionTask);
     }
 
     public void setTasks() {
@@ -212,4 +218,11 @@ public class TaskManager {
         return initialized;
     }
 
+    public ArrayList<BotTask> getTaskList() {
+        return taskList;
+    }
+
+    public void setTaskList(ArrayList<BotTask> taskList) {
+        this.taskList = taskList;
+    }
 }
