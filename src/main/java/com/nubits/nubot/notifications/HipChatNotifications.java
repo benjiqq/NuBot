@@ -20,6 +20,7 @@ package com.nubits.nubot.notifications;
 
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Passwords;
 import io.evanwong.oss.hipchat.v2.HipChatClient;
 import io.evanwong.oss.hipchat.v2.commons.NoContent;
@@ -58,8 +59,8 @@ public class HipChatNotifications {
         }
 
         String sessionId = "";
-        if (Global.sessionId != null) {
-            sessionId = Global.sessionId;
+        if (SessionManager.sessionId != null) {
+            sessionId = SessionManager.sessionId;
         }
 
         String toSend = message + " <em>[" + sessionId + " - " + publicAddress + "] </em>";

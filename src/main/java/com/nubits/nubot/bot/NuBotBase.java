@@ -69,8 +69,8 @@ public abstract class NuBotBase {
     protected void setupAllConfig() {
 
         //Generate Bot Session unique id
-        Global.sessionId = Utils.generateSessionID();
-        LOG.info("Session ID = " + Global.sessionId);
+        SessionManager.sessionId = Utils.generateSessionID();
+        LOG.info("Session ID = " + SessionManager.sessionId);
 
         this.mode = "sell-side";
         if (Global.options.isDualSide()) {

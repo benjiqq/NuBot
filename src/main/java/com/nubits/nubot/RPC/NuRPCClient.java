@@ -19,6 +19,7 @@
 package com.nubits.nubot.RPC;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.models.CurrencyPair;
 import org.apache.http.HttpEntity;
@@ -318,7 +319,7 @@ public class NuRPCClient {
         String identifier = tier + separator
                 + pair.toString().toUpperCase() + separator
                 + exchangeName + separator
-                + Global.sessionId;
+                + SessionManager.sessionId;
         LOG.debug("liquidity identifier = " + identifier);
         return identifier;
     }

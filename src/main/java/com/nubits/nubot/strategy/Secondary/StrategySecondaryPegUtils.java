@@ -18,6 +18,7 @@
 package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
@@ -44,7 +45,7 @@ public class StrategySecondaryPegUtils {
 
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
-        if (Global.sessionShuttingDown)
+        if (SessionManager.sessionShuttingDown)
             return true;
 
         //They are either 0 or need to be cancelled

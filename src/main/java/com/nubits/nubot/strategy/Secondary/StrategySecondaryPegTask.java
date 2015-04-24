@@ -19,6 +19,7 @@
 package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
@@ -59,7 +60,7 @@ public class StrategySecondaryPegTask extends TimerTask {
 
         LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
 
-        if (Global.sessionShuttingDown)
+        if (SessionManager.sessionShuttingDown)
             return;
 
         if (isFirstTime) {

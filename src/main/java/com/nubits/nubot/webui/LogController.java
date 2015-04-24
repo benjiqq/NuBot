@@ -3,6 +3,7 @@ package com.nubits.nubot.webui;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.PairBalance;
@@ -59,7 +60,7 @@ public class LogController {
             int numbuys = 0;
             int numsells = 0;
 
-            if (Global.sessionRunning) {
+            if (SessionManager.sessionRunningFinal()) {
                 try {
 
                     numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
@@ -92,7 +93,7 @@ public class LogController {
             LOG.trace("/" + balanceEndPoint + " called");
             Map opmap = new HashMap();
 
-            if (Global.sessionRunning) {
+            if (SessionManager.sessionRunning) {
                 try {
                     try {
                         //query only up to every X msec, otherwise just get the last info

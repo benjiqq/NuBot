@@ -27,6 +27,18 @@ public class SessionManager {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
+    public static boolean sessionRunning = false;
+
+    public static boolean sessionShuttingDown = false;
+
+    public static DateTime sessionStartDate;
+
+    public static long sessionStarted;
+
+    public static long sessionStopped;
+
+    public static String sessionId;
+
     private static File sessionFile;
 
     private static String appFolder;
@@ -82,13 +94,13 @@ public class SessionManager {
 
     }
 
-    private static void sessionStarted(){
+    private static void sessionStart(){
 
-        Global.sessionRunning = true;
+        sessionRunning = true;
         runonce = true;
 
-        Global.sessionStarted = System.currentTimeMillis();
-        Global.sessionStartDate = new DateTime();
+        sessionStarted = System.currentTimeMillis();
+        sessionStartDate = new DateTime();
 
         String timestamp =
                 new java.text.SimpleDateFormat("yyyyMMdd HH:mm:ss").format(new Date());
@@ -98,14 +110,14 @@ public class SessionManager {
     }
 
     public static String startedString() {
-        Date startdate = Date.from(Instant.ofEpochSecond(Global.sessionStarted / 1000));
+        Date startdate = Date.from(Instant.ofEpochSecond(sessionStarted / 1000));
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
         String dstr = df.format(startdate);
         return dstr;
     }
 
     public static String durationString() {
-        Long diff = System.currentTimeMillis() - Global.sessionStarted;
+        Long diff = System.currentTimeMillis() - sessionStarted;
 
         /*long seconds = diff / 1000;
         LocalTime timeOfDay = LocalTime.ofSecondOfDay(seconds);
@@ -145,7 +157,7 @@ public class SessionManager {
             Global.bot = new NuBotSecondary();
             try {
                 Global.bot.execute(opt);
-                sessionStarted();
+                sessionStart();
             } catch (NuBotRunException e) {
                 throw e;
             }
@@ -156,7 +168,7 @@ public class SessionManager {
             Global.bot = new NuBotSimple();
             try {
                 Global.bot.execute(opt);
-                sessionStarted();
+                sessionStart();
             } catch (NuBotRunException e) {
                 throw e;
             }
@@ -179,6 +191,15 @@ public class SessionManager {
                 (appFolder, Settings.SESSION_FILE);
         //LOG.warn("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
+    }
+
+
+    //TODO this is not clean but a workaround due to race conditions at startup
+    public static boolean sessionRunningFinal(){
+        if (sessionRunning && Global.orderManager != null && Global.balanceManager != null){
+            return true;
+        }
+        return false;
     }
 
     /**

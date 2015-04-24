@@ -19,6 +19,7 @@
 package com.nubits.nubot.strategy.Primary;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
@@ -56,7 +57,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.info("DualSide :  " + Global.options.isDualSide());
 
-        if (Global.sessionShuttingDown)
+        if (SessionManager.sessionShuttingDown)
             return;
 
         cycles++;

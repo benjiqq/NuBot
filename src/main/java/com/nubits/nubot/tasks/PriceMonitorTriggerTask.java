@@ -20,6 +20,7 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotConnectionException;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
@@ -629,7 +630,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
         String message = "NuBot timed out after " + MAX_ATTEMPTS + " failed attempts to update " + pfm.getPair().getOrderCurrency().getCode() + ""
                 + " price. Please restart the bot and get in touch with Nu Dev team ";
-        message += "[<strong>" + Global.sessionId + "</strong>]";
+        message += "[<strong>" + SessionManager.sessionId + "</strong>]";
         MailNotifications.sendCritical(Global.options.getMailRecipient(), title, message);
         HipChatNotifications.sendMessageCritical(title + message);
         LOG.error(title + message);
@@ -730,7 +731,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
     protected void notifyDeviation(ArrayList<LastPrice> priceList) {
         String title = "Problems while updating " + pfm.getPair().getOrderCurrency().getCode() + " price. Cannot find a reliable feed.";
         String message = "Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n";
-        message += "[<strong>" + Global.sessionId + "</strong>]";
+        message += "[<strong>" + SessionManager.sessionId + "</strong>]";
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
