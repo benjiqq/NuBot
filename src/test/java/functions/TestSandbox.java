@@ -19,7 +19,9 @@
 package functions;
 
 
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.*;
+import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.SandboxWrapper;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -30,15 +32,15 @@ public class TestSandbox extends TestCase {
 
     @Test
     public void testAll() {
-        SandboxWrapper wrapper = new SandboxWrapper();
+        SandboxWrapper wrapper = new SandboxWrapper(new ApiKeys("", ""), new Exchange("Simulation"));
         CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
         ApiResponse resp = wrapper.getAvailableBalances(pair);
         assertTrue(resp != null);
-        PairBalance pb = (PairBalance)resp.getResponseObject();
+        PairBalance pb = (PairBalance) resp.getResponseObject();
         assertTrue(pb != null);
-        assertTrue(pb.getNBTAvailable().getQuantity()==0);
+        assertTrue(pb.getNBTAvailable().getQuantity() == 0);
 
-        ArrayList< Order> ao = (ArrayList< Order>)wrapper.getActiveOrders().getResponseObject();
-        assertTrue(ao.size()==1);
+        ArrayList<Order> ao = (ArrayList<Order>) wrapper.getActiveOrders().getResponseObject();
+        assertTrue(ao.size() == 1);
     }
 }

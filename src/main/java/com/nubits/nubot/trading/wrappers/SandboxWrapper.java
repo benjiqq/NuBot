@@ -1,5 +1,6 @@
 package com.nubits.nubot.trading.wrappers;
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.TradeInterface;
@@ -121,7 +122,7 @@ public class SandboxWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        return null;
+        return new ApiResponse(true, 0, null);
     }
 
     @Override
