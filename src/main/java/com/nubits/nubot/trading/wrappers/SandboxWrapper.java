@@ -13,6 +13,10 @@ import java.util.ArrayList;
  */
 public class SandboxWrapper implements TradeInterface {
 
+    public SandboxWrapper(ApiKeys keys, Exchange exchange) {
+
+    }
+
     @Override
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
@@ -157,7 +161,7 @@ public class SandboxWrapper implements TradeInterface {
 
     @Override
     public String getUrlConnectionCheck() {
-        return null;
+        return "http://www.google.com";
     }
 
     @Override

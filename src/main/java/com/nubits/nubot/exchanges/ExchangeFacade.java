@@ -60,7 +60,6 @@ public class ExchangeFacade {
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "https://178.62.140.24";
     private static ArrayList<String> supportedExchanges, liveExchanges;
     private static HashMap<String, Class> exchangeInterfaces;
-    ;
 
     static {
         supportedExchanges = new ArrayList<>();
