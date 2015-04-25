@@ -1,4 +1,3 @@
-package functions;
 /*
  * Copyright (C) 2015 Nu Development Team
  *
@@ -17,24 +16,34 @@ package functions;
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
-import com.nubits.nubot.models.CurrencyList;
-import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.models.LastPrice;
-import com.nubits.nubot.pricefeeds.feedservices.BitfinexPriceFeed;
-import com.nubits.nubot.pricefeeds.feedservices.BlockchainPriceFeed;
-import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
-import com.nubits.nubot.pricefeeds.feedservices.CoinbasePriceFeed;
+import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.launch.MainLaunch;
 import junit.framework.TestCase;
 import org.junit.Test;
+
+import javax.mail.Session;
 
 /**
  * test NuBot in simulation
  */
 public class TestSimulation extends TestCase {
 
+    static String configFile = "config/simulation.json";
+
     @Test
     public void testSimple() {
 
+        String[] args2 = {"-cfg=" + configFile}; //, "-GUI"};
+        MainLaunch.main(args2);
+
+        try{
+            Thread.sleep(10 * 1000);
+        }catch (Exception e){
+
+        }
+
+        //assertTrue(SessionManager.isSessionActive());
+        //assertTrue(SessionManager.)
 
     }
 
