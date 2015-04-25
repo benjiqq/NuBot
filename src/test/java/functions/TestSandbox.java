@@ -42,5 +42,9 @@ public class TestSandbox extends TestCase {
 
         ArrayList<Order> ao = (ArrayList<Order>) wrapper.getActiveOrders().getResponseObject();
         assertTrue(ao.size() == 1);
+
+        ApiResponse resp2 = wrapper.getTxFee();
+        double d = (Double)resp2.getResponseObject();
+        assertTrue(d==0);
     }
 }

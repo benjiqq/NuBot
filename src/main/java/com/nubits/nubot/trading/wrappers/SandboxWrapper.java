@@ -122,12 +122,12 @@ public class SandboxWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getTxFee() {
-        return new ApiResponse(true, 0, null);
+        return new ApiResponse(true, 0.0, null);
     }
 
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
-        return null;
+        return new ApiResponse(true, 0.0, null);
     }
 
     @Override
