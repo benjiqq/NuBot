@@ -7,8 +7,6 @@ import com.nubits.nubot.strategy.Primary.NuBotSimple;
 import com.nubits.nubot.strategy.Secondary.NuBotSecondary;
 import com.nubits.nubot.utils.FilesystemUtils;
 import org.joda.time.DateTime;
-import org.joda.time.Period;
-import org.joda.time.PeriodType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +25,17 @@ public class SessionManager {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    public static boolean sessionRunning = false;
+    public static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
 
-    public static boolean sessionShuttingDown = false;
+    public static final String MODE_STARTING = "MODE_STARTING";
+
+    public static final String MODE_HALTING = "MODE_HALTING";
+
+    public static final String MODE_RUNNING = "MODE_RUNNING";
+
+    public static final String MODE_HALTED = "MODE_HALTED";
+
+    public static String sessionMode = MODE_NOTSTARTED;
 
     public static DateTime sessionStartDate;
 
@@ -92,11 +98,13 @@ public class SessionManager {
         //create session file
         createSessionFile();
 
+        sessionMode = MODE_RUNNING;
+
     }
 
     private static void sessionStart() {
 
-        sessionRunning = true;
+        sessionMode = MODE_STARTING;
         runonce = true;
 
         sessionStarted = System.currentTimeMillis();
@@ -114,22 +122,6 @@ public class SessionManager {
         DateFormat df = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
         String dstr = df.format(startdate);
         return dstr;
-    }
-
-    public static String durationString() {
-        Long diff = System.currentTimeMillis() - sessionStarted;
-
-        /*long seconds = diff / 1000;
-        LocalTime timeOfDay = LocalTime.ofSecondOfDay(seconds);
-        String time = timeOfDay.toString();
-        return time;*/
-
-        PeriodType minutesEtc = PeriodType.time().withHoursRemoved();
-        Period period = new Period(diff, minutesEtc);
-        String periodString = String.format("%d min, %d sec",
-                period.getMinutes(),
-                period.getSeconds());
-        return periodString;
     }
 
     public static boolean wasRunOnce() {
@@ -183,7 +175,7 @@ public class SessionManager {
      *
      * @return
      */
-    public static boolean isSessionActive() {
+    /*public static boolean isSessionActive() {
 
         appFolder = System.getProperty("user.home") + "/" + Settings.APP_FOLDER;
 
@@ -191,7 +183,7 @@ public class SessionManager {
                 (appFolder, Settings.SESSION_FILE);
         //LOG.warn("checking " + sessionFile.getAbsolutePath() + " " + sessionFile.exists());
         return sessionFile.exists();
-    }
+    }*/
 
 
     /**
@@ -224,11 +216,58 @@ public class SessionManager {
 
     }
 
+    private static boolean startupOrShutdown() {
+        boolean startupOrShutdown = sessionMode.equals(MODE_HALTING) || sessionMode.equals(MODE_STARTING);
+        return startupOrShutdown;
+    }
+
+    public static boolean sessionRunning() {
+        //TODO: remove sessionisactive and integrate here
+        boolean r = sessionMode.equals(MODE_RUNNING);
+        return r;
+    }
+
+    public static void setShuttingDown() {
+        sessionMode = MODE_HALTING;
+    }
+
+    public static void setHalted() {
+        sessionMode = MODE_HALTED;
+    }
+
+    public static String getMode() {
+        return sessionMode;
+    }
+
+    public static String getReadableMode() {
+        String readableMode = "undefined";
+        switch (sessionMode) {
+            case MODE_NOTSTARTED:
+                readableMode = "not started";
+                break;
+            case MODE_HALTED:
+                readableMode = "halted";
+                break;
+            case MODE_RUNNING:
+                readableMode = "running";
+                break;
+            case MODE_STARTING:
+                readableMode = "starting";
+                break;
+            case MODE_HALTING:
+                readableMode = "halting";
+                break;
+
+        }
+
+        return readableMode;
+    }
+
     public static boolean sessionInterrupted() {
-        boolean interrupted = sessionShuttingDown || !sessionRunning;
-        if (interrupted)
+        boolean startupOrShutdown = startupOrShutdown();
+        if (startupOrShutdown)
             LOG.debug("Session Interrupted catch");
-        return sessionShuttingDown || !sessionRunning;
+        return startupOrShutdown;
     }
 
     public static void removeSessionFile() {

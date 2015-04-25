@@ -167,4 +167,8 @@ public class Settings {
      * for BalanceManager: the maximum refresh period triggered from the UI. strategy can trigger at higher rates
      */
     public static final int BALANCE_MAX_INTERVAL = 4 * 1000;
+
+
+
+
 }
