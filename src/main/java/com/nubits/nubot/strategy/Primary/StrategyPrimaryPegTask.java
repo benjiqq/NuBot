@@ -58,9 +58,6 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.info("DualSide :  " + Global.options.isDualSide());
 
-        if (SessionManager.sessionShuttingDown)
-            return;
-
         cycles++;
 
         if (isFirstTime)
