@@ -137,8 +137,6 @@ public class SessionManager {
 
         Global.mainThread = Thread.currentThread();
 
-        Global.createShutDownHook();
-
         setupSession();
 
         LOG.debug("execute bot depending on defined strategy");
