@@ -1,6 +1,5 @@
 package com.nubits.nubot.trading.wrappers;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.TradeInterface;
@@ -11,11 +10,31 @@ import java.util.ArrayList;
 
 /**
  * A wrapper to simulate a dummy exchange response
+ * uses internal data for mockup data: balances, orders
  */
 public class SandboxWrapper implements TradeInterface {
 
     public SandboxWrapper(ApiKeys keys, Exchange exchange) {
 
+    }
+
+    //dummy data
+    ArrayList<Order> activeOrderList;
+
+    private void addDummyOrder(){
+        Order order = new Order();
+
+        /* {"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5" */
+
+        order.setType("sell");
+        order.setId("123");
+        order.setAmount(new Amount(100.0, CurrencyList.NBT));
+        order.setPrice(new Amount(0.004, CurrencyList.BTC));
+        order.setCompleted(false);
+        CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
+        order.setPair(pair);
+        //order.setInsertedDate(new Date()); //Not provided
+        activeOrderList.add(order);
     }
 
     @Override
@@ -67,23 +86,10 @@ public class SandboxWrapper implements TradeInterface {
     @Override
     public ApiResponse getActiveOrders() {
         ApiResponse apiResponse = new ApiResponse();
-        ArrayList<Order> orderList = new ArrayList<Order>();
+        activeOrderList = new ArrayList<Order>();
+        addDummyOrder();
 
-        Order order = new Order();
-
-        /* {"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5" */
-
-        order.setType("sell");
-        order.setId("123");
-        order.setAmount(new Amount(100.0, CurrencyList.NBT));
-        order.setPrice(new Amount(0.004, CurrencyList.BTC));
-        order.setCompleted(false);
-        CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
-        order.setPair(pair);
-        //order.setInsertedDate(new Date()); //Not provided
-        orderList.add(order);
-
-        apiResponse.setResponseObject(orderList);
+        apiResponse.setResponseObject(activeOrderList);
         return apiResponse;
     }
 
@@ -152,7 +158,11 @@ public class SandboxWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
-        return null;
+        //clear orders
+        activeOrderList = new ArrayList<Order>();
+        ApiResponse toReturn = new ApiResponse();
+        toReturn.setResponseObject(true);
+        return toReturn;
     }
 
     @Override
