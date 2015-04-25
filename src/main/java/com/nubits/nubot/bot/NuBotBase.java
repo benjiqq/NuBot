@@ -359,10 +359,10 @@ public abstract class NuBotBase {
         }
 
         LOG.info("Logs of this session saved in " + Global.sessionPath);
-
+        LOG.debug("remove session file");
         SessionManager.removeSessionFile();
-
         LOG.info("** end of the session **");
+        SessionManager.setHalted();
 
     }
 

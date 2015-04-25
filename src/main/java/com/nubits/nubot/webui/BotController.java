@@ -29,25 +29,19 @@ public class BotController {
 
         get("/opstatus", "application/json", (request, response) -> {
             LOG.trace("/opstatus called");
+
             Map opmap = new HashMap();
-            boolean active = SessionManager.isSessionActive();
+            opmap.put("status", SessionManager.getReadableMode());
+
+            boolean active = SessionManager.sessionRunning();
             if (active) {
-                opmap.put("status", "running");
-
                 opmap.put("sessionstart", SessionManager.startedString());
-
                 opmap.put("duration", Utils.getBotUptimeDate());
-
             } else {
-                if (SessionManager.wasRunOnce())
-                    opmap.put("status", "halted");
-                else
-                    opmap.put("status", "not started");
-
                 opmap.put("sessionstart", "");
             }
 
-            opmap.put("stopped", SessionManager.sessionStopped);
+            //opmap.put("stopped", SessionManager.sessionStopped);
             String json = new Gson().toJson(opmap);
             return json;
         });
@@ -79,7 +73,7 @@ public class BotController {
 
                 LOG.info("testing if global options are valid");
 
-                boolean active = SessionManager.isSessionActive();
+                boolean active = SessionManager.sessionRunning();
                 if (active) {
                     success = false;
                     String errmsg = "could not start bot. session already running";
@@ -109,18 +103,16 @@ public class BotController {
             }
 
             if (startstop.equals(STOP)) {
-                boolean active = SessionManager.isSessionActive();
+                boolean active = SessionManager.sessionRunning();
 
                 boolean success = true;
                 if (active) {
                     try {
                         LOG.info("try interrupt bot");
 
-                        SessionManager.sessionShuttingDown = true;
+                        SessionManager.setShuttingDown();
 
                         Global.bot.shutdownBot();
-
-                        SessionManager.sessionRunning = false;
 
                         Global.mainThread.interrupt();
 
