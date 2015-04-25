@@ -86,27 +86,21 @@ public class SessionManager {
     }
 
     /**
-     * setup all the logging and storage for one session
+     * setup all the path for one session
      */
-    private static void setupSession() {
+    private static void setupSessionPath() {
 
         //set up session dir
         String wdir = FilesystemUtils.getBotAbsolutePath();
-
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
 
         //create session file
         createSessionFile();
-
-        sessionMode = MODE_RUNNING;
-
     }
 
-    private static void sessionStart() {
+    public static void sessionStart() {
 
-        sessionMode = MODE_STARTING;
         runonce = true;
-
         sessionStarted = System.currentTimeMillis();
         sessionStartDate = new DateTime();
 
@@ -137,9 +131,7 @@ public class SessionManager {
 
         Global.mainThread = Thread.currentThread();
 
-        Global.createShutDownHook();
-
-        setupSession();
+        setupSessionPath();
 
         LOG.debug("execute bot depending on defined strategy");
 
@@ -231,9 +223,19 @@ public class SessionManager {
         sessionMode = MODE_HALTING;
     }
 
-    public static void setHalted() {
+    public static void setModeHalted() {
         sessionMode = MODE_HALTED;
     }
+
+
+    public static void setModeRunning(){
+        sessionMode = MODE_RUNNING;
+    }
+
+    public static void setModeStarting(){
+        sessionMode = MODE_STARTING;
+    }
+
 
     public static String getMode() {
         return sessionMode;

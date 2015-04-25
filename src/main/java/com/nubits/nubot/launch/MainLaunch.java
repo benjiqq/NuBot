@@ -31,6 +31,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
+import javax.mail.Session;
 import java.io.File;
 
 
@@ -107,6 +108,7 @@ public class MainLaunch {
                 SessionManager.setConfigGlobal(configFile, false);
                 sessionLOG.debug("launch bot");
                 try {
+                    SessionManager.setModeStarting();
                     SessionManager.launchBot(Global.options);
                     Global.createShutDownHook();
                 } catch (NuBotRunException e) {

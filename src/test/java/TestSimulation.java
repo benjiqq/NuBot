@@ -16,6 +16,7 @@
  * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
  */
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.launch.MainLaunch;
 import junit.framework.TestCase;
@@ -34,7 +35,27 @@ public class TestSimulation extends TestCase {
     public void testSimple() {
 
         String[] args2 = {"-cfg=" + configFile}; //, "-GUI"};
+        assertTrue(!SessionManager.sessionRunning());
         MainLaunch.main(args2);
+
+        try{
+            Thread.sleep(2 * 1000);
+        }catch (Exception e){
+
+        }
+        assertTrue(SessionManager.getMode().equals(SessionManager.MODE_STARTING));
+
+        System.out.println(">> mode: " + SessionManager.getMode());
+        try{
+            Thread.sleep(30 * 1000);
+        }catch (Exception e){
+
+        }
+        System.out.println(">> mode: " + SessionManager.getMode());
+        assertTrue(SessionManager.sessionRunning());
+
+        Global.bot.shutdownBot();
+        Global.createShutDownHook();
 
         try{
             Thread.sleep(10 * 1000);
@@ -42,7 +63,8 @@ public class TestSimulation extends TestCase {
 
         }
 
-        //assertTrue(SessionManager.isSessionActive());
+        assertTrue(!SessionManager.sessionRunning());
+
         //assertTrue(SessionManager.)
 
     }

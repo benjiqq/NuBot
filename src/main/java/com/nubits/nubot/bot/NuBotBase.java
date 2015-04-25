@@ -362,7 +362,7 @@ public abstract class NuBotBase {
         LOG.debug("remove session file");
         SessionManager.removeSessionFile();
         LOG.info("** end of the session **");
-        SessionManager.setHalted();
+        SessionManager.setModeHalted();
 
     }
 
