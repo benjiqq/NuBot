@@ -84,7 +84,25 @@ public class SandboxWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        return null;
+
+        ApiResponse apiResponse = new ApiResponse();
+        ArrayList<Order> orderList = new ArrayList<Order>();
+
+        Order order = new Order();
+
+        /* {"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5" */
+
+        order.setType("sell");
+        order.setId("123");
+        order.setAmount(new Amount(100.0, CurrencyList.NBT));
+        order.setPrice(new Amount(0.004, CurrencyList.BTC));
+        order.setCompleted(false);
+        order.setPair(pair);
+        //order.setInsertedDate(new Date()); //Not provided
+        orderList.add(order);
+
+        apiResponse.setResponseObject(orderList);
+        return apiResponse;
     }
 
     @Override
