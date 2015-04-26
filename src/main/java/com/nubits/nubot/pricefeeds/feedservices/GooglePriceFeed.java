@@ -31,13 +31,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 
-public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
+public class GooglePriceFeed extends AbstractPriceFeed {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GoogleUnofficialPriceFeed.class.getName());
+    private static final Logger LOG = LoggerFactory.getLogger(GooglePriceFeed.class.getName());
 
-    public static final String name = FeedFacade.GoogleUnofficialPriceFeed;
+    public static final String name = FeedFacade.GooglePriceFeed;
 
-    public GoogleUnofficialPriceFeed() {
+    public GooglePriceFeed() {
         refreshMinTime = 8 * 60 * 60 * 1000; //8 hours
     }
 
@@ -56,8 +56,11 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
             }
             JSONParser parser = new JSONParser();
             try {
+                //Sample asnwer : // [ { "id": "-2001" ,"t" : "GBPUSD" ,"e" : "CURRENCY" ,"l" : "1.5187" ,"l_fix" : "" ,"l_cur" : "" ,"s": "0" ,"ltt":"" ,"lt" : "Apr 25, 11:55AM GMT" ,"lt_dts" : "2015-04-25T11:55:00Z" ,"c" : "0.00000" ,"c_fix" : "" ,"cp" : "0.000" ,"cp_fix" : "" ,"ccol" : "chb" ,"pcls_fix" : "" } ]
+                htmlString = htmlString.replace("//","").replace("[","").replace("]","");
+
                 JSONObject httpAnswerJson = (JSONObject) (parser.parse(htmlString));
-                double last = Utils.getDouble((Double) httpAnswerJson.get("rate"));
+                double last = Utils.getDouble((String) httpAnswerJson.get("l"));
                 last = Utils.round(last, 8);
                 lastRequest = System.currentTimeMillis();
                 lastPrice = new LastPrice(false, name, pair.getOrderCurrency(), new Amount(last, pair.getPaymentCurrency()));
@@ -77,6 +80,6 @@ public class GoogleUnofficialPriceFeed extends AbstractPriceFeed {
     private String getUrl(CurrencyPair pair) {
         String from = pair.getOrderCurrency().getCode().toUpperCase();
         String to = pair.getPaymentCurrency().getCode().toUpperCase();
-        return "http://rate-exchange.appspot.com/currency?from=" + from + "&to=" + to;
+        return "http://www.google.com/finance/info?q=CURRENCY%3a"+from+""+to;
     }
 }
