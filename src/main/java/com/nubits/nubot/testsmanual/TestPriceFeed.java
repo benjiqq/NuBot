@@ -53,10 +53,11 @@ public class TestPriceFeed {
 
         //test.trackBTC(); //Test BTC
         //test.trackPPC(); //Test PPC
-        test.trackEUR(); //Test EUR
+        //test.trackEUR(); //Test EUR
         //test.trackCNY(); //Test CNY
         //test.trackHKD(); //Test HKD
         //test.trackPHP(); //Test PHP
+        test.trackJPY(); //TEST JPY
 
     }
 
@@ -110,12 +111,24 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(OpenexchangeratesPriceFeed.name);
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
-        backupFeedList.add(ExchangeratelabPriceFeed.name);
+        backupFeedList.add(FeedFacade.OpenexchangeratesPriceFeed);
+        backupFeedList.add(FeedFacade.GoogleUnofficialPriceFeed);
+        backupFeedList.add(FeedFacade.ExchangeratelabPriceFeed);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.EUR_USD);
+    }
+
+    private void trackJPY() {
+        String mainFeed = FeedFacade.OpenexchangeratesPriceFeed;
+
+        ArrayList<String> backupFeedList = new ArrayList<>();
+
+        backupFeedList.add(FeedFacade.YahooPriceFeed);
+        backupFeedList.add(FeedFacade.GoogleUnofficialPriceFeed);
+        backupFeedList.add(FeedFacade.ExchangeratelabPriceFeed);
+
+        execute(mainFeed, backupFeedList, CurrencyList.JPY_USD);
     }
 
     private void trackHKD() {

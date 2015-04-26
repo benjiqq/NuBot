@@ -21,32 +21,48 @@ package com.nubits.nubot.models;
 
 public class CurrencyList {
 
+    public static Currency NBT;
+
+    //fiat
     public static Currency USD;
     public static Currency CNY;
     public static Currency EUR;
     public static Currency PHP;
+    public static Currency JPY;
     public static Currency HKD;
+
+    //crypto
     public static Currency BTC;
-    public static Currency NBT;
     public static Currency NSR;
     public static Currency PPC;
     public static Currency LTC;
     public static Currency DOGE;
+
+    //nbt fiat pairs
     public static CurrencyPair NBT_USD;
-    public static CurrencyPair NBT_BTC;
-    public static CurrencyPair BTC_NBT;
-    public static CurrencyPair NBT_PPC;
     public static CurrencyPair NBT_EUR;
     public static CurrencyPair NBT_CNY;
+
+    //fiat to fiat pairs
+    public static CurrencyPair EUR_USD;
+    public static CurrencyPair CNY_USD;
+    public static CurrencyPair PHP_USD;
+    public static CurrencyPair HKD_USD;
+    public static CurrencyPair JPY_USD;
+
+    //nbt crypto pairs
+    public static CurrencyPair NBT_BTC;
+    public static CurrencyPair NBT_PPC;
+
+    //swapped crypto pairs
+    public static CurrencyPair BTC_NBT;
+
+    //other pairs
     public static CurrencyPair BTC_USD;
     public static CurrencyPair PPC_USD;
     public static CurrencyPair PPC_BTC;
     public static CurrencyPair PPC_LTC;
     public static CurrencyPair BTC_CNY;
-    public static CurrencyPair EUR_USD;
-    public static CurrencyPair CNY_USD;
-    public static CurrencyPair PHP_USD;
-    public static CurrencyPair HKD_USD;
     public static CurrencyPair LTC_BTC;
     public static CurrencyPair DOGE_BTC;
 
@@ -56,6 +72,7 @@ public class CurrencyList {
         EUR = Currency.createCurrency("EUR");
         PHP = Currency.createCurrency("PHP");
         HKD = Currency.createCurrency("HKD");
+        JPY = Currency.createCurrency("JPY");
         BTC = Currency.createCurrency("BTC");
         NBT = Currency.createCurrency("NBT");
         NSR = Currency.createCurrency("NSR");
@@ -78,6 +95,7 @@ public class CurrencyList {
         CNY_USD = new CurrencyPair(CNY, USD);
         PHP_USD = new CurrencyPair(PHP, USD);
         HKD_USD = new CurrencyPair(HKD, USD);
+        JPY_USD = new CurrencyPair(JPY, USD);
         LTC_BTC = new CurrencyPair(LTC, BTC);
         DOGE_BTC = new CurrencyPair(DOGE, BTC);
     }
