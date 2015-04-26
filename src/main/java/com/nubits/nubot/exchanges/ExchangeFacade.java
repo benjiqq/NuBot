@@ -54,11 +54,12 @@ public class ExchangeFacade {
     public static final String COMKORT = "Comkort";
     public static final String BITTREX = "Bittrex";
 
+    public static final String SIMULATION = "Simulation";
+
     //API base url for peatio instances
     public static final String INTERNAL_EXCHANGE_PEATIO_API_BASE = "https://178.62.140.24";
     private static ArrayList<String> supportedExchanges, liveExchanges;
     private static HashMap<String, Class> exchangeInterfaces;
-    ;
 
     static {
         supportedExchanges = new ArrayList<>();
@@ -77,6 +78,7 @@ public class ExchangeFacade {
         supportedExchanges.add(EXCOIN);
         supportedExchanges.add(COMKORT);
         supportedExchanges.add(BITTREX);
+        supportedExchanges.add(SIMULATION);
 
         exchangeInterfaces.put(ALTSTRADE, AltsTradeWrapper.class);
         exchangeInterfaces.put(POLONIEX, PoloniexWrapper.class);
@@ -91,6 +93,7 @@ public class ExchangeFacade {
         exchangeInterfaces.put(BITTREX, BittrexWrapper.class);
         exchangeInterfaces.put(BTER, BterWrapper.class);
         exchangeInterfaces.put(CCEDK, CcedkWrapper.class);
+        exchangeInterfaces.put(SIMULATION, SandboxWrapper.class);
 
 
     }
