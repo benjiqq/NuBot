@@ -49,7 +49,7 @@ public class TestPriceFeed {
 
         TestPriceFeed test = new TestPriceFeed();
         test.init();
-        //test.executeSingle(BitcoinaveragePriceFeed, Constant.BTC_USD); //Uncomment to test a single price feed
+        //test.executeSingle(new GooglePriceFeed(), CurrencyList.EUR_USD); //Uncomment to test a single price feed
 
         //test.trackBTC(); //Test BTC
         //test.trackPPC(); //Test PPC
@@ -112,7 +112,7 @@ public class TestPriceFeed {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         backupFeedList.add(FeedFacade.OpenexchangeratesPriceFeed);
-        backupFeedList.add(FeedFacade.GoogleUnofficialPriceFeed);
+        backupFeedList.add(FeedFacade.GooglePriceFeed);
         backupFeedList.add(FeedFacade.ExchangeratelabPriceFeed);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
@@ -125,7 +125,7 @@ public class TestPriceFeed {
         ArrayList<String> backupFeedList = new ArrayList<>();
 
         backupFeedList.add(FeedFacade.YahooPriceFeed);
-        backupFeedList.add(FeedFacade.GoogleUnofficialPriceFeed);
+        backupFeedList.add(FeedFacade.GooglePriceFeed);
         backupFeedList.add(FeedFacade.ExchangeratelabPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.JPY_USD);
@@ -136,7 +136,7 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(GooglePriceFeed.name);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.HKD_USD);
@@ -147,7 +147,7 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(GooglePriceFeed.name);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.PHP_USD);
@@ -158,7 +158,7 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(GooglePriceFeed.name);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
         backupFeedList.add(ExchangeratelabPriceFeed.name);
 

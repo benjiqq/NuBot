@@ -15,8 +15,8 @@
 | BitstampEUR    | EUR  |  https://bitstamp.com |
 | yahoo    | EUR,CNY,PHP,HKD ...  |  https://yahooapis.com |
 | Openexchangerates    | EUR,CNY, PHP,HKD...  |  https://openexchangerates.org |
-| Exchangeratelab    | EUR,CNY, ...  |  https://exchangeratelab.com
-
+| Exchangeratelab    | EUR,CNY, PHP,HKD..  |  https://exchangeratelab.com
+| GoogleOfficial    | EUR,CNY, PHP,HKD..  |  http://www.google.com/finance/
 
 #Old feeds now unsupported
 | GoogleUnofficialPrice    | EUR,CNY,PHP,HKD ...  |  http://rate-exchange.appspot.com |
