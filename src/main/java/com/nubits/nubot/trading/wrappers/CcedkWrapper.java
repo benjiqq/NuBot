@@ -464,15 +464,24 @@ public class CcedkWrapper implements TradeInterface {
         if (activeOrdersResponse.isPositive()) {
             apiResponse.setResponseObject(true);
             ArrayList<Order> orderList = (ArrayList) activeOrdersResponse.getResponseObject();
+            String errorString = "";
+            boolean ok = true;
             for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (!pair.equals(thisOrder.getPair())) {
                     continue;
                 }
                 ApiResponse deleteOrderResponse = cancelOrder(thisOrder.getId(), null);
-                if (deleteOrderResponse.isPositive()) {
-                    apiResponse.setResponseObject(false);
+                if (!deleteOrderResponse.isPositive()) {
+                    errorString += "Cannot delete order" + thisOrder.getId() + "\n";
+                    ok = false;
                 }
+            }
+            if (!ok) {
+                apiResponse.setResponseObject(false);
+                apiResponse.setError(new ApiError(1337, errorString)); //TODO change error number
+            } else {
+                apiResponse.setResponseObject(true);
             }
         } else {
             apiResponse = activeOrdersResponse;
