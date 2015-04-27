@@ -457,29 +457,29 @@ public class CcedkWrapper implements TradeInterface {
     public ApiResponse clearOrders(CurrencyPair pair) {
         //Since there is no API entry point for that, this call will iterate over active
         ApiResponse apiResponse = new ApiResponse();
+        ArrayList<String> errorIds = new ArrayList<>();
 
         ApiResponse activeOrdersResponse = getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
             apiResponse.setResponseObject(true);
             ArrayList<Order> orderList = (ArrayList) activeOrdersResponse.getResponseObject();
-            String errorString = "";
-            boolean ok = true;
             for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (!pair.equals(thisOrder.getPair())) {
                     continue;
                 }
                 ApiResponse deleteOrderResponse = cancelOrder(thisOrder.getId(), null);
-                if (!deleteOrderResponse.isPositive()) {
-                    errorString += "Cannot delete order" + thisOrder.getId() + "\n";
-                    ok = false;
+                if (deleteOrderResponse.isPositive()) {
+                    continue;
+                } else {
+                    errorIds.add(thisOrder.getId());
                 }
             }
-            if (!ok) {
+            if (!errorIds.isEmpty()) {
+                ApiError error = errors.genericError;
+                error.setDescription(errorIds.toString());
+                apiResponse.setError(error);
                 apiResponse.setResponseObject(false);
-                apiResponse.setError(new ApiError(1337, errorString)); //TODO change error number
-            } else {
-                apiResponse.setResponseObject(true);
             }
         } else {
             apiResponse = activeOrdersResponse;
