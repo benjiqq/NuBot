@@ -527,7 +527,7 @@ public class BterWrapper implements TradeInterface {
     public ApiResponse isOrderActive(String id) {
         ApiResponse apiResp = new ApiResponse();
 
-        ApiResponse orderDetailResponse = Global.exchange.getTrade().getOrderDetail(id);
+        ApiResponse orderDetailResponse = getOrderDetail(id);
         if (orderDetailResponse.isPositive()) {
             Order order = (Order) orderDetailResponse.getResponseObject();
             if (order.isCompleted()) {

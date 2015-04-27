@@ -211,7 +211,6 @@ public class CcedkWrapper implements TradeInterface {
         HashMap<String, String> query_args = new HashMap<>();
 
 
-
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
 
         if (response.isPositive()) {
@@ -225,13 +224,13 @@ public class CcedkWrapper implements TradeInterface {
                 Amount NBTTotal = new Amount(0, pair.getOrderCurrency());
                 Amount PEGTotal = new Amount(0, pair.getPaymentCurrency());
 
-                for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext();) {
+                for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext(); ) {
                     JSONObject thisEntity = entity.next();
                     long entityId = (Long) thisEntity.get("currency_id");
                     if (entityId == NBTid) {
                         try {
                             NBTTotal.setQuantity((Double) thisEntity.get("balance"));
-                        } catch (ClassCastException cce){
+                        } catch (ClassCastException cce) {
                             NBTTotal.setQuantity((Long) thisEntity.get("balance"));
                         }
                     }
@@ -250,7 +249,7 @@ public class CcedkWrapper implements TradeInterface {
                 long id = TradeUtilsCCEDK.getCCDKECurrencyId(currency.getCode().toUpperCase());
                 Amount total = new Amount(0, currency);
 
-                for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext();) {
+                for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext(); ) {
                     JSONObject thisEntity = entity.next();
                     long entityId = (Long) thisEntity.get("currency_id");
                     if (entityId == id) {
@@ -368,7 +367,8 @@ public class CcedkWrapper implements TradeInterface {
         String url = API_BASE_URL;
         String method = API_ACTIVE_ORDERS;
         boolean isGet = false;
-;        HashMap<String, String> query_args = new HashMap<>();
+        ;
+        HashMap<String, String> query_args = new HashMap<>();
 
         if (pair != null) {
             String pair_id = Integer.toString(TradeUtilsCCEDK.getCCDKECurrencyPairId(pair));
@@ -381,7 +381,7 @@ public class CcedkWrapper implements TradeInterface {
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
             JSONArray entities = (JSONArray) dataJson.get("entities");
 
-            for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext();) {
+            for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext(); ) {
                 JSONObject orderObject = entity.next();
                 Order tempOrder = parseOrder(orderObject);
 
@@ -403,15 +403,20 @@ public class CcedkWrapper implements TradeInterface {
         ApiResponse apiResponse = new ApiResponse();
 
         ApiResponse getActiveOrders = getActiveOrders();
+        boolean found = false;
         if (getActiveOrders.isPositive()) {
             apiResponse.setResponseObject(false);
             ArrayList<Order> orderList = (ArrayList) getActiveOrders.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
+                    found = true;
+                    break;
                 }
             }
+            if (!found)
+                apiResponse.setError(errors.orderNotFound);
         } else {
             apiResponse = getActiveOrders;
         }
@@ -462,7 +467,7 @@ public class CcedkWrapper implements TradeInterface {
         if (getActiveOrders.isPositive()) {
             ArrayList<Order> orderList = (ArrayList) getActiveOrders.getResponseObject();
             apiResponse.setResponseObject(false);
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(true);
@@ -484,7 +489,7 @@ public class CcedkWrapper implements TradeInterface {
         if (activeOrdersResponse.isPositive()) {
             apiResponse.setResponseObject(true);
             ArrayList<Order> orderList = (ArrayList) activeOrdersResponse.getResponseObject();
-            for (Iterator<Order> order = orderList.iterator(); order.hasNext();) {
+            for (Iterator<Order> order = orderList.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
                 if (!pair.equals(thisOrder.getPair())) {
                     continue;
@@ -770,7 +775,7 @@ public class CcedkWrapper implements TradeInterface {
                 String output;
 
                 while ((output = br.readLine()) != null) {
-                    LOG.info(output);
+                    LOG.debug(output);
                     answer += output;
                 }
 
