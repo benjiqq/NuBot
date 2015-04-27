@@ -553,12 +553,9 @@ public class CcedkWrapper implements TradeInterface {
             order.setAmount(new Amount((Double) orderObject.get("volume"), cp.getOrderCurrency()));
         }
 
-        try {
-            order.setPrice(new Amount((Long) orderObject.get("price"), cp.getPaymentCurrency()));
-        } catch (ClassCastException cce) {
-            order.setAmount(new Amount((Double) orderObject.get("price"), cp.getOrderCurrency()));
-        }
 
+        order.setPrice(new Amount(Utils.getDouble(orderObject.get("price")), cp.getPaymentCurrency()));
+      
         long active = (Long) orderObject.get("active");
         if (active == 0) {
             order.setCompleted(true);
@@ -734,7 +731,7 @@ public class CcedkWrapper implements TradeInterface {
                 } else {
                     queryUrl = new URL(base + method);
                 }
-                LOG.info(queryUrl.toString());
+                LOG.trace(queryUrl.toString());
 
 
                 connection = (HttpsURLConnection) queryUrl.openConnection();
