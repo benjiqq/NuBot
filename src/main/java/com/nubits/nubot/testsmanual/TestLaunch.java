@@ -108,7 +108,7 @@ public class TestLaunch {
 
         //testlaunchWithFile();
         //testlaunchNoFile();
-        String[] args2 = {"-cfg=" + configFile}; //, "-GUI"};
+        String[] args2 = {"-cfg=" + configFile, "-GUI"};
         MainLaunch.main(args2);
 
     }

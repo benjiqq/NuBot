@@ -298,7 +298,7 @@
                       //on success of post change the color of the button
                       toggleBot(true);
                   } else {
-                      flashButtonRed(cbtn);
+                      //flashButtonRed(cbtn);
                       alert(data["error"]);
                   }
 
@@ -327,12 +327,12 @@
                   var cbtn = $('#togglebot');
                   if (success) {
                       //on success of post change the color of the button
-                      flashButton(cbtn);
+                      //flashButton(cbtn);
                       $('#duration').html("");
                       toggleBot(false);
                   } else {
                       alert(data["error"]);
-                      flashButtonRed(cbtn);
+                      //flashButtonRed(cbtn);
                   }
               },
               error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -527,7 +527,7 @@
 
                   //on success of post change the color of the button
                   var cbtn = $('#saveconfigbutton');
-                  flashButton(cbtn);
+                  //flashButton(cbtn);
 
               } else {
                   alert(errormsg);
