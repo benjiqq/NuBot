@@ -240,7 +240,7 @@ public abstract class NuBotBase {
 
         LOG.info("Waiting a for the connectionThreads to detect connection");
         try {
-            Thread.sleep(3000);
+            Thread.sleep(Settings.WAIT_CHECK_INTERVAL);
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
         }

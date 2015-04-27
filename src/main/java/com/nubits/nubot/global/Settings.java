@@ -168,7 +168,7 @@ public class Settings {
      */
     public static final int BALANCE_MAX_INTERVAL = 4 * 1000;
 
-
+    public static final int WAIT_CHECK_INTERVAL = 3000;
 
 
 }
