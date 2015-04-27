@@ -200,6 +200,10 @@ public class SessionManager {
 
     }
 
+    /**
+     * boolean for session in startup or shutdown mode, i.e. not running and not halted
+     * @return
+     */
     private static boolean startupOrShutdown() {
         boolean startupOrShutdown = sessionMode.equals(MODE_HALTING) || sessionMode.equals(MODE_STARTING);
         return startupOrShutdown;
