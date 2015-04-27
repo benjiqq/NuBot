@@ -268,9 +268,9 @@ public class OrderManager {
     public void fetchTimeBound(double tresh) {
         long cur = System.currentTimeMillis();
         long diff = cur - lastFetch;
-        LOG.debug("OrderManager. diff: " + diff);
+        LOG.trace("OrderManager. diff: " + diff);
         if (diff > tresh) {
-            LOG.debug("triggered fetch");
+            LOG.debug("Fetching active orders ...");
             fetchOrders();
         }
     }
@@ -286,7 +286,7 @@ public class OrderManager {
             }
         }
 
-        LOG.debug("activeorders " + type + " " + numOrders);
+        LOG.trace("activeorders " + type + " " + numOrders);
         return numOrders;
     }
 
@@ -303,8 +303,8 @@ public class OrderManager {
     }
 
     public void logActiveOrders() {
-        LOG.debug("buy orders: " + this.getNumActiveBuyOrders());
-        LOG.debug("sell orders: " + this.getNumActiveSellOrders());
+        LOG.trace("buy orders: " + this.getNumActiveBuyOrders());
+        LOG.trace("sell orders: " + this.getNumActiveSellOrders());
     }
 
     public ArrayList<Order> getOrderList() {

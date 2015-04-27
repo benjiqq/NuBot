@@ -750,7 +750,7 @@ public class CcedkWrapper implements TradeInterface {
                 String output;
 
                 while ((output = br.readLine()) != null) {
-                    LOG.debug(output);
+                    LOG.trace(output);
                     answer += output;
                 }
 

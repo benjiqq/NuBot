@@ -57,9 +57,9 @@ public class BalanceManager {
     public void fetchBalancePairTimeBound(CurrencyPair pair, double tresh) throws Exception {
         long current = System.currentTimeMillis();
         long diff = current - this.lastFetchPairBalance;
-        LOG.debug("balance. diff: " + diff);
+        LOG.trace("balance. diff: " + diff);
         if (diff > tresh) {
-            LOG.debug("triggered fetch");
+            LOG.trace("Fetching balances ...");
             fetchBalances(pair);
         }
     }
