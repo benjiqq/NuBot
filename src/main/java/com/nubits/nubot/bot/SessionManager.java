@@ -136,27 +136,19 @@ public class SessionManager {
         LOG.debug("execute bot depending on defined strategy");
 
         if (opt.requiresSecondaryPegStrategy()) {
-
             LOG.debug("creating secondary bot object");
             Global.bot = new NuBotSecondary();
-            try {
-                sessionStart();
-                Global.bot.execute(opt);
-            } catch (NuBotRunException e) {
-                throw e;
-            }
-
         } else {
-
             LOG.debug("creating simple bot object");
             Global.bot = new NuBotSimple();
-            try {
-                Global.bot.execute(opt);
-                sessionStart();
-            } catch (NuBotRunException e) {
-                throw e;
-            }
+        }
 
+        try {
+            sessionStart();
+            Global.bot.execute(opt);
+            SessionManager.setModeRunning();
+        } catch (NuBotRunException e) {
+            throw e;
         }
 
     }
