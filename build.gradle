@@ -24,7 +24,7 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = '0.2.0a' //Change for new releases
+version = '0.2.0b' //Change for new releases
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
