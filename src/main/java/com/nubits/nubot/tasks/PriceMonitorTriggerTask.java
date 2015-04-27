@@ -128,6 +128,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
 
         //if a problem occurred we sleep for a period using the SLEEP_COUNTER
         if (SLEEP_COUNT > 0) {
+            LOG.error("error occurred. sleep " + SLEEP_COUNT);
             SLEEP_COUNT--;
             currentTime = System.currentTimeMillis();
             return;
