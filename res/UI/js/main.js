@@ -186,8 +186,6 @@
               })
               .done(function(data) {
 
-
-
                   //console.log("buys: " + data["buys"]);
                   //console.log("BuyCurrency: " + data["BuyCurrency"]);
                   //console.log("SellCurrency: " + data["SellCurrency"]);
@@ -233,16 +231,16 @@
               $('#duration').html(data["duration"]);
 
                   var run=false;
-                  if (data["status"] == "running") {
+                  if (data["status"] == "running" || data["status"] == "halting") {
                       run = true;
                   }
 
                   if(pageName=="operation"){
                       toggleBot(run);
-                      }
-                   else if(pageName=="config"){
+                  }
+                  else if(pageName=="config"){
                       updateConfigElements(run);
-                      }
+                  }
           });
 
         setTimeout(updateStatus, refreshStatusInterval);
@@ -527,7 +525,7 @@
 
                   //on success of post change the color of the button
                   var cbtn = $('#saveconfigbutton');
-                  //flashButton(cbtn);
+                  flashButton(cbtn);
 
               } else {
                   alert(errormsg);
