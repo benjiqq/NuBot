@@ -98,7 +98,7 @@ public class ConfigController {
 
         post("/config", "application/json", (request, response) -> {
             //check if bot is running
-            boolean active = SessionManager.sessionRunning();
+            boolean active = SessionManager.isSessionRunning();
             LOG.info("session currently active " + active);
 
             if (active) {

@@ -28,6 +28,8 @@ public class OrderManager {
 
     private long lastFetch;
 
+    private int totalOrdersSubmitted = 0;
+
     /**
      * clear all orders
      *
@@ -202,6 +204,8 @@ public class OrderManager {
             toReturn = Global.exchange.getTrade().sell(order.getPair(), order.getSize(), order.getPrice());
         }
 
+        totalOrdersSubmitted++;
+
         return toReturn;
     }
 
@@ -331,6 +335,10 @@ public class OrderManager {
 
     public int getNumTotalActiveOrders() {
         return orderList.size();
+    }
+
+    public int getTotalOrdersSubmitted(){
+        return this.totalOrdersSubmitted;
     }
 
 }

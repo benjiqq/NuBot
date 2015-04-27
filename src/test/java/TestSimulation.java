@@ -22,8 +22,6 @@ import com.nubits.nubot.launch.MainLaunch;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import javax.mail.Session;
-
 /**
  * test NuBot in simulation
  */
@@ -35,7 +33,7 @@ public class TestSimulation extends TestCase {
     public void testSimple() {
 
         String[] args2 = {"-cfg=" + configFile}; //, "-GUI"};
-        assertTrue(!SessionManager.sessionRunning());
+        assertTrue(!SessionManager.isSessionRunning());
         MainLaunch.main(args2);
 
         try{
@@ -52,7 +50,7 @@ public class TestSimulation extends TestCase {
 
         }
         System.out.println(">> mode: " + SessionManager.getMode());
-        assertTrue(SessionManager.sessionRunning());
+        assertTrue(SessionManager.isSessionRunning());
 
         Global.bot.shutdownBot();
         Global.createShutDownHook();
@@ -63,7 +61,7 @@ public class TestSimulation extends TestCase {
 
         }
 
-        assertTrue(!SessionManager.sessionRunning());
+        assertTrue(!SessionManager.isSessionRunning());
 
         //assertTrue(SessionManager.)
 

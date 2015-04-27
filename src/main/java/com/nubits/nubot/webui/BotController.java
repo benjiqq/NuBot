@@ -33,7 +33,7 @@ public class BotController {
             Map opmap = new HashMap();
             opmap.put("status", SessionManager.getReadableMode());
 
-            boolean active = SessionManager.sessionRunning();
+            boolean active = SessionManager.isSessionRunning();
             if (active) {
                 opmap.put("sessionstart", SessionManager.startedString());
                 opmap.put("duration", Utils.getBotUptimeDate());
@@ -73,7 +73,7 @@ public class BotController {
 
                 LOG.info("testing if global options are valid");
 
-                boolean active = SessionManager.sessionRunning();
+                boolean active = SessionManager.isSessionRunning();
                 if (active) {
                     success = false;
                     String errmsg = "could not start bot. session already running";
@@ -103,7 +103,7 @@ public class BotController {
             }
 
             if (startstop.equals(STOP)) {
-                boolean active = SessionManager.sessionRunning();
+                boolean active = SessionManager.isSessionRunning();
 
                 boolean success = true;
                 if (active) {

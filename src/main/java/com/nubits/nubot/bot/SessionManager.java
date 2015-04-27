@@ -209,7 +209,7 @@ public class SessionManager {
         return startupOrShutdown;
     }
 
-    public static boolean sessionRunning() {
+    public static boolean isSessionRunning() {
         //TODO: remove sessionisactive and integrate here
         boolean r = sessionMode.equals(MODE_RUNNING);
         return r;

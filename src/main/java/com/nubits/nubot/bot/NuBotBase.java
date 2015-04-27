@@ -292,6 +292,9 @@ public abstract class NuBotBase {
 
         LOG.info("Bot shutting down sequence started.");
 
+        //log closing statistics
+        LOG.info("totalOrdersSubmitted " + Global.orderManager.getTotalOrdersSubmitted());
+
         String openStrongTaging = "<strong>";
         String closingStrongTaging = "</strong>";
 

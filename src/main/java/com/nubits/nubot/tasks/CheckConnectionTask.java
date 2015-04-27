@@ -36,7 +36,7 @@ public class CheckConnectionTask extends TimerTask {
 
     @Override
     public void run() {
-        //if (SessionManager.sessionShuttingDown || !SessionManager.sessionRunning) return; //external interruption
+        //if (SessionManager.sessionShuttingDown || !SessionManager.isSessionRunning) return; //external interruption
         LOG.debug("Executing " + this.getClass());
         this.url = Global.exchange.getLiveData().getUrlConnectionCheck();
         Global.exchange.getLiveData().setConnected(isConnected());

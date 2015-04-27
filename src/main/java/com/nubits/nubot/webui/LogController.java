@@ -93,7 +93,7 @@ public class LogController {
             LOG.trace("/" + balanceEndPoint + " called");
             Map opmap = new HashMap();
 
-            if (SessionManager.sessionRunning() && Global.balanceManager != null) {
+            if (SessionManager.isSessionRunning() && Global.balanceManager != null) {
                 try {
                     try {
                         //query only up to every X msec, otherwise just get the last info
