@@ -228,18 +228,10 @@ public class CcedkWrapper implements TradeInterface {
                     JSONObject thisEntity = entity.next();
                     long entityId = (Long) thisEntity.get("currency_id");
                     if (entityId == NBTid) {
-                        try {
-                            NBTTotal.setQuantity((Double) thisEntity.get("balance"));
-                        } catch (ClassCastException cce) {
-                            NBTTotal.setQuantity((Long) thisEntity.get("balance"));
-                        }
+                        NBTTotal.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                     if (entityId == PEGid) {
-                        try {
-                            PEGTotal.setQuantity((Double) thisEntity.get("balance"));
-                        } catch (ClassCastException cce) {
-                            PEGTotal.setQuantity((Long) thisEntity.get("balance"));
-                        }
+                        PEGTotal.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                 }
                 PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
@@ -253,11 +245,7 @@ public class CcedkWrapper implements TradeInterface {
                     JSONObject thisEntity = entity.next();
                     long entityId = (Long) thisEntity.get("currency_id");
                     if (entityId == id) {
-                        try {
-                            total.setQuantity((Double) thisEntity.get("balance"));
-                        } catch (ClassCastException cce) {
-                            total.setQuantity((Long) thisEntity.get("balance"));
-                        }
+                        total.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                 }
                 apiResponse.setResponseObject(total);
@@ -289,24 +277,11 @@ public class CcedkWrapper implements TradeInterface {
             JSONObject entity = (JSONObject) dataJson.get("entities");
 
             Ticker ticker = new Ticker(0, 0, 0);
-            try {
-                Long ask = (Long) entity.get("min_ask");
-                ticker.setAsk(ask.doubleValue());
-            } catch (ClassCastException cce) {
-                ticker.setAsk((Double) entity.get("min_ask"));
-            }
-            try {
-                Long bid = (Long) entity.get("max_bid");
-                ticker.setBid(bid.doubleValue());
-            } catch (ClassCastException cce) {
-                ticker.setBid((Double) entity.get("max_bid"));
-            }
-            try {
-                Long last = (Long) entity.get("last_price");
-                ticker.setLast(last.doubleValue());
-            } catch (ClassCastException cce) {
-                ticker.setLast((Double) entity.get("last_price"));
-            }
+
+            ticker.setAsk(Utils.getDouble(entity.get("min_ask")));
+            ticker.setBid(Utils.getDouble(entity.get("max_bid")));
+            ticker.setLast(Utils.getDouble(entity.get("last_price")));
+
             apiResponse.setResponseObject(ticker);
         } else {
             apiResponse = response;
@@ -546,7 +521,7 @@ public class CcedkWrapper implements TradeInterface {
 
 
         order.setType(orderObject.get("type").toString());
-        
+
         order.setAmount(new Amount(Utils.getDouble(orderObject.get("volume")), cp.getOrderCurrency()));
         order.setPrice(new Amount(Utils.getDouble(orderObject.get("price")), cp.getPaymentCurrency()));
 
