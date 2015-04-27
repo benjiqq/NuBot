@@ -287,27 +287,13 @@ public class CcedkWrapper implements TradeInterface {
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
-            JSONObject entity = (JSONObject) dataJson.get("entities");
+            JSONObject entity = (JSONObject) dataJson.get("entity");
 
             Ticker ticker = new Ticker(0, 0, 0);
-            try {
-                Long ask = (Long) entity.get("min_ask");
-                ticker.setAsk(ask.doubleValue());
-            } catch (ClassCastException cce) {
-                ticker.setAsk((Double) entity.get("min_ask"));
-            }
-            try {
-                Long bid = (Long) entity.get("max_bid");
-                ticker.setBid(bid.doubleValue());
-            } catch (ClassCastException cce) {
-                ticker.setBid((Double) entity.get("max_bid"));
-            }
-            try {
-                Long last = (Long) entity.get("last_price");
-                ticker.setLast(last.doubleValue());
-            } catch (ClassCastException cce) {
-                ticker.setLast((Double) entity.get("last_price"));
-            }
+            ticker.setAsk(Utils.getDouble(entity.get("min_ask")));
+            ticker.setBid(Utils.getDouble(entity.get("max_bid")));
+            ticker.setLast(Utils.getDouble(entity.get("last_price")));
+
             apiResponse.setResponseObject(ticker);
         } else {
             apiResponse = response;
@@ -542,11 +528,7 @@ public class CcedkWrapper implements TradeInterface {
 
         order.setType(orderObject.get("type").toString());
 
-        try {
-            order.setAmount(new Amount((Long) orderObject.get("volume"), cp.getOrderCurrency()));
-        } catch (ClassCastException cce) {
-            order.setAmount(new Amount((Double) orderObject.get("volume"), cp.getOrderCurrency()));
-        }
+        order.setAmount(new Amount(Utils.getDouble(orderObject.get("volume")), cp.getOrderCurrency()));
 
         try {
             order.setPrice(new Amount((Long) orderObject.get("price"), cp.getPaymentCurrency()));
@@ -649,7 +631,7 @@ public class CcedkWrapper implements TradeInterface {
         startDateArg = startDateArg.substring(0, 10);
 
         query_args.put("date_from", startDateArg);
-        query_args.put("items_per_page", "10000");
+        query_args.put("items_per_page", "100");
 
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
         if (response.isPositive()) {
@@ -749,14 +731,16 @@ public class CcedkWrapper implements TradeInterface {
                     connection.setRequestProperty("Sign", signature);
                 }
 
-                connection.setDoOutput(true);
-                connection.setDoInput(true);
+                if (!isGet) {
+                    connection.setDoOutput(true);
+                    connection.setDoInput(true);
+                    DataOutputStream os = new DataOutputStream(connection.getOutputStream());
+                    os.writeBytes(post_data);
+                    os.close();
+                }
 
                 //Read the response
 
-                DataOutputStream os = new DataOutputStream(connection.getOutputStream());
-                os.writeBytes(post_data);
-                os.close();
 
                 BufferedReader br;
                 if (connection.getResponseCode() >= 400) {
