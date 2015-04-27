@@ -150,6 +150,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
                 executeUpdatePrice(count);
                 if (SessionManager.sessionInterrupted()) return; //external interruption
             } catch (FeedPriceException e) {
+                LOG.error("" + e);
                 sendErrorNotification();
                 Global.exchange.getTrade().clearOrders(Global.options.getPair());
                 if (SessionManager.sessionInterrupted()) return; //external interruption
