@@ -79,7 +79,7 @@ public class Global {
                 //shutdown logic of the bot handled in the bot related to the global thread
                 if (SessionManager.sessionRunning()) {
                     Global.bot.shutdownBot();
-                    SessionManager.setShuttingDown();
+                    SessionManager.setModeHalting();
                     SessionManager.sessionStopped = System.currentTimeMillis();
                 }
 

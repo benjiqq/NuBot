@@ -215,21 +215,24 @@ public class SessionManager {
         return r;
     }
 
-    public static void setShuttingDown() {
+    public static void setModeStarting(){
+        LOG.debug("set mode to starting");
+        sessionMode = MODE_STARTING;
+    }
+
+    public static void setModeHalting() {
+        LOG.debug("set mode to halting");
         sessionMode = MODE_HALTING;
     }
 
+
     public static void setModeHalted() {
+        LOG.debug("set mode to halted");
         sessionMode = MODE_HALTED;
     }
 
-
     public static void setModeRunning(){
         sessionMode = MODE_RUNNING;
-    }
-
-    public static void setModeStarting(){
-        sessionMode = MODE_STARTING;
     }
 
 

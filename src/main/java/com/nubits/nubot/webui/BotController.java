@@ -110,7 +110,7 @@ public class BotController {
                     try {
                         LOG.info("try interrupt bot");
 
-                        SessionManager.setShuttingDown();
+                        SessionManager.setModeHalting();
 
                         Global.bot.shutdownBot();
 
