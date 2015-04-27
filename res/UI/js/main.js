@@ -623,6 +623,26 @@
   function getBaseUrl() {
           return "http://" + location.host;
       }
+
+
+
+  window.onbeforeunload = function (e) {
+  if(botRunning)
+  {
+      e = e || window.event;
+      var confirmMessage = "The bot is still running."
+
+      // For IE and Firefox prior to version 4
+      if (e) {
+          e.returnValue = confirmMessage;
+      }
+
+      // For Safari
+      return confirmMessage;
+   }
+  };
+
+
       /*
 
           1. Sample Data -------------------
