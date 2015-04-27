@@ -393,9 +393,7 @@
       if($('#autoscrollCheckbox').prop('checked'))
         autoScroll();
 
-    if (botRunning){
         setTimeout(updateLog, refreshLogInterval);
-    }
 
   }
 
