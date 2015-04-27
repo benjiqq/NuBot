@@ -106,7 +106,7 @@ public class TradeUtilsCCEDK {
         }
     }
 
-    public static int getCCDKECurrencyId(String currencyCode) {
+    public static long getCCDKECurrencyId(String currencyCode) {
         /*
          * LAST UPDATED : 17 september
          * FROM : https://www.ccedk.com/api/v1/currency/list?nonce=1410950600
@@ -122,7 +122,7 @@ public class TradeUtilsCCEDK {
         String USD = CurrencyList.USD.getCode();
         String PPC = CurrencyList.PPC.getCode();
 
-        int toRet = -1;
+        long toRet = -1;
 
         switch (currencyCode) {
             case "BTC":
@@ -189,7 +189,7 @@ public class TradeUtilsCCEDK {
         return toRet;
     }
 
-    public static CurrencyPair getCCEDKPairFromID(int id) {
+    public static CurrencyPair getCCEDKPairFromID(long id) {
         /*
          * LAST UPDATED : 20 september
          FROM : https://www.ccedk.com/api/v1/pair/list?nonce=1410950600
@@ -204,29 +204,31 @@ public class TradeUtilsCCEDK {
          */
         CurrencyPair toRet = new CurrencyPair(CurrencyList.BTC, CurrencyList.BTC);
 
-        switch (id) {
-            case 2:
+        String idString = Long.toString(id);
+
+        switch (idString) {
+            case "2":
                 toRet = CurrencyList.BTC_USD;
                 break;
-            case 12:
+            case "12":
                 toRet = CurrencyList.PPC_LTC;
                 break;
-            case 13:
+            case "13":
                 toRet = CurrencyList.PPC_BTC;
                 break;
-            case 14:
+            case "14":
                 toRet = CurrencyList.PPC_USD;
                 break;
-            case 46:
+            case "46":
                 toRet = CurrencyList.NBT_USD;
                 break;
-            case 47:
+            case "47":
                 toRet = CurrencyList.NBT_BTC;
                 break;
-            case 48:
+            case "48":
                 toRet = CurrencyList.NBT_PPC;
                 break;
-            case 49:
+            case "49":
                 toRet = CurrencyList.NBT_EUR;
                 break;
             default:

@@ -128,3 +128,4 @@ See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/m
 
 #License
 NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/LICENSE.md)
+

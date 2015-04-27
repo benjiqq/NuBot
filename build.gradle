@@ -24,7 +24,8 @@
 apply plugin: 'java'
 apply plugin: 'application'
 
-version = '0.2.0.5' //Change for new releases
+
+version = 'develop' //Change for new releases
 
 targetCompatibility = 1.8
 sourceCompatibility = 1.8 // java version
@@ -49,11 +50,13 @@ def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
 def sampleconfig = "config/sample-options.json"
 def infofile = ".info"
 
+
 def testreportdir = new File("testreports") //$buildDir/reports
 def mainclass = "com.nubits.nubot.launch.MainLaunch"
 def getlasttradeclass = "com.nubits.nubot.launch.toolkit.NuLastTrades"
 
 def launchuiclass = "com.nubits.nubot.launch.toolkit.LaunchUI" //mainclass of the utils that runs the UI
+
 
 FileCollection html_files = files("./${docdir}/readme.html", "./${docdir}/setup.html", "./${docdir}/exchanges.html",
         "./${docdir}/license.html", "./${docdir}/feeds.html", "./${docdir}/changelog.html", "./${docdir}/disclaimer.html", "./${docdir}/gradle.html")
@@ -143,6 +146,7 @@ task distInit << {
     distdir.mkdirs()
 }
 
+
 //create an executable Jar to launch the UI
 task LaunchUIjar(type: Jar) {
     archiveName jarnameuilauncher
@@ -164,6 +168,7 @@ task LaunchUIjar(type: Jar) {
     }
     with jar
 }
+
 
 //create a single Jar with all dependencies
 task NuBotJar(type: Jar) {

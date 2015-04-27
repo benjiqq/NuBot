@@ -457,6 +457,7 @@ public class AllCoinWrapper implements TradeInterface {
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
 
+        boolean found = false;
         ApiResponse activeOrders = getActiveOrders();
         if (activeOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) activeOrders.getResponseObject();
@@ -464,8 +465,12 @@ public class AllCoinWrapper implements TradeInterface {
                 Order thisOrder = order.next();
                 if (thisOrder.getId().equals(orderID)) {
                     apiResponse.setResponseObject(thisOrder);
+                    found = true;
+                    break;
                 }
             }
+            if (!found)
+                apiResponse.setError(errors.orderNotFound);
         } else {
             apiResponse = activeOrders;
         }

@@ -43,7 +43,8 @@ public class TestWrappers {
     /**
      * Configure tests
      */
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/bitcoincoid.json";
+
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/ccedk.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -59,6 +60,7 @@ public class TestWrappers {
         //Methods strictly necessary for NuBot to run-------------
         //-------------
 
+
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
 
         WrapperTestUtils.testGetAvailableBalances(testPair);
@@ -66,14 +68,19 @@ public class TestWrappers {
 
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
         //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
+
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
         //WrapperTestUtils.testGetActiveOrders(testPair);
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
 
         //WrapperTestUtils.testGetAvailableBalances(testPair);
+
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.3, 0.00100, testPair);  //ok
+
         //WrapperTestUtils.testGetActiveOrders();
-        //WrapperTestUtils.testCancelOrder("123199680", testPair);
+        //WrapperTestUtils.testCancelOrder("459324", testPair);
         //WrapperTestUtils.testClearAllOrders(testPair);
         //WrapperTestUtils.testSell(1, 0.1830509, testPair);  //ok
         //WrapperTestUtils.testBuy(0.0000120, 0.0000120, testPair);  //ok
@@ -126,7 +133,7 @@ public class TestWrappers {
 
 
         //-------- Stress test start ---------
-        /*
+/*
         Thread t = new Thread(new Runnable() {
             public void run() {
                 for (int i = 0; i < 100; i++) {
@@ -152,11 +159,11 @@ public class TestWrappers {
         }
 
         //-------- Stress test end ---------
-        */
+*/
 
 
         //Create multiple orders for testing
-        /*
+/*
          ArrayList<OrderToPlace> orders = new ArrayList<>();
          for (int i = 0; i < 10; i++) {
          orders.add(new OrderToPlace(Constant.BUY, testPair, 0.5, 0.001));
@@ -167,13 +174,13 @@ public class TestWrappers {
          }
 
          WrapperTestUtils.testMultipleOrders(orders, testPair);
-         */
+*/
 
         //Methods NOT strictly necessary for NuBot to run---------------
         //---------------
         //WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
-        //WrapperTestUtils.testGetLastTrades(testPair);
+        WrapperTestUtils.testGetLastTrades(testPair);
 
 
         LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
