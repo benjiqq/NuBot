@@ -36,6 +36,7 @@ public class ErrorManager {
     public ApiError apiReturnError = new ApiError(5, ""); //This shows an error returned by the Exchange API.
     // The description will be filled with the returned value
     public ApiError authenticationError = new ApiError(6, "Authentication Error");
+    public ApiError orderNotFound = new ApiError(7, "Order not found");
 
     public void setExchangeName(Exchange exchange) {
         exchangeName = exchange;

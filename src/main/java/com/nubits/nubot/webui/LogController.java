@@ -72,7 +72,7 @@ public class LogController {
 
                     ArrayList<Order> ol = Global.orderManager.getOrderList();
                     opmap.put("orders", ol);
-                    LOG.debug("orders: " + ol);
+                    LOG.trace("orders: " + ol);
 
                 } catch (Exception e) {
                     LOG.error(e.toString());

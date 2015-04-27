@@ -20,3 +20,4 @@
 
 #Old feeds now unsupported
 | GoogleUnofficialPrice    | EUR,CNY,PHP,HKD ...  |  http://rate-exchange.appspot.com |
+

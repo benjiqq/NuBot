@@ -19,7 +19,6 @@
 
 #### New Features:
   - Added Comkort exchange API support
-  - Added Bittrex exchange API support
   - Added a unique session id for each instance of the bot
   - Liquidityinfo identifier contains multi-tier informaiton
   - Added script to retrieve updated keystore from bitbucket repository

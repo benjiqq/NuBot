@@ -184,7 +184,7 @@ Parameters :
 | mainfeed  | / | the name of the main price feed that has priority over the others | **see following table |
 | backupfeeds  | / |  a json array containing an arbitrary number (>2) of backup price feed names    |   **see following table |
 
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master) for an updated list of valid feed names.
+See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/03332b2637c5a67d9abd31b1c7bf1f37c239bc71/md/FEEDS.md?at=master) for an updated list of valid feed names.
 
 ---
 

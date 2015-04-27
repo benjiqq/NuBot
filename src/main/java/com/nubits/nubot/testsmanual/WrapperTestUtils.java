@@ -165,7 +165,7 @@ public class WrapperTestUtils {
             Order order = (Order) orderDetailResponse.getResponseObject();
             LOG.info(order.toString());
         } else {
-            LOG.info(orderDetailResponse.getError().toString());
+            LOG.error(orderDetailResponse.getError().toString());
         }
     }
 
@@ -223,14 +223,15 @@ public class WrapperTestUtils {
     }
 
     public static void testClearAllOrders(CurrencyPair pair) {
+        LOG.debug("TestClearAllOrders");
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
             if (deleted) {
-                LOG.info("\nOrder clear request succesfully");
+                LOG.info("Order clear request succesfully");
             } else {
-                LOG.info("\nCould not submit request to clear orders");
+                LOG.error("Could not submit request to clear orders");
             }
 
         } else {
