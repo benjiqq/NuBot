@@ -289,10 +289,7 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
-    public void shutdownBot() {
-
-        LOG.info("Bot shutting down sequence started.");
-
+    private void logSessionStatistics(){
         //log closing statistics
         LOG.info("totalOrdersSubmitted " + Global.orderManager.getTotalOrdersSubmitted());
 
@@ -305,6 +302,11 @@ public abstract class NuBotBase {
 
         LOG.info(additionalInfo.replace(closingStrongTaging, "").replace(openStrongTaging, "")); //Remove html tags
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+    }
+
+    public void shutdownBot() {
+
+        LOG.info("Bot shutting down sequence started.");
 
         //Interrupt all BotTasks
 
@@ -362,11 +364,14 @@ public abstract class NuBotBase {
             }
         }
 
+
         LOG.info("Logs of this session saved in " + Global.sessionPath);
         LOG.debug("remove session file");
         SessionManager.removeSessionFile();
-        LOG.info("** end of the session **");
         SessionManager.setModeHalted();
+        LOG.info("** end of the session **");
+
+        logSessionStatistics();
 
     }
 
