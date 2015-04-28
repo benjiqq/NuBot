@@ -12,9 +12,9 @@ import java.util.ArrayList;
  * A wrapper to simulate a dummy exchange response
  * uses internal data for mockup data: balances, orders
  */
-public class SandboxWrapper implements TradeInterface {
+public class SimulationWrapper implements TradeInterface {
 
-    public SandboxWrapper(ApiKeys keys, Exchange exchange) {
+    public SimulationWrapper(ApiKeys keys, Exchange exchange) {
 
     }
 

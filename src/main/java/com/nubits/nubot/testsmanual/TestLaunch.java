@@ -37,7 +37,8 @@ public class TestLaunch {
         System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
-    static String configFile = "config/poloniex.json";
+    //static String configFile = "config/poloniex.json";
+    static String configFile = "config/simulation.json";
     //static String configFile = "config/myconfig/bitspark.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
@@ -108,7 +109,8 @@ public class TestLaunch {
 
         //testlaunchWithFile();
         //testlaunchNoFile();
-        String[] args2 = {"-cfg=" + configFile, "-GUI"};
+        //String[] args2 = {"-cfg=" + configFile, "-GUI"};
+        String[] args2 = {"-cfg=" + configFile};
         MainLaunch.main(args2);
 
     }

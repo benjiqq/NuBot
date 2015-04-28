@@ -22,7 +22,7 @@ package functions;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.SandboxWrapper;
+import com.nubits.nubot.trading.wrappers.SimulationWrapper;
 import junit.framework.TestCase;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TestSandbox extends TestCase {
 
     @Test
     public void testAll() {
-        SandboxWrapper wrapper = new SandboxWrapper(new ApiKeys("", ""), new Exchange("Simulation"));
+        SimulationWrapper wrapper = new SimulationWrapper(new ApiKeys("", ""), new Exchange("Simulation"));
         CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
         ApiResponse resp = wrapper.getAvailableBalances(pair);
         assertTrue(resp != null);

@@ -47,6 +47,8 @@ public class FeedFacade {
     public static final String ExchangeratelabPriceFeed = "Exchangeratelab";
     public static final String GooglePriceFeed = "GoogleOfficial";
     public static final String OpenexchangeratesPriceFeed = "Openexchangerates";
+    public static final String SimulationPriceFeed = "simulationfeed";
+
 
 
     static {
@@ -66,6 +68,7 @@ public class FeedFacade {
         FEED_NAMES_MAP.put(ExchangeratelabPriceFeed, new ExchangeratelabPriceFeed());
         FEED_NAMES_MAP.put(GooglePriceFeed, new GooglePriceFeed());
         FEED_NAMES_MAP.put(OpenexchangeratesPriceFeed, new OpenexchangeratesPriceFeed());
+        FEED_NAMES_MAP.put(SimulationPriceFeed, new SimulationPriceFeed());
 
     }
 

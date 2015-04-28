@@ -93,7 +93,7 @@ public class ExchangeFacade {
         exchangeInterfaces.put(BITTREX, BittrexWrapper.class);
         exchangeInterfaces.put(BTER, BterWrapper.class);
         exchangeInterfaces.put(CCEDK, CcedkWrapper.class);
-        exchangeInterfaces.put(SIMULATION, SandboxWrapper.class);
+        exchangeInterfaces.put(SIMULATION, SimulationWrapper.class);
 
 
     }
