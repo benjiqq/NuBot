@@ -67,6 +67,8 @@ public class Global {
 
     public static String currentOptionsFile;
 
+    public static boolean isSimulation = false;
+
     /**
      * shutdown mechanics
      */

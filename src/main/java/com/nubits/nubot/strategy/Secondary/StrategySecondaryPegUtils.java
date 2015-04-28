@@ -73,7 +73,7 @@ public class StrategySecondaryPegUtils {
                             Thread.sleep(wait);
                             areAllOrdersCanceled = Global.orderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
-                                LOG.warn("All orders canceled succefully");
+                                LOG.warn("All orders canceled successfully");
                             } else {
                                 LOG.error("There was a problem cancelling the orders");
                             }
@@ -87,7 +87,7 @@ public class StrategySecondaryPegUtils {
                     } while (!areAllOrdersCanceled && !timedOut);
 
                     if (timedOut) {
-                        String message = "There was a problem cancelling all existing orders";
+                        String message = "There was a problem cancelling all existing orders (timedOut)";
                         LOG.error(message);
                         HipChatNotifications.sendMessage(message, MessageColor.YELLOW);
                         MailNotifications.send(Global.options.getMailRecipient(), "NuBot : Problem cancelling existing orders", message);

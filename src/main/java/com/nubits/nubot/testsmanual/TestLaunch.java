@@ -112,6 +112,7 @@ public class TestLaunch {
         //String[] args2 = {"-cfg=" + configFile, "-GUI"};
         String[] args2 = {"-cfg=" + configFile};
         MainLaunch.main(args2);
+        Global.isSimulation = true;
 
     }
 

@@ -4,6 +4,8 @@ import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
@@ -13,6 +15,8 @@ import java.util.ArrayList;
  * uses internal data for mockup data: balances, orders
  */
 public class SimulationWrapper implements TradeInterface {
+
+    private static final Logger LOG = LoggerFactory.getLogger(SimulationWrapper.class.getName());
 
     public SimulationWrapper(ApiKeys keys, Exchange exchange) {
 
@@ -158,6 +162,7 @@ public class SimulationWrapper implements TradeInterface {
 
     @Override
     public ApiResponse clearOrders(CurrencyPair pair) {
+        LOG.debug("simuatlion. clear orders called for pair " + pair);
         //clear orders
         activeOrderList = new ArrayList<Order>();
         ApiResponse toReturn = new ApiResponse();

@@ -44,6 +44,8 @@ public class CheckConnectionTask extends TimerTask {
     }
 
     public boolean isConnected() {
+        if (Global.isSimulation) return true;
+
         boolean connected = false;
         HttpURLConnection connection = null;
         URL query = null;
