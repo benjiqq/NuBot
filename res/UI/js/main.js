@@ -396,7 +396,7 @@
       if($('#autoscrollCheckbox').prop('checked'))
         autoScroll();
 
-      setTimeout(updateLog, refreshLogInterval);
+        setTimeout(updateLog, refreshLogInterval);
 
   }
 

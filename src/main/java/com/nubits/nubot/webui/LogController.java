@@ -46,8 +46,7 @@ public class LogController {
             try {
                 String l = new String(Files.readAllBytes(Paths.get(f)));
                 int fsize = 10000;
-                int m = Math.max(0,l.length()-fsize);
-                l = l.substring(m, l.length());
+                l = l.substring(l.length()-fsize, l.length());
                 object.addProperty("log", l);
                 return object;
             } catch (Exception e) {
