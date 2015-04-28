@@ -78,8 +78,11 @@ public class Global {
             @Override
             public void run() {
 
+                LOG.debug("global shutdownhook called");
+
                 //shutdown logic of the bot handled in the bot related to the global thread
                 if (SessionManager.isSessionRunning()) {
+                    LOG.debug("bot is running. shut it down");
                     Global.bot.shutdownBot();
                     SessionManager.setModeHalting();
                     SessionManager.sessionStopped = System.currentTimeMillis();

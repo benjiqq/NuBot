@@ -202,6 +202,7 @@ public class SessionManager {
 
     /**
      * boolean for session in startup or shutdown mode, i.e. not running and not halted
+     *
      * @return
      */
     private static boolean startupOrShutdown() {
@@ -215,7 +216,7 @@ public class SessionManager {
         return r;
     }
 
-    public static void setModeStarting(){
+    public static void setModeStarting() {
         LOG.debug("set mode to starting");
         sessionMode = MODE_STARTING;
     }
@@ -231,7 +232,7 @@ public class SessionManager {
         sessionMode = MODE_HALTED;
     }
 
-    public static void setModeRunning(){
+    public static void setModeRunning() {
         sessionMode = MODE_RUNNING;
     }
 
