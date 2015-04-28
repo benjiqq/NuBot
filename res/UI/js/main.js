@@ -36,7 +36,7 @@
   function handleFailServer() {
        botRunning = false;
        serverDown = true;
-      $('#maincontainer').html("NuBot engine is down. Relaunch it");
+      $('#maincontainer').html("NuBot engine is down. Relaunch it and refresh this page");
   }
 
   function clearTables() {
