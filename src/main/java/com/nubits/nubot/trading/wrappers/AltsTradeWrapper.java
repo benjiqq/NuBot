@@ -22,6 +22,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
@@ -41,6 +42,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -49,7 +51,6 @@ import java.net.NoRouteToHostException;
 import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
 
 
 /**
@@ -57,7 +58,7 @@ import java.util.logging.Logger;
  */
 public class AltsTradeWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AltsTradeWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     protected AltsTradeService service;
@@ -123,11 +124,11 @@ public class AltsTradeWrapper implements TradeInterface {
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
                 // Alts.trade return the order id as an integer
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -320,7 +321,7 @@ public class AltsTradeWrapper implements TradeInterface {
         try {
             date = sdf.parse(in.get("date").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
         }
         if (date != null) {
             out.setInsertedDate(date);
@@ -432,7 +433,7 @@ public class AltsTradeWrapper implements TradeInterface {
         try {
             date = sdf.parse(in.get("date").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
         }
         if (date != null) {
             out.setDate(date);
@@ -504,11 +505,52 @@ public class AltsTradeWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        if (!exchange.getLiveData().isConnected()) {
-            LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
-            return TOKEN_BAD_RETURN;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
+        if (exchange.getLiveData().isConnected()) {
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
+        } else {
+            LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
+            queryResult = TOKEN_BAD_RETURN;
         }
-        return service.executeQuery(base, "", args, needAuth, isGet);
+        return queryResult;
     }
 
     @Override
@@ -581,7 +623,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 } else {
                     get.abort();
                 }
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             } catch (SocketException e) {
                 if (!isGet) {
@@ -589,7 +631,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 } else {
                     get.abort();
                 }
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             } catch (Exception e) {
                 if (!isGet) {
@@ -597,7 +639,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 } else {
                     get.abort();
                 }
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             }
             BufferedReader rd;
@@ -616,22 +658,22 @@ public class AltsTradeWrapper implements TradeInterface {
                 answer = buffer.toString();
             } catch (IOException ex) {
 
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } catch (IllegalStateException ex) {
 
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.fine("\nSending request to URL : " + base + " ; get = " + isGet);
+                LOG.trace("\nSending request to URL : " + base + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
-                LOG.fine("Response Code : " + response.getStatusLine().getStatusCode());
-                LOG.fine("Response :" + response);
+                LOG.trace("Response Code : " + response.getStatusLine().getStatusCode());
+                LOG.trace("Response :" + response);
 
             }
             return answer;
