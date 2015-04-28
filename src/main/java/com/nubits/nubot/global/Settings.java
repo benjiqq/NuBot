@@ -150,6 +150,9 @@ public class Settings {
     public static final int DELAY_CONN = 1;
     public final static int DELAY_LIQUIIDITY = 40;
 
+    public final static long TIMEOUT_QUERY_RETRY = 10 * 1000; // For how long should the wrapper retry the call if the exchange has found busy
+    public final static long RETRY_SLEEP_INCREMENT = 300; // Sleep time increment each new cycle of retry. Cannot be less than 100 ms
+
 
     /**
      * a utility file which gets created in the distribution folder

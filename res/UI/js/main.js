@@ -24,8 +24,19 @@
   var logLine = 0;
   var requestedStop = false;
 
+  var l; //ladda button
+  var progressPB = 0;  //current status of progressbar (min 0 max 1)
+  var incrementPB ;
+  var currentAnimID;
+  var animatingButton = false;
+
+  var serverDown = false;
+
+
   function handleFailServer() {
-      $('#maincontainer').html("NuBot engine is down. Relaunch it");
+       botRunning = false;
+       serverDown = true;
+      $('#maincontainer').html("NuBot engine is down. Relaunch it and refresh this page");
   }
 
   function clearTables() {
@@ -40,31 +51,23 @@
           $('#togglebot-text').addClass("glyphicon-off");
           $('#togglebot-text').removeClass("glyphicon-play");
 
-          $('#togglebot').removeClass("btn-primary");
-          $('#togglebot').addClass("btn-warning");
-
+          $("#togglebot").attr("data-color","red");
 
           $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
 
-          //$('#status-img').attr("src","img/bot_running.gif");
           document.title = 'Running! - NuBot GUI';
       } else {
           botRunning = false;
-          //console.log("upd0");
 
           $('#togglebot-text').html(" Start Bot");
           $('#togglebot-text').addClass("glyphicon-play");
           $('#togglebot-text').removeClass("glyphicon-off");
 
-          $('#togglebot').removeClass("btn-warning");
-          $('#togglebot').addClass("btn-primary");
-
-          //$('#status-img').attr("src","img/bot_running.png");
+          $("#togglebot").attr("data-color","blue");
 
           setTimeout(clearTables, refreshTablesInterval);
 
           document.title = 'NuBot GUI - Stopped';
-          //clearInterval(dotsAnimationID);
           $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
 
       }
@@ -170,7 +173,6 @@
       first = false;
   }
 
-
   function updateOrders() {
       //console.log("updateorders, botrunning="+botRunning);
 
@@ -235,7 +237,7 @@
                       run = true;
                   }
 
-                  if(pageName=="operation"){
+                  if(pageName=="operation" && !animatingButton){
                       toggleBot(run);
                   }
                   else if(pageName=="config"){
@@ -278,6 +280,11 @@
 
   function startBot() {
       if (confirm("Are you sure you want to start the bot?")) {
+          // Start loading button
+          incrementPB = 0.004;  //determines speed of progressbar
+          l.ladda( 'start' );
+          currentAnimID = setInterval(animateProgressBar,50,true);
+          $('#togglebot-text').html(" Starting Bot");
           if (debug) console.log("calling start on server");
 
           var jsondata = JSON.stringify({
@@ -293,13 +300,12 @@
                   var success = data["success"];
 
                   if (success) {
-                      //on success of post change the color of the button
-                      toggleBot(true);
+
                   } else {
                       //flashButtonRed(cbtn);
                       alert(data["error"]);
+                      stopProgressBarAnimation(false);
                   }
-
               },
               error: function(XMLHttpRequest, textStatus, errorThrown) {
                   alert("error posting to server " + textStatus + " " + errorThrown);
@@ -311,6 +317,12 @@
   function stopBot() {
       if (debug) console.log("calling stop on server");
       if (confirm("Are you sure you want to stop the bot?")) {
+          //Start loading
+          incrementPB = 0.004; //determines speed of progressbar
+          l.ladda( 'start' );
+          currentAnimID = setInterval(animateProgressBar,50,false);
+          $('#togglebot-text').html(" Stopping Bot");
+
           var jsondata = JSON.stringify({
               "operation": "stop"
           });
@@ -327,9 +339,9 @@
                       //on success of post change the color of the button
                       //flashButton(cbtn);
                       $('#duration').html("");
-                      toggleBot(false);
                   } else {
                       alert(data["error"]);
+                      stopProgressBarAnimation(false);
                       //flashButtonRed(cbtn);
                   }
               },
@@ -344,7 +356,6 @@
 
       updateConfigFile();
 
-
       $('#togglebot').click(function() {
           if (botRunning)
               stopBot();
@@ -354,7 +365,6 @@
   }); //end document.ready function
 
   function autoScroll() {
-
       //autoscrolling. not used - how to make log readable also?
       var psconsole = $('#logarea');
       if (psconsole.length)
@@ -386,12 +396,9 @@
       if($('#autoscrollCheckbox').prop('checked'))
         autoScroll();
 
-    if (botRunning){
         setTimeout(updateLog, refreshLogInterval);
-    }
 
   }
-
 
   function loadconfig() {
 
@@ -589,6 +596,8 @@
       switch (page_name) {
           case "operation":
               updateNavbar("operation");
+              // Create a new instance of ladda for the specified button
+              l = $('#togglebot').ladda();
               toggleBot(false);
 
               updateStatus("operation");
@@ -596,8 +605,7 @@
 
               updateBalances();
               updateOrders();
-
-              break;
+           break;
           case "config":
               updateNavbar("config");
               updateStatus("config");
@@ -612,6 +620,26 @@
       }
   }
 
+  function animateProgressBar(toggle) {
+
+        progressPB += incrementPB;
+        if (progressPB >= 1) {
+            stopProgressBarAnimation(toggle);
+        } else {
+            animatingButton = true;
+            l.ladda('setProgress', progressPB);
+        }
+  }
+
+  function stopProgressBarAnimation(toggle)
+  {
+                clearInterval(currentAnimID);
+              progressPB = 0;
+              l.ladda('stop');
+              animatingButton = false;
+              //on success of post change the color of the button
+              toggleBot(toggle);
+  }
 
   function updateConfigElements(running)
   {
@@ -622,7 +650,36 @@
 
   function getBaseUrl() {
           return "http://" + location.host;
+   }
+
+  window.onbeforeunload = function (e) {
+  if(botRunning)
+  {
+      e = e || window.event;
+      var confirmMessage = "The bot is still running."
+      // For IE and Firefox prior to version 4
+      if (e) {
+          e.returnValue = confirmMessage;
       }
+      // For Safari
+      return confirmMessage;
+   }
+
+   else if(!serverDown)
+   {
+         e = e || window.event;
+         var confirmMessage = "Beware that closing this window will not stop the server. Ok?"
+         // For IE and Firefox prior to version 4
+         if (e) {
+             e.returnValue = confirmMessage;
+         }
+         // For Safari
+         return confirmMessage;
+   }
+
+  };
+
+
       /*
 
           1. Sample Data -------------------

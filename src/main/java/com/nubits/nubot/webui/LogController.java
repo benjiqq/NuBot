@@ -26,8 +26,8 @@ public class LogController {
     /**
      * the log file to send to client
      */
-    String logfile = Global.sessionPath + "/ui_standard.log";
-    String verboselogfile = Global.sessionPath + "/ui_verbose.log";
+    String logfile = Global.sessionPath + "/ui_standard.log"; //Must be the same as defined in logback.xml files
+    String verboselogfile = Global.sessionPath + "/ui_verbose.log"; //Must be the same as defined in logback.xml files
 
     private String orderEndPoint = "orders";
     private String balanceEndPoint = "balances";

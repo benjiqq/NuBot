@@ -486,7 +486,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         }
 
         if (needToShift && !isWallsBeingShifted()) { //prevent a wall shift trigger if the strategy is already shifting walls.
-            LOG.info("Walls needs to be shifted");
+            LOG.info("Walls need to be shifted");
             //Compute price for walls
             currentWallPEGPrice = lastPrice;
             computeNewPrices();
