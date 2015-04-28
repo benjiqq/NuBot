@@ -13,7 +13,7 @@
   var refreshBalances = 4 * 1000;
 
   var refreshTablesInterval = 500;
-  var refreshLogInterval = 150;
+  var refreshLogInterval = 300;
 
   var pageName = "operation";
   var debug = true;
@@ -404,7 +404,7 @@
 
       var url = baseurl + "/config";
 
-      $.ajax({
+        $.ajax({
               type: "GET",
               dataType: "json",
               url: url,
