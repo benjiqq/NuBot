@@ -55,7 +55,7 @@ public class StrategySecondaryPegUtils {
                 if (SessionManager.sessionInterrupted()) return false;
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
-                    LOG.info("Clear all orders request succesfully");
+                    LOG.info("Clear all orders request successfully");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
                         Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
@@ -410,9 +410,11 @@ public class StrategySecondaryPegUtils {
 
             if (Global.options.isDualSide()) {
 
-                strategy.setOrdersAndBalancesOK((activeSellOrders == 2 && activeBuyOrders == 2)
+                boolean correctOrders = (activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1));
+                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1);
+                LOG.debug("correct orders: " + correctOrders);
+                strategy.setOrdersAndBalancesOK(correctOrders);
 
 
                 if (balancePEG > oneNBT
@@ -426,7 +428,9 @@ public class StrategySecondaryPegUtils {
                     strategy.setProceedsInBalance(false);
                 }
             } else {
-                strategy.setOrdersAndBalancesOK(activeSellOrders == 2 && activeBuyOrders == 0); // Ignore the balance
+                boolean correctOrders = activeSellOrders == 2 && activeBuyOrders == 0;
+                LOG.debug("correctOrders: " + correctOrders);
+                strategy.setOrdersAndBalancesOK(correctOrders); // Ignore the balance
             }
         } else {
             LOG.error(balancesResponse.getError().toString());
