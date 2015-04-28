@@ -45,8 +45,6 @@ public class LogController {
                 f = verboselogfile;
             try {
                 String l = new String(Files.readAllBytes(Paths.get(f)));
-                int fsize = 10000;
-                l = l.substring(l.length()-fsize, l.length());
                 object.addProperty("log", l);
                 return object;
             } catch (Exception e) {
