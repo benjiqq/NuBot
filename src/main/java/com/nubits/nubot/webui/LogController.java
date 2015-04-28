@@ -23,16 +23,19 @@ import static spark.Spark.get;
 
 public class LogController {
 
+    final static Logger LOG = LoggerFactory.getLogger(LogController.class);
+
     /**
      * the log file to send to client
      */
     String logfile = Global.sessionPath + "/ui_standard.log"; //Must be the same as defined in logback.xml files
-    String verboselogfile = Global.sessionPath + "/ui_verbose.log"; //Must be the same as defined in logback.xml files
 
+    String verboselogfile = Global.sessionPath + "/ui_verbose.log"; //Must be the same as defined in logback.xml files
     private String orderEndPoint = "orders";
+
     private String balanceEndPoint = "balances";
 
-    final static Logger LOG = LoggerFactory.getLogger(LogController.class);
+    private static final int maxSize = 100000;
 
     public LogController() {
 
@@ -45,6 +48,9 @@ public class LogController {
                 f = verboselogfile;
             try {
                 String l = new String(Files.readAllBytes(Paths.get(f)));
+
+                if (l.length() > maxSize)
+                    l = l.substring(l.length()-maxSize,l.length());
                 object.addProperty("log", l);
                 return object;
             } catch (Exception e) {
