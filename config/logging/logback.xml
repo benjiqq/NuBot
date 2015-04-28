@@ -8,8 +8,8 @@
     <property scope="context" name="verbosefile" value="verbose.html" />
 
     <!-- UI - these files are always there but only read when the GUI is run.-->
-    <property scope="context" name="UIstandardlogFile" value="ui_standard.log" />
-    <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
+    <property scope="context" name="UIstandardlogFile" value=".ui_standard.log" />
+    <property scope="context" name="UIverboselogFile" value=".ui_verbose.log" />
 
 
     <!-- console output filtered. to show different colors error and warn go separate  -->
