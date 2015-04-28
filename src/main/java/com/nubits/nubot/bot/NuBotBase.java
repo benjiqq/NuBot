@@ -276,7 +276,8 @@ public abstract class NuBotBase {
             throw new NuBotRunException("" + e);
         }
 
-        notifyOnline();
+        if (Global.options.isHipchat())
+            notifyOnline();
 
     }
 
