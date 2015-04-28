@@ -105,7 +105,8 @@ public class OrderManager {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
 
                 if (deleted) {
-                    LOG.info("Order clear request succesful");
+                    LOG.info("Order clear request successful");
+                    toRet = true;
                 } else {
                     toRet = false;
                     LOG.info("Could not submit request to clear orders");
