@@ -30,9 +30,12 @@
   var currentAnimID;
   var animatingButton = false;
 
+  var serverDown = false;
+
 
   function handleFailServer() {
        botRunning = false;
+       serverDown = true;
       $('#maincontainer').html("NuBot engine is down. Relaunch it");
   }
 
@@ -649,22 +652,31 @@
           return "http://" + location.host;
    }
 
-
-
   window.onbeforeunload = function (e) {
   if(botRunning)
   {
       e = e || window.event;
       var confirmMessage = "The bot is still running."
-
       // For IE and Firefox prior to version 4
       if (e) {
           e.returnValue = confirmMessage;
       }
-
       // For Safari
       return confirmMessage;
    }
+
+   else if(!serverDown)
+   {
+         e = e || window.event;
+         var confirmMessage = "Beware that closing this window will not stop the server. Ok?"
+         // For IE and Firefox prior to version 4
+         if (e) {
+             e.returnValue = confirmMessage;
+         }
+         // For Safari
+         return confirmMessage;
+   }
+
   };
 
 
