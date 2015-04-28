@@ -35,9 +35,13 @@ public class Exchange {
     private ApiKeys keys;
     private TradeInterface trade;
 
+    //handle concurrent requests
+    private boolean isBusy;
+
     public Exchange(String name) {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
+        this.isBusy = false;
     }
 
     public String getName() {
@@ -76,5 +80,19 @@ public class Exchange {
         return this.trade;
     }
 
+    public boolean isBusy() {
+        return isBusy;
+    }
 
+    public boolean isFree() {
+        return !isBusy;
+    }
+
+    public void setBusy() {
+        this.isBusy = true;
+    }
+
+    public void setFree() {
+        this.isBusy = true;
+    }
 }

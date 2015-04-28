@@ -67,8 +67,9 @@ public class Global {
 
     public static String currentOptionsFile;
 
+
     /**
-     * shutdown mechanics
+     * process shutdown mechanics
      */
     public static void createShutDownHook() {
 

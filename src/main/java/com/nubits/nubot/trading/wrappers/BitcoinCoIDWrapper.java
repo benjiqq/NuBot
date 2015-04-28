@@ -538,9 +538,48 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.warn(method + " blocked, "); //TODO
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.warn("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method); //TODO remove
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.warn("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method); //TODO remove
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.warn("Exchange still busy : " + counter + " .Will retry soon; Method=" + method); //TODO remove
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (exit);
+            }
         } else {
             LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
             queryResult = TOKEN_BAD_RETURN;
@@ -597,7 +636,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             if (needAuth) {
 
                 String nonce = Objects.toString(System.currentTimeMillis());
-                LOG.warn("computed nonce =" + nonce);
+                LOG.debug("computed nonce =" + nonce); //TODO level down to trace?
 
                 args.put("nonce", nonce);
                 args.put("method", method);
