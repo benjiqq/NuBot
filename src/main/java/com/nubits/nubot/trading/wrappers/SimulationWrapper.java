@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Date;
 
 /**
  * A wrapper to simulate a dummy exchange response
@@ -25,7 +26,7 @@ public class SimulationWrapper implements TradeInterface {
     //dummy data
     ArrayList<Order> activeOrderList;
 
-    private void addDummyOrder(){
+    private void addDummyOrder() {
         Order order = new Order();
 
         /* {"orderNumber":"120466","type":"sell","rate":"0.025","amount":"100","total":"2.5" */
@@ -35,6 +36,7 @@ public class SimulationWrapper implements TradeInterface {
         order.setAmount(new Amount(100.0, CurrencyList.NBT));
         order.setPrice(new Amount(0.004, CurrencyList.BTC));
         order.setCompleted(false);
+        order.setInsertedDate(new Date());
         CurrencyPair pair = new CurrencyPair(CurrencyList.NBT, CurrencyList.BTC);
         order.setPair(pair);
         //order.setInsertedDate(new Date()); //Not provided
@@ -45,11 +47,11 @@ public class SimulationWrapper implements TradeInterface {
     public ApiResponse getAvailableBalances(CurrencyPair pair) {
         ApiResponse apiResponse = new ApiResponse();
 
-        Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
-        Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
+        Amount NBTAvail = new Amount(50, pair.getOrderCurrency());
+        Amount PEGAvail = new Amount(1, pair.getPaymentCurrency());
 
-        Amount PEGonOrder = new Amount(0, pair.getPaymentCurrency());
-        Amount NBTonOrder = new Amount(0, pair.getOrderCurrency());
+        Amount PEGonOrder = new Amount(50, pair.getPaymentCurrency());
+        Amount NBTonOrder = new Amount(1, pair.getOrderCurrency());
 
         PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGonOrder, NBTonOrder);
         apiResponse.setResponseObject(balance);
@@ -60,8 +62,11 @@ public class SimulationWrapper implements TradeInterface {
     public ApiResponse getAvailableBalance(Currency currency) {
         ApiResponse apiResponse = new ApiResponse();
 
-        double balanceD = 0;
-        apiResponse.setResponseObject(new Amount(balanceD, currency));
+        double balance = 10;
+        if (currency.equals(CurrencyList.BTC))
+            balance = 1;
+
+        apiResponse.setResponseObject(new Amount(balance, currency));
         return apiResponse;
     }
 

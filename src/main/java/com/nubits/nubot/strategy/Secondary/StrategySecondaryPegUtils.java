@@ -178,7 +178,7 @@ public class StrategySecondaryPegUtils {
     private boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
         if (SessionManager.sessionInterrupted()) return false;
         String orderString = orderString(type, amount, rate);
-        LOG.warn("Submiting limit order : " + orderString);
+        LOG.warn("Submitting limit order : " + orderString);
 
         if (Global.options.isExecuteOrders()) {
 

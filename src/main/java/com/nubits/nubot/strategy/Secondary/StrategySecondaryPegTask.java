@@ -95,6 +95,7 @@ public class StrategySecondaryPegTask extends TimerTask {
                 if (SessionManager.sessionInterrupted()) return; //external interruption
 
                 LOG.warn(message);
+                LOG.debug("mightNeedInit: " + mightNeedInit + " ordersAndBalancesOK: " + ordersAndBalancesOK);
                 boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
                 if (reinitiateSuccess) {
                     mightNeedInit = false;
