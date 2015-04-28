@@ -42,7 +42,7 @@ public class StrategySecondaryPegUtils {
     }
 
     public boolean reInitiateOrders(boolean firstTime) {
-
+        strategy.setResettingOrders(true);
         LOG.debug("reInitiateOrders . firstTime=" + firstTime);
 
         if (SessionManager.sessionInterrupted()) return false; //external interruption
@@ -98,6 +98,7 @@ public class StrategySecondaryPegUtils {
                 } else {
                     String message = "Could not submit request to clear orders";
                     LOG.error(message);
+                    strategy.setResettingOrders(false);
                     return false;
                 }
 
@@ -105,6 +106,7 @@ public class StrategySecondaryPegUtils {
                 LOG.error(deleteOrdersResponse.getError().toString());
                 String message = "Could not submit request to clear orders";
                 LOG.error(message);
+                strategy.setResettingOrders(false);
                 return false;
             }
         } else {
@@ -119,6 +121,7 @@ public class StrategySecondaryPegUtils {
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
         }
+        strategy.setResettingOrders(false);
         return true;
     }
 
@@ -470,6 +473,11 @@ public class StrategySecondaryPegUtils {
 
     public boolean shiftWalls() {
         if (SessionManager.sessionInterrupted()) return false; //external interruption
+
+        if (strategy.isResettingOrders()) {
+            LOG.warn("Cannot shift walls, orders are being reinitiated. Price is already adjusted.");
+            return false;
+        }
 
         LOG.debug("Executing shiftWalls()");
 

@@ -54,6 +54,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
+    private boolean resettingOrders = false; //Flag turned true by resetorders
 
     @Override
     public void run() {
@@ -267,5 +268,13 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void setPriceDirection(String priceDirection) {
         this.priceDirection = priceDirection;
+    }
+
+    public boolean isResettingOrders() {
+        return resettingOrders;
+    }
+
+    public void setResettingOrders(boolean resettingOrders) {
+        this.resettingOrders = resettingOrders;
     }
 }
