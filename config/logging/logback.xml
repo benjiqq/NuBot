@@ -4,12 +4,13 @@
 
 <configuration>
 
-    <property scope="context" name="SessionLOG" value="SessionLOG" />
-    <property scope="context" name="sessionlogFile" value=".sessions.log" />
-    <property scope="context" name="standardlogFile" value="ui_standard.log" />
+    <property scope="context" name="standardfile" value="standard.html" />
+    <property scope="context" name="verbosefile" value="verbose.html" />
+    <property scope="context" name="UIstandardlogFile" value="ui_standard.log" />
     <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
 
-    <!-- console output of NuBot -->
+
+    <!-- console output filtered. to show different colors error and warn go separate  -->
 
     <appender name="STDOUTerr" class="ch.qos.logback.core.ConsoleAppender">
 
@@ -43,6 +44,7 @@
 
     </appender>
 
+    <!-- standard output to console -->
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
@@ -94,7 +96,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/standard.html</file>
+                <file>${session}/{standardfile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>INFO</level>
@@ -142,8 +144,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/verbose.html</file>
-                <!--<append>false</append>-->
+                <file>${session}/{verbosefile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>DEBUG</level>
@@ -181,34 +182,6 @@
         </sift>
     </appender>
 
-    <!-- session logger -->
-    <!--
-    <appender name="sessionFile" class="ch.qos.logback.core.FileAppender">
-
-        <encoder>
-            <pattern>%msg%n
-            </pattern>
-        </encoder>
-
-        <file>${session}/${sessionlogFile}</file>
-
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
-        </filter>
-
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    return logger.contains("jetty");
-                </expression>
-            </evaluator>
-            <onMatch>DENY</onMatch>
-            <onMismatch>NEUTRAL</onMismatch>
-        </filter>
-
-    </appender>
-    -->
-
     <!-- standard output for GUI -->
 
     <appender name="standardGUI" class="ch.qos.logback.classic.sift.SiftingAppender">
@@ -219,7 +192,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/${standardlogFile}</file>
+                <file>${session}/${UIstandardlogFile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>INFO</level>
@@ -240,11 +213,11 @@
                     <onMismatch>NEUTRAL</onMismatch>
                 </filter>
 
-
-
             </appender>
         </sift>
     </appender>
+
+    <!-- verbose output for GUI -->
 
     <appender name="verboseGUI" class="ch.qos.logback.classic.sift.SiftingAppender">
 
@@ -294,7 +267,6 @@
         <appender-ref ref="STDOUT" />
         <appender-ref ref="STDOUTwarn" />
         <appender-ref ref="STDOUTerr" />
-        <appender-ref ref="sessionFile" />
         <appender-ref ref="standardGUI" />
         <appender-ref ref="verboseGUI" />
     </root>

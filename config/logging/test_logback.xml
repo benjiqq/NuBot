@@ -6,8 +6,8 @@
 
 
         <property scope="context" name="testlogfolder" value="logs/tests" />
-        <property scope="context" name="sessionlogFile" value=".sessions.log" />
-        <property scope="context" name="standardlogFile" value="ui_standard.log" />
+
+        <property scope="context" name="UIstandardlogFile" value="ui_standard.log" />
         <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
 
 
@@ -194,7 +194,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>${session}/${standardlogFile}</file>
+                    <file>${session}/${UIstandardlogFile}</file>
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                         <level>INFO</level>
