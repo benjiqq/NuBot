@@ -392,7 +392,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             return orderDetailResponse;
         }
         
-        currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
+        currentOrder = (Order) orderDetailResponse.getResponseObject();
         query_args.put("type", currentOrder.getType().toLowerCase());
 
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
@@ -595,7 +595,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             }
 
             if (needAuth) {
-                args.put("nonce", Objects.toString(System.currentTimeMillis()));
+
+                String nonce = Objects.toString(System.currentTimeMillis());
+                LOG.warn("computed nonce =" + nonce);
+
+                args.put("nonce", nonce);
                 args.put("method", method);
                 post_data = TradeUtils.buildQueryString(args, ENCODING);
             }

@@ -278,7 +278,7 @@
   function startBot() {
       if (confirm("Are you sure you want to start the bot?")) {
           // Start loading button
-          incrementPB = 0.004;
+          incrementPB = 0.004;  //determines speed of progressbar
           l.ladda( 'start' );
           currentAnimID = setInterval(animateProgressBar,50,true);
           $('#togglebot-text').html(" Starting Bot");
@@ -315,7 +315,7 @@
       if (debug) console.log("calling stop on server");
       if (confirm("Are you sure you want to stop the bot?")) {
           //Start loading
-          incrementPB = 0.01;
+          incrementPB = 0.004; //determines speed of progressbar
           l.ladda( 'start' );
           currentAnimID = setInterval(animateProgressBar,50,false);
           $('#togglebot-text').html(" Stopping Bot");
