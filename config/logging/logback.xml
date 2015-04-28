@@ -4,10 +4,10 @@
 
 <configuration>
 
-    <property scope="context" name="SessionLOG" value="SessionLOG" />
-    <property scope="context" name="sessionlogFile" value=".sessions.log" />
-    <property scope="context" name="standardlogFile" value="ui_standard.log" />
-    <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
+    <property scope="context" name="SessionLOG" value="SessionLOG"/>
+    <property scope="context" name="sessionlogFile" value=".sessions.log"/>
+    <property scope="context" name="standardlogFile" value="ui_standard.log"/>
+    <property scope="context" name="UIverboselogFile" value="ui_verbose.log"/>
 
     <!-- console output of NuBot -->
 
@@ -64,7 +64,7 @@
             <onMismatch>NEUTRAL</onMismatch>
         </filter>
 
-        <filter class="com.nubits.nubot.utils.LogVerboseFilter" />
+        <filter class="com.nubits.nubot.utils.LogVerboseFilter"/>
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -226,7 +226,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %logger{16} - %msg%n
+                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg%n
                     </pattern>
                 </encoder>
 
@@ -239,7 +239,6 @@
                     <onMatch>DENY</onMatch>
                     <onMismatch>NEUTRAL</onMismatch>
                 </filter>
-
 
 
             </appender>
@@ -261,7 +260,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %logger{16} - %msg%n
+                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg - [%thread]-[%logger{16}:%line]%n
                     </pattern>
                 </encoder>
 
@@ -278,7 +277,6 @@
                 </filter>
 
 
-
             </appender>
         </sift>
     </appender>
@@ -289,18 +287,18 @@
 	-->
 
     <root level="debug">
-        <appender-ref ref="standardHTML" />
-        <appender-ref ref="verboseHTML" />
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="STDOUTwarn" />
-        <appender-ref ref="STDOUTerr" />
-        <appender-ref ref="sessionFile" />
-        <appender-ref ref="standardGUI" />
-        <appender-ref ref="verboseGUI" />
+        <appender-ref ref="standardHTML"/>
+        <appender-ref ref="verboseHTML"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUTwarn"/>
+        <appender-ref ref="STDOUTerr"/>
+        <appender-ref ref="sessionFile"/>
+        <appender-ref ref="standardGUI"/>
+        <appender-ref ref="verboseGUI"/>
     </root>
 
 
     <!-- to surpress logback startup messages -->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
 </configuration>
