@@ -41,7 +41,7 @@ public class Exchange {
     public Exchange(String name) {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
-        this.isBusy = false;
+        this.setFree();
     }
 
     public String getName() {
@@ -93,6 +93,6 @@ public class Exchange {
     }
 
     public void setFree() {
-        this.isBusy = true;
+        this.isBusy = false;
     }
 }
