@@ -4,12 +4,12 @@
 
 <configuration>
 
-
         <property scope="context" name="testlogfolder" value="logs/tests" />
 
+        <property scope="context" name="standardfile" value="standard.html" />
+        <property scope="context" name="verbosefile" value="verbose.html" />
         <property scope="context" name="UIstandardlogFile" value="ui_standard.log" />
         <property scope="context" name="UIverboselogFile" value="ui_verbose.log" />
-
 
         <!-- console output of NuBot -->
 
@@ -97,7 +97,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>${session}/standard.html</file>
+                    <file>${session}/{standardfile}</file>
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                         <level>INFO</level>
@@ -145,7 +145,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>${session}/verbose.html</file>
+                    <file>${session}/{verbosefile}</file>
                     <!--<append>false</append>-->
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">

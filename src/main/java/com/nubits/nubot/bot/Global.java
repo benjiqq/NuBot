@@ -70,7 +70,7 @@ public class Global {
     public static boolean isSimulation = false;
 
     /**
-     * shutdown mechanics
+     * process shutdown mechanics
      */
     public static void createShutDownHook() {
 
