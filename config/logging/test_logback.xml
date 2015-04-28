@@ -99,7 +99,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>${session}/{standardfile}</file>
+                    <file>${session}/${standardfile}</file>
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                         <level>INFO</level>
@@ -107,7 +107,7 @@
 
                     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                         <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                            <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                            <pattern>%date{HH:mm:ss.SSS}%level%logger{16}%thread%msg</pattern>
                         </layout>
                     </encoder>
 
@@ -147,7 +147,7 @@
             </discriminator>
             <sift>
                 <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                    <file>${session}/{verbosefile}</file>
+                    <file>${session}/${verbosefile}</file>
                     <!--<append>false</append>-->
 
                     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -156,7 +156,7 @@
 
                     <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                         <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                            <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                            <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%thread%msg</pattern>
                         </layout>
                     </encoder>
 
