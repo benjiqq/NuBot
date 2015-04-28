@@ -18,7 +18,7 @@
   "multipleCustodians": false,
   "txFee": 0.0,
   "priceIncrement": 0.0,
-  "emergencyTimeout": 0,
+  "emergencyTimeout": 60,
   "keepProceeds": 0.0,
   "maxSellVolume": 5.0,
   "maxBuyVolume": 5.0,
