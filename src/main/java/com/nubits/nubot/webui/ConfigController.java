@@ -134,7 +134,7 @@ public class ConfigController {
                 LOG.error("error parsing " + postJson + "\n" + e);
                 //handle errors
                 success = false;
-                error = "" + e;
+                error = "error parsing options. " + e;
             }
 
             opmap.put("success", success);

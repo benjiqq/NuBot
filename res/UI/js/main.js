@@ -513,10 +513,10 @@
 
       });
 
-      makePost(posturl, jsondata);
+      makePostConfig(posturl, jsondata);
   }
 
-  function makePost(url, jsondata) {
+  function makePostConfig(url, jsondata) {
       //make HTTP post to server
 
       $.ajax(url, {
