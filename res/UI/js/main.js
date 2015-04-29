@@ -671,6 +671,25 @@ function updateConfigElements(running) {
     $('#resetbutton').prop('disabled', running);
 }
 
+function stopServer() {
+      var url = baseurl + "/stopserver";
+
+      //console.log("url  " + url);
+      $.ajax({
+              type: "GET",
+              dataType: "json",
+              url: url,
+          })
+          .fail(function() {
+               hook = false;
+               alert("Server stopped.");
+               location.reload();
+
+          })
+          .done(function(data) {
+              //It cannot succed
+          });
+}
 
 
 window.onbeforeunload = function(e) {

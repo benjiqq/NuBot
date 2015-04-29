@@ -20,6 +20,7 @@ package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
+import com.nubits.nubot.launch.ShutDownProcess;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.strategy.BalanceManager;
 import com.nubits.nubot.strategy.OrderManager;
@@ -73,32 +74,7 @@ public class Global {
      * process shutdown mechanics
      */
     public static void createShutDownHook() {
-
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                LOG.debug("global shutdownhook called");
-
-                //shutdown logic of the bot handled in the bot related to the global thread
-                if (SessionManager.isSessionRunning()) {
-                    LOG.debug("bot is running. shut it down");
-                    Global.bot.shutdownBot();
-                    SessionManager.setModeHalting();
-                    SessionManager.sessionStopped = System.currentTimeMillis();
-                }
-
-                //Interrupt mainThread
-                if (Global.mainThread != null)
-                    Global.mainThread.interrupt();
-
-                LOG.info("Exit main");
-
-                //this shuts down UI as well
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutDownProcess()));
     }
 
 

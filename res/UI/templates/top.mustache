@@ -43,7 +43,7 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <a onclick="changePage('operation')" class="navbar-brand" >NuBot v0.3.0</a>
+            <a onclick="changePage('operation')" class="navbar-brand" ><img alt="Brand" src="img/nubot-logo-50.png"></a>
         </div>
         <div id="navbar" class="navbar-collapse collapse">
             <ul class="nav navbar-nav">
@@ -52,6 +52,10 @@
                 <li id="docu-nav"><a href='#' onclick="changePage('docu')">Documentation</a></li>
                 <li id="disclaimer-nav"><a href='#' onclick="changePage('disclaimer')">Disclaimer</a></li>
             </ul>
+                <button type="button" class="btn btn-danger btn-xs navbar-btn navbar-right" onclick="stopServer()">
+                    <span class="glyphicon glyphicon-record" aria-hidden="true"></span> Kill server
+                </button>
+
         </div>
         <!--/.nav-collapse -->
     </div>

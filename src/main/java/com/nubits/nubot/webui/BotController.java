@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.launch.ShutDownProcess;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
@@ -14,7 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
@@ -106,7 +111,7 @@ public class BotController {
             if (startstop.equals(STOP)) {
 
                 //prevent double calls
-                if (SessionManager.lastStopped()<5000){
+                if (SessionManager.lastStopped() < 5000) {
                     opmap.put("success", true);
                     json = new Gson().toJson(opmap);
                     return json;
@@ -141,6 +146,27 @@ public class BotController {
             }
 
             return json;
+        });
+
+
+        get("/stopserver", "application/json", (request, response) -> {
+            LOG.trace("/stopserver called");
+
+            //Schedule a task to shut down in 1 second
+            new Thread(new ShutDownProcess()).run();
+            ScheduledExecutorService scheduler =
+                    Executors.newScheduledThreadPool(1);
+
+            final Runnable terminatorTask = new Runnable() {
+                public void run() {
+                    System.exit(0);
+                }
+            };
+
+            final ScheduledFuture<?> terminatorHandle =
+                    scheduler.schedule(terminatorTask, 1, SECONDS);
+            
+            return "stopped";
         });
 
 
