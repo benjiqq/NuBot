@@ -685,10 +685,12 @@
               url: url,
           })
           .fail(function() {
-              alert("failed stopping server");
+              hook = false;
+              alert("Server stopped.");
+              location.reload();
           })
           .done(function(data) {
-             alert("server stopped");
+             //It cannot succed
           });
   }
 

@@ -15,7 +15,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static spark.Spark.get;
 import static spark.Spark.post;
 
@@ -148,7 +152,20 @@ public class BotController {
         get("/stopserver", "application/json", (request, response) -> {
             LOG.trace("/stopserver called");
 
+            //Schedule a task to shut down in 1 second
             new Thread(new ShutDownProcess()).run();
+            ScheduledExecutorService scheduler =
+                    Executors.newScheduledThreadPool(1);
+
+            final Runnable terminatorTask = new Runnable() {
+                public void run() {
+                    System.exit(0);
+                }
+            };
+
+            final ScheduledFuture<?> terminatorHandle =
+                    scheduler.schedule(terminatorTask, 1, SECONDS);
+            
             return "stopped";
         });
 
