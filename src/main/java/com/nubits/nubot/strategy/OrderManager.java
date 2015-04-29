@@ -269,7 +269,7 @@ public class OrderManager {
                 HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
                 LOG.info("Strategy - Order success: " + type + " Response = " + orderResponse.getResponseObject());
                 totalOrdersSubmitted++;
-                LOG.debug("(order #" + totalOrdersSubmitted);
+                LOG.debug("order #" + totalOrdersSubmitted);
                 return true;
             } else {
                 LOG.error(orderResponse.getError().toString());
