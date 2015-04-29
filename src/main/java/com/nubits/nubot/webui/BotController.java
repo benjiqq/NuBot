@@ -89,7 +89,7 @@ public class BotController {
                     } catch (NuBotRunException e) {
                         success = false;
                         LOG.error("could not start bot " + e);
-                        opmap.put("error", "" + e);
+                        opmap.put("error", "could not start bot: " + e);
                     }
                 } else {
                     success = false;
@@ -112,10 +112,8 @@ public class BotController {
                     return json;
                 }
 
-                boolean active = SessionManager.isSessionRunning();
-
                 boolean success = true;
-                if (active) {
+                if (SessionManager.isSessionRunning()) {
                     try {
                         LOG.info("try interrupt bot. set halting mode");
 
