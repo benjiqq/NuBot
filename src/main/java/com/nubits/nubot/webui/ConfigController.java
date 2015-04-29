@@ -80,7 +80,7 @@ public class ConfigController {
         });
 
         get("/configfile", "application/json", (request, response) -> {
-            LOG.debug("/configfile called");
+            LOG.trace("/configfile called");
 
             Map opmap = new HashMap();
             opmap.put("configfile", Global.currentOptionsFile);
