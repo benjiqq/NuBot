@@ -53,7 +53,6 @@ public class ParseOptions {
      */
     public static NuBotOptions parseOptionsSingle(String filepath) throws NuBotConfigException {
 
-
         File f = new File(filepath);
         if (!f.exists())
             throw new NuBotConfigException("file " + f.getAbsolutePath() + " does not exist");

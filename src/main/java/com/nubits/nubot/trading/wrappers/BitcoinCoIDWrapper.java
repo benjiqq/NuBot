@@ -26,6 +26,7 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
+import com.nubits.nubot.utils.Utils;
 import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -161,13 +162,17 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 Amount NBTAvail = new Amount(nbtAvail, pair.getOrderCurrency());
                 double pegOnOrder = 0;
                 double nbtOnOrder = 0;
-                ArrayList<Order> orders = (ArrayList) getActiveOrders(pair).getResponseObject();
+                ArrayList<Order> orders = (ArrayList) getActiveOrdersToCountLockedBalance(pair).getResponseObject();
+                if (orders == null) {
+                    apiResponse.setError(errors.nullReturnError);
+                    return apiResponse;
+                }
                 for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
                     Order thisOrder = order.next();
                     if (thisOrder.getType().equals(Constant.SELL)) {
                         nbtOnOrder += thisOrder.getAmount().getQuantity();
                     } else {
-                        pegOnOrder += thisOrder.getAmount().getQuantity();
+                        pegOnOrder += Utils.round(thisOrder.getAmount().getQuantity() / Global.conversion, Settings.DEFAULT_PRECISION);
                     }
                 }
                 Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());
@@ -264,15 +269,19 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public ApiResponse getActiveOrders() {
-        return getActiveOrdersImpl(null);
+        return getActiveOrdersImpl(null, false);
     }
 
     @Override
     public ApiResponse getActiveOrders(CurrencyPair pair) {
-        return getActiveOrdersImpl(pair);
+        return getActiveOrdersImpl(pair, false);
     }
 
-    private ApiResponse getActiveOrdersImpl(CurrencyPair pair) {
+    public ApiResponse getActiveOrdersToCountLockedBalance(CurrencyPair pair) {
+        return getActiveOrdersImpl(pair, true);
+    }
+
+    private ApiResponse getActiveOrdersImpl(CurrencyPair pair, boolean convertBuyAmounts) {
         ApiResponse apiResponse = new ApiResponse();
         String url = API_BASE_URL;
         String method = API_OPEN_ORDERS;
@@ -298,7 +307,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             if (orders != null) {
                 for (Iterator<JSONObject> order = orders.iterator(); order.hasNext(); ) {
                     JSONObject thisOrder = order.next();
-                    orderList.add(parseOrder(thisOrder, pair));
+                    orderList.add(parseOrder(thisOrder, pair, convertBuyAmounts));
                 }
             }
             apiResponse.setResponseObject(orderList);
@@ -308,7 +317,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         return apiResponse;
     }
 
-    private Order parseOrder(JSONObject in, CurrencyPair cp) {
+    private Order parseOrder(JSONObject in, CurrencyPair cp, boolean convertBuyAmounts) {
         Order out = new Order();
 
         out.setId(in.get("order_id").toString());
@@ -320,7 +329,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         Amount price = new Amount(Double.parseDouble(in.get("price").toString()), Global.options.getPair().getPaymentCurrency());
         if (out.getType().equals(Constant.BUY)) {
             cur = Global.options.getPair().getPaymentCurrency().getCode().toLowerCase();
-            amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()) / price.getQuantity(), Global.options.getPair().getOrderCurrency());
+            if (!convertBuyAmounts) {
+                amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()) / price.getQuantity(), Global.options.getPair().getOrderCurrency());
+            } else {
+                amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getPaymentCurrency()); //Leave the amount expressed in PEG currency, to count orders
+            }
         } else {
             cur = Global.options.getPair().getOrderCurrency().getCode().toLowerCase();
             amount = new Amount(Double.parseDouble(in.get("order_" + cur).toString()), Global.options.getPair().getOrderCurrency());
@@ -338,10 +351,10 @@ public class BitcoinCoIDWrapper implements TradeInterface {
     public ApiResponse getOrderDetail(String orderID) {
         ApiResponse apiResponse = new ApiResponse();
 
-        ApiResponse getActiveOrders = getActiveOrders();
+        ApiResponse getActiveOrdersResponse = getActiveOrders();
 
-        if (getActiveOrders.isPositive()) {
-            ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrders().getResponseObject();
+        if (getActiveOrdersResponse.isPositive()) {
+            ArrayList<Order> activeOrders = (ArrayList<Order>) getActiveOrdersResponse.getResponseObject();
             boolean found = false;
             for (Iterator<Order> order = activeOrders.iterator(); order.hasNext(); ) {
                 Order thisOrder = order.next();
@@ -358,7 +371,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                 apiResponse.setError(err);
             }
         } else {
-            apiResponse = getActiveOrders;
+            apiResponse = getActiveOrdersResponse;
         }
 
         return apiResponse;
@@ -374,7 +387,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
         query_args.put("pair", pair.toStringSep());
         query_args.put("order_id", orderID);
-        Order currentOrder = (Order) getOrderDetail(orderID).getResponseObject();
+
+        ApiResponse orderDetailResponse = getOrderDetail(orderID);
+        Order currentOrder;
+        if (!orderDetailResponse.isPositive()) {
+            return orderDetailResponse;
+        }
+
+        currentOrder = (Order) orderDetailResponse.getResponseObject();
         query_args.put("type", currentOrder.getType().toLowerCase());
 
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
@@ -491,8 +511,14 @@ public class BitcoinCoIDWrapper implements TradeInterface {
         if (getOrders.isPositive()) {
             ArrayList<Order> orders = (ArrayList) getOrders.getResponseObject();
             for (Iterator<Order> order = orders.iterator(); order.hasNext(); ) {
-                if (!(boolean) cancelOrder(order.next().getId(), pair).getResponseObject()) {
+                Order o = order.next();
+                String id = o.getId();
+                ApiResponse r = cancelOrder(id, pair);
+                boolean posi = r.isPositive();
+                if (!posi) {
                     apiResponse.setResponseObject(false);
+                } else {
+                    apiResponse.setResponseObject(r.getResponseObject());
                 }
             }
         } else {
