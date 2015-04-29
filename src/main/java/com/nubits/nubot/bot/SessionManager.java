@@ -244,6 +244,10 @@ public class SessionManager {
         return sessionMode == MODE_HALTED;
     }
 
+    public static boolean isModeActive(){
+        return !sessionInterrupted() && !isModeHalted();
+    }
+
     public static String getMode() {
         return sessionMode;
     }
