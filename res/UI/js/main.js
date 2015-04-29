@@ -359,7 +359,7 @@
       updateConfigFile();
 
       $('#togglebot').click(function() {
-          if (botRunning)
+          if (botRunning && !animatingButton)
               stopBot();
           else
               startBot();
