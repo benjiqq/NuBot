@@ -149,67 +149,6 @@ public class StrategySecondaryPegUtils {
         }
     }
 
-    // ---- Trade Manager ----
-
-    private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
-        LOG.info("executeBuysideOrder : " + pair + " " + amount + " " + rate);
-        ApiResponse orderResponse;
-        if (!Global.swappedPair) {
-            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
-        } else {
-            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
-        }
-        return orderResponse;
-    }
-
-    private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
-
-        String type = Constant.SELL;
-
-        LOG.info("executeSellsideOrder : " + pair + " " + amount + " " + rate);
-        ApiResponse orderResponse;
-        if (!Global.swappedPair) {
-            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
-        } else {
-            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
-        }
-
-        return orderResponse;
-    }
-
-
-    private boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
-        if (SessionManager.sessionInterrupted()) return false;
-        String orderString = orderString(type, amount, rate);
-        LOG.warn("Submitting limit order : " + orderString);
-
-        if (Global.options.isExecuteOrders()) {
-
-            ApiResponse orderResponse;
-            if (type.equals(Constant.BUY)) {
-                orderResponse = executeBuysideOrder(pair, amount, rate);
-            } else {
-                orderResponse = executeSellsideOrder(pair, amount, rate);
-            }
-            if (SessionManager.sessionInterrupted()) return false;
-
-            if (orderResponse.isPositive()) {
-                String msg = hipchatMsg(type, orderString);
-                HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
-                LOG.info("Strategy - Order success: " + type + " Response = " + orderResponse.getResponseObject());
-                return true;
-            } else {
-                LOG.error(orderResponse.getError().toString());
-                return false;
-            }
-        } else {
-            LOG.warn("Demo mode[executeorders:false] . Not executing orders");
-            return true;
-        }
-
-
-    }
-
     private Currency getCurrency(String type) {
         Currency currency;
         if (!Global.swappedPair) {
@@ -227,28 +166,6 @@ public class StrategySecondaryPegUtils {
         }
 
         return currency;
-    }
-
-    private String orderString(String type, double amount1, double price) {
-
-        String orderString;
-        String sideStr = type + " side order : ";
-
-        if (!Global.swappedPair) {
-            orderString = sideStr + " " + type + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-        } else {
-            String typeStr;
-            if (type.equals(Constant.SELL)) {
-                typeStr = Constant.BUY;
-            } else {
-                typeStr = Constant.SELL;
-            }
-            orderString = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
-                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
-        }
-
-        return orderString;
     }
 
     private String hipchatMsg(String type, String orderString1) {
@@ -327,7 +244,7 @@ public class StrategySecondaryPegUtils {
             }
             if (SessionManager.sessionInterrupted()) return false;
 
-            success = this.executeOrder(type, Global.options.getPair(), amount1, price);
+            success = Global.orderManager.executeOrder(type, Global.options.getPair(), amount1, price);
             if (!success)
                 return false;
 
@@ -375,11 +292,10 @@ public class StrategySecondaryPegUtils {
 
                 }
 
-
                 //execute second order
                 if (SessionManager.sessionInterrupted()) return false;
 
-                success = this.executeOrder(type, Global.options.getPair(), amount2, price);
+                success = Global.orderManager.executeOrder(type, Global.options.getPair(), amount2, price);
                 if (!success)
                     return false;
 

@@ -10,6 +10,7 @@ import com.nubits.nubot.models.OrderToPlace;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.trading.OrderException;
+import com.nubits.nubot.utils.Utils;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -192,6 +193,96 @@ public class OrderManager {
         return true;
     }
 
+
+    private ApiResponse executeBuysideOrder(CurrencyPair pair, double amount, double rate) {
+        LOG.info("executeBuysideOrder : " + pair + " " + amount + " " + rate);
+        ApiResponse orderResponse;
+        if (!Global.swappedPair) {
+            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
+        } else {
+            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
+        }
+        return orderResponse;
+    }
+
+    private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
+        LOG.info("executeSellsideOrder : " + pair + " " + amount + " " + rate);
+        ApiResponse orderResponse;
+        if (!Global.swappedPair) {
+            orderResponse = Global.exchange.getTrade().sell(pair, amount, rate);
+        } else {
+            orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
+        }
+        return orderResponse;
+    }
+
+    private String orderString(String type, double amount1, double price) {
+
+        String orderString;
+        String sideStr = type + " side order : ";
+
+        if (!Global.swappedPair) {
+            orderString = sideStr + " " + type + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+        } else {
+            String typeStr;
+            if (type.equals(Constant.SELL)) {
+                typeStr = Constant.BUY;
+            } else {
+                typeStr = Constant.SELL;
+            }
+            orderString = sideStr + " " + typeStr + " " + Utils.round(amount1, 4) + " " + Global.options.getPair().getOrderCurrency().getCode()
+                    + " @ " + price + " " + Global.options.getPair().getPaymentCurrency().getCode();
+        }
+
+        return orderString;
+    }
+
+
+    /**
+     * execute an order with specified type
+     *
+     * @param type
+     * @param pair
+     * @param amount
+     * @param rate
+     * @return
+     */
+    public boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
+        if (SessionManager.sessionInterrupted()) return false;
+
+        String orderString = orderString(type, amount, rate);
+        LOG.warn("Submitting limit order : " + orderString);
+
+        if (Global.options.isExecuteOrders()) {
+
+            ApiResponse orderResponse;
+            if (type.equals(Constant.BUY)) {
+                orderResponse = executeBuysideOrder(pair, amount, rate);
+            } else {
+                orderResponse = executeSellsideOrder(pair, amount, rate);
+            }
+            if (SessionManager.sessionInterrupted()) return false;
+
+            if (orderResponse.isPositive()) {
+                String msg = "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString;
+                HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
+                LOG.info("Strategy - Order success: " + type + " Response = " + orderResponse.getResponseObject());
+                totalOrdersSubmitted++;
+                return true;
+            } else {
+                LOG.error(orderResponse.getError().toString());
+                return false;
+            }
+        } else {
+            LOG.warn("Demo mode[executeorders:false] . Not executing orders");
+            return true;
+        }
+
+    }
+
+
+    //TODO: never used in live trading
     public ApiResponse placeOrder(OrderToPlace order) {
         //TODO move into the trade interface when tested and ready
         LOG.info(": Submit order : "
@@ -205,12 +296,11 @@ public class OrderManager {
             toReturn = Global.exchange.getTrade().sell(order.getPair(), order.getSize(), order.getPrice());
         }
 
-        totalOrdersSubmitted++;
-
         return toReturn;
     }
 
     //Init the order
+    //TODO: never used in live trading
     public boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
         //Observation : it can take between 15 and 20 seconds to place 10 orders
         boolean success = true;
@@ -338,7 +428,7 @@ public class OrderManager {
         return orderList.size();
     }
 
-    public int getTotalOrdersSubmitted(){
+    public int getTotalOrdersSubmitted() {
         return this.totalOrdersSubmitted;
     }
 
