@@ -84,6 +84,7 @@ public class BotController {
                 if (ParseOptions.isValidOptions(Global.options)) {
                     LOG.info("trying to start bot");
                     try {
+                        SessionManager.setModeStarting();
                         SessionManager.launchBot(Global.options);
                     } catch (NuBotRunException e) {
                         success = false;
@@ -103,6 +104,9 @@ public class BotController {
             }
 
             if (startstop.equals(STOP)) {
+
+
+
                 boolean active = SessionManager.isSessionRunning();
 
                 boolean success = true;

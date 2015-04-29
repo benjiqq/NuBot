@@ -56,7 +56,6 @@ public class SessionManager {
 
     private static boolean runonce = false;
 
-
     /**
      * set config in global
      *
@@ -123,6 +122,17 @@ public class SessionManager {
 
     public static boolean wasRunOnce() {
         return runonce;
+    }
+
+    /**
+     * the time in milliseconds since a session was last stopped
+     * @return
+     */
+    public static long lastStopped(){
+        if (sessionStopped != -1){
+            return System.currentTimeMillis() - sessionStopped;
+        } else
+            return -1;
     }
 
     /**
