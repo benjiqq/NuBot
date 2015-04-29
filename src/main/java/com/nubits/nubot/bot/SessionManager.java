@@ -25,15 +25,15 @@ public class SessionManager {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    public static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
+    private static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
 
-    public static final String MODE_STARTING = "MODE_STARTING";
+    private static final String MODE_STARTING = "MODE_STARTING";
 
-    public static final String MODE_HALTING = "MODE_HALTING";
+    private static final String MODE_HALTING = "MODE_HALTING";
 
-    public static final String MODE_RUNNING = "MODE_RUNNING";
+    private static final String MODE_RUNNING = "MODE_RUNNING";
 
-    public static final String MODE_HALTED = "MODE_HALTED";
+    private static final String MODE_HALTED = "MODE_HALTED";
 
     public static String sessionMode = MODE_NOTSTARTED;
 
