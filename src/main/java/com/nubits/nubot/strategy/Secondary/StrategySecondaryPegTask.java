@@ -21,7 +21,6 @@ package com.nubits.nubot.strategy.Secondary;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
@@ -47,6 +46,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     private SubmitLiquidityinfoTask sendLiquidityTask;
     private boolean isFirstTime = true;
     private boolean proceedsInBalance = false; // Only used on secondary peg to fiat (EUR , CNY etc)
+    private boolean resettingOrders = false; //Flag turned true by resetorders
 
     @Override
     public void run() {
@@ -260,6 +260,14 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void setProceedsInBalance(boolean proceedsInBalance) {
         this.proceedsInBalance = proceedsInBalance;
+    }
+
+    public boolean isResettingOrders() {
+        return resettingOrders;
+    }
+
+    public void setResettingOrders(boolean resettingOrders) {
+        this.resettingOrders = resettingOrders;
     }
 
     public String getPriceDirection() {
