@@ -105,7 +105,12 @@ public class BotController {
 
             if (startstop.equals(STOP)) {
 
-
+                //prevent double calls
+                if (SessionManager.lastStopped()<5000){
+                    opmap.put("success", true);
+                    json = new Gson().toJson(opmap);
+                    return json;
+                }
 
                 boolean active = SessionManager.isSessionRunning();
 
@@ -132,7 +137,6 @@ public class BotController {
                 }
 
                 opmap.put("success", success);
-
                 json = new Gson().toJson(opmap);
 
                 return json;
