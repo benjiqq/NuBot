@@ -246,7 +246,6 @@ public class OrderManager {
      * @param pair
      * @param amount
      * @param rate
-     * @param strategyInfo
      * @return
      */
     public boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
