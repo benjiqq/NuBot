@@ -277,7 +277,6 @@ public abstract class NuBotBase {
             throw new NuBotRunException("" + e);
         }
 
-
         notifyOnline();
 
     }
@@ -305,7 +304,7 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
     }
 
-    public void shutdownBot() {
+    public void     shutdownBot() {
 
         LOG.info("Bot shutting down sequence started.");
 

@@ -240,6 +240,10 @@ public class SessionManager {
         return sessionMode == MODE_HALTING;
     }
 
+    public static boolean isModeHalted() {
+        return sessionMode == MODE_HALTED;
+    }
+
     public static String getMode() {
         return sessionMode;
     }

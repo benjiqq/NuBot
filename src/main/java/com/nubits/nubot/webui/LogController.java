@@ -66,7 +66,7 @@ public class LogController {
             int numbuys = 0;
             int numsells = 0;
 
-            if (!SessionManager.sessionInterrupted() && Global.orderManager != null) {
+            if (!SessionManager.sessionInterrupted() && !SessionManager.isModeHalted() && Global.orderManager != null) {
                 try {
 
                     numbuys = Global.orderManager.fetchBuyOrdersTimeBound(Settings.ORDER_MAX_INTERVAL);
