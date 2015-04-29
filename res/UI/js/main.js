@@ -2,6 +2,8 @@
   var orderEndPoint = "orders";
   var balanceEndPoint = "balances";
 
+  var hook = true; //flag that prevents/allow the alert on page change to show up
+
   var refreshStatusInterval = 2 * 1000; //ms
 
   /*
@@ -620,6 +622,26 @@
       }
   }
 
+  function changePage(page_name) {
+       hook = false; //this flag will prevent the alert to show up on page change
+       var newUrl = window.location.href; // default to same
+       switch (page_name) {
+           case "operation":
+               newUrl = '/';
+               break;
+           case "config":
+               newUrl = '/configui';
+               break;
+           case "docu":
+               newUrl = '/docu';
+               break;
+           case "disclaimer":
+               newUrl = '/disclaimer';
+               break;
+       }
+       document.location.href = baseurl+newUrl;
+  }
+
   function animateProgressBar(toggle) {
 
         progressPB += incrementPB;
@@ -633,7 +655,7 @@
 
   function stopProgressBarAnimation(toggle)
   {
-                clearInterval(currentAnimID);
+              clearInterval(currentAnimID);
               progressPB = 0;
               l.ladda('stop');
               animatingButton = false;
@@ -653,7 +675,7 @@
    }
 
   window.onbeforeunload = function (e) {
-  if(botRunning)
+  if(botRunning && hook)
   {
       e = e || window.event;
       var confirmMessage = "The bot is still running."
@@ -665,7 +687,7 @@
       return confirmMessage;
    }
 
-   else if(!serverDown)
+   else if(!serverDown && hook)
    {
          e = e || window.event;
          var confirmMessage = "Beware that closing this window will not stop the server. Ok?"
