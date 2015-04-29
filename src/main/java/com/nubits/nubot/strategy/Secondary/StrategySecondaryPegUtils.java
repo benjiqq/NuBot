@@ -149,11 +149,6 @@ public class StrategySecondaryPegUtils {
         }
     }
 
-    // ---- Trade Manager ----
-
-    private String strategyInfo = "\"New \" + type + \" wall is up on <strong>\" + Global.options.getExchangeName() + \"</strong> : \"";
-
-
     private Currency getCurrency(String type) {
         Currency currency;
         if (!Global.swappedPair) {
@@ -249,7 +244,7 @@ public class StrategySecondaryPegUtils {
             }
             if (SessionManager.sessionInterrupted()) return false;
 
-            success = Global.orderManager.executeOrder(type, Global.options.getPair(), amount1, price, strategyInfo);
+            success = Global.orderManager.executeOrder(type, Global.options.getPair(), amount1, price);
             if (!success)
                 return false;
 
@@ -300,7 +295,7 @@ public class StrategySecondaryPegUtils {
                 //execute second order
                 if (SessionManager.sessionInterrupted()) return false;
 
-                success = Global.orderManager.executeOrder(type, Global.options.getPair(), amount2, price, strategyInfo);
+                success = Global.orderManager.executeOrder(type, Global.options.getPair(), amount2, price);
                 if (!success)
                     return false;
 

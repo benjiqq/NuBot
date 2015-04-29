@@ -249,7 +249,7 @@ public class OrderManager {
      * @param strategyInfo
      * @return
      */
-    public boolean executeOrder(String type, CurrencyPair pair, double amount, double rate, String strategyInfo) {
+    public boolean executeOrder(String type, CurrencyPair pair, double amount, double rate) {
         if (SessionManager.sessionInterrupted()) return false;
 
         String orderString = orderString(type, amount, rate);
@@ -266,7 +266,7 @@ public class OrderManager {
             if (SessionManager.sessionInterrupted()) return false;
 
             if (orderResponse.isPositive()) {
-                String msg = strategyInfo + orderString;
+                String msg = "New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString;
                 HipChatNotifications.sendMessage(msg, MessageColor.YELLOW);
                 LOG.info("Strategy - Order success: " + type + " Response = " + orderResponse.getResponseObject());
                 totalOrdersSubmitted++;
