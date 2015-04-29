@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotRunException;
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.launch.ShutDownProcess;
 import com.nubits.nubot.options.ParseOptions;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
@@ -106,7 +107,7 @@ public class BotController {
             if (startstop.equals(STOP)) {
 
                 //prevent double calls
-                if (SessionManager.lastStopped()<5000){
+                if (SessionManager.lastStopped() < 5000) {
                     opmap.put("success", true);
                     json = new Gson().toJson(opmap);
                     return json;
@@ -141,6 +142,14 @@ public class BotController {
             }
 
             return json;
+        });
+
+
+        get("/stopserver", "application/json", (request, response) -> {
+            LOG.trace("/stopserver called");
+
+            new Thread(new ShutDownProcess()).run();
+            return "stopped";
         });
 
 
