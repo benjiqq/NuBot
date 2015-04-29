@@ -290,6 +290,8 @@ public abstract class NuBotBase {
     }
 
     private void logSessionStatistics() {
+
+        LOG.info("session statistics");
         //log closing statistics
         LOG.info("totalOrdersSubmitted " + Global.orderManager.getTotalOrdersSubmitted());
 
@@ -302,9 +304,11 @@ public abstract class NuBotBase {
 
         LOG.info(additionalInfo.replace(closingStrongTaging, "").replace(openStrongTaging, "")); //Remove html tags
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+
+        LOG.info("startup time: " + SessionManager.startupTime);
     }
 
-    public void     shutdownBot() {
+    public void shutdownBot() {
 
         LOG.info("Bot shutting down sequence started.");
 

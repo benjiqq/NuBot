@@ -43,6 +43,11 @@ public class SessionManager {
 
     public static long sessionStopped;
 
+    /**
+     * time it took from startup to first order
+     */
+    public static long startupTime = -1;
+
     public static String sessionId;
 
     private static File sessionFile;
