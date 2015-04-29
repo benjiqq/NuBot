@@ -206,9 +206,6 @@ public class OrderManager {
     }
 
     private ApiResponse executeSellsideOrder(CurrencyPair pair, double amount, double rate) {
-
-        String type = Constant.SELL;
-
         LOG.info("executeSellsideOrder : " + pair + " " + amount + " " + rate);
         ApiResponse orderResponse;
         if (!Global.swappedPair) {
@@ -216,10 +213,8 @@ public class OrderManager {
         } else {
             orderResponse = Global.exchange.getTrade().buy(pair, amount, rate);
         }
-
         return orderResponse;
     }
-
 
     private String orderString(String type, double amount1, double price) {
 
@@ -244,6 +239,16 @@ public class OrderManager {
     }
 
 
+    /**
+     * execute an order with specified type
+     *
+     * @param type
+     * @param pair
+     * @param amount
+     * @param rate
+     * @param strategyInfo
+     * @return
+     */
     public boolean executeOrder(String type, CurrencyPair pair, double amount, double rate, String strategyInfo) {
         if (SessionManager.sessionInterrupted()) return false;
 
@@ -274,7 +279,6 @@ public class OrderManager {
             LOG.warn("Demo mode[executeorders:false] . Not executing orders");
             return true;
         }
-
 
     }
 
