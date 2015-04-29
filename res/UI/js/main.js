@@ -283,7 +283,7 @@
   function startBot() {
       if (confirm("Are you sure you want to start the bot?")) {
           // Start loading button
-          incrementPB = 0.003;  //determines speed of progressbar
+          incrementPB = 0.0038;  //determines speed of progressbar
           l.ladda( 'start' );
           currentAnimID = setInterval(animateProgressBar,50,true);
           $('#togglebot-text').html(" Starting Bot");
