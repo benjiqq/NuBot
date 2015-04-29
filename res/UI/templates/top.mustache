@@ -51,8 +51,11 @@
                 <li id="config-nav"><a href='#' onclick="changePage('config')">Configuration</a></li>
                 <li id="docu-nav"><a href='#' onclick="changePage('docu')">Documentation</a></li>
                 <li id="disclaimer-nav"><a href='#' onclick="changePage('disclaimer')">Disclaimer</a></li>
-                <li><a href='#' onclick="stopServer()">Stop-Server</a></li>
             </ul>
+                <button type="button" class="btn btn-danger btn-xs navbar-btn navbar-right" onclick="stopServer()">
+                    <span class="glyphicon glyphicon-record" aria-hidden="true"></span> Kill server
+                </button>
+
         </div>
         <!--/.nav-collapse -->
     </div>
