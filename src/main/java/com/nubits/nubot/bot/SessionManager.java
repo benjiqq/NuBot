@@ -236,6 +236,9 @@ public class SessionManager {
         sessionMode = MODE_RUNNING;
     }
 
+    public static boolean isModeHalting() {
+        return sessionMode == MODE_HALTING;
+    }
 
     public static String getMode() {
         return sessionMode;
@@ -266,10 +269,10 @@ public class SessionManager {
     }
 
     public static boolean sessionInterrupted() {
-        boolean startupOrShutdown = startupOrShutdown();
-        if (startupOrShutdown)
+        boolean ishalting = isModeHalting();
+        if (ishalting)
             LOG.debug("Session Interrupted catch");
-        return startupOrShutdown;
+        return ishalting;
     }
 
     public static void removeSessionFile() {

@@ -194,6 +194,7 @@ public abstract class NuBotBase {
 
     /**
      * test setup exchange
+     *
      * @throws NuBotRunException
      */
     public void testExchange() throws NuBotRunException {
@@ -276,8 +277,8 @@ public abstract class NuBotBase {
             throw new NuBotRunException("" + e);
         }
 
-        if (Global.options.isHipchat())
-            notifyOnline();
+
+        notifyOnline();
 
     }
 
@@ -289,7 +290,7 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
-    private void logSessionStatistics(){
+    private void logSessionStatistics() {
         //log closing statistics
         LOG.info("totalOrdersSubmitted " + Global.orderManager.getTotalOrdersSubmitted());
 
