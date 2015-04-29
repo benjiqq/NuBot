@@ -1,5 +1,5 @@
 
-## v0.2.0.5 (xxxx-xx-zz)
+## v0.3.0 (xxxx-xx-zz)
 - Parameters have changed: use maxbuyvolume instead of maxbuyordervolume
 
 #### New Features:
