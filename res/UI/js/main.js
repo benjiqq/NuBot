@@ -398,7 +398,7 @@
       if($('#autoscrollCheckbox').prop('checked'))
         autoScroll();
 
-        setTimeout(updateLog, refreshLogInterval);
+      setTimeout(updateLog, refreshLogInterval);
 
   }
 
@@ -673,6 +673,24 @@
   function getBaseUrl() {
           return "http://" + location.host;
    }
+
+  function stopServer()
+  {
+      var url = baseurl + "/stopserver";
+
+      //console.log("url  " + url);
+      $.ajax({
+              type: "GET",
+              dataType: "json",
+              url: url,
+          })
+          .fail(function() {
+              alert("failed stopping server");
+          })
+          .done(function(data) {
+             alert("server stopped");
+          });
+  }
 
   window.onbeforeunload = function (e) {
   if(botRunning && hook)
