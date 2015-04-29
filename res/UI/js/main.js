@@ -320,7 +320,7 @@
       if (debug) console.log("calling stop on server");
       if (confirm("Are you sure you want to stop the bot?")) {
           //Start loading
-          incrementPB = 0.003; //determines speed of progressbar
+          incrementPB = 0.005; //determines speed of progressbar
           l.ladda( 'start' );
           currentAnimID = setInterval(animateProgressBar,50,false);
           $('#togglebot-text').html(" Stopping Bot");
