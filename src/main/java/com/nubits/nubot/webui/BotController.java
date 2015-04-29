@@ -108,7 +108,7 @@ public class BotController {
                 boolean success = true;
                 if (active) {
                     try {
-                        LOG.info("try interrupt bot");
+                        LOG.info("try interrupt bot. set halting mode");
 
                         SessionManager.setModeHalting();
 

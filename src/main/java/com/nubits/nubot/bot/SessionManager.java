@@ -25,15 +25,15 @@ public class SessionManager {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    public static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
+    private static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
 
-    public static final String MODE_STARTING = "MODE_STARTING";
+    private static final String MODE_STARTING = "MODE_STARTING";
 
-    public static final String MODE_HALTING = "MODE_HALTING";
+    private static final String MODE_HALTING = "MODE_HALTING";
 
-    public static final String MODE_RUNNING = "MODE_RUNNING";
+    private static final String MODE_RUNNING = "MODE_RUNNING";
 
-    public static final String MODE_HALTED = "MODE_HALTED";
+    private static final String MODE_HALTED = "MODE_HALTED";
 
     public static String sessionMode = MODE_NOTSTARTED;
 
@@ -42,6 +42,11 @@ public class SessionManager {
     public static long sessionStarted;
 
     public static long sessionStopped;
+
+    /**
+     * time it took from startup to first order
+     */
+    public static long startupTime = -1;
 
     public static String sessionId;
 
@@ -94,8 +99,6 @@ public class SessionManager {
         String wdir = FilesystemUtils.getBotAbsolutePath();
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
 
-        //create session file
-        createSessionFile();
     }
 
     public static void sessionStart() {
@@ -174,7 +177,7 @@ public class SessionManager {
      * create a session file in the app folder. increase session counter with each session
      * Note: session file gets marked as deleted after exit
      */
-    public static void createSessionFile() {
+    /*public static void createSessionFile() {
 
         try {
             File appdir = new File(System.getProperty("user.home") + "/" + Settings.APP_FOLDER);
@@ -198,7 +201,7 @@ public class SessionManager {
             }
         }
 
-    }
+    }*/
 
     /**
      * boolean for session in startup or shutdown mode, i.e. not running and not halted
@@ -238,6 +241,14 @@ public class SessionManager {
 
     public static boolean isModeHalting() {
         return sessionMode == MODE_HALTING;
+    }
+
+    public static boolean isModeHalted() {
+        return sessionMode == MODE_HALTED;
+    }
+
+    public static boolean isModeActive(){
+        return !sessionInterrupted() && !isModeHalted();
     }
 
     public static String getMode() {

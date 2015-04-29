@@ -41,7 +41,6 @@ public class TestSimulation extends TestCase {
         }catch (Exception e){
 
         }
-        assertTrue(SessionManager.getMode().equals(SessionManager.MODE_STARTING));
 
         System.out.println(">> mode: " + SessionManager.getMode());
         try{
