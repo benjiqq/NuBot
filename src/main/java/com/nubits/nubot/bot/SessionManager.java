@@ -94,8 +94,6 @@ public class SessionManager {
         String wdir = FilesystemUtils.getBotAbsolutePath();
         Global.sessionLogFolder = wdir + "/" + Global.sessionPath;
 
-        //create session file
-        createSessionFile();
     }
 
     public static void sessionStart() {
@@ -174,7 +172,7 @@ public class SessionManager {
      * create a session file in the app folder. increase session counter with each session
      * Note: session file gets marked as deleted after exit
      */
-    public static void createSessionFile() {
+    /*public static void createSessionFile() {
 
         try {
             File appdir = new File(System.getProperty("user.home") + "/" + Settings.APP_FOLDER);
@@ -198,7 +196,7 @@ public class SessionManager {
             }
         }
 
-    }
+    }*/
 
     /**
      * boolean for session in startup or shutdown mode, i.e. not running and not halted
