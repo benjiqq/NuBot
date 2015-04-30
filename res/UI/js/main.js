@@ -54,7 +54,7 @@ function clearTables() {
     $("#balancetable").find("tr:gt(0)").remove();
 }
 
-function setStateRunning(){
+function setStateRunning() {
     $('#togglebot-text').html(" Stop Bot");
     $('#togglebot-text').addClass("glyphicon-off");
     $('#togglebot-text').removeClass("glyphicon-play");
@@ -63,10 +63,11 @@ function setStateRunning(){
 
     $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
 
-    document.title = 'Running! - NuBot GUI';
+    document.title = 'Running! - NuBot GUI'
+    stopAnimation();
 }
 
-function setStateStopped(){
+function setStateStopped() {
     $('#togglebot-text').html(" Start Bot");
     $('#togglebot-text').addClass("glyphicon-play");
     $('#togglebot-text').removeClass("glyphicon-off");
@@ -77,6 +78,7 @@ function setStateStopped(){
 
     document.title = 'NuBot GUI - Stopped';
     $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
+    stopAnimation();
 }
 
 
@@ -130,7 +132,7 @@ function startBot() {
     }
 }
 
-function setStateStopping(){
+function setStateHalting(){
     //Start loading
     incrementPB = 0.005; //determines speed of progressbar
     laddaToggleBtn.ladda('start');
@@ -142,7 +144,7 @@ function stopBot() {
     if (debug) console.log("calling stop on server");
     if (confirm("Are you sure you want to stop the bot?")) {
 
-        setStateStopping();
+        setStateHalting();
 
         var jsondata = JSON.stringify({
             "operation": "stop"
@@ -331,7 +333,13 @@ function updateStatus() {
             $('#duration').html(data["duration"]);
 
             var run = false;
-            if (data["status"] == "running" || data["status"] == "halting") {
+            if (data["status"] == "running"){
+                setStateRunning();
+                run = true;
+            }
+
+            if (data["status"] == "halting") {
+                setStateHalting();
                 run = true;
             }
 
@@ -648,11 +656,15 @@ function animateProgressBar(toggle) {
     }
 }
 
-function stopProgressBarAnimation(toggle) {
+function stopAnimation() {
     clearInterval(currentAnimID);
     progressPB = 0;
     laddaToggleBtn.ladda('stop');
     animatingButton = false;
+}
+
+function stopProgressBarAnimation(toggle) {
+    stopAnimation();
     //on success of post change the color of the button
     toggleBotButton(toggle);
 }
