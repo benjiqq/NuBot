@@ -4,11 +4,11 @@
 
 <configuration>
 
-    <property scope="context" name="standardfile" value="standard.html" />
-    <property scope="context" name="verbosefile" value="verbose.html" />
+    <property scope="context" name="standardfile" value="standard.html"/>
+    <property scope="context" name="verbosefile" value="verbose.html"/>
 
-    <property scope="context" name="standardlogFile" value="standard.log" />
-    <property scope="context" name="verboselogFile" value="verbose.log" />
+    <property scope="context" name="standardlogFile" value="standard.log"/>
+    <property scope="context" name="verboselogFile" value="verbose.log"/>
 
 
     <!-- console output filtered. to show different colors error and warn go separate  -->
@@ -67,7 +67,7 @@
             <onMismatch>NEUTRAL</onMismatch>
         </filter>
 
-        <filter class="com.nubits.nubot.utils.LogVerboseFilter" />
+        <filter class="com.nubits.nubot.utils.LogVerboseFilter"/>
 
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
             <level>ERROR</level>
@@ -199,7 +199,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %logger{16} - %msg%n
+                    <pattern>%date{HH:mm:ss.SSS} %msg - [%logger{16}]%n
                     </pattern>
                 </encoder>
 
@@ -235,7 +235,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %logger{16} - %msg%n
+                    <pattern>%date{HH:mm:ss.SSS} %msg - [%thread - %logger{16}:%line] %n
                     </pattern>
                 </encoder>
 
@@ -252,7 +252,6 @@
                 </filter>
 
 
-
             </appender>
         </sift>
     </appender>
@@ -263,17 +262,17 @@
 	-->
 
     <root level="debug">
-        <appender-ref ref="standardHTML" />
-        <appender-ref ref="verboseHTML" />
-        <appender-ref ref="STDOUT" />
-        <appender-ref ref="STDOUTwarn" />
-        <appender-ref ref="STDOUTerr" />
-        <appender-ref ref="standard" />
-        <appender-ref ref="verbose" />
+        <appender-ref ref="standardHTML"/>
+        <appender-ref ref="verboseHTML"/>
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="STDOUTwarn"/>
+        <appender-ref ref="STDOUTerr"/>
+        <appender-ref ref="standard"/>
+        <appender-ref ref="verbose"/>
     </root>
 
 
     <!-- to surpress logback startup messages -->
-    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener"/>
 
 </configuration>
