@@ -299,7 +299,7 @@ public abstract class NuBotBase {
         LOG.info(additionalInfo.replace(closingStrongTaging, "").replace(openStrongTaging, "")); //Remove html tags
         HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 
-        LOG.info("startup time: " + SessionManager.startupDuration);
+        LOG.info("startup duration [msec]: " + SessionManager.startupDuration);
     }
 
     public void shutdownBot() {
