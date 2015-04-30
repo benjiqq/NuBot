@@ -30,6 +30,9 @@ public class BotController {
     private final static String START = "start";
     private final static String STOP = "stop";
 
+    //workaround for double stop call
+    private long lastStopCall;
+
     public BotController() {
 
         get("/opstatus", "application/json", (request, response) -> {
@@ -110,8 +113,12 @@ public class BotController {
 
             if (startstop.equals(STOP)) {
 
+                //workaround for double call, see issue #643
+                long dif = System.currentTimeMillis() - lastStopCall;
+                lastStopCall = System.currentTimeMillis();
+
                 //prevent double calls
-                if (SessionManager.lastStopped() < 5000) {
+                if (dif < 5000) {
                     opmap.put("success", true);
                     json = new Gson().toJson(opmap);
                     return json;
