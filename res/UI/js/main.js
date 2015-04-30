@@ -41,6 +41,7 @@ var currentAnimID;
 var animatingButton = false;
 
 var serverDown = false;
+var mode = "stopped";
 
 
 function handleFailServer() {
@@ -174,6 +175,16 @@ function stopBot() {
 }
 
 function updateNavbar(page) {
+    if (mode == "halting"){
+        alert("Wait for Bot to halt");
+        return;
+    }
+
+    if (mode == "starting"){
+            alert("Wait for Bot to start");
+            return;
+    }
+
     $('#operation-nav').removeClass('active');
     $('#config-nav').removeClass('active');
     $('#docu-nav').removeClass('active');
@@ -331,6 +342,8 @@ function updateStatus() {
             $('#sessionstart').html(data["sessionstart"]);
 
             $('#duration').html(data["duration"]);
+
+            mode = data["status"];
 
             var run = false;
             if (data["status"] == "running"){
