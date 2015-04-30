@@ -1,17 +1,81 @@
+#Changelog
 
-## v0.3.0 (xxxx-xx-zz)
-- Parameters have changed: use maxbuyvolume instead of maxbuyordervolume
+## v0.3.0 (2015-04-30)
+
+#### Notes for custodians : 
+ - Option parameters have changed: use maxbuyvolume instead of maxbuyordervolume. 
+ - All parameters are compulsory. 
+ - Case is ignored for parameter name. 
+
+Launch string changed to
+```
+java -jar NuBot.jar -cfg=<path/to/config.json> [-GUI]
+```
 
 #### New Features:
-  - A
-
+  - Optionally launch a web-server with a front end to manage nubot, both locally than remotely. 
+  - web-gui | - Basic functionality to configure the bot's launch parameters : see/change/save/reset/validate 
+  - web-gui | - Start/Stop the bot via toggle button
+  - web-gui | - Shutdown server via button
+  - web-gui | - When bot is running, display open orders and balances.
+  - web-gui | - Display real time messages from std-ouput in the bot's dashboard
+  - web-gui | - Browse up-do-date HTML documentation automatically generated at build time
+  - web-gui | - Jar launcher : Launch the bot by double clicking this new executable file distributed with the bot
+  - web-gui | - Automatically launch browser (if available) on bot dashboard in GUI mode
+  - web-gui | - Show confirmation dialogs for important operations
+  - web-gui | - Show progressbar in startup and shutdown sequence
+  - web-gui | - Show status, uptime and session timestamp.
+  - web-gui | - Obscure secret fields 
+  - New price feeds for fiat rates (GoogleOfficial)
+  - Sandbox enviroment created to simulate a live exchange 
+  - BalanceManager and OrderManager handles their own logic separately from Strategy
+  - Finally the verbose configuration parameter has the runtime impact expected. Set it to true to enable DEBUG level messages
+  - Colored output : Display errors in red, warnings in blue (trading) everything else default
+  - Bittrex wrapper ready (not fully integrated into the bot)
+  - Created NuStringEncrypt https://bitbucket.org/mj2p/nustringencrypt simple standalone tool that uses scrypt as a key derivation to AES encrypt strings
+  - Test credential validity before starting the bot by trying to fetch balance
+  - Report uptime on shutdown
+  - Validate Options before running or throws Exception
+  - Documented exchange names in exchanges.md
+  
+  
 #### Improvements:
   - Refactored Trading Strategy code extracing methods to Order and Balance Manager objects
   - Introduced Utils.formatNumber
+  - Handle concurrent requests to remote API correctly
+  - A new SessionManager class to manage session correctly
+  - Log messages improved both in std output and in files
+  - Session handles MODES of the bot , starting up, running, paused, shutting down, etc...
+  - Shutdown sequence improved consistently
+  - *compileAll.sh* script updated
+  - Refactored Strategy code to make it cleaner
+  - old metafile (.nubot) file moved to a new file in *res/.info*
+  - Separated fetch/get logic for remote calls
+  - Automatically handle large log files size
+  - Added thread name to logging 
+  - Ignore case in configuration parameters
+  - Added thread name to HTML logs as a column
+  - Ported time duration using Joda as a proper handler
+  - Externalised - where possible - the sign() method from API wrappers
+  - In documentation, replaced all internal links with a static resource URI
+  - During build, warn if using a different version of gradle
+  - Resized image files for correct visualisation of the readme
+  - Restructured duplicate folder-file structure in gradle.md
+  - Refactored ~md/ in ~docs/
+  - Standardised CLI arguments using GNU-style and apache Commons CLI
+  - Deprecated NuPriceMonitorTask 
+  - Added market info on hipchat debug message
+  - Systematically reformatted all the code base using shared code standards
 
 
 #### Bug fixes:
   - Wrong count of locked peg balance on bitcoin.co.id
+  - Prevent wallShifts if an order reset is already happening
+  - Bitcoin.co.id wrappers various fix (runtime exceptions)
+  - Poloniex wrong nonce issues fixed with a retry loop
+  - Replaced *System.getProperty("user.dir")* with a more adequate custom method :*FileSystemUtils.getBotAbsolutePath()*
+  - Corrected URL in *updateKeystore.sh* script
+  - Corrected Feed names in documentation to match the code
 	
 	 
 	
