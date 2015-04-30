@@ -22,7 +22,6 @@ package com.nubits.nubot.models;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//TODO rename (requires refactoring of current Order class)
 public class OrderToPlace {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderToPlace.class.getName());
@@ -74,7 +73,7 @@ public class OrderToPlace {
     }
 
     /**
-     * @param amount
+     * @param size
      */
     public void setSize(double size) {
         this.size = size;

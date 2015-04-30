@@ -672,23 +672,25 @@ function updateConfigElements(running) {
 }
 
 function stopServer() {
-      var url = baseurl + "/stopserver";
+      if (confirm("Are you sure you want to shutdown the server?")) {
+          var url = baseurl + "/stopserver";
 
-      //console.log("url  " + url);
-      $.ajax({
-              type: "GET",
-              dataType: "json",
-              url: url,
-          })
-          .fail(function() {
-               hook = false;
-               alert("Server stopped.");
-               location.reload();
+          //console.log("url  " + url);
+          $.ajax({
+                  type: "GET",
+                  dataType: "json",
+                  url: url,
+              })
+              .fail(function() {
+                   hook = false;
+                   alert("Server stopped.");
+                   location.reload();
 
-          })
-          .done(function(data) {
-              //It cannot succed
-          });
+              })
+              .done(function(data) {
+                  //It cannot succed
+              });
+          }
 }
 
 
@@ -704,7 +706,7 @@ window.onbeforeunload = function(e) {
         return confirmMessage;
     } else if (!serverDown && hook) {
         e = e || window.event;
-        var confirmMessage = "Beware that closing this window will not stop the server. Ok?"
+        var confirmMessage = "Closing this window will not stop the server. Use the red button if you want to shut down server before leaving this page."
             // For IE and Firefox prior to version 4
         if (e) {
             e.returnValue = confirmMessage;

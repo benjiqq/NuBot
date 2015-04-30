@@ -125,9 +125,6 @@ public class ExchangeFacade {
         Global.exchange.setLiveData(liveData);
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
         TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.exchange.getName(), keys, Global.exchange);
-        //TODO remove when tested
-        //ti.setKeys(keys);
-        //ti.setExchange(Global.exchange);
         return ti;
     }
 

@@ -80,7 +80,7 @@ public class ConfigController {
         });
 
         get("/configfile", "application/json", (request, response) -> {
-            LOG.trace("/configfile called");
+            LOG.debug("/configfile called");
 
             Map opmap = new HashMap();
             opmap.put("configfile", Global.currentOptionsFile);
@@ -89,7 +89,7 @@ public class ConfigController {
         });
 
         get("/config", "application/json", (request, response) -> {
-            LOG.trace("/config called");
+            LOG.debug("GET /config called");
 
             //get from memory. any change in the file is reflected in the global options
             String jsonString = NuBotOptions.optionsToJson(Global.options);
@@ -98,8 +98,10 @@ public class ConfigController {
 
         post("/config", "application/json", (request, response) -> {
             //check if bot is running
+            LOG.debug("POST /config called");
+
             boolean active = SessionManager.isSessionRunning();
-            LOG.info("session currently active " + active);
+            LOG.trace("session currently active " + active);
 
             if (active) {
                 //if bot is running show an error
