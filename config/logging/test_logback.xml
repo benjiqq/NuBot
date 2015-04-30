@@ -9,7 +9,6 @@
         <property scope="context" name="standardfile" value="standard.html" />
         <property scope="context" name="verbosefile" value="verbose.html" />
 
-        <!-- used in UI also -->
         <property scope="context" name="standardlogFile" value="standard.log" />
         <property scope="context" name="verboselogFile" value="verbose.log" />
 
@@ -186,7 +185,6 @@
             </sift>
         </appender>
 
-        <!-- standard output for GUI -->
 
         <appender name="standard" class="ch.qos.logback.classic.sift.SiftingAppender">
 
