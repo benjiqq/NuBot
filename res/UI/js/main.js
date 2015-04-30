@@ -90,16 +90,19 @@ function toggleBotButton(running) {
     }
 }
 
-
+function setStateStarting(){
+    // Start loading button
+    incrementPB = 0.0038; //determines speed of progressbar
+    laddaToggleBtn.ladda('start');
+    currentAnimID = setInterval(animateProgressBar, 50, true);
+    $('#togglebot-text').html(" Starting Bot");
+}
 
 function startBot() {
     if (confirm("Are you sure you want to start the bot?")) {
-        // Start loading button
-        incrementPB = 0.0038; //determines speed of progressbar
-        laddaToggleBtn.ladda('start');
-        currentAnimID = setInterval(animateProgressBar, 50, true);
-        $('#togglebot-text').html(" Starting Bot");
         if (debug) console.log("calling start on server");
+
+        setStateStarting();
 
         var jsondata = JSON.stringify({
             "operation": "start"
@@ -127,14 +130,19 @@ function startBot() {
     }
 }
 
+function setStateStopping(){
+    //Start loading
+    incrementPB = 0.005; //determines speed of progressbar
+    laddaToggleBtn.ladda('start');
+    currentAnimID = setInterval(animateProgressBar, 50, false);
+    $('#togglebot-text').html(" Stopping Bot");
+}
+
 function stopBot() {
     if (debug) console.log("calling stop on server");
     if (confirm("Are you sure you want to stop the bot?")) {
-        //Start loading
-        incrementPB = 0.005; //determines speed of progressbar
-        laddaToggleBtn.ladda('start');
-        currentAnimID = setInterval(animateProgressBar, 50, false);
-        $('#togglebot-text').html(" Stopping Bot");
+
+        setStateStopping();
 
         var jsondata = JSON.stringify({
             "operation": "stop"
