@@ -64,8 +64,6 @@ public class NuBotSecondary extends NuBotBase {
 
         CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, CurrencyList.USD);
 
-        //TODO
-
         PriceMonitorTriggerTask pmTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
         StrategySecondaryPegTask stratTask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
 

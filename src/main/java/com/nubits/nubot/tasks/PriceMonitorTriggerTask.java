@@ -184,7 +184,7 @@ public class PriceMonitorTriggerTask extends TimerTask {
         //Add(remove) the offset % from prices
 
         //compute half of the spread
-        double halfSpread = Utils.round(Global.options.getSpread() / 2, 6); //TODO: different precision?
+        double halfSpread = Utils.round(Global.options.getSpread() / 2, 6);
 
         double offset = Utils.round(halfSpread / 100, 6);
 

@@ -286,7 +286,6 @@ public class OrderManager {
     }
 
 
-    //TODO: never used in live trading
     public ApiResponse placeOrder(OrderToPlace order) {
         //TODO move into the trade interface when tested and ready
         LOG.info(": Submit order : "
@@ -304,7 +303,6 @@ public class OrderManager {
     }
 
     //Init the order
-    //TODO: never used in live trading
     public boolean placeMultipleOrders(ArrayList<OrderToPlace> orders) {
         //Observation : it can take between 15 and 20 seconds to place 10 orders
         boolean success = true;

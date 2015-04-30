@@ -154,7 +154,7 @@ public class NuBotOptions {
     public double maxBuyVolume;
 
     /**
-     * TODO
+     * When this flag is true, the bot will put tier2 on orderbook at different price levels
      */
     public boolean distributeLiquidity;
 

@@ -138,13 +138,7 @@ public abstract class NuBotBase {
             MainLaunch.exitWithNotice("exchange unknown");
         }
 
-        //TODO remove this block after testing it
-        //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
-        //LOG.debug("Create a new TradeInterface object");
-        //ti.setKeys(keys);
-        //ti.setExchange(Global.exchange);
-
-
+        
         //TODO handle on exchange level, not bot level
         if (Global.options.getExchangeName().equals(ExchangeFacade.CCEX)) {
             ((CcexWrapper) (ti)).initBaseUrl();

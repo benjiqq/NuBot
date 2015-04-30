@@ -21,7 +21,6 @@ package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,7 +36,6 @@ public class TradeUtilsCCEDK {
     private static final Logger LOG = LoggerFactory.getLogger(TradeUtilsCCEDK.class.getName());
 
     //The two methods below have been amalgamated into the CCDEK wrapper
-    //TODO - get rid of these ccedk =methods once testing has taken place
     public static int offset = 0;
 
     public static String getCCDKEvalidNonce() {
