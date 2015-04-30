@@ -67,7 +67,7 @@ function setStateRunning() {
     stopAnimation();
 }
 
-function setStateStopped() {
+function setStateHalted() {
     $('#togglebot-text').html(" Start Bot");
     $('#togglebot-text').addClass("glyphicon-play");
     $('#togglebot-text').removeClass("glyphicon-off");
@@ -88,7 +88,7 @@ function toggleBotButton(running) {
         setStateRunning();
     } else {
         botRunning = false;
-        setStateStopped();
+        setStateHalted();
     }
 }
 
@@ -341,6 +341,10 @@ function updateStatus() {
             if (data["status"] == "halting") {
                 setStateHalting();
                 run = true;
+            }
+
+            if (data["status"] == "halted") {
+                setStateHalted();
             }
 
             if (pageName == "operation" && !animatingButton) {
