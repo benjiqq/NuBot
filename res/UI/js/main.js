@@ -54,33 +54,39 @@ function clearTables() {
     $("#balancetable").find("tr:gt(0)").remove();
 }
 
+function setStateRunning(){
+    $('#togglebot-text').html(" Stop Bot");
+    $('#togglebot-text').addClass("glyphicon-off");
+    $('#togglebot-text').removeClass("glyphicon-play");
+
+    $("#togglebot").attr("data-color", "red");
+
+    $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
+
+    document.title = 'Running! - NuBot GUI';
+}
+
+function setStateStopped(){
+    $('#togglebot-text').html(" Start Bot");
+    $('#togglebot-text').addClass("glyphicon-play");
+    $('#togglebot-text').removeClass("glyphicon-off");
+
+    $("#togglebot").attr("data-color", "blue");
+
+    setTimeout(clearTables, refreshTablesInterval);
+
+    document.title = 'NuBot GUI - Stopped';
+    $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
+}
+
+
 function toggleBotButton(running) {
     if (running) {
         botRunning = true;
-        $('#togglebot-text').html(" Stop Bot");
-        $('#togglebot-text').addClass("glyphicon-off");
-        $('#togglebot-text').removeClass("glyphicon-play");
-
-        $("#togglebot").attr("data-color", "red");
-
-        $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
-
-        document.title = 'Running! - NuBot GUI';
-
+        setStateRunning();
     } else {
         botRunning = false;
-
-        $('#togglebot-text').html(" Start Bot");
-        $('#togglebot-text').addClass("glyphicon-play");
-        $('#togglebot-text').removeClass("glyphicon-off");
-
-        $("#togglebot").attr("data-color", "blue");
-
-        setTimeout(clearTables, refreshTablesInterval);
-
-        document.title = 'NuBot GUI - Stopped';
-        $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
-
+        setStateRunning();
     }
 }
 
