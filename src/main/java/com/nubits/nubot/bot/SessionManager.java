@@ -291,9 +291,11 @@ public class SessionManager {
 
     public static boolean sessionInterrupted() {
         boolean ishalting = isModeHalting();
-        if (ishalting)
+        boolean ishalted = isModeHalted();
+        boolean interrupt = ishalting || ishalted;
+        if (interrupt)
             LOG.debug("Session Interrupted catch");
-        return ishalting;
+        return interrupt;
     }
 
 
