@@ -54,7 +54,7 @@ function clearTables() {
     $("#balancetable").find("tr:gt(0)").remove();
 }
 
-function toggleBot(running) {
+function toggleBotButton(running) {
     if (running) {
         botRunning = true;
         $('#togglebot-text').html(" Stop Bot");
@@ -249,7 +249,7 @@ function updateStatus() {
             }
 
             if (pageName == "operation" && !animatingButton) {
-                toggleBot(run);
+                toggleBotButton(run);
             } else if (pageName == "config") {
                 updateConfigElements(run);
             }
@@ -575,7 +575,7 @@ function startupPage(page_name) {
             updateNavbar("operation");
             // Create a new instance of ladda for the specified button
             laddaToggleBtn = $('#togglebot').ladda();
-            toggleBot(false);
+            toggleBotButton(false);
 
             updateStatus("operation");
             updateLog();
@@ -638,7 +638,7 @@ function stopProgressBarAnimation(toggle) {
     laddaToggleBtn.ladda('stop');
     animatingButton = false;
     //on success of post change the color of the button
-    toggleBot(toggle);
+    toggleBotButton(toggle);
 }
 
 function updateConfigElements(running) {
