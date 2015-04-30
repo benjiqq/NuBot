@@ -23,7 +23,7 @@ By using NuBot you declare to have accepted the afore-mentioned risks. See the D
 
 #How does it work?
 
-Only custodians will use the trading bot and relay liquidity data to other Nu clients.
+Custodians will use the trading bot and relay liquidity data to other Nu clients.
 Within the Nu system there are two types of custodians: **sell side** and **dual side** custodians.
 *Dual side custodians* are custodians whose specific function is to provide liquidity for compensation, and they will initially only provide buy side price support. Once their buy order for NBT is partially filled, the bot should then create a sell order for that NBT.
 In the case of *sell side custodians*, the liquidity they provide is secondary to another goal such as funding core development, marketing NBT or distributing Peercoin dividends. They want to spend the proceeds of their NBT, so under no circumstance will they provide buy side liquidity.
@@ -92,7 +92,6 @@ See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/ma
 ![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
 
 
-
 ##Auto-Updating the latest version of the keystore
 In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.
 NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
@@ -119,9 +118,6 @@ keytool -importcert -file poloniex-dec.cer -keystore nubot_keystore.jks -alias â
 ```
 
 You will be prompted for a passphrase : type nub0tSSL
-
-#Price Feeds
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/FEEDS.md)
 
 #Contribute
 See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/CONTRIBUTE.md)
