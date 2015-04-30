@@ -46,7 +46,7 @@ public class SessionManager {
     /**
      * time it took from startup to first order
      */
-    public static long startupTime = -1;
+    public static long startupDuration = -1;
 
     public static String sessionId;
 

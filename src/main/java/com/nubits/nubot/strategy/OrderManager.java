@@ -256,8 +256,8 @@ public class OrderManager {
 
         if (Global.options.isExecuteOrders()) {
 
-            if (SessionManager.startupTime == -1)
-                SessionManager.startupTime = System.currentTimeMillis() - SessionManager.sessionStarted;
+            if (SessionManager.startupDuration == -1)
+                SessionManager.startupDuration = System.currentTimeMillis() - SessionManager.sessionStarted;
 
             ApiResponse orderResponse;
             if (type.equals(Constant.BUY)) {
