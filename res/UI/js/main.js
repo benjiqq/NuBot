@@ -368,6 +368,7 @@ function updateStatus() {
             $('#duration').html(data["duration"]);
 
             //we polled the server and now set the client status
+            //we set the state depending on the status with the setState functions
             mode = data["status"];
 
             var run = false;
