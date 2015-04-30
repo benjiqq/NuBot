@@ -127,7 +127,7 @@ function startBot() {
                 }
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert("error posting to server " + textStatus + " " + errorThrown);
+                alert("startBot - error posting to server " + textStatus + " " + errorThrown);
             }
         });
     }
@@ -168,7 +168,7 @@ function stopBot() {
                 }
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert("error posting to server " + textStatus + " " + errorThrown);
+                alert("stopBot - error posting to server " + textStatus + " " + errorThrown);
             }
         });
     }
@@ -181,8 +181,8 @@ function updateNavbar(page) {
     }
 
     if (mode == "starting"){
-            alert("Wait for Bot to start");
-            return;
+        alert("Wait for Bot to start");
+        return;
     }
 
     $('#operation-nav').removeClass('active');
@@ -562,7 +562,7 @@ function makePostConfig(url, jsondata) {
         },
 
         error: function(xhr, textStatus, errorThrown) {
-            alert("error posting to server " + textStatus + " " + errorThrown);
+            alert("makePostConfig - error posting to server " + textStatus + " " + errorThrown);
             alert(xhr.responseText);
         }
     });
@@ -598,7 +598,7 @@ function postreset() {
 
                 laddaClearcfgBtn.ladda('stop');
 
-                alert("error posting to server " + textStatus + " " + errorThrown);
+                alert("PostReset - error posting to server " + textStatus + " " + errorThrown);
                 alert(xhr.responseText);
             }
         });
