@@ -59,7 +59,7 @@ public class BalanceManager {
         long diff = current - this.lastFetchPairBalance;
         LOG.trace("balance. diff: " + diff);
         if (diff > tresh) {
-            LOG.trace("Fetching balances ...");
+            LOG.debug("Fetching balances ...");
             fetchBalances(pair);
         }
     }

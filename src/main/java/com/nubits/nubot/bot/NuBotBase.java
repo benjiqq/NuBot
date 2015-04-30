@@ -138,7 +138,7 @@ public abstract class NuBotBase {
             MainLaunch.exitWithNotice("exchange unknown");
         }
 
-        
+
         //TODO handle on exchange level, not bot level
         if (Global.options.getExchangeName().equals(ExchangeFacade.CCEX)) {
             ((CcexWrapper) (ti)).initBaseUrl();
