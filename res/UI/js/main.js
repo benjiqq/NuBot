@@ -97,7 +97,7 @@ function toggleBotButton(running) {
 
 function setStateStarting(){
     // Start loading button
-    incrementPB = 0.0038; //determines speed of progressbar
+    incrementPB = 0.006; //determines speed of progressbar
     laddaToggleBtn.ladda('start');
     currentAnimID = setInterval(animateProgressBar, 50, true);
     $('#togglebot-text').html(" Starting Bot");
@@ -138,7 +138,7 @@ function startBot() {
 }
 
 function setStateHalting(){
-    incrementPB = 0.005; //determines speed of progressbar
+    incrementPB = 0.008; //determines speed of progressbar
     laddaToggleBtn.ladda('start');
     currentAnimID = setInterval(animateProgressBar, 50, false);
     $('#togglebot-text').html(" Stopping Bot");
