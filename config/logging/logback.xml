@@ -8,8 +8,8 @@
     <property scope="context" name="verbosefile" value="verbose.html" />
 
     <!-- UI - these files are always there but only read when the GUI is run.-->
-    <property scope="context" name="UIstandardlogFile" value="standard.log" />
-    <property scope="context" name="UIverboselogFile" value="verbose.log" />
+    <property scope="context" name="standardlogFile" value="standard.log" />
+    <property scope="context" name="verboselogFile" value="verbose.log" />
 
 
     <!-- console output filtered. to show different colors error and warn go separate  -->
@@ -184,9 +184,8 @@
         </sift>
     </appender>
 
-    <!-- standard output for GUI -->
 
-    <appender name="standardGUI" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <appender name="standard" class="ch.qos.logback.classic.sift.SiftingAppender">
 
         <discriminator>
             <key>session</key>
@@ -194,7 +193,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/${UIstandardlogFile}</file>
+                <file>${session}/${standardlogFile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>INFO</level>
@@ -221,9 +220,8 @@
         </sift>
     </appender>
 
-    <!-- verbose output for GUI -->
 
-    <appender name="verboseGUI" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <appender name="verbose" class="ch.qos.logback.classic.sift.SiftingAppender">
 
         <discriminator>
             <key>session</key>
@@ -231,7 +229,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/${UIverboselogFile}</file>
+                <file>${session}/${verboselogFile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>DEBUG</level>
@@ -271,8 +269,8 @@
         <appender-ref ref="STDOUT" />
         <appender-ref ref="STDOUTwarn" />
         <appender-ref ref="STDOUTerr" />
-        <appender-ref ref="standardGUI" />
-        <appender-ref ref="verboseGUI" />
+        <appender-ref ref="standard" />
+        <appender-ref ref="verbose" />
     </root>
 
 
