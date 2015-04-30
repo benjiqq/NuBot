@@ -66,6 +66,7 @@ function setStateRunning() {
 
     document.title = 'Running! - NuBot GUI'
     stopAnimation();
+    setNavBarActive();
 }
 
 function setStateHalted() {
@@ -80,6 +81,7 @@ function setStateHalted() {
     document.title = 'NuBot GUI - Stopped';
     $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
     stopAnimation();
+    setNavBarActive();
 }
 
 
@@ -99,6 +101,8 @@ function setStateStarting(){
     laddaToggleBtn.ladda('start');
     currentAnimID = setInterval(animateProgressBar, 50, true);
     $('#togglebot-text').html(" Starting Bot");
+
+    setNavBarInactive();
 }
 
 function startBot() {
@@ -134,11 +138,12 @@ function startBot() {
 }
 
 function setStateHalting(){
-    //Start loading
     incrementPB = 0.005; //determines speed of progressbar
     laddaToggleBtn.ladda('start');
     currentAnimID = setInterval(animateProgressBar, 50, false);
     $('#togglebot-text').html(" Stopping Bot");
+
+    setNavBarInactive();
 }
 
 function stopBot() {
@@ -172,6 +177,25 @@ function stopBot() {
             }
         });
     }
+}
+
+function setNavBarInactive(){
+    $('#operation-nav').html('<a>Dashboard</a>');
+    $('#config-nav').html('<a>Configuration</a');
+    $('#docu-nav').html('<a>Documentation</a>');
+    $('#disclaimer-nav').html('<a>Disclaimer</a>');
+
+    //<a href='#' onclick="changePage('operation')">Dashboard</a>
+      //<a href='#' onclick="changePage('config')">Configuration</a>
+        //<a href='#' onclick="changePage('docu')">Documentation</a>
+          //><a href='#' onclick="changePage('disclaimer')">Disclaimer</a>
+}
+
+function setNavBarActive(){
+    $('#operation-nav').html("<a href='#' onclick=\"changePage('operation')\">Dashboard</a>");
+    $('#config-nav').html("<a href='#' onclick=\"changePage('config')\">Configuration</a>");
+    $('#docu-nav').html("<a href='#' onclick=\"changePage('docu')\">Documentation</a>");
+    $('#disclaimer-nav').html("<a href='#' onclick=\"changePage('disclaimer')\">Disclaimer</a>");
 }
 
 function updateNavbar(page) {
