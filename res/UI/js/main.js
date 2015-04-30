@@ -90,6 +90,79 @@ function toggleBotButton(running) {
     }
 }
 
+
+
+function startBot() {
+    if (confirm("Are you sure you want to start the bot?")) {
+        // Start loading button
+        incrementPB = 0.0038; //determines speed of progressbar
+        laddaToggleBtn.ladda('start');
+        currentAnimID = setInterval(animateProgressBar, 50, true);
+        $('#togglebot-text').html(" Starting Bot");
+        if (debug) console.log("calling start on server");
+
+        var jsondata = JSON.stringify({
+            "operation": "start"
+        });
+
+        $.ajax(baseurl + "/startstop", {
+            data: jsondata,
+            dataType: "json",
+            type: 'POST',
+            success: function(data) {
+                console.log("starting bot ok " + data);
+                var success = data["success"];
+
+                if (success) {
+
+                } else {
+                    alert(data["error"]);
+                    stopProgressBarAnimation(false);
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("error posting to server " + textStatus + " " + errorThrown);
+            }
+        });
+    }
+}
+
+function stopBot() {
+    if (debug) console.log("calling stop on server");
+    if (confirm("Are you sure you want to stop the bot?")) {
+        //Start loading
+        incrementPB = 0.005; //determines speed of progressbar
+        laddaToggleBtn.ladda('start');
+        currentAnimID = setInterval(animateProgressBar, 50, false);
+        $('#togglebot-text').html(" Stopping Bot");
+
+        var jsondata = JSON.stringify({
+            "operation": "stop"
+        });
+
+        $.ajax(baseurl + "/startstop", {
+            data: jsondata,
+            dataType: "json",
+            type: 'POST',
+            success: function(data) {
+                var success = data["success"];
+                console.log("stopped bot. success " + success);
+                var cbtn = $('#togglebot');
+                if (success) {
+                    //on success of post change the color of the button
+                    $('#duration').html("");
+                } else {
+                    alert(data["error"]);
+                    stopProgressBarAnimation(false);
+                }
+            },
+            error: function(XMLHttpRequest, textStatus, errorThrown) {
+                alert("error posting to server " + textStatus + " " + errorThrown);
+            }
+        });
+    }
+}
+
 function updateNavbar(page) {
     $('#operation-nav').removeClass('active');
     $('#config-nav').removeClass('active');
@@ -264,77 +337,6 @@ function updateStatus() {
     setTimeout(updateStatus, refreshStatusInterval);
 }
 
-
-function startBot() {
-    if (confirm("Are you sure you want to start the bot?")) {
-        // Start loading button
-        incrementPB = 0.0038; //determines speed of progressbar
-        laddaToggleBtn.ladda('start');
-        currentAnimID = setInterval(animateProgressBar, 50, true);
-        $('#togglebot-text').html(" Starting Bot");
-        if (debug) console.log("calling start on server");
-
-        var jsondata = JSON.stringify({
-            "operation": "start"
-        });
-
-        $.ajax(baseurl + "/startstop", {
-            data: jsondata,
-            dataType: "json",
-            type: 'POST',
-            success: function(data) {
-                console.log("starting bot ok " + data);
-                var success = data["success"];
-
-                if (success) {
-
-                } else {
-                    alert(data["error"]);
-                    stopProgressBarAnimation(false);
-                }
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert("error posting to server " + textStatus + " " + errorThrown);
-            }
-        });
-    }
-}
-
-function stopBot() {
-    if (debug) console.log("calling stop on server");
-    if (confirm("Are you sure you want to stop the bot?")) {
-        //Start loading
-        incrementPB = 0.005; //determines speed of progressbar
-        laddaToggleBtn.ladda('start');
-        currentAnimID = setInterval(animateProgressBar, 50, false);
-        $('#togglebot-text').html(" Stopping Bot");
-
-        var jsondata = JSON.stringify({
-            "operation": "stop"
-        });
-
-        $.ajax(baseurl + "/startstop", {
-            data: jsondata,
-            dataType: "json",
-            type: 'POST',
-            success: function(data) {
-                var success = data["success"];
-                console.log("stopped bot. success " + success);
-                var cbtn = $('#togglebot');
-                if (success) {
-                    //on success of post change the color of the button
-                    $('#duration').html("");
-                } else {
-                    alert(data["error"]);
-                    stopProgressBarAnimation(false);
-                }
-            },
-            error: function(XMLHttpRequest, textStatus, errorThrown) {
-                alert("error posting to server " + textStatus + " " + errorThrown);
-            }
-        });
-    }
-}
 
 $(document).ready(function() {
 
