@@ -46,7 +46,7 @@ def staticDocsDir = new File("res/UI/docs")
 
 def jarname = "NuBot.jar"
 def jarnamelasttrades = "NuGetLastTrades.jar"
-def jarnameuilauncher = "LaunchUI.jar" //filename of the utils that runs the UI
+def jarnameuilauncher = "NuBot-GUI-launcher.jar" //filename of the utils that runs the UI
 def sampleconfig = "config/sample-options.json"
 def infofile = ".info"
 
@@ -146,7 +146,6 @@ task distInit << {
     distdir.mkdirs()
 }
 
-
 //create an executable Jar to launch the UI
 task LaunchUIjar(type: Jar) {
     archiveName jarnameuilauncher
@@ -168,7 +167,6 @@ task LaunchUIjar(type: Jar) {
     }
     with jar
 }
-
 
 //create a single Jar with all dependencies
 task NuBotJar(type: Jar) {

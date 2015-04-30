@@ -26,7 +26,7 @@ public class UiServer {
     /**
      * start the UI server
      */
-    public static void startUIserver(String configFile) {
+    public static void startUIserver(String configFile, boolean openConfig) {
 
         LOG.info("start ui server. configfile " + configFile);
 
@@ -62,6 +62,8 @@ public class UiServer {
         new BotController();
 
         LOG.debug("Opening the system default browser :");
+        if (openConfig)
+            urlStr += "/configui"; //if the user didn't specify cfg, it will automatically go to /configui
         Utils.launchBrowser(urlStr);
 
     }
