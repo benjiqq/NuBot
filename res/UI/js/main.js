@@ -86,7 +86,7 @@ function toggleBotButton(running) {
         setStateRunning();
     } else {
         botRunning = false;
-        setStateRunning();
+        setStateStopped();
     }
 }
 
