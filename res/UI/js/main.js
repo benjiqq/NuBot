@@ -338,8 +338,8 @@ function stopBot() {
             dataType: "json",
             type: 'POST',
             success: function(data) {
-                console.log("stopping bot " + data);
                 var success = data["success"];
+                console.log("stopped bot. success " + success);
                 var cbtn = $('#togglebot');
                 if (success) {
                     //on success of post change the color of the button
