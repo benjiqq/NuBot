@@ -9,7 +9,6 @@ By using NuBot you declare to have accepted the afore-mentioned risks. See the D
 
 ##Requirements for a correct functioning 
 
-* The machine that runs NuBot must be connected to the internet
 * The custodian must provide the bot with access to market exchanges where NuBits are traded
 * The custodian must avoid manual interaction with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. 
 * To communicate *liquidityinfo*, the custodian should possess an unlocked NuBit client which controls the custodial grant address. 
@@ -23,7 +22,7 @@ Detailed tutorial below :
 ###0) Setup the machine
 
 NuBot can run on a computer, on a raspberry pi, or a remote VPS, as long as it has a permanent connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java Runtime Environment to be installed.
-NuBot comes as a cross platform executable jar file to run from command line. 
+NuBot comes as a cross platform executable jar file to run from command line or by double clicking the GUI launcher executable jar. 
 
 Type `java -version` in your terminal to make sure you have JRE >= 1.8 installed on your machine, otherwise download Java JRE:1.8[from oracle's download page](http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
 
@@ -33,6 +32,8 @@ $ sudo add-apt-repository ppa:webupd8team/java
 $ sudo apt-get update
 $ sudo apt-get install oracle-java8-installer
 ```
+
+Starting from v0.3.0,  NuBot can be run as a service and controlled via web interface. That implies you can run the service on a remote machine with permanent connection and control it via browser from another machine.
 
 ###1) Prepare the NuBits client 
 
@@ -54,7 +55,7 @@ rpcport=9091
 rpcallowip=<ip_of_machine_running_the_bot>*
 ```
 
-*NOTE: if you plan using NuBot and NuBits on the same machine, the last parameter can be omitted. If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client.
+* NOTE: if you plan using NuBot and NuBits on the same machine, the rpcallowip parameter can be omitted. If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client.
 
 Restart the NuBits client to make changes effective. Make sure that the NuBit client controls a public address which received a custodial grant.  If the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to *liquidityinfo*. Unlocking the wallet *for minting only* is not enough.  
   
@@ -64,11 +65,26 @@ walletpassphrase <your passphrase> 9999999999
 ```
 The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg!
 
-###2) Configure the NuBot
+###2) Prepare NuBot
 
 *Download and unzip the latest stable build from the [download page](https://bitbucket.org/JordanLeePeershares/nubottrading/downloads).*
 
-The bot reads configuration options from one *.json* file.  Below you can find a list of all the available options parameter along a brief description. 
+#### Launch NuBot as a service (web GUI)
+
+If you want to launch the bot via CLI, you can skip this section.
+
+Double click the provided *NuBot-GUI-launcher.jar* executable or add the -GUI flag to command line arguments. A new webservice will be started at your localhost on port 4567.
+You can navigate to http://localhost:4567 from the local machine or properly configure firewall/port-forwarding to access the web-interface from a remote machine or smartphone.
+
+On startup you will be given the option of selecting an existing *.json* configuration file or start from scratch. 
+If you chose the latter, a new empty configuration file will be created in *config/nubot-config.json* and you can setup the bot using the web-interface. Remember to save your changes or they will not be effective.
+The next chapter of this tutorial provides a detailed explanation of each launch parameter you can change in the web interface. 
+
+In the web-interface you are presented with a simple dashboard that lets you control the bot (start/stop, change configuration, access documentation).  
+
+#### Launch configuration tutorial
+
+The bot reads configuration options from one *.json* file (also when configured via web-interface although it is transparent to the user).  Below you can find a list of all the available options parameter along a brief description. 
 Please make sure you fully understand in which way changing a setting will affect the bot before doing anything that can lead to losses. 
 
 In this tutorial we will use the following grouping : 
@@ -97,8 +113,8 @@ Sample options:
   "mailrecipient":"xxx@xxx.xxx",
   "emergencytimeout":60,
   "keepproceeds":0,
-  "maxsellordervolume" : 0.0,
-  "maxbuyordervolume" : 0.0,
+  "maxsellvolume" : 0.0,
+  "maxbuyvolume" : 0.0,
   "priceincrement": 0.1,
 
   "submitliquidity":true,
@@ -189,10 +205,9 @@ See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/03332b
 ---
 
 
-###3) Run NuBot
+###3) Run NuBot via command line
 
-
-Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
+Open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the *.json* file(s) you want to use as configuration.
 This is the syntax : 
 ```
 java -jar NuBot.jar -cfg=sample-config.json [-GUI]
@@ -201,10 +216,10 @@ java -jar NuBot.jar -cfg=sample-config.json [-GUI]
 You can also use nohup in *nix system to redirect the output, and run it in background with the `&` char. For, example, if you followed the structured configuration files explained above you can run nubot with :  
 
 ```
-nohup java -jar NuBot.jar sample-config.json
+nohup java -jar NuBot.jar sample-config.json &
 ```
 
-The [optional] flug -GUI will spin up the UI. 
+The [optional] flug -GUI will spin up the UI and automatically launch the browser, when avaialeble. Please be aware, only one GUI session at the time is allowed. 
 
 The bot will start and write output in the */logs* folder. 
 
@@ -226,12 +241,14 @@ Log files:
 | ------------- |:-------------:| 
 | standard.html    | Standard output of the bot  | 
 | verbose.html    | Verbose output of the bot with additional messages | 
+| standard.log    | Standard output of the bot  | 
+| verbose.log    | Verbose output of the bot with additional messages | 
 | orders_history.(csv;json) | snapshots of active orders (taken every minute) |
 | balance_history.json    | snapshots of balances (taken every minute)   | 
 | wall_shifts.(csv;json) | list of wall shifts | 
 
 
-NOTE: to avoid huge files, html files gets rotated at 50MB.
+NOTE: to avoid large files, html files gets rotated at 50MB.
 
 Additional messages are logged to console if the option `"verbose"=true` is set. Useful for debug
 

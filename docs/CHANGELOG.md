@@ -14,6 +14,7 @@ java -jar NuBot.jar -cfg=<path/to/config.json> [-GUI]
 
 #### New Features:
   - Optionally launch a web-server with a front end to manage nubot, both locally than remotely. 
+  - web-gui | - Responsive dashboard to control basic functioning of the bot.
   - web-gui | - Basic functionality to configure the bot's launch parameters : see/change/save/reset/validate 
   - web-gui | - Start/Stop the bot via toggle button
   - web-gui | - Shutdown server via button
