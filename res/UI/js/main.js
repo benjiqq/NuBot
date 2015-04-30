@@ -30,7 +30,11 @@ var botRunning = false;
 var logLine = 0;
 var requestedStop = false;
 
-var l; //ladda button
+var laddaToggleBtn; //ladda button for starting and stopping the bot
+
+var laddaSavecfgBtn; //ladda button for saving the config
+var laddaClearcfgBtn; //ladda button for clearing config
+
 var progressPB = 0; //current status of progressbar (min 0 max 1)
 var incrementPB;
 var currentAnimID;
@@ -254,41 +258,12 @@ function updateStatus() {
     setTimeout(updateStatus, refreshStatusInterval);
 }
 
-function flashButton(cbtn) {
-
-    if (cbtn.hasClass("btn-primary")) {
-        cbtn.removeClass("btn-primary");
-        cbtn.addClass("btn-success");
-
-        //change color back after 2000 msec
-        setTimeout(function() {
-            cbtn.removeClass("btn-success");
-            cbtn.addClass("btn-primary");
-        }, 2000);
-    }
-
-}
-
-function flashButtonRed(cbtn) {
-
-    if (cbtn.hasClass("btn-primary")) {
-        cbtn.removeClass("btn-primary");
-        cbtn.addClass("btn-danger");
-
-        //change color back after 2000 msec
-        setTimeout(function() {
-            cbtn.removeClass("btn-danger");
-            cbtn.addClass("btn-primary");
-        }, 2000);
-    }
-
-}
 
 function startBot() {
     if (confirm("Are you sure you want to start the bot?")) {
         // Start loading button
         incrementPB = 0.0038; //determines speed of progressbar
-        l.ladda('start');
+        laddaToggleBtn.ladda('start');
         currentAnimID = setInterval(animateProgressBar, 50, true);
         $('#togglebot-text').html(" Starting Bot");
         if (debug) console.log("calling start on server");
@@ -308,7 +283,6 @@ function startBot() {
                 if (success) {
 
                 } else {
-                    //flashButtonRed(cbtn);
                     alert(data["error"]);
                     stopProgressBarAnimation(false);
                 }
@@ -325,7 +299,7 @@ function stopBot() {
     if (confirm("Are you sure you want to stop the bot?")) {
         //Start loading
         incrementPB = 0.005; //determines speed of progressbar
-        l.ladda('start');
+        laddaToggleBtn.ladda('start');
         currentAnimID = setInterval(animateProgressBar, 50, false);
         $('#togglebot-text').html(" Stopping Bot");
 
@@ -343,12 +317,10 @@ function stopBot() {
                 var cbtn = $('#togglebot');
                 if (success) {
                     //on success of post change the color of the button
-                    //flashButton(cbtn);
                     $('#duration').html("");
                 } else {
                     alert(data["error"]);
                     stopProgressBarAnimation(false);
-                    //flashButtonRed(cbtn);
                 }
             },
             error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -449,9 +421,8 @@ function loadconfig() {
 }
 
 function postall() {
-
     var posturl = baseurl + "/config";
-
+    laddaSavecfgBtn.ladda('start');
     //get all vars and post them
 
     var exchangename = $("#exchangename").attr("value");
@@ -538,15 +509,15 @@ function makePostConfig(url, jsondata) {
             console.log("error " + errormsg);
 
             if (success) {
-
-                //on success of post change the color of the button
-                var cbtn = $('#saveconfigbutton');
-                flashButton(cbtn);
-
+                    //stop loading after 1000 msec
+                    setTimeout(function() {
+                            laddaSavecfgBtn.ladda('stop');
+                    }, 1000);
             } else {
                 alert(errormsg);
+                //Stop loading right away
+                laddaSavecfgBtn.ladda('stop');
             }
-
         },
 
         error: function(xhr, textStatus, errorThrown) {
@@ -558,6 +529,7 @@ function makePostConfig(url, jsondata) {
 
 function postreset() {
     if (confirm("The bot will use a clean config saved in config/nubot-config.json. Are you sure?")) {
+        laddaClearcfgBtn.ladda('start');
         var posturl = baseurl + "/configreset";
 
         $.ajax(posturl, {
@@ -569,16 +541,12 @@ function postreset() {
                 //on success of post change the color of the button
                 var rbtn = $('#resetbutton');
 
-                if (rbtn.hasClass("btn-primary")) {
-                    rbtn.removeClass("btn-primary");
-                    rbtn.addClass("btn-success");
 
-                    //change color back after 2000 msec
-                    setTimeout(function() {
-                        rbtn.removeClass("btn-success");
-                        rbtn.addClass("btn-primary");
-                    }, 2000);
-                }
+                //stop loading after 1000 msec
+                setTimeout(function() {
+                        laddaClearcfgBtn.ladda('stop');
+                }, 1000);
+
 
                 //reset values from server
                 updateConfigFile();
@@ -586,6 +554,9 @@ function postreset() {
             },
 
             error: function(xhr, textStatus, errorThrown) {
+
+                laddaClearcfgBtn.ladda('stop');
+
                 alert("error posting to server " + textStatus + " " + errorThrown);
                 alert(xhr.responseText);
             }
@@ -603,7 +574,7 @@ function startupPage(page_name) {
         case "operation":
             updateNavbar("operation");
             // Create a new instance of ladda for the specified button
-            l = $('#togglebot').ladda();
+            laddaToggleBtn = $('#togglebot').ladda();
             toggleBot(false);
 
             updateStatus("operation");
@@ -614,6 +585,10 @@ function startupPage(page_name) {
             break;
         case "config":
             updateNavbar("config");
+
+            laddaSavecfgBtn = $('#saveconfigbutton').ladda();
+            laddaClearcfgBtn = $('#resetbutton').ladda();
+
             updateStatus("config");
             loadconfig();
             break;
@@ -653,14 +628,14 @@ function animateProgressBar(toggle) {
         stopProgressBarAnimation(toggle);
     } else {
         animatingButton = true;
-        l.ladda('setProgress', progressPB);
+        laddaToggleBtn.ladda('setProgress', progressPB);
     }
 }
 
 function stopProgressBarAnimation(toggle) {
     clearInterval(currentAnimID);
     progressPB = 0;
-    l.ladda('stop');
+    laddaToggleBtn.ladda('stop');
     animatingButton = false;
     //on success of post change the color of the button
     toggleBot(toggle);

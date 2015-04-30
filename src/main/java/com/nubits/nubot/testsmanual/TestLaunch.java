@@ -68,7 +68,7 @@ public class TestLaunch {
         if (runui) {
 
             try {
-                UiServer.startUIserver(configFile);
+                UiServer.startUIserver(configFile, false);
             } catch (Exception e) {
                 LOG.error("error setting up UI server " + e);
             }
@@ -92,7 +92,7 @@ public class TestLaunch {
         if (runui) {
 
             try {
-                UiServer.startUIserver(Settings.DEFAULT_CONFIG_FILE_PATH);
+                UiServer.startUIserver(Settings.DEFAULT_CONFIG_FILE_PATH, false);
             } catch (Exception e) {
                 LOG.error("error setting up UI server " + e);
             }

@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
-import javax.mail.Session;
 import java.io.File;
 
 
@@ -96,7 +95,7 @@ public class MainLaunch {
             if (runGUI) {
                 SessionManager.setConfigGlobal(configFile, true);
                 try {
-                    UiServer.startUIserver(configFile);
+                    UiServer.startUIserver(configFile, defaultCfg);
                     Global.createShutDownHook();
                 } catch (Exception e) {
                     LOG.error("error setting up UI server " + e);
