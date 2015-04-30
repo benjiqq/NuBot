@@ -296,17 +296,5 @@ public class SessionManager {
         return ishalting;
     }
 
-    public static void removeSessionFile() {
-        String sessionFileName = Settings.SESSION_FILE;
-        sessionFile = new File(appFolder, sessionFileName);
-        if (sessionFile.exists()) {
-            try {
-                sessionFile.delete();
-            } catch (Exception e) {
-
-            }
-        }
-    }
-
 
 }
