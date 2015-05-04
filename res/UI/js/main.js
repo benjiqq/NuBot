@@ -372,10 +372,8 @@ function updateStatus() {
             //we set the state depending on the status with the setState functions
             mode = data["status"];
 
-            botRunning = false;
             if (mode == "running"){
                 setStateRunning();
-                botRunning = true;
             }
 
             if (mode == "halting") {

@@ -25,7 +25,7 @@ public class SessionManager {
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    private static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
+    //private static final String MODE_NOTSTARTED = "MODE_NOTSTARTED";
 
     private static final String MODE_STARTING = "MODE_STARTING";
 
@@ -35,7 +35,8 @@ public class SessionManager {
 
     private static final String MODE_HALTED = "MODE_HALTED";
 
-    public static String sessionMode = MODE_NOTSTARTED;
+    //public static String sessionMode = MODE_NOTSTARTED;
+    public static String sessionMode = MODE_HALTED;
 
     public static DateTime sessionStartDate;
 
@@ -268,9 +269,9 @@ public class SessionManager {
     public static String getReadableMode() {
         String readableMode = "undefined";
         switch (sessionMode) {
-            case MODE_NOTSTARTED:
+           /* case MODE_NOTSTARTED:
                 readableMode = "not started";
-                break;
+                break;*/
             case MODE_HALTED:
                 readableMode = "halted";
                 break;
