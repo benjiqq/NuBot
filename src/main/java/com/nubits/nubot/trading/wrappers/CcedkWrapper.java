@@ -427,7 +427,7 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
 
-        LOG.warn("CCEDK uses global TX fee, currency pair not supported."
+        LOG.debug("CCEDK uses global TX fee, currency pair not supported."
                 + "now calling getTxFee()");
         return getTxFee();
     }
