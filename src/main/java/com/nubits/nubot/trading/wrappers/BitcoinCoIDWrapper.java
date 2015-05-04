@@ -170,7 +170,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                     if (thisOrder.getType().equals(Constant.SELL)) {
                         nbtOnOrder += thisOrder.getAmount().getQuantity();
                     } else {
-                        pegOnOrder += Utils.round(thisOrder.getAmount().getQuantity() / Global.conversion, Settings.DEFAULT_PRECISION);
+                        pegOnOrder += Utils.round(thisOrder.getAmount().getQuantity(), Settings.DEFAULT_PRECISION);
                     }
                 }
                 Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());

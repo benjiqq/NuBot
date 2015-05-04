@@ -92,7 +92,7 @@ public class WrapperTestUtils {
         if (sellResponse.isPositive()) {
 
             LOG.info("\nPositive response  from TradeInterface.sell(...) ");
-            LOG.warn("Strategy : Submit order : "
+            LOG.info("Submit order : "
                     + "sell" + amountSell + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceSell + " " + pair.getPaymentCurrency().getCode());
 
@@ -109,7 +109,7 @@ public class WrapperTestUtils {
         ApiResponse buyResponse = Global.exchange.getTrade().buy(pair, amountBuy, priceBuy);
         if (buyResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.buy(...) ");
-            LOG.info(": Submit order : "
+            LOG.info("Submit order : "
                     + "buy" + amountBuy + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceBuy + " " + pair.getPaymentCurrency().getCode());
             String buyResponseString = (String) buyResponse.getResponseObject();
