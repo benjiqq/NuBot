@@ -8,15 +8,15 @@ var balanceEndPoint = "balances";
 
 var hook = true; //flag that prevents/allow the alert on page change to show up
 
-var refreshStatusInterval = 2 * 1000; //ms
+var refreshStatusInterval = 3 * 1000; //ms
 
 /*
  No matter how fast we set the refreshOrders,
  it will be capped by Server
  in Settings.ORDER_MIN_UPDATE and BALANCE_MIN_UPDATE
 */
-var refreshOrders = 4 * 1000;
-var refreshBalances = 4 * 1000;
+var refreshOrders = 6 * 1000;
+var refreshBalances = 6 * 1000;
 
 var refreshTablesInterval = 500;
 var refreshLogInterval = 300;
@@ -24,7 +24,6 @@ var refreshLogInterval = 300;
 var pageName = "operation";
 var debug = true;
 
-var dotCounter = 1;
 var botRunning = false;
 
 var logLine = 0;
