@@ -76,7 +76,7 @@ As explained in the <a href="https://nubits.com/about/white-paper">white paper</
 <h1>
 <a id="user-content-how-does-it-work" class="anchor" href="#how-does-it-work" aria-hidden="true"><span class="octicon octicon-link"></span></a>How does it work?</h1>
 
-<p>Only custodians will use the trading bot and relay liquidity data to other Nu clients.
+<p>Custodians will use the trading bot and relay liquidity data to other Nu clients.
 Within the Nu system there are two types of custodians: <strong>sell side</strong> and <strong>dual side</strong> custodians.
 <em>Dual side custodians</em> are custodians whose specific function is to provide liquidity for compensation, and they will initially only provide buy side price support. Once their buy order for NBT is partially filled, the bot should then create a sell order for that NBT.
 In the case of <em>sell side custodians</em>, the liquidity they provide is secondary to another goal such as funding core development, marketing NBT or distributing Peercoin dividends. They want to spend the proceeds of their NBT, so under no circumstance will they provide buy side liquidity.
@@ -182,11 +182,6 @@ After that the certificate can be added to the bot's keystore using keytool. See
 </code></pre>
 
 <p>You will be prompted for a passphrase : type nub0tSSL</p>
-
-<h1>
-<a id="user-content-price-feeds" class="anchor" href="#price-feeds" aria-hidden="true"><span class="octicon octicon-link"></span></a>Price Feeds</h1>
-
-<p>See <a href="https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/FEEDS.md">FEEDS.md</a></p>
 
 <h1>
 <a id="user-content-contribute" class="anchor" href="#contribute" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contribute</h1>

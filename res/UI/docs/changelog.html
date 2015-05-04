@@ -45,18 +45,55 @@
                 </h3>
               
               <div class="markdown-body entry-content">
-                <h2>
-<a id="user-content-v0205-xxxx-xx-zz" class="anchor" href="#v0205-xxxx-xx-zz" aria-hidden="true"><span class="octicon octicon-link"></span></a>v0.2.0.5 (xxxx-xx-zz)</h2>
+                <h1>
+<a id="user-content-changelog" class="anchor" href="#changelog" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changelog</h1>
+
+<h2>
+<a id="user-content-v030-2015-04-30" class="anchor" href="#v030-2015-04-30" aria-hidden="true"><span class="octicon octicon-link"></span></a>v0.3.0 (2015-04-30)</h2>
+
+<h4>
+<a id="user-content-notes-for-custodians-" class="anchor" href="#notes-for-custodians-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Notes for custodians :</h4>
 
 <ul>
-<li>Parameters have changed: use maxbuyvolume instead of maxbuyordervolume</li>
+<li>Option parameters have changed: use maxbuyvolume instead of maxbuyordervolume. </li>
+<li>All parameters are compulsory. </li>
+<li>Case is ignored for parameter name. </li>
 </ul>
+
+<p>Launch string changed to</p>
+
+<pre><code>java -jar NuBot.jar -cfg=&lt;path/to/config.json&gt; [-GUI]
+</code></pre>
 
 <h4>
 <a id="user-content-new-features" class="anchor" href="#new-features" aria-hidden="true"><span class="octicon octicon-link"></span></a>New Features:</h4>
 
 <ul>
-<li>A</li>
+<li>Optionally launch a web-server with a front end to manage nubot, both locally than remotely. </li>
+<li>web-gui | - Responsive dashboard to control basic functioning of the bot.</li>
+<li>web-gui | - Basic functionality to configure the bot's launch parameters : see/change/save/reset/validate </li>
+<li>web-gui | - Start/Stop the bot via toggle button</li>
+<li>web-gui | - Shutdown server via button</li>
+<li>web-gui | - When bot is running, display open orders and balances.</li>
+<li>web-gui | - Display real time messages from std-ouput in the bot's dashboard</li>
+<li>web-gui | - Browse up-do-date HTML documentation automatically generated at build time</li>
+<li>web-gui | - Jar launcher : Launch the bot by double clicking this new executable file distributed with the bot</li>
+<li>web-gui | - Automatically launch browser (if available) on bot dashboard in GUI mode</li>
+<li>web-gui | - Show confirmation dialogs for important operations</li>
+<li>web-gui | - Show progressbar in startup and shutdown sequence</li>
+<li>web-gui | - Show status, uptime and session timestamp.</li>
+<li>web-gui | - Obscure secret fields </li>
+<li>New price feeds for fiat rates (GoogleOfficial)</li>
+<li>Sandbox enviroment created to simulate a live exchange </li>
+<li>BalanceManager and OrderManager handles their own logic separately from Strategy</li>
+<li>Finally the verbose configuration parameter has the runtime impact expected. Set it to true to enable DEBUG level messages</li>
+<li>Colored output : Display errors in red, warnings in blue (trading) everything else default</li>
+<li>Bittrex wrapper ready (not fully integrated into the bot)</li>
+<li>Created NuStringEncrypt <a href="https://bitbucket.org/mj2p/nustringencrypt">https://bitbucket.org/mj2p/nustringencrypt</a> simple standalone tool that uses scrypt as a key derivation to AES encrypt strings</li>
+<li>Test credential validity before starting the bot by trying to fetch balance</li>
+<li>Report uptime on shutdown</li>
+<li>Validate Options before running or throws Exception</li>
+<li>Documented exchange names in exchanges.md</li>
 </ul>
 
 <h4>
@@ -65,6 +102,32 @@
 <ul>
 <li>Refactored Trading Strategy code extracing methods to Order and Balance Manager objects</li>
 <li>Introduced Utils.formatNumber</li>
+<li>Handle concurrent requests to remote API correctly</li>
+<li>A new SessionManager class to manage session correctly</li>
+<li>Log messages improved both in std output and in files</li>
+<li>Session handles MODES of the bot , starting up, running, paused, shutting down, etc...</li>
+<li>Shutdown sequence improved consistently</li>
+<li>
+<em>compileAll.sh</em> script updated</li>
+<li>Refactored Strategy code to make it cleaner</li>
+<li>old metafile (.nubot) file moved to a new file in <em>res/.info</em>
+</li>
+<li>Separated fetch/get logic for remote calls</li>
+<li>Automatically handle large log files size</li>
+<li>Added thread name to logging </li>
+<li>Ignore case in configuration parameters</li>
+<li>Added thread name to HTML logs as a column</li>
+<li>Ported time duration using Joda as a proper handler</li>
+<li>Externalised - where possible - the sign() method from API wrappers</li>
+<li>In documentation, replaced all internal links with a static resource URI</li>
+<li>During build, warn if using a different version of gradle</li>
+<li>Resized image files for correct visualisation of the readme</li>
+<li>Restructured duplicate folder-file structure in gradle.md</li>
+<li>Refactored ~md/ in ~docs/</li>
+<li>Standardised CLI arguments using GNU-style and apache Commons CLI</li>
+<li>Deprecated NuPriceMonitorTask </li>
+<li>Added market info on hipchat debug message</li>
+<li>Systematically reformatted all the code base using shared code standards</li>
 </ul>
 
 <h4>
@@ -72,6 +135,13 @@
 
 <ul>
 <li>Wrong count of locked peg balance on bitcoin.co.id</li>
+<li>Prevent wallShifts if an order reset is already happening</li>
+<li>Bitcoin.co.id wrappers various fix (runtime exceptions)</li>
+<li>Poloniex wrong nonce issues fixed with a retry loop</li>
+<li>Replaced <em>System.getProperty("user.dir")</em> with a more adequate custom method :<em>FileSystemUtils.getBotAbsolutePath()</em>
+</li>
+<li>Corrected URL in <em>updateKeystore.sh</em> script</li>
+<li>Corrected Feed names in documentation to match the code</li>
 </ul>
 
 <h2>
@@ -82,7 +152,6 @@
 
 <ul>
 <li>Added Comkort exchange API support</li>
-<li>Added Bittrex exchange API support</li>
 <li>Added a unique session id for each instance of the bot</li>
 <li>Liquidityinfo identifier contains multi-tier informaiton</li>
 <li>Added script to retrieve updated keystore from bitbucket repository</li>

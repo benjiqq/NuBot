@@ -61,7 +61,6 @@
 <a id="user-content-requirements-for-a-correct-functioning" class="anchor" href="#requirements-for-a-correct-functioning" aria-hidden="true"><span class="octicon octicon-link"></span></a>Requirements for a correct functioning</h2>
 
 <ul>
-<li>The machine that runs NuBot must be connected to the internet</li>
 <li>The custodian must provide the bot with access to market exchanges where NuBits are traded</li>
 <li>The custodian must avoid manual interaction with the exchange while the automated bot is operating. Do not try to trade, do not try to deposit/withdraw funds. </li>
 <li>To communicate <em>liquidityinfo</em>, the custodian should possess an unlocked NuBit client which controls the custodial grant address. </li>
@@ -79,7 +78,7 @@
 <a id="user-content-0-setup-the-machine" class="anchor" href="#0-setup-the-machine" aria-hidden="true"><span class="octicon octicon-link"></span></a>0) Setup the machine</h3>
 
 <p>NuBot can run on a computer, on a raspberry pi, or a remote VPS, as long as it has a permanent connection. The choice is up to you. It only requires a machine with 24/7 connection and recent Java Runtime Environment to be installed.
-NuBot comes as a cross platform executable jar file to run from command line. </p>
+NuBot comes as a cross platform executable jar file to run from command line or by double clicking the GUI launcher executable jar. </p>
 
 <p>Type <code>java -version</code> in your terminal to make sure you have JRE &gt;= 1.8 installed on your machine, otherwise download Java JRE:1.8<a href="http://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html">from oracle's download page</a></p>
 
@@ -89,6 +88,8 @@ NuBot comes as a cross platform executable jar file to run from command line. </
 $ sudo apt-get update
 $ sudo apt-get install oracle-java8-installer
 </code></pre>
+
+<p>Starting from v0.3.0,  NuBot can be run as a service and controlled via web interface. That implies you can run the service on a remote machine with permanent connection and control it via browser from another machine.</p>
 
 <h3>
 <a id="user-content-1-prepare-the-nubits-client" class="anchor" href="#1-prepare-the-nubits-client" aria-hidden="true"><span class="octicon octicon-link"></span></a>1) Prepare the NuBits client</h3>
@@ -111,7 +112,9 @@ rpcport=9091
 rpcallowip=&lt;ip_of_machine_running_the_bot&gt;*
 </code></pre>
 
-<p>*NOTE: if you plan using NuBot and NuBits on the same machine, the last parameter can be omitted. If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client.</p>
+<ul>
+<li>NOTE: if you plan using NuBot and NuBits on the same machine, the rpcallowip parameter can be omitted. If you plan to run the bot on a different machine, you must authorise remote calls to your Nu client.</li>
+</ul>
 
 <p>Restart the NuBits client to make changes effective. Make sure that the NuBit client controls a public address which received a custodial grant.  If the NuBits wallet is encrypted with a passphrase, make sure to unlock it, otherwise it won't accept RPC calls to <em>liquidityinfo</em>. Unlocking the wallet <em>for minting only</em> is not enough.  </p>
 
@@ -123,11 +126,28 @@ rpcallowip=&lt;ip_of_machine_running_the_bot&gt;*
 <p>The command above will unlock the NBT wallet for 9999999999 seconds, ~ 300 years. That should be enough time for your bot to keep the peg!</p>
 
 <h3>
-<a id="user-content-2-configure-the-nubot" class="anchor" href="#2-configure-the-nubot" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Configure the NuBot</h3>
+<a id="user-content-2-prepare-nubot" class="anchor" href="#2-prepare-nubot" aria-hidden="true"><span class="octicon octicon-link"></span></a>2) Prepare NuBot</h3>
 
 <p><em>Download and unzip the latest stable build from the <a href="https://bitbucket.org/JordanLeePeershares/nubottrading/downloads">download page</a>.</em></p>
 
-<p>The bot reads configuration options from one <em>.json</em> file.  Below you can find a list of all the available options parameter along a brief description. 
+<h4>
+<a id="user-content-launch-nubot-as-a-service-web-gui" class="anchor" href="#launch-nubot-as-a-service-web-gui" aria-hidden="true"><span class="octicon octicon-link"></span></a>Launch NuBot as a service (web GUI)</h4>
+
+<p>If you want to launch the bot via CLI, you can skip this section.</p>
+
+<p>Double click the provided <em>NuBot-GUI-launcher.jar</em> executable or add the -GUI flag to command line arguments. A new webservice will be started at your localhost on port 4567.
+You can navigate to http://localhost:4567 from the local machine or properly configure firewall/port-forwarding to access the web-interface from a remote machine or smartphone.</p>
+
+<p>On startup you will be given the option of selecting an existing <em>.json</em> configuration file or start from scratch. 
+If you chose the latter, a new empty configuration file will be created in <em>config/nubot-config.json</em> and you can setup the bot using the web-interface. Remember to save your changes or they will not be effective.
+The next chapter of this tutorial provides a detailed explanation of each launch parameter you can change in the web interface. </p>
+
+<p>In the web-interface you are presented with a simple dashboard that lets you control the bot (start/stop, change configuration, access documentation).  </p>
+
+<h4>
+<a id="user-content-launch-configuration-tutorial" class="anchor" href="#launch-configuration-tutorial" aria-hidden="true"><span class="octicon octicon-link"></span></a>Launch configuration tutorial</h4>
+
+<p>The bot reads configuration options from one <em>.json</em> file (also when configured via web-interface although it is transparent to the user).  Below you can find a list of all the available options parameter along a brief description. 
 Please make sure you fully understand in which way changing a setting will affect the bot before doing anything that can lead to losses. </p>
 
 <p>In this tutorial we will use the following grouping : </p>
@@ -160,8 +180,8 @@ Please make sure you fully understand in which way changing a setting will affec
   <span class="pl-s"><span class="pl-pds">"</span>mailrecipient<span class="pl-pds">"</span></span>:<span class="pl-s"><span class="pl-pds">"</span>xxx@xxx.xxx<span class="pl-pds">"</span></span>,
   <span class="pl-s"><span class="pl-pds">"</span>emergencytimeout<span class="pl-pds">"</span></span>:<span class="pl-c1">60</span>,
   <span class="pl-s"><span class="pl-pds">"</span>keepproceeds<span class="pl-pds">"</span></span>:<span class="pl-c1">0</span>,
-  <span class="pl-s"><span class="pl-pds">"</span>maxsellordervolume<span class="pl-pds">"</span></span> : <span class="pl-c1">0.0</span>,
-  <span class="pl-s"><span class="pl-pds">"</span>maxbuyordervolume<span class="pl-pds">"</span></span> : <span class="pl-c1">0.0</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>maxsellvolume<span class="pl-pds">"</span></span> : <span class="pl-c1">0.0</span>,
+  <span class="pl-s"><span class="pl-pds">"</span>maxbuyvolume<span class="pl-pds">"</span></span> : <span class="pl-c1">0.0</span>,
   <span class="pl-s"><span class="pl-pds">"</span>priceincrement<span class="pl-pds">"</span></span>: <span class="pl-c1">0.1</span>,
 
   <span class="pl-s"><span class="pl-pds">"</span>submitliquidity<span class="pl-pds">"</span></span>:<span class="pl-c1">true</span>,
@@ -428,14 +448,14 @@ The price feed will track the live rate between the <em>secondary peg</em> curre
 </tbody>
 </table>
 
-<p>See <a href="https://bitbucket.org/JordanLeePeershares/nubottrading/src/5ef7ead8a435ef0e142dc07de3a0405569da0ecc/FEEDS.md?at=master">FEEDS.md</a> for an updated list of valid feed names.</p>
+<p>See <a href="https://bitbucket.org/JordanLeePeershares/nubottrading/src/03332b2637c5a67d9abd31b1c7bf1f37c239bc71/md/FEEDS.md?at=master">FEEDS.md</a> for an updated list of valid feed names.</p>
 
 <hr>
 
 <h3>
-<a id="user-content-3-run-nubot" class="anchor" href="#3-run-nubot" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Run NuBot</h3>
+<a id="user-content-3-run-nubot-via-command-line" class="anchor" href="#3-run-nubot-via-command-line" aria-hidden="true"><span class="octicon octicon-link"></span></a>3) Run NuBot via command line</h3>
 
-<p>Now open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the <em>.json</em> file(s) you want to use as configuration.
+<p>Open a terminal, navigate to the folder of NuBot and execute the jar, specifying the path to the <em>.json</em> file(s) you want to use as configuration.
 This is the syntax : </p>
 
 <pre><code>java -jar NuBot.jar -cfg=sample-config.json [-GUI]
@@ -443,10 +463,10 @@ This is the syntax : </p>
 
 <p>You can also use nohup in *nix system to redirect the output, and run it in background with the <code>&amp;</code> char. For, example, if you followed the structured configuration files explained above you can run nubot with :  </p>
 
-<pre><code>nohup java -jar NuBot.jar sample-config.json
+<pre><code>nohup java -jar NuBot.jar sample-config.json &amp;
 </code></pre>
 
-<p>The [optional] flug -GUI will spin up the UI. </p>
+<p>The [optional] flug -GUI will spin up the UI and automatically launch the browser, when avaialeble. Please be aware, only one GUI session at the time is allowed. </p>
 
 <p>The bot will start and write output in the <em>/logs</em> folder. </p>
 
@@ -482,6 +502,14 @@ On startup, NuBot prints out the name of the folder it is using to log:</p>
 <td align="center">Verbose output of the bot with additional messages</td>
 </tr>
 <tr>
+<td>standard.log</td>
+<td align="center">Standard output of the bot</td>
+</tr>
+<tr>
+<td>verbose.log</td>
+<td align="center">Verbose output of the bot with additional messages</td>
+</tr>
+<tr>
 <td>orders_history.(csv;json)</td>
 <td align="center">snapshots of active orders (taken every minute)</td>
 </tr>
@@ -496,7 +524,7 @@ On startup, NuBot prints out the name of the folder it is using to log:</p>
 </tbody>
 </table>
 
-<p>NOTE: to avoid huge files, html files gets rotated at 50MB.</p>
+<p>NOTE: to avoid large files, html files gets rotated at 50MB.</p>
 
 <p>Additional messages are logged to console if the option <code>"verbose"=true</code> is set. Useful for debug</p>
 
