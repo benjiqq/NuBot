@@ -4,7 +4,6 @@
 | ------------- |:-------------:| -------------:| 
 | [AllCoin](https://www.allcoin.com)    | live  |  https://www.allcoin.com |
 | [BitcoinCoID](https://vip.bitcoin.co.id)    | live  |  https://vip.bitcoin.co.id |
-| [Bitspark](https://www.bitspark.io)    | live  |  https://www.bitspark.io |
 | [Poloniex](https://poloniex.com)    | live  |  https://poloniex.com |
 | [Bittrex](https://bittrex.com)    | in progress  |  https://bittrex.com |
 | [CCEDK](https://ccedk.com)    | live  |  https://ccedk.com |
@@ -21,5 +20,7 @@ not operational for liquidity operations
 | CCEX    |  delisted nubits |   |
 | Excoin    | defunct  |   |
 | [Comkort](https://comkort.com)    | delisted nubits  |  https://comkort.com |
+| [Bitspark](https://www.bitspark.io)    | shifted business |  https://www.bitspark.io |
+
 
 
