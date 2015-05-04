@@ -63,7 +63,7 @@ function setStateRunning() {
 
     $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
 
-    document.title = 'Running! - NuBot GUI'
+    document.title = 'Running! - NuBot GUI';
     stopAnimation();
     setNavBarActive();
 }
@@ -348,7 +348,7 @@ function updateOrders() {
     setTimeout(updateOrders, refreshOrders);
 }
 
-function updateStatus() {
+function updateStatus(pageName) {
     $.ajax({
             type: "GET",
             dataType: "json",
@@ -369,20 +369,22 @@ function updateStatus() {
             //we polled the server and now set the client status
             //we set the state depending on the status with the setState functions
             mode = data["status"];
+            if(pageName == "operation"){
+                var run = false;
 
-            var run = false;
-            if (data["status"] == "running"){
-                setStateRunning();
-                run = true;
-            }
+                if (data["status"] == "running"){
+                    setStateRunning();
+                    run = true;
+                }
 
-            if (data["status"] == "halting") {
-                setStateHalting();
-                run = true;
-            }
+                if (data["status"] == "halting") {
+                    setStateHalting();
+                    run = true;
+                }
 
-            if (data["status"] == "halted") {
-                setStateHalted();
+                if (data["status"] == "halted") {
+                    setStateHalted();
+                }
             }
 
             if (pageName == "operation" && !animatingButton) {
