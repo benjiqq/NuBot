@@ -44,7 +44,7 @@ public class TestWrappers {
      * Configure tests
      */
 
-    private static final String TEST_OPTIONS_PATH = "config/myconfig/ccedk.json";
+    private static final String TEST_OPTIONS_PATH = "config/myconfig/bitcoincoid.json";
 
     public static final CurrencyPair testPair = CurrencyList.NBT_BTC;
     public static final Currency testCurrency = CurrencyList.NBT;
@@ -67,7 +67,12 @@ public class TestWrappers {
         //WrapperTestUtils.testClearAllOrders(testPair);
 
         //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
+        //WrapperTestUtils.testSell(0.3, 0.00830509, testPair);  //ok
         //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
+        //WrapperTestUtils.testBuy(0.3, 0.00300, testPair);  //ok
+        //WrapperTestUtils.testGetAvailableBalances(testPair);
 
         //WrapperTestUtils.testGetActiveOrders(); //Try with 0 active orders also . for buy orders, check in which currency is the amount returned.
         //WrapperTestUtils.testClearAllOrders(CurrencyList.NBT_BTC);
@@ -96,7 +101,7 @@ public class TestWrappers {
         //WrapperTestUtils.testClearAllOrders(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair);
 
-
+/*
         try {
             long waitTime = 500;//ms
             WrapperTestUtils.testGetActiveOrders(testPair, false); //How many any active orders prior to starting the test?
@@ -131,7 +136,7 @@ public class TestWrappers {
             LOG.error(e.toString());
         }
 
-
+*/
         //-------- Stress test start ---------
 /*
         Thread t = new Thread(new Runnable() {
@@ -180,7 +185,7 @@ public class TestWrappers {
         //---------------
         //WrapperTestUtils.testGetLastPrice(testPair);
         //WrapperTestUtils.testGetLastTrades(testPair, 1388534400);
-        WrapperTestUtils.testGetLastTrades(testPair);
+        //WrapperTestUtils.testGetLastTrades(testPair);
 
 
         LOG.info("Total Time: " + (System.nanoTime() - startTime) / 1000000 + " ms"); //TOC
