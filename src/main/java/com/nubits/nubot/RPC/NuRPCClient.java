@@ -321,6 +321,8 @@ public class NuRPCClient {
                 + exchangeName + separator
                 + SessionManager.sessionId;
         LOG.debug("liquidity identifier = " + identifier);
+        //TODO limit identifier to 250bytes
+        //TODO limit to this charset https://en.wikipedia.org/wiki/ASCII#ASCII_printable_characters
         return identifier;
     }
 }
