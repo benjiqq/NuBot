@@ -369,23 +369,23 @@ function updateStatus(pageName) {
             //we polled the server and now set the client status
             //we set the state depending on the status with the setState functions
             mode = data["status"];
-            if(pageName == "operation"){
-                var run = false;
 
-                if (data["status"] == "running"){
-                    setStateRunning();
-                    run = true;
-                }
+            var run = false;
 
-                if (data["status"] == "halting") {
-                    setStateHalting();
-                    run = true;
-                }
-
-                if (data["status"] == "halted") {
-                    setStateHalted();
-                }
+            if (data["status"] == "running"){
+                if(pageName == "operation") setStateRunning();
+                run = true;
             }
+
+            if (data["status"] == "halting") {
+                if(pageName == "operation") setStateHalting();
+                run = true;
+            }
+
+            if (data["status"] == "halted") {
+                if(pageName == "operation") setStateHalted();
+            }
+
 
             if (pageName == "operation" && !animatingButton) {
                 toggleBotButton(run);
@@ -714,6 +714,7 @@ function stopProgressBarAnimation(toggle) {
 }
 
 function updateConfigElements(running) {
+    console.log("here-"+running)
     $('#saveconfigbutton').prop('disabled', running);
     $('#resetbutton').prop('disabled', running);
 }
