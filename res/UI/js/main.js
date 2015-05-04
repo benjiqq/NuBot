@@ -359,7 +359,8 @@ function updateStatus() {
             handleFailServer();
         })
         .done(function(data) {
-            //console.log("status data: " + JSON.parse(JSON.stringify(data)));
+            console.log("status data: " + JSON.parse(JSON.stringify(data)));
+            console.log("status : " + data["status"]);
 
             $('#botstatus').html(data["status"]);
 
@@ -371,26 +372,25 @@ function updateStatus() {
             //we set the state depending on the status with the setState functions
             mode = data["status"];
 
-            var run = false;
-            if (data["status"] == "running"){
+            botRunning = false;
+            if (mode == "running"){
                 setStateRunning();
-                run = true;
+                botRunning = true;
             }
 
-            if (data["status"] == "halting") {
+            if (mode == "halting") {
                 setStateHalting();
-                run = true;
             }
 
-            if (data["status"] == "halted") {
+            if (mode == "halted") {
                 setStateHalted();
             }
 
-            if (pageName == "operation" && !animatingButton) {
+            /*if (pageName == "operation" && !animatingButton) {
                 toggleBotButton(run);
             } else if (pageName == "config") {
                 updateConfigElements(run);
-            }
+            }*/
         });
 
     setTimeout(updateStatus, refreshStatusInterval);
@@ -402,10 +402,18 @@ $(document).ready(function() {
     updateConfigFile();
 
     $('#togglebot').click(function() {
-        if (botRunning && !animatingButton)
-            stopBot();
-        else
+
+        if (mode == "running"){
+           stopBot();
+        }
+
+        if (mode == "halted") {
             startBot();
+        }
+
+        //ignore starting and halting
+
+
     });
 }); //end document.ready function
 
