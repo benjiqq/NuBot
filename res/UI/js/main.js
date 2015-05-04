@@ -714,7 +714,6 @@ function stopProgressBarAnimation(toggle) {
 }
 
 function updateConfigElements(running) {
-    console.log("here-"+running)
     $('#saveconfigbutton').prop('disabled', running);
     $('#resetbutton').prop('disabled', running);
 }
