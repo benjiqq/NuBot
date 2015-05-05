@@ -56,6 +56,7 @@ function clearTables() {
 }
 
 function setStateRunning() {
+    console.log("set running");
     $('#togglebot-text').html(" Stop Bot");
     $('#togglebot-text').addClass("glyphicon-off");
     $('#togglebot-text').removeClass("glyphicon-play");
@@ -70,6 +71,7 @@ function setStateRunning() {
 }
 
 function setStateHalted() {
+    console.log("set halted");
     $('#togglebot-text').html(" Start Bot");
     $('#togglebot-text').addClass("glyphicon-play");
     $('#togglebot-text').removeClass("glyphicon-off");
@@ -84,23 +86,23 @@ function setStateHalted() {
     setNavBarActive();
 }
 
-
-function toggleBotButton(running) {
-    if (running) {
-        botRunning = true;
-        setStateRunning();
-    } else {
-        botRunning = false;
-        setStateHalted();
-    }
-}
-
 function setStateStarting(){
+    console.log("set starting");
     // Start loading button
     incrementPB = 0.006; //determines speed of progressbar
     laddaToggleBtn.ladda('start');
     currentAnimID = setInterval(animateProgressBar, 50, true);
     $('#togglebot-text').html(" Starting Bot");
+
+    setNavBarInactive();
+}
+
+function setStateHalting(){
+    console.log("set halting");
+    incrementPB = 0.008; //determines speed of progressbar
+    laddaToggleBtn.ladda('start');
+    currentAnimID = setInterval(animateProgressBar, 50, false);
+    $('#togglebot-text').html(" Stopping Bot");
 
     setNavBarInactive();
 }
@@ -137,14 +139,6 @@ function startBot() {
     }
 }
 
-function setStateHalting(){
-    incrementPB = 0.008; //determines speed of progressbar
-    laddaToggleBtn.ladda('start');
-    currentAnimID = setInterval(animateProgressBar, 50, false);
-    $('#togglebot-text').html(" Stopping Bot");
-
-    setNavBarInactive();
-}
 
 function stopBot() {
     if (debug) console.log("calling stop on server");
@@ -370,19 +364,25 @@ function updateStatus() {
 
             //we polled the server and now set the client status
             //we set the state depending on the status with the setState functions
-            mode = data["status"];
+            var newmode = data["status"];
 
-            if (mode == "running"){
+            if (newmode == "running" && mode != "running"){
                 setStateRunning();
             }
 
-            if (mode == "halting") {
+            if (newmode == "starting" && mode != "starting"){
+                setStateStarting();
+            }
+
+            if (newmode == "halting" && mode != "halting") {
                 setStateHalting();
             }
 
-            if (mode == "halted") {
+            if (newmode == "halted" && mode != "halted") {
                 setStateHalted();
             }
+
+            mode = newmode;
 
             /*if (pageName == "operation" && !animatingButton) {
                 toggleBotButton(run);
@@ -648,7 +648,6 @@ function startupPage(page_name) {
             updateNavbar("operation");
             // Create a new instance of ladda for the specified button
             laddaToggleBtn = $('#togglebot').ladda();
-            toggleBotButton(false);
 
             updateStatus("operation");
             updateLog();
@@ -714,8 +713,6 @@ function stopAnimation() {
 
 function stopProgressBarAnimation(toggle) {
     stopAnimation();
-    //on success of post change the color of the button
-    toggleBotButton(toggle);
 }
 
 function updateConfigElements(running) {
