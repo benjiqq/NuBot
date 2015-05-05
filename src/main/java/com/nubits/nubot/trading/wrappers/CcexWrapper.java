@@ -676,7 +676,7 @@ public class CcexWrapper implements TradeInterface {
                 } while (!exit);
             }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;

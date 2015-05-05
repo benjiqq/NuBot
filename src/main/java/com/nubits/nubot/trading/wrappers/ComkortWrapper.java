@@ -552,7 +552,7 @@ public class ComkortWrapper implements TradeInterface {
                     }
                     if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
                         exit = true;
-                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                        LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
                     }
                 } while (!exit);
             }
