@@ -366,6 +366,8 @@ function updateStatus() {
             //we set the state depending on the status with the setState functions
             var newmode = data["status"];
 
+            console.log("newmode " + newmode + " oldmode " + mode);
+
             if (newmode == "running" && mode != "running"){
                 setStateRunning();
             }
