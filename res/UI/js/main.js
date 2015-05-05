@@ -55,53 +55,69 @@ function clearTables() {
 }
 
 function setStateRunning() {
-    $('#togglebot-text').html(" Stop Bot");
-    $('#togglebot-text').addClass("glyphicon-off");
-    $('#togglebot-text').removeClass("glyphicon-play");
+    if (mode != "running"){
+        //console.log("set running");
+        $('#togglebot-text').html(" Stop Bot");
+        $('#togglebot-text').addClass("glyphicon-off");
+        $('#togglebot-text').removeClass("glyphicon-play");
 
-    $("#togglebot").attr("data-color", "red");
+        $("#togglebot").attr("data-color", "red");
 
-    $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
+        $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
 
-    document.title = 'Running! - NuBot GUI';
-    stopAnimation();
-    setNavBarActive();
+        document.title = 'Running! - NuBot GUI';
+        stopAnimation();
+        setNavBarActive();
+
+        mode = "running";
+    }
+
 }
 
 function setStateHalted() {
-    $('#togglebot-text').html(" Start Bot");
-    $('#togglebot-text').addClass("glyphicon-play");
-    $('#togglebot-text').removeClass("glyphicon-off");
+    if (mode != "halted"){
+        //console.log("set halted");
+        $('#togglebot-text').html(" Start Bot");
+        $('#togglebot-text').addClass("glyphicon-play");
+        $('#togglebot-text').removeClass("glyphicon-off");
 
-    $("#togglebot").attr("data-color", "blue");
+        $("#togglebot").attr("data-color", "blue");
 
-    setTimeout(clearTables, refreshTablesInterval);
+        setTimeout(clearTables, refreshTablesInterval);
 
-    document.title = 'NuBot GUI - Stopped';
-    $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
-    stopAnimation();
-    setNavBarActive();
-}
-
-
-function toggleBotButton(running) {
-    if (running) {
-        botRunning = true;
-        setStateRunning();
-    } else {
-        botRunning = false;
-        setStateHalted();
+        document.title = 'NuBot GUI - Stopped';
+        $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
+        stopAnimation();
+        setNavBarActive();
+        mode = "halted";
     }
 }
 
 function setStateStarting(){
-    // Start loading button
-    incrementPB = 0.006; //determines speed of progressbar
-    laddaToggleBtn.ladda('start');
-    currentAnimID = setInterval(animateProgressBar, 50, true);
-    $('#togglebot-text').html(" Starting Bot");
+    if (mode != "starting"){
+        //console.log("set starting");
+        // Start loading button
+        incrementPB = 0.006; //determines speed of progressbar
+        laddaToggleBtn.ladda('start');
+        currentAnimID = setInterval(animateProgressBar, 50, true);
+        $('#togglebot-text').html(" Starting Bot");
 
-    setNavBarInactive();
+        setNavBarInactive();
+        mode = "starting";
+    }
+}
+
+function setStateHalting(){
+    if (mode != "halting"){
+        //console.log("set halting");
+        incrementPB = 0.008; //determines speed of progressbar
+        laddaToggleBtn.ladda('start');
+        currentAnimID = setInterval(animateProgressBar, 50, false);
+        $('#togglebot-text').html(" Stopping Bot");
+
+        setNavBarInactive();
+        mode = "halting";
+    }
 }
 
 function startBot() {
@@ -119,7 +135,7 @@ function startBot() {
             dataType: "json",
             type: 'POST',
             success: function(data) {
-                console.log("starting bot ok " + data);
+                //console.log("starting bot ok " + data);
                 var success = data["success"];
 
                 if (success) {
@@ -136,14 +152,6 @@ function startBot() {
     }
 }
 
-function setStateHalting(){
-    incrementPB = 0.008; //determines speed of progressbar
-    laddaToggleBtn.ladda('start');
-    currentAnimID = setInterval(animateProgressBar, 50, false);
-    $('#togglebot-text').html(" Stopping Bot");
-
-    setNavBarInactive();
-}
 
 function stopBot() {
     if (debug) console.log("calling stop on server");
@@ -161,7 +169,7 @@ function stopBot() {
             type: 'POST',
             success: function(data) {
                 var success = data["success"];
-                console.log("stopped bot. success " + success);
+                //console.log("stopped bot. success " + success);
                 var cbtn = $('#togglebot');
                 if (success) {
                     //on success of post change the color of the button
@@ -359,42 +367,51 @@ function updateStatus(pageName) {
         })
         .done(function(data) {
             //console.log("status data: " + JSON.parse(JSON.stringify(data)));
+            //console.log("status : " + data["status"]);
 
-            $('#botstatus').html(data["status"]);
-
-            $('#sessionstart').html(data["sessionstart"]);
-
-            $('#duration').html(data["duration"]);
 
             //we polled the server and now set the client status
             //we set the state depending on the status with the setState functions
-            mode = data["status"];
+            var newmode = data["status"];
 
-            var run = false;
+            //console.log("newmode " + newmode + " oldmode " + mode);
 
-            if (data["status"] == "running"){
-                if(pageName == "operation") setStateRunning();
-                run = true;
+            //Perform page-specific operations
+            if(pageName=="operation"){
+                $('#botstatus').html(data["status"]);
+
+                $('#sessionstart').html(data["sessionstart"]);
+
+                $('#duration').html(data["duration"]);
+
+                if (newmode == "running"){
+                    setStateRunning();
+                }
+
+                if (newmode == "starting" && mode != "starting"){
+                    setStateStarting();
+                }
+
+                if (newmode == "halting" && mode != "halting") {
+                    setStateHalting();
+                }
+
+                if (newmode == "halted" && mode != "halted") {
+                    setStateHalted();
+                }
+
+            }
+            else if (pageName == "config") {
+                var disableButtons = newmode != "halted"; //allow changes to config only with bot halted
+                updateConfigElements(disableButtons);
+
             }
 
-            if (data["status"] == "halting") {
-                if(pageName == "operation") setStateHalting();
-                run = true;
-            }
+            mode = newmode;
 
-            if (data["status"] == "halted") {
-                if(pageName == "operation") setStateHalted();
-            }
-
-
-            if (pageName == "operation" && !animatingButton) {
-                toggleBotButton(run);
-            } else if (pageName == "config") {
-                updateConfigElements(run);
-            }
         });
 
-    setTimeout(updateStatus, refreshStatusInterval);
+    setTimeout(updateStatus, refreshStatusInterval,"operation");
 }
 
 
@@ -403,10 +420,18 @@ $(document).ready(function() {
     updateConfigFile();
 
     $('#togglebot').click(function() {
-        if (botRunning && !animatingButton)
-            stopBot();
-        else
+
+        if (mode == "running"){
+           stopBot();
+        }
+
+        if (mode == "halted") {
             startBot();
+        }
+
+        //ignore starting and halting
+
+
     });
 }); //end document.ready function
 
@@ -568,13 +593,13 @@ function makePostConfig(url, jsondata) {
         type: 'POST',
         success: function(data) {
 
-            console.log("got data " + data);
+            //console.log("got data " + data);
 
             // server returns custom error message
             var success = data["success"];
-            console.log("success " + success);
+            //console.log("success " + success);
             var errormsg = data["error"];
-            console.log("error " + errormsg);
+            //console.log("error " + errormsg);
 
             if (success) {
                     //stop loading after 1000 msec
@@ -643,7 +668,6 @@ function startupPage(page_name) {
             updateNavbar("operation");
             // Create a new instance of ladda for the specified button
             laddaToggleBtn = $('#togglebot').ladda();
-            toggleBotButton(false);
 
             updateStatus("operation");
             updateLog();
@@ -709,8 +733,6 @@ function stopAnimation() {
 
 function stopProgressBarAnimation(toggle) {
     stopAnimation();
-    //on success of post change the color of the button
-    toggleBotButton(toggle);
 }
 
 function updateConfigElements(running) {
