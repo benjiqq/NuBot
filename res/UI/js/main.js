@@ -57,7 +57,7 @@ function clearTables() {
 
 function setStateRunning() {
     if (mode != "running"){
-        console.log("set running");
+        //console.log("set running");
         $('#togglebot-text').html(" Stop Bot");
         $('#togglebot-text').addClass("glyphicon-off");
         $('#togglebot-text').removeClass("glyphicon-play");
@@ -76,7 +76,7 @@ function setStateRunning() {
 
 function setStateHalted() {
     if (mode != "halted"){
-        console.log("set halted");
+        //console.log("set halted");
         $('#togglebot-text').html(" Start Bot");
         $('#togglebot-text').addClass("glyphicon-play");
         $('#togglebot-text').removeClass("glyphicon-off");
@@ -95,7 +95,7 @@ function setStateHalted() {
 
 function setStateStarting(){
     if (mode != "starting"){
-        console.log("set starting");
+        //console.log("set starting");
         // Start loading button
         incrementPB = 0.006; //determines speed of progressbar
         laddaToggleBtn.ladda('start');
@@ -109,7 +109,7 @@ function setStateStarting(){
 
 function setStateHalting(){
     if (mode != "halting"){
-        console.log("set halting");
+        //console.log("set halting");
         incrementPB = 0.008; //determines speed of progressbar
         laddaToggleBtn.ladda('start');
         currentAnimID = setInterval(animateProgressBar, 50, false);
@@ -135,7 +135,7 @@ function startBot() {
             dataType: "json",
             type: 'POST',
             success: function(data) {
-                console.log("starting bot ok " + data);
+                //console.log("starting bot ok " + data);
                 var success = data["success"];
 
                 if (success) {
@@ -169,7 +169,7 @@ function stopBot() {
             type: 'POST',
             success: function(data) {
                 var success = data["success"];
-                console.log("stopped bot. success " + success);
+                //console.log("stopped bot. success " + success);
                 var cbtn = $('#togglebot');
                 if (success) {
                     //on success of post change the color of the button
@@ -366,8 +366,8 @@ function updateStatus() {
             handleFailServer();
         })
         .done(function(data) {
-            console.log("status data: " + JSON.parse(JSON.stringify(data)));
-            console.log("status : " + data["status"]);
+            //console.log("status data: " + JSON.parse(JSON.stringify(data)));
+            //console.log("status : " + data["status"]);
 
             $('#botstatus').html(data["status"]);
 
@@ -379,7 +379,7 @@ function updateStatus() {
             //we set the state depending on the status with the setState functions
             var newmode = data["status"];
 
-            console.log("newmode " + newmode + " oldmode " + mode);
+            //console.log("newmode " + newmode + " oldmode " + mode);
 
             if (newmode == "running"){
                 setStateRunning();
@@ -588,13 +588,13 @@ function makePostConfig(url, jsondata) {
         type: 'POST',
         success: function(data) {
 
-            console.log("got data " + data);
+            //console.log("got data " + data);
 
             // server returns custom error message
             var success = data["success"];
-            console.log("success " + success);
+            //console.log("success " + success);
             var errormsg = data["error"];
-            console.log("error " + errormsg);
+            //console.log("error " + errormsg);
 
             if (success) {
                     //stop loading after 1000 msec
