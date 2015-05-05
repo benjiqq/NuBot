@@ -356,7 +356,7 @@ function updateOrders() {
     setTimeout(updateOrders, refreshOrders);
 }
 
-function updateStatus() {
+function updateStatus(pageName) {
     $.ajax({
             type: "GET",
             dataType: "json",
@@ -369,44 +369,48 @@ function updateStatus() {
             console.log("status data: " + JSON.parse(JSON.stringify(data)));
             console.log("status : " + data["status"]);
 
-            $('#botstatus').html(data["status"]);
-
-            $('#sessionstart').html(data["sessionstart"]);
-
-            $('#duration').html(data["duration"]);
 
             //we polled the server and now set the client status
             //we set the state depending on the status with the setState functions
             var newmode = data["status"];
 
-            console.log("newmode " + newmode + " oldmode " + mode);
+            //console.log("newmode " + newmode + " oldmode " + mode);
 
-            if (newmode == "running"){
-                setStateRunning();
+            //Perform page-specific operations
+            if(pageName=="operation"){
+                $('#botstatus').html(data["status"]);
+
+                $('#sessionstart').html(data["sessionstart"]);
+
+                $('#duration').html(data["duration"]);
+
+                if (newmode == "running"){
+                    setStateRunning();
+                }
+
+                if (newmode == "starting" && mode != "starting"){
+                    setStateStarting();
+                }
+
+                if (newmode == "halting" && mode != "halting") {
+                    setStateHalting();
+                }
+
+                if (newmode == "halted" && mode != "halted") {
+                    setStateHalted();
+                }
+
             }
-
-            if (newmode == "starting" && mode != "starting"){
-                setStateStarting();
-            }
-
-            if (newmode == "halting" && mode != "halting") {
-                setStateHalting();
-            }
-
-            if (newmode == "halted" && mode != "halted") {
-                setStateHalted();
+            else if (pageName == "config") {
+                var disableButtons = newmode != "halted"; //allow changes to config only with bot halted
+                updateConfigElements(disableButtons);
             }
 
             mode = newmode;
 
-            /*if (pageName == "operation" && !animatingButton) {
-                toggleBotButton(run);
-            } else if (pageName == "config") {
-                updateConfigElements(run);
-            }*/
         });
 
-    setTimeout(updateStatus, refreshStatusInterval);
+    setTimeout(updateStatus, refreshStatusInterval,"operation");
 }
 
 
