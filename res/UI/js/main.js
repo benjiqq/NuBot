@@ -56,55 +56,67 @@ function clearTables() {
 }
 
 function setStateRunning() {
-    console.log("set running");
-    $('#togglebot-text').html(" Stop Bot");
-    $('#togglebot-text').addClass("glyphicon-off");
-    $('#togglebot-text').removeClass("glyphicon-play");
+    if( mode != "running")
+    {
+        console.log("set running");
+        $('#togglebot-text').html(" Stop Bot");
+        $('#togglebot-text').addClass("glyphicon-off");
+        $('#togglebot-text').removeClass("glyphicon-play");
 
-    $("#togglebot").attr("data-color", "red");
+        $("#togglebot").attr("data-color", "red");
 
-    $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
+        $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
 
-    document.title = 'Running! - NuBot GUI'
-    stopAnimation();
-    setNavBarActive();
+        document.title = 'Running! - NuBot GUI'
+        stopAnimation();
+        setNavBarActive();
+    }
 }
 
 function setStateHalted() {
-    console.log("set halted");
-    $('#togglebot-text').html(" Start Bot");
-    $('#togglebot-text').addClass("glyphicon-play");
-    $('#togglebot-text').removeClass("glyphicon-off");
+    if( mode != "halted")
+    {
+        console.log("set halted");
+        $('#togglebot-text').html(" Start Bot");
+        $('#togglebot-text').addClass("glyphicon-play");
+        $('#togglebot-text').removeClass("glyphicon-off");
 
-    $("#togglebot").attr("data-color", "blue");
+        $("#togglebot").attr("data-color", "blue");
 
-    setTimeout(clearTables, refreshTablesInterval);
+        setTimeout(clearTables, refreshTablesInterval);
 
-    document.title = 'NuBot GUI - Stopped';
-    $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
-    stopAnimation();
-    setNavBarActive();
+        document.title = 'NuBot GUI - Stopped';
+        $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
+        stopAnimation();
+        setNavBarActive();
+    }
 }
 
 function setStateStarting(){
-    console.log("set starting");
-    // Start loading button
-    incrementPB = 0.006; //determines speed of progressbar
-    laddaToggleBtn.ladda('start');
-    currentAnimID = setInterval(animateProgressBar, 50, true);
-    $('#togglebot-text').html(" Starting Bot");
+    if( mode != "starting")
+    {
+        console.log("set starting");
+        // Start loading button
+        incrementPB = 0.006; //determines speed of progressbar
+        laddaToggleBtn.ladda('start');
+        currentAnimID = setInterval(animateProgressBar, 50, true);
+        $('#togglebot-text').html(" Starting Bot");
 
-    setNavBarInactive();
+        setNavBarInactive();
+    }
 }
 
 function setStateHalting(){
-    console.log("set halting");
-    incrementPB = 0.008; //determines speed of progressbar
-    laddaToggleBtn.ladda('start');
-    currentAnimID = setInterval(animateProgressBar, 50, false);
-    $('#togglebot-text').html(" Stopping Bot");
+    if( mode != "halting")
+    {
+        console.log("set halting");
+        incrementPB = 0.008; //determines speed of progressbar
+        laddaToggleBtn.ladda('start');
+        currentAnimID = setInterval(animateProgressBar, 50, false);
+        $('#togglebot-text').html(" Stopping Bot");
 
-    setNavBarInactive();
+        setNavBarInactive();
+    }
 }
 
 function startBot() {
