@@ -256,9 +256,9 @@ function updateConfigFile() {
 var first = true;
 
 function updateBalances() {
-    console.log("updatebalance");
+    //console.log("updatebalance");
     if (isBotActive()) {
-        console.log("updatebalance QUERY. mode="+mode);
+        //console.log("updatebalance QUERY. mode="+mode);
 
         $.ajax({
                 type: "GET",
@@ -318,10 +318,10 @@ function updateBalances() {
 }
 
 function updateOrders() {
-    console.log("updateorders");
+    //console.log("updateorders");
 
     if (isBotActive()) {
-        console.log("updateorders QUERY mode="+mode);
+        //console.log("updateorders QUERY mode="+mode);
 
         $.ajax({
                 type: "GET",
