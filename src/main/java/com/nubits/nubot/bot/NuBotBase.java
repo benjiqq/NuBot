@@ -207,12 +207,11 @@ public abstract class NuBotBase {
 
         LOG.info("Setting up NuBot version : " + VersionInfo.getVersionName());
 
-        //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
-            LOG.warn("Trades will be executed");
+            LOG.info("Live mode : Trades will be executed");
         } else {
-            LOG.info("Trades will not be executed [executetrade:false]");
+            LOG.info("Demo mode: Trades will not be executed [executetrade:false]");
             liveTrading = false;
         }
 

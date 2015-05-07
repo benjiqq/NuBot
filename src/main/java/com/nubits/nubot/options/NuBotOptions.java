@@ -194,7 +194,7 @@ public class NuBotOptions {
 
     public boolean requiresSecondaryPegStrategy() {
         //Return TRUE when it requires a dedicated NBT peg to something that is not USD
-        if (this.pair.equals(CurrencyList.NBT_USD)) {
+        if (this.pair.equalsIgnoreCase(CurrencyList.NBT_USD.toStringSep())) {
             return false;
         } else {
             return true;
