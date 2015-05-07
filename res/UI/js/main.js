@@ -485,7 +485,7 @@ function loadconfig() {
             url: url,
         })
         .done(function(data) {
-
+            //console.log(JSON.stringify(data));
             $("#exchangename").attr("value", data["exchangeName"]);
             $("#apikey").attr("value", data["apiKey"]);
             $("#apisecret").attr("value", data["apiSecret"]);
@@ -503,7 +503,7 @@ function loadconfig() {
             $("#maxsellvolume").attr("value", data["maxSellVolume"]);
             $("#maxbuyvolume").attr("value", data["maxBuyVolume"]);
             $("#priceincrement").attr("value", data["priceIncrement"]);
-            $("#submitliquidity").attr("checked", data["submitliquidity"]);
+            $("#submitliquidity").attr("checked", data["submitLiquidity"]);
             $("#nubitaddress").attr("value", data["nubitAddress"]);
             $("#nudip").attr("value", data["nudIp"]);
             $("#nudport").attr("value", data["nudPort"]);
