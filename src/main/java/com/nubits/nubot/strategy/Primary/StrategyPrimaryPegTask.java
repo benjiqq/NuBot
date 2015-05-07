@@ -301,7 +301,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         }
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-        if (balancesResponse.isPositive()) {
+        if (!balancesResponse.isPositive()) {
             //Cannot get balance
             LOG.error(balancesResponse.getError().toString());
             return;
