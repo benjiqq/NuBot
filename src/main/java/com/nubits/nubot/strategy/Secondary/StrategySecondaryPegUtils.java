@@ -334,7 +334,8 @@ public class StrategySecondaryPegUtils {
 
                 boolean correctOrders = (activeSellOrders == 2 && activeBuyOrders == 2)
                         || (activeSellOrders == 2 && activeBuyOrders == 0 && balancePEG < oneNBT)
-                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1);
+                        || (activeSellOrders == 0 && activeBuyOrders == 2 && balanceNBT < 1)
+                        || (activeSellOrders == 0 && activeBuyOrders == 0 && balanceNBT < 1 && balancePEG < oneNBT);
                 LOG.debug("correct orders: " + correctOrders);
                 strategy.setOrdersAndBalancesOK(correctOrders);
 
