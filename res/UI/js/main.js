@@ -116,7 +116,7 @@ function setStateStarting(){
 function setStateHalting(){
     if (mode != "halting"){
         //console.log("set halting");
-        incrementPB = 0.008; //determines speed of progressbar
+        incrementPB = 0.006; //determines speed of progressbar
         laddaToggleBtn.ladda('start');
         currentAnimID = setInterval(animateProgressBar, 50, false);
         $('#togglebot-text').html(" Stopping Bot");
