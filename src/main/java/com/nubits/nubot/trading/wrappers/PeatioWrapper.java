@@ -55,10 +55,8 @@ public class PeatioWrapper implements TradeInterface {
     private ApiKeys keys;
     protected PeatioService service;
     private Exchange exchange;
-    private final int SPACING_BETWEEN_CALLS = 1100;
+
     private final int TIME_OUT = 15000;
-    private long lastSentTonce = 0L;
-    private boolean apiBusy = false;
     private final String SIGN_HASH_FUNCTION = "HmacSHA256";
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
@@ -85,27 +83,14 @@ public class PeatioWrapper implements TradeInterface {
         this.checkConnectionUrl = api_base;
         service = new PeatioService(keys);
         setupErrors();
-
     }
 
     protected Long createNonce(String requester) {
         Long toReturn = 0L;
-        if (!apiBusy) {
-            toReturn = getNonceInternal(requester);
-        } else {
-            try {
-
-                if (Global.options.isVerbose()) {
-                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-                }
-
-                Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
-                createNonce(requester);
-            } catch (InterruptedException e) {
-                LOG.error(e.toString());
-            }
-        }
-        return toReturn;
+        long currentTime = System.currentTimeMillis();
+        getTimeDiff(currentTime);
+        currentTime = System.currentTimeMillis();
+        return currentTime += timeDiffMs;
     }
 
     private void setupErrors() {
@@ -642,48 +627,6 @@ public class PeatioWrapper implements TradeInterface {
         return apiResponse;
     }
 
-    //DO NOT USE THIS METHOD DIRECTLY, use CREATENONCE
-    private long getNonceInternal(String requester) {
-        apiBusy = true;
-        long currentTime = System.currentTimeMillis();
-        if (isFirstNonce) {
-            apiBusy = false;
-            //The newer version of peatio require the nonce to be in the 30 seconds range of remote time
-            isFirstNonce = false;
-            timeDiffMs = getTimeDiff(currentTime);
-        }
-
-
-        if (Global.options.isVerbose()) {
-            LOG.info(currentTime + " Now apiBusy! req : " + requester);
-        }
-
-
-        long timeElapsedSinceLastCall = currentTime - lastSentTonce;
-        if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
-            try {
-                long sleepTime = SPACING_BETWEEN_CALLS;
-                Thread.sleep(sleepTime);
-                currentTime = System.currentTimeMillis();
-                if (Global.options != null) {
-                    if (Global.options.isVerbose()) {
-                        LOG.info("Just slept " + sleepTime + "; req : " + requester);
-                    }
-                }
-            } catch (InterruptedException e) {
-                LOG.error(e.toString());
-            }
-        }
-
-        lastSentTonce = currentTime += timeDiffMs;
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
-            }
-        }
-        apiBusy = false;
-        return lastSentTonce;
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
