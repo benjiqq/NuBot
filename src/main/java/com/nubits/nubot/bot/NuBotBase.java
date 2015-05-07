@@ -163,18 +163,6 @@ public abstract class NuBotBase {
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
 
-        //For a 0 tx fee market, force a price-offset of 0.1%
-        ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-        if (txFeeResponse.isPositive()) {
-            double txfee = (Double) txFeeResponse.getResponseObject();
-            if (txfee == 0) {
-                LOG.warn("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
-                double maxOffset = 0.1;
-                if (Global.options.getSpread() < maxOffset) {
-                    Global.options.setSpread(maxOffset);
-                }
-            }
-        }
     }
 
     protected void checkNuConn() throws NuBotConnectionException {
@@ -237,6 +225,20 @@ public abstract class NuBotBase {
             Thread.sleep(Settings.WAIT_CHECK_INTERVAL);
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
+        }
+
+        
+        //For a 0 tx fee market, force a price-offset of 0.1%
+        ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+        if (txFeeResponse.isPositive()) {
+            double txfee = (Double) txFeeResponse.getResponseObject();
+            if (txfee == 0) {
+                LOG.warn("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
+                double maxOffset = 0.1;
+                if (Global.options.getSpread() < maxOffset) {
+                    Global.options.setSpread(maxOffset);
+                }
+            }
         }
 
         testExchange();
