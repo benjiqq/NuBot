@@ -210,29 +210,56 @@ public class CcedkWrapper implements TradeInterface {
 
 
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
-
         if (response.isPositive()) {
+
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+
             JSONArray entities = (JSONArray) dataJson.get("entities");
 
             if (currency == null) { //Get all balances
                 long NBTid = TradeUtilsCCEDK.getCCDKECurrencyId(pair.getOrderCurrency().getCode().toUpperCase());
                 long PEGid = TradeUtilsCCEDK.getCCDKECurrencyId(pair.getPaymentCurrency().getCode().toUpperCase());
-                Amount NBTTotal = new Amount(0, pair.getOrderCurrency());
-                Amount PEGTotal = new Amount(0, pair.getPaymentCurrency());
+                Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+                Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
 
                 for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext(); ) {
                     JSONObject thisEntity = entity.next();
                     long entityId = (Long) thisEntity.get("currency_id");
                     if (entityId == NBTid) {
-                        NBTTotal.setQuantity(Utils.getDouble(thisEntity.get("balance")));
+                        NBTAvail.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                     if (entityId == PEGid) {
-                        PEGTotal.setQuantity(Utils.getDouble(thisEntity.get("balance")));
+                        PEGAvail.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                 }
-                PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
+
+                //Get balance on Order by counting active orders
+                ApiResponse activeOrdersResponse = getActiveOrders(pair);
+                //Initialize Amounts
+                double NBTonOrder = 0;
+                double PEGonOrder = 0;
+                Amount NBTOnOrderAmount = new Amount(NBTonOrder, pair.getOrderCurrency());
+                Amount PEGOnOrderAmount = new Amount(PEGonOrder, pair.getPaymentCurrency());
+
+                if (activeOrdersResponse.isPositive()) {
+                    ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+                    for (int i = 0; i < orderList.size(); i++) {
+                        Order tempOrder = orderList.get(i);
+                        if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
+                            NBTonOrder += tempOrder.getAmount().getQuantity();
+                        } else {
+                            PEGonOrder += tempOrder.getAmount().getQuantity();
+                        }
+                    }
+                    NBTOnOrderAmount = new Amount(NBTonOrder, pair.getOrderCurrency());
+                    PEGOnOrderAmount = new Amount(PEGonOrder, pair.getPaymentCurrency());
+                } else {
+                    return activeOrdersResponse;
+                }
+
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGOnOrderAmount, NBTOnOrderAmount);
                 apiResponse.setResponseObject(balance);
 
             } else { //Specific currency requested
@@ -248,7 +275,9 @@ public class CcedkWrapper implements TradeInterface {
                 }
                 apiResponse.setResponseObject(total);
             }
-        } else {
+        } else
+
+        {
             apiResponse = response;
         }
 
