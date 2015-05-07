@@ -24,8 +24,6 @@ var refreshLogInterval = 300;
 var pageName = "operation";
 var debug = true;
 
-var botRunning = false;
-
 var logLine = 0;
 var requestedStop = false;
 
@@ -40,11 +38,11 @@ var currentAnimID;
 var animatingButton = false;
 
 var serverDown = false;
-var mode = "stopped";
+var mode = "halted"; // halted, running, starting, halting
 
 
 function handleFailServer() {
-    botRunning = false;
+    mode = "halted";
     serverDown = true;
     $('#maincontainer').html("NuBot engine is down. Relaunch it and refresh this page");
 }
@@ -52,6 +50,14 @@ function handleFailServer() {
 function clearTables() {
     $("#ordertable").find("tr:gt(0)").remove();
     $("#balancetable").find("tr:gt(0)").remove();
+}
+
+function isBotActive()
+{
+    if(mode == "halted")
+        return false;
+    else
+        return true;
 }
 
 function setStateRunning() {
@@ -152,7 +158,6 @@ function startBot() {
     }
 }
 
-
 function stopBot() {
     if (debug) console.log("calling stop on server");
     if (confirm("Are you sure you want to stop the bot?")) {
@@ -191,11 +196,6 @@ function setNavBarInactive(){
     $('#config-nav').html('<a>Configuration</a');
     $('#docu-nav').html('<a>Documentation</a>');
     $('#disclaimer-nav').html('<a>Disclaimer</a>');
-
-    //<a href='#' onclick="changePage('operation')">Dashboard</a>
-      //<a href='#' onclick="changePage('config')">Configuration</a>
-        //<a href='#' onclick="changePage('docu')">Documentation</a>
-          //><a href='#' onclick="changePage('disclaimer')">Disclaimer</a>
 }
 
 function setNavBarActive(){
@@ -256,8 +256,10 @@ function updateConfigFile() {
 var first = true;
 
 function updateBalances() {
-    //console.log("updatebalance, botrunning="+botRunning);
-    if (botRunning) {
+    console.log("updatebalance");
+    if (isBotActive()) {
+        console.log("updatebalance QUERY. mode="+mode);
+
         $.ajax({
                 type: "GET",
                 dataType: "json",
@@ -316,9 +318,11 @@ function updateBalances() {
 }
 
 function updateOrders() {
-    //console.log("updateorders, botrunning="+botRunning);
+    console.log("updateorders");
 
-    if (botRunning) {
+    if (isBotActive()) {
+        console.log("updateorders QUERY mode="+mode);
+
         $.ajax({
                 type: "GET",
                 dataType: "json",
@@ -764,7 +768,7 @@ function stopServer() {
 
 
 window.onbeforeunload = function(e) {
-    if (botRunning && hook) {
+    if (isBotActive() && hook) {
         e = e || window.event;
         var confirmMessage = "The bot is still running."
             // For IE and Firefox prior to version 4
