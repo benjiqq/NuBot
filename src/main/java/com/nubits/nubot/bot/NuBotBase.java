@@ -120,7 +120,7 @@ public abstract class NuBotBase {
 
     protected void setupExchange() {
 
-        LOG.info("setup Exchange object");
+        LOG.debug("setup Exchange object");
 
         LOG.debug("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());

@@ -54,9 +54,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
     public void run() {
         if (SessionManager.sessionInterrupted()) return; //external interruption
 
-        LOG.info("Executing " + this.getClass());
+        LOG.debug("Executing " + this.getClass());
 
-        LOG.info("DualSide :  " + Global.options.isDualSide());
+        LOG.debug("DualSide :  " + Global.options.isDualSide());
 
         cycles++;
 
@@ -232,11 +232,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
             double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
             boolean buysOrdersOk = true;
             double sellprice = TradeUtils.getSellPrice(txFeeFIATNTB);
-            LOG.info("init sell orders. price " + sellprice);
+            LOG.debug("init sell orders. price " + sellprice);
             boolean sellsOrdersOk = initOrders(Constant.SELL, sellprice);
 
-            LOG.info("txFeeFIATNTB " + txFeeFIATNTB);
-            LOG.info("sellsOrdersOk " + sellsOrdersOk);
+            LOG.debug("txFeeFIATNTB " + txFeeFIATNTB);
+            LOG.debug("sellsOrdersOk " + sellsOrdersOk);
 
             if (Global.options.isDualSide()) {
 
@@ -439,17 +439,17 @@ public class StrategyPrimaryPegTask extends TimerTask {
         double balanceNBT = balance.getNBTAvailable().getQuantity();
         double balanceFIAT = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        LOG.info("balance NBT " + balanceNBT);
-        LOG.info("balance FIAT " + balanceFIAT);
+        LOG.debug("balance NBT " + balanceNBT);
+        LOG.debug("balance USD " + balanceFIAT);
 
         Global.orderManager.fetchOrders();
         activeSellOrders = Global.orderManager.getNumActiveSellOrders();
         activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-        LOG.info("activeSellOrders " + activeSellOrders);
-        LOG.info("activeBuyOrders " + activeBuyOrders);
-        LOG.info("totalActiveOrders" + totalActiveOrders);
+        LOG.debug("activeSellOrders " + activeSellOrders);
+        LOG.debug("activeBuyOrders " + activeBuyOrders);
+        LOG.debug("totalActiveOrders " + totalActiveOrders);
 
         ordersAndBalancesOk = false;
 
@@ -460,15 +460,15 @@ public class StrategyPrimaryPegTask extends TimerTask {
         int numOrdersBuy = 2;
 
         if (Global.options.isDualSide()) {
-            LOG.info("checking balance and orders for dualside");
+            LOG.debug("checking balance and orders for dualside");
 
             boolean bothSides = activeSellOrders == numOrdersBoth && activeBuyOrders == numOrdersBoth;
             boolean sellinplace = activeSellOrders == numOrdersSell && activeBuyOrders == 0 && balanceFIAT < treshholdFIAT;
             boolean buyinplace = activeSellOrders == 0 && activeBuyOrders == numOrdersBuy && balanceNBT < treshholdNBT;
 
-            LOG.info("bothSides " + bothSides);
-            LOG.info("sellneeded " + sellinplace);
-            LOG.info("buyneeded " + buyinplace);
+            LOG.debug("bothSides " + bothSides);
+            LOG.debug("sellneeded " + sellinplace);
+            LOG.debug("buyneeded " + buyinplace);
 
             ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
 
@@ -622,18 +622,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
             ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBPEGResponse.isPositive()) {
                 double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                LOG.debug("Updated Trasaction fee = " + txFeePEGNTB + "%");
                 if (SessionManager.sessionInterrupted()) return false;
                 double amount1 = Utils.round(amount.getQuantity() / 2, Settings.DEFAULT_PRECISION);
 
                 double maxBuy = Global.options.getMaxBuyVolume();
                 double maxSell = Global.options.getMaxSellVolume();
 
-                LOG.info("check the calculated amount against the set maximum sell amount");
+                LOG.debug("check the calculated amount against the set maximum sell amount");
 
                 //check the calculated amount against the set maximum sell amount set in the options.json file
 
-                LOG.info("max sell volume " + maxSell);
+                LOG.debug("max sell volume " + maxSell);
 
                 if (maxSell > 0 && type.equals(Constant.SELL)) {
                     double most = (maxSell / 2);
@@ -646,14 +646,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
                     amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
                     //check the calculated amount against the max buy amount option, if any.
-                    LOG.info("check the calculated amount against the max buy amount option, if any.");
-                    LOG.info("max buy volume " + maxBuy);
+                    LOG.debug("check the calculated amount against the max buy amount option, if any.");
+                    LOG.debug("max buy volume " + maxBuy);
                     if (maxBuy > 0) {
 
                         double most = maxBuy / 2;
                         if (amount1 > most) {
                             amount1 = most;
-                            LOG.info("cap buy amount at " + most);
+                            LOG.debug("cap buy amount at " + most);
                         }
                     }
                 }
@@ -665,7 +665,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                     if (amount2 > most) {
                         amount2 = most;
-                        LOG.info("cap sell amount at " + most);
+                        LOG.debug("cap sell amount at " + most);
                     }
                 }
 
@@ -681,7 +681,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         double most = maxBuy / 2;
                         if (amount2 > most) {
                             amount2 = most;
-                            LOG.info("cap buy at " + most);
+                            LOG.debug("cap buy at " + most);
                         }
                     }
 

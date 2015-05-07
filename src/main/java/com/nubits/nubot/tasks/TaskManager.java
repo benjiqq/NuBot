@@ -95,7 +95,7 @@ public class TaskManager {
     public void setTasks() {
         //connectivity tasks
 
-        LOG.info("setting up tasks");
+        LOG.debug("setting up tasks");
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
