@@ -105,7 +105,7 @@
 
                 <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                     <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                        <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                        <pattern>%date %date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
                     </layout>
                 </encoder>
 
@@ -153,7 +153,7 @@
 
                 <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                     <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                        <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%thread%msg</pattern>
+                        <pattern>%date %date{HH:mm:ss.SSS}%level%line%logger{16}%thread%msg</pattern>
                     </layout>
                 </encoder>
 
@@ -199,7 +199,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg - [%logger{16}]%n
+                    <pattern>%date %date{HH:mm:ss.SSS} %-5level - %msg - [%logger{16}]%n
                     </pattern>
                 </encoder>
 
@@ -235,7 +235,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg - [%thread - %logger{16}:%line] %n
+                    <pattern>%date %date{HH:mm:ss.SSS} %-5level - %msg - [%thread - %logger{16}:%line] %n
                     </pattern>
                 </encoder>
 
