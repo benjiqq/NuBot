@@ -21,7 +21,10 @@ import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
-import com.nubits.nubot.models.*;
+import com.nubits.nubot.models.Amount;
+import com.nubits.nubot.models.ApiResponse;
+import com.nubits.nubot.models.Currency;
+import com.nubits.nubot.models.PairBalance;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.notifications.MailNotifications;
 import com.nubits.nubot.utils.Utils;
@@ -143,7 +146,7 @@ public class StrategySecondaryPegUtils {
 
         if (buysOrdersOk && sellsOrdersOk) {
             strategy.setMightNeedInit(false);
-            LOG.info("Initial walls placed");
+            LOG.info("Strategy initialization completed");
         } else {
             strategy.setMightNeedInit(true);
         }
