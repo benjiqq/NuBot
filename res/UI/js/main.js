@@ -38,7 +38,7 @@ var currentAnimID;
 var animatingButton = false;
 
 var serverDown = false;
-var mode = "halted"; // halted, running, starting, halting
+var mode = ""; // halted, running, starting, halting
 
 
 function handleFailServer() {
