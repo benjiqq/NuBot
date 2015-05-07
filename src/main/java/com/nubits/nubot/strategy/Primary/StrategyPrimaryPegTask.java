@@ -109,7 +109,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         //Make sure there are 2 orders per side
         if (!ordersAndBalancesOk) {
-            LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+            LOG.warn("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
         } else {
             if (SessionManager.sessionInterrupted()) return; //external interruption
@@ -131,8 +131,12 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
 
             if (SessionManager.sessionInterrupted()) return; //external interruption
-            //Execute sellSide strategy
-            sellSide(balanceNBT);
+
+
+            if (balance.getNBTonOrder().getQuantity() < Global.options.getMaxSellVolume())
+                //Execute sellSide strategy
+                sellSide(balanceNBT);
+
 
             if (SessionManager.sessionInterrupted()) return; //external interruption
 
@@ -472,7 +476,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
 
-            if (balanceFIAT > 1 && !isFirstTime) {
+            if (balanceFIAT > 1 && !isFirstTime && Global.options.getMaxBuyVolume() == 0) { //TODO this condition should be more complext to take into account froozenBalance
                 LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
                         + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 proceedsInBalance = true;
