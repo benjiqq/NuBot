@@ -88,9 +88,10 @@ public class PeatioWrapper implements TradeInterface {
     protected Long createNonce(String requester) {
         Long toReturn = 0L;
         long currentTime = System.currentTimeMillis();
-        getTimeDiff(currentTime);
-        currentTime = System.currentTimeMillis();
-        return currentTime += timeDiffMs;
+        //getTimeDiff(currentTime);
+        //currentTime = System.currentTimeMillis();
+        return currentTime;
+        //return currentTime += timeDiffMs;
     }
 
     private void setupErrors() {
@@ -727,6 +728,7 @@ public class PeatioWrapper implements TradeInterface {
         throw new UnsupportedOperationException("PeatioWrapper.getOrderBook() not implemented yet.");
     }
 
+    //TODO remove if not necessary anymore (we stopped using it in 0.3.0)
     private long getTimeDiff(long localtime) {
         long diff = 0;
         //Make an API call, parse the response and compute the diff (localtime vs remotetime)
@@ -742,9 +744,11 @@ public class PeatioWrapper implements TradeInterface {
             try {
                 int startIndex = errString.indexOf(startStr) + startStr.length();
                 int stopIndex = errString.lastIndexOf(stopStr);
+
                 remoteTime = Long.parseLong(errString.substring(startIndex, stopIndex));
             } catch (Exception ex) {
-                LOG.info("Local timestamp and Peatio timestamp are equal");
+                LOG.debug("Local timestamp and Peatio timestamp are likely equal");
+                LOG.error(ex.toString());
             }
             diff = remoteTime - localtime;
             //LOG.warn("\n\n\n diff=" + diff + "  \n\n");
@@ -766,7 +770,6 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-
             args.put("access_key", keys.getApiKey());
 
             String messageDbg = (String) args.get("canonical_verb") + " " + (String) args.get("canonical_uri");
@@ -781,6 +784,7 @@ public class PeatioWrapper implements TradeInterface {
             Document doc;
             String response = null;
             try {
+
                 String url = base + canonical_uri;
                 LOG.debug(canonical_verb.toUpperCase() + " - Calling " + url + " with params:" + args);
 
@@ -793,14 +797,16 @@ public class PeatioWrapper implements TradeInterface {
                     doc = connection.ignoreContentType(true).get();
                 }
                 response = doc.body().text();
-
                 return response;
             } catch (Exception e) {
                 LOG.error(e.toString());
+
                 return null;
             } finally {
                 LOG.debug("result:{}" + response);
+                return response;
             }
+
         }
 
 
