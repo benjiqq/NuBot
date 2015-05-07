@@ -42,6 +42,9 @@ public class NuBotSimple extends NuBotBase {
 
         LOG.info("configuring strategy NuBotSimple");
 
+        Global.balanceManager = new BalanceManager();
+        Global.orderManager = new OrderManager();
+        
         // set liquidityinfo task to the strategy
         ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))
                 .setSendLiquidityTask(((SubmitLiquidityinfoTask) (Global.taskManager.getSendLiquidityTask().getTask())));
