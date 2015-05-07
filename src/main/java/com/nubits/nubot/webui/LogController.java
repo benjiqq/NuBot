@@ -61,7 +61,7 @@ public class LogController {
 
 
         get("/" + orderEndPoint, "application/json", (request, response) -> {
-            LOG.trace("/" + orderEndPoint + " called");
+            LOG.debug("/" + orderEndPoint + " called");
             Map opmap = new HashMap();
             int numbuys = 0;
             int numsells = 0;
@@ -96,7 +96,7 @@ public class LogController {
 
 
         get("/" + balanceEndPoint, "application/json", (request, response) -> {
-            LOG.trace("/" + balanceEndPoint + " called");
+            LOG.debug("/" + balanceEndPoint + " called");
             Map opmap = new HashMap();
 
             if (SessionManager.isSessionRunning() && Global.balanceManager != null) {
