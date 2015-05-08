@@ -69,7 +69,7 @@ public class SessionManager {
         try {
             //Check if NuBot has valid parameters and quit if it doesn't
             NuBotOptions opt = ParseOptions.parseOptionsSingle(configfile, skipValidation);
-            LOG.debug("loading opt: " + opt.toStringNoKeys());
+            LOG.debug("loading opt: " + opt.toString());
             Global.options = opt;
             Global.currentOptionsFile = configfile;
         } catch (NuBotConfigException e) {
@@ -127,10 +127,11 @@ public class SessionManager {
 
     /**
      * the time in milliseconds since a session was last stopped
+     *
      * @return
      */
-    public static long lastStopped(){
-        if (sessionStopped != -1){
+    public static long lastStopped() {
+        if (sessionStopped != -1) {
             return System.currentTimeMillis() - sessionStopped;
         } else
             return -1;
@@ -258,7 +259,7 @@ public class SessionManager {
         return sessionMode == MODE_HALTED;
     }
 
-    public static boolean isModeActive(){
+    public static boolean isModeActive() {
         return !sessionInterrupted() && !isModeHalted();
     }
 
