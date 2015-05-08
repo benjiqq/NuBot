@@ -227,7 +227,7 @@ public abstract class NuBotBase {
             LOG.error(ex.toString());
         }
 
-        
+
         //For a 0 tx fee market, force a price-offset of 0.1%
         ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
         if (txFeeResponse.isPositive()) {
@@ -260,7 +260,7 @@ public abstract class NuBotBase {
 
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
-        LOG.info("Options loaded : " + Global.options.toStringNoKeys());
+        LOG.info("Options loaded : " + Global.options.toString());
 
         // Set the frozen balance manager in the global variable
 

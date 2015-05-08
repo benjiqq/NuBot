@@ -366,7 +366,7 @@ public class NuBotOptions {
     }
 
 
-    public String toStringNoKeys() {
+    private String toStringNoKeys() {
         String toRet = "";
 
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
