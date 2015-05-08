@@ -71,11 +71,11 @@ function setStateRunning() {
 
         $('#logarea').removeClass("stopped-logarea").addClass("running-logarea");
 
-        document.title = 'Running! - NuBot GUI';
         stopAnimation();
         setNavBarActive();
 
         mode = "running";
+        updatePageTitle();
     }
 
 }
@@ -91,11 +91,11 @@ function setStateHalted() {
 
         setTimeout(clearTables, refreshTablesInterval);
 
-        document.title = 'NuBot GUI - Stopped';
         $('#logarea').removeClass("running-logarea").addClass("stopped-logarea");
         stopAnimation();
         setNavBarActive();
         mode = "halted";
+        updatePageTitle();
     }
 }
 
@@ -110,6 +110,7 @@ function setStateStarting(){
 
         setNavBarInactive();
         mode = "starting";
+        updatePageTitle();
     }
 }
 
@@ -123,7 +124,22 @@ function setStateHalting(){
 
         setNavBarInactive();
         mode = "halting";
+        updatePageTitle();
     }
+}
+
+function updatePageTitle(running)
+{
+    if (mode != "" && mode != null)
+        document.title = 'NuBot GUI - '+mode;
+    else {
+    if (running)
+        document.title = 'NuBot GUI - running';
+    else
+        document.title = 'NuBot GUI - halted';
+    }
+
+
 }
 
 function startBot() {
@@ -742,6 +758,7 @@ function stopProgressBarAnimation(toggle) {
 function updateConfigElements(running) {
     $('#saveconfigbutton').prop('disabled', running);
     $('#resetbutton').prop('disabled', running);
+    updatePageTitle(running);
 }
 
 function stopServer() {
