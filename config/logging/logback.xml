@@ -199,7 +199,7 @@
                 </filter>
 
                 <encoder>
-                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg - [%logger{16}]%n
+                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg - [%logger{16}:%line]%n
                     </pattern>
                 </encoder>
 
