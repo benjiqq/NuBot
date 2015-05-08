@@ -37,8 +37,6 @@ public class ConfigController {
 
     private void saveConfig(NuBotOptions newopt, String saveTo) {
 
-        LOG.info("parsed: new opt: " + newopt);
-
         try {
             SaveOptions.backupOptions(this.configDir + File.separator + this.configfile);
         } catch (IOException e) {
@@ -47,7 +45,6 @@ public class ConfigController {
 
 
         String js = SaveOptions.jsonPretty(newopt);
-        LOG.info("new opt: " + js);
 
         boolean savesuccess = true;
         try {
@@ -122,8 +119,6 @@ public class ConfigController {
             } catch (ParseException e) {
 
             }
-
-            LOG.info("the JSON of the post " + postJson);
 
             boolean success = true;
 
