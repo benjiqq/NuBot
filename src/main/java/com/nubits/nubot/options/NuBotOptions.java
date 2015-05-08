@@ -360,6 +360,12 @@ public class NuBotOptions {
         return backupFeeds;
     }
 
+    @Override
+    public String toString() {
+        return toStringNoKeys(); //removes sensitive information
+    }
+
+
     public String toStringNoKeys() {
         String toRet = "";
 
