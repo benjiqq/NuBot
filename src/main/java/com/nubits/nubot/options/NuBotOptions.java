@@ -360,11 +360,6 @@ public class NuBotOptions {
         return backupFeeds;
     }
 
-    @Override
-    public String toString() {
-        return toStringNoKeys(); //removes sensitive information
-    }
-
     public String toStringNoKeys() {
         String toRet = "";
 
@@ -372,17 +367,19 @@ public class NuBotOptions {
         //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
 
-        String serializedOptions = parser.toJson(this);
+        String serializedOptionsStr = parser.toJson(this);
         org.json.simple.parser.JSONParser p = new org.json.simple.parser.JSONParser();
         try {
-            JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptions));
+            JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptionsStr));
 
             //Replace sensitive information
             String[] sensitiveKeys = {"apisecret", "apikey", "rpcpass", "apiSecret", "apiKey", "rpcPass"};
             String replaceString = "hidden";
 
             for (int i = 0; i < sensitiveKeys.length; i++) {
-                serializedOptionsJSON.replace(sensitiveKeys[0], replaceString);
+                if (serializedOptionsJSON.containsKey(sensitiveKeys[i])) {
+                    serializedOptionsJSON.replace(sensitiveKeys[i], replaceString);
+                }
             }
 
             toRet = serializedOptionsJSON.toString();
