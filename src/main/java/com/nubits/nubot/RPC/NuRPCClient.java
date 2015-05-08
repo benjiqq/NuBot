@@ -292,6 +292,17 @@ public class NuRPCClient {
             JSONParser parser = new JSONParser();
             String entityString = EntityUtils.toString(entity);
             LOG.debug("Entity = " + entityString);
+            /* TODO In case of wrong username/pass the response would be the following .Consider parsing it.
+            Entity = <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+                        "http://www.w3.org/TR/1999/REC-html401-19991224/loose.dtd">
+                        <HTML>
+                        <HEAD>
+                        <TITLE>Error</TITLE>
+                        <META HTTP-EQUIV='Content-Type' CONTENT='text/html; charset=ISO-8859-1'>
+                        </HEAD>
+                        <BODY><H1>401 Unauthorized.</H1></BODY>
+                        </HTML>
+             */
             responseJsonObj = (JSONObject) parser.parse(entityString);
         } catch (ClientProtocolException e) {
             LOG.error("Nud RPC Connection problem:" + e.toString());
