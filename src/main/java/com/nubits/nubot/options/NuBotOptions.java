@@ -378,9 +378,12 @@ public class NuBotOptions {
             JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptions));
 
             //Replace sensitive information
-            serializedOptionsJSON.replace("apisecret", "hidden");
-            serializedOptionsJSON.replace("apikey", "hidden");
-            serializedOptionsJSON.replace("rpcpass", "hidden");
+            String[] sensitiveKeys = {"apisecret", "apikey", "rpcpass", "apiSecret", "apiKey", "rpcPass"};
+            String replaceString = "hidden";
+
+            for (int i = 0; i < sensitiveKeys.length; i++) {
+                serializedOptionsJSON.replace(sensitiveKeys[0], replaceString);
+            }
 
             toRet = serializedOptionsJSON.toString();
         } catch (org.json.simple.parser.ParseException e) {
