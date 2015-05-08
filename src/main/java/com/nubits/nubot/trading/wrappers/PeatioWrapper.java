@@ -22,6 +22,7 @@ package com.nubits.nubot.trading.wrappers;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.ErrorManager;
@@ -54,10 +55,8 @@ public class PeatioWrapper implements TradeInterface {
     private ApiKeys keys;
     protected PeatioService service;
     private Exchange exchange;
-    private final int SPACING_BETWEEN_CALLS = 1100;
+
     private final int TIME_OUT = 15000;
-    private long lastSentTonce = 0L;
-    private boolean apiBusy = false;
     private final String SIGN_HASH_FUNCTION = "HmacSHA256";
     private final String ENCODING = "UTF-8";
     private String apiBaseUrl;
@@ -84,27 +83,15 @@ public class PeatioWrapper implements TradeInterface {
         this.checkConnectionUrl = api_base;
         service = new PeatioService(keys);
         setupErrors();
-
     }
 
     protected Long createNonce(String requester) {
         Long toReturn = 0L;
-        if (!apiBusy) {
-            toReturn = getNonceInternal(requester);
-        } else {
-            try {
-
-                if (Global.options.isVerbose()) {
-                    LOG.info(System.currentTimeMillis() + " - Api is busy, I'll sleep and retry in a few ms (" + requester + ")");
-                }
-
-                Thread.sleep(Math.round(2.2 * SPACING_BETWEEN_CALLS));
-                createNonce(requester);
-            } catch (InterruptedException e) {
-                LOG.error(e.toString());
-            }
-        }
-        return toReturn;
+        long currentTime = System.currentTimeMillis();
+        //getTimeDiff(currentTime);
+        //currentTime = System.currentTimeMillis();
+        return currentTime;
+        //return currentTime += timeDiffMs;
     }
 
     private void setupErrors() {
@@ -513,15 +500,54 @@ public class PeatioWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to Peatio");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
+
 
     private Order parseOrder(JSONObject jsonObject) {
         Order order = new Order();
@@ -602,48 +628,6 @@ public class PeatioWrapper implements TradeInterface {
         return apiResponse;
     }
 
-    //DO NOT USE THIS METHOD DIRECTLY, use CREATENONCE
-    private long getNonceInternal(String requester) {
-        apiBusy = true;
-        long currentTime = System.currentTimeMillis();
-        if (isFirstNonce) {
-            apiBusy = false;
-            //The newer version of peatio require the nonce to be in the 30 seconds range of remote time
-            isFirstNonce = false;
-            timeDiffMs = getTimeDiff(currentTime);
-        }
-
-
-        if (Global.options.isVerbose()) {
-            LOG.info(currentTime + " Now apiBusy! req : " + requester);
-        }
-
-
-        long timeElapsedSinceLastCall = currentTime - lastSentTonce;
-        if (timeElapsedSinceLastCall < SPACING_BETWEEN_CALLS) {
-            try {
-                long sleepTime = SPACING_BETWEEN_CALLS;
-                Thread.sleep(sleepTime);
-                currentTime = System.currentTimeMillis();
-                if (Global.options != null) {
-                    if (Global.options.isVerbose()) {
-                        LOG.info("Just slept " + sleepTime + "; req : " + requester);
-                    }
-                }
-            } catch (InterruptedException e) {
-                LOG.error(e.toString());
-            }
-        }
-
-        lastSentTonce = currentTime += timeDiffMs;
-        if (Global.options != null) {
-            if (Global.options.isVerbose()) {
-                LOG.info("Final tonce to be sent: req : " + requester + " ; Tonce=" + lastSentTonce);
-            }
-        }
-        apiBusy = false;
-        return lastSentTonce;
-    }
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -744,6 +728,7 @@ public class PeatioWrapper implements TradeInterface {
         throw new UnsupportedOperationException("PeatioWrapper.getOrderBook() not implemented yet.");
     }
 
+    //TODO remove if not necessary anymore (we stopped using it in 0.3.0)
     private long getTimeDiff(long localtime) {
         long diff = 0;
         //Make an API call, parse the response and compute the diff (localtime vs remotetime)
@@ -759,9 +744,11 @@ public class PeatioWrapper implements TradeInterface {
             try {
                 int startIndex = errString.indexOf(startStr) + startStr.length();
                 int stopIndex = errString.lastIndexOf(stopStr);
+
                 remoteTime = Long.parseLong(errString.substring(startIndex, stopIndex));
             } catch (Exception ex) {
-                LOG.info("Local timestamp and Peatio timestamp are equal");
+                LOG.debug("Local timestamp and Peatio timestamp are likely equal");
+                LOG.error(ex.toString());
             }
             diff = remoteTime - localtime;
             //LOG.warn("\n\n\n diff=" + diff + "  \n\n");
@@ -783,7 +770,6 @@ public class PeatioWrapper implements TradeInterface {
 
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-
             args.put("access_key", keys.getApiKey());
 
             String messageDbg = (String) args.get("canonical_verb") + " " + (String) args.get("canonical_uri");
@@ -798,6 +784,7 @@ public class PeatioWrapper implements TradeInterface {
             Document doc;
             String response = null;
             try {
+
                 String url = base + canonical_uri;
                 LOG.debug(canonical_verb.toUpperCase() + " - Calling " + url + " with params:" + args);
 
@@ -810,20 +797,18 @@ public class PeatioWrapper implements TradeInterface {
                     doc = connection.ignoreContentType(true).get();
                 }
                 response = doc.body().text();
-
                 return response;
             } catch (Exception e) {
                 LOG.error(e.toString());
+
                 return null;
             } finally {
                 LOG.debug("result:{}" + response);
+                return response;
             }
+
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            throw new UnsupportedOperationException("Use getSign(TreeMap<String, String> parameters");
-        }
 
         private String getSign(AbstractMap<String, String> parameters) {
             if (parameters.containsKey("signature")) {

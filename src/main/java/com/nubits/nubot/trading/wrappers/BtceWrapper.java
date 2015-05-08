@@ -26,7 +26,6 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,15 +34,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Date;
@@ -551,11 +549,49 @@ public class BtceWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to btce");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -675,7 +711,7 @@ public class BtceWrapper implements TradeInterface {
                     // args signature with apache cryptografic tools
                     String toHash = post_data;
 
-                    signature = signRequest(keys.getPrivateKey(), toHash);
+                    signature = TradeUtils.signRequest(keys.getPrivateKey(), toHash, SIGN_HASH_FUNCTION, ENCODING);
                 }
                 // build URL
 
@@ -762,43 +798,5 @@ public class BtceWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String signature = "";
-
-            Mac mac;
-            SecretKeySpec key = null;
-
-            // Create a new secret key
-            try {
-                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-            } catch (UnsupportedEncodingException uee) {
-                LOG.error("Unsupported encoding exception: " + uee.toString());
-                return null;
-            }
-
-            // Create a new mac
-            try {
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.error("No such algorithm exception: " + nsae.toString());
-                return null;
-            }
-
-            // Init mac with key.
-            try {
-                mac.init(key);
-            } catch (InvalidKeyException ike) {
-                LOG.error("Invalid key exception: " + ike.toString());
-                return null;
-            }
-            try {
-                signature = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.error(ex.toString());
-            }
-            return signature;
-        }
     }
 }

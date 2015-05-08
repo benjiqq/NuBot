@@ -28,16 +28,17 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 
-public class TestLog extends TestCase{
+public class TestLog extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLog.class.getName());
 
     @Test
-    public void testXML(){
+    public void testXML() {
         LoggerContext loggerContext = ((ch.qos.logback.classic.Logger) LOG).getLoggerContext();
         URL mainURL = ConfigurationWatchListUtil.getMainWatchURL(loggerContext);
 
-        LOG.info("Logback used '{}' as the configuration file.", mainURL);
+        LOG.info("Logback used '{}' as the configuration file."
+                + mainURL);
 
     }
 }

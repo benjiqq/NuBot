@@ -36,12 +36,12 @@ public class NuBotOptionsDefault {
         opt.exchangeName = "";
         opt.apiSecret = "";
         opt.txFee = 0.2;
-        opt.pair = CurrencyList.NBT_BTC;
+        opt.pair = CurrencyList.NBT_BTC.toStringSep();
         opt.dualSide = true;
         opt.multipleCustodians = false;
         opt.executeOrders = false;
         opt.verbose = false;
-        opt.sendHipchat = true;
+        opt.hipchat = true;
         opt.mailnotifications = MailNotifications.MAIL_LEVEL_SEVERE;
         opt.mailRecipient = "";
         opt.emergencyTimeout = 30;
@@ -59,7 +59,8 @@ public class NuBotOptionsDefault {
         opt.wallchangeThreshold = 0;
         opt.spread = 0;
         opt.mainFeed = FeedFacade.CoinbasePriceFeed;
-        opt.backupFeedNames = new ArrayList<String>() {{
+        opt.backupFeeds = new ArrayList<String>() {{
+
             add(FeedFacade.BtcePriceFeed);
             add(FeedFacade.BlockchainPriceFeed);
             add(FeedFacade.CoinmarketcapnexuistPriceFeed);

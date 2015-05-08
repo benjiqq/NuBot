@@ -30,23 +30,21 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import io.evanwong.oss.hipchat.v2.rooms.MessageColor;
-
-import java.io.File;
-import java.io.IOException;
-import java.text.DateFormat;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class FrozenBalancesManager {
 
@@ -110,15 +108,12 @@ public class FrozenBalancesManager {
                 if (percentageToSetApart != 0) {
                     double quantityToFreeze = percentageToSetApart * (amountFoundInBalance.getQuantity() - initialFunds.getQuantity());
 
-                    DecimalFormat df = new DecimalFormat("#");
-                    df.setMaximumFractionDigits(8);
-
                     Currency curerncyToFreeze = amountFoundInBalance.getCurrency();
-                    Global.frozenBalances.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
+                    Global.frozenBalancesManager.updateFrozenBalance(new Amount(quantityToFreeze, curerncyToFreeze));
 
-                    HipChatNotifications.sendMessage("" + df.format(quantityToFreeze) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
+                    HipChatNotifications.sendMessage("" + Utils.formatNumber(quantityToFreeze, Settings.DEFAULT_PRECISION) + " " + curerncyToFreeze.getCode().toUpperCase() + " have been put aside to pay dividends ("
                             + percentageToSetApart * 100 + "% of  sale proceedings)"
-                            + ". Funds frozen to date = " + df.format(Global.frozenBalances.getFrozenAmount().getAmount().getQuantity()) + " " + curerncyToFreeze.getCode().toUpperCase(), MessageColor.PURPLE);
+                            + ". Funds frozen to date = " + Utils.formatNumber(Global.frozenBalancesManager.getFrozenAmount().getAmount().getQuantity(), Settings.DEFAULT_PRECISION) + " " + curerncyToFreeze.getCode().toUpperCase(), MessageColor.PURPLE);
                 }
             } else {
                 LOG.info("Nothing to freeze. The funds initially set apart (" + initialFunds.toString() + ") "
@@ -133,10 +128,10 @@ public class FrozenBalancesManager {
 
             if (balancesResponse.isPositive()) {
                 Amount balance = (Amount) balancesResponse.getResponseObject();
-                balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                balance = removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
                 double oneNBT = Utils.round(1 / Global.conversion, 8);
                 if (balance.getQuantity() > oneNBT) {
-                    tryKeepProceedsAside(balance, Global.frozenBalances.getAmountAlreadyThere());
+                    tryKeepProceedsAside(balance, Global.frozenBalancesManager.getAmountAlreadyThere());
                 }
                 setBalanceAlreadyThere(toFreezeCurrency);
             } else {
@@ -156,7 +151,7 @@ public class FrozenBalancesManager {
             if (balancesResponse.isPositive()) {
                 //Here its time to compute the balance to put apart, if any
                 balance = (Amount) balancesResponse.getResponseObject();
-                balance = removeFrozenAmount(balance, Global.frozenBalances.getFrozenAmount());
+                balance = removeFrozenAmount(balance, Global.frozenBalancesManager.getFrozenAmount());
 
                 //Only set this value is its greater than prev
                 if (balance.getQuantity() > getAmountAlreadyThere().getQuantity()) {
@@ -170,12 +165,11 @@ public class FrozenBalancesManager {
         }
         if (success) {
             String message = "Frozen funds already in balance (not proceeds) updated : "
-                    + Global.frozenBalances.getAmountAlreadyThere().getQuantity()
-                    + " " + Global.frozenBalances.getAmountAlreadyThere().getCurrency();
-            if(Global.options.getKeepProceeds()>0) {
+                    + Global.frozenBalancesManager.getAmountAlreadyThere().getQuantity()
+                    + " " + Global.frozenBalancesManager.getAmountAlreadyThere().getCurrency();
+            if (Global.options.getKeepProceeds() > 0) {
                 LOG.info(message);
-            }
-            else
+            } else
                 LOG.debug(message);
         } else {
             LOG.error("An error occurred while trying to set the balance already there (not proceeds)");
@@ -185,11 +179,9 @@ public class FrozenBalancesManager {
     //use this method to set frozen amount
     public void setInitialFrozenAmount(Amount newAmount, boolean writeToFile) {
         this.frozenAmount = new FrozenAmount(newAmount);
-        DecimalFormat df = new DecimalFormat("#");
-        df.setMaximumFractionDigits(8);
 
         if (Global.options.getKeepProceeds() != 0) {
-            LOG.info("Setting initial frozen amount to : " + df.format(this.frozenAmount.getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
+            LOG.info("Setting initial frozen amount to : " + Utils.formatNumber(this.frozenAmount.getAmount().getQuantity(), Settings.DEFAULT_PRECISION) + " " + toFreezeCurrency.getCode());
         }
 
         if (writeToFile) {
@@ -223,7 +215,7 @@ public class FrozenBalancesManager {
 
     private void parseFrozenBalancesFile() {
         JSONParser parser = new JSONParser();
-        String FrozenBalancesManagerString = FileSystem.readFromFile(this.pathToFrozenBalancesFiles);
+        String FrozenBalancesManagerString = FilesystemUtils.readFromFile(this.pathToFrozenBalancesFiles);
         try {
             JSONObject frozenBalancesJSON = (JSONObject) (parser.parse(FrozenBalancesManagerString));
             double quantity = Double.parseDouble((String) frozenBalancesJSON.get("frozen-quantity-total"));
@@ -253,10 +245,8 @@ public class FrozenBalancesManager {
         String toWrite = "";
         JSONObject toWriteJ = new JSONObject();
 
-        DecimalFormat df = new DecimalFormat("#");
-        df.setMaximumFractionDigits(10);
 
-        toWriteJ.put("frozen-quantity-total", df.format(getFrozenAmount().getAmount().getQuantity()));
+        toWriteJ.put("frozen-quantity-total", Utils.formatNumber(getFrozenAmount().getAmount().getQuantity(), 10));
         toWriteJ.put("frozen-currency", getFrozenAmount().getAmount().getCurrency().getCode());
         JSONArray historyListJ = new JSONArray();
         for (int i = 0; i < history.size(); i++) {
@@ -266,7 +256,7 @@ public class FrozenBalancesManager {
             if (tempHistory.getFreezedQuantity() > 0.00000001) {
 
                 tempRow.put("timestamp", tempHistory.getTimestamp().toString());
-                tempRow.put("froze-quantity", df.format(tempHistory.getFreezedQuantity()));
+                tempRow.put("froze-quantity", Utils.formatNumber(tempHistory.getFreezedQuantity(), 10));
                 tempRow.put("currency-code", tempHistory.getCurrencyCode());
 
 
@@ -286,7 +276,7 @@ public class FrozenBalancesManager {
 
         try {
             FileUtils.writeStringToFile(new File(pathToFrozenBalancesFiles), toWritePretty);
-            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + df.format(getFrozenAmount().getAmount().getQuantity()) + " " + toFreezeCurrency.getCode());
+            LOG.info("Updated Froozen Balances file (" + pathToFrozenBalancesFiles + ") : " + Utils.formatNumber(getFrozenAmount().getAmount().getQuantity(), 10) + " " + toFreezeCurrency.getCode());
         } catch (IOException ex) {
             LOG.error(ex.toString());
         }

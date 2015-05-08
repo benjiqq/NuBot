@@ -1,0 +1,33 @@
+{
+  "apiKey": "",
+  "apiSecret": "",
+  "mailRecipient": "bla",
+  "exchangeName": "Simulation",
+  "dualSide": true,
+  "pair": "nbt_btc",
+  "rpcUser": "bla",
+  "rpcPass": "yay",
+  "nubitAddress": "testUI",
+  "nudPort": 9091,
+  "nudIp": "127.0.0.1",
+  "mailnotifications": "NONE",
+  "submitLiquidity": false,
+  "executeOrders": false,
+  "verbose": true,
+  "hipchat": false,
+  "multipleCustodians": false,
+  "txFee": 0.0,
+  "priceIncrement": 0.0,
+  "emergencyTimeout": 60,
+  "keepProceeds": 0.0,
+  "maxSellVolume": 5.0,
+  "maxBuyVolume": 5.0,
+  "distributeLiquidity": false,
+  "wallchangeThreshold": 0.1,
+  "spread": 10.0,
+  "mainFeed": "simulationfeed",
+  "backupFeeds": [
+    "simulationfeed",
+    "simulationfeed"
+  ]
+}

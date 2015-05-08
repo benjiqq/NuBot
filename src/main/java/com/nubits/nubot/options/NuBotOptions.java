@@ -33,8 +33,6 @@ public class NuBotOptions {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuBotOptions.class.getName());
 
-    //Compulsory settings ----------------------------
-
     /**
      * Custodian's public key to access the exchange
      */
@@ -63,7 +61,7 @@ public class NuBotOptions {
     /**
      * valid currency pair for the specified eg. "nbt_usd"
      */
-    public CurrencyPair pair;
+    public String pair;
 
     //Conditional settings with a default value
 
@@ -96,7 +94,6 @@ public class NuBotOptions {
 
     /**
      * if set to false will disable email notifications
-     *
      */
     public String mailnotifications;
 
@@ -119,7 +116,7 @@ public class NuBotOptions {
     /**
      * if set to false will disable hipchat notifications
      */
-    public boolean sendHipchat;
+    public boolean hipchat;
 
     /**
      * if set to true, will sync with remote NPT and reset orders often
@@ -157,20 +154,9 @@ public class NuBotOptions {
     public double maxBuyVolume;
 
     /**
-     * TODO
+     * When this flag is true, the bot will put tier2 on orderbook at different price levels
      */
     public boolean distributeLiquidity;
-
-    /**
-     * TODO
-     */
-    //public int executeStrategyInterval; //disabled
-
-    /**
-     * TODO
-     */
-    //public int sendLiquidityInterval; //disabled
-
 
     public double wallchangeThreshold;
 
@@ -179,92 +165,21 @@ public class NuBotOptions {
     // feeds
 
     public String mainFeed;
-    public ArrayList<String> backupFeedNames;
+    public ArrayList<String> backupFeeds;
 
     /**
      * empty constructor. assumes safe creation of valid options
      */
     public NuBotOptions() {
-        backupFeedNames = new ArrayList<>();
+        backupFeeds = new ArrayList<>();
     }
 
-
-    /**
-     * standard constructor with all options
-     */
-    public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
-                        String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
-                        double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-                        boolean sendHipchat,
-                        String mailnotifications, String mailRecipient, int emergencyTimeout, double keepProceeds,
-                        boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity,
-                        double wallchangeThreshold, double spread) {
-        this.dualSide = dualSide;
-        this.apiKey = apiKey;
-        this.apiSecret = apiSecret;
-        this.nubitAddress = nubitAddress;
-        this.rpcUser = rpcUser;
-        this.rpcPass = rpcPass;
-        this.nudIp = nudIp;
-        this.nudPort = nudPort;
-        this.priceIncrement = priceIncrement;
-        this.txFee = txFee;
-        this.submitLiquidity = sendRPC;
-        this.exchangeName = exchangeName;
-        this.verbose = verbose;
-        this.executeOrders = executeOrders;
-        this.pair = pair;
-        this.sendHipchat = sendHipchat;
-        this.mailnotifications = mailnotifications;
-        this.mailRecipient = mailRecipient;
-        this.emergencyTimeout = emergencyTimeout;
-        this.keepProceeds = keepProceeds;
-        this.multipleCustodians = multipleCustodians;
-        this.maxSellVolume = maxSellVolume;
-        this.maxBuyVolume = maxBuyVolume;
-        this.distributeLiquidity = distributeLiquidity;
-        this.wallchangeThreshold = wallchangeThreshold;
-        this.spread = spread;
-
-    }
-
-    /**
-     * standard constructor with all options
-     */
-    public NuBotOptions(boolean dualSide, String apiKey, String apiSecret, String nubitAddress,
-                        String rpcUser, String rpcPass, String nudIp, int nudPort, double priceIncrement,
-                        double txFee, boolean sendRPC, String exchangeName, boolean executeOrders, boolean verbose, CurrencyPair pair,
-                        int executeStrategyInterval, boolean sendHipchat,
-                        String mailnotifications, String mailRecipient, int emergencyTimeout, double keepProceeds,
-                        boolean multipleCustodians, double maxSellVolume, double maxBuyVolume,
-                        boolean distributeLiquidity) {
-        this.dualSide = dualSide;
-        this.apiKey = apiKey;
-        this.apiSecret = apiSecret;
-        this.nubitAddress = nubitAddress;
-        this.rpcUser = rpcUser;
-        this.rpcPass = rpcPass;
-        this.nudIp = nudIp;
-        this.nudPort = nudPort;
-        this.priceIncrement = priceIncrement;
-        this.txFee = txFee;
-        this.submitLiquidity = sendRPC;
-        this.exchangeName = exchangeName;
-        this.verbose = verbose;
-        this.executeOrders = executeOrders;
-        this.pair = pair;
-        this.sendHipchat = sendHipchat;
-        this.mailnotifications = mailnotifications;
-        this.mailRecipient = mailRecipient;
-        this.emergencyTimeout = emergencyTimeout;
-        this.keepProceeds = keepProceeds;
-        this.multipleCustodians = multipleCustodians;
-        this.maxSellVolume = maxSellVolume;
-        this.maxBuyVolume = maxBuyVolume;
-        this.distributeLiquidity = distributeLiquidity;
-
-        backupFeedNames = new ArrayList<>();
+    public static String optionsToJson(NuBotOptions opt) {
+        GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
+        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        Gson parser = gson.create();
+        String js = parser.toJson(opt);
+        return js;
 
     }
 
@@ -279,7 +194,7 @@ public class NuBotOptions {
 
     public boolean requiresSecondaryPegStrategy() {
         //Return TRUE when it requires a dedicated NBT peg to something that is not USD
-        if (this.pair.equals(CurrencyList.NBT_USD)) {
+        if (this.pair.equalsIgnoreCase(CurrencyList.NBT_USD.toStringSep())) {
             return false;
         } else {
             return true;
@@ -314,137 +229,80 @@ public class NuBotOptions {
         return apiKey;
     }
 
-    /**
-     * @return
-     */
     public String getApiSecret() {
         return apiSecret;
     }
 
-    /**
-     * @return
-     */
     public String getNubitsAddress() {
         return nubitAddress;
     }
 
-    /**
-     * @return
-     */
     public String getRpcUser() {
         return rpcUser;
     }
 
-    /**
-     * @return
-     */
     public String getRpcPass() {
         return rpcPass;
     }
 
-    /**
-     * @param rpcPass
-     */
     public void setRpcPass(String rpcPass) {
         this.rpcPass = rpcPass;
     }
 
-    /**
-     * @return
-     */
     public String getNudIp() {
         return nudIp;
     }
 
-    /**
-     * @return
-     */
     public int getNudPort() {
         return nudPort;
     }
 
-    /**
-     * @param nudPort
-     */
     public void setNudPort(int nudPort) {
         this.nudPort = nudPort;
     }
 
-    /**
-     * @return
-     */
     public double getPriceIncrement() {
         return priceIncrement;
     }
 
-    /**
-     * @return
-     */
     public double getTxFee() {
         return txFee;
     }
 
-    /**
-     * @param txFee
-     */
     public void setTxFee(double txFee) {
         this.txFee = txFee;
     }
 
-    /**
-     * @return
-     */
     public String getExchangeName() {
         return exchangeName;
     }
 
-    /**
-     * @param exchangeName
-     */
     public void setExchangeName(String exchangeName) {
         this.exchangeName = exchangeName;
     }
 
-    /**
-     * @return
-     */
     public CurrencyPair getPair() {
+        CurrencyPair pair = CurrencyPair.getCurrencyPairFromString(this.pair);
         return pair;
     }
 
-    /**
-     * @param pair
-     */
     public void setPair(CurrencyPair pair) {
-        this.pair = pair;
+        this.pair = pair.toStringSep();
     }
 
-
-    /**
-     * @return
-     */
-    public boolean isSendHipchat() {
-        return sendHipchat;
+    public boolean isHipchat() {
+        return hipchat;
     }
 
-    /**
-     * @return
-     */
-    public String getMailnotifications() {
+    public String getSendMailsLevel() {
         return mailnotifications;
     }
 
-    /**
-     * @return
-     */
     public boolean sendMails() {
         boolean not_none = !(this.mailnotifications.equals(MailNotifications.MAIL_LEVEL_NONE));
         return not_none;
     }
 
-    /**
-     * @return
-     */
     public String getMailRecipient() {
         return mailRecipient;
     }
@@ -498,8 +356,8 @@ public class NuBotOptions {
         this.wallchangeThreshold = wallchangeThreshold;
     }
 
-    public ArrayList<String> getBackupFeedNames() {
-        return backupFeedNames;
+    public ArrayList<String> getBackupFeeds() {
+        return backupFeeds;
     }
 
     @Override
@@ -507,22 +365,28 @@ public class NuBotOptions {
         return toStringNoKeys(); //removes sensitive information
     }
 
-    public String toStringNoKeys() {
+
+    private String toStringNoKeys() {
         String toRet = "";
 
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
 
-        String serializedOptions = parser.toJson(this);
+        String serializedOptionsStr = parser.toJson(this);
         org.json.simple.parser.JSONParser p = new org.json.simple.parser.JSONParser();
         try {
-            JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptions));
+            JSONObject serializedOptionsJSON = (JSONObject) (p.parse(serializedOptionsStr));
 
             //Replace sensitive information
-            serializedOptionsJSON.replace("apisecret", "hidden");
-            serializedOptionsJSON.replace("apikey", "hidden");
-            serializedOptionsJSON.replace("rpcpass", "hidden");
+            String[] sensitiveKeys = {"apisecret", "apikey", "rpcpass", "apiSecret", "apiKey", "rpcPass"};
+            String replaceString = "hidden";
+
+            for (int i = 0; i < sensitiveKeys.length; i++) {
+                if (serializedOptionsJSON.containsKey(sensitiveKeys[i])) {
+                    serializedOptionsJSON.replace(sensitiveKeys[i], replaceString);
+                }
+            }
 
             toRet = serializedOptionsJSON.toString();
         } catch (org.json.simple.parser.ParseException e) {

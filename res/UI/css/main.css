@@ -1,0 +1,60 @@
+ body {
+        font-family: Helvetica;
+        padding-top: 70px;
+        }
+
+ .row {
+        margin-bottom: 20px;
+ }
+ .row .row {
+        margin-top: -20px;
+        margin-bottom: 0;
+ }
+
+ [class*="col-"] {
+        padding-top: 2px;
+        padding-bottom: 2px;
+        border: 0px solid #ddd;
+        border: 0px solid rgba(86,61,124,.2);
+ }
+
+ hr {
+        margin-top: 20px;
+        margin-bottom: 20px;
+ }
+
+ #logarea {
+        width:650px;
+        height:400px;
+        resize:none
+        border: 3px solid #cccccc;
+        padding: 5px;
+        font-family: Tahoma, sans-serif;
+        font-size:x-small;
+ }
+
+ #logareadiv {
+    margin-top : 10px;
+ }
+
+ .running-logarea
+ {
+         background-color: white !important;
+         background-image: url(../img/running.gif) !important;
+         background-position: 96% 98%;
+         background-repeat: no-repeat;
+}
+
+ .stopped-logarea
+ {
+         background-color: white !important;
+ }
+
+ .navbar-brand
+ {
+         padding: 1px 1px !important;
+ }
+
+
+
+

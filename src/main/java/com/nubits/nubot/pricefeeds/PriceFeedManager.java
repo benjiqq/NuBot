@@ -20,13 +20,12 @@ package com.nubits.nubot.pricefeeds;
 
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
-
-import java.util.ArrayList;
-
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.feedservices.AbstractPriceFeed;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
 
 /**
  * Manager for a selected list of price feeds
@@ -39,6 +38,7 @@ public class PriceFeedManager {
     private ArrayList<AbstractPriceFeed> feedList = new ArrayList<>();
     private CurrencyPair pair;
 
+    private LastPriceResponse response;
 
     public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws NuBotConfigException {
 
@@ -54,23 +54,25 @@ public class PriceFeedManager {
 
     /**
      * trigger fetches from all feeds
+     *
      * @return
      */
-    public LastPriceResponse fetchLastPrices() {
+    public void fetchLastPrices() {
 
         LOG.debug("fetch last prices");
 
-        LastPriceResponse response = new LastPriceResponse();
+        response = new LastPriceResponse();
         boolean isMainFeedValid = false;
         ArrayList<LastPrice> prices = new ArrayList<>();
-        for (int i = 0; i < feedList.size(); i++) {
-            AbstractPriceFeed tempFeed = feedList.get(i);
+        int i = 0;
+        final int main_index = 0;
+        for (AbstractPriceFeed tempFeed : feedList) {
 
             LastPrice lastPrice = tempFeed.getLastPrice(pair);
             if (lastPrice != null && !lastPrice.isError()) {
                 LOG.debug("Obtained price : " + lastPrice.getPrice().getQuantity() + " from " + tempFeed.getClass().getSimpleName());
                 prices.add(lastPrice);
-                if (i == 0) {
+                if (i == main_index) {
                     isMainFeedValid = true;
                 }
             } else {
@@ -80,9 +82,12 @@ public class PriceFeedManager {
         }
         response.setMainFeedValid(isMainFeedValid);
         response.setPrices(prices);
-        return response;
+
     }
 
+    public ArrayList<LastPrice> getLastPrices() {
+        return this.response.getPrices();
+    }
 
 
     public ArrayList<AbstractPriceFeed> getFeedList() {

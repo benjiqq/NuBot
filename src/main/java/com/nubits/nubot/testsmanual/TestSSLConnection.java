@@ -25,9 +25,11 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.SSLSocket;
 import javax.net.ssl.SSLSocketFactory;
-import java.io.*;
- 
-/** Establish a SSL connection to a host and port, writes a byte and
+import java.io.InputStream;
+import java.io.OutputStream;
+
+/**
+ * Establish a SSL connection to a host and port, writes a byte and
  * prints the response. See
  * http://confluence.atlassian.com/display/JIRA/Connecting+to+SSL+services
  */
@@ -40,7 +42,7 @@ public class TestSSLConnection {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestSSLConnection.class);
 
-    public static boolean connectionTest(String host, int port){
+    public static boolean connectionTest(String host, int port) {
         try {
             SSLSocketFactory sslsocketfactory = (SSLSocketFactory) SSLSocketFactory.getDefault();
             SSLSocket sslsocket = (SSLSocket) sslsocketfactory.createSocket(host, port);
@@ -68,10 +70,10 @@ public class TestSSLConnection {
 
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.out.println("Usage: "+ TestSSLConnection.class.getName()+" <host> <port>");
+            System.out.println("Usage: " + TestSSLConnection.class.getName() + " <host> <port>");
             System.exit(1);
         }
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestSSLConnection.class.getSimpleName());
 
         connectionTest(args[0], Integer.parseInt(args[1]));
 

@@ -19,7 +19,6 @@
 package testexchanges;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
@@ -33,9 +32,6 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Iterator;
 
 /**
  * test bitspark
@@ -64,7 +60,7 @@ public class TestExchangeBitspark extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
             assertTrue(opt != null);
             assertTrue(opt.getExchangeName().equals("bitspark"));
@@ -82,7 +78,7 @@ public class TestExchangeBitspark extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             LOG.info("using opt " + opt);
             LOG.info("key: " + opt.apiKey);
             LOG.info("secret: " + opt.apiSecret);
@@ -91,9 +87,9 @@ public class TestExchangeBitspark extends TestCase {
             e.printStackTrace();
         }
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 
@@ -110,7 +106,7 @@ public class TestExchangeBitspark extends TestCase {
         assertTrue(ld != null);
         long start = System.currentTimeMillis();
         ApiResponse balancesResponse = ti.getAvailableBalance(btc);
-        assertTrue(balancesResponse!=null);
+        assertTrue(balancesResponse != null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
         assertTrue(delta < 5000);
@@ -142,7 +138,7 @@ public class TestExchangeBitspark extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             LOG.info("using opt " + opt);
             LOG.info("key: " + opt.apiKey);
             LOG.info("secret: " + opt.apiSecret);
@@ -151,9 +147,9 @@ public class TestExchangeBitspark extends TestCase {
             e.printStackTrace();
         }
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 

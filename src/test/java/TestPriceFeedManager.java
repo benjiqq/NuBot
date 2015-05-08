@@ -19,8 +19,6 @@
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.pricefeeds.FeedFacade;
-import com.nubits.nubot.pricefeeds.feedservices.BitfinexPriceFeed;
-import com.nubits.nubot.pricefeeds.feedservices.BtcePriceFeed;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import junit.framework.TestCase;
 import org.junit.Test;
@@ -36,18 +34,19 @@ public class TestPriceFeedManager extends TestCase {
     public void testAll() {
 
         //public PriceFeedManager(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) throws
-        ArrayList<String>backup = new ArrayList<>();
+        ArrayList<String> backup = new ArrayList<>();
         backup.add(FeedFacade.BitfinexPriceFeed);
         PriceFeedManager pfm = null;
-        try{
-             pfm = new PriceFeedManager(FeedFacade.BtcePriceFeed, backup, CurrencyList.BTC_USD);
-        }catch(Exception e){
+        try {
+            pfm = new PriceFeedManager(FeedFacade.BtcePriceFeed, backup, CurrencyList.BTC_USD);
+        } catch (Exception e) {
 
         }
 
-        ArrayList<LastPrice> prices = pfm.fetchLastPrices().getPrices();
+        pfm.fetchLastPrices();
+        ArrayList<LastPrice> prices = pfm.getLastPrices();
         Iterator<LastPrice> it = prices.iterator();
-        while(it.hasNext()){
+        while (it.hasNext()) {
             LastPrice p = it.next();
             double pd = p.getPrice().getQuantity();
             System.out.println(pd);

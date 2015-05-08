@@ -19,6 +19,7 @@
 package com.nubits.nubot.strategy.Secondary;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.notifications.HipChatNotifications;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
@@ -33,14 +34,21 @@ import java.util.TimerTask;
 public class StrategySecondaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategySecondaryPegTask.class.getName());
+
     private StrategySecondaryPegUtils strategyUtils = new StrategySecondaryPegUtils(this);
+
     private boolean mightNeedInit = true;
-    private int activeSellOrders, activeBuyOrders, totalActiveOrders;
+
     private boolean ordersAndBalancesOK;
+
     private boolean needWallShift;
+
     private double sellPricePEG;
+
     private double buyPricePEG;
+
     private boolean shiftingWalls = false;
+
     private String priceDirection;  //this parameter can be either Constant.UP (when the price of the new order increased since last wall) or Constant.DOWN
     private PriceMonitorTriggerTask priceMonitorTask;
     private SubmitLiquidityinfoTask sendLiquidityTask;
@@ -50,8 +58,9 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     @Override
     public void run() {
-
+        if (SessionManager.sessionInterrupted()) return; //external interruption
         LOG.debug("Executing task on " + Global.exchange.getName() + ": StrategySecondaryPegTask. DualSide :  " + Global.options.isDualSide());
+
 
         if (isFirstTime) {
             initStrategy();
@@ -61,6 +70,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void adaptOrders() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.debug("adapt orders");
 
@@ -75,13 +85,18 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
 
         strategyUtils.recount(); //Count number of active sells and buys
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         if (mightNeedInit) {
             LOG.info("might need init");
             boolean reset = mightNeedInit && !(ordersAndBalancesOK);
             if (reset) {
                 String message = "Order reset needed on " + Global.exchange.getName();
                 HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
+                if (SessionManager.sessionInterrupted()) return; //external interruption
+
                 LOG.warn(message);
+                LOG.debug("mightNeedInit: " + mightNeedInit + " ordersAndBalancesOK: " + ordersAndBalancesOK);
                 boolean reinitiateSuccess = strategyUtils.reInitiateOrders(false);
                 if (reinitiateSuccess) {
                     mightNeedInit = false;
@@ -89,6 +104,7 @@ public class StrategySecondaryPegTask extends TimerTask {
             } else {
                 LOG.debug("No need to init new orders since current orders are correct");
             }
+
             strategyUtils.recount();
         }
 
@@ -108,8 +124,13 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void initStrategy() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         //First execution : reset orders and init strategy
         LOG.info("Initializing strategy");
+        LOG.info("setting up ordermanager");
+
+
         isFirstTime = false;
         strategyUtils.recount();
         boolean reinitiateSuccess = strategyUtils.reInitiateOrders(true);
@@ -121,6 +142,7 @@ public class StrategySecondaryPegTask extends TimerTask {
     }
 
     public void notifyPriceChanged(double new_sellPricePEG, double new_buyPricePEG, double conversion, String direction) {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         if (shiftingWalls) {
             LOG.warn("Shift request failed, shift in progress.");
@@ -159,6 +181,7 @@ public class StrategySecondaryPegTask extends TimerTask {
         }
         HipChatNotifications.sendMessage(message, MessageColor.PURPLE);
         LOG.warn(message);
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         shiftSuccess = strategyUtils.shiftWalls();
         if (shiftSuccess) {
@@ -206,29 +229,6 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.sendLiquidityTask = sendLiquidityTask;
     }
 
-    public int getActiveSellOrders() {
-        return activeSellOrders;
-    }
-
-    public void setActiveSellOrders(int activeSellOrders) {
-        this.activeSellOrders = activeSellOrders;
-    }
-
-    public int getActiveBuyOrders() {
-        return activeBuyOrders;
-    }
-
-    public void setActiveBuyOrders(int activeBuyOrders) {
-        this.activeBuyOrders = activeBuyOrders;
-    }
-
-    public int getTotalActiveOrders() {
-        return totalActiveOrders;
-    }
-
-    public void setTotalActiveOrders(int totalActiveOrders) {
-        this.totalActiveOrders = totalActiveOrders;
-    }
 
     public boolean isMightNeedInit() {
         return mightNeedInit;
@@ -276,5 +276,13 @@ public class StrategySecondaryPegTask extends TimerTask {
 
     public void setPriceDirection(String priceDirection) {
         this.priceDirection = priceDirection;
+    }
+
+    public boolean isResettingOrders() {
+        return resettingOrders;
+    }
+
+    public void setResettingOrders(boolean resettingOrders) {
+        this.resettingOrders = resettingOrders;
     }
 }

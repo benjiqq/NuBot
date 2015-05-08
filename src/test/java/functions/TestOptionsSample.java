@@ -22,21 +22,20 @@ package functions;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.utils.FilesystemUtils;
 import junit.framework.TestCase;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.junit.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class TestOptionsSample extends TestCase {
 
     private static String testconfigFile = "sample-options.json";
-    private static String testconfigdir = "config/options/";
+    private static String testconfigdir = "config/";
     private static String testconfig = testconfigdir + testconfigFile;
 
     @Override
@@ -48,7 +47,7 @@ public class TestOptionsSample extends TestCase {
     public void testConfigExists() {
         Path currentRelativePath = Paths.get("");
         String s = currentRelativePath.toAbsolutePath().toString();
-        final String wdir = System.getProperty("user.dir");
+        final String wdir = FilesystemUtils.getBotAbsolutePath();
 
         File f = new File(testconfig);
         assertTrue(f.exists());
@@ -79,8 +78,7 @@ public class TestOptionsSample extends TestCase {
     @Test
     public void testLoadConfig() {
         try {
-            NuBotOptions nuo = ParseOptions
-                    .parseOptionsSingle(testconfig);
+            NuBotOptions nuo = ParseOptions.parseOptionsSingle(testconfig, false);
 
             assertTrue(nuo != null);
 
@@ -105,17 +103,17 @@ public class TestOptionsSample extends TestCase {
             inputJSON = ParseOptions.parseSingleJsonFile(testconfig);
             //assertTrue(inputJSON.containsKey("options"));
             //JSONObject optionsJSON = ParseOptions.getOptionsKey(inputJSON);
-            assertTrue(inputJSON.containsKey("exchangename"));
         } catch (Exception e) {
 
         }
+
         assertTrue(!catched);
 
-        assertTrue(inputJSON.containsKey("exchangename"));
-        assertTrue(inputJSON.containsKey("apikey"));
-        assertTrue(inputJSON.containsKey("spread"));
-        assertTrue(inputJSON.containsKey("hipchat"));
-        assertTrue(inputJSON.containsKey("pair"));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.exchangename));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.apikey));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.spread));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.hipchat));
+        assertTrue(ParseOptions.containsIgnoreCase(inputJSON, ParseOptions.pair));
     }
 
     @Test
@@ -125,20 +123,21 @@ public class TestOptionsSample extends TestCase {
         boolean catched = false;
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions.parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 
         assertTrue(!catched);
 
         /*String nudIp = NuBotOptionsDefault.nudIp;
-        String sendMails = NuBotOptionsDefault.sendMails;
+        String mailnotifications = NuBotOptionsDefault.mailnotifications;
         boolean submitLiquidity = NuBotOptionsDefault.submitLiquidity;
         boolean executeOrders = NuBotOptionsDefault.executeOrders;
         boolean verbose = NuBotOptionsDefault.verbose;
-        boolean sendHipchat = NuBotOptionsDefault.sendHipchat;
+        boolean hipchat = NuBotOptionsDefault.hipchat;
         boolean multipleCustodians = NuBotOptionsDefault.multipleCustodians;
         int executeStrategyInterval = NuBotOptionsDefault.executeStrategyInterval;
         double txFee = NuBotOptionsDefault.txFee;
@@ -160,14 +159,15 @@ public class TestOptionsSample extends TestCase {
 
         boolean catched = false;
         try {
-            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig);
+            NuBotOptions opt = ParseOptions.parseOptionsSingle(testconfig, false);
             assertTrue(opt.mainFeed != null);
             assertTrue(opt.mainFeed.equals("blockchain"));
-            assertTrue(opt.backupFeedNames.size() == 2);
-            assertTrue(opt.backupFeedNames.get(0).equals("coinbase"));
-            assertTrue(opt.backupFeedNames.get(1).equals("btce"));
+            assertTrue(opt.backupFeeds.size() == 2);
+            assertTrue(opt.backupFeeds.get(0).equals("coinbase"));
+            assertTrue(opt.backupFeeds.get(1).equals("btce"));
 
         } catch (NuBotConfigException e) {
+            System.out.println("error " + e);
             catched = true;
         }
 

@@ -20,6 +20,8 @@ package com.nubits.nubot.strategy.Primary;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.bot.NuBotBase;
+import com.nubits.nubot.strategy.BalanceManager;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +41,9 @@ public class NuBotSimple extends NuBotBase {
     public void configureStrategy() {
 
         LOG.info("configuring strategy NuBotSimple");
+
+        Global.balanceManager = new BalanceManager();
+        Global.orderManager = new OrderManager();
 
         // set liquidityinfo task to the strategy
         ((StrategyPrimaryPegTask) (Global.taskManager.getStrategyFiatTask().getTask()))

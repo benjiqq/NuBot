@@ -20,11 +20,17 @@ package com.nubits.nubot.utils;
 
 import easyjcckit.Graphics2DPlotCanvas;
 import easyjcckit.GraphicsPlotCanvas;
-import easyjcckit.data.*;
-import easyjcckit.util.*;
-import java.awt.event.*;
-import java.util.*;
+import easyjcckit.data.DataCurve;
+import easyjcckit.data.DataPlot;
+import easyjcckit.data.DataPoint;
+import easyjcckit.util.ConfigParameters;
+import easyjcckit.util.PropertiesBasedConfigData;
+
 import javax.swing.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * You can import this statically "import static easyjcckit.QuickPlot.*;
@@ -56,6 +62,7 @@ public class LiquidityPlot {
             return this;
         }
     }
+
     static final ArrayList<easyjcckit.QuickPlot.CurveData> curves = new ArrayList<easyjcckit.QuickPlot.CurveData>();
 
     static void _plot() {

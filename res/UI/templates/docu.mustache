@@ -1,0 +1,23 @@
+
+    <div class="row">
+        <ul>
+            <li><a href="#" onclick="updateIframe('readme')">Readme</a></li>
+            <li><a href="#" onclick="updateIframe('setup')">Setup guide</a></li>
+            <li><a href="#" onclick="updateIframe('exchanges')">Exchanges</a></li>
+            <li><a href="#" onclick="updateIframe('feeds')">Price feeds</a></li>
+            <li><a href="#" onclick="updateIframe('changelog')">Changelog</a></li>
+            <li><a href="#" onclick="updateIframe('license')">License</a></li>
+        </ul>
+    </div>
+    <div class="row">
+        <iframe id="docu-iframe" src="docs/readme.html" width="100%" height="1000" frameBorder="0"></iframe>
+    </div>
+
+
+<script>
+   $( document ).ready(function() {
+                startupPage("docu");
+    });
+
+
+</script>

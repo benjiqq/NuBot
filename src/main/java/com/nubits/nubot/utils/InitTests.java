@@ -35,7 +35,7 @@ import java.io.File;
 public class InitTests {
 
     static {
-        System.setProperty("logback.configurationFile", "allconfig/testlog.xml");
+        System.setProperty("logback.configurationFile", "config/logging/test_logback.xml");
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(InitTests.class.getName());
@@ -45,7 +45,7 @@ public class InitTests {
         File f = new File(path);
         if (f.exists() && !f.isDirectory()) {
             try {
-                Global.options = ParseOptions.parseOptionsSingle(path);
+                Global.options = ParseOptions.parseOptionsSingle(path, false);
             } catch (NuBotConfigException ex) {
                 LOG.error(ex.toString());
             }
@@ -69,6 +69,8 @@ public class InitTests {
     public static void startConnectionCheck() {
         //Create a TaskManager
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
+
         //Start checking for connection with the exchange
         Global.taskManager.getCheckConnectionTask().start();
         //Wait a couple of seconds for the connectionThread to get live
@@ -79,11 +81,10 @@ public class InitTests {
         }
     }
 
-    public static void setLoggingFilename(Logger log) {
-        String fullName = log.getName();
-        String fileName = fullName.substring(fullName.lastIndexOf(".") + 1) + "_"
-                + Utils.getTimestampLong();
-        MDC.put("testFileName", fileName);
-        LOG.info("Logging on " + Settings.TEST_LOGFOLDER + "/" + fileName);
+    public static void setLoggingFilename(String name) {
+        name += "_" + Utils.getTimestampLong();
+        String path = Settings.TEST_LOGFOLDER + "/" + name;
+        MDC.put("session", path);
+        LOG.info("Logging on " + path);
     }
 }

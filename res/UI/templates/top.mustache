@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NuBot GUI</title>
+    <link id="favicon" rel="shortcut icon" href="/favicon.ico" type="image/gif">
+
+    <!-- External JS libraries -->
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
+
+    <!-- Custom JS -->
+    <script src="js/main.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="css/main.css">
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap-theme.min.css">
+
+    <!-- Latest compiled and minified Bootstrap js -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/js/bootstrap.min.js"></script>
+
+    <!-- Ladda JS https://github.com/hakimel/Ladda -->
+    <script src="js/spin.min.js"></script>
+    <script src="js/ladda.min.js"></script>
+    <script src="js/ladda.jquery.min.js"></script>
+
+    <link rel="stylesheet" href="css/ladda.min.css">
+</head>
+
+<body>
+<!-- Fixed navbar -->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a onclick="changePage('operation')" class="navbar-brand" ><img alt="Brand" src="img/nubot-logo-50.png"></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav navbar-nav">
+                <li id="operation-nav" class="active"><a href='#' onclick="changePage('operation')">Dashboard</a></li>
+                <li id="config-nav"><a href='#' onclick="changePage('config')">Configuration</a></li>
+                <li id="docu-nav"><a href='#' onclick="changePage('docu')">Documentation</a></li>
+                <li id="disclaimer-nav"><a href='#' onclick="changePage('disclaimer')">Disclaimer</a></li>
+            </ul>
+                <button type="button" class="btn btn-danger btn-xs navbar-btn navbar-right" onclick="stopServer()">
+                    <span class="glyphicon glyphicon-record" aria-hidden="true"></span> Shutdown server
+                </button>
+
+        </div>
+        <!--/.nav-collapse -->
+    </div>
+</nav>
+
+<div class="container" id="maincontainer">

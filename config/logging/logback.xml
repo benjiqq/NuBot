@@ -1,46 +1,88 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<!-- Logging setup for launch tests-->
+<!-- Logging setup for launch-->
 
 <configuration>
 
-    <property scope="context" name="logfolder" value="logs"/>
-    <property scope="context" name="SessionLOG" value="SessionLOG"/>
-    <property scope="context" name="sessionlogFile" value=".sessions.log"/>
+    <property scope="context" name="standardfile" value="standard.html"/>
+    <property scope="context" name="verbosefile" value="verbose.html"/>
+
+    <property scope="context" name="standardlogFile" value="standard.log"/>
+    <property scope="context" name="verboselogFile" value="verbose.log"/>
 
 
-    <!-- console output of NuBot -->
+    <!-- console output filtered. to show different colors error and warn go separate  -->
+
+    <appender name="STDOUTerr" class="ch.qos.logback.core.ConsoleAppender">
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %red(%date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n)
+            </Pattern>
+        </layout>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+    </appender>
+
+    <appender name="STDOUTwarn" class="ch.qos.logback.core.ConsoleAppender">
+
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %blue(%date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n)
+            </Pattern>
+        </layout>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+
+    </appender>
+
+    <!-- standard output to console -->
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 
         <layout class="ch.qos.logback.classic.PatternLayout">
             <Pattern>
-                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{16}:%line]%n
+                %date{HH:mm:ss.SSS} [%thread] %-5level - %msg [%logger{1x6}:%line]%n
             </Pattern>
         </layout>
 
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>
+                    return logger.contains("jetty") || logger.contains("JettyHandler")
+                    || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                    || logger.contains("hipchat");
+                </expression>
+            </evaluator>
+            <onMatch>DENY</onMatch>
+            <onMismatch>NEUTRAL</onMismatch>
+        </filter>
+
+        <filter class="com.nubits.nubot.utils.LogVerboseFilter"/>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>WARN</level>
+            <onMatch>DENY</onMatch>
+            <onMismatch>ACCEPT</onMismatch>
+        </filter>
+
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
             <level>INFO</level>
-        </filter>
-
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    return logger.contains("jetty");
-                </expression>
-            </evaluator>
-            <onMatch>DENY</onMatch>
-            <onMismatch>NEUTRAL</onMismatch>
-        </filter>
-
-        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-            <evaluator>
-                <expression>
-                    return logger.contains("hipchat");
-                </expression>
-            </evaluator>
-            <onMatch>DENY</onMatch>
-            <onMismatch>NEUTRAL</onMismatch>
         </filter>
 
     </appender>
@@ -55,7 +97,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/standard.html</file>
+                <file>${session}/${standardfile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>INFO</level>
@@ -63,30 +105,21 @@
 
                 <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                     <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                        <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                        <pattern>%date %level%line%logger{16}%msg</pattern>
                     </layout>
                 </encoder>
 
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
                         <expression>
-                            return logger.contains("jetty");
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>
                     <onMismatch>NEUTRAL</onMismatch>
                 </filter>
-
-                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
-                    <evaluator>
-                        <expression>
-                            return logger.contains("hipchat");
-                        </expression>
-                    </evaluator>
-                    <onMatch>DENY</onMatch>
-                    <onMismatch>NEUTRAL</onMismatch>
-                </filter>
-
 
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
@@ -112,8 +145,7 @@
         </discriminator>
         <sift>
             <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
-                <file>${session}/verbose.html</file>
-                <!--<append>false</append>-->
+                <file>${session}/${verbosefile}</file>
 
                 <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                     <level>DEBUG</level>
@@ -121,14 +153,16 @@
 
                 <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
                     <layout class="ch.qos.logback.classic.html.HTMLLayout">
-                        <pattern>%date{HH:mm:ss.SSS}%level%line%logger{16}%msg</pattern>
+                        <pattern>%date %level%line%logger{16}%thread%msg</pattern>
                     </layout>
                 </encoder>
 
                 <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
                     <evaluator>
                         <expression>
-                            return logger.contains("jetty");
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
                         </expression>
                     </evaluator>
                     <onMatch>DENY</onMatch>
@@ -149,32 +183,92 @@
         </sift>
     </appender>
 
-    <!-- session logger -->
 
-    <appender name="sessionFile" class="ch.qos.logback.core.FileAppender">
+    <appender name="standard" class="ch.qos.logback.classic.sift.SiftingAppender">
 
-        <encoder>
-            <pattern>%msg%n
-            </pattern>
-        </encoder>
+        <discriminator>
+            <key>session</key>
+            <defaultValue>session_main</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
+                <file>${session}/${standardlogFile}</file>
 
-        <file>${logfolder}/${sessionlogFile}</file>
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>INFO</level>
+                </filter>
 
-        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>TRACE</level>
-        </filter>
+                <encoder>
+                    <pattern>%date{HH:mm:ss.SSS} %-5level - %msg - [%logger{16}:%line]%n
+                    </pattern>
+                </encoder>
 
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
+            </appender>
+        </sift>
     </appender>
 
+
+    <appender name="verbose" class="ch.qos.logback.classic.sift.SiftingAppender">
+
+        <discriminator>
+            <key>session</key>
+            <defaultValue>session_main</defaultValue>
+        </discriminator>
+        <sift>
+            <appender name="FILE-${session}" class="ch.qos.logback.core.FileAppender">
+                <file>${session}/${verboselogFile}</file>
+
+                <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+                    <level>DEBUG</level>
+                </filter>
+
+                <encoder>
+                    <pattern>%date %-5level - %msg - [%thread - %logger{16}:%line] %n
+                    </pattern>
+                </encoder>
+
+                <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+                    <evaluator>
+                        <expression>
+                            return logger.contains("jetty") || logger.contains("JettyHandler")
+                            || logger.contains("spark.Request") || logger.contains("MatcherFilter")
+                            || logger.contains("hipchat");
+                        </expression>
+                    </evaluator>
+                    <onMatch>DENY</onMatch>
+                    <onMismatch>NEUTRAL</onMismatch>
+                </filter>
+
+
+            </appender>
+        </sift>
+    </appender>
+
+
     <!--
-    definition of all loggers
-    -->
+	definition of all loggers
+	-->
 
     <root level="debug">
         <appender-ref ref="standardHTML"/>
         <appender-ref ref="verboseHTML"/>
         <appender-ref ref="STDOUT"/>
-        <appender-ref ref="sessionFile"/>
+        <appender-ref ref="STDOUTwarn"/>
+        <appender-ref ref="STDOUTerr"/>
+        <appender-ref ref="standard"/>
+        <appender-ref ref="verbose"/>
     </root>
 
 

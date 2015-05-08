@@ -24,12 +24,9 @@ import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
-import com.nubits.nubot.trading.ErrorManager;
-import com.nubits.nubot.trading.ServiceInterface;
-import com.nubits.nubot.trading.Ticker;
-import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import org.apache.commons.codec.binary.Hex;
+import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,16 +34,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -242,10 +237,8 @@ public class ExcoinWrapper implements TradeInterface {
     public ApiResponse enterOrder(String type, CurrencyPair pair, double amount, double rate) {
         ApiResponse apiResponse = new ApiResponse();
 
-        DecimalFormat nf = new DecimalFormat("0");
-        nf.setMinimumFractionDigits(8);
         String curs = pair.getPaymentCurrency().getCode().toUpperCase() + "/" + pair.getOrderCurrency().getCode().toUpperCase();
-        String details = curs + "/" + (type.equals("BUY") ? "bid" : "ask") + "/" + nf.format(amount) + "/" + nf.format(rate);
+        String details = curs + "/" + (type.equals("BUY") ? "bid" : "ask") + "/" + Utils.formatNumber(amount, 8) + "/" + Utils.formatNumber(rate, 8);
         String url = API_BASE_URL + "/" + API_ACCOUNT + "/" + API_ORDERS + "/" + API_TRADE + "/" + details;
 
         ApiResponse response = getQuery(url);
@@ -636,11 +629,49 @@ public class ExcoinWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to Excoin");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -703,7 +734,7 @@ public class ExcoinWrapper implements TradeInterface {
                 connection.setRequestProperty("Accept", "*/*");
                 if (needAuth) {
                     connection.setRequestProperty("Api-Key", keys.getApiKey());
-                    connection.setRequestProperty("Api-Signature", signRequest(keys.getPrivateKey(), url));
+                    connection.setRequestProperty("Api-Signature", TradeUtils.signRequest(keys.getPrivateKey(), url, SIGN_HASH_FUNCTION, ENCODING));
                 }
                 connection.setRequestProperty("Connection", "close");
                 connection.setRequestProperty("Host", "exco.in");
@@ -777,27 +808,5 @@ public class ExcoinWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String sign = "";
-            try {
-                Mac mac;
-                SecretKeySpec key;
-                // Create a new secret key
-                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-                // Create a new mac
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                // Init mac with key.
-                mac.init(key);
-                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-            } catch (UnsupportedEncodingException uee) {
-                LOG.error("Unsupported encoding exception: " + uee.toString());
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.error("No such algorithm exception: " + nsae.toString());
-            } catch (InvalidKeyException ike) {
-                LOG.error("Invalid key exception: " + ike.toString());
-            }
-            return sign;
-        }
     }
 }

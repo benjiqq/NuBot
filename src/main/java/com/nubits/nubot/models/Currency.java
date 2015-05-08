@@ -20,13 +20,11 @@ package com.nubits.nubot.models;
 
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.CSVtools;
-import com.nubits.nubot.utils.FileSystem;
-import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Objects;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class Currency {
@@ -35,7 +33,6 @@ public class Currency {
     private boolean fiat; // indicate whether its crypto or fiat
     private String code; // i.e USD
     private String extendedName; // the extended name where available
-
 
 
     /**
@@ -71,7 +68,6 @@ public class Currency {
     }
 
     /**
-     *
      * @return
      */
     public boolean isFiat() {
@@ -79,7 +75,6 @@ public class Currency {
     }
 
     /**
-     *
      * @param fiat
      */
     public void setFiat(boolean fiat) {
@@ -87,7 +82,6 @@ public class Currency {
     }
 
     /**
-     *
      * @return
      */
     public String getCode() {
@@ -95,7 +89,6 @@ public class Currency {
     }
 
     /**
-     *
      * @param code
      */
     public void setCode(String code) {
@@ -103,7 +96,6 @@ public class Currency {
     }
 
     /**
-     *
      * @return
      */
     public String getExtendedName() {
@@ -111,7 +103,6 @@ public class Currency {
     }
 
     /**
-     *
      * @param extendedName
      */
     public void setExtendedName(String extendedName) {

@@ -1,0 +1,67 @@
+
+<div class="row" style="margin-top: 5px">
+
+    <div class="col-xs-12 col-md-4">
+
+       <button id="togglebot" type="button" class="btn btn-primary ladda-button" data-size="xl" data-style="expand-right">
+            <span id="togglebot-text" class="ladda-label glyphicon glyphicon-star"> Start Bot</span>
+        </button>
+
+        <br>
+
+        <p style="margin-top: 10px">Config file: <span id="configfile"><span></p>
+
+        <p style="margin-top: 10px">Status: <span id="botstatus">Stopped<span></p>
+
+        <p>Sesssion start: <span id="sessionstart"></span></p>
+
+        <p>Sesssion duration: <span id="duration"></span></p>
+
+
+        <h3>Active Orders</h3>
+        <table id="ordertable" class="table">
+            <thead>
+            <tr>
+                <th>Order type</th>
+                <th style='text-align: right;'>Quantity (NBT)</th>
+                <th style='text-align: right;'>Price</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <h3>Balances</h3>
+        <table id="balancetable" class="table">
+            <thead>
+            <tr>
+                <th>Asset</th>
+                <th style='text-align: right;'>Total</th>
+                <th style='text-align: right;'>On order (T1)</th>
+                <th style='text-align: right;'>In balance (T2)</th>
+            </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+
+    <div class="col-xs-12 col-md-6">
+            <h3>Logs</h3>
+             <label><input id="autoscrollCheckbox" type="checkbox" value="" checked> autoscroll</label>
+
+            <div id="logareadiv" class="input-group" >
+                <textarea readonly id="logarea" class="form-control custom-control"></textarea>
+            </div>
+    </div>
+
+</div>
+<script>
+   $( document ).ready(function() {
+        startupPage("operation");
+    });
+
+
+
+
+
+</script>

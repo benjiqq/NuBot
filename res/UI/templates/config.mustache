@@ -1,0 +1,368 @@
+
+
+    <div class="row">
+
+        <div class="col-xs-12 col-md-6">
+
+            <table class="table table-bordered" width="500">
+
+                <tr>
+                    <td class="col-md-2">Exchange</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="exchangename" size="100" type="text" class="form-control"
+                                   placeholder="exchangename">
+                        </div>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class="col-md-2">API key</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="apikey" size="100" type="text" class="form-control" placeholder="API Key">
+                    </td>
+
+
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-2">API secret</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="apisecret" type="password" size="100" type="text" class="form-control"
+                                   placeholder="API Secret">
+                    </td>
+
+
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-2">pair</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="pair" size="100" type="text" class="form-control" placeholder="pair">
+                    </td>
+
+
+                </tr>
+
+
+                <table class="table table-bordered" width="500">
+
+                    <tr>
+
+                        <td class="col-md-4">Maximum Buy Volume</td>
+
+                        <td class="col-md-2">
+                            <div class="input-group">
+                                <input id="maxbuyvolume" size="200" type="text" class="form-control" placeholder="0.0">
+                        </td>
+
+                        <td class="col-md-4">Maximum Sell Volume</td>
+
+                        <td class="col-md-2">
+                            <div class="input-group">
+                                <input id="maxsellvolume" size="200" type="text" class="form-control" placeholder="0.0">
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>wallchangeThreshold</td>
+                        <td>
+                            <div class="input-group">
+                                <input id="wallchangethreshold" size="100" type="text" class="form-control"
+                                       placeholder="0.0">
+                            </div>
+                        </td>
+
+                        <td>spread</td>
+                        <td>
+                            <div class="input-group">
+                                <input id="spread" size="100" type="text" class="form-control" placeholder="0.0">
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>emergencytimeout</td>
+                        <td>
+                            <div class="input-group">
+                                <input id="emergencytimeout" size="100" type="text" class="form-control"
+                                       placeholder="0.0">
+                            </div>
+                        </td>
+
+                        <td>keepproceeds</td>
+                        <td>
+                            <div class="input-group">
+                                <input id="keepproceeds" size="100" type="text" class="form-control" placeholder="0.0">
+                            </div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td>priceincrement</td>
+                        <td>
+                            <div class="input-group">
+                                <input id="priceincrement" size="100" type="text" class="form-control"
+                                       placeholder="0.0">
+                            </div>
+                        </td>
+
+
+                        <td class="col-md-2">txfee</td>
+
+                        <td class="col-md-8">
+
+                            <div class="input-group">
+                                <input id="txfee" size="100" type="text" class="form-control" placeholder="txfee">
+                            </div>
+
+                        </td>
+                    </tr>
+
+
+                </table>
+
+                <div class="col-xs-12 col-md-8">
+
+                    <!--<div class="row">-->
+
+                    <button id="saveconfigbutton" type="button" class="btn ladda-button" data-size="s" data-color="mint" data-style="expand-right" onclick="postall()">
+                        <span class="glyphicon glyphicon-save" aria-hidden="true"> Save</span>
+                    </button>
+
+                    <button id="resetbutton" type="button" class="btn ladda-button" data-size="s" data-color="red" data-style="expand-right" style="margin-left: 20px"
+                            onclick="postreset()">
+                        <span class="glyphicon glyphicon-alert" aria-hidden="true"> Clear all</span>
+                    </button>
+
+                    <br>
+
+                    <p style="margin-top: 10px">file: <span id="configfile"><span></p>
+
+                </div>
+
+
+        </div>
+
+
+        <div class="col-xs-6 col-md-4"></div>
+        <!-- spacer -->
+
+        <div class="col-xs-12 col-md-6">
+
+
+            <table class="table table-bordered" width="500">
+
+                <tr>
+                    <td class="col-md-2">Mainfeed</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="mainfeed" size="100" type="text" class="form-control" placeholder="">
+                        </div>
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td class="col-md-2">Backupfeeds</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="backupfeeds" size="100" type="text" class="form-control" placeholder="">
+                        </div>
+                    </td>
+
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-2">Mailrecipient</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="mailrecipient" size="100" type="text" class="form-control"
+                                   placeholder="mailrecipient">
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td class="col-md-2">Mailnotifications</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="mailnotifications" size="100" type="text" class="form-control"
+                                   placeholder="mailnotifications">
+                        </div>
+                    </td>
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-2">nubitaddress</td>
+
+                    <td class="col-md-8">
+                        <div class="input-group">
+                            <input id="nubitaddress" size="100" type="text" class="form-control"
+                                   placeholder="nubitaddress">
+                        </div>
+                    </td>
+
+
+                </tr>
+            </table>
+
+
+            <table class="table table-bordered" width="500">
+
+
+                <tr>
+                    <td class="col-md-3">nudIP</td>
+
+                    <td class="col-md-3">
+                        <div class="input-group">
+                            <input id="nudip" size="100" type="text" class="form-control" placeholder="nudIP">
+                    </td>
+
+                    <td class="col-md-3">nudport</td>
+
+                    <td class="col-md-3">
+                        <div class="input-group">
+                            <input id="nudport" size="100" type="text" class="form-control" placeholder="nudport">
+                    </td>
+
+                </tr>
+
+
+                <tr>
+                    <td class="col-md-3">rpcuser</td>
+
+                    <td class="col-md-3">
+                        <div class="input-group">
+                            <input id="rpcuser" size="100" type="text" class="form-control" placeholder="rpcuser">
+                        </div>
+                    </td>
+
+
+                    <td class="col-md-3">rpcpass</td>
+
+                    <td class="col-md-3">
+
+                        <div class="input-group">
+                            <input id="rpcpass" type="password" size="100" type="text" class="form-control"
+                                   placeholder="rpcpass">
+                        </div>
+
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+
+                </tr>
+
+            </table>
+
+
+            <div class="col-xs-12 col-md-8">
+
+                <table class="table table-bordered">
+
+                    <tr>
+                        <td>submitliquidity</td>
+
+                        <td>
+  <span class="input-group-addon">
+        <input id="submitliquidity" type="checkbox" aria-label="dualside">
+  </span>
+
+                        </td>
+
+                        <td>executeorders</td>
+
+                        <td>
+  <span class="input-group-addon">
+        <input id="executeorders" type="checkbox" aria-label="dualside">
+  </span>
+
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <td>Dual side</td>
+
+                        <td>
+  <span class="input-group-addon">
+        <input id="dualside" type="checkbox" aria-label="dualside">
+  </span>
+                        </td>
+
+
+                        <td>multiplecustodians</td>
+
+                        <td>
+  <span class="input-group-addon">
+        <input id="multiplecustodians" type="checkbox" aria-label="dualside">
+  </span>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+                        <td>verbose</td>
+
+                        <td>
+  <span class="input-group-addon">
+        <input id="verbose" type="checkbox" aria-label="dualside">
+  </span>
+
+                        </td>
+
+                        <td>hipchat</td>
+
+                        <td>
+  <span class="input-group-addon">
+        <input id="hipchat" type="checkbox" aria-label="dualside">
+  </span>
+
+                        </td>
+
+                    </tr>
+
+                </table>
+            </div>
+
+
+        </div>
+
+    </div>
+    <!-- /container -->
+
+</div>
+
+</div>
+
+
+<script>
+   $( document ).ready(function() {
+        startupPage("config");
+    });
+
+
+</script>
+

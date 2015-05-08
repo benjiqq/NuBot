@@ -21,8 +21,11 @@ package com.nubits.nubot.options;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.utils.FilesystemUtils;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -31,21 +34,23 @@ import java.io.IOException;
  * Save NuBotOptions to disk
  */
 public class SaveOptions {
+    private static final Logger LOG = LoggerFactory.getLogger(SaveOptions.class.getName());
 
 
-    public static String jsonPretty(NuBotOptions opt){
+    public static String jsonPretty(NuBotOptions opt) {
         GsonBuilder gson = new GsonBuilder().setPrettyPrinting();
-        gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
+        //gson.registerTypeAdapter(NuBotOptions.class, new NuBotOptionsSerializer());
         Gson parser = gson.create();
         String js = parser.toJson(opt);
         return js;
     }
 
-    public static boolean saveOptionsPretty(NuBotOptions opt, String filepath){
+    public static boolean saveOptionsPretty(NuBotOptions opt, String filepath) {
         String js = jsonPretty(opt);
-        FileSystem.writeToFile(js, filepath, false);
+        FilesystemUtils.writeToFile(js, filepath, false);
         return true;
     }
+
     /**
      * save options to file
      *
@@ -57,9 +62,24 @@ public class SaveOptions {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
         String jsonOpt = gson.toJson(opt);
-        FileSystem.writeToFile(jsonOpt, filepath, false);
-        //TODO: success?
+        FilesystemUtils.writeToFile(jsonOpt, filepath, false);
+        LOG.info("Options saved on " + filepath);
         return true;
+    }
+
+    public static boolean optionsReset(String filepath) {
+
+        try {
+            NuBotOptions opt = NuBotOptionsDefault.defaultFactory();
+            Global.options = opt;
+            Global.currentOptionsFile = filepath;
+            saveOptions(opt, filepath);
+            return true;
+
+        } catch (Exception e) {
+            return false;
+        }
+
     }
 
 
@@ -69,7 +89,7 @@ public class SaveOptions {
      * @param filepath
      * @return
      */
-    public static boolean backupOptions(String filepath) throws IOException{
+    public static boolean backupOptions(String filepath) throws IOException {
         File f = new File(filepath);
         if (f.exists()) {
             boolean wrote = false;

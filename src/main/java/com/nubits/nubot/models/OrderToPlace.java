@@ -19,10 +19,9 @@
 package com.nubits.nubot.models;
 
 
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-//TODO rename (requires refactoring of current Order class)
 public class OrderToPlace {
 
     private static final Logger LOG = LoggerFactory.getLogger(OrderToPlace.class.getName());
@@ -39,7 +38,6 @@ public class OrderToPlace {
     }
 
     /**
-     *
      * @return
      */
     public String getType() {
@@ -47,7 +45,6 @@ public class OrderToPlace {
     }
 
     /**
-     *
      * @param type
      */
     public void setType(String type) {
@@ -55,7 +52,6 @@ public class OrderToPlace {
     }
 
     /**
-     *
      * @return
      */
     public CurrencyPair getPair() {
@@ -63,7 +59,6 @@ public class OrderToPlace {
     }
 
     /**
-     *
      * @param pair
      */
     public void setPair(CurrencyPair pair) {
@@ -71,7 +66,6 @@ public class OrderToPlace {
     }
 
     /**
-     *
      * @return
      */
     public double getSize() {
@@ -79,15 +73,13 @@ public class OrderToPlace {
     }
 
     /**
-     *
-     * @param amount
+     * @param size
      */
     public void setSize(double size) {
         this.size = size;
     }
 
     /**
-     *
      * @return
      */
     public double getPrice() {
@@ -95,7 +87,6 @@ public class OrderToPlace {
     }
 
     /**
-     *
      * @param price
      */
     public void setPrice(double price) {

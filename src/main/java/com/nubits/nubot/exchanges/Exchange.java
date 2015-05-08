@@ -18,15 +18,10 @@
 
 package com.nubits.nubot.exchanges;
 
-import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.keys.ApiKeys;
-import com.nubits.nubot.trading.wrappers.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
 
 
 public class Exchange {
@@ -40,9 +35,13 @@ public class Exchange {
     private ApiKeys keys;
     private TradeInterface trade;
 
+    //handle concurrent requests
+    private boolean isBusy;
+
     public Exchange(String name) {
         this.name = name;
         this.exchangeLiveData = new ExchangeLiveData();
+        this.setFree();
     }
 
     public String getName() {
@@ -81,5 +80,19 @@ public class Exchange {
         return this.trade;
     }
 
+    public boolean isBusy() {
+        return isBusy;
+    }
 
+    public boolean isFree() {
+        return !isBusy;
+    }
+
+    public void setBusy() {
+        this.isBusy = true;
+    }
+
+    public void setFree() {
+        this.isBusy = false;
+    }
 }

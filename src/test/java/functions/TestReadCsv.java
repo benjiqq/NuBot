@@ -23,13 +23,12 @@ import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.CSVtools;
 import junit.framework.TestCase;
 import org.junit.Test;
-
-import java.io.File;
-import java.util.ArrayList;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class TestReadCsv  extends TestCase {
+import java.util.ArrayList;
+
+public class TestReadCsv extends TestCase {
 
     private static final Logger LOG = LoggerFactory.getLogger(TestReadCsv.class
             .getName());
@@ -40,12 +39,12 @@ public class TestReadCsv  extends TestCase {
 
         //File f = new File(getClass().getClassLoader().getResource(TEST_FILE).getFile());
         //assertTrue(f!=null);
-        ArrayList<String[]> parsedCsv  = CSVtools.parseCsvFromFile(Settings.CURRENCY_FILE_PATH);
+        ArrayList<String[]> parsedCsv = CSVtools.parseCsvFromFile(Settings.CURRENCY_FILE_PATH);
         assertTrue(parsedCsv.size() > 5);
         //InputStream is = TestReadCsv.class.getResourceAsStream(TEST_FILE);
 
 
-        /*ArrayList<String[]> parsedCsv = FileSystem.parseCsvFromFile(TEST_FILE);
+        /*ArrayList<String[]> parsedCsv = FilesystemUtils.parseCsvFromFile(TEST_FILE);
 
         for (int j = 0; j < parsedCsv.size(); j++) {
             String[] tempLine = parsedCsv.get(j);

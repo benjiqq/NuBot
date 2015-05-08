@@ -18,7 +18,6 @@
 
 package com.nubits.nubot.testsmanual;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
@@ -27,11 +26,8 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import com.nubits.nubot.utils.InitTests;
-import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
-
-import java.io.IOException;
+import org.slf4j.LoggerFactory;
 
 public class TestFroozenAmounts {
 
@@ -43,7 +39,7 @@ public class TestFroozenAmounts {
     private static final Logger LOG = LoggerFactory.getLogger(TestFroozenAmounts.class.getName());
 
     public static void main(String[] args) {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestFroozenAmounts.class.getSimpleName());
 
         CurrencyPair pair = CurrencyList.NBT_BTC;
         Currency currency = pair.getPaymentCurrency();

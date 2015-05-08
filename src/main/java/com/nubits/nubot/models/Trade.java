@@ -18,11 +18,12 @@
 
 package com.nubits.nubot.models;
 
-import java.text.DecimalFormat;
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.utils.Utils;
+
 import java.util.Date;
 
 /**
- *
  * @author admin
  */
 public class Trade {
@@ -136,12 +137,10 @@ public class Trade {
      }
      */
     public String toJSONString() {
-        DecimalFormat df = new DecimalFormat("0");
-        df.setMaximumFractionDigits(8);
 
         String feeString = "N.A.";
         if (fee != null) {
-            feeString = df.format(this.fee.getQuantity());
+            feeString = Utils.formatNumber(this.fee.getQuantity(), Settings.DEFAULT_PRECISION);
         }
 
 

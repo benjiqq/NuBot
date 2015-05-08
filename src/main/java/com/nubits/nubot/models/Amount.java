@@ -18,8 +18,8 @@
 
 package com.nubits.nubot.models;
 
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.utils.Utils;
-import java.text.DecimalFormat;
 
 
 public class Amount {
@@ -29,7 +29,6 @@ public class Amount {
     private Currency currency;
 
     /**
-     *
      * @param quantity
      * @param currency
      */
@@ -39,7 +38,6 @@ public class Amount {
     }
 
     /**
-     *
      * @return
      */
     public double getQuantity() {
@@ -47,7 +45,6 @@ public class Amount {
     }
 
     /**
-     *
      * @param quantity
      */
     public void setQuantity(double quantity) {
@@ -55,7 +52,6 @@ public class Amount {
     }
 
     /**
-     *
      * @return
      */
     public Currency getCurrency() {
@@ -63,7 +59,6 @@ public class Amount {
     }
 
     /**
-     *
      * @param currency
      */
     public void setCurrency(Currency currency) {
@@ -72,13 +67,10 @@ public class Amount {
 
     @Override
     public String toString() {
-        DecimalFormat df = new DecimalFormat("#");
-        df.setMaximumFractionDigits(8);
-        return "" + df.format(quantity) + " " + currency.getCode() + "\n";
+        return "" + Utils.formatNumber(quantity, Settings.DEFAULT_PRECISION) + " " + currency.getCode() + "\n";
     }
 
     /**
-     *
      * @param multiplyFactor
      * @return
      */

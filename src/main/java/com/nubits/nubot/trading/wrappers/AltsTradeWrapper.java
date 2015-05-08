@@ -1,14 +1,33 @@
+/*
+ * Copyright (C) 2015 Nu Development Team
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+ */
+
+
 package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.global.Constant;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -23,27 +42,23 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.net.NoRouteToHostException;
 import java.net.SocketException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.logging.Logger;
+
 
 /**
  * Created by sammoth on 27/02/15.
  */
 public class AltsTradeWrapper implements TradeInterface {
 
-    private static final Logger LOG = Logger.getLogger(ExcoinWrapper.class.getName());
+    private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(AltsTradeWrapper.class.getName());
     //Class fields
     private ApiKeys keys;
     protected AltsTradeService service;
@@ -79,9 +94,9 @@ public class AltsTradeWrapper implements TradeInterface {
         errors.setExchangeName(exchange);
     }
 
-    private ApiResponse getQuery(String url, HashMap<String, String> query_args,boolean needAuth, boolean isGet) {
+    private ApiResponse getQuery(String url, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
-        String queryResult = query(url, "", query_args,needAuth, isGet);
+        String queryResult = query(url, "", query_args, needAuth, isGet);
         if (queryResult == null) {
             apiResponse.setError(errors.nullReturnError);
             return apiResponse;
@@ -109,11 +124,11 @@ public class AltsTradeWrapper implements TradeInterface {
                 apiResponse.setResponseObject(httpAnswerJson);
             } catch (ParseException pe) {
                 // Alts.trade return the order id as an integer
-                LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+                LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
                 apiResponse.setError(errors.parseError);
             }
         } catch (ParseException pe) {
-            LOG.severe("httpResponse: " + queryResult + " \n" + pe.toString());
+            LOG.error("httpResponse: " + queryResult + " \n" + pe.toString());
             apiResponse.setError(errors.parseError);
             return apiResponse;
         }
@@ -136,7 +151,7 @@ public class AltsTradeWrapper implements TradeInterface {
         HashMap<String, String> args = new HashMap<>();
         boolean isGet = false;
 
-        ApiResponse response = getQuery(url, args,true, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONArray httpAnswerJson = (JSONArray) response.getResponseObject();
             if (currency != null) { //get just one currency balance
@@ -188,7 +203,7 @@ public class AltsTradeWrapper implements TradeInterface {
         double bid = -1;
         Ticker ticker = new Ticker();
 
-        ApiResponse response = getQuery(url, args,false, isGet);
+        ApiResponse response = getQuery(url, args, false, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject result = (JSONObject) httpAnswerJson.get("result");
@@ -226,7 +241,7 @@ public class AltsTradeWrapper implements TradeInterface {
         args.put("price", Objects.toString(rate));
         args.put("action", type);
 
-        ApiResponse response = getQuery(url, args,true, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             ApiResponse getOpenOrders = getActiveOrders(pair);
             if (getOpenOrders.isPositive()) {
@@ -258,7 +273,7 @@ public class AltsTradeWrapper implements TradeInterface {
         boolean isGet = false;
         ArrayList<Order> orderList = new ArrayList<>();
 
-        ApiResponse response = getQuery(url, args,true, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -282,7 +297,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("market", pair.toStringSepSpecial("/").toUpperCase());
 
-        ApiResponse response = getQuery(url, args,true, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray orders = (JSONArray) httpAnswerJson.get("orders");
@@ -306,7 +321,7 @@ public class AltsTradeWrapper implements TradeInterface {
         try {
             date = sdf.parse(in.get("date").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
         }
         if (date != null) {
             out.setInsertedDate(date);
@@ -351,7 +366,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("order_id", orderID);
 
-        ApiResponse response = getQuery(url, args, true,isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             apiResponse.setResponseObject(true);
         } else {
@@ -393,7 +408,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
         args.put("market", pair.toStringSepSpecial("/"));
 
-        ApiResponse response = getQuery(url, args,true, isGet);
+        ApiResponse response = getQuery(url, args, true, isGet);
         if (response.isPositive()) {
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONArray history = (JSONArray) httpAnswerJson.get("history");
@@ -418,7 +433,7 @@ public class AltsTradeWrapper implements TradeInterface {
         try {
             date = sdf.parse(in.get("date").toString());
         } catch (java.text.ParseException pe) {
-            LOG.severe(pe.toString());
+            LOG.error(pe.toString());
         }
         if (date != null) {
             out.setDate(date);
@@ -490,18 +505,52 @@ public class AltsTradeWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        if (!exchange.getLiveData().isConnected()) {
-            LOG.severe("The bot will not execute the query, there is no connection to Alts.Trade");
-            return TOKEN_BAD_RETURN;
-        }
-        String queryResult = "";
-        if (isGet) {
-            service.executeQuery(base, "", args, false, isGet);
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
+        if (exchange.getLiveData().isConnected()) {
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            service.executeQuery(base, "", args, true, isGet);
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
+            queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
-
     }
 
     @Override
@@ -527,13 +576,12 @@ public class AltsTradeWrapper implements TradeInterface {
             this.keys = keys;
         }
 
-
         @Override
         public String executeQuery(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
             String answer = null;
             String signature = "";
             String post_data = "";
-            String url=base+method;
+            String url = base + method;
             args.put("nonce", Objects.toString(System.currentTimeMillis()));
 
             List<NameValuePair> urlParameters = new ArrayList<NameValuePair>();
@@ -545,7 +593,7 @@ public class AltsTradeWrapper implements TradeInterface {
 
             post_data = TradeUtils.buildQueryString(args, ENCODING);
 
-            signature = signRequest(keys.getPrivateKey(), post_data);
+            signature = TradeUtils.signRequest(keys.getPrivateKey(), post_data, SIGN_HASH_FUNCTION, ENCODING);
 
             // add header
             Header[] headers = new Header[3];
@@ -575,7 +623,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 } else {
                     get.abort();
                 }
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             } catch (SocketException e) {
                 if (!isGet) {
@@ -583,7 +631,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 } else {
                     get.abort();
                 }
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             } catch (Exception e) {
                 if (!isGet) {
@@ -591,7 +639,7 @@ public class AltsTradeWrapper implements TradeInterface {
                 } else {
                     get.abort();
                 }
-                LOG.severe(e.toString());
+                LOG.error(e.toString());
                 return null;
             }
             BufferedReader rd;
@@ -610,50 +658,27 @@ public class AltsTradeWrapper implements TradeInterface {
                 answer = buffer.toString();
             } catch (IOException ex) {
 
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             } catch (IllegalStateException ex) {
 
-                LOG.severe(ex.toString());
+                LOG.error(ex.toString());
                 return null;
             }
             if (Global.options
                     != null && Global.options.isVerbose()) {
 
-                LOG.fine("\nSending request to URL : " + base + " ; get = " + isGet);
+                LOG.trace("\nSending request to URL : " + base + " ; get = " + isGet);
                 if (post != null) {
                     System.out.println("Post parameters : " + post.getEntity());
                 }
-                LOG.fine("Response Code : " + response.getStatusLine().getStatusCode());
-                LOG.fine("Response :" + response);
+                LOG.trace("Response Code : " + response.getStatusLine().getStatusCode());
+                LOG.trace("Response :" + response);
 
             }
             return answer;
 
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-
-            String sign = "";
-            try {
-                Mac mac;
-                SecretKeySpec key;
-                // Create a new secret key
-                key = new SecretKeySpec(Base64.decode(secret), SIGN_HASH_FUNCTION);
-                // Create a new mac
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                // Init mac with key.
-                mac.init(key);
-                sign = Base64.encode(mac.doFinal(hash_data.getBytes(ENCODING)));
-            } catch (UnsupportedEncodingException uee) {
-                LOG.severe("Unsupported encoding exception: " + uee.toString());
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.severe("No such algorithm exception: " + nsae.toString());
-            } catch (InvalidKeyException ike) {
-                LOG.severe("Invalid key exception: " + ike.toString());
-            }
-            return sign;
-        }
     }
 }

@@ -18,10 +18,10 @@
 
 package com.nubits.nubot.launch.toolkit;
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiError;
 import com.nubits.nubot.models.ApiResponse;
@@ -29,7 +29,7 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,23 +44,23 @@ import java.util.ArrayList;
 public class NuExecuteOrders {
 
     private static final Logger LOG = LoggerFactory.getLogger(NuExecuteOrders.class.getName());
+    private static final String USAGE_STRING = "java -jar OrderBot <apikey> <secretkey> <exchange-name> <path/to/orders.csv>";
+    private static Thread mainThread;
     private String api;
     private String secret;
     private String pathToOrders;
     private String exchangename;
     private ArrayList<CsvLine> orderList;
     private ApiKeys keys;
-    private static Thread mainThread;
-    private static final String USAGE_STRING = "java -jar OrderBot <apikey> <secretkey> <exchange-name> <path/to/orders.csv>";
 
     public static void main(String[] args) {
 
         mainThread = Thread.currentThread();
 
         String folderName = "NuExecuteOrders_" + System.currentTimeMillis() + "/";
-        String logsFolder = Settings.LOGS_PATH + folderName;
+        String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
 
 
         NuExecuteOrders app = new NuExecuteOrders();
@@ -76,6 +76,24 @@ public class NuExecuteOrders {
         } else {
             System.exit(0);
         }
+    }
+
+    private static void createShutDownHook() {
+        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
+            @Override
+            public void run() {
+                LOG.info("Exiting...");
+                NuExecuteOrders.mainThread.interrupt();
+                try {
+                    Global.taskManager.stopAll();
+                } catch (IllegalStateException e) {
+
+                }
+
+                Thread.currentThread().interrupt();
+                return;
+            }
+        }));
     }
 
     private void executeOrders() {
@@ -104,7 +122,6 @@ public class NuExecuteOrders {
         Global.exchange.setLiveData(liveData);
 
 
-
         //Switch the ip of exchange
         String apibase = "";
         if (exchangename.equalsIgnoreCase(ExchangeFacade.INTERNAL_EXCHANGE_PEATIO)) {
@@ -118,12 +135,12 @@ public class NuExecuteOrders {
         //Assign the TradeInterface to the PeatioExchange
 
 
-
         Global.exchange.setTrade(new PeatioWrapper(keys, Global.exchange, apibase));
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
         //Create a TaskManager and
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
         //Start checking for connection
         Global.taskManager.getCheckConnectionTask().start();
 
@@ -187,24 +204,6 @@ public class NuExecuteOrders {
 
         return list;
 
-    }
-
-    private static void createShutDownHook() {
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-                LOG.info("Exiting...");
-                NuExecuteOrders.mainThread.interrupt();
-                try{
-                    Global.taskManager.stopAll();
-                }catch(IllegalStateException e){
-
-                }
-
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
     }
 
     protected class CsvLine {

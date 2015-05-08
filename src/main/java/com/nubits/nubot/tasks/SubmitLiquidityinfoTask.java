@@ -20,13 +20,14 @@ package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.Amount;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.Order;
 import com.nubits.nubot.models.PairBalance;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -36,7 +37,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
@@ -59,12 +59,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private String jsonFile_balances;
 
     public SubmitLiquidityinfoTask(boolean verbose) {
-
         this.verbose = verbose;
-
     }
 
     private void initFiles() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         this.outputFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".csv";
         this.jsonFile_orders = Global.sessionLogFolder + "/" + Settings.ORDERS_FILENAME + ".json";
@@ -84,8 +83,9 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             JSONObject history = new JSONObject();
             JSONArray orders = new JSONArray();
             history.put("orders", orders);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
+            FilesystemUtils.writeToFile(history.toJSONString(), this.jsonFile_orders, true);
         }
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         //create json file if it doesn't already exist
         File jsonF2 = new File(this.jsonFile_balances);
@@ -100,8 +100,10 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             JSONObject history = new JSONObject();
             JSONArray balances = new JSONArray();
             history.put("balances", balances);
-            FileSystem.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
+            FilesystemUtils.writeToFile(history.toJSONString(), this.jsonFile_balances, true);
         }
+
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         File of = new File(this.outputFile_orders);
         if (!of.exists()) {
@@ -113,13 +115,17 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             }
         }
 
-        FileSystem.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);
+        FilesystemUtils.writeToFile("timestamp,activeOrders, sells,buys, digest\n", this.outputFile_orders, false);
 
     }
 
     @Override
     public void run() {
-        LOG.debug("Executing task : CheckOrdersTask ");
+
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
+        LOG.debug("Executing " + this.getClass());
+
         if (firstExecution) {
             initFiles();
             firstExecution = false;
@@ -129,9 +135,15 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     }
 
     private void checkOrders() {
+
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
         if (!isWallsBeingShifted()) { //Do not report liquidity info during wall shifts (issue #23)
             if (isFirstOrdersPlaced()) {
                 String response1 = reportTier1(); //active orders
+
+                if (SessionManager.sessionInterrupted()) return; //external interruption
+
                 String response2 = reportTier2(); //balance
                 if (Global.options.isSubmitliquidity()) {
                     LOG.info("Liquidity info submitted:\n\t" + response1 + "\n\t" + response2);
@@ -150,14 +162,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     private String reportTier1() {
         String toReturn = "";
 
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        Global.orderManager.fetchOrders();
 
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return toReturn;
-        }
+        ArrayList<Order> orderList = Global.orderManager.getOrderList();
 
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         LOG.debug("Active orders : " + orderList.size());
 
@@ -166,12 +175,12 @@ public class SubmitLiquidityinfoTask extends TimerTask {
             Order o = it.next();
             LOG.debug("order: " + o.getDigest());
         }
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         if (verbose) {
-            DecimalFormat nf = new DecimalFormat("0");
-            nf.setMinimumFractionDigits(8);
-            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + nf.format(Global.exchange.getLiveData().getNBTonbuy()));
-            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + nf.format(Global.exchange.getLiveData().getNBTonsell()));
+
+            LOG.info(Global.exchange.getName() + "OLD NBTonbuy  : " + Utils.formatNumber(Global.exchange.getLiveData().getNBTonbuy(), Settings.DEFAULT_PRECISION));
+            LOG.info(Global.exchange.getName() + "OLD NBTonsell  : " + Utils.formatNumber(Global.exchange.getLiveData().getNBTonsell(), Settings.DEFAULT_PRECISION));
         }
 
         double nbt_onsell = 0;
@@ -217,6 +226,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         String toWrite = timeStampString + " , " + orderList.size() + " , " + sells + " , " + buys + " , " + digest;
         logOrderCSV(toWrite);
 
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
         //Also update a json version of the output file
         //build the latest data into a JSONObject
         JSONObject latestOrders = new JSONObject();
@@ -250,13 +261,14 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         }
         latestOrders.put("digest", jsonDigest);
 
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         //now read the existing object if one exists
         JSONParser parser = new JSONParser();
         JSONObject orderHistory = new JSONObject();
         JSONArray orders = new JSONArray();
         try { //object already exists in file
-            orderHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_orders));
+            orderHistory = (JSONObject) parser.parse(FilesystemUtils.readFromFile(this.jsonFile_orders));
             orders = (JSONArray) orderHistory.get("orders");
         } catch (ParseException pe) {
             LOG.error("Unable to parse " + this.jsonFile_orders);
@@ -267,11 +279,11 @@ public class SubmitLiquidityinfoTask extends TimerTask {
         logOrderJSON(orderHistory);
 
         if (verbose) {
-            DecimalFormat nf = new DecimalFormat("0");
-            nf.setMinimumFractionDigits(8);
-            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + nf.format(nbt_onbuy));
-            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + nf.format(nbt_onsell));
+            LOG.info(Global.exchange.getName() + "Updated NBTonbuy  : " + Utils.formatNumber(nbt_onbuy, Settings.DEFAULT_PRECISION));
+            LOG.info(Global.exchange.getName() + "Updated NBTonsell  : " + Utils.formatNumber(nbt_onsell, Settings.DEFAULT_PRECISION));
         }
+
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
 
         if (Global.options.isSubmitliquidity()) {
             //Call RPC
@@ -294,12 +306,14 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private JSONObject getBalanceHistory() throws ParseException {
         JSONParser parser = new JSONParser();
-        JSONObject balanceHistory = (JSONObject) parser.parse(FileSystem.readFromFile(this.jsonFile_balances));
+        JSONObject balanceHistory = (JSONObject) parser.parse(FilesystemUtils.readFromFile(this.jsonFile_balances));
         return balanceHistory;
     }
 
     private String reportTier2() {
         String toReturn = "";
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
         if (balancesResponse.isPositive()) {
             PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
@@ -328,6 +342,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             latestBalances.put("balance-not-on-order", availableBalancesArray);
 
+            if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
             //now read the existing object if one exists
             JSONObject balanceHistory = null;
             try {
@@ -352,6 +368,7 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
             if (Global.options.isSubmitliquidity()) {
                 //Call RPC
+                if (SessionManager.sessionInterrupted()) return ""; //external interruption
                 toReturn = sendLiquidityInfoImpl(buyside, sellside, 2);
             }
 
@@ -364,6 +381,8 @@ public class SubmitLiquidityinfoTask extends TimerTask {
 
     private String sendLiquidityInfoImpl(double buySide, double sellSide, int tier) {
         String toReturn = "";
+        if (SessionManager.sessionInterrupted()) return ""; //external interruption
+
         if (Global.rpcClient.isConnected()) {
             JSONObject responseObject;
 
@@ -424,15 +443,15 @@ public class SubmitLiquidityinfoTask extends TimerTask {
     //---------------- storage related -----------------
 
     private void logOrderCSV(String toWrite) {
-        FileSystem.writeToFile(toWrite, outputFile_orders, true);
+        FilesystemUtils.writeToFile(toWrite, outputFile_orders, true);
     }
 
     private void logOrderJSON(JSONObject orderHistory) {
-        FileSystem.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
+        FilesystemUtils.writeToFile(orderHistory.toJSONString(), jsonFile_orders, false);
     }
 
     private void logBalanceJSON(JSONObject balanceHistory) {
-        FileSystem.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
+        FilesystemUtils.writeToFile(balanceHistory.toJSONString(), jsonFile_balances, false);
     }
 
 

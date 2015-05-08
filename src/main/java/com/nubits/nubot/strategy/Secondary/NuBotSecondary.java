@@ -26,6 +26,8 @@ import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.pricefeeds.PriceFeedManager;
+import com.nubits.nubot.strategy.BalanceManager;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.PriceMonitorTriggerTask;
 import com.nubits.nubot.tasks.SubmitLiquidityinfoTask;
 import com.nubits.nubot.utils.Utils;
@@ -42,12 +44,14 @@ public class NuBotSecondary extends NuBotBase {
     @Override
     public void configureStrategy() throws NuBotConfigException {
 
+        Global.balanceManager = new BalanceManager();
+        Global.orderManager = new OrderManager();
+
         if (Global.options.isDualSide()) {
             LOG.info("Configuring NuBot for Dual-Side strategy");
         } else {
             LOG.info("Configuring NuBot for Sell-Side strategy");
         }
-
 
         //Peg to a USD price via crypto pair
         Currency toTrackCurrency;
@@ -60,26 +64,24 @@ public class NuBotSecondary extends NuBotBase {
 
         CurrencyPair toTrackCurrencyPair = new CurrencyPair(toTrackCurrency, CurrencyList.USD);
 
-        //TODO
-
         PriceMonitorTriggerTask pmTask = (PriceMonitorTriggerTask) Global.taskManager.getPriceTriggerTask().getTask();
-        StrategySecondaryPegTask straTask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
+        StrategySecondaryPegTask stratTask = (StrategySecondaryPegTask) (Global.taskManager.getSecondaryPegTask().getTask());
 
         // set trading strategy to the price monitor task
-        pmTask.setStrategy(straTask);
+        pmTask.setStrategy(stratTask);
 
         //TODO circular
 
         // set price monitor task to the strategy
-        straTask.setPriceMonitorTask(pmTask);
+        stratTask.setPriceMonitorTask(pmTask);
 
         // set liquidityinfo task to the strategy
         SubmitLiquidityinfoTask liqTask = (SubmitLiquidityinfoTask) Global.taskManager.getSendLiquidityTask().getTask();
-        straTask.setSendLiquidityTask(liqTask);
+        stratTask.setSendLiquidityTask(liqTask);
 
         PriceFeedManager pfm = null;
         try {
-            pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeedNames(), toTrackCurrencyPair);
+            pfm = new PriceFeedManager(Global.options.getMainFeed(), Global.options.getBackupFeeds(), toTrackCurrencyPair);
         } catch (NuBotConfigException e) {
             throw new NuBotConfigException("can't configure price feeds");
         } catch (Exception e) {
@@ -124,10 +126,10 @@ public class NuBotSecondary extends NuBotBase {
 
         if (Global.options.isMultipleCustodians()) {
             delaySeconds = Utils.getSecondsToNextwindow(reset_every);
-            LOG.info("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
+            LOG.warn("NuBot will start running in " + delaySeconds + " seconds, to sync with remote NTP and place walls during next wall shift window.");
         } else {
 
-            LOG.info("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
+            LOG.warn("NuBot will not try to sync with other bots via remote NTP : 'multiple-custodians' is set to false");
         }
         //then start the thread
         Global.taskManager.getPriceTriggerTask().start(delaySeconds);

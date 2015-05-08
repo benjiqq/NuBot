@@ -18,10 +18,11 @@
 
 package com.nubits.nubot.tasks;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Timer;
 import java.util.TimerTask;
-import org.slf4j.LoggerFactory;
-import org.slf4j.Logger;
 
 
 public class BotTask {
@@ -29,11 +30,11 @@ public class BotTask {
     private static final Logger LOG = LoggerFactory.getLogger(BotTask.class.getName());
     private Timer timer;
     private boolean running;
-    private long interval; //expressed in millseconds
+    private long interval; //expressed in seconds
     private TimerTask task;
     private String name;
 
-    public BotTask(TimerTask task, long interval, String name) {
+    public BotTask(TimerTask task, int interval, String name) {
         this.timer = new Timer(name);
         this.running = false;
 
@@ -65,7 +66,10 @@ public class BotTask {
     }
 
     public void stop() {
+        LOG.debug("Stopping " + this.name + " (" + this + ")");
+        task.cancel();
         timer.cancel();
+        timer.purge();
         setRunning(false);
         LOG.info("Stopped BotTask " + this.name);
     }
@@ -80,14 +84,6 @@ public class BotTask {
 
     public Timer getTimer() {
         return timer;
-    }
-
-    public void setTimer(Timer timer) {
-        this.timer = timer;
-    }
-
-    public long getInterval() {
-        return interval;
     }
 
     public void setInterval(long interval) {

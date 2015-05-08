@@ -32,7 +32,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -63,7 +62,7 @@ public class TestExchangeAlts extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
             assertTrue(opt != null);
             assertTrue(opt.getExchangeName().equals("altstrade"));
@@ -81,7 +80,7 @@ public class TestExchangeAlts extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
             LOG.info("using opt " + opt);
             LOG.info("key: " + opt.apiKey);
             LOG.info("secret: " + opt.apiSecret);
@@ -91,14 +90,13 @@ public class TestExchangeAlts extends TestCase {
         }
 
 
-
         Global.options = opt;
 
         CurrencyPair testPair = CurrencyList.NBT_BTC;
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 
@@ -124,7 +122,7 @@ public class TestExchangeAlts extends TestCase {
 
         long start = System.currentTimeMillis();
 
-        assertTrue(balancesResponse!=null);
+        assertTrue(balancesResponse != null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
         assertTrue(delta < 5000);
@@ -156,7 +154,7 @@ public class TestExchangeAlts extends TestCase {
         NuBotOptions opt = null;
         try {
             opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+                    .parseOptionsSingle(testconfig, false);
 
         } catch (NuBotConfigException e) {
             e.printStackTrace();

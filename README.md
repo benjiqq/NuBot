@@ -13,12 +13,17 @@ As explained in the [white paper](https://nubits.com/about/white-paper), a custo
 [Discuss NuBot with the community](http://discuss.nubits.com/category/nubits/automated-trading)
 
 #Changelog
-See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/CHANGELOG.md?at=master)
+See [CHANGELOG.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/CHANGELOG.md)
 
+##Disclaimer . Use NuBot at your own risk
+
+*PLEASE BE AWARE THAT AUTOMATED TRADING WITH NUBOT MAY BE RISKY, ADDICTIVE, UNETHICAL OR ILLEGAL. ITS MISUSE MAY ALSO CAUSE FINANCIAL LOSS. NONE OF THE AUTHORS, CONTRIBUTORS, ADMINISTRATORS, OR ANYONE ELSE CONNECTED WITH NUBITS, IN ANY WAY WHATSOEVER, CAN BE RESPONSIBLE FOR THE USE YOU MAKE OF NUBOT*
+
+By using NuBot you declare to have accepted the afore-mentioned risks. See the DISCLAIMER.md for detailed terms.
 
 #How does it work?
 
-Only custodians will use the trading bot and relay liquidity data to other Nu clients.
+Custodians will use the trading bot and relay liquidity data to other Nu clients.
 Within the Nu system there are two types of custodians: **sell side** and **dual side** custodians.
 *Dual side custodians* are custodians whose specific function is to provide liquidity for compensation, and they will initially only provide buy side price support. Once their buy order for NBT is partially filled, the bot should then create a sell order for that NBT.
 In the case of *sell side custodians*, the liquidity they provide is secondary to another goal such as funding core development, marketing NBT or distributing Peercoin dividends. They want to spend the proceeds of their NBT, so under no circumstance will they provide buy side liquidity.
@@ -26,7 +31,7 @@ NuBot permits a user to indicate they are either a sell side or dual side custod
 
 #Using NuBot
 
-See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/SETUP.md?at=master)
+See [SETUP.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/SETUP.md)
 
 ##Dual-side strategy
 
@@ -74,7 +79,7 @@ Alternative strategies  :
 
 ##Supported exchanges 
 
-See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/EXCHANGES.md?at=master)
+See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/EXCHANGES.md)
 
 ##Design and diagrams
 
@@ -87,10 +92,9 @@ See [EXCHANGES.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a
 ![alt text](https://bytebucket.org/JordanLeePeershares/nubottrading/raw/faa3a5ebbb483372e176e4a8821d7835c2d404fd/readme-assets/bot-case-1.png "NuBot Dual-Side logic")
 
 
-
 ##Auto-Updating the latest version of the keystore
 In order for the bot to communicate with the exchanges API via encrypted https, it is necessary that the SSL certificate of the exchange is added to the local store of trusted certificates.
-NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](../master/NuBot/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
+NuBot includes the keystore file in its build. The Java JVM uses this keystore, an encrypted file which contains a [file.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/res/ssl/nubot_keystore.jks) with a collection of authorised certificates.
 
 Exchanges tend to upgrade their SSL certificates multiple times per year, and you need to maintain the keystore up-to-date for security reasons. We are committed to keep the *java keystore* always updated with most recent certificates available in the develop branch of this repository. 
 
@@ -101,7 +105,7 @@ cd res/ssl
  ./updateKeystore.sh
 ```
 
-Alternatively you can manually download the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/cfa0c7699ccd96300c1b1f77d416b9a6f1fa6e8d/NuBot/res/ssl/nubot_keystore.jks?at=develop) and place it in the *res/ssl* folder of NuBot.
+Alternatively you can manually download the latest available download the most recent version from the repository: [nubot_keystore.jks](https://bitbucket.org/JordanLeePeershares/nubottrading/src/develop/res/ssl/nubot_keystore.jks) and place it in the *res/ssl* folder of NuBot.
 
 ##Manually Adding SSL certificates for an exchange
 
@@ -115,11 +119,9 @@ keytool -importcert -file poloniex-dec.cer -keystore nubot_keystore.jks -alias â
 
 You will be prompted for a passphrase : type nub0tSSL
 
-#Price Feeds
-See [FEEDS.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/FEEDS.md?at=master)
-
 #Contribute
-See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/CONTRIBUTE.md?at=master)
+See [CONTRIBUTE.md](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/CONTRIBUTE.md)
 
 #License
-NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/6a8b65021a75e6193457ed8c415a8082468b686e/md/LICENSE.md?at=master)
+NuBot is released under [GNU GPL v2.0](https://bitbucket.org/JordanLeePeershares/nubottrading/src/master/docs/LICENSE.md)
+

@@ -18,22 +18,19 @@
 
 package com.nubits.nubot.launch.toolkit;
 
-import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
+import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.PeatioWrapper;
-import com.nubits.nubot.utils.FileSystem;
-import com.nubits.nubot.utils.Utils;
+import com.nubits.nubot.utils.FilesystemUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 
 public class NuCancelOrders {
@@ -51,9 +48,9 @@ public class NuCancelOrders {
 
         NuCancelOrders app = new NuCancelOrders();
         String folderName = "NuCancelOrders_" + System.currentTimeMillis() + "/";
-        String logsFolder = Settings.LOGS_PATH + folderName;
+        String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
         if (app.readParams(args)) {
 
             LOG.info("Launching CancellAllOrders ");
@@ -115,6 +112,7 @@ public class NuCancelOrders {
 
         //Create a TaskManager and
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
         //Start checking for connection
         Global.taskManager.getCheckConnectionTask().start();
 

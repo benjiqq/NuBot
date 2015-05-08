@@ -19,32 +19,85 @@
 package com.nubits.nubot.testsmanual;
 
 import com.nubits.nubot.bot.Global;
-import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.bot.SessionManager;
+import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.utils.VersionInfo;
+import com.nubits.nubot.webui.UiServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
-
 
 /**
  * the test launcher class for all functions
  */
 public class TestLaunch {
 
-
     static {
-        System.setProperty("testlogfolder","abc");
-        System.setProperty("logback.configurationFile", Settings.TEST_LAUNCH_XML);
+        System.setProperty("logback.configurationFile", Settings.TEST_LOGXML);
     }
 
-    static String configfile = "config/myconfig/poloniex.json";
+    static String configFile = "config/poloniex.json";
+    //static String configFile = "config/simulation.json";
+    //static String configFile = "config/myconfig/bitspark.json";
 
     private static final Logger LOG = LoggerFactory.getLogger(TestLaunch.class.getName());
 
     private static final Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
 
-    private static boolean runui = false;
+    private static boolean runui = true;
+
+
+    public static void testlaunchWithFile() {
+
+        LOG.info("test");
+
+        Global.sessionPath = "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        MDC.put("session", Global.sessionPath);
+
+        LOG.info("defined session path " + Global.sessionPath);
+
+        LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
+
+        sessionLOG.debug("test launch");
+
+        LOG.info("set global config");
+        SessionManager.setConfigGlobal(configFile, false);
+
+
+        if (runui) {
+
+            try {
+                UiServer.startUIserver(configFile, false);
+            } catch (Exception e) {
+                LOG.error("error setting up UI server " + e);
+            }
+        }
+    }
+
+    public static void testlaunchNoFile() {
+
+        LOG.info("test");
+
+        Global.sessionPath = "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
+        MDC.put("session", Global.sessionPath);
+        LOG.info("defined session path " + Global.sessionPath);
+        LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
+
+        sessionLOG.debug("test launch");
+
+        LOG.info("set global config");
+        SessionManager.setConfigDefault();
+
+        if (runui) {
+
+            try {
+                UiServer.startUIserver(Settings.DEFAULT_CONFIG_FILE_PATH, false);
+            } catch (Exception e) {
+                LOG.error("error setting up UI server " + e);
+            }
+        }
+    }
 
 
     /**
@@ -54,23 +107,14 @@ public class TestLaunch {
      */
     public static void main(String args[]) {
 
-        //MDC.put("session", Settings.GLOBAL_SESSION_NAME);
-
-        Global.sessionPath= "testlaunch" + "/" + Settings.SESSION_LOG + System.currentTimeMillis();
-        MDC.put("session", Global.sessionPath);
-        LOG.info("defined session path " + Global.sessionPath);
-
-        LOG.info("commit info " + VersionInfo.getBranchCommitInfo());
-
-        sessionLOG.debug("test launch");
-
-        SessionManager.sessionLaunch(configfile, runui);
-
-        //SessionManager.sessionLaunch(configfile, false);
+        //testlaunchWithFile();
+        //testlaunchNoFile();
+        String[] args2 = {"-cfg=" + configFile, "-GUI"};
+        //String[] args2 = {"-cfg=" + configFile};
+        Global.isSimulation = true;
+        MainLaunch.main(args2);
 
     }
-
-
 
 
 }

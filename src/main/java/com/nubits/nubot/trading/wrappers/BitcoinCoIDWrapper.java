@@ -27,7 +27,6 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -35,15 +34,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.NumberFormat;
 import java.util.*;
 
@@ -172,7 +170,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
                     if (thisOrder.getType().equals(Constant.SELL)) {
                         nbtOnOrder += thisOrder.getAmount().getQuantity();
                     } else {
-                        pegOnOrder += Utils.round(thisOrder.getAmount().getQuantity() / Global.conversion, Settings.DEFAULT_PRECISION);
+                        pegOnOrder += Utils.round(thisOrder.getAmount().getQuantity(), Settings.DEFAULT_PRECISION);
                     }
                 }
                 Amount PEGonOrder = new Amount(pegOnOrder, pair.getPaymentCurrency());
@@ -540,11 +538,49 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to BitcoinCoId");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -597,7 +633,11 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             }
 
             if (needAuth) {
-                args.put("nonce", Objects.toString(System.currentTimeMillis()));
+
+                String nonce = Objects.toString(System.currentTimeMillis());
+                LOG.trace("computed nonce =" + nonce);
+
+                args.put("nonce", nonce);
                 args.put("method", method);
                 post_data = TradeUtils.buildQueryString(args, ENCODING);
             }
@@ -609,7 +649,7 @@ public class BitcoinCoIDWrapper implements TradeInterface {
 
                 if (needAuth) {
                     connection.setRequestProperty("Key", keys.getApiKey());
-                    connection.setRequestProperty("Sign", signRequest(keys.getPrivateKey(), post_data));
+                    connection.setRequestProperty("Sign", TradeUtils.signRequest(keys.getPrivateKey(), post_data, SIGN_HASH_FUNCTION, ENCODING));
                 }
 
                 connection.setDoOutput(true);
@@ -669,27 +709,5 @@ public class BitcoinCoIDWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String sign = "";
-            try {
-                Mac mac;
-                SecretKeySpec key;
-                // Create a new secret key
-                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-                // Create a new mac
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                // Init mac with key.
-                mac.init(key);
-                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-            } catch (UnsupportedEncodingException uee) {
-                LOG.error("Unsupported encoding exception: " + uee.toString());
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.error("No such algorithm exception: " + nsae.toString());
-            } catch (InvalidKeyException ike) {
-                LOG.error("Invalid key exception: " + ike.toString());
-            }
-            return sign;
-        }
     }
 }

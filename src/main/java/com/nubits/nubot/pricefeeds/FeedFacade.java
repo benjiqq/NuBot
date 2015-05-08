@@ -45,8 +45,10 @@ public class FeedFacade {
     public static final String BtcePriceFeed = "btce";
     public static final String BitstampEURPriceFeed = "BitstampEUR";
     public static final String ExchangeratelabPriceFeed = "Exchangeratelab";
-    public static final String GoogleUnofficialPriceFeed = "GoogleUnofficialPrice";
+    public static final String GooglePriceFeed = "GoogleOfficial";
     public static final String OpenexchangeratesPriceFeed = "Openexchangerates";
+    public static final String SimulationPriceFeed = "simulationfeed";
+
 
 
     static {
@@ -64,8 +66,9 @@ public class FeedFacade {
         FEED_NAMES_MAP.put(BitfinexPriceFeed, new BitfinexPriceFeed());
         FEED_NAMES_MAP.put(BitstampEURPriceFeed, new BitstampEURPriceFeed());
         FEED_NAMES_MAP.put(ExchangeratelabPriceFeed, new ExchangeratelabPriceFeed());
-        FEED_NAMES_MAP.put(GoogleUnofficialPriceFeed, new GoogleUnofficialPriceFeed());
+        FEED_NAMES_MAP.put(GooglePriceFeed, new GooglePriceFeed());
         FEED_NAMES_MAP.put(OpenexchangeratesPriceFeed, new OpenexchangeratesPriceFeed());
+        FEED_NAMES_MAP.put(SimulationPriceFeed, new SimulationPriceFeed());
 
     }
 

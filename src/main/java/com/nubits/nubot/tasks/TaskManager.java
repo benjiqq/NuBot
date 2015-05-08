@@ -18,8 +18,10 @@
 
 package com.nubits.nubot.tasks;
 
+import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.strategy.Primary.StrategyPrimaryPegTask;
 import com.nubits.nubot.strategy.Secondary.StrategySecondaryPegTask;
 import org.slf4j.Logger;
@@ -34,12 +36,11 @@ public class TaskManager {
     private static final String STRATEGY_FIAT = "Strategy Fiat Task";
     private static final String STRATEGY_CRYPTO = "Strategy Crypto Task";
 
-    protected int interval;
+    //protected int interval;
     private BotTask checkConnectionTask;
     private BotTask strategyFiatTask;
     private BotTask sendLiquidityTask;
     private BotTask checkNudTask;
-    private BotTask priceMonitorTask; //use only with NuPriceMonitor
 
     //these are used for secondary peg strategy
     private BotTask secondaryPegTask;
@@ -53,20 +54,29 @@ public class TaskManager {
         this.running = false;
         taskList = new ArrayList<BotTask>();
 
-        //TODO! options can't be null
         //assign default values just for testing without Global.options loaded
-        //TODO naming mixed
 
-        setTasks();
     }
 
-    public TaskManager(boolean iniTasks) {
-        this.running = false;
-        taskList = new ArrayList<BotTask>();
-        if (iniTasks) {
-            setTasks();
-        }
+    /**
+     * setup the task for checking Nu RPC
+     */
+    public void setupNuRPCTask() {
+        LOG.info("Setting up RPC client on " + Global.options.getNudIp() + ":" + Global.options.getNudPort());
+
+        Global.rpcClient = new NuRPCClient(Global.options.getNudIp(), Global.options.getNudPort(),
+                Global.options.getRpcUser(), Global.options.getRpcPass(), true,
+                Global.options.getNubitsAddress(), Global.options.getPair(), Global.options.getExchangeName());
+
+        this.setNudTask();
+
     }
+
+    public void startTaskNu() {
+        LOG.info("Starting task : Check connection with Nud");
+        this.getCheckNudTask().start();
+    }
+
 
     public void setNudTask() {
         this.checkNudTask = new BotTask(
@@ -75,10 +85,17 @@ public class TaskManager {
 
     }
 
-    private void setTasks() {
+    public void setTestTask() {
+        checkConnectionTask = new BotTask(
+                new CheckConnectionTask(), 3, "checkConnectionTest");
+        taskList.add(checkConnectionTask);
+        LOG.debug("adde checkConnectionTask : " + checkConnectionTask);
+    }
+
+    public void setTasks() {
         //connectivity tasks
 
-        LOG.info("setting up tasks");
+        LOG.debug("setting up tasks");
 
         checkConnectionTask = new BotTask(
                 new CheckConnectionTask(), Settings.CHECK_CONNECTION_INTERVAL, "checkConnection");
@@ -103,23 +120,22 @@ public class TaskManager {
 
         //Select the correct interval
         int checkPriceInterval = Settings.CHECK_PRICE_INTERVAL;
-        if (Global.options.pair.getPaymentCurrency().isFiat() && !Global.swappedPair
-                || Global.options.pair.getOrderCurrency().isFiat() && Global.swappedPair) {
+        CurrencyPair pair = Global.options.getPair();
+        boolean checkFiat = pair.getPaymentCurrency().isFiat() && !Global.swappedPair
+                || pair.getOrderCurrency().isFiat() && Global.swappedPair;
+
+        if (checkFiat) {
             checkPriceInterval = Settings.CHECK_PRICE_INTERVAL_FIAT;
         }
+
         priceTriggerTask = new BotTask(
                 new PriceMonitorTriggerTask(), checkPriceInterval, "priceTriggerTask");
         taskList.add(priceTriggerTask);
         LOG.debug("priceTriggerTask : " + priceTriggerTask);
 
-        /*priceMonitorTask = new BotTask(
-                new NuPriceMonitorTask(), Settings.CHECK_PRICE_INTERVAL, STRATEGY_CRYPTO);
-        taskList.add(priceMonitorTask);*/
-
         initialized = true;
     }
 
-    //Methods
     public void startAll() {
         for (int i = 0; i < taskList.size(); i++) {
             BotTask task = taskList.get(i);
@@ -128,23 +144,23 @@ public class TaskManager {
 
     }
 
-    public void stopAll() throws IllegalStateException {
+    public boolean stopAll() throws IllegalStateException {
         LOG.info("Stopping all BotTasks. ");
         boolean sentNotification = false;
         for (int i = 0; i < taskList.size(); i++) {
 
             BotTask bt = taskList.get(i);
 
-            LOG.debug("Shutting down " + bt.getName());
+            LOG.debug("Shutting down " + bt.getName() + " (" + bt.getTask().getClass().getSimpleName() + ")");
             try {
-                bt.getTimer().cancel();
-                bt.getTimer().purge();
+                bt.stop();
             } catch (IllegalStateException e) {
+                LOG.error("" + e);
                 throw e;
             }
         }
         LOG.info("BotTasks stopped. ");
-
+        return true;
     }
 
     public void printTasksStatus() {
@@ -155,19 +171,6 @@ public class TaskManager {
         }
     }
 
-    /**
-     * @return the interval
-     */
-    public int getInterval() {
-        return interval;
-    }
-
-    /**
-     * @param interval the interval to set
-     */
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
 
     /**
      * @return the isRunning
@@ -195,10 +198,6 @@ public class TaskManager {
         return strategyFiatTask;
     }
 
-    public void setStrategyFiatTask(BotTask strategyFiatTask) {
-        this.strategyFiatTask = strategyFiatTask;
-    }
-
     public BotTask getSendLiquidityTask() {
         return sendLiquidityTask;
     }
@@ -207,20 +206,16 @@ public class TaskManager {
         return secondaryPegTask;
     }
 
-    public void setSecondaryPegTask(BotTask secondaryPegTask) {
-        this.secondaryPegTask = secondaryPegTask;
-    }
-
     public BotTask getPriceTriggerTask() {
         return priceTriggerTask;
     }
 
-    public void setPriceTriggerTask(BotTask priceTriggerTask) {
-        this.priceTriggerTask = priceTriggerTask;
+    public BotTask getCheckNudTask() {
+        return checkNudTask;
     }
 
-    public void setSendLiquidityTask(BotTask slt) {
-        this.sendLiquidityTask = slt;
+    public boolean isInitialized() {
+        return initialized;
     }
 
     public ArrayList<BotTask> getTaskList() {
@@ -229,29 +224,5 @@ public class TaskManager {
 
     public void setTaskList(ArrayList<BotTask> taskList) {
         this.taskList = taskList;
-    }
-
-    public BotTask getCheckNudTask() {
-        return checkNudTask;
-    }
-
-    public void setCheckNudTask(BotTask checkNudTask) {
-        this.checkNudTask = checkNudTask;
-    }
-
-    public BotTask getPriceMonitorTask() {
-        return priceMonitorTask;
-    }
-
-    public void setPriceMonitorTask(BotTask priceMonitorTask) {
-        this.priceMonitorTask = priceMonitorTask;
-    }
-
-    public boolean isInitialized() {
-        return initialized;
-    }
-
-    public void setInitialized(boolean initialized) {
-        this.initialized = initialized;
     }
 }

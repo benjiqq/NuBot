@@ -19,9 +19,10 @@
 package com.nubits.nubot.trading.LiquidityDistribution;
 
 
-import java.util.Objects;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Objects;
 
 public class ModelParameters {
 

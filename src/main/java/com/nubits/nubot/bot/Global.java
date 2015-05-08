@@ -20,8 +20,10 @@ package com.nubits.nubot.bot;
 
 import com.nubits.nubot.RPC.NuRPCClient;
 import com.nubits.nubot.exchanges.Exchange;
-import com.nubits.nubot.global.Settings;
+import com.nubits.nubot.launch.ShutDownProcess;
 import com.nubits.nubot.options.NuBotOptions;
+import com.nubits.nubot.strategy.BalanceManager;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.utils.FrozenBalancesManager;
 import org.slf4j.Logger;
@@ -38,55 +40,42 @@ public class Global {
 
     public static NuBotOptions options;
 
-    //path of logs in this session
-    public static String sessionLogFolder;
-
-    public static TaskManager taskManager;
-
-    public static NuRPCClient rpcClient;
-
-    public static double conversion = 1; //Change this? update SendLiquidityinfoTask
-    public static FrozenBalancesManager frozenBalances;
-    public static boolean swappedPair; //true if payment currency is NBT
-
-    public static Exchange exchange;
-
-    public static String sessionId;
-    public static String sessionPath;
-    public static long sessionStarted, sessionStopped;
-
     /**
      * the bot connected to the global thread
      */
     public static NuBotBase bot;
 
+    public static OrderManager orderManager;
+
+    public static BalanceManager balanceManager;
+
+    public static Exchange exchange;
+
+    public static TaskManager taskManager;
+
+    //path of logs in this session
+    public static String sessionLogFolder;
+
+    public static NuRPCClient rpcClient;
+
+    public static double conversion = 1; //Change this? update SendLiquidityinfoTask
+
+    public static FrozenBalancesManager frozenBalancesManager;
+
+    public static boolean swappedPair; //true if payment currency is NBT
+
+    public static String sessionPath;
+
+    public static String currentOptionsFile;
+
+    public static boolean isSimulation = false;
 
     /**
-     * shutdown mechanics
+     * process shutdown mechanics
      */
     public static void createShutDownHook() {
-
-        Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
-        sessionLOG.info("adding shutdown hook");
-
-        Runtime.getRuntime().addShutdownHook(new Thread(new Runnable() {
-            @Override
-            public void run() {
-
-                //shutdown logic of the bot handled in the bot related to the global thread
-                Global.bot.shutdownBot();
-
-                Logger sessionLOG = LoggerFactory.getLogger(Settings.SESSION_LOGGER_NAME);
-                Global.sessionStopped = System.currentTimeMillis();
-                sessionLOG.info("Session terminated. Timestamp " + Global.sessionStopped);
-
-                //Interrupt mainThread
-                Global.mainThread.interrupt();
-
-                //TODO! this shuts down UI as well
-                Thread.currentThread().interrupt();
-                return;
-            }
-        }));
+        Runtime.getRuntime().addShutdownHook(new Thread(new ShutDownProcess()));
     }
+
+
 }

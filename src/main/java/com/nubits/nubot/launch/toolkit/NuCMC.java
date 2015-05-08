@@ -19,9 +19,9 @@
 package com.nubits.nubot.launch.toolkit;
 
 
+import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyPair;
@@ -30,13 +30,12 @@ import com.nubits.nubot.tasks.TaskManager;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.trading.wrappers.BterWrapper;
 import com.nubits.nubot.trading.wrappers.CcedkWrapper;
-import com.nubits.nubot.utils.FileSystem;
+import com.nubits.nubot.utils.FilesystemUtils;
 import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
 import org.json.JSONException;
 import org.json.simple.parser.JSONParser;
-
-import java.io.IOException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class NuCMC {
 
@@ -55,9 +54,9 @@ public class NuCMC {
 
 
         String folderName = "NuCMC_" + System.currentTimeMillis() + "/";
-        String logsFolder = Settings.LOGS_PATH + folderName;
+        String logsFolder = Settings.LOGS_PATH + "/" + folderName;
         //Create log dir
-        FileSystem.mkdir(logsFolder);
+        FilesystemUtils.mkdir(logsFolder);
 
         NuCMC app = new NuCMC();
         if (app.readParams(args)) {
@@ -76,14 +75,10 @@ public class NuCMC {
             init();
 
 
-
-
-
         } else {
             LOG.error("Problem while reading options from " + optionsPath);
             System.exit(0);
         }
-
 
 
     }
@@ -92,7 +87,7 @@ public class NuCMC {
         boolean ok = false;
         NuBotOptions options = null;
         JSONParser parser = new JSONParser();
-        String optionsString = FileSystem.readFromFile(optionsPath);
+        String optionsString = FilesystemUtils.readFromFile(optionsPath);
         try {
             org.json.JSONObject jsonString = new org.json.JSONObject(optionsString);
             org.json.JSONObject optionsJSON = (org.json.JSONObject) jsonString.get("options");
@@ -112,7 +107,6 @@ public class NuCMC {
             ExchangeLiveData liveDataB = new ExchangeLiveData();
             ccedk.setLiveData(liveDataC);
             bter.setLiveData(liveDataB);
-
 
 
             ccedk.setTrade(new CcedkWrapper(new ApiKeys(ccedkSecret, ccedkKey), ccedk));
@@ -152,9 +146,9 @@ public class NuCMC {
             public void run() {
                 LOG.info("Exiting...");
                 mainThread.interrupt();
-                try{
+                try {
                     Global.taskManager.stopAll();
-                }catch(IllegalStateException e){
+                } catch (IllegalStateException e) {
 
                 }
 
@@ -169,6 +163,7 @@ public class NuCMC {
         Utils.installKeystore(true);
 
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
 
         clearAll(ccedk);
         clearAll(bter);

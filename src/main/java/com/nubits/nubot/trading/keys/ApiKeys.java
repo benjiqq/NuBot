@@ -19,8 +19,8 @@
 package com.nubits.nubot.trading.keys;
 
 import com.nubits.nubot.utils.Utils;
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ApiKeys {
@@ -30,13 +30,14 @@ public class ApiKeys {
 
     private String secretKey, apiKey;
 
-//Constructor (private) use the static method loadKeysFromFile instead
+    //Constructor (private) use the static method loadKeysFromFile instead
     public ApiKeys(String secretKey, String apiKey) {
         this.secretKey = secretKey;
         this.apiKey = apiKey;
     }
 
 //Methods
+
     /**
      * @return the privateKey
      */

@@ -27,10 +27,9 @@ public class CurrencyPair {
     private Currency orderCurrency;
     private Currency paymentCurrency;
 
-    private final static String standardsep  = "_";
+    private final static String standardsep = "_";
 
     /**
-     *
      * @param orderCurrency
      * @param paymentCurrency
      */
@@ -45,7 +44,6 @@ public class CurrencyPair {
     }
 
     /**
-     *
      * @param pairString
      * @param sep
      * @return
@@ -77,6 +75,10 @@ public class CurrencyPair {
         return orderCurrency.getCode().toLowerCase() + sep + paymentCurrency.getCode().toLowerCase();
     }
 
+    public String toStringSepInverse(String sep) {
+        return paymentCurrency.getCode().toLowerCase() + sep + orderCurrency.getCode().toLowerCase();
+    }
+
     @Override
     public String toString() {
         return orderCurrency.getCode().toLowerCase() + "" + paymentCurrency.getCode().toLowerCase();
@@ -98,7 +100,6 @@ public class CurrencyPair {
     }
 
     /**
-     *
      * @return
      */
     public Currency getOrderCurrency() {
@@ -106,7 +107,6 @@ public class CurrencyPair {
     }
 
     /**
-     *
      * @param currency1
      */
     public void setOrderCurrency(Currency currency1) {
@@ -114,7 +114,6 @@ public class CurrencyPair {
     }
 
     /**
-     *
      * @return
      */
     public Currency getPaymentCurrency() {
@@ -122,7 +121,6 @@ public class CurrencyPair {
     }
 
     /**
-     *
      * @param currency2
      */
     public void setPaymentCurrency(Currency currency2) {
@@ -130,7 +128,6 @@ public class CurrencyPair {
     }
 
     /**
-     *
      * @param other
      * @return
      */

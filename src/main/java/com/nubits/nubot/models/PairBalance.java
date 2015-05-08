@@ -30,7 +30,6 @@ public class PairBalance {
 
 
     /**
-     *
      * @param NBTTotal
      * @param PEGTotal
      */
@@ -44,7 +43,6 @@ public class PairBalance {
     }
 
     /**
-     *
      * @param PEGAvail
      * @param NBTAvail
      * @param PEGonOrder
@@ -74,7 +72,6 @@ public class PairBalance {
     }
 
     /**
-     *
      * @return
      */
     public Amount getPEGBalanceonOrder() {
@@ -82,7 +79,6 @@ public class PairBalance {
     }
 
     /**
-     *
      * @return
      */
     public Amount getNBTonOrder() {
@@ -90,7 +86,6 @@ public class PairBalance {
     }
 
     /**
-     *
      * @return
      */
     public Amount getPEGAvailableBalance() {
@@ -98,7 +93,6 @@ public class PairBalance {
     }
 
     /**
-     *
      * @return
      */
     public Amount getNBTAvailable() {

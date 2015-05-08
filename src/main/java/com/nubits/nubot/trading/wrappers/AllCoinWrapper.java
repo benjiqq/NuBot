@@ -47,6 +47,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.*;
 
+
 /**
  * Created by woolly_sammoth on 21/10/14.
  */
@@ -312,31 +313,55 @@ public class AllCoinWrapper implements TradeInterface {
 
 
     @Override
-    public String query(String url, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        long now = System.currentTimeMillis();
-        long sleeptime = 0;
-        if (now - lastRequest < MIN_SPACING) {
-            sleeptime = MIN_SPACING - (now - lastRequest);
-        }
-        lastRequest = System.currentTimeMillis();
-
-        Future<String> queryResult;
+    public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQueryAsync(url, method, args, true, isGet, sleeptime);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to AllCoin");
-            return TOKEN_BAD_RETURN;
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
+            queryResult = TOKEN_BAD_RETURN;
         }
-        try {
-            return queryResult.get();
-        } catch (InterruptedException e) {
-            LOG.error(e.toString());
-            return TOKEN_BAD_RETURN;
-        } catch (ExecutionException e) {
-            LOG.error(e.toString());
-            return TOKEN_BAD_RETURN;
-        }
+        return queryResult;
     }
+
 
     @Override
     public void setKeys(ApiKeys keys) {
@@ -757,7 +782,7 @@ public class AllCoinWrapper implements TradeInterface {
                         args.put("created", Objects.toString(System.currentTimeMillis() / 1000L));
                         args.put("method", method);
                         //the sign is the MD5 hash of all arguments so far in alphabetical order
-                        args.put("sign", signRequest(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
+                        args.put("sign", getSign(keys.getPrivateKey(), TradeUtils.buildQueryString(args, ENCODING)));
 
                         post_data = TradeUtils.buildQueryString(args, ENCODING);
                     } else {
@@ -847,8 +872,7 @@ public class AllCoinWrapper implements TradeInterface {
             return toRet;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
+        private String getSign(String secret, String hash_data) {
             try {
                 java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
                 byte[] array = md.digest(hash_data.getBytes());

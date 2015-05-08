@@ -19,15 +19,13 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.NoRouteToHostException;
-import java.net.URL;
-import java.net.UnknownHostException;
-import java.util.TimerTask;
-import org.slf4j.LoggerFactory;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.net.*;
+import java.util.TimerTask;
 
 
 public class CheckConnectionTask extends TimerTask {
@@ -35,15 +33,19 @@ public class CheckConnectionTask extends TimerTask {
     private static final Logger LOG = LoggerFactory.getLogger(CheckConnectionTask.class.getName());
 
     private String url;
+
     @Override
     public void run() {
+        //if (SessionManager.sessionShuttingDown || !SessionManager.isSessionRunning) return; //external interruption
+        LOG.debug("Executing " + this.getClass());
         this.url = Global.exchange.getLiveData().getUrlConnectionCheck();
         Global.exchange.getLiveData().setConnected(isConnected());
         LOG.debug("Checking connection to " + url + " -  Connected : " + Global.exchange.getLiveData().isConnected());
-
     }
 
     public boolean isConnected() {
+        if (Global.isSimulation) return true;
+
         boolean connected = false;
         HttpURLConnection connection = null;
         URL query = null;

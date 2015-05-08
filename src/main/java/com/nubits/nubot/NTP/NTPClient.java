@@ -18,14 +18,15 @@
 
 package com.nubits.nubot.NTP;
 
+import com.nubits.nubot.global.Settings;
+import org.apache.commons.net.time.TimeUDPClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Date;
-
-import com.nubits.nubot.global.Settings;
-import org.slf4j.LoggerFactory; import org.slf4j.Logger;
-import org.apache.commons.net.time.TimeUDPClient;
 
 public final class NTPClient {
 
@@ -37,7 +38,6 @@ public final class NTPClient {
 
     private void initHosts() {
         hostnames = new ArrayList<>();
-        hostnames.add("ntp.xs4all.nl");
         hostnames.add("nist1-pa.ustiming.org");
         hostnames.add("nist-time-server.eoni.com");
         hostnames.add("time.nist.gov");
@@ -73,7 +73,6 @@ public final class NTPClient {
             LOG.error("Cannot update time after querying " + hostnames.size() + " timeservers. ");
         }
         return new Date(); //statement is never reached
-
 
 
     }

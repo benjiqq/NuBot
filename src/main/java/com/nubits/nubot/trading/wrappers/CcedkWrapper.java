@@ -29,7 +29,6 @@ import com.nubits.nubot.models.Currency;
 import com.nubits.nubot.trading.*;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -37,15 +36,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.*;
 
 public class CcedkWrapper implements TradeInterface {
@@ -212,29 +210,56 @@ public class CcedkWrapper implements TradeInterface {
 
 
         ApiResponse response = getQuery(url, method, query_args, true, isGet);
-
         if (response.isPositive()) {
+
             JSONObject httpAnswerJson = (JSONObject) response.getResponseObject();
             JSONObject dataJson = (JSONObject) httpAnswerJson.get("response");
+
             JSONArray entities = (JSONArray) dataJson.get("entities");
 
             if (currency == null) { //Get all balances
                 long NBTid = TradeUtilsCCEDK.getCCDKECurrencyId(pair.getOrderCurrency().getCode().toUpperCase());
                 long PEGid = TradeUtilsCCEDK.getCCDKECurrencyId(pair.getPaymentCurrency().getCode().toUpperCase());
-                Amount NBTTotal = new Amount(0, pair.getOrderCurrency());
-                Amount PEGTotal = new Amount(0, pair.getPaymentCurrency());
+                Amount NBTAvail = new Amount(0, pair.getOrderCurrency());
+                Amount PEGAvail = new Amount(0, pair.getPaymentCurrency());
 
                 for (Iterator<JSONObject> entity = entities.iterator(); entity.hasNext(); ) {
                     JSONObject thisEntity = entity.next();
                     long entityId = (Long) thisEntity.get("currency_id");
                     if (entityId == NBTid) {
-                        NBTTotal.setQuantity(Utils.getDouble(thisEntity.get("balance")));
+                        NBTAvail.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                     if (entityId == PEGid) {
-                        PEGTotal.setQuantity(Utils.getDouble(thisEntity.get("balance")));
+                        PEGAvail.setQuantity(Utils.getDouble(thisEntity.get("balance")));
                     }
                 }
-                PairBalance balance = new PairBalance(NBTTotal, PEGTotal);
+
+                //Get balance on Order by counting active orders
+                ApiResponse activeOrdersResponse = getActiveOrders(pair);
+                //Initialize Amounts
+                double NBTonOrder = 0;
+                double PEGonOrder = 0;
+                Amount NBTOnOrderAmount = new Amount(NBTonOrder, pair.getOrderCurrency());
+                Amount PEGOnOrderAmount = new Amount(PEGonOrder, pair.getPaymentCurrency());
+
+                if (activeOrdersResponse.isPositive()) {
+                    ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+
+                    for (int i = 0; i < orderList.size(); i++) {
+                        Order tempOrder = orderList.get(i);
+                        if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
+                            NBTonOrder += tempOrder.getAmount().getQuantity();
+                        } else {
+                            PEGonOrder += tempOrder.getAmount().getQuantity() * tempOrder.getPrice().getQuantity();
+                        }
+                    }
+                    NBTOnOrderAmount = new Amount(NBTonOrder, pair.getOrderCurrency());
+                    PEGOnOrderAmount = new Amount(PEGonOrder, pair.getPaymentCurrency());
+                } else {
+                    return activeOrdersResponse;
+                }
+
+                PairBalance balance = new PairBalance(PEGAvail, NBTAvail, PEGOnOrderAmount, NBTOnOrderAmount);
                 apiResponse.setResponseObject(balance);
 
             } else { //Specific currency requested
@@ -250,7 +275,9 @@ public class CcedkWrapper implements TradeInterface {
                 }
                 apiResponse.setResponseObject(total);
             }
-        } else {
+        } else
+
+        {
             apiResponse = response;
         }
 
@@ -429,7 +456,7 @@ public class CcedkWrapper implements TradeInterface {
     @Override
     public ApiResponse getTxFee(CurrencyPair pair) {
 
-        LOG.warn("CCEDK uses global TX fee, currency pair not supported."
+        LOG.debug("CCEDK uses global TX fee, currency pair not supported."
                 + "now calling getTxFee()");
         return getTxFee();
     }
@@ -459,6 +486,7 @@ public class CcedkWrapper implements TradeInterface {
     public ApiResponse clearOrders(CurrencyPair pair) {
         //Since there is no API entry point for that, this call will iterate over active
         ApiResponse apiResponse = new ApiResponse();
+        ArrayList<String> errorIds = new ArrayList<>();
 
         ApiResponse activeOrdersResponse = getActiveOrders();
         if (activeOrdersResponse.isPositive()) {
@@ -472,16 +500,18 @@ public class CcedkWrapper implements TradeInterface {
                     continue;
                 }
                 ApiResponse deleteOrderResponse = cancelOrder(thisOrder.getId(), null);
-                if (!deleteOrderResponse.isPositive()) {
-                    errorString += "Cannot delete order" + thisOrder.getId() + "\n";
-                    ok = false;
+
+                if (deleteOrderResponse.isPositive()) {
+                    continue;
+                } else {
+                    errorIds.add(thisOrder.getId());
                 }
             }
-            if (!ok) {
+            if (!errorIds.isEmpty()) {
+                ApiError error = errors.genericError;
+                error.setDescription(errorIds.toString());
+                apiResponse.setError(error);
                 apiResponse.setResponseObject(false);
-                apiResponse.setError(new ApiError(1337, errorString)); //TODO change error number
-            } else {
-                apiResponse.setResponseObject(true);
             }
         } else {
             apiResponse = activeOrdersResponse;
@@ -502,15 +532,54 @@ public class CcedkWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to ccdek");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
     }
+
 
     private Order parseOrder(JSONObject orderObject) {
         Order order = new Order();
@@ -549,7 +618,7 @@ public class CcedkWrapper implements TradeInterface {
 
     private Trade parseTrade(JSONObject orderObject) {
         //hotfix for Ben request
-        //FileSystem.writeToFile(orderObject.toJSONString(), "raw-trades.json", true);
+        //FilesystemUtils.writeToFile(orderObject.toJSONString(), "raw-trades.json", true);
 
         Trade trade = new Trade();
 
@@ -687,7 +756,7 @@ public class CcedkWrapper implements TradeInterface {
 
             String answer = "";
             String signature = "";
-            String post_data;
+            String post_data = "";
             boolean httpError = false;
             HttpsURLConnection connection = null;
 
@@ -697,9 +766,9 @@ public class CcedkWrapper implements TradeInterface {
                     args.put("nonce", Long.toString(System.currentTimeMillis()));
                     post_data = TradeUtils.buildQueryString(args, ENCODING);
                     String toHash = post_data;
-                    signature = signRequest(keys.getPrivateKey(), toHash);
-                } else {
-                    post_data = TradeUtils.buildQueryString(args, ENCODING);
+
+                    signature = TradeUtils.signRequest(keys.getPrivateKey(), toHash, SIGN_HASH_FUNCTION, ENCODING);
+
                 }
                 // build URL
 
@@ -752,7 +821,7 @@ public class CcedkWrapper implements TradeInterface {
                 String output;
 
                 while ((output = br.readLine()) != null) {
-                    LOG.debug(output);
+                    LOG.trace(output);
                     answer += output;
                 }
 
@@ -789,43 +858,6 @@ public class CcedkWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String signature = "";
 
-            Mac mac;
-            SecretKeySpec key = null;
-
-            // Create a new secret key
-            try {
-                key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-            } catch (UnsupportedEncodingException uee) {
-                LOG.error("Unsupported encoding exception: " + uee.toString());
-                return null;
-            }
-
-            // Create a new mac
-            try {
-                mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-            } catch (NoSuchAlgorithmException nsae) {
-                LOG.error("No such algorithm exception: " + nsae.toString());
-                return null;
-            }
-
-            // Init mac with key.
-            try {
-                mac.init(key);
-            } catch (InvalidKeyException ike) {
-                LOG.error("Invalid key exception: " + ike.toString());
-                return null;
-            }
-            try {
-                signature = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.error(ex.toString());
-            }
-            return signature;
-        }
     }
 }

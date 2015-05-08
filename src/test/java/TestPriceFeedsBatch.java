@@ -18,11 +18,10 @@
 
 package com.nubits.nubot.global;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.*;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.testsmanual.TestPriceFeed;
 import com.nubits.nubot.utils.Utils;
 import junit.framework.TestCase;
@@ -30,7 +29,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -41,9 +39,8 @@ public class TestPriceFeedsBatch extends TestCase {
     private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeedsBatch.class.getName());
 
 
-    public void setup(){
+    public void setup() {
         TestPriceFeed test = new TestPriceFeed();
-
 
 
         //feed = new BitcoinaveragePriceFeed();
@@ -64,15 +61,14 @@ public class TestPriceFeedsBatch extends TestCase {
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
 
         PriceFeedManager pfm = null;
-        try{
+        try {
             pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
 
         }
 
-        PriceFeedManager.LastPriceResponse lpr = pfm.fetchLastPrices();
-
-        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
+        pfm.fetchLastPrices();
+        ArrayList<LastPrice> priceList = pfm.getLastPrices();
 
         int s = pfm.getFeedList().size();
         int ps = priceList.size();
@@ -80,7 +76,7 @@ public class TestPriceFeedsBatch extends TestCase {
 
         for (int i = 0; i < priceList.size(); i++) {
             LastPrice tempPrice = priceList.get(i);
-          //  LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
+            //  LOG.info(tempPrice.getSource() + ":1 " + tempPrice.getCurrencyMeasured().getCode() + " = "
             //        + tempPrice.getPrice().getQuantity() + " " + tempPrice.getPrice().getCurrency().getCode());
         }
     }

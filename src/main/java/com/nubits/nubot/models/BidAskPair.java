@@ -27,21 +27,21 @@ public class BidAskPair {
     private double bid;
     private double ask;
 
-    public BidAskPair(double bid, double ask){
+    public BidAskPair(double bid, double ask) {
         this.bid = bid;
         this.ask = ask;
     }
 
-    public void setBidAsk(double newBid, double newAsk){
+    public void setBidAsk(double newBid, double newAsk) {
         this.bid = newBid;
         this.ask = newAsk;
     }
 
-    public double getBid(){
+    public double getBid() {
         return this.bid;
     }
 
-    public double getAsk(){
+    public double getAsk() {
         return this.ask;
     }
 }

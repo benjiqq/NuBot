@@ -18,8 +18,8 @@
 
 package com.nubits.nubot.strategy.Primary;
 
-import com.nubits.nubot.bot.BotUtil;
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Constant;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.*;
@@ -36,7 +36,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.TimerTask;
 
-
 public class StrategyPrimaryPegTask extends TimerTask {
 
     private static final Logger LOG = LoggerFactory.getLogger(StrategyPrimaryPegTask.class.getName());
@@ -51,11 +50,13 @@ public class StrategyPrimaryPegTask extends TimerTask {
     private boolean proceedsInBalance = false;
     private int cycles = 0;
 
-
     @Override
     public void run() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
-        LOG.info("Executing task : StrategyTask. DualSide :  " + Global.options.isDualSide());
+        LOG.debug("Executing " + this.getClass());
+
+        LOG.debug("DualSide :  " + Global.options.isDualSide());
 
         cycles++;
 
@@ -76,6 +77,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     }
 
     private void adjust() throws OrderException {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.debug("adjust");
 
@@ -89,7 +91,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                 //if there orders need to be cleared
                 if (totalActiveOrders > 0) {
                     try {
-                        BotUtil.clearOrders();
+                        Global.orderManager.clearOrders();
                     } catch (OrderException e) {
                         throw e;
                     }
@@ -107,9 +109,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         //Make sure there are 2 orders per side
         if (!ordersAndBalancesOk) {
-            LOG.error("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
+            LOG.warn("Detected a number of active orders not in line with strategy. Will try to aggregate soon");
             mightNeedInit = true; //if not, set firstime = true so nextTime will try to cancel and reset.
         } else {
+            if (SessionManager.sessionInterrupted()) return; //external interruption
 
             CurrencyPair pair = Global.options.getPair();
 
@@ -123,27 +126,35 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
             Amount balanceNBT = balance.getNBTAvailable();
 
-            Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            Amount balanceFIAT = Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount());
             LOG.info("Current Balance : " + balanceNBT.getQuantity() + " " + pair.getOrderCurrency() + " "
                     + balanceFIAT.getQuantity() + " " + pair.getPaymentCurrency());
 
-            //Execute sellSide strategy
-            sellSide(balanceNBT);
+            if (SessionManager.sessionInterrupted()) return; //external interruption
+
+
+            if (balance.getNBTonOrder().getQuantity() < Global.options.getMaxSellVolume())
+                //Execute sellSide strategy
+                sellSide(balanceNBT);
+
+
+            if (SessionManager.sessionInterrupted()) return; //external interruption
 
             //Execute buy Side strategy
             if (Global.options.isDualSide() && proceedsInBalance) {
                 buySide();
             }
 
-
         }
     }
 
     private void init() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.info("Initializing strategy");
 
         checkBalancesAndOrders();
+
         isFirstTime = false;
 
         boolean reinitiateSuccess = reInitiateOrders(true);
@@ -170,7 +181,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         cycles += Utils.randInt(0, 5);
 
         //Cancel sell side orders
-        boolean cancelSells = TradeUtils.takeDownOrders(Constant.SELL, Global.options.getPair());
+        boolean cancelSells = Global.orderManager.takeDownOrders(Constant.SELL, Global.options.getPair());
 
         if (cancelSells) {
             //Update balances
@@ -185,7 +196,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             Amount balanceNBT = balance.getNBTAvailable();
 
 
-            Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+            Amount balanceFIAT = Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount());
             LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " NBT\n "
                     + balanceFIAT.getQuantity() + " USD");
 
@@ -225,11 +236,11 @@ public class StrategyPrimaryPegTask extends TimerTask {
             double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
             boolean buysOrdersOk = true;
             double sellprice = TradeUtils.getSellPrice(txFeeFIATNTB);
-            LOG.info("init sell orders. price " + sellprice);
+            LOG.debug("init sell orders. price " + sellprice);
             boolean sellsOrdersOk = initOrders(Constant.SELL, sellprice);
 
-            LOG.info("txFeeFIATNTB " + txFeeFIATNTB);
-            LOG.info("sellsOrdersOk " + sellsOrdersOk);
+            LOG.debug("txFeeFIATNTB " + txFeeFIATNTB);
+            LOG.debug("sellsOrdersOk " + sellsOrdersOk);
 
             if (Global.options.isDualSide()) {
 
@@ -283,7 +294,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.warn("Sellside : Taking down smaller order to aggregate it with new balance");
 
-        boolean orderdelete = TradeUtils.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
+        boolean orderdelete = Global.orderManager.takeDownAndWait(idToDelete, Global.options.getEmergencyTimeout() * 1000, Global.options.getPair());
 
         if (!orderdelete) {
             String errMessagedeletingOrder = "could not delete order " + idToDelete;
@@ -293,9 +304,8 @@ public class StrategyPrimaryPegTask extends TimerTask {
             return;
         }
 
-
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
-        if (balancesResponse.isPositive()) {
+        if (!balancesResponse.isPositive()) {
             //Cannot get balance
             LOG.error(balancesResponse.getError().toString());
             return;
@@ -305,7 +315,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         balanceNBT = balance.getNBTAvailable();
 
-        Amount balanceFIAT = Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount());
+        Amount balanceFIAT = Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount());
 
         LOG.info("Updated Balance : " + balanceNBT.getQuantity() + " " + balanceNBT.getCurrency().getCode() + "\n "
                 + balanceFIAT.getQuantity() + " " + balanceFIAT.getCurrency().getCode());
@@ -365,9 +375,9 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
         LOG.debug("buySide");
 
-        boolean cancel = TradeUtils.takeDownOrders(Constant.BUY, Global.options.getPair());
+        boolean cancel = Global.orderManager.takeDownOrders(Constant.BUY, Global.options.getPair());
         if (cancel) {
-            Global.frozenBalances.freezeNewFunds();
+            Global.frozenBalancesManager.freezeNewFunds();
             ApiResponse txFeeNTBFIATResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBFIATResponse.isPositive()) {
                 double txFeeFIATNTB = (Double) txFeeNTBFIATResponse.getResponseObject();
@@ -389,19 +399,14 @@ public class StrategyPrimaryPegTask extends TimerTask {
         Order smallerOrder = new Order();
         smallerOrder.setId("-1");
 
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        Global.orderManager.fetchOrders();
 
-        if (!activeOrdersResponse.isPositive()) {
-            LOG.error(activeOrdersResponse.getError().toString());
-            return "-1";
-        }
+        ArrayList<Order> orderList = Global.orderManager.getOrderList();
 
-        ArrayList<Order> orderList = (ArrayList<Order>) activeOrdersResponse.getResponseObject();
+        ArrayList<Order> orderListCategorized = Global.orderManager.filterOrders(orderList, type);
 
-        ArrayList<Order> orderListCategorized = TradeUtils.filterOrders(orderList, type);
-
-        for (int i = 0; i < orderListCategorized.size(); i++) {
-            Order tempOrder = orderListCategorized.get(i);
+        int i = 0;
+        for (Order tempOrder : orderListCategorized) {
             if (tempOrder.getType().equalsIgnoreCase(type)) {
                 if (i == 0) {
                     smallerOrder = tempOrder;
@@ -411,6 +416,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     }
                 }
             }
+            i++;
         }
 
         return smallerOrder.getId();
@@ -420,8 +426,10 @@ public class StrategyPrimaryPegTask extends TimerTask {
      * check whether outstanding orders are according to the strategy
      */
     private void checkBalancesAndOrders() {
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         LOG.debug("checkBalancesAndOrders");
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         ApiResponse balancesResponse = Global.exchange.getTrade().getAvailableBalances(Global.options.getPair());
 
@@ -429,21 +437,23 @@ public class StrategyPrimaryPegTask extends TimerTask {
             LOG.error(balancesResponse.getError().toString());
             return;
         }
+        if (SessionManager.sessionInterrupted()) return; //external interruption
 
         PairBalance balance = (PairBalance) balancesResponse.getResponseObject();
         double balanceNBT = balance.getNBTAvailable().getQuantity();
-        double balanceFIAT = (Global.frozenBalances.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalances.getFrozenAmount())).getQuantity();
+        double balanceFIAT = (Global.frozenBalancesManager.removeFrozenAmount(balance.getPEGAvailableBalance(), Global.frozenBalancesManager.getFrozenAmount())).getQuantity();
 
-        LOG.info("balance NBT " + balanceNBT);
-        LOG.info("balance FIAT " + balanceFIAT);
+        LOG.debug("balance NBT " + balanceNBT);
+        LOG.debug("balance USD " + balanceFIAT);
 
-        activeSellOrders = BotUtil.countActiveOrders(Constant.SELL);
-        activeBuyOrders = BotUtil.countActiveOrders(Constant.BUY);
+        Global.orderManager.fetchOrders();
+        activeSellOrders = Global.orderManager.getNumActiveSellOrders();
+        activeBuyOrders = Global.orderManager.getNumActiveBuyOrders();
         totalActiveOrders = activeSellOrders + activeBuyOrders;
 
-        LOG.info("activeSellOrders " + activeSellOrders);
-        LOG.info("activeBuyOrders " + activeBuyOrders);
-        LOG.info("totalActiveOrders" + totalActiveOrders);
+        LOG.debug("activeSellOrders " + activeSellOrders);
+        LOG.debug("activeBuyOrders " + activeBuyOrders);
+        LOG.debug("totalActiveOrders " + totalActiveOrders);
 
         ordersAndBalancesOk = false;
 
@@ -454,19 +464,19 @@ public class StrategyPrimaryPegTask extends TimerTask {
         int numOrdersBuy = 2;
 
         if (Global.options.isDualSide()) {
-            LOG.info("checking balance and orders for dualside");
+            LOG.debug("checking balance and orders for dualside");
 
             boolean bothSides = activeSellOrders == numOrdersBoth && activeBuyOrders == numOrdersBoth;
             boolean sellinplace = activeSellOrders == numOrdersSell && activeBuyOrders == 0 && balanceFIAT < treshholdFIAT;
             boolean buyinplace = activeSellOrders == 0 && activeBuyOrders == numOrdersBuy && balanceNBT < treshholdNBT;
 
-            LOG.info("bothSides " + bothSides);
-            LOG.info("sellneeded " + sellinplace);
-            LOG.info("buyneeded " + buyinplace);
+            LOG.debug("bothSides " + bothSides);
+            LOG.debug("sellneeded " + sellinplace);
+            LOG.debug("buyneeded " + buyinplace);
 
             ordersAndBalancesOk = bothSides || sellinplace || buyinplace;
 
-            if (balanceFIAT > 1 && !isFirstTime) {
+            if (balanceFIAT > 1 && !isFirstTime && Global.options.getMaxBuyVolume() == 0) { //TODO this condition should be more complext to take into account froozenBalance
                 LOG.warn("The " + balance.getPEGAvailableBalance().getCurrency().getCode() + " balance is not zero (" + balanceFIAT + " ). If the balance represent proceedings "
                         + "from a sale the bot will notice.  On the other hand, If you keep seying this message repeatedly over and over, you should restart the bot. ");
                 proceedsInBalance = true;
@@ -490,6 +500,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
     }
 
     private boolean reInitiateOrders(boolean firstTime) {
+        if (SessionManager.sessionInterrupted()) return false; //external interruption
 
         LOG.debug("reInitiateOrders");
 
@@ -498,31 +509,33 @@ public class StrategyPrimaryPegTask extends TimerTask {
             LOG.info("totalActiveOrders " + totalActiveOrders);
 
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
+            if (SessionManager.sessionInterrupted()) return false;
             if (deleteOrdersResponse.isPositive()) {
                 boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
                 if (deleted) {
                     LOG.warn("Clear all orders request successful");
                     if (firstTime) //update the initial balance of the secondary peg
                     {
-                        Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                        Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
                     }
                     //Wait until there are no active orders
                     boolean timedOut = false;
                     long timeout = Global.options.getEmergencyTimeout() * 1000;
                     long wait = 5 * 1000;
                     long count = 0L;
-
+                    if (SessionManager.sessionInterrupted()) return false;
                     boolean areAllOrdersCanceled = false;
                     do {
                         try {
-
+                            if (SessionManager.sessionInterrupted()) return false;
                             Thread.sleep(wait);
-                            areAllOrdersCanceled = TradeUtils.tryCancelAllOrders(Global.options.getPair());
+                            areAllOrdersCanceled = Global.orderManager.tryCancelAllOrders(Global.options.getPair());
                             if (areAllOrdersCanceled) {
                                 LOG.warn("All orders canceled succefully");
                             } else {
                                 LOG.error("There was a problem cancelling the orders");
                             }
+                            if (SessionManager.sessionInterrupted()) return false;
                             count += wait;
                             timedOut = count > timeout;
 
@@ -557,7 +570,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         } else {
             if (firstTime) //update the initial balance of the secondary peg
             {
-                Global.frozenBalances.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
+                Global.frozenBalancesManager.setBalanceAlreadyThere(Global.options.getPair().getPaymentCurrency());
             }
             placeInitialWalls();
         }
@@ -571,7 +584,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
 
     private boolean initOrders(String type, double price) {
-
+        if (SessionManager.sessionInterrupted()) return false;
         LOG.debug("initOrders. type: " + type + " .  price: " + price);
 
         boolean success = true;
@@ -598,7 +611,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
         } else {
             //Here its time to compute the balance to put apart, if any
             amount = (Amount) balancesResponse.getResponseObject();
-            amount = Global.frozenBalances.removeFrozenAmount(amount, Global.frozenBalances.getFrozenAmount());
+            amount = Global.frozenBalancesManager.removeFrozenAmount(amount, Global.frozenBalancesManager.getFrozenAmount());
             oneNBT = Utils.round(1 / Global.conversion, Settings.DEFAULT_PRECISION);
         }
 
@@ -613,18 +626,18 @@ public class StrategyPrimaryPegTask extends TimerTask {
             ApiResponse txFeeNTBPEGResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
             if (txFeeNTBPEGResponse.isPositive()) {
                 double txFeePEGNTB = (Double) txFeeNTBPEGResponse.getResponseObject();
-                LOG.info("Updated Trasaction fee = " + txFeePEGNTB + "%");
-
+                LOG.debug("Updated Trasaction fee = " + txFeePEGNTB + "%");
+                if (SessionManager.sessionInterrupted()) return false;
                 double amount1 = Utils.round(amount.getQuantity() / 2, Settings.DEFAULT_PRECISION);
 
                 double maxBuy = Global.options.getMaxBuyVolume();
                 double maxSell = Global.options.getMaxSellVolume();
 
-                LOG.info("check the calculated amount against the set maximum sell amount");
+                LOG.debug("check the calculated amount against the set maximum sell amount");
 
                 //check the calculated amount against the set maximum sell amount set in the options.json file
 
-                LOG.info("max sell volume " + maxSell);
+                LOG.debug("max sell volume " + maxSell);
 
                 if (maxSell > 0 && type.equals(Constant.SELL)) {
                     double most = (maxSell / 2);
@@ -634,22 +647,21 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     }
                 }
 
-
                 if (type.equals(Constant.BUY) && !Global.swappedPair) {
                     amount1 = Utils.round(amount1 / price, Settings.DEFAULT_PRECISION);
                     //check the calculated amount against the max buy amount option, if any.
-                    LOG.info("check the calculated amount against the max buy amount option, if any.");
-                    LOG.info("max buy volume " + maxBuy);
+                    LOG.debug("check the calculated amount against the max buy amount option, if any.");
+                    LOG.debug("max buy volume " + maxBuy);
                     if (maxBuy > 0) {
 
                         double most = maxBuy / 2;
                         if (amount1 > most) {
                             amount1 = most;
-                            LOG.info("cap buy amount at " + most);
+                            LOG.debug("cap buy amount at " + most);
                         }
                     }
                 }
-
+                if (SessionManager.sessionInterrupted()) return false;
                 double amount2 = amount.getQuantity() - amount1;
 
                 if (maxSell > 0 && type.equals(Constant.SELL)) {
@@ -657,7 +669,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
 
                     if (amount2 > most) {
                         amount2 = most;
-                        LOG.info("cap sell amount at " + most);
+                        LOG.debug("cap sell amount at " + most);
                     }
                 }
 
@@ -673,7 +685,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                         double most = maxBuy / 2;
                         if (amount2 > most) {
                             amount2 = most;
-                            LOG.info("cap buy at " + most);
+                            LOG.debug("cap buy at " + most);
                         }
                     }
 
@@ -699,7 +711,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     } else {
                         order1Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount1, price);
                     }
-
+                    if (SessionManager.sessionInterrupted()) return false;
                     if (order1Response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString1, MessageColor.YELLOW);
                         String response1String = (String) order1Response.getResponseObject();
@@ -717,8 +729,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
                     } else {
                         order2Response = Global.exchange.getTrade().buy(Global.options.getPair(), amount2, price);
                     }
-
-
+                    if (SessionManager.sessionInterrupted()) return false;
                     if (order2Response.isPositive()) {
                         HipChatNotifications.sendMessage("New " + type + " wall is up on <strong>" + Global.options.getExchangeName() + "</strong> : " + orderString2, MessageColor.YELLOW);
                         String response2String = (String) order2Response.getResponseObject();
@@ -735,8 +746,7 @@ public class StrategyPrimaryPegTask extends TimerTask {
             }
         }
 
-
-        return true;
+        return success;
     }
 
     public SubmitLiquidityinfoTask getSendLiquidityTask() {

@@ -19,6 +19,7 @@
 package com.nubits.nubot.tasks;
 
 import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,9 +32,13 @@ public class CheckNudTask extends TimerTask {
 
     @Override
     public void run() {
-        LOG.debug("Executing task : CheckNudTask ");
+        if (SessionManager.sessionInterrupted()) return; //external interruption
+
+        LOG.info("Executing " + this.getClass());
+
         if (Global.rpcClient != null) {
             Global.rpcClient.checkConnection();
+            if (SessionManager.sessionInterrupted()) return; //external interruption
 
             if (Global.options.verbose) {
                 String connectedString = "offline";

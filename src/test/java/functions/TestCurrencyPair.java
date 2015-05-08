@@ -27,9 +27,9 @@ import org.junit.Test;
 public class TestCurrencyPair extends TestCase {
 
     @Test
-    public void testParse(){
+    public void testParse() {
         CurrencyPair pair = CurrencyPair.getCurrencyPairFromString("nbt_btc");
-        assertTrue(pair!=null);
+        assertTrue(pair != null);
         assertTrue(pair.getOrderCurrency().equals(CurrencyList.NBT));
         assertTrue(pair.getPaymentCurrency().equals(CurrencyList.BTC));
 

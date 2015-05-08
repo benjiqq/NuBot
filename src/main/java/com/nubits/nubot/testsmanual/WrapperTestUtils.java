@@ -25,9 +25,9 @@ import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
 import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
+import com.nubits.nubot.strategy.OrderManager;
 import com.nubits.nubot.trading.Ticker;
 import com.nubits.nubot.trading.TradeInterface;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,7 +92,7 @@ public class WrapperTestUtils {
         if (sellResponse.isPositive()) {
 
             LOG.info("\nPositive response  from TradeInterface.sell(...) ");
-            LOG.warn("Strategy : Submit order : "
+            LOG.info("Submit order : "
                     + "sell" + amountSell + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceSell + " " + pair.getPaymentCurrency().getCode());
 
@@ -109,7 +109,7 @@ public class WrapperTestUtils {
         ApiResponse buyResponse = Global.exchange.getTrade().buy(pair, amountBuy, priceBuy);
         if (buyResponse.isPositive()) {
             LOG.info("\nPositive response  from TradeInterface.buy(...) ");
-            LOG.info(": Submit order : "
+            LOG.info("Submit order : "
                     + "buy" + amountBuy + " " + pair.getOrderCurrency().getCode()
                     + " @ " + priceBuy + " " + pair.getPaymentCurrency().getCode());
             String buyResponseString = (String) buyResponse.getResponseObject();
@@ -138,7 +138,7 @@ public class WrapperTestUtils {
         }
     }
 
-    public static void testGetActiveOrders(CurrencyPair pair) {
+    public static void testGetActiveOrders(CurrencyPair pair, boolean printThem) {
         //Get active orders associated with a specific CurrencyPair
         ApiResponse activeOrdersUSDNTBResponse = Global.exchange.getTrade().getActiveOrders(pair);
         if (activeOrdersUSDNTBResponse.isPositive()) {
@@ -146,9 +146,11 @@ public class WrapperTestUtils {
             ArrayList<Order> orderListUSDNBT = (ArrayList<Order>) activeOrdersUSDNTBResponse.getResponseObject();
 
             LOG.info("Active orders : " + orderListUSDNBT.size());
-            for (int i = 0; i < orderListUSDNBT.size(); i++) {
-                Order tempOrder = orderListUSDNBT.get(i);
-                LOG.info(tempOrder.toString());
+            if (printThem) {
+                for (int i = 0; i < orderListUSDNBT.size(); i++) {
+                    Order tempOrder = orderListUSDNBT.get(i);
+                    LOG.info(tempOrder.toString());
+                }
             }
         } else {
             LOG.error(activeOrdersUSDNTBResponse.getError().toString());
@@ -163,7 +165,7 @@ public class WrapperTestUtils {
             Order order = (Order) orderDetailResponse.getResponseObject();
             LOG.info(order.toString());
         } else {
-            LOG.info(orderDetailResponse.getError().toString());
+            LOG.error(orderDetailResponse.getError().toString());
         }
     }
 
@@ -221,6 +223,7 @@ public class WrapperTestUtils {
     }
 
     public static void testClearAllOrders(CurrencyPair pair) {
+        LOG.debug("TestClearAllOrders");
         ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(pair);
         if (deleteOrdersResponse.isPositive()) {
             boolean deleted = (boolean) deleteOrdersResponse.getResponseObject();
@@ -228,7 +231,7 @@ public class WrapperTestUtils {
             if (deleted) {
                 LOG.info("Order clear request succesfully");
             } else {
-                LOG.info("Could not submit request to clear orders");
+                LOG.error("Could not submit request to clear orders");
             }
 
         } else {
@@ -269,8 +272,8 @@ public class WrapperTestUtils {
     }
 
     public static void testMultipleOrders(ArrayList<OrderToPlace> orders, CurrencyPair pair) {
-
-        boolean success = TradeUtils.placeMultipleOrders(orders);
+        OrderManager om = new OrderManager();
+        boolean success = om.placeMultipleOrders(orders);
         LOG.info("Multiple orders (" + orders + ") placed. success = " + success);
 
     }
@@ -328,7 +331,6 @@ public class WrapperTestUtils {
         //Create a new TradeInterface object using the custom implementation
         TradeInterface ti = ExchangeFacade.getInterfaceByName(exchangeName, keys, Global.exchange);
 
-        //TODO:  remove when tested
         //Assign the keys to the TradeInterface
         ti.setKeys(keys);
 

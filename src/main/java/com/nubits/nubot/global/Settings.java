@@ -43,19 +43,14 @@ public class Settings {
     // ------ Timing ------
     /**
      * [seconds] Submit liquidity info
-     *
      */
-    public static final String NUD_RPC_USER = "nubotTestUser";
-    public static final String NUD_RPC_PASS = "nubotTestPass";
-    public static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
-
+    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;
 
     /**
      * [seconds] Execute StrategyTask
      */
     public static final int EXECUTE_STRATEGY_INTERVAL = 41;
 
-    public static final int SUBMIT_LIQUIDITY_SECONDS = 130;  // [seconds] Submit liquidity info
 
     /**
      * [seconds] Check connection with exchanges API
@@ -89,6 +84,7 @@ public class Settings {
 
     // ------ Paths and filenames
     // Refer to md/FILES-AND-FOLDERS.md for the convention of where to place files and folders
+    // In defining folder names, omit the "/" at the end
 
     //--- Logging ---
 
@@ -103,31 +99,34 @@ public class Settings {
     public static final String TEST_LOGXML = "config/logging/test_logback.xml";
 
     /**
-     * configuration file for test launches
-     */
-    public static final String TEST_LAUNCH_XML = "config/logging/test_launch.xml";
-
-    /**
      * main logs file. also defined in logback.xml
      */
-    public final static String LOGS_PATH = "logs/";
+    public final static String LOGS_PATH = "logs";
 
     /**
      * testlog directory. also defined in test_logback.xml
      */
-    public static final String TEST_LOGFOLDER = LOGS_PATH + "tests";
+    public static final String TEST_LOGFOLDER = LOGS_PATH + "/" + "tests";
 
     /**
      * the relative path for resources
      */
-    public final static String RES_PATH = "res/";
+    public final static String RES_PATH = "res";
 
-    public final static String KEYSTORE_PATH = RES_PATH + "ssl/nubot_keystore.jks";
+    public final static String KEYSTORE_PATH = RES_PATH + "/" + "ssl/nubot_keystore.jks";
 
     /**
      * folder containing resources needed at runtime
      */
-    public final static String FROZEN_FUNDS_PATH = RES_PATH + "frozen-funds/";
+    public final static String FROZEN_FUNDS_PATH = RES_PATH + "/" + "frozen-funds/";
+
+    public final static String DEFAULT_CONFIG_FILENAME = "nubot-config.json";//Used by UI in case file not explicitly declared
+
+    public final static String CONFIG_DIR = "config";
+
+    public final static String DEFAULT_CONFIG_FILE_PATH = CONFIG_DIR + "/" + DEFAULT_CONFIG_FILENAME;
+
+    public final static String IMAGE_FOLDER = RES_PATH + "/" + "images";
 
     public final static String SESSION_LOG = "session_";
 
@@ -135,23 +134,47 @@ public class Settings {
 
     public final static String BALANCES_FILEAME = "balance_history"; //Filename for historical snapshot of balance
 
-    public final static String WALLSHIFTS_FILENAME =  "wall_shifts"; //Filename for recording wallshifts
+    public final static String WALLSHIFTS_FILENAME = "wall_shifts"; //Filename for recording wallshifts
 
     public final static String TESTS_LOG_PREFIX = "tests"; //Prefix used in naming the directory for saving the output of tests
 
-    public static final String TESTS_CONFIG_PATH = "config/myconfig"; //Directory containing configuration files used in tests
+    public static final String TESTS_CONFIG_PATH = CONFIG_DIR + "/" + "myconfig"; //Directory containing configuration files used in tests
 
-    public final static String CURRENCY_FILE_PATH = RES_PATH + "currencies.csv";
-
+    public final static String CURRENCY_FILE_PATH = RES_PATH + "/" + "currencies.csv";
 
     public final static String APP_FOLDER = ".nubot";
 
-    public final static String SESSION_FILE = "_session.txt";
+    public final static String SESSION_FILE = APP_NAME + "_session.tmp";
 
     public final static String SESSION_LOGGER_NAME = "SessionLOG";
+    public static final int DELAY_CONN = 1;
+    public final static int DELAY_LIQUIIDITY = 40;
+
+    public final static long TIMEOUT_QUERY_RETRY = 10 * 1000; // For how long should the wrapper retry the call if the exchange has found busy
+    public final static long RETRY_SLEEP_INCREMENT = 300; // Sleep time increment each new cycle of retry. Cannot be less than 100 ms
+
 
     /**
      * a utility file which gets created in the distribution folder
      */
-    public static String INFO_FILE = ".nubot";
+    public static String INFO_FILE = "res/.info";
+
+    public static String HTML_FOLDER = "." + "/res" + "/" + "UI" + "/" + "templates/";
+
+    /**
+     * for OrderManager: the maximum refresh period triggered from the UI. strategy can trigger at higher rates
+     */
+    public static final int ORDER_MAX_INTERVAL = 10 * 1000;
+
+    /**
+     * for BalanceManager: the maximum refresh period triggered from the UI. strategy can trigger at higher rates
+     */
+    public static final int BALANCE_MAX_INTERVAL = 10 * 1000;
+
+    /**
+     * at startup - stop and wait for the check connection thread  [ms]
+     */
+    public static final int WAIT_CHECK_INTERVAL = 3000;
+
+
 }

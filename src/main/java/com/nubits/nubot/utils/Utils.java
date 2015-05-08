@@ -19,11 +19,16 @@
 package com.nubits.nubot.utils;
 
 import com.nubits.nubot.NTP.NTPClient;
-import com.nubits.nubot.bot.Global;
+import com.nubits.nubot.bot.SessionManager;
 import com.nubits.nubot.global.Passwords;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.OrderToPlace;
 import org.apache.commons.io.FileUtils;
+import org.joda.time.DateTime;
+import org.joda.time.Duration;
+import org.joda.time.Period;
+import org.joda.time.format.PeriodFormatter;
+import org.joda.time.format.PeriodFormatterBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,19 +38,21 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.*;
+import java.awt.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.nio.file.Paths;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -59,7 +66,7 @@ public class Utils {
 
     private static final int maxThreadsError = 30;
 
-    public static void logActiveThreads(){
+    public static void logActiveThreads() {
         int active = Thread.activeCount();
         LOG.trace("currently active threads: " + active);
         Thread allThreads[] = new Thread[active];
@@ -68,11 +75,11 @@ public class Utils {
         for (int i = 0; i < active; i++) {
             Thread t = allThreads[i];
             LOG.trace(i + ": " + t + " id: " + t.getId() + " name: " + t.getName() + " " + t.getContextClassLoader()
-            + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
+                    + " group: " + t.getThreadGroup() + " alive" + t.isAlive());
             LOG.trace("super: " + t.getClass().getSuperclass());
         }
 
-        if (active > maxThreadsError){
+        if (active > maxThreadsError) {
             LOG.error("too many threads started");
         }
     }
@@ -229,6 +236,7 @@ public class Utils {
     public static void printSeparator() {
         LOG.info("\n----------- -----------  -----------\n");
     }
+
 
     //When parsing Json with org.json.simple.JSONObject, use this for doubles
     //not needed if using alibaba json parser
@@ -391,54 +399,15 @@ public class Utils {
 
             //load file depending whether run from inside a Jar or not
 
-            String wdir = System.getProperty("user.dir");
+            String wdir = FilesystemUtils.getBotAbsolutePath();
             String wdirpath = wdir + "/" + Settings.KEYSTORE_PATH;
 
             LOG.info("Reading keystorefile from : " + wdirpath);
-            
+
             System.setProperty("javax.net.ssl.trustStore", wdirpath);
             System.setProperty("javax.net.ssl.trustStorePassword", Passwords.KEYSTORE_ENCRYPTION_PASS);
         }
     }
-
-    /**
-     * Determine whether the current thread runs inside a jar
-     *
-     * @return
-     */
-    public static boolean insideJar() {
-        String c = "" + Utils.class.getResource("Utils.class");
-        String path = "";
-        if (c.startsWith("jar:"))
-            return true;
-        else
-            return false;
-    }
-
-    /**
-     * get filepath from a file in the resources folder
-     *
-     * @param filename
-     * @return
-     */
-    public static String filePathClasspathFile(String filename) {
-        LOG.debug("filename " + filename);
-        //File f = new File(Utils.class.getClassLoader().getResource(filename).getFile());
-        URL resource = Utils.class.getClassLoader().getResource(filename);
-        File f = null;
-        try {
-            URI u = resource.toURI();
-            LOG.debug("u: " + u);
-            f = Paths.get(u).toFile();
-            LOG.debug("f exists " + f.exists());
-            return f.getAbsolutePath();
-        } catch (Exception e) {
-
-        }
-
-        return "";
-    }
-
 
     public static void drawOrderBooks(ArrayList<OrderToPlace> sellOrders, ArrayList<OrderToPlace> buyOrders, double pegPrice) {
         double[] xSell = new double[sellOrders.size()];
@@ -466,8 +435,46 @@ public class Utils {
 
     }
 
+    public static String getDurationDate(DateTime from, DateTime to) {
+        Duration duration = new Duration(from, to);
+        Period period = duration.toPeriod();
+        Period normalizedPeriod = period.normalizedStandard();
+        PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
+                .appendDays()
+                .appendSuffix(" day", " days")
+                .appendSeparator(" ")
+                .printZeroIfSupported()
+                        //.minimumPrintedDigits(2)
+                .appendHours()
+                .appendSuffix(" hour", " hours")
+                .appendSeparator(" ")
+                .appendMinutes()
+                .appendSuffix(" minute", " minutes")
+                .printZeroIfSupported()
+                        //.minimumPrintedDigits(2)
+                .appendSeparator(" ")
+                .appendSeconds()
+                .appendSuffix(" second", " seconds")
+                        //.minimumPrintedDigits(2)
+                .toFormatter();
+
+                /*
+                .printZeroAlways()
+                .appendMinutes()
+                .appendSeparator(":")
+                .appendSeconds()
+                .toFormatter();*/
+        String result = minutesAndSeconds.print(normalizedPeriod);
+        return result;
+    }
+
+    public static String getBotUptimeDate() {
+        DateTime now = new DateTime();
+        return getDurationDate(SessionManager.sessionStartDate, now);
+    }
+
     //Return the uptime of the bot [hours]
-    public static String getBotUptime() {
+    /*public static String getBotUptimeReadable() {
         long upTimeMs = System.currentTimeMillis() - Global.sessionStarted;
         String toReturn = "";
         if (getDaysFromMillis(upTimeMs) > 2) {
@@ -478,6 +485,27 @@ public class Utils {
             toReturn = getMinutesFromMillis(upTimeMs) + " minutes";
         }
         return toReturn;
+    }*/
+
+    //Format numbers in decimal notation with custom digits
+    public static String formatNumber(double number, int digits) {
+        DecimalFormat df = new DecimalFormat("0");
+        df.setMaximumFractionDigits(digits);
+        return df.format(number);
+    }
+
+    public static void launchBrowser(String url) {
+        if (Desktop.isDesktopSupported()) {
+            try {
+                Desktop.getDesktop().browse(new URI(url));
+            } catch (IOException e) {
+                LOG.error(e.toString());
+            } catch (URISyntaxException e) {
+                LOG.error(e.toString());
+            }
+        } else {
+            LOG.warn("Can't launch browser: Desktop not supported.");
+        }
     }
 
     public static double getHoursFromMillis(long millis) {

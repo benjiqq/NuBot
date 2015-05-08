@@ -32,7 +32,6 @@ import com.nubits.nubot.trading.TradeInterface;
 import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.trading.keys.ApiKeys;
 import com.nubits.nubot.utils.Utils;
-import org.apache.commons.codec.binary.Hex;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -40,15 +39,14 @@ import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.HttpsURLConnection;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.NoRouteToHostException;
 import java.net.URL;
 import java.net.UnknownHostException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -75,6 +73,9 @@ public class PoloniexWrapper implements TradeInterface {
     private final String TOKEN_ERR = "error";
     private final String TOKEN_BAD_RETURN = "No Connection With Exchange";
 
+    private long nonceCount = new Long(System.currentTimeMillis() / 100000).longValue();
+    private boolean fixNonce = false;
+
     public PoloniexWrapper(ApiKeys keys, Exchange exchange) {
         this.keys = keys;
         this.exchange = exchange;
@@ -87,6 +88,46 @@ public class PoloniexWrapper implements TradeInterface {
     }
 
     private ApiResponse getQuery(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
+
+        int maxRetry = 10;
+        boolean done = false;
+        int i = 0;
+        ApiResponse response = null;
+        while (!done) {
+            response = getQueryMain(url, method, query_args, needAuth, isGet);
+            if (!response.isPositive()) {
+                String errMsg = response.getError().getDescription();
+                if (errMsg.contains("Nonce must be greater than ")) {
+                    //handle nonce exception. get the nonce they want and add some
+                    String stmp = "Nonce must be greater than ";
+                    int k = errMsg.indexOf(stmp);
+                    int q = errMsg.indexOf(". You");
+                    String subs = errMsg.substring(k + stmp.length(), q);
+                    fixNonce = true;
+                    long greaterNonce = new Long(subs);
+                    int addNonce = 5;
+                    this.nonceCount = greaterNonce + addNonce;
+                    LOG.debug("retry with corrected nonce " + this.nonceCount);
+                    try {
+                        Thread.sleep(100);
+                    } catch (InterruptedException e) {
+
+                    }
+
+                }
+
+            } else
+                return response;
+            i++;
+            if (i > maxRetry) {
+                LOG.error("nonce reset failed");
+                return response;
+            }
+        }
+        return response;
+    }
+
+    private ApiResponse getQueryMain(String url, String method, HashMap<String, String> query_args, boolean needAuth, boolean isGet) {
         ApiResponse apiResponse = new ApiResponse();
         String queryResult = query(url, method, query_args, needAuth, false);
         if (queryResult == null) {
@@ -105,7 +146,8 @@ public class PoloniexWrapper implements TradeInterface {
                 String errorMessage = (String) httpAnswerJson.get("error");
                 ApiError apiErr = errors.apiReturnError;
                 apiErr.setDescription(errorMessage);
-                LOG.error("Poloniex API returned an error: " + errorMessage);
+                LOG.debug("Poloniex API returned an error: " + errorMessage);
+
                 apiResponse.setError(apiErr);
             } else {
                 apiResponse.setResponseObject(httpAnswerJson);
@@ -166,7 +208,7 @@ public class PoloniexWrapper implements TradeInterface {
             if (httpAnswerJson.containsKey(lookingFor)) {
                 JSONObject balanceJSON = (JSONObject) httpAnswerJson.get(lookingFor);
                 double balanceD = Utils.getDouble(balanceJSON.get("available"));
-                LOG.debug("balance double : " + balanceD);
+                LOG.trace("balance double : " + balanceD);
                 apiResponse.setResponseObject(new Amount(balanceD, currency));
             } else {
                 String errorMessage = "Cannot find a balance for currency " + lookingFor;
@@ -461,11 +503,49 @@ public class PoloniexWrapper implements TradeInterface {
 
     @Override
     public String query(String base, String method, AbstractMap<String, String> args, boolean needAuth, boolean isGet) {
-        String queryResult;
+        String queryResult = TOKEN_BAD_RETURN; //Will return this string in case it fails
         if (exchange.getLiveData().isConnected()) {
-            queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+            if (exchange.isFree()) {
+                exchange.setBusy();
+                queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                exchange.setFree();
+            } else {
+                //Another thread is probably executing a query. Init the retry procedure
+                long sleeptime = Settings.RETRY_SLEEP_INCREMENT * 1;
+                int counter = 0;
+                long startTimeStamp = System.currentTimeMillis();
+                LOG.debug(method + " blocked, another call is being processed ");
+                boolean exit = false;
+                do {
+                    counter++;
+                    sleeptime = counter * Settings.RETRY_SLEEP_INCREMENT; //Increase sleep time
+                    sleeptime += (int) (Math.random() * 200) - 100;// Add +- 100 ms random to facilitate competition
+                    LOG.debug("Retrying for the " + counter + " time. Sleep for " + sleeptime + "; Method=" + method);
+                    try {
+                        Thread.sleep(sleeptime);
+                    } catch (InterruptedException e) {
+                        LOG.error(e.toString());
+                    }
+
+                    //Try executing the call
+                    if (exchange.isFree()) {
+                        LOG.debug("Finally the exchange is free, executing query after " + counter + " attempt. Method=" + method);
+                        exchange.setBusy();
+                        queryResult = service.executeQuery(base, method, args, needAuth, isGet);
+                        exchange.setFree();
+                        break; //Exit loop
+                    } else {
+                        LOG.debug("Exchange still busy : " + counter + " .Will retry soon; Method=" + method);
+                        exit = false;
+                    }
+                    if (System.currentTimeMillis() - startTimeStamp >= Settings.TIMEOUT_QUERY_RETRY) {
+                        exit = true;
+                        LOG.error("Method=" + method + " failed too many times and timed out. attempts = " + counter);
+                    }
+                } while (!exit);
+            }
         } else {
-            LOG.error("The bot will not execute the query, there is no connection to ccdek");
+            LOG.error("The bot will not execute the query, there is no connection with" + exchange.getName());
             queryResult = TOKEN_BAD_RETURN;
         }
         return queryResult;
@@ -633,7 +713,7 @@ public class PoloniexWrapper implements TradeInterface {
                 // add nonce and build arg list
                 if (needAuth) {
                     String nonce = createNonce();
-                    LOG.debug("nonce used " + nonce);
+                    LOG.trace("nonce used " + nonce);
                     args.put("nonce", nonce);
                     args.put("command", method);
 
@@ -642,7 +722,7 @@ public class PoloniexWrapper implements TradeInterface {
                     // args signature with apache cryptographic tools
                     String toHash = post_data;
 
-                    signature = signRequest(keys.getPrivateKey(), toHash);
+                    signature = TradeUtils.signRequest(keys.getPrivateKey(), toHash, SIGN_HASH_FUNCTION, ENCODING);
                 }
 
 
@@ -698,16 +778,18 @@ public class PoloniexWrapper implements TradeInterface {
                     }
                 }
             } //Capture Exceptions
+            //2ERROR - Poloniex API returned an error: Nonce must be greater than 14296103443350000. You provided 2. [c.n.n.t.w.PoloniexWrapper:106]
+
             catch (IllegalStateException ex) {
-                LOG.error(ex.toString());
+                LOG.error("IllegalStateException: " + ex.toString());
                 return null;
             } catch (NoRouteToHostException | UnknownHostException ex) {
                 //Global.BtceExchange.setConnected(false);
-                LOG.error(ex.toString());
+                LOG.error("NoRouteToHostException: " + ex.toString());
 
                 answer = TOKEN_BAD_RETURN;
             } catch (IOException ex) {
-                LOG.error(ex.toString());
+                LOG.error("IOException: " + ex.toString());
                 return null;
             } finally {
                 //close the connection, set all objects to null
@@ -716,46 +798,18 @@ public class PoloniexWrapper implements TradeInterface {
             return answer;
         }
 
-        @Override
-        public String signRequest(String secret, String hash_data) {
-            String sign = "";
-            try {
-                Mac mac = null;
-                SecretKeySpec key = null;
-                // Create a new secret key
-                try {
-                    key = new SecretKeySpec(secret.getBytes(ENCODING), SIGN_HASH_FUNCTION);
-                } catch (UnsupportedEncodingException uee) {
-                    LOG.error("Unsupported encoding exception: " + uee.toString());
-                }
-
-                // Create a new mac
-                try {
-                    mac = Mac.getInstance(SIGN_HASH_FUNCTION);
-                } catch (NoSuchAlgorithmException nsae) {
-                    LOG.error("No such algorithm exception: " + nsae.toString());
-                }
-
-                // Init mac with key.
-                try {
-                    mac.init(key);
-                } catch (InvalidKeyException ike) {
-                    LOG.error("Invalid key exception: " + ike.toString());
-                }
-
-                sign = Hex.encodeHexString(mac.doFinal(hash_data.getBytes(ENCODING)));
-
-            } catch (UnsupportedEncodingException ex) {
-                LOG.error(ex.toString());
-            }
-            return sign;
-        }
 
         private String createNonce() {
+
             //potential FIX: add some time to the nonce, since time sync has issues
             //long fixtime = 1000;
-            long toRet = System.currentTimeMillis(); // + fixtime;
-            return Long.toString(toRet);
+            if (!fixNonce)
+                return "" + System.currentTimeMillis();
+            else {
+                nonceCount++;
+                LOG.trace("nonce used " + nonceCount);
+                return "" + nonceCount;
+            }
         }
     }
 }

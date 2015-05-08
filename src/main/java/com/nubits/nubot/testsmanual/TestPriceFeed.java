@@ -18,21 +18,19 @@
 
 package com.nubits.nubot.testsmanual;
 
-import com.nubits.nubot.bot.Global;
 import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
 import com.nubits.nubot.models.LastPrice;
 import com.nubits.nubot.options.NuBotConfigException;
-import com.nubits.nubot.pricefeeds.*;
-import com.nubits.nubot.pricefeeds.PriceFeedManager.LastPriceResponse;
+import com.nubits.nubot.pricefeeds.FeedFacade;
+import com.nubits.nubot.pricefeeds.PriceFeedManager;
 import com.nubits.nubot.pricefeeds.feedservices.*;
 import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.utils.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
 
@@ -47,18 +45,19 @@ public class TestPriceFeed {
     private static final Logger LOG = LoggerFactory.getLogger(TestPriceFeed.class.getName());
 
     public static void main(String a[]) {
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestPriceFeed.class.getSimpleName());
 
         TestPriceFeed test = new TestPriceFeed();
         test.init();
-        //test.executeSingle(BitcoinaveragePriceFeed, Constant.BTC_USD); //Uncomment to test a single price feed
+        //test.executeSingle(new GooglePriceFeed(), CurrencyList.EUR_USD); //Uncomment to test a single price feed
 
-        test.trackBTC(); //Test BTC
-        test.trackPPC(); //Test PPC
-        test.trackEUR(); //Test EUR
-        test.trackCNY(); //Test CNY
-        test.trackHKD(); //Test HKD
-        test.trackPHP(); //Test PHP
+        //test.trackBTC(); //Test BTC
+        //test.trackPPC(); //Test PPC
+        //test.trackEUR(); //Test EUR
+        //test.trackCNY(); //Test CNY
+        //test.trackHKD(); //Test HKD
+        //test.trackPHP(); //Test PHP
+        test.trackJPY(); //TEST JPY
 
     }
 
@@ -112,12 +111,24 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(OpenexchangeratesPriceFeed.name);
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
-        backupFeedList.add(ExchangeratelabPriceFeed.name);
+        backupFeedList.add(FeedFacade.OpenexchangeratesPriceFeed);
+        backupFeedList.add(FeedFacade.GooglePriceFeed);
+        backupFeedList.add(FeedFacade.ExchangeratelabPriceFeed);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.EUR_USD);
+    }
+
+    private void trackJPY() {
+        String mainFeed = FeedFacade.OpenexchangeratesPriceFeed;
+
+        ArrayList<String> backupFeedList = new ArrayList<>();
+
+        backupFeedList.add(FeedFacade.YahooPriceFeed);
+        backupFeedList.add(FeedFacade.GooglePriceFeed);
+        backupFeedList.add(FeedFacade.ExchangeratelabPriceFeed);
+
+        execute(mainFeed, backupFeedList, CurrencyList.JPY_USD);
     }
 
     private void trackHKD() {
@@ -125,7 +136,7 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(GooglePriceFeed.name);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.HKD_USD);
@@ -136,7 +147,7 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(GooglePriceFeed.name);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
 
         execute(mainFeed, backupFeedList, CurrencyList.PHP_USD);
@@ -147,7 +158,7 @@ public class TestPriceFeed {
 
         ArrayList<String> backupFeedList = new ArrayList<>();
 
-        backupFeedList.add(GoogleUnofficialPriceFeed.name);
+        backupFeedList.add(GooglePriceFeed.name);
         backupFeedList.add(FeedFacade.YahooPriceFeed);
         backupFeedList.add(ExchangeratelabPriceFeed.name);
 
@@ -157,13 +168,14 @@ public class TestPriceFeed {
     private void execute(String mainFeed, ArrayList<String> backupFeedList, CurrencyPair pair) {
 
         PriceFeedManager pfm = null;
-        try{
+        try {
             pfm = new PriceFeedManager(mainFeed, backupFeedList, pair);
-        }catch(NuBotConfigException e){
+        } catch (NuBotConfigException e) {
             LOG.error(e.toString());
         }
 
-        ArrayList<LastPrice> priceList = pfm.fetchLastPrices().getPrices();
+        pfm.fetchLastPrices();
+        ArrayList<LastPrice> priceList = pfm.getLastPrices();
 
         LOG.info("\n\n\n ---------------------- Testing results for: " + pair.toStringSepSpecial("/"));
         LOG.info("Positive response from " + priceList.size() + "/" + pfm.getFeedList().size() + " feeds\n");

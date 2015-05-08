@@ -24,9 +24,9 @@ import com.nubits.nubot.models.*;
 import com.nubits.nubot.options.NuBotConfigException;
 import com.nubits.nubot.options.NuBotOptions;
 import com.nubits.nubot.options.ParseOptions;
-import com.nubits.nubot.utils.InitTests;
 import com.nubits.nubot.testsmanual.WrapperTestUtils;
 import com.nubits.nubot.trading.TradeInterface;
+import com.nubits.nubot.utils.InitTests;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -66,11 +66,10 @@ public class TestExchangePeatio extends TestCase {
         }
     }
 
-    private TradeInterface setupTI(){
+    private TradeInterface setupTI() {
         NuBotOptions opt = null;
         try {
-            opt = ParseOptions
-                    .parseOptionsSingle(testconfig);
+            opt = ParseOptions.parseOptionsSingle(testconfig, false);
 
             assertTrue(opt != null);
 
@@ -86,9 +85,9 @@ public class TestExchangePeatio extends TestCase {
         Global.options = opt;
 
 
-        try{
+        try {
             WrapperTestUtils.configureExchange(opt.getExchangeName());
-        }catch(NuBotConfigException ex){
+        } catch (NuBotConfigException ex) {
 
         }
 
@@ -111,7 +110,7 @@ public class TestExchangePeatio extends TestCase {
 
         long start = System.currentTimeMillis();
         ApiResponse balancesResponse = ti.getAvailableBalance(CurrencyList.BTC);
-        assertTrue(balancesResponse!=null);
+        assertTrue(balancesResponse != null);
         long stop = System.currentTimeMillis();
         long delta = stop - start;
         assertTrue(delta < 5000);

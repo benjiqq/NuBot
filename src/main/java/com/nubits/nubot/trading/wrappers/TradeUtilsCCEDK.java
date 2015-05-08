@@ -21,7 +21,6 @@ package com.nubits.nubot.trading.wrappers;
 
 import com.nubits.nubot.models.CurrencyList;
 import com.nubits.nubot.models.CurrencyPair;
-import com.nubits.nubot.trading.TradeUtils;
 import com.nubits.nubot.utils.Utils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -36,35 +35,38 @@ public class TradeUtilsCCEDK {
 
     private static final Logger LOG = LoggerFactory.getLogger(TradeUtilsCCEDK.class.getName());
 
+    //The two methods below have been amalgamated into the CCDEK wrapper
+    public static int offset = 0;
+
     public static String getCCDKEvalidNonce() {
         //It tries to send a wrong nonce, get the allowed window, and use it for the actual call
         String wrongNonce = "1234567891";
         String lastdigits;
         //LOG.info("Offset = " + Objects.toStringSep(offset));
         String validNonce;
-        if (TradeUtils.offset == 0) {
+        if (offset == 0) {
             try {
                 String htmlString = Utils.getHTML("https://www.ccedk.com/api/v1/currency/list?nonce=" + wrongNonce, false);
                 //LOG.info(htmlString);
                 //LOG.info(Objects.toStringSep(System.currentTimeMillis() / 1000L));
                 validNonce = getCCDKEvalidNonce(htmlString);
-                TradeUtils.offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
+                offset = Integer.parseInt(validNonce) - (int) (System.currentTimeMillis() / 1000L);
                 //LOG.info("Offset = " + Objects.toStringSep(offset));
             } catch (IOException io) {
                 //LOG.info(io.toStringSep());
                 validNonce = "";
             }
         } else {
-            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + TradeUtils.offset) - 1);
+            validNonce = Objects.toString(((int) (System.currentTimeMillis() / 1000L) + offset) - 1);
         }
         if (!validNonce.equals("")) {
             lastdigits = validNonce.substring(validNonce.length() - 2);
             if (lastdigits.equals("98") || lastdigits.equals("99")) {
-                TradeUtils.offset = 0;
+                offset = 0;
                 validNonce = getCCDKEvalidNonce();
             }
         } else {
-            TradeUtils.offset = 0;
+            offset = 0;
             validNonce = getCCDKEvalidNonce();
         }
         //LOG.info("Last digits = " + lastdigits + "\nvalidNonce = " + validNonce);

@@ -38,10 +38,16 @@ public class TestRPCLiquidityInfo {
     }
 
     private static final Logger LOG = LoggerFactory.getLogger(TestRPCLiquidityInfo.class.getName());
+
+    private static final String NUD_RPC_USER = "nubotTestUser";
+    private static final String NUD_RPC_PASS = "nubotTestPass";
+    private static final String CUSTODIAN_PUBLIC_ADDRESS = "bVcXrdTgrMSg6J2YqsLedCbi6Ubek9eTe5"; //testnet elected custodian
+
     /**
      * Configure tests
      */
     private static final String TEST_OPTIONS_PATH = "config/myconfig/comkort.json";
+
     private static String ipTest = "127.0.0.1";
     private static int portTest = 9091;
     private static boolean verbose = false;
@@ -50,16 +56,18 @@ public class TestRPCLiquidityInfo {
 
     public static void main(String[] args) {
 
-        InitTests.setLoggingFilename(LOG);
+        InitTests.setLoggingFilename(TestRPCLiquidityInfo.class.getSimpleName());
 
         InitTests.loadConfig(TEST_OPTIONS_PATH);  //Load settings
 
         //Default values
-        String custodian = Settings.CUSTODIAN_PUBLIC_ADDRESS;
-        String user = Settings.NUD_RPC_USER;
-        String pass = Settings.NUD_RPC_PASS;
-        double sell = 13.1;
-        double buy = 11.0;
+
+        String custodian = CUSTODIAN_PUBLIC_ADDRESS;
+        String user = NUD_RPC_USER;
+        String pass = NUD_RPC_PASS;
+        double sell = 0;
+        double buy = 0;
+
         //java -jar testRPC user pass custodian sell buy
         if (args.length == 5) {
             LOG.info("Reading input parameters");
@@ -70,8 +78,7 @@ public class TestRPCLiquidityInfo {
             buy = Double.parseDouble(args[4]);
         }
 
-        Global.rpcClient = new NuRPCClient("127.0.0.1", 9091,
-                user, pass, true, custodian, CurrencyList.NBT_BTC, "");
+        Global.rpcClient = new NuRPCClient("127.0.0.1", 9091, user, pass, true, custodian, CurrencyList.NBT_BTC, "");
 
         TestRPCLiquidityInfo test = new TestRPCLiquidityInfo();
 
@@ -129,7 +136,7 @@ public class TestRPCLiquidityInfo {
 
     private void testCheckNudTask() {
         //Create a TaskManager and
-        Global.taskManager = new TaskManager(false);
+        Global.taskManager = new TaskManager();
         Global.taskManager.setNudTask();
         //Start checking for connection
         Global.taskManager.getCheckNudTask().start();

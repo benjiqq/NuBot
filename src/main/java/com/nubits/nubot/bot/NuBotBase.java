@@ -20,10 +20,10 @@ package com.nubits.nubot.bot;
 
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.joran.util.ConfigurationWatchListUtil;
-import com.nubits.nubot.RPC.NuSetup;
 import com.nubits.nubot.exchanges.Exchange;
 import com.nubits.nubot.exchanges.ExchangeFacade;
 import com.nubits.nubot.exchanges.ExchangeLiveData;
+import com.nubits.nubot.global.Settings;
 import com.nubits.nubot.launch.MainLaunch;
 import com.nubits.nubot.models.ApiResponse;
 import com.nubits.nubot.models.CurrencyList;
@@ -43,6 +43,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Abstract NuBot. implements all primitives without the strategy itself
@@ -56,11 +58,6 @@ public abstract class NuBotBase {
 
     final static Logger LOG = LoggerFactory.getLogger(NuBotBase.class);
 
-    /**
-     * Logger for session data. called only once per session
-     */
-    // private static final Logger sessionLOG = LoggerFactory.getLogger("SessionLOG"); //TODO remove if never used
-
     protected String mode;
 
     protected boolean liveTrading;
@@ -72,8 +69,8 @@ public abstract class NuBotBase {
     protected void setupAllConfig() {
 
         //Generate Bot Session unique id
-        Global.sessionId = Utils.generateSessionID();
-        LOG.info("Session ID = " + Global.sessionId);
+        SessionManager.sessionId = Utils.generateSessionID();
+        LOG.info("Session ID = " + SessionManager.sessionId);
 
         this.mode = "sell-side";
         if (Global.options.isDualSide()) {
@@ -102,15 +99,13 @@ public abstract class NuBotBase {
         //Disable hipchat debug logging https://github.com/evanwong/hipchat-java/issues/16
         System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "error");
 
-        //print loggers
-
-        /*List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
+        List<ch.qos.logback.classic.Logger> llist = loggerContext.getLoggerList();
 
         Iterator<ch.qos.logback.classic.Logger> it = llist.iterator();
         while (it.hasNext()) {
             ch.qos.logback.classic.Logger l = it.next();
-            LOG.debug("" + l);
-        }*/
+            LOG.trace("" + l);
+        }
     }
 
     protected void setupSSL() {
@@ -124,7 +119,8 @@ public abstract class NuBotBase {
 
 
     protected void setupExchange() {
-        LOG.info("setup Exchange object");
+
+        LOG.debug("setup Exchange object");
 
         LOG.debug("Wrap the keys into a new ApiKeys object");
         ApiKeys keys = new ApiKeys(Global.options.getApiSecret(), Global.options.getApiKey());
@@ -141,12 +137,6 @@ public abstract class NuBotBase {
         } catch (Exception e) {
             MainLaunch.exitWithNotice("exchange unknown");
         }
-
-        //TODO remove this block after testing it
-        //TradeInterface ti = ExchangeFacade.getInterfaceByName(Global.options.getExchangeName());
-        //LOG.debug("Create a new TradeInterface object");
-        //ti.setKeys(keys);
-        //ti.setExchange(Global.exchange);
 
 
         //TODO handle on exchange level, not bot level
@@ -173,18 +163,6 @@ public abstract class NuBotBase {
         Global.exchange.getLiveData().setUrlConnectionCheck(Global.exchange.getTrade().getUrlConnectionCheck());
 
 
-        //For a 0 tx fee market, force a price-offset of 0.1%
-        ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
-        if (txFeeResponse.isPositive()) {
-            double txfee = (Double) txFeeResponse.getResponseObject();
-            if (txfee == 0) {
-                LOG.warn("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
-                double maxOffset = 0.1;
-                if (Global.options.getSpread() < maxOffset) {
-                    Global.options.setSpread(maxOffset);
-                }
-            }
-        }
     }
 
     protected void checkNuConn() throws NuBotConnectionException {
@@ -197,17 +175,31 @@ public abstract class NuBotBase {
     }
 
     /**
+     * test setup exchange
+     *
+     * @throws NuBotRunException
+     */
+    public void testExchange() throws NuBotRunException {
+
+        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
+        if (activeOrdersResponse.isPositive()) {
+        } else {
+            throw new NuBotRunException("could not query exchange: [ " + activeOrdersResponse.getError() + " ]");
+        }
+    }
+
+    /**
      * execute the NuBot based on a configuration
      */
-    public void execute(NuBotOptions opt) {
+    public void execute(NuBotOptions opt) throws NuBotRunException {
 
         LOG.info("Setting up NuBot version : " + VersionInfo.getVersionName());
 
-        //DANGER ZONE : This variable set to true will cause orders to execute
         if (opt.isExecuteOrders()) {
             liveTrading = true;
+            LOG.info("Live mode : Trades will be executed");
         } else {
-            LOG.info("Trades will not be executed [executetrade:false]");
+            LOG.info("Demo mode: Trades will not be executed [executetrade:false]");
             liveTrading = false;
         }
 
@@ -217,36 +209,46 @@ public abstract class NuBotBase {
 
         LOG.debug("Create a TaskManager ");
         Global.taskManager = new TaskManager();
+        Global.taskManager.setTasks();
 
         if (Global.options.isSubmitliquidity()) {
-            NuSetup.setupNuRPCTask();
-            NuSetup.startTask();
+            Global.taskManager.setupNuRPCTask();
+            Global.taskManager.startTaskNu();
         }
 
-
         LOG.debug("Starting task : Check connection with exchange");
-        int conn_delay = 1;
-        Global.taskManager.getCheckConnectionTask().start(conn_delay);
 
+        Global.taskManager.getCheckConnectionTask().start(Settings.DELAY_CONN);
 
-        LOG.info("Waiting  a for the connectionThreads to detect connection");
+        LOG.info("Waiting a for the connectionThreads to detect connection");
         try {
-            Thread.sleep(3000);
+            Thread.sleep(Settings.WAIT_CHECK_INTERVAL);
         } catch (InterruptedException ex) {
             LOG.error(ex.toString());
         }
 
-        //test setup exchange
-        ApiResponse activeOrdersResponse = Global.exchange.getTrade().getActiveOrders(Global.options.getPair());
-        if (activeOrdersResponse.isPositive()) {
-        } else {
-            MainLaunch.exitWithNotice("could not query exchange. exchange setup went wrong [ " + activeOrdersResponse.getError() + " ]");
+
+        //For a 0 tx fee market, force a price-offset of 0.1%
+        ApiResponse txFeeResponse = Global.exchange.getTrade().getTxFee(Global.options.getPair());
+        if (txFeeResponse.isPositive()) {
+            double txfee = (Double) txFeeResponse.getResponseObject();
+            if (txfee == 0) {
+                LOG.warn("The bot detected a 0 TX fee : forcing a priceOffset of 0.1% [if required]");
+                double maxOffset = 0.1;
+                if (Global.options.getSpread() < maxOffset) {
+                    Global.options.setSpread(maxOffset);
+                }
+            }
         }
 
+        testExchange();
 
         //Start task to check orders
-        int start_delay = 40;
-        Global.taskManager.getSendLiquidityTask().start(start_delay);
+        try {
+            Global.taskManager.getSendLiquidityTask().start(Settings.DELAY_LIQUIIDITY);
+        } catch (Exception e) {
+            throw new NuBotRunException("" + e);
+        }
 
         if (Global.options.isSubmitliquidity()) {
             try {
@@ -258,16 +260,16 @@ public abstract class NuBotBase {
 
         LOG.info("Start trading Strategy specific for " + Global.options.getPair().toString());
 
-        LOG.info("Options loaded : " + Global.options.toStringNoKeys());
+        LOG.info("Options loaded : " + Global.options.toString());
 
         // Set the frozen balance manager in the global variable
 
-        Global.frozenBalances = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
+        Global.frozenBalancesManager = new FrozenBalancesManager(Global.options.getExchangeName(), Global.options.getPair());
 
         try {
             configureStrategy();
-        } catch (NuBotConfigException e) {
-            MainLaunch.exitWithNotice("can't configure strategy");
+        } catch (Exception e) {
+            throw new NuBotRunException("" + e);
         }
 
         notifyOnline();
@@ -282,30 +284,45 @@ public abstract class NuBotBase {
         HipChatNotifications.sendMessage(msg, MessageColor.GREEN);
     }
 
+    private void logSessionStatistics() {
+
+        LOG.info("session statistics");
+        //log closing statistics
+        LOG.info("totalOrdersSubmitted " + Global.orderManager.getTotalOrdersSubmitted());
+
+        String openStrongTaging = "<strong>";
+        String closingStrongTaging = "</strong>";
+
+        String additionalInfo = "after " + Utils.getBotUptimeDate() + " uptime on "
+                + openStrongTaging + Global.options.getExchangeName() + closingStrongTaging + " ["
+                + Global.options.getPair().toStringSep() + "]";
+
+        LOG.info(additionalInfo.replace(closingStrongTaging, "").replace(openStrongTaging, "")); //Remove html tags
+        HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
+
+        LOG.debug("startup duration [msec]: " + SessionManager.startupDuration);
+    }
+
     public void shutdownBot() {
 
         LOG.info("Bot shutting down sequence started.");
-
-        String additionalInfo = "after " + Utils.getBotUptime() + " uptime on "
-                + Global.options.getExchangeName() + " ["
-                + Global.options.getPair().toStringSep() + "]";
-
-        HipChatNotifications.sendMessageCritical("Bot shut-down " + additionalInfo);
 
         //Interrupt all BotTasks
 
         if (Global.taskManager != null) {
             if (Global.taskManager.isInitialized()) {
                 try {
+                    LOG.info("try to shutdown all tasks");
                     Global.taskManager.stopAll();
                 } catch (IllegalStateException e) {
-
+                    LOG.error(e.toString());
                 }
             }
         }
 
         //Try to cancel all orders, if any
         if (Global.exchange.getTrade() != null && Global.options.getPair() != null) {
+
             LOG.info("Clearing out active orders ... ");
 
             ApiResponse deleteOrdersResponse = Global.exchange.getTrade().clearOrders(Global.options.getPair());
@@ -318,7 +335,7 @@ public abstract class NuBotBase {
                     LOG.error("Could not submit request to clear orders");
                 }
             } else {
-                LOG.error(deleteOrdersResponse.getError().toString());
+                LOG.error("error canceling orders: " + deleteOrdersResponse.getError().toString());
             }
         }
 
@@ -346,7 +363,14 @@ public abstract class NuBotBase {
             }
         }
 
+
         LOG.info("Logs of this session saved in " + Global.sessionPath);
+        SessionManager.setModeHalted();
+        SessionManager.sessionStopped = System.currentTimeMillis();
+        LOG.info("** end of the session **");
+
+        logSessionStatistics();
+
     }
 
 }
