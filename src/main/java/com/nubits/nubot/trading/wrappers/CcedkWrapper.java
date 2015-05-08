@@ -250,7 +250,7 @@ public class CcedkWrapper implements TradeInterface {
                         if (tempOrder.getType().equalsIgnoreCase(Constant.SELL)) {
                             NBTonOrder += tempOrder.getAmount().getQuantity();
                         } else {
-                            PEGonOrder += tempOrder.getAmount().getQuantity();
+                            PEGonOrder += tempOrder.getAmount().getQuantity() * tempOrder.getPrice().getQuantity();
                         }
                     }
                     NBTOnOrderAmount = new Amount(NBTonOrder, pair.getOrderCurrency());
