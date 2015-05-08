@@ -33,6 +33,10 @@
         font-size:x-small;
  }
 
+ #logareadiv {
+    margin-top : 10px;
+ }
+
  .running-logarea
  {
          background-color: white !important;
