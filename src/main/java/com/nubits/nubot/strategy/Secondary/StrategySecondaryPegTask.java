@@ -278,11 +278,5 @@ public class StrategySecondaryPegTask extends TimerTask {
         this.priceDirection = priceDirection;
     }
 
-    public boolean isResettingOrders() {
-        return resettingOrders;
-    }
 
-    public void setResettingOrders(boolean resettingOrders) {
-        this.resettingOrders = resettingOrders;
-    }
 }
